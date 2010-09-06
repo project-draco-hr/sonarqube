@@ -1,0 +1,9 @@
+{
+  Squid squid=new Squid(new JavaSquidConfiguration());
+  squid.register(JavaAstScanner.class).scanDirectory(getFile("/bytecode/virtualMethodsLinker/src"));
+  squid.registerVisitor(UnusedProtectedMethodCheck.class);
+  squid.register(BytecodeScanner.class).scanDirectory(getFile("/bytecode/virtualMethodsLinker/bin"));
+  squid.decorateSourceCodeTreeWith(Metric.values());
+  SourceFile file=(SourceFile)squid.search("Animal.java");
+  assertThat(file.getCheckMessages().size(),is(0));
+}

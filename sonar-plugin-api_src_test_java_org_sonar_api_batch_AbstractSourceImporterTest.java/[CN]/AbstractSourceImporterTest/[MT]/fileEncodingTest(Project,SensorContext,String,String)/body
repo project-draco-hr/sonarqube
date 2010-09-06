@@ -1,0 +1,17 @@
+{
+  DefaultProjectFileSystem fileSystem=mock(DefaultProjectFileSystem.class);
+  when(project.getFileSystem()).thenReturn(fileSystem);
+  when(fileSystem.getSourceCharset()).thenReturn(Charset.forName(encoding));
+  when(project.getConfiguration()).thenReturn(new MapConfiguration(new HashMap<String,String>()));
+  when(fileSystem.getSourceFiles((Language)anyObject())).thenReturn(Arrays.asList(new File("test-resources/org/sonar/api/batch/AbstractSourceImporterTest/encoding/" + testFile)));
+  importer.analyse(project,context);
+  verify(context).saveSource(eq(FakeSourceImporter.TEST_RESOURCE),argThat(new BaseMatcher<String>(){
+    public boolean matches(    Object arg0){
+      String source=(String)arg0;
+      return source.contains(aClaess) && source.contains(explicacao);
+    }
+    public void describeTo(    Description arg0){
+    }
+  }
+));
+}

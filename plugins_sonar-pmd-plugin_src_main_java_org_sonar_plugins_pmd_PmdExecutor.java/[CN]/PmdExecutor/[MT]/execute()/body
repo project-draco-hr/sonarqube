@@ -1,0 +1,34 @@
+{
+  TimeProfiler profiler=new TimeProfiler().start("Execute PMD " + PmdVersion.getVersion());
+  ClassLoader initialClassLoader=Thread.currentThread().getContextClassLoader();
+  Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+  try {
+    PMD pmd=new PMD();
+    setJavaVersion(pmd,project);
+    RuleContext ruleContext=new RuleContext();
+    Report report=new Report();
+    ruleContext.setReport(report);
+    RuleSets rulesets=createRulesets();
+    for (    File file : project.getFileSystem().getSourceFiles(Java.INSTANCE)) {
+      ruleContext.setSourceCodeFilename(file.getAbsolutePath());
+      Reader fileReader=new InputStreamReader(new FileInputStream(file),project.getFileSystem().getSourceCharset());
+      try {
+        pmd.processFile(fileReader,rulesets,ruleContext);
+      }
+ catch (      PMDException e) {
+        LOG.error("Fail to execute PMD. Following file is ignored: " + file,e.getCause());
+      }
+catch (      Exception e) {
+        LOG.error("Fail to execute PMD. Following file is ignored: " + file,e);
+      }
+ finally {
+        IOUtils.closeQuietly(fileReader);
+      }
+    }
+    return writeXmlReport(project,report);
+  }
+  finally {
+    profiler.stop();
+    Thread.currentThread().setContextClassLoader(initialClassLoader);
+  }
+}

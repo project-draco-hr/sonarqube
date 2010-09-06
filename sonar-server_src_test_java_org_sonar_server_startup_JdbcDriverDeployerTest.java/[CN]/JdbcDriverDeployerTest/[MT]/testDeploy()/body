@@ -1,0 +1,12 @@
+{
+  DefaultServerFileSystem fs=mock(DefaultServerFileSystem.class);
+  File initialDriver=TestUtils.getResource(getClass(),"deploy/my-driver.jar");
+  when(fs.getJdbcDriver()).thenReturn(initialDriver);
+  File deployed=new File(TestUtils.getTestTempDir(getClass(),"deploy",true),"copy.jar");
+  assertThat(deployed.exists(),is(false));
+  when(fs.getDeployedJdbcDriver()).thenReturn(deployed);
+  JdbcDriverDeployer deployer=new JdbcDriverDeployer(fs);
+  deployer.start();
+  assertThat(deployed.exists(),is(true));
+  assertThat(deployed.length(),is(initialDriver.length()));
+}

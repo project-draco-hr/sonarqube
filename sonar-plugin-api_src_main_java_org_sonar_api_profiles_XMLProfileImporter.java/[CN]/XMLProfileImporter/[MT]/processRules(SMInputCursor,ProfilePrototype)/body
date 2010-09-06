@@ -1,0 +1,23 @@
+{
+  while (rulesCursor.getNext() != null) {
+    SMInputCursor ruleCursor=rulesCursor.childElementCursor();
+    ProfilePrototype.RulePrototype rule=ProfilePrototype.RulePrototype.create();
+    profile.activateRule(rule);
+    while (ruleCursor.getNext() != null) {
+      String nodeName=ruleCursor.getLocalName();
+      if (StringUtils.equals("repositoryKey",nodeName)) {
+        rule.setRepositoryKey(StringUtils.trim(ruleCursor.collectDescendantText(false)));
+      }
+ else       if (StringUtils.equals("key",nodeName)) {
+        rule.setKey(StringUtils.trim(ruleCursor.collectDescendantText(false)));
+      }
+ else       if (StringUtils.equals("priority",nodeName)) {
+        rule.setPriority(RulePriority.valueOf(StringUtils.trim(ruleCursor.collectDescendantText(false))));
+      }
+ else       if (StringUtils.equals("parameters",nodeName)) {
+        SMInputCursor propsCursor=ruleCursor.childElementCursor("parameter");
+        processParameters(propsCursor,rule);
+      }
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  String keyAttribute=ruleC.getAttrValue("key");
+  if (StringUtils.isNotBlank(keyAttribute)) {
+    rule.setKey(StringUtils.trim(keyAttribute));
+  }
+  String priorityAttribute=ruleC.getAttrValue("priority");
+  if (StringUtils.isNotBlank(priorityAttribute)) {
+    rule.setPriority(RulePriority.valueOf(StringUtils.trim(priorityAttribute)));
+  }
+  SMInputCursor cursor=ruleC.childElementCursor();
+  while (cursor.getNext() != null) {
+    String nodeName=cursor.getLocalName();
+    if (StringUtils.equalsIgnoreCase("name",nodeName)) {
+      rule.setName(StringUtils.trim(cursor.collectDescendantText(false)));
+    }
+ else     if (StringUtils.equalsIgnoreCase("description",nodeName)) {
+      rule.setDescription(StringUtils.trim(cursor.collectDescendantText(false)));
+    }
+ else     if (StringUtils.equalsIgnoreCase("key",nodeName)) {
+      rule.setKey(StringUtils.trim(cursor.collectDescendantText(false)));
+    }
+ else     if (StringUtils.equalsIgnoreCase("configKey",nodeName)) {
+      rule.setConfigKey(StringUtils.trim(cursor.collectDescendantText(false)));
+    }
+ else     if (StringUtils.equalsIgnoreCase("priority",nodeName)) {
+      rule.setPriority(RulePriority.valueOf(StringUtils.trim(cursor.collectDescendantText(false))));
+    }
+ else     if (StringUtils.equalsIgnoreCase("category",nodeName)) {
+      String category=StringUtils.trim(StringUtils.defaultString(cursor.getAttrValue("name"),cursor.collectDescendantText(false)));
+      rule.setRulesCategory(new RulesCategory(category));
+    }
+ else     if (StringUtils.equalsIgnoreCase("cardinality",nodeName)) {
+      rule.setCardinality(Rule.Cardinality.valueOf(StringUtils.trim(cursor.collectDescendantText(false))));
+    }
+ else     if (StringUtils.equalsIgnoreCase("param",nodeName)) {
+      processParameter(rule,cursor);
+    }
+  }
+  if (StringUtils.isEmpty(rule.getKey())) {
+    throw new SonarException("Node <key> is missing in <rule>");
+  }
+  if (StringUtils.isEmpty(rule.getName())) {
+    throw new SonarException("Node <name> is missing in <rule>");
+  }
+}

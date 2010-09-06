@@ -1,0 +1,23 @@
+{
+  if (key == null)   throw new NullPointerException("null keys not allowed");
+  if (value == null)   throw new NullPointerException("null values not allowed");
+  purge();
+  if (size + 1 > threshold)   resize();
+  int hash=key.hashCode();
+  int index=indexFor(hash);
+  Entry entry=table[index];
+  while (entry != null) {
+    if ((hash == entry.hash) && key.equals(entry.getKey())) {
+      Object result=entry.getValue();
+      entry.setValue(value);
+      return result;
+    }
+    entry=entry.next;
+  }
+  this.size++;
+  modCount++;
+  key=toReference(keyType,key,hash);
+  value=toReference(valueType,value,hash);
+  table[index]=new Entry(key,hash,value,table[index]);
+  return null;
+}

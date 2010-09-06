@@ -1,0 +1,24 @@
+{
+  final ResourceQuery query=getResourceQuery();
+  Sonar.getInstance().findAll(query,new AbstractListCallback<Resource>(){
+    @Override protected void doOnResponse(    List<Resource> resources){
+      Grid grid=new Grid(resources.size(),11);
+      grid.setStyleName("gwt-Hotspot");
+      int row=0;
+      for (      Resource resource : resources) {
+        if (resource.getMeasures().size() > 0) {
+          renderNameCell(grid,resource,Metrics.WEIGHTED_VIOLATIONS,row,0);
+          renderPriorities(grid,resource,row);
+          row++;
+        }
+      }
+      if (row == 0) {
+        renderEmptyResults();
+      }
+ else {
+        render(grid);
+      }
+    }
+  }
+);
+}

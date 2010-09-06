@@ -1,0 +1,19 @@
+{
+  Collection<RuleMeasure> categDebts=context.getMeasures(MeasuresFilters.ruleCategories(CoreMetrics.WEIGHTED_VIOLATIONS));
+  Set<Integer> categIdsDone=new HashSet<Integer>();
+  if (categDebts != null) {
+    for (    RuleMeasure categDebt : categDebts) {
+      if (MeasureUtils.hasValue(categDebt)) {
+        double density=calculate(categDebt.getValue().intValue(),ncloc);
+        context.saveMeasure(RuleMeasure.createForCategory(CoreMetrics.VIOLATIONS_DENSITY,categDebt.getRuleCategory(),density));
+        context.saveMeasure(metricByCategoryId.get(categDebt.getRuleCategory()),density);
+        categIdsDone.add(categDebt.getRuleCategory());
+      }
+    }
+  }
+  for (  Map.Entry<Integer,Metric> entry : metricByCategoryId.entrySet()) {
+    if (!categIdsDone.contains(entry.getKey())) {
+      context.saveMeasure(entry.getValue(),100.0);
+    }
+  }
+}

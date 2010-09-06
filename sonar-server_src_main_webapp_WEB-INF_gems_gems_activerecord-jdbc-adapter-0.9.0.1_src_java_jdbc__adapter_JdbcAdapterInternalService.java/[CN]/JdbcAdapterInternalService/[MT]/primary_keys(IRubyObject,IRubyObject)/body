@@ -1,0 +1,31 @@
+{
+  return withConnectionAndRetry(recv,new SQLBlock(){
+    public IRubyObject call(    Connection c) throws SQLException {
+      DatabaseMetaData metadata=c.getMetaData();
+      String table_name=_table_name.toString();
+      if (metadata.storesUpperCaseIdentifiers()) {
+        table_name=table_name.toUpperCase();
+      }
+ else       if (metadata.storesLowerCaseIdentifiers()) {
+        table_name=table_name.toLowerCase();
+      }
+      ResultSet result_set=metadata.getPrimaryKeys(null,null,table_name);
+      List keyNames=new ArrayList();
+      Ruby runtime=recv.getRuntime();
+      while (result_set.next()) {
+        String s1=result_set.getString(4);
+        if (metadata.storesUpperCaseIdentifiers() && !HAS_SMALL.matcher(s1).find()) {
+          s1=s1.toLowerCase();
+        }
+        keyNames.add(RubyString.newUnicodeString(runtime,s1));
+      }
+      try {
+        result_set.close();
+      }
+ catch (      Exception e) {
+      }
+      return runtime.newArray(keyNames);
+    }
+  }
+);
+}

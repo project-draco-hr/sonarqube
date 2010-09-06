@@ -1,0 +1,15 @@
+{
+  Bucket bucket=getOrCreateBucket(resource);
+  if (!bucket.isExcluded()) {
+    if (bucket.getMeasures(MeasuresFilters.measure(measure)) != null) {
+      throw new IllegalArgumentException("This measure has already been saved: " + measure + ",resource: "+ resource);
+    }
+    if (shouldPersistMeasure(resource,measure)) {
+      persistMeasure(bucket,measure);
+    }
+    if (measure.getPersistenceMode().useMemory()) {
+      bucket.addMeasure(measure);
+    }
+  }
+  return measure;
+}

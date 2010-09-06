@@ -1,0 +1,22 @@
+{
+  if (!(c instanceof Set)) {
+    throw new IllegalArgumentException("Collections added must implement java.util.Set");
+  }
+  for (Iterator i=this.getCollections().iterator(); i.hasNext(); ) {
+    Set set=(Set)i.next();
+    Collection intersects=CollectionUtils.intersection(set,c);
+    if (intersects.size() > 0) {
+      if (this.mutator == null) {
+        throw new UnsupportedOperationException("Collision adding composited collection with no SetMutator set");
+      }
+ else       if (!(this.mutator instanceof SetMutator)) {
+        throw new UnsupportedOperationException("Collision adding composited collection to a CompositeSet with a CollectionMutator instead of a SetMutator");
+      }
+      ((SetMutator)this.mutator).resolveCollision(this,set,(Set)c,intersects);
+      if (CollectionUtils.intersection(set,c).size() > 0) {
+        throw new IllegalArgumentException("Attempt to add illegal entry unresolved by SetMutator.resolveCollision()");
+      }
+    }
+  }
+  super.addComposited(new Collection[]{c});
+}

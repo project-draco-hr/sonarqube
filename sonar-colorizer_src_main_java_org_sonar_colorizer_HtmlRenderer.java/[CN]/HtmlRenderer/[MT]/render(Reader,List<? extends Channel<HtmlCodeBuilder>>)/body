@@ -1,0 +1,20 @@
+{
+  try {
+    List<Channel<HtmlCodeBuilder>> allTokenizers=new ArrayList<Channel<HtmlCodeBuilder>>();
+    HtmlCodeBuilder codeBuilder=new HtmlCodeBuilder();
+    HtmlDecorator htmlDecorator=new HtmlDecorator(options);
+    if (options != null && options.isGenerateTable()) {
+      codeBuilder.appendWithoutTransforming(htmlDecorator.getTagBeginOfFile());
+      allTokenizers.add(htmlDecorator);
+    }
+    allTokenizers.addAll(tokenizers);
+    new TokenizerDispatcher(allTokenizers).colorize(new CodeReader(code),codeBuilder);
+    if (options != null && options.isGenerateTable()) {
+      codeBuilder.appendWithoutTransforming(htmlDecorator.getTagEndOfFile());
+    }
+    return codeBuilder.toString();
+  }
+ catch (  Exception e) {
+    throw new SynhtaxHighlightingException("Can not render code",e);
+  }
+}

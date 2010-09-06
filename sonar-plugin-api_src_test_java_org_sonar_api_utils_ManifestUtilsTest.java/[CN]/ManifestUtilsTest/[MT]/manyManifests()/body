@@ -1,0 +1,12 @@
+{
+  Manifest mf1=new Manifest();
+  mf1.getMainAttributes().putValue("foo","bar");
+  File jar1=createJar(mf1,"manyManifests-one.jar");
+  Manifest mf2=new Manifest();
+  mf2.getMainAttributes().putValue("foo","otherbar");
+  File jar2=createJar(mf2,"manyManifests-two.jar");
+  URLClassLoader classloader=new URLClassLoader(FileUtils.toURLs(new File[]{jar1,jar2}));
+  List<String> values=ManifestUtils.getPropertyValues(classloader,"foo");
+  assertThat(values.size(),is(2));
+  assertThat(values,hasItems("bar","otherbar"));
+}

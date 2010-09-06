@@ -1,0 +1,11 @@
+{
+  final Logger logger=LoggerFactory.getLogger(FinalizeSnapshotsJob.class);
+  TimeProfiler profiler=new TimeProfiler(logger).start("Database optimization");
+  PurgeContext context=createPurgeContext(currentSnapshot,previousLastSnapshot);
+  logger.debug("Snapshots to purge: " + context);
+  for (  Purge purge : purges) {
+    logger.debug("Executing {}...",purge.getClass().getName());
+    purge.purge(context);
+  }
+  profiler.stop();
+}

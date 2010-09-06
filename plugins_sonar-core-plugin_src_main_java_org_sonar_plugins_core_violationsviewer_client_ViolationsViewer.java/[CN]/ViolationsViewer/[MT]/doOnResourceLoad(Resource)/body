@@ -1,0 +1,44 @@
+{
+  this.resource=resource;
+  mainPanel.clear();
+  mainPanel.add(loading);
+  mainPanel.setWidth("100%");
+  mainPanel.setStyleName("gwt-Violations");
+  header=new Grid(1,5);
+  header.setWidth("100%");
+  header.setStylePrimaryName("gwt-ViewerHeader");
+  header.getCellFormatter().setStyleName(0,0,"thin left");
+  initDefaultFilter();
+  sourcePanel=new ViolationsPanel(resource,defaultFilter);
+  header.setHTML(0,1,"<div class='cell'><span class='note'>" + I18nConstants.INSTANCE.filter() + "</span></div>");
+  header.getCellFormatter().setStyleName(0,1,"right");
+  filterBox=new ListBox();
+  filterBox.addItem(I18nConstants.INSTANCE.noFilters(),"");
+  filterBox.setStyleName("small");
+  filterBox.addChangeHandler(new ChangeHandler(){
+    public void onChange(    ChangeEvent event){
+      String filter=filterBox.getValue(filterBox.getSelectedIndex());
+      loadSources();
+      sourcePanel.filter(filter);
+      sourcePanel.refresh();
+    }
+  }
+);
+  header.setWidget(0,2,filterBox);
+  header.getCellFormatter().setStyleName(0,2,"thin cell right");
+  header.setHTML(0,3,"<div class='note'>" + I18nConstants.INSTANCE.expand() + "</div>");
+  header.getCellFormatter().setStyleName(0,3,"thin right");
+  expandCheckbox=new CheckBox();
+  expandCheckbox.addClickHandler(new ClickHandler(){
+    public void onClick(    ClickEvent event){
+      loadSources();
+      sourcePanel.setExpand(expandCheckbox.getValue());
+      sourcePanel.refresh();
+    }
+  }
+);
+  header.setWidget(0,4,expandCheckbox);
+  header.getCellFormatter().setStyleName(0,4,"thin cell left");
+  loadRulePriorities();
+  return mainPanel;
+}

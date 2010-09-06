@@ -1,0 +1,19 @@
+{
+  String className=ast.findFirstToken(TokenTypes.IDENT).getText();
+  SourceClass unit;
+  if (peekSourceCode().isType(SourceClass.class)) {
+    unit=createSourceClass((SourceClass)peekSourceCode(),className);
+  }
+ else {
+    unit=createSourceClass(peekParentPackage(),className);
+  }
+  addSourceCode(unit);
+  unit.setStartAtLine(ast.getLineNo());
+  unit.setMeasure(Metric.CLASSES,1);
+  if (isInterface(ast.getType())) {
+    unit.setMeasure(Metric.INTERFACES,1);
+  }
+  if (isAbstract(ast)) {
+    unit.setMeasure(Metric.ABSTRACT_CLASSES,1);
+  }
+}

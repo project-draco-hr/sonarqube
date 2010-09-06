@@ -1,0 +1,20 @@
+{
+  ProjectFileSystem fileSystem=mock(ProjectFileSystem.class);
+  when(fileSystem.getSourceDirs()).thenReturn(Collections.<File>emptyList());
+  File file1=new File("target/tmp/file1.ext");
+  Project project=new Project("key").setFileSystem(fileSystem);
+  SensorContext context=mock(SensorContext.class);
+  CpdMapping cpdMapping=mock(CpdMapping.class);
+  Resource resource1=new JavaFile("foo.Foo");
+  when(cpdMapping.createResource((File)anyObject(),anyList())).thenReturn(resource1).thenReturn(resource1);
+  when(context.saveResource(resource1)).thenReturn("key1");
+  Match match1=new Match(304,new TokenEntry(null,file1.getAbsolutePath(),5),new TokenEntry(null,file1.getAbsolutePath(),215));
+  match1.setLineCount(200);
+  CpdAnalyser cpdAnalyser=new CpdAnalyser(project,context,cpdMapping);
+  cpdAnalyser.analyse(Arrays.asList(match1).iterator());
+  verify(context).saveMeasure(resource1,CoreMetrics.DUPLICATED_FILES,1d);
+  verify(context).saveMeasure(resource1,CoreMetrics.DUPLICATED_BLOCKS,2d);
+  verify(context).saveMeasure(resource1,CoreMetrics.DUPLICATED_LINES,400d);
+  verify(context).saveMeasure(eq(resource1),argThat(new IsMeasure(CoreMetrics.DUPLICATIONS_DATA,"<duplications>" + "<duplication lines=\"200\" start=\"5\" target-start=\"215\" target-resource=\"key1\"/>" + "<duplication lines=\"200\" start=\"215\" target-start=\"5\" target-resource=\"key1\"/>"+ "</duplications>")));
+  verify(context,atLeastOnce()).saveResource(resource1);
+}

@@ -1,0 +1,55 @@
+{
+  String groupId=StringUtils.substringBefore(id,":");
+  String artifactId=StringUtils.substringAfter(id,":");
+  Artifact artifact=artifactFactory.createArtifact(groupId,artifactId,Artifact.LATEST_VERSION,Artifact.SCOPE_COMPILE,ARTIFACT_JAR_TYPE);
+  List<ArtifactVersion> versions=filterSnapshots(metadataSource.retrieveAvailableVersions(artifact,localRepository,remoteRepositories));
+  History<Plugin> history=new History<Plugin>();
+  for (  ArtifactVersion version : versions) {
+    Plugin plugin=org.sonar.updatecenter.deprecated.Plugin.extractMetadata(resolve(artifact.getGroupId(),artifact.getArtifactId(),version.toString()));
+    history.addArtifact(version,plugin);
+    MavenProject project=mavenProjectBuilder.buildFromRepository(artifactFactory.createArtifact(groupId,artifactId,version.toString(),Artifact.SCOPE_COMPILE,ARTIFACT_POM_TYPE),remoteRepositories,localRepository);
+    if (plugin.getVersion() == null) {
+      plugin.setKey(project.getArtifactId());
+      plugin.setName(project.getName());
+      plugin.setVersion(project.getVersion());
+      String sonarVersion="1.10";
+      for (      Dependency dependency : project.getDependencies()) {
+        if ("sonar-plugin-api".equals(dependency.getArtifactId())) {
+          sonarVersion=dependency.getVersion();
+        }
+      }
+      plugin.setRequiredSonarVersion(sonarVersion);
+      plugin.setHomepage(project.getUrl());
+    }
+    plugin.setDownloadUrl(getDownloadUrl(groupId,artifactId,plugin.getVersion()));
+    if (project.getIssueManagement() != null) {
+      plugin.setIssueTracker(project.getIssueManagement().getUrl());
+    }
+ else {
+      System.out.println("Unknown Issue Management for " + plugin.getKey() + ":"+ plugin.getVersion());
+    }
+    if (project.getScm() != null) {
+      String scmUrl=project.getScm().getUrl();
+      if (StringUtils.startsWith(scmUrl,"scm:")) {
+        scmUrl=StringUtils.substringAfter(StringUtils.substringAfter(scmUrl,":"),":");
+      }
+      plugin.setSources(scmUrl);
+    }
+ else {
+      System.out.println("Unknown SCM for " + plugin.getKey() + ":"+ plugin.getVersion());
+    }
+    if (project.getLicenses() != null && project.getLicenses().size() > 0) {
+      plugin.setLicense(project.getLicenses().get(0).getName());
+    }
+ else {
+      System.out.println("Unknown License for " + plugin.getKey() + ":"+ plugin.getVersion());
+    }
+    if (project.getDevelopers().size() > 0) {
+      plugin.setDevelopers(project.getDevelopers());
+    }
+ else {
+      System.out.println("Unknown Developers for " + plugin.getKey() + ":"+ plugin.getVersion());
+    }
+  }
+  return history;
+}

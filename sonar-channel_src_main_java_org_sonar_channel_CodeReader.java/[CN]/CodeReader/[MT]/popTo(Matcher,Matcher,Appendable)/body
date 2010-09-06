@@ -1,0 +1,26 @@
+{
+  try {
+    matcher.reset(this);
+    if (matcher.lookingAt()) {
+      if (afterMatcher != null) {
+        afterMatcher.reset(this);
+        afterMatcher.region(matcher.end(),length());
+        if (!afterMatcher.lookingAt()) {
+          return -1;
+        }
+      }
+      previousCursor=getCursor().clone();
+      for (int i=0; i < matcher.end(); i++) {
+        appendable.append((char)pop());
+      }
+      return matcher.end();
+    }
+  }
+ catch (  IndexOutOfBoundsException e) {
+    return -1;
+  }
+catch (  IOException e) {
+    throw new ChannelException(e.getMessage(),e);
+  }
+  return -1;
+}

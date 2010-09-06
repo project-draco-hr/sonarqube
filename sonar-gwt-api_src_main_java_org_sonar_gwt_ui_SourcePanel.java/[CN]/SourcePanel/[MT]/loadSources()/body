@@ -1,0 +1,24 @@
+{
+  Sonar.getInstance().find(SourceQuery.create(resource.getId().toString()).setLinesFromLine(from,length).setHighlightedSyntax(true),new AbstractCallback<Source>(loading){
+    @Override protected void doOnResponse(    Source result){
+      source=result;
+      displaySource();
+    }
+    @Override protected void doOnError(    int errorCode,    String errorMessage){
+      if (errorCode == 404) {
+        panel.add(new HTML("<p style=\"padding: 5px\">No sources</p>"));
+        hasNoSources=true;
+        loading.removeFromParent();
+      }
+ else       if (errorCode == 401) {
+        panel.add(new HTML("<p style=\"padding: 5px\">You're not authorized to view source code</p>"));
+        hasNoSources=true;
+        loading.removeFromParent();
+      }
+ else {
+        super.onError(errorCode,errorMessage);
+      }
+    }
+  }
+);
+}

@@ -1,0 +1,14 @@
+{
+  Reader reader=new InputStreamReader(getClass().getResourceAsStream("/org/sonar/api/profiles/XMLProfileImporterTest/importProfileWithRuleParameters.xml"),CharEncoding.UTF_8);
+  try {
+    ValidationMessages validation=ValidationMessages.create();
+    ProfilePrototype profile=XMLProfileImporter.create().importProfile(reader,validation);
+    assertThat(validation.hasErrors(),is(false));
+    ProfilePrototype.RulePrototype rule=profile.getRule("checkstyle","IllegalRegexp");
+    assertThat(rule.getParameter("format"),is("foo"));
+    assertThat(rule.getParameter("message"),is("with special characters < > &"));
+  }
+  finally {
+    IOUtils.closeQuietly(reader);
+  }
+}

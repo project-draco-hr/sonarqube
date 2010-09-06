@@ -1,0 +1,28 @@
+{
+  URL messages=new URL("http://findbugs.googlecode.com/svn/branches/" + FOR_VERSION + "/findbugs/etc/findbugs.xml");
+  InputStream in=messages.openStream();
+  final List<FindBugsBug> bugs=new ArrayList<FindBugsBug>();
+  StaxParser p=new StaxParser(new StaxParser.XmlStreamHandler(){
+    public void stream(    SMHierarchicCursor rootCursor) throws XMLStreamException {
+      rootCursor.advance();
+      SMInputCursor bugPatterns=rootCursor.descendantElementCursor("BugPattern");
+      collectBugDefs(bugs,bugPatterns);
+    }
+    private void collectBugDefs(    final List<FindBugsBug> bugs,    SMInputCursor bugPatterns) throws XMLStreamException {
+      while (bugPatterns.getNext() != null) {
+        if (bugPatterns.asEvent().isEndElement())         continue;
+        String experimental=bugPatterns.getAttrValue("experimental");
+        boolean isExperimental=(StringUtils.isNotEmpty(experimental) && Boolean.valueOf(experimental)) || bugPatterns.getAttrValue("category").equals("EXPERIMENTAL");
+        String deprecated=bugPatterns.getAttrValue("deprecated");
+        boolean isDeprecated=StringUtils.isNotEmpty(deprecated) && Boolean.valueOf(deprecated);
+        if (!isExperimental && !isDeprecated) {
+          bugs.add(new FindBugsBug(bugPatterns.getAttrValue("category"),bugPatterns.getAttrValue("type")));
+        }
+      }
+    }
+  }
+);
+  p.parse(in);
+  in.close();
+  return bugs;
+}

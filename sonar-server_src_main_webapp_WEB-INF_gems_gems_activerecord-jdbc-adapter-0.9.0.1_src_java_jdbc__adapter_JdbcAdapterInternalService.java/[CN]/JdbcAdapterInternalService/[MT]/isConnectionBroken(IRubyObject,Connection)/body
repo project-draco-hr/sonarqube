@@ -1,0 +1,26 @@
+{
+  try {
+    IRubyObject alive=config_value(recv,"connection_alive_sql");
+    if (select_p(recv,alive).isTrue()) {
+      String connectionSQL=rubyApi.convertToRubyString(alive).toString();
+      Statement s=c.createStatement();
+      try {
+        s.execute(connectionSQL);
+      }
+  finally {
+        try {
+          s.close();
+        }
+ catch (        SQLException ignored) {
+        }
+      }
+      return false;
+    }
+ else {
+      return !c.isClosed();
+    }
+  }
+ catch (  SQLException sx) {
+    return true;
+  }
+}

@@ -1,0 +1,22 @@
+{
+  XStream xStream=new XStream(new XppDriver(){
+    @Override public HierarchicalStreamWriter createWriter(    Writer out){
+      return new PrettyPrintWriter(out){
+        @Override protected void writeText(        QuickWriter writer,        String text){
+          writer.write("<![CDATA[");
+          writer.write(text);
+          writer.write("]]>");
+        }
+      }
+;
+    }
+  }
+);
+  xStream.processAnnotations(SonarConfig.class);
+  xStream.addDefaultImplementation(ArrayList.class,Collection.class);
+  xStream.registerConverter(new DateConverter(DATE_FORMAT,new String[]{}));
+  for (  Backupable backupable : backupables) {
+    backupable.configure(xStream);
+  }
+  return xStream;
+}

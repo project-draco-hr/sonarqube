@@ -1,0 +1,28 @@
+{
+  RuleParam param=rule.createParameter();
+  String keyAttribute=ruleC.getAttrValue("key");
+  if (StringUtils.isNotBlank(keyAttribute)) {
+    param.setKey(StringUtils.trim(keyAttribute));
+  }
+  String typeAttribute=ruleC.getAttrValue("type");
+  if (StringUtils.isNotBlank(typeAttribute)) {
+    param.setType(StringUtils.trim(typeAttribute));
+  }
+  SMInputCursor paramC=ruleC.childElementCursor();
+  while (paramC.getNext() != null) {
+    String propNodeName=paramC.getLocalName();
+    String propText=StringUtils.trim(paramC.collectDescendantText(false));
+    if (StringUtils.equalsIgnoreCase("key",propNodeName)) {
+      param.setKey(propText);
+    }
+ else     if (StringUtils.equalsIgnoreCase("description",propNodeName)) {
+      param.setDescription(propText);
+    }
+ else     if (StringUtils.equalsIgnoreCase("type",propNodeName)) {
+      param.setType(propText);
+    }
+  }
+  if (StringUtils.isEmpty(param.getKey())) {
+    throw new SonarException("Node <key> is missing in <param>");
+  }
+}

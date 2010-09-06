@@ -1,0 +1,16 @@
+{
+  Map<Integer,Metric> metricByCategoryId=new HashMap<Integer,Metric>();
+  metricByCategoryId.put(3,CoreMetrics.USABILITY);
+  metricByCategoryId.put(5,CoreMetrics.EFFICIENCY);
+  metricByCategoryId.put(6,CoreMetrics.RELIABILITY);
+  Resource resource=mock(Resource.class);
+  when(resource.getScope()).thenReturn(Resource.SCOPE_SET);
+  DecoratorContext context=mock(DecoratorContext.class);
+  when(context.getMeasure(CoreMetrics.NCLOC)).thenReturn(new Measure(CoreMetrics.NCLOC,200.0));
+  when(context.getMeasures((MeasuresFilter)anyObject())).thenReturn(Arrays.asList(new RuleMeasure(CoreMetrics.WEIGHTED_VIOLATIONS,new Rule(),null,3).setValue(50.0),new RuleMeasure(CoreMetrics.WEIGHTED_VIOLATIONS,new Rule(),null,5).setValue(0.0)));
+  ViolationsDensityDecorator decorator=new ViolationsDensityDecorator(metricByCategoryId);
+  decorator.decorate(resource,context);
+  verify(context).saveMeasure(CoreMetrics.USABILITY,75.0);
+  verify(context).saveMeasure(CoreMetrics.EFFICIENCY,100.0);
+  verify(context).saveMeasure(CoreMetrics.RELIABILITY,100.0);
+}

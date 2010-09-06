@@ -1,0 +1,18 @@
+{
+  Collection<Measure> children=context.getChildrenMeasures(MeasuresFilters.rules(CoreMetrics.VIOLATIONS));
+  for (  Measure childMeasure : children) {
+    RuleMeasure childRuleMeasure=(RuleMeasure)childMeasure;
+    Rule rule=childRuleMeasure.getRule();
+    if (rule != null && MeasureUtils.hasValue(childRuleMeasure)) {
+      rules.add(rule,childRuleMeasure.getValue().intValue());
+      ruleToLevel.put(childRuleMeasure.getRule(),childRuleMeasure.getRulePriority());
+    }
+  }
+  for (  Multiset.Entry<Rule> entry : rules.entrySet()) {
+    Rule rule=entry.getElement();
+    RuleMeasure measure=RuleMeasure.createForRule(CoreMetrics.VIOLATIONS,rule,(double)entry.getCount());
+    measure.setRuleCategory(rule.getCategoryId());
+    measure.setRulePriority(ruleToLevel.get(rule));
+    context.saveMeasure(measure);
+  }
+}

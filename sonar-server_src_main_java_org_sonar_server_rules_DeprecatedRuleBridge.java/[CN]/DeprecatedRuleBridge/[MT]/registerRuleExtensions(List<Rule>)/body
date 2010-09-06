@@ -1,0 +1,16 @@
+{
+  for (  File file : fileSystem.getPluginExtensionXml(getKey())) {
+    try {
+      String fileContent=FileUtils.readFileToString(file,CharEncoding.UTF_8);
+      List<Rule> deprecatedRules=deprecatedRepository.parseReferential(fileContent);
+      if (deprecatedRules != null) {
+        for (        Rule deprecatedRule : deprecatedRules) {
+          rules.add(cloneRule(deprecatedRule));
+        }
+      }
+    }
+ catch (    IOException e) {
+      throw new SonarException("Can not read the file: " + file.getPath(),e);
+    }
+  }
+}

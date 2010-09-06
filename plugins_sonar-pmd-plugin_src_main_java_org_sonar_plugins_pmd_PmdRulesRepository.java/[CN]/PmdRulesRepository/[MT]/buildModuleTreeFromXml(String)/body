@@ -1,0 +1,18 @@
+{
+  InputStream inputStream=null;
+  try {
+    XStream xstream=new XStream();
+    xstream.setClassLoader(getClass().getClassLoader());
+    xstream.processAnnotations(Ruleset.class);
+    xstream.processAnnotations(org.sonar.api.rules.Rule.class);
+    xstream.processAnnotations(Property.class);
+    inputStream=IOUtils.toInputStream(configuration,CharEncoding.UTF_8);
+    return (Ruleset)xstream.fromXML(inputStream);
+  }
+ catch (  IOException e) {
+    throw new SonarException("can't read configuration file",e);
+  }
+ finally {
+    IOUtils.closeQuietly(inputStream);
+  }
+}

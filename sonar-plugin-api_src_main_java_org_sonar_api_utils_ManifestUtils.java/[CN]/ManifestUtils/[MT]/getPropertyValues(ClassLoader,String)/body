@@ -1,0 +1,18 @@
+{
+  List<String> values=new ArrayList<String>();
+  try {
+    Enumeration<URL> resources=classloader.getResources("META-INF/MANIFEST.MF");
+    while (resources.hasMoreElements()) {
+      Manifest manifest=new Manifest(resources.nextElement().openStream());
+      Attributes attributes=manifest.getMainAttributes();
+      String value=attributes.getValue(key);
+      if (value != null) {
+        values.add(value);
+      }
+    }
+  }
+ catch (  IOException e) {
+    throw new SonarException("Fail to load manifests from classloader: " + classloader,e);
+  }
+  return values;
+}

@@ -1,0 +1,22 @@
+{
+  if (key == null) {
+    throw new IllegalArgumentException("Java filename can not be null");
+  }
+  if (key != null && key.indexOf('$') >= 0) {
+    throw new IllegalArgumentException("Java inner classes are not supported : " + key);
+  }
+  String realKey=StringUtils.trim(key);
+  this.unitTest=unitTest;
+  if (realKey.contains(".")) {
+    this.filename=StringUtils.substringAfterLast(realKey,".");
+    this.packageKey=StringUtils.substringBeforeLast(realKey,".");
+    this.longName=realKey;
+  }
+ else {
+    this.filename=realKey;
+    this.longName=realKey;
+    this.packageKey=JavaPackage.DEFAULT_PACKAGE_NAME;
+    realKey=new StringBuilder().append(JavaPackage.DEFAULT_PACKAGE_NAME).append(".").append(realKey).toString();
+  }
+  setKey(realKey);
+}

@@ -1,0 +1,22 @@
+{
+  projects=Lists.newArrayList();
+  Map<String,Project> paths=Maps.newHashMap();
+  for (  MavenProject pom : poms) {
+    Project project=projectBuilder.create(pom);
+    projects.add(project);
+    paths.put(pom.getBasedir().getCanonicalPath(),project);
+  }
+  for (  Map.Entry<String,Project> entry : paths.entrySet()) {
+    Project project=entry.getValue();
+    MavenProject pom=project.getPom();
+    for (    Object moduleId : pom.getModules()) {
+      File modulePath=new File(pom.getBasedir(),(String)moduleId);
+      Project module=paths.get(modulePath.getCanonicalPath());
+      if (module != null) {
+        module.setParent(project);
+      }
+    }
+  }
+  configureProjects();
+  applyModuleExclusions();
+}

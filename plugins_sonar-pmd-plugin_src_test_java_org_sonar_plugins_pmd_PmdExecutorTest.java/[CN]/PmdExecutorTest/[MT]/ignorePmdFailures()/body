@@ -1,0 +1,12 @@
+{
+  Project project=new Project("ignorePmdFailures");
+  ProjectFileSystem fs=mock(ProjectFileSystem.class);
+  when(fs.getSourceFiles(Java.INSTANCE)).thenReturn(Arrays.asList(new File("test-resources/ignorePmdFailures/DoesNotCompile.java")));
+  when(fs.getSourceCharset()).thenReturn(Charset.forName("UTF-8"));
+  project.setFileSystem(fs);
+  PmdConfiguration conf=mock(PmdConfiguration.class);
+  when(conf.getRulesets()).thenReturn(Arrays.asList(new File("test-resources/ignorePmdFailures/pmd.xml").getAbsolutePath()));
+  PmdExecutor executor=new PmdExecutor(project,conf);
+  File xmlReport=executor.execute();
+  assertThat(xmlReport.exists(),is(true));
+}

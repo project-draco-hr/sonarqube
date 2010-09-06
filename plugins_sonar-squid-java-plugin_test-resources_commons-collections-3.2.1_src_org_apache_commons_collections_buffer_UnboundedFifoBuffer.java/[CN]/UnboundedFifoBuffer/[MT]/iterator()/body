@@ -1,0 +1,37 @@
+{
+  return new Iterator(){
+    private int index=head;
+    private int lastReturnedIndex=-1;
+    public boolean hasNext(){
+      return index != tail;
+    }
+    public Object next(){
+      if (!hasNext()) {
+        throw new NoSuchElementException();
+      }
+      lastReturnedIndex=index;
+      index=increment(index);
+      return buffer[lastReturnedIndex];
+    }
+    public void remove(){
+      if (lastReturnedIndex == -1) {
+        throw new IllegalStateException();
+      }
+      if (lastReturnedIndex == head) {
+        UnboundedFifoBuffer.this.remove();
+        lastReturnedIndex=-1;
+        return;
+      }
+      int i=increment(lastReturnedIndex);
+      while (i != tail) {
+        buffer[decrement(i)]=buffer[i];
+        i=increment(i);
+      }
+      lastReturnedIndex=-1;
+      tail=decrement(tail);
+      buffer[tail]=null;
+      index=decrement(index);
+    }
+  }
+;
+}

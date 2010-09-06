@@ -1,0 +1,31 @@
+{
+  Map<Resource,DuplicationsData> duplicationsData=new HashMap<Resource,DuplicationsData>();
+  while (matches.hasNext()) {
+    Match match=matches.next();
+    for (    TokenEntry firstMark : match.getMarkSet()) {
+      String firstAbsolutePath=firstMark.getTokenSrcID();
+      int firstLine=firstMark.getBeginLine();
+      Resource firstFile=mapping.createResource(new File(firstAbsolutePath),project.getFileSystem().getSourceDirs());
+      if (firstFile == null) {
+        LOG.warn("CPD - File not found : {}",firstAbsolutePath);
+        continue;
+      }
+      for (      TokenEntry tokenEntry : match.getMarkSet()) {
+        String secondAbsolutePath=tokenEntry.getTokenSrcID();
+        int secondLine=tokenEntry.getBeginLine();
+        if (secondAbsolutePath.equals(firstAbsolutePath) && firstLine == secondLine) {
+          continue;
+        }
+        Resource secondFile=mapping.createResource(new File(secondAbsolutePath),project.getFileSystem().getSourceDirs());
+        if (secondFile == null) {
+          LOG.warn("CPD - File not found : {}",secondAbsolutePath);
+          continue;
+        }
+        processClassMeasure(duplicationsData,firstFile,firstLine,secondFile,secondLine,match.getLineCount());
+      }
+    }
+  }
+  for (  DuplicationsData data : duplicationsData.values()) {
+    data.saveUsing(context);
+  }
+}

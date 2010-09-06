@@ -1,0 +1,25 @@
+{
+  boolean replacementFound=false;
+  ByteList bl=((RubyString)string).getByteList();
+  for (int i=bl.begin; i < bl.begin + bl.realSize; i++) {
+switch (bl.bytes[i]) {
+case '\'':
+      break;
+default :
+    continue;
+}
+if (!replacementFound) {
+  i-=bl.begin;
+  bl=new ByteList(bl);
+  replacementFound=true;
+}
+bl.replace(i,1,TWO_SINGLE);
+i+=1;
+}
+if (replacementFound) {
+return recv.getRuntime().newStringShared(bl);
+}
+ else {
+return string;
+}
+}

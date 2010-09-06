@@ -1,0 +1,21 @@
+{
+  Violations result=new Violations();
+  JSONArray jsonArray=new JSONArray(obj);
+  for (int i=0; i < jsonArray.size(); i++) {
+    JSONObject jsViolation=jsonArray.get(i).isObject();
+    if (jsViolation == null) {
+      continue;
+    }
+    JSONString message=jsViolation.get("message").isString();
+    JSONString priority=jsViolation.get("priority").isString();
+    JSONValue lineJson=jsViolation.get("line");
+    int lineIndex=0;
+    if (lineJson != null) {
+      lineIndex=(int)lineJson.isNumber().doubleValue();
+    }
+    JSONObject ruleObj=jsViolation.get("rule").isObject();
+    Rule rule=new Rule(JsonUtils.getString(ruleObj,"key"),JsonUtils.getString(ruleObj,"name"),JsonUtils.getString(ruleObj,"category"));
+    result.add(new Violation(message.stringValue(),priority.stringValue(),lineIndex,rule,null));
+  }
+  return result;
+}

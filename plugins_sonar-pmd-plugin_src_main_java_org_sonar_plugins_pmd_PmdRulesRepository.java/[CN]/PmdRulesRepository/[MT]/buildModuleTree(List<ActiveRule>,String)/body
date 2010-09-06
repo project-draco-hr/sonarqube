@@ -1,0 +1,19 @@
+{
+  Ruleset ruleset=new Ruleset(profileName);
+  for (  ActiveRule activeRule : activeRules) {
+    if (activeRule.getRule().getPluginName().equals(CoreProperties.PMD_PLUGIN)) {
+      String configKey=activeRule.getRule().getConfigKey();
+      Rule rule=new Rule(configKey,getRulePriorityMapper().to(activeRule.getPriority()));
+      List<Property> properties=null;
+      if (activeRule.getActiveRuleParams() != null && !activeRule.getActiveRuleParams().isEmpty()) {
+        properties=new ArrayList<Property>();
+        for (        ActiveRuleParam activeRuleParam : activeRule.getActiveRuleParams()) {
+          properties.add(new Property(activeRuleParam.getRuleParam().getKey(),activeRuleParam.getValue()));
+        }
+      }
+      rule.setProperties(properties);
+      ruleset.addRule(rule);
+    }
+  }
+  return ruleset;
+}

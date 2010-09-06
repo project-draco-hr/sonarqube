@@ -1,0 +1,13 @@
+{
+  RulesProfile profileProvided=new RulesProfile("test provided","lang",false,true);
+  RulesProfile profileNotProvided=new RulesProfile("test not provided","lang",false,false);
+  getSession().save(profileProvided,profileNotProvided);
+  assertThat(getHQLCount(RulesProfile.class),equalTo(2l));
+  ProfilesBackup profilesBackup=new ProfilesBackup(getSession());
+  assertNull(sonarConfig.getProfiles());
+  profilesBackup.importXml(sonarConfig);
+  assertThat(getHQLCount(RulesProfile.class),equalTo(2l));
+  RulesProfile profileProvidedRemains=getSession().getSingleResult(RulesProfile.class,"name","test provided","provided",true);
+  assertNotNull(profileProvidedRemains);
+  assertEquals(profileProvided,profileProvidedRemains);
+}

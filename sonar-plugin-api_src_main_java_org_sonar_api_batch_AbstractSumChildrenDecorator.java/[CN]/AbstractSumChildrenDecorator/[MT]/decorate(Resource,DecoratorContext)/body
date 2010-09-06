@@ -1,0 +1,13 @@
+{
+  if (!shouldDecorateResource(resource)) {
+    return;
+  }
+  for (  Metric metric : generatesMetrics()) {
+    if (context.getMeasure(metric) == null) {
+      Double sum=MeasureUtils.sum(shouldSaveZeroIfNoChildMeasures(),context.getChildrenMeasures(metric));
+      if (sum != null) {
+        context.saveMeasure(new Measure(metric,sum));
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  RulesProfile rulesProfile=mock(RulesProfile.class);
+  when(rulesProfile.getActiveRule(eq(CoreProperties.FINDBUGS_PLUGIN),anyString())).thenAnswer(new Answer<ActiveRule>(){
+    public ActiveRule answer(    InvocationOnMock invocationOnMock) throws Throwable {
+      Object[] args=invocationOnMock.getArguments();
+      ActiveRule activeRule=mock(ActiveRule.class);
+      when(activeRule.getPluginName()).thenReturn((String)args[0]);
+      when(activeRule.getRuleKey()).thenReturn((String)args[1]);
+      when(activeRule.getPriority()).thenReturn(RulePriority.CRITICAL);
+      return activeRule;
+    }
+  }
+);
+  when(rulesProfile.getActiveRulesByPlugin(CoreProperties.FINDBUGS_PLUGIN)).thenReturn(Arrays.asList(new ActiveRule()));
+  return rulesProfile;
+}

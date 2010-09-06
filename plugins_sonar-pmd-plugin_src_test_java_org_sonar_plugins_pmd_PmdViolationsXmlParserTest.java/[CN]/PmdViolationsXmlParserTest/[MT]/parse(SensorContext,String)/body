@@ -1,0 +1,19 @@
+{
+  DefaultProjectFileSystem fileSystem=mock(DefaultProjectFileSystem.class);
+  when(fileSystem.getSourceDirs()).thenReturn(Arrays.asList(new File("/test/src/main/java")));
+  Project project=mock(Project.class);
+  when(project.getFileSystem()).thenReturn(fileSystem);
+  RulesManager manager=mock(RulesManager.class);
+  when(manager.getPluginRule(anyString(),anyString())).thenAnswer(new Answer<Rule>(){
+    public Rule answer(    InvocationOnMock invocation){
+      Object[] args=invocation.getArguments();
+      return new Rule((String)args[1],(String)args[1],null,(String)args[0],"");
+    }
+  }
+);
+  RulesProfile profile=mock(RulesProfile.class);
+  when(profile.getActiveRule(anyString(),anyString())).thenReturn(new ActiveRule(null,null,RulePriority.MINOR));
+  PmdViolationsXmlParser parser=new PmdViolationsXmlParser(project,context,manager,profile);
+  File xmlFile=new File(getClass().getResource(xmlPath).toURI());
+  parser.parse(xmlFile);
+}

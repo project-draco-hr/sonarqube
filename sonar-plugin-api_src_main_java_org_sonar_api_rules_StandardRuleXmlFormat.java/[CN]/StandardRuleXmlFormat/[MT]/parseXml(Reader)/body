@@ -1,0 +1,23 @@
+{
+  XMLInputFactory xmlFactory=XMLInputFactory2.newInstance();
+  xmlFactory.setProperty(XMLInputFactory.IS_COALESCING,Boolean.TRUE);
+  xmlFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE,Boolean.FALSE);
+  xmlFactory.setProperty(XMLInputFactory.SUPPORT_DTD,Boolean.FALSE);
+  xmlFactory.setProperty(XMLInputFactory.IS_VALIDATING,Boolean.FALSE);
+  SMInputFactory inputFactory=new SMInputFactory(xmlFactory);
+  try {
+    SMHierarchicCursor rootC=inputFactory.rootElementCursor(reader);
+    rootC.advance();
+    List<Rule> rules=new ArrayList<Rule>();
+    SMInputCursor rulesC=rootC.childElementCursor("rule");
+    while (rulesC.getNext() != null) {
+      Rule rule=Rule.create();
+      rules.add(rule);
+      processRule(rule,rulesC);
+    }
+    return rules;
+  }
+ catch (  XMLStreamException e) {
+    throw new SonarException("XML is not valid",e);
+  }
+}

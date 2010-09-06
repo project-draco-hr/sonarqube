@@ -1,0 +1,10 @@
+{
+  boolean analyzePropertyAccessors=project.getConfiguration().getBoolean(SquidPluginProperties.SQUID_ANALYSE_ACCESSORS_PROPERTY,SquidPluginProperties.SQUID_ANALYSE_ACCESSORS_DEFAULT_VALUE);
+  String fieldNamesToExcludeFromLcom4Computation=project.getConfiguration().getString(SquidPluginProperties.FIELDS_TO_EXCLUDE_FROM_LCOM4_COMPUTATION,SquidPluginProperties.FIELDS_TO_EXCLUDE_FROM_LCOM4_COMPUTATION_DEFAULT_VALUE);
+  Charset charset=project.getFileSystem().getSourceCharset();
+  MessageDispatcher messageDispatcher=initMessageDispatcher(context);
+  SquidExecutor squidExecutor=new SquidExecutor(analyzePropertyAccessors,fieldNamesToExcludeFromLcom4Computation,messageDispatcher,charset);
+  squidExecutor.scan(getSourceFiles(project),getBytecodeFiles(project));
+  squidExecutor.save(project,context,noSonarFilter);
+  squidExecutor.initSonarProxy(proxy);
+}

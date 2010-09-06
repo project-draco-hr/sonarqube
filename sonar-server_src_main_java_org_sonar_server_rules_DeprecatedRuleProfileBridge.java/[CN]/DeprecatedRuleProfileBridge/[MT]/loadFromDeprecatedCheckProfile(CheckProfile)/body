@@ -1,0 +1,14 @@
+{
+  DefaultProfileDefinition definition=DefaultProfileDefinition.create(cp.getName(),cp.getLanguage());
+  for (  Check check : cp.getChecks()) {
+    RulePriority priority=null;
+    if (check.getPriority() != null) {
+      priority=RulePriority.fromCheckPriority(check.getPriority());
+    }
+    ProfilePrototype.RulePrototype rule=definition.activateRule(check.getRepositoryKey(),check.getTemplateKey(),priority);
+    for (    Map.Entry<String,String> entry : rule.getParameters().entrySet()) {
+      rule.setParameter(entry.getKey(),entry.getValue());
+    }
+  }
+  return definition;
+}

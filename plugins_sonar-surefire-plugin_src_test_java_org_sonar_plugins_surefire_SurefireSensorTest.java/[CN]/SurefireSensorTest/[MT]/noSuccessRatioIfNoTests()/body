@@ -1,0 +1,9 @@
+{
+  SensorContext context=mock(SensorContext.class);
+  new SurefireSensor().collect(newJarProject(),context,new File(getClass().getResource("/org/sonar/plugins/surefire/SurefireSensorTest/noSuccessRatioIfNoTests/").toURI()));
+  verify(context).saveMeasure(eq(new JavaFile("org.sonar.Foo",true)),eq(CoreMetrics.TESTS),eq(0d));
+  verify(context).saveMeasure(eq(new JavaFile("org.sonar.Foo",true)),eq(CoreMetrics.TEST_FAILURES),eq(0d));
+  verify(context).saveMeasure(eq(new JavaFile("org.sonar.Foo",true)),eq(CoreMetrics.TEST_ERRORS),eq(0d));
+  verify(context).saveMeasure(eq(new JavaFile("org.sonar.Foo",true)),eq(CoreMetrics.SKIPPED_TESTS),eq(2d));
+  verify(context,never()).saveMeasure(eq(new JavaFile("org.sonar.Foo")),eq(CoreMetrics.TEST_SUCCESS_DENSITY),anyDouble());
+}

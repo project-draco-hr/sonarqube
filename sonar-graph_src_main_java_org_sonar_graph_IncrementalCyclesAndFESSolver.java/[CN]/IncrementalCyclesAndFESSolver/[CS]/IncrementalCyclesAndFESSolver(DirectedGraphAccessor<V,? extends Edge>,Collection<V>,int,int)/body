@@ -1,0 +1,19 @@
+{
+  iterations++;
+  CycleDetector<V> cycleDetector=new CycleDetector<V>(graph,vertices);
+  cycleDetector.detectCyclesWithMaxSearchDepth(maxSearchDepthAtFirst);
+  searchCyclesCalls+=cycleDetector.getSearchCyclesCalls();
+  cycles.addAll(cycleDetector.getCycles());
+  solver=new MinimumFeedbackEdgeSetSolver(cycles);
+  edgesToExclude=solver.getEdges();
+  do {
+    iterations++;
+    cycleDetector=new CycleDetector<V>(graph,vertices,edgesToExclude);
+    cycleDetector.detectCyclesWithUpperLimit(maxCyclesToFoundByIteration);
+    searchCyclesCalls+=cycleDetector.getSearchCyclesCalls();
+    cycles.addAll(cycleDetector.getCycles());
+    solver=new MinimumFeedbackEdgeSetSolver(cycles);
+    edgesToExclude=solver.getEdges();
+  }
+ while (cycleDetector.getCycles().size() != 0);
+}

@@ -1,0 +1,9 @@
+{
+  Map<RulePriority,Integer> weights=createWeights();
+  WeightedViolationsDecorator decorator=new WeightedViolationsDecorator(weights);
+  DecoratorContext context=mock(DecoratorContext.class);
+  when(context.getMeasures((MeasuresFilter)anyObject())).thenReturn(createViolationsMeasures());
+  decorator.decorate(mock(Resource.class),context);
+  verify(context).saveMeasure(argThat(new IsMeasure(CoreMetrics.WEIGHTED_VIOLATIONS,(double)(100 * 10 + 80 * 5 + 50 * 0))));
+  verify(context).saveMeasure(argThat(new IsMeasure(CoreMetrics.WEIGHTED_VIOLATIONS,"INFO=50;CRITICAL=80;BLOCKER=100")));
+}

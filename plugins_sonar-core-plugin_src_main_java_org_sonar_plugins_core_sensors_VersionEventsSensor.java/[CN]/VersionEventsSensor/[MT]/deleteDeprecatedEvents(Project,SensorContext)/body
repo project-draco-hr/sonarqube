@@ -1,0 +1,19 @@
+{
+  String version=project.getAnalysisVersion();
+  String snapshotVersionToDelete=(version.endsWith(SNAPSHOT_SUFFIX) ? "" : version + SNAPSHOT_SUFFIX);
+  for (Iterator<Event> it=context.getEvents(project).iterator(); it.hasNext(); ) {
+    Event event=it.next();
+    if (event.isVersionCategory()) {
+      if (version.equals(event.getName()) || snapshotVersionToDelete.equals(event.getName())) {
+        it.remove();
+        context.deleteEvent(event);
+        event=null;
+      }
+    }
+    if (event != null && !event.isLinkedToSnapshot() && event.getDate() != null && project.getAnalysisDate() != null && DateUtils.isSameDay(event.getDate(),project.getAnalysisDate())) {
+      it.remove();
+      context.deleteEvent(event);
+      context.createEvent(project,event.getName(),event.getDescription(),event.getCategory(),null);
+    }
+  }
+}

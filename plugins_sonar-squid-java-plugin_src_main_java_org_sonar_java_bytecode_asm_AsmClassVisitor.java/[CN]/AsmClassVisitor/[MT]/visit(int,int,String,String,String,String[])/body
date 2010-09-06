@@ -1,0 +1,23 @@
+{
+  if (asmClass.getDetailLevel() == DETAIL_LEVEL.NOTHING) {
+    asmClass.setAccessFlags(accessFlags);
+    if (asmClass.isInterface()) {
+      if (interfaces.length == 1) {
+        asmClass.setSuperClass(asmClassProvider.getClass(interfaces[0],DETAIL_LEVEL.STRUCTURE));
+      }
+    }
+ else {
+      if (superClass != null) {
+        asmClass.setSuperClass(asmClassProvider.getClass(superClass,DETAIL_LEVEL.STRUCTURE));
+      }
+      for (      String interfaceName : interfaces) {
+        asmClass.addInterface(asmClassProvider.getClass(interfaceName,DETAIL_LEVEL.STRUCTURE));
+      }
+    }
+    if (signature != null) {
+      String[] internalNames=AsmSignature.extractInternalNames(signature);
+      AsmClass[] asmClasses=internalNamesToAsmClasses(internalNames,DETAIL_LEVEL.NOTHING);
+      asmClass.addUsesOfClasses(asmClasses);
+    }
+  }
+}

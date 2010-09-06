@@ -1,0 +1,40 @@
+{
+  if (collectionOfValues[VALUE] == null) {
+    collectionOfValues[VALUE]=new AbstractCollection(){
+      public Iterator iterator(){
+        return new DoubleOrderedMapIterator(VALUE){
+          protected Object doGetNext(){
+            return lastReturnedNode.getData(VALUE);
+          }
+        }
+;
+      }
+      public int size(){
+        return DoubleOrderedMap.this.size();
+      }
+      public boolean contains(      Object o){
+        return containsValue(o);
+      }
+      public boolean remove(      Object o){
+        int oldnodeCount=nodeCount;
+        removeValue(o);
+        return nodeCount != oldnodeCount;
+      }
+      public boolean removeAll(      Collection c){
+        boolean modified=false;
+        Iterator iter=c.iterator();
+        while (iter.hasNext()) {
+          if (removeValue(iter.next()) != null) {
+            modified=true;
+          }
+        }
+        return modified;
+      }
+      public void clear(){
+        DoubleOrderedMap.this.clear();
+      }
+    }
+;
+  }
+  return collectionOfValues[VALUE];
+}

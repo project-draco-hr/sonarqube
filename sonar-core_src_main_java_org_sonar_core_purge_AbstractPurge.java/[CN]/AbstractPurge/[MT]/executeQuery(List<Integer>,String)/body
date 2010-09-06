@@ -1,0 +1,14 @@
+{
+  if (ids == null || ids.isEmpty()) {
+    return;
+  }
+  int index=0;
+  while (index < ids.size()) {
+    Query query=session.createQuery(hql);
+    List<Integer> paginedSids=ids.subList(index,Math.min(ids.size(),index + sqlInPageSize));
+    query.setParameter("ids",paginedSids);
+    query.executeUpdate();
+    index+=sqlInPageSize;
+    session.commit();
+  }
+}

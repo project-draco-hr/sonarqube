@@ -1,0 +1,30 @@
+{
+  final IRubyObject sql=args[0];
+  final int maxrows;
+  if (args.length > 1) {
+    maxrows=RubyNumeric.fix2int(args[1]);
+  }
+ else {
+    maxrows=0;
+  }
+  return withConnectionAndRetry(recv,new SQLBlock(){
+    public IRubyObject call(    Connection c) throws SQLException {
+      Statement stmt=null;
+      try {
+        stmt=c.createStatement();
+        stmt.setMaxRows(maxrows);
+        return unmarshal_result(recv,stmt.executeQuery(rubyApi.convertToRubyString(sql).getUnicodeValue()));
+      }
+  finally {
+        if (null != stmt) {
+          try {
+            stmt.close();
+          }
+ catch (          Exception e) {
+          }
+        }
+      }
+    }
+  }
+);
+}

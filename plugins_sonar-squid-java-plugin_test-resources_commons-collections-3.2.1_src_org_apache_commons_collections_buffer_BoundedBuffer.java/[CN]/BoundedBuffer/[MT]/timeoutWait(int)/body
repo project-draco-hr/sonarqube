@@ -1,0 +1,27 @@
+{
+  if (nAdditions > maximumSize) {
+    throw new BufferOverflowException("Buffer size cannot exceed " + maximumSize);
+  }
+  if (timeout <= 0) {
+    if (getBuffer().size() + nAdditions > maximumSize) {
+      throw new BufferOverflowException("Buffer size cannot exceed " + maximumSize);
+    }
+    return;
+  }
+  final long expiration=System.currentTimeMillis() + timeout;
+  long timeLeft=expiration - System.currentTimeMillis();
+  while (timeLeft > 0 && getBuffer().size() + nAdditions > maximumSize) {
+    try {
+      lock.wait(timeLeft);
+      timeLeft=expiration - System.currentTimeMillis();
+    }
+ catch (    InterruptedException ex) {
+      PrintWriter out=new PrintWriter(new StringWriter());
+      ex.printStackTrace(out);
+      throw new BufferUnderflowException("Caused by InterruptedException: " + out.toString());
+    }
+  }
+  if (getBuffer().size() + nAdditions > maximumSize) {
+    throw new BufferOverflowException("Timeout expired");
+  }
+}

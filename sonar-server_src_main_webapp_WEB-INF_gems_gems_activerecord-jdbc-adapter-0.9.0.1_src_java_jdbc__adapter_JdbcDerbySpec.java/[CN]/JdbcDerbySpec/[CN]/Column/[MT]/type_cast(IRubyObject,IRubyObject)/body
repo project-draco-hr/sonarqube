@@ -1,0 +1,46 @@
+{
+  Ruby runtime=recv.getRuntime();
+  if (value.isNil() || ((value instanceof RubyString) && value.toString().trim().equalsIgnoreCase("null"))) {
+    return runtime.getNil();
+  }
+  String type=rubyApi.getInstanceVariable(recv,"@type").toString();
+switch (type.charAt(0)) {
+case 's':
+    return value;
+case 't':
+  if (type.equals("text")) {
+    return value;
+  }
+ else {
+    return rubyApi.callMethod(recv,"cast_to_time",value);
+  }
+case 'i':
+case 'p':
+if (value.respondsTo("to_i")) {
+  return rubyApi.callMethod(value,"to_i");
+}
+ else {
+  return runtime.newFixnum(value.isTrue() ? 1 : 0);
+}
+case 'd':
+if (type.equals("datetime")) {
+return rubyApi.callMethod(recv,"cast_to_date_or_time",value);
+}
+ else if (type.equals("date")) {
+return rubyApi.callMethod(recv.getMetaClass(),"string_to_date",value);
+}
+ else {
+return rubyApi.callMethod(recv.getMetaClass(),"value_to_decimal",value);
+}
+case 'f':
+return rubyApi.callMethod(value,"to_f");
+case 'b':
+if (type.equals("binary")) {
+return rubyApi.callMethod(recv,"value_to_binary",value);
+}
+ else {
+return rubyApi.callMethod(recv.getMetaClass(),"value_to_boolean",value);
+}
+}
+return value;
+}

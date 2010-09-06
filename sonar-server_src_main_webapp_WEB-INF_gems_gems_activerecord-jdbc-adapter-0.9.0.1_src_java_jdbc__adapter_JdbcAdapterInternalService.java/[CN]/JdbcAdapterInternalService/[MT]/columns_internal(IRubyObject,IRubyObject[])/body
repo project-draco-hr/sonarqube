@@ -1,0 +1,56 @@
+{
+  return withConnectionAndRetry(recv,new SQLBlock(){
+    public IRubyObject call(    Connection c) throws SQLException {
+      ResultSet results=null;
+      try {
+        String table_name=rubyApi.convertToRubyString(args[0]).getUnicodeValue();
+        String schemaName=null;
+        int index=table_name.indexOf(".");
+        if (index != -1) {
+          schemaName=table_name.substring(0,index);
+          table_name=table_name.substring(index + 1);
+        }
+        DatabaseMetaData metadata=c.getMetaData();
+        String clzName=metadata.getClass().getName().toLowerCase();
+        boolean isDerby=clzName.indexOf("derby") != -1;
+        boolean isOracle=clzName.indexOf("oracle") != -1 || clzName.indexOf("oci") != -1;
+        if (args.length > 2) {
+          schemaName=args[2].toString();
+        }
+        if (metadata.storesUpperCaseIdentifiers()) {
+          if (null != schemaName)           schemaName=schemaName.toUpperCase();
+          table_name=table_name.toUpperCase();
+        }
+ else         if (metadata.storesLowerCaseIdentifiers()) {
+          if (null != schemaName)           schemaName=schemaName.toLowerCase();
+          table_name=table_name.toLowerCase();
+        }
+        if (schemaName == null && (isDerby || isOracle)) {
+          ResultSet schemas=metadata.getSchemas();
+          String username=metadata.getUserName();
+          while (schemas.next()) {
+            if (schemas.getString(1).equalsIgnoreCase(username)) {
+              schemaName=schemas.getString(1);
+              break;
+            }
+          }
+          schemas.close();
+        }
+        RubyArray matchingTables=(RubyArray)tableLookupBlock(recv.getRuntime(),c.getCatalog(),schemaName,table_name,new String[]{"TABLE","VIEW"}).call(c);
+        if (matchingTables.isEmpty()) {
+          throw new SQLException("Table " + table_name + " does not exist");
+        }
+        results=metadata.getColumns(c.getCatalog(),schemaName,table_name,null);
+        return unmarshal_columns(recv,metadata,results);
+      }
+  finally {
+        try {
+          if (results != null)           results.close();
+        }
+ catch (        SQLException sqx) {
+        }
+      }
+    }
+  }
+);
+}

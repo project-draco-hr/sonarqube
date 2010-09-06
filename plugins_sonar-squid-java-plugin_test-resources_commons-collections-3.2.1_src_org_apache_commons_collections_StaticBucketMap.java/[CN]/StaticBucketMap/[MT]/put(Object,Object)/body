@@ -1,0 +1,28 @@
+{
+  int hash=getHash(key);
+synchronized (m_locks[hash]) {
+    Node n=m_buckets[hash];
+    if (n == null) {
+      n=new Node();
+      n.key=key;
+      n.value=value;
+      m_buckets[hash]=n;
+      m_locks[hash].size++;
+      return null;
+    }
+    for (Node next=n; next != null; next=next.next) {
+      n=next;
+      if (n.key == key || (n.key != null && n.key.equals(key))) {
+        Object returnVal=n.value;
+        n.value=value;
+        return returnVal;
+      }
+    }
+    Node newNode=new Node();
+    newNode.key=key;
+    newNode.value=value;
+    n.next=newNode;
+    m_locks[hash].size++;
+  }
+  return null;
+}

@@ -1,0 +1,46 @@
+{
+  for (int index=FIRST_INDEX; index < NUMBER_OF_INDICES; index++) {
+    if ((deletedNode.getLeft(index) != null) && (deletedNode.getRight(index) != null)) {
+      swapPosition(nextGreater(deletedNode,index),deletedNode,index);
+    }
+    Node replacement=((deletedNode.getLeft(index) != null) ? deletedNode.getLeft(index) : deletedNode.getRight(index));
+    if (replacement != null) {
+      replacement.setParent(deletedNode.getParent(index),index);
+      if (deletedNode.getParent(index) == null) {
+        rootNode[index]=replacement;
+      }
+ else       if (deletedNode == deletedNode.getParent(index).getLeft(index)) {
+        deletedNode.getParent(index).setLeft(replacement,index);
+      }
+ else {
+        deletedNode.getParent(index).setRight(replacement,index);
+      }
+      deletedNode.setLeft(null,index);
+      deletedNode.setRight(null,index);
+      deletedNode.setParent(null,index);
+      if (isBlack(deletedNode,index)) {
+        doRedBlackDeleteFixup(replacement,index);
+      }
+    }
+ else {
+      if (deletedNode.getParent(index) == null) {
+        rootNode[index]=null;
+      }
+ else {
+        if (isBlack(deletedNode,index)) {
+          doRedBlackDeleteFixup(deletedNode,index);
+        }
+        if (deletedNode.getParent(index) != null) {
+          if (deletedNode == deletedNode.getParent(index).getLeft(index)) {
+            deletedNode.getParent(index).setLeft(null,index);
+          }
+ else {
+            deletedNode.getParent(index).setRight(null,index);
+          }
+          deletedNode.setParent(null,index);
+        }
+      }
+    }
+  }
+  shrink();
+}

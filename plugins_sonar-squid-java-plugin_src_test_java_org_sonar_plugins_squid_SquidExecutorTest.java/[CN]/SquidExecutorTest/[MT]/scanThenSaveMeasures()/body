@@ -1,0 +1,9 @@
+{
+  SquidExecutor executor=new SquidExecutor(true,"LOG, logger",new MessageDispatcher(mock(SensorContext.class)),Charset.defaultCharset());
+  SensorContext context=mock(SensorContext.class);
+  executor.scan(SquidTestUtils.getStrutsCoreSources(),Collections.<File>emptyList());
+  executor.save(new Project("p1"),context,null);
+  assertThat(executor.isSourceScanned(),is(true));
+  executor.save(new Project("p1"),context,null);
+  verify(context,atLeast(100)).saveMeasure((Resource)anyObject(),(org.sonar.api.measures.Metric)anyObject(),anyDouble());
+}

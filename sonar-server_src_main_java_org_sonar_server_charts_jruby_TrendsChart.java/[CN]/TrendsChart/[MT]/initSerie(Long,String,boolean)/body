@@ -1,0 +1,38 @@
+{
+  TimeSeries series=new TimeSeries(legend);
+  int index=seriesById.size();
+  seriesById.put(serieId,series);
+  TimeSeriesCollection timeSeriesColl=new TimeSeriesCollection();
+  timeSeriesColl.addSeries(series);
+  plot.setDataset(index,timeSeriesColl);
+  if (isPercent) {
+    if (percentAxisId == -1) {
+      NumberAxis rangeAxis=new NumberAxis();
+      rangeAxis.setNumberFormatOverride(new DecimalFormat("0'%'"));
+      rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+      rangeAxis.setUpperBound(100.0);
+      rangeAxis.setLowerBound(0.0);
+      plot.setRangeAxisLocation(index,AxisLocation.TOP_OR_LEFT);
+      plot.setRangeAxis(index,rangeAxis);
+      plot.mapDatasetToRangeAxis(index,index);
+      percentAxisId=index;
+    }
+ else {
+      plot.mapDatasetToRangeAxis(index,percentAxisId);
+    }
+  }
+ else {
+    NumberAxis rangeAxis=new NumberAxis(displayLegend ? legend : null);
+    rangeAxis.setAutoRangeIncludesZero(false);
+    rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+    rangeAxis.setAutoRangeMinimumSize(2.0);
+    plot.setRangeAxisLocation(index,AxisLocation.TOP_OR_RIGHT);
+    plot.setRangeAxis(index,rangeAxis);
+    plot.mapDatasetToRangeAxis(index,index);
+  }
+  XYLineAndShapeRenderer renderer=new XYLineAndShapeRenderer();
+  renderer.setBaseShapesVisible(false);
+  renderer.setSeriesStroke(0,new BasicStroke(2.0f));
+  renderer.setSeriesPaint(0,COLORS[index % COLORS.length]);
+  plot.setRenderer(index,renderer);
+}

@@ -1,0 +1,23 @@
+{
+  Reference ref=createDatasourceReference();
+  Context ctx=null;
+  try {
+    ctx=new InitialContext();
+    createJNDISubContexts(ctx,getJndiName());
+    ctx.rebind(getJndiName(),ref);
+    datasource=(DataSource)ctx.lookup(getJndiName());
+    Logs.INFO.info("JDBC datasource bound to JNDI, name=" + getJndiName());
+  }
+ catch (  NamingException e) {
+    throw new JndiException("Can not bind JDBC datasource to JNDI",e);
+  }
+ finally {
+    if (ctx != null) {
+      try {
+        ctx.close();
+      }
+ catch (      NamingException e) {
+      }
+    }
+  }
+}

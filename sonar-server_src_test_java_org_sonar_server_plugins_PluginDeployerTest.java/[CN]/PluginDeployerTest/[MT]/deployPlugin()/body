@@ -1,0 +1,18 @@
+{
+  setupData("shared");
+  deployer.start();
+  List<JpaPlugin> plugins=dao.getPlugins();
+  assertThat(plugins.size(),is(1));
+  JpaPlugin plugin=plugins.get(0);
+  assertThat(plugin.getName(),is("Foo"));
+  assertThat(plugin.getFiles().size(),is(1));
+  assertThat(plugin.isCore(),is(false));
+  JpaPluginFile pluginFile=plugin.getFiles().get(0);
+  assertThat(pluginFile.getFilename(),is("foo-plugin.jar"));
+  assertThat(pluginFile.getPath(),is("foo/foo-plugin.jar"));
+  File deployedJar=new File(deployDir,"plugins/foo/foo-plugin.jar");
+  assertThat(deployedJar.exists(),is(true));
+  assertThat(deployedJar.isFile(),is(true));
+  ClassLoader classloader=classloaders.getClassLoader("foo");
+  assertNotNull(classloader);
+}

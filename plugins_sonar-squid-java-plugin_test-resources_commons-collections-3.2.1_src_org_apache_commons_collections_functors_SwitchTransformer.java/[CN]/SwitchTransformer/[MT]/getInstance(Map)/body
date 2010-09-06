@@ -1,0 +1,25 @@
+{
+  Transformer[] transformers=null;
+  Predicate[] preds=null;
+  if (predicatesAndTransformers == null) {
+    throw new IllegalArgumentException("The predicate and transformer map must not be null");
+  }
+  if (predicatesAndTransformers.size() == 0) {
+    return ConstantTransformer.NULL_INSTANCE;
+  }
+  Transformer defaultTransformer=(Transformer)predicatesAndTransformers.remove(null);
+  int size=predicatesAndTransformers.size();
+  if (size == 0) {
+    return (defaultTransformer == null ? ConstantTransformer.NULL_INSTANCE : defaultTransformer);
+  }
+  transformers=new Transformer[size];
+  preds=new Predicate[size];
+  int i=0;
+  for (Iterator it=predicatesAndTransformers.entrySet().iterator(); it.hasNext(); ) {
+    Map.Entry entry=(Map.Entry)it.next();
+    preds[i]=(Predicate)entry.getKey();
+    transformers[i]=(Transformer)entry.getValue();
+    i++;
+  }
+  return new SwitchTransformer(preds,transformers,defaultTransformer);
+}

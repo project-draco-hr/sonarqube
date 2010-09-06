@@ -1,0 +1,8 @@
+{
+  Ruby runtime=recv.getRuntime();
+  IRubyObject types=unmarshal_result_downcase(recv,getConnection(recv,true).getMetaData().getTypeInfo());
+  IRubyObject typeConverter=((RubyModule)(runtime.getModule("ActiveRecord").getConstant("ConnectionAdapters"))).getConstant("JdbcTypeConverter");
+  IRubyObject value=rubyApi.callMethod(rubyApi.callMethod(typeConverter,"new",types),"choose_best_types");
+  rubyApi.setInstanceVariable(recv,"@native_types",value);
+  return runtime.getNil();
+}

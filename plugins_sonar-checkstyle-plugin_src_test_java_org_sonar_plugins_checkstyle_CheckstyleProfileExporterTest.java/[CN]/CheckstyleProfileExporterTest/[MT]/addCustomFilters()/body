@@ -1,0 +1,8 @@
+{
+  Configuration conf=new BaseConfiguration();
+  conf.addProperty(CheckstyleConstants.FILTERS_KEY,"<module name=\"SuppressionCommentFilter\">" + "<property name=\"offCommentFormat\" value=\"BEGIN GENERATED CODE\"/>" + "<property name=\"onCommentFormat\" value=\"END GENERATED CODE\"/>"+ "</module>"+ "<module name=\"SuppressWithNearbyCommentFilter\">"+ "<property name=\"commentFormat\" value=\"CHECKSTYLE IGNORE (\\w+) FOR NEXT (\\d+) LINES\"/>"+ "<property name=\"checkFormat\" value=\"$1\"/>"+ "<property name=\"messageFormat\" value=\"$2\"/>"+ "</module>");
+  RulesProfile profile=RulesProfile.create("sonar way","java");
+  StringWriter writer=new StringWriter();
+  new CheckstyleProfileExporter(conf).exportProfile(profile,writer);
+  TestUtils.assertSimilarXml(TestUtils.getResourceContent("/org/sonar/plugins/checkstyle/CheckstyleProfileExporterTest/addCustomFilters.xml"),writer.toString());
+}

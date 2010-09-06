@@ -1,0 +1,14 @@
+{
+  Event christmas=mockEvent("christmas","20081225");
+  Event newYear=mockEvent("newYear","20090101");
+  Event valentine=mockEvent("valentine","20090214");
+  SensorContext context=mock(SensorContext.class);
+  Project project=mock(Project.class);
+  when(project.getAnalysisVersion()).thenReturn("1.5");
+  when(project.getAnalysisDate()).thenReturn(dateTimeFormat.parse("20090101 15:34"));
+  when(context.getEvents(project)).thenReturn(new ArrayList(Arrays.asList(christmas,newYear,valentine)));
+  VersionEventsSensor sensor=new VersionEventsSensor();
+  sensor.analyse(project,context);
+  verify(context).deleteEvent(newYear);
+  verify(context).createEvent(eq(project),eq("newYear"),(String)isNull(),(String)isNull(),(Date)isNull());
+}

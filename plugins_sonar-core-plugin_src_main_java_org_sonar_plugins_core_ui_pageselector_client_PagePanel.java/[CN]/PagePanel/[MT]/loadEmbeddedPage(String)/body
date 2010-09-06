@@ -1,0 +1,27 @@
+{
+  final RootPanel panel=RootPanel.get(rootPanelId);
+  panel.add(new Loading());
+  String url=def.getUrl();
+  if (url == null) {
+    url="/plugins/resource/" + resourceId + "?page="+ def.getId()+ "&layout=false&hd=false";
+  }
+ else {
+    url+=resourceId;
+  }
+  RequestBuilder builder=new RequestBuilder(RequestBuilder.GET,URL.encode(Links.baseUrl() + url));
+  try {
+    builder.sendRequest(null,new RequestCallback(){
+      public void onError(      Request request,      Throwable exception){
+        Utils.showError("Can not load the page " + request.toString());
+      }
+      public void onResponseReceived(      Request request,      Response response){
+        panel.clear();
+        panel.add(new HTML(response.getText()));
+      }
+    }
+);
+  }
+ catch (  RequestException e) {
+    Utils.showError("Can not connect to server: " + url);
+  }
+}

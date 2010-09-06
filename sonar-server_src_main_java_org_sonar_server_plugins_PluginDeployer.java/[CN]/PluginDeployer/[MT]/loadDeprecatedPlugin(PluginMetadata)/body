@@ -1,0 +1,15 @@
+{
+  File tempFile=new File(fileSystem.getDeprecatedPluginsDir(),plugin.getFilename());
+  FileUtils.copyFile(plugin.getSourceFile(),tempFile);
+  String mainClass=plugin.getMainClass();
+  try {
+    URLClassLoader pluginClassLoader=URLClassLoader.newInstance(new URL[]{tempFile.toURI().toURL()},getClass().getClassLoader());
+    Plugin pluginInstance=(Plugin)pluginClassLoader.loadClass(mainClass).newInstance();
+    plugin.setKey(pluginInstance.getKey());
+    plugin.setDescription(pluginInstance.getDescription());
+    plugin.setName(pluginInstance.getName());
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("The plugin main class can not be created: plugin=" + plugin.getFilename() + ", class="+ mainClass,e);
+  }
+}

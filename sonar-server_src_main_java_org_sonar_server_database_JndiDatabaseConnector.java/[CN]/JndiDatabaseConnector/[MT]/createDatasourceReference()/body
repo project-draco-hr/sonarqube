@@ -1,0 +1,21 @@
+{
+  try {
+    Reference ref=new Reference(DataSource.class.getName(),UniqueDatasourceFactory.class.getName(),null);
+    Configuration dsConfig=getConfiguration().subset("sonar.jdbc");
+    for (Iterator<String> it=dsConfig.getKeys(); it.hasNext(); ) {
+      String key=it.next();
+      String value=dsConfig.getString(key);
+      ref.add(new StringRefAddr(key,value));
+      if (value != null && key.equals("user")) {
+        ref.add(new StringRefAddr("username",value));
+      }
+      if (value != null && key.equals("driver")) {
+        ref.add(new StringRefAddr("driverClassName",value));
+      }
+    }
+    return ref;
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Cannot create the JDBC datasource",e);
+  }
+}

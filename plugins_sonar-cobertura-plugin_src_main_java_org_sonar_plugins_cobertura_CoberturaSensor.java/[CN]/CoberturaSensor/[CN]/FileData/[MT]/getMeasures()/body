@@ -1,0 +1,17 @@
+{
+  List<Measure> measures=new ArrayList<Measure>();
+  if (lines > 0) {
+    measures.add(new Measure(CoreMetrics.COVERAGE,calculateCoverage(coveredLines + coveredConditions,lines + conditions)));
+    measures.add(new Measure(CoreMetrics.LINE_COVERAGE,calculateCoverage(coveredLines,lines)));
+    measures.add(new Measure(CoreMetrics.LINES_TO_COVER,(double)lines));
+    measures.add(new Measure(CoreMetrics.UNCOVERED_LINES,(double)lines - coveredLines));
+    measures.add(lineHitsBuilder.build().setPersistenceMode(PersistenceMode.DATABASE));
+    if (conditions > 0) {
+      measures.add(new Measure(CoreMetrics.BRANCH_COVERAGE,calculateCoverage(coveredConditions,conditions)));
+      measures.add(new Measure(CoreMetrics.CONDITIONS_TO_COVER,(double)conditions));
+      measures.add(new Measure(CoreMetrics.UNCOVERED_CONDITIONS,(double)conditions - coveredConditions));
+      measures.add(branchHitsBuilder.build().setPersistenceMode(PersistenceMode.DATABASE));
+    }
+  }
+  return measures;
+}

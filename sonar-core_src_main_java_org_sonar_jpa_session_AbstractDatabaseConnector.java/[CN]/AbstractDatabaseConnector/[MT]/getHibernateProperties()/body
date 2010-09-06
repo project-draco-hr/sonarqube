@@ -1,0 +1,19 @@
+{
+  Properties props=new Properties();
+  if (transactionIsolation != null) {
+    props.put("hibernate.connection.isolation",Integer.toString(transactionIsolation));
+  }
+  props.put("hibernate.hbm2ddl.auto",getConfiguration().getString(DatabaseProperties.PROP_HIBERNATE_HBM2DLL,"validate"));
+  props.put("hibernate.dialect",getDialectClass());
+  props.put("hibernate.generate_statistics",getConfiguration().getBoolean(DatabaseProperties.PROP_HIBERNATE_GENERATE_STATISTICS,false));
+  props.put("hibernate.show_sql",Boolean.valueOf(LOG_SQL.isInfoEnabled()).toString());
+  Configuration subset=getConfiguration().subset("sonar.hibernate");
+  for (Iterator keys=subset.getKeys(); keys.hasNext(); ) {
+    String key=(String)keys.next();
+    if (StringUtils.isNotBlank((String)subset.getProperty(key))) {
+      props.put("hibernate." + key,subset.getProperty(key));
+    }
+  }
+  setupEntityManagerFactory(props);
+  return props;
+}

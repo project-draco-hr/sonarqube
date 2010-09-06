@@ -1,0 +1,8 @@
+{
+  final Date beforeDate=DateUtils.addHours(new Date(),MINIMUM_AGE_IN_HOURS);
+  Query query=getSession().createQuery("SELECT s.id FROM " + Snapshot.class.getSimpleName() + " s WHERE s.last=false AND status=:status AND s.createdAt<:date");
+  query.setParameter("status",Snapshot.STATUS_UNPROCESSED);
+  query.setParameter("date",beforeDate);
+  List<Integer> snapshotIds=query.getResultList();
+  deleteSnapshotData(snapshotIds);
+}

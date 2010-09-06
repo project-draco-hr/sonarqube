@@ -1,0 +1,11 @@
+{
+  MavenSurefireUtils.configure(project);
+  boolean skipCloverLaunch=project.getConfiguration().getBoolean("maven.clover.skip",false);
+  if (!skipCloverLaunch) {
+    String skipInPomConfig=cloverPlugin.getParameter("skip");
+    skipCloverLaunch=StringUtils.isNotBlank(skipInPomConfig) ? Boolean.parseBoolean(skipInPomConfig) : false;
+  }
+  if (!project.getConfiguration().containsKey(CoreProperties.SUREFIRE_REPORTS_PATH_PROPERTY) && !skipCloverLaunch) {
+    project.getConfiguration().setProperty(CoreProperties.SUREFIRE_REPORTS_PATH_PROPERTY,new File(project.getFileSystem().getBuildDir(),"clover/surefire-reports").getAbsolutePath());
+  }
+}

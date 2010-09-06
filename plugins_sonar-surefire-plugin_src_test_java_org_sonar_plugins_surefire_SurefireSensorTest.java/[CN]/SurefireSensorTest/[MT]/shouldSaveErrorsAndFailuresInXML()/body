@@ -1,0 +1,9 @@
+{
+  SensorContext context=mock(SensorContext.class);
+  new SurefireSensor().collect(newJarProject(),context,new File(getClass().getResource("/org/sonar/plugins/surefire/SurefireSensorTest/shouldSaveErrorsAndFailuresInXML/").toURI()));
+  verify(context,times(1)).saveMeasure(argThat(new IsResource(JavaFile.SCOPE_ENTITY,JavaFile.QUALIFIER_UNIT_TEST_CLASS)),eq(CoreMetrics.SKIPPED_TESTS),anyDouble());
+  verify(context,times(1)).saveMeasure(argThat(new IsResource(JavaFile.SCOPE_ENTITY,JavaFile.QUALIFIER_UNIT_TEST_CLASS)),eq(CoreMetrics.TESTS),anyDouble());
+  verify(context,times(6)).saveMeasure(argThat(new IsResource(JavaFile.SCOPE_ENTITY,JavaFile.QUALIFIER_UNIT_TEST_CLASS)),(Metric)anyObject(),anyDouble());
+  verify(context,times(1)).saveMeasure(argThat(new IsResource(JavaFile.SCOPE_ENTITY,JavaFile.QUALIFIER_UNIT_TEST_CLASS)),argThat(new IsMeasure(CoreMetrics.TEST_DATA)));
+  verify(context).saveMeasure(eq(new JavaFile("org.sonar.core.ExtensionsFinderTest",true)),argThat(getTestDetailsMatcher("shouldSaveErrorsAndFailuresInXML/expected-test-details.xml")));
+}

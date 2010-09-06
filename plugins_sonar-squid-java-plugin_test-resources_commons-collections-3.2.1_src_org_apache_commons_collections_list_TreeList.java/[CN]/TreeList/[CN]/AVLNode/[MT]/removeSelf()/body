@@ -1,0 +1,46 @@
+{
+  if (getRightSubTree() == null && getLeftSubTree() == null) {
+    return null;
+  }
+  if (getRightSubTree() == null) {
+    if (relativePosition > 0) {
+      left.relativePosition+=relativePosition + (relativePosition > 0 ? 0 : 1);
+    }
+    left.max().setRight(null,right);
+    return left;
+  }
+  if (getLeftSubTree() == null) {
+    right.relativePosition+=relativePosition - (relativePosition < 0 ? 0 : 1);
+    right.min().setLeft(null,left);
+    return right;
+  }
+  if (heightRightMinusLeft() > 0) {
+    AVLNode rightMin=right.min();
+    value=rightMin.value;
+    if (leftIsPrevious) {
+      left=rightMin.left;
+    }
+    right=right.removeMin();
+    if (relativePosition < 0) {
+      relativePosition++;
+    }
+  }
+ else {
+    AVLNode leftMax=left.max();
+    value=leftMax.value;
+    if (rightIsNext) {
+      right=leftMax.right;
+    }
+    AVLNode leftPrevious=left.left;
+    left=left.removeMax();
+    if (left == null) {
+      left=leftPrevious;
+      leftIsPrevious=true;
+    }
+    if (relativePosition > 0) {
+      relativePosition--;
+    }
+  }
+  recalcHeight();
+  return this;
+}

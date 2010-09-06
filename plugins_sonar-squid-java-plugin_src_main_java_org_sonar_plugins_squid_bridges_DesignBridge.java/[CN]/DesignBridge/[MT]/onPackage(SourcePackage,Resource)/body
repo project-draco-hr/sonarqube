@@ -1,0 +1,17 @@
+{
+  Set<SourceCode> squidFiles=squidPackage.getChildren();
+  if (squidFiles != null && !squidFiles.isEmpty()) {
+    saveFileDependencies(squidFiles);
+    IncrementalCyclesAndFESSolver<SourceCode> cycleDetector=new IncrementalCyclesAndFESSolver<SourceCode>(squid,squidFiles);
+    Set<Cycle> cycles=cycleDetector.getCycles();
+    MinimumFeedbackEdgeSetSolver solver=new MinimumFeedbackEdgeSetSolver(cycles);
+    Set<Edge> feedbackEdges=solver.getEdges();
+    int tangles=solver.getWeightOfFeedbackEdgeSet();
+    savePositiveMeasure(sonarPackage,CoreMetrics.FILE_CYCLES,(double)cycles.size(),false);
+    savePositiveMeasure(sonarPackage,CoreMetrics.FILE_FEEDBACK_EDGES,(double)feedbackEdges.size(),false);
+    savePositiveMeasure(sonarPackage,CoreMetrics.FILE_TANGLES,(double)tangles,false);
+    savePositiveMeasure(sonarPackage,CoreMetrics.FILE_EDGES_WEIGHT,getEdgesWeight(squidFiles),false);
+    String dsmJson=serializeDsm(squid,squidFiles,feedbackEdges);
+    context.saveMeasure(sonarPackage,new Measure(CoreMetrics.DEPENDENCY_MATRIX,dsmJson));
+  }
+}

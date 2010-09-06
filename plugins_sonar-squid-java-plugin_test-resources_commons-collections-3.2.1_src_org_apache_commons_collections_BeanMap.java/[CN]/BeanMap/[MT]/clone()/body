@@ -1,0 +1,34 @@
+{
+  BeanMap newMap=(BeanMap)super.clone();
+  if (bean == null) {
+    return newMap;
+  }
+  Object newBean=null;
+  Class beanClass=null;
+  try {
+    beanClass=bean.getClass();
+    newBean=beanClass.newInstance();
+  }
+ catch (  Exception e) {
+    throw new CloneNotSupportedException("Unable to instantiate the underlying bean \"" + beanClass.getName() + "\": "+ e);
+  }
+  try {
+    newMap.setBean(newBean);
+  }
+ catch (  Exception exception) {
+    throw new CloneNotSupportedException("Unable to set bean in the cloned bean map: " + exception);
+  }
+  try {
+    Iterator readableKeys=readMethods.keySet().iterator();
+    while (readableKeys.hasNext()) {
+      Object key=readableKeys.next();
+      if (getWriteMethod(key) != null) {
+        newMap.put(key,get(key));
+      }
+    }
+  }
+ catch (  Exception exception) {
+    throw new CloneNotSupportedException("Unable to copy bean values to cloned bean map: " + exception);
+  }
+  return newMap;
+}

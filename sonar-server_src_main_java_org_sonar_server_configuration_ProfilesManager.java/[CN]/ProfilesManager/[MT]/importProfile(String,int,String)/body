@@ -1,0 +1,11 @@
+{
+  for (  RulesRepository rulesRepository : rulesManager.getRulesRepositories()) {
+    Plugin plugin=plugins.getPluginByExtension(rulesRepository);
+    if (rulesRepository instanceof ConfigurationImportable && pluginKey.equals(plugin.getKey())) {
+      List<ActiveRule> activeRules=((ConfigurationImportable)rulesRepository).importConfiguration(configuration,rulesDao.getRulesByPlugin(pluginKey));
+      rulesDao.addActiveRulesToProfile(activeRules,profileId,pluginKey);
+      getSession().commit();
+      break;
+    }
+  }
+}

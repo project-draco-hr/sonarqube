@@ -1,0 +1,13 @@
+{
+  Resource resource=toResource(resourcesCursor);
+  if (!doSaveViolationsOnUnexistedResource && context.getResource(resource) == null) {
+    return;
+  }
+  SMInputCursor violationsCursor=cursorForViolations(resourcesCursor);
+  SMEvent event;
+  while ((event=violationsCursor.getNext()) != null) {
+    if (event.compareTo(SMEvent.START_ELEMENT) == 0) {
+      createViolationFor(resource,violationsCursor);
+    }
+  }
+}

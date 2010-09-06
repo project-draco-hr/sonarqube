@@ -1,0 +1,9 @@
+{
+  RulesProfile profile=getSession().getEntity(RulesProfile.class,profileId);
+  if (profile != null && !profile.getProvided()) {
+    String hql="UPDATE " + ResourceModel.class.getSimpleName() + " o SET o.rulesProfile=null WHERE o.rulesProfile=:rulesProfile";
+    getSession().createQuery(hql).setParameter("rulesProfile",profile).executeUpdate();
+    getSession().remove(profile);
+    getSession().commit();
+  }
+}

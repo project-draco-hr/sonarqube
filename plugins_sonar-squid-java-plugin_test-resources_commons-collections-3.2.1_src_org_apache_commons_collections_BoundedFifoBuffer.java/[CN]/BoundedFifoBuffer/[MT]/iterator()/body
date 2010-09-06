@@ -1,0 +1,42 @@
+{
+  return new Iterator(){
+    private int index=m_start;
+    private int lastReturnedIndex=-1;
+    private boolean isFirst=m_full;
+    public boolean hasNext(){
+      return isFirst || (index != m_end);
+    }
+    public Object next(){
+      if (!hasNext())       throw new NoSuchElementException();
+      isFirst=false;
+      lastReturnedIndex=index;
+      index=increment(index);
+      return m_elements[lastReturnedIndex];
+    }
+    public void remove(){
+      if (lastReturnedIndex == -1)       throw new IllegalStateException();
+      if (lastReturnedIndex == m_start) {
+        BoundedFifoBuffer.this.remove();
+        lastReturnedIndex=-1;
+        return;
+      }
+      int i=lastReturnedIndex + 1;
+      while (i != m_end) {
+        if (i >= maxElements) {
+          m_elements[i - 1]=m_elements[0];
+          i=0;
+        }
+ else {
+          m_elements[i - 1]=m_elements[i];
+          i++;
+        }
+      }
+      lastReturnedIndex=-1;
+      m_end=decrement(m_end);
+      m_elements[m_end]=null;
+      m_full=false;
+      index=decrement(index);
+    }
+  }
+;
+}

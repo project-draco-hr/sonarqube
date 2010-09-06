@@ -1,0 +1,16 @@
+{
+  setupData("loadMeasuresFromDate");
+  DefaultTimeMachine timeMachine=initTimeMachine();
+  TimeMachineQuery query=new TimeMachineQuery(null).setFrom(date("2008-02-01")).setMetrics(Arrays.asList(CoreMetrics.NCLOC));
+  List<Measure> measures=timeMachine.getMeasures(query);
+  assertThat(measures.size(),is(3));
+  long previous=0;
+  for (  Measure measure : measures) {
+    assertThat(measure.getMetric(),is(CoreMetrics.NCLOC));
+    assertThat(measure.getDate().getTime(),greaterThan(previous));
+    previous=measure.getDate().getTime();
+  }
+  assertThat(measures.get(0).getValue(),is(200d));
+  assertThat(measures.get(1).getValue(),is(230d));
+  assertThat(measures.get(2).getValue(),is(180d));
+}

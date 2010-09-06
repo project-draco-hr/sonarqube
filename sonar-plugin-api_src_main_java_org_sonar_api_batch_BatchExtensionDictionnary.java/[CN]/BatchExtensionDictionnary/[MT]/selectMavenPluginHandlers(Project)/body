@@ -1,0 +1,17 @@
+{
+  Collection<DependsUponMavenPlugin> selectedExtensions=select(DependsUponMavenPlugin.class,project,true);
+  List<MavenPluginHandler> handlers=new ArrayList<MavenPluginHandler>();
+  for (  DependsUponMavenPlugin extension : selectedExtensions) {
+    MavenPluginHandler handler=extension.getMavenPluginHandler(project);
+    if (handler != null) {
+      boolean ok=true;
+      if (handler instanceof CheckProject) {
+        ok=((CheckProject)handler).shouldExecuteOnProject(project);
+      }
+      if (ok) {
+        handlers.add(handler);
+      }
+    }
+  }
+  return handlers;
+}

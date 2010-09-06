@@ -1,0 +1,13 @@
+{
+  MutablePicoContainer container=IocContainer.buildPicoContainer();
+  register(container,configuration);
+  URLClassLoader fullClassloader=RemoteClassLoader.createForJdbcDriver(configuration).getClassLoader();
+  Thread.currentThread().setContextClassLoader(fullClassloader);
+  register(container,new DriverDatabaseConnector(configuration,fullClassloader));
+  register(container,ThreadLocalDatabaseSessionFactory.class);
+  container.as(Characteristics.CACHE).addAdapter(new DatabaseSessionProvider());
+  for (  Object component : components) {
+    register(container,component);
+  }
+  return container;
+}

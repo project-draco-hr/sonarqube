@@ -1,0 +1,15 @@
+{
+  setupData("shared");
+  DefaultModelProvider provider=new DefaultModelProvider(getSessionFactory());
+  Model model=Model.createByName("M1");
+  Characteristic c1=model.createCharacteristicByName("NEWM1C1");
+  Characteristic c1a=model.createCharacteristicByName("NEWM1C1A");
+  c1.addChild(c1a);
+  model.createCharacteristicByName("NEWM1C2");
+  model=provider.reset(model);
+  model=getSession().getSingleResult(Model.class,"name","M1");
+  assertNotNull(model);
+  assertThat(model.getCharacteristics().size(),is(3));
+  assertThat(model.getCharacteristicByName("NEWM1C1A").getParents().size(),is(1));
+  assertNotNull(model.getCharacteristicByName("NEWM1C1A").getParent("NEWM1C1"));
+}

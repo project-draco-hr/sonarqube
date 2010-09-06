@@ -1,0 +1,33 @@
+{
+  TimeProfiler profiler=new TimeProfiler().start("Execute Checkstyle " + CheckstyleVersion.getVersion());
+  ClassLoader initialClassLoader=Thread.currentThread().getContextClassLoader();
+  Thread.currentThread().setContextClassLoader(PackageNamesLoader.class.getClassLoader());
+  Checker checker=null;
+  OutputStream xmlOutput=null;
+  try {
+    checker=new Checker();
+    checker.setClassloader(projectClassloader);
+    checker.setModuleClassLoader(Thread.currentThread().getContextClassLoader());
+    checker.addListener(listener);
+    File xmlReport=configuration.getTargetXMLReport();
+    if (xmlReport != null) {
+      LOG.info("Checkstyle output report: " + xmlReport.getAbsolutePath());
+      xmlOutput=new FileOutputStream(xmlReport);
+      checker.addListener(new XMLLogger(xmlOutput,true));
+    }
+    checker.setCharset(configuration.getCharset().name());
+    checker.configure(configuration.getCheckstyleConfiguration());
+    checker.process(configuration.getSourceFiles());
+    profiler.stop();
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Can not execute Checkstyle",e);
+  }
+ finally {
+    if (checker != null) {
+      checker.destroy();
+    }
+    IOUtils.closeQuietly(xmlOutput);
+    Thread.currentThread().setContextClassLoader(initialClassLoader);
+  }
+}

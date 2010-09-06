@@ -1,0 +1,15 @@
+{
+  RulesProfile testDefaultProfile=new RulesProfile("default","java",true,true);
+  RulesProfile testProfile=new RulesProfile("not default","java",false,false);
+  ResourceModel testResourceWithProfile=new ResourceModel(ResourceModel.SCOPE_PROJECT,"withProfile","qual",null,"test");
+  testResourceWithProfile.setRulesProfile(testProfile);
+  getSession().save(testDefaultProfile,testProfile,testResourceWithProfile);
+  getSession().commit();
+  getSession().getEntityManager().clear();
+  manager.deleteProfile(testDefaultProfile.getId());
+  assertNotNull(getSession().getEntity(RulesProfile.class,testDefaultProfile.getId()));
+  manager.deleteProfile(testProfile.getId());
+  assertNull(getSession().getEntity(RulesProfile.class,testProfile.getId()));
+  testResourceWithProfile=getSession().getEntity(ResourceModel.class,testResourceWithProfile.getId());
+  assertNull(testResourceWithProfile.getRulesProfile());
+}

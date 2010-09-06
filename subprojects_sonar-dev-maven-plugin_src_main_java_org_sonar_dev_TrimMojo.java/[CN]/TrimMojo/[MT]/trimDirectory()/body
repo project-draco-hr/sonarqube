@@ -1,0 +1,21 @@
+{
+  File[] files=scanFiles();
+  for (  File file : files) {
+    StringBuilder sb=new StringBuilder();
+    try {
+      LineIterator lines=FileUtils.lineIterator(file,sourceEncoding);
+      while (lines.hasNext()) {
+        String line=lines.nextLine();
+        if (StringUtils.isNotBlank(line)) {
+          sb.append(StringUtils.trim(line));
+          sb.append(IOUtils.LINE_SEPARATOR);
+        }
+      }
+      FileUtils.writeStringToFile(file,sb.toString(),sourceEncoding);
+    }
+ catch (    IOException e) {
+      throw new MojoExecutionException("Can not trim the file " + file,e);
+    }
+  }
+  getLog().info("Trimmed files: " + files.length);
+}

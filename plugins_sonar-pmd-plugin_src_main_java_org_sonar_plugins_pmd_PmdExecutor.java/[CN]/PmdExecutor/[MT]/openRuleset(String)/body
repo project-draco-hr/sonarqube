@@ -1,0 +1,24 @@
+{
+  try {
+    File file=new File(rulesetPath);
+    boolean found;
+    if (file.exists()) {
+      found=true;
+    }
+ else {
+      file=new File(project.getFileSystem().getBasedir(),rulesetPath);
+      found=file.exists();
+    }
+    if (found) {
+      return new FileInputStream(file);
+    }
+    InputStream stream=getClass().getResourceAsStream(rulesetPath);
+    if (stream == null) {
+      throw new RuntimeException("The PMD ruleset can not be found: " + rulesetPath);
+    }
+    return stream;
+  }
+ catch (  FileNotFoundException e) {
+    throw new RuntimeException("The PMD ruleset can not be found: " + rulesetPath);
+  }
+}

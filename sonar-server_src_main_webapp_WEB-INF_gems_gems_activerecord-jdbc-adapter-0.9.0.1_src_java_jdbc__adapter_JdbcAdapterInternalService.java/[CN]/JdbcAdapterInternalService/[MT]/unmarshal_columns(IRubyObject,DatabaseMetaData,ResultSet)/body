@@ -1,0 +1,71 @@
+{
+  try {
+    List columns=new ArrayList();
+    String clzName=metadata.getClass().getName().toLowerCase();
+    boolean isDerby=clzName.indexOf("derby") != -1;
+    boolean isOracle=clzName.indexOf("oracle") != -1 || clzName.indexOf("oci") != -1;
+    Ruby runtime=recv.getRuntime();
+    IRubyObject adapter=rubyApi.callMethod(recv,"adapter");
+    RubyHash tps=(RubyHash)rubyApi.callMethod(adapter,"native_database_types");
+    IRubyObject jdbcCol=((RubyModule)(runtime.getModule("ActiveRecord").getConstant("ConnectionAdapters"))).getConstant("JdbcColumn");
+    while (rs.next()) {
+      String column_name=rs.getString(4);
+      if (metadata.storesUpperCaseIdentifiers() && !HAS_SMALL.matcher(column_name).find()) {
+        column_name=column_name.toLowerCase();
+      }
+      String prec=rs.getString(7);
+      String scal=rs.getString(9);
+      int precision=-1;
+      int scale=-1;
+      if (prec != null) {
+        precision=Integer.parseInt(prec);
+        if (scal != null) {
+          scale=Integer.parseInt(scal);
+        }
+ else         if (isOracle && rs.getInt(5) == java.sql.Types.DECIMAL) {
+          prec=null;
+        }
+      }
+      String type=rs.getString(6);
+      if (prec != null && precision > 0) {
+        type+="(" + precision;
+        if (scal != null && scale > 0) {
+          type+="," + scale;
+        }
+        type+=")";
+      }
+      String def=rs.getString(13);
+      IRubyObject _def;
+      if (def == null || (isOracle && def.toLowerCase().trim().equals("null"))) {
+        _def=runtime.getNil();
+      }
+ else {
+        if (isOracle) {
+          def=def.trim();
+        }
+        if ((isDerby || isOracle) && def.length() > 0 && def.charAt(0) == '\'') {
+          def=def.substring(1,def.length() - 1);
+        }
+        _def=RubyString.newUnicodeString(runtime,def);
+      }
+      IRubyObject config=rubyApi.getInstanceVariable(recv,"@config");
+      IRubyObject c=rubyApi.callMethod(jdbcCol,"new",new IRubyObject[]{config,RubyString.newUnicodeString(runtime,column_name),_def,RubyString.newUnicodeString(runtime,type),runtime.newBoolean(!rs.getString(18).trim().equals("NO"))});
+      columns.add(c);
+      IRubyObject tp=(IRubyObject)tps.fastARef(rubyApi.callMethod(c,"type"));
+      if (tp != null && !tp.isNil() && rubyApi.callMethod(tp,"[]",runtime.newSymbol("limit")).isNil()) {
+        rubyApi.callMethod(c,"limit=",runtime.getNil());
+        if (!rubyApi.callMethod(c,"type").equals(runtime.newSymbol("decimal"))) {
+          rubyApi.callMethod(c,"precision=",runtime.getNil());
+        }
+      }
+    }
+    return runtime.newArray(columns);
+  }
+  finally {
+    try {
+      rs.close();
+    }
+ catch (    Exception e) {
+    }
+  }
+}

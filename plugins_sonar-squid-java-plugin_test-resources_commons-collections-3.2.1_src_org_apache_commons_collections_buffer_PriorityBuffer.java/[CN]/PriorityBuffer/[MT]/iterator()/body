@@ -1,0 +1,50 @@
+{
+  return new Iterator(){
+    private int index=1;
+    private int lastReturnedIndex=-1;
+    public boolean hasNext(){
+      return index <= size;
+    }
+    public Object next(){
+      if (!hasNext()) {
+        throw new NoSuchElementException();
+      }
+      lastReturnedIndex=index;
+      index++;
+      return elements[lastReturnedIndex];
+    }
+    public void remove(){
+      if (lastReturnedIndex == -1) {
+        throw new IllegalStateException();
+      }
+      elements[lastReturnedIndex]=elements[size];
+      elements[size]=null;
+      size--;
+      if (size != 0 && lastReturnedIndex <= size) {
+        int compareToParent=0;
+        if (lastReturnedIndex > 1) {
+          compareToParent=compare(elements[lastReturnedIndex],elements[lastReturnedIndex / 2]);
+        }
+        if (ascendingOrder) {
+          if (lastReturnedIndex > 1 && compareToParent < 0) {
+            percolateUpMinHeap(lastReturnedIndex);
+          }
+ else {
+            percolateDownMinHeap(lastReturnedIndex);
+          }
+        }
+ else {
+          if (lastReturnedIndex > 1 && compareToParent > 0) {
+            percolateUpMaxHeap(lastReturnedIndex);
+          }
+ else {
+            percolateDownMaxHeap(lastReturnedIndex);
+          }
+        }
+      }
+      index--;
+      lastReturnedIndex=-1;
+    }
+  }
+;
+}

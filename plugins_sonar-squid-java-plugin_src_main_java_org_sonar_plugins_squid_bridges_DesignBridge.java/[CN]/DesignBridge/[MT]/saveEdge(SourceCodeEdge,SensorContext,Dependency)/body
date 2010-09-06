@@ -1,0 +1,22 @@
+{
+  Dependency dependency=dependencyIndex.get(edge);
+  if (dependency == null) {
+    Resource from=resourceIndex.get(edge.getFrom());
+    Resource to=resourceIndex.get(edge.getTo());
+    if (from != null && to != null) {
+      dependency=new Dependency(from,to).setUsage(edge.getUsage().name()).setWeight(edge.getWeight()).setParent(parentDependency);
+      context.saveDependency(dependency);
+      dependencyIndex.put(edge,dependency);
+    }
+ else {
+      if (from == null) {
+        LOG.warn("Unable to find resource '" + edge.getFrom() + "' to create a dependency with '"+ edge.getTo()+ "'");
+      }
+      if (to == null) {
+        LOG.warn("Unable to find resource '" + edge.getTo() + "' to create a dependency with '"+ edge.getFrom()+ "'");
+      }
+      return null;
+    }
+  }
+  return dependency;
+}

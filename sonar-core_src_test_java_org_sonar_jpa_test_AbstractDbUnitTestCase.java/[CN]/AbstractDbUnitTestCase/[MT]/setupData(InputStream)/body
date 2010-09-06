@@ -1,0 +1,21 @@
+{
+  try {
+    IDataSet[] dataSets=new IDataSet[dataSetStream.length];
+    for (int i=0; i < dataSetStream.length; i++) {
+      ReplacementDataSet dataSet=new ReplacementDataSet(new FlatXmlDataSet(dataSetStream[i]));
+      dataSet.addReplacementObject("[null]",null);
+      dataSets[i]=dataSet;
+    }
+    CompositeDataSet compositeDataSet=new CompositeDataSet(dataSets);
+    databaseTester.setDataSet(compositeDataSet);
+    connection=databaseTester.getConnection();
+    connection.getConnection().prepareStatement("set referential_integrity FALSE").execute();
+    DatabaseConfig config=connection.getConfig();
+    config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY,new HsqldbDataTypeFactory());
+    DatabaseOperation.CLEAN_INSERT.execute(connection,databaseTester.getDataSet());
+    connection.getConnection().prepareStatement("set referential_integrity TRUE").execute();
+  }
+ catch (  Exception e) {
+    throw translateException("Could not setup DBUnit data",e);
+  }
+}

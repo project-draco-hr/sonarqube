@@ -1,0 +1,25 @@
+{
+  ProfilePrototype profile=ProfilePrototype.create();
+  XMLInputFactory xmlFactory=XMLInputFactory2.newInstance();
+  xmlFactory.setProperty(XMLInputFactory.IS_COALESCING,Boolean.TRUE);
+  xmlFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE,Boolean.FALSE);
+  xmlFactory.setProperty(XMLInputFactory.SUPPORT_DTD,Boolean.FALSE);
+  xmlFactory.setProperty(XMLInputFactory.IS_VALIDATING,Boolean.FALSE);
+  SMInputFactory inputFactory=new SMInputFactory(xmlFactory);
+  try {
+    SMHierarchicCursor rootC=inputFactory.rootElementCursor(reader);
+    rootC.advance();
+    SMInputCursor cursor=rootC.childElementCursor();
+    while (cursor.getNext() != null) {
+      String nodeName=cursor.getLocalName();
+      if (StringUtils.equals("rules",nodeName)) {
+        SMInputCursor rulesCursor=cursor.childElementCursor("rule");
+        processRules(rulesCursor,profile);
+      }
+    }
+  }
+ catch (  XMLStreamException e) {
+    messages.addError("unvalidXml","XML is not valid: " + e.getMessage());
+  }
+  return profile;
+}

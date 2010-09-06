@@ -1,0 +1,10 @@
+{
+  ProfileProvider provider=new ProfileProvider();
+  Project project=new Project("project").setLanguageKey(Java.KEY);
+  Project module=new Project("module").setParent(project).setLanguageKey(Java.KEY);
+  ProfilesDao dao=mock(ProfilesDao.class);
+  when(dao.getActiveProfile(Java.KEY,"project")).thenReturn(newProfile());
+  assertNotNull(provider.provide(module,dao));
+  verify(dao,never()).getActiveProfile(Java.KEY,"module");
+  verify(dao).getActiveProfile(Java.KEY,"project");
+}

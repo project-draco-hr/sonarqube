@@ -1,0 +1,20 @@
+{
+  Set<SourceCode> squidPackages=squidProject.getChildren();
+  if (squidPackages != null && !squidPackages.isEmpty()) {
+    TimeProfiler profiler=new TimeProfiler(LOG).start("Package design analysis");
+    LOG.debug("{} packages to analyze",squidPackages.size());
+    savePackageDependencies(squidPackages);
+    IncrementalCyclesAndFESSolver<SourceCode> cyclesAndFESSolver=new IncrementalCyclesAndFESSolver<SourceCode>(squid,squidPackages);
+    LOG.debug("{} cycles",cyclesAndFESSolver.getCycles().size());
+    Set<Edge> feedbackEdges=cyclesAndFESSolver.getFeedbackEdgeSet();
+    LOG.debug("{} feedback edges",feedbackEdges.size());
+    int tangles=cyclesAndFESSolver.getWeightOfFeedbackEdgeSet();
+    savePositiveMeasure(sonarProject,CoreMetrics.PACKAGE_CYCLES,(double)cyclesAndFESSolver.getCycles().size(),true);
+    savePositiveMeasure(sonarProject,CoreMetrics.PACKAGE_FEEDBACK_EDGES,(double)feedbackEdges.size(),true);
+    savePositiveMeasure(sonarProject,CoreMetrics.PACKAGE_TANGLES,(double)tangles,true);
+    savePositiveMeasure(sonarProject,CoreMetrics.PACKAGE_EDGES_WEIGHT,getEdgesWeight(squidPackages),false);
+    String dsmJson=serializeDsm(squid,squidPackages,feedbackEdges);
+    context.saveMeasure(sonarProject,new Measure(CoreMetrics.DEPENDENCY_MATRIX,dsmJson));
+    profiler.stop();
+  }
+}

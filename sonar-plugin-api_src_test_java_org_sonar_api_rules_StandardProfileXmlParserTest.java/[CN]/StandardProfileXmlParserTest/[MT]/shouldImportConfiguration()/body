@@ -1,0 +1,11 @@
+{
+  final List<Rule> inputRules=buildRulesFixture();
+  List<ActiveRule> activeRulesExpected=buildActiveRulesFixture(inputRules);
+  StandardProfileXmlParser standardProfileXmlParser=new StandardProfileXmlParser(inputRules);
+  InputStream input=getClass().getResourceAsStream("/org/sonar/api/rules/test_profile.xml");
+  RulesProfile profile=standardProfileXmlParser.importConfiguration(IOUtils.toString(input));
+  List<ActiveRule> results=profile.getActiveRules();
+  assertThat("Sonar way",is(profile.getName()));
+  assertThat(results.size(),is(activeRulesExpected.size()));
+  assertActiveRulesAreEquals(results,activeRulesExpected);
+}

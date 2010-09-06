@@ -1,0 +1,37 @@
+{
+  Backup backup=new Backup(Arrays.asList(new MetricsBackup(null),new PropertiesBackup(null),new ProfilesBackup((DatabaseSession)null)));
+  String xml=getFileFromClasspath("backup-restore-valid.xml");
+  SonarConfig sonarConfig=backup.getSonarConfigFromXml(xml);
+  assertTrue(CollectionUtils.isEqualCollection(sonarConfig.getMetrics(),getMetrics()));
+  assertTrue(CollectionUtils.isEqualCollection(sonarConfig.getProperties(),getProperties()));
+  for (  Metric metric : sonarConfig.getMetrics()) {
+    assertNotNull(metric.getEnabled());
+    assertTrue(metric.getEnabled());
+    assertNotNull(metric.getUserManaged());
+    assertTrue(metric.getUserManaged());
+  }
+  Collection<RulesProfile> profiles=sonarConfig.getProfiles();
+  assertEquals(2,profiles.size());
+  RulesProfile testProfile=profiles.iterator().next();
+  assertEquals("test name",testProfile.getName());
+  assertEquals(true,testProfile.getDefaultProfile());
+  assertEquals("test language",testProfile.getLanguage());
+  assertEquals(1,testProfile.getActiveRules().size());
+  ActiveRule testActiveRule=testProfile.getActiveRules().get(0);
+  assertEquals(RulePriority.MAJOR,testActiveRule.getPriority());
+  assertNotNull(testActiveRule.getRule());
+  assertEquals("test key",testActiveRule.getRule().getKey());
+  assertEquals("test plugin",testActiveRule.getRule().getPluginName());
+  assertEquals(1,testActiveRule.getActiveRuleParams().size());
+  ActiveRuleParam testActiveRuleParam=testActiveRule.getActiveRuleParams().get(0);
+  assertEquals("test value",testActiveRuleParam.getValue());
+  assertNotNull(testActiveRuleParam.getRuleParam());
+  assertEquals("test param key",testActiveRuleParam.getRuleParam().getKey());
+  assertEquals(1,testProfile.getAlerts().size());
+  Alert testAlert=testProfile.getAlerts().get(0);
+  assertEquals(Alert.OPERATOR_GREATER,testAlert.getOperator());
+  assertEquals("testError",testAlert.getValueError());
+  assertEquals("testWarn",testAlert.getValueWarning());
+  assertNotNull(testAlert.getMetric());
+  assertEquals("test key",testAlert.getMetric().getKey());
+}

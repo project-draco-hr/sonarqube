@@ -1,0 +1,18 @@
+{
+  Map<String,Rule> rulesByKey=new HashMap<String,Rule>();
+  for (  Rule rule : repository.createRules()) {
+    rule.setRepositoryKey(repository.getKey());
+    rulesByKey.put(rule.getKey(),rule);
+  }
+  Logs.INFO.info(rulesByKey.size() + " rules");
+  List<Rule> persistedRules=session.getResults(Rule.class,"pluginName",repository.getKey());
+  for (  Rule persistedRule : persistedRules) {
+    Rule rule=rulesByKey.get(persistedRule.getKey());
+    if (rule != null) {
+      updateRule(persistedRule,rule,session);
+      rulesByKey.remove(rule.getKey());
+    }
+  }
+  saveNewRules(rulesByKey.values(),session);
+  session.commit();
+}

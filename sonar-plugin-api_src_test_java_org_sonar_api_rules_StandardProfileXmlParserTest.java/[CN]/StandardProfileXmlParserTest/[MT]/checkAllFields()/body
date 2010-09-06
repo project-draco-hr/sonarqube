@@ -1,0 +1,18 @@
+{
+  StandardProfileXmlParser parser=new StandardProfileXmlParser();
+  String xml="<profile name='Sonar way' language='java'><rule key=\"2006\" priority=\"warning\" /><rule key=\"2007\" priority=\"error\"><property name=\"toto\" value=\"titi\" /></rule></profile>";
+  Profile profile=parser.parse(xml);
+  assertEquals(2,profile.getRules().size());
+  assertEquals("Sonar way",profile.getName());
+  org.sonar.api.rules.xml.Rule rule1=profile.getRules().get(0);
+  assertEquals("2006",rule1.getKey());
+  assertEquals("warning",rule1.getPriority());
+  assertNull(rule1.getProperties());
+  org.sonar.api.rules.xml.Rule rule2=profile.getRules().get(1);
+  assertEquals("2007",rule2.getKey());
+  assertEquals("error",rule2.getPriority());
+  assertEquals(rule2.getProperties().size(),1);
+  Property property=rule2.getProperties().get(0);
+  assertEquals("toto",property.getName());
+  assertEquals("titi",property.getValue());
+}

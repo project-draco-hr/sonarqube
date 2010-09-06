@@ -1,0 +1,13 @@
+{
+  RulesProfile testDefaultProfile=new RulesProfile("default","java",true,true);
+  RulesProfile testProfile=new RulesProfile("not default","java",false,false);
+  getSession().save(testDefaultProfile,testProfile);
+  ResourceModel testResourceWithProfile=new ResourceModel(ResourceModel.SCOPE_PROJECT,"withProfile","qual",null,"test");
+  testResourceWithProfile.setRulesProfile(testProfile);
+  ResourceModel testResourceWithNoProfile=new ResourceModel(ResourceModel.SCOPE_PROJECT,"withoutProfile","qual",null,"test");
+  getSession().save(testResourceWithProfile,testResourceWithNoProfile);
+  assertNull(profilesDao.getActiveProfile("wrongLanguage","withoutProfile"));
+  assertEquals(testDefaultProfile.getId(),profilesDao.getActiveProfile("java","wrongKey").getId());
+  assertEquals(testDefaultProfile.getId(),profilesDao.getActiveProfile("java","withoutProfile").getId());
+  assertEquals(testProfile.getId(),profilesDao.getActiveProfile("java","withProfile").getId());
+}

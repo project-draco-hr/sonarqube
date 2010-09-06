@@ -1,0 +1,19 @@
+{
+  boolean isArray=isArrayType(ast);
+  for (  Integer tokenType : tokenJavaTypeMapping.keySet()) {
+    if (ast.branchContains(tokenType)) {
+      return new Parameter(tokenJavaTypeMapping.get(tokenType),isArray);
+    }
+  }
+  if (isObjectType(ast)) {
+    String className;
+    if (isArray) {
+      className=extractClassName(drilldownToLastArray(ast));
+    }
+ else {
+      className=extractClassName(ast);
+    }
+    return new Parameter(className,isArray);
+  }
+  throw new IllegalStateException("No Known TokenType has been found at line " + ast.getLineNo() + " of file "+ getFileContents().getFilename());
+}

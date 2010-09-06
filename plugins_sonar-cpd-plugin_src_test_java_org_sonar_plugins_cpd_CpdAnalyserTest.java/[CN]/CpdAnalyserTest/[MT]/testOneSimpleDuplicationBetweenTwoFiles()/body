@@ -1,0 +1,28 @@
+{
+  ProjectFileSystem fileSystem=mock(ProjectFileSystem.class);
+  when(fileSystem.getSourceDirs()).thenReturn(Collections.<File>emptyList());
+  File file1=new File("target/tmp/file1.ext");
+  File file2=new File("target/tmp/file2.ext");
+  Project project=new Project("key").setFileSystem(fileSystem);
+  SensorContext context=mock(SensorContext.class);
+  CpdMapping cpdMapping=mock(CpdMapping.class);
+  Resource resource1=new JavaFile("foo.Foo");
+  Resource resource2=new JavaFile("foo.Bar");
+  when(cpdMapping.createResource((File)anyObject(),anyList())).thenReturn(resource1).thenReturn(resource2).thenReturn(resource2).thenReturn(resource1);
+  when(context.saveResource(resource1)).thenReturn("key1");
+  when(context.saveResource(resource2)).thenReturn("key2");
+  Match match1=new Match(5,new TokenEntry(null,file1.getAbsolutePath(),5),new TokenEntry(null,file2.getAbsolutePath(),15));
+  match1.setLineCount(200);
+  CpdAnalyser cpdAnalyser=new CpdAnalyser(project,context,cpdMapping);
+  cpdAnalyser.analyse(Arrays.asList(match1).iterator());
+  verify(context).saveMeasure(resource1,CoreMetrics.DUPLICATED_FILES,1d);
+  verify(context).saveMeasure(resource1,CoreMetrics.DUPLICATED_BLOCKS,1d);
+  verify(context).saveMeasure(resource1,CoreMetrics.DUPLICATED_LINES,200d);
+  verify(context).saveMeasure(eq(resource1),argThat(new IsMeasure(CoreMetrics.DUPLICATIONS_DATA,"<duplications>" + "<duplication lines=\"200\" start=\"5\" target-start=\"15\" target-resource=\"key2\"/>" + "</duplications>")));
+  verify(context).saveMeasure(resource2,CoreMetrics.DUPLICATED_FILES,1d);
+  verify(context).saveMeasure(resource2,CoreMetrics.DUPLICATED_LINES,200d);
+  verify(context).saveMeasure(resource2,CoreMetrics.DUPLICATED_BLOCKS,1d);
+  verify(context).saveMeasure(eq(resource2),argThat(new IsMeasure(CoreMetrics.DUPLICATIONS_DATA,"<duplications><duplication lines=\"200\" start=\"15\" target-start=\"5\" target-resource=\"key1\"/></duplications>")));
+  verify(context,atLeastOnce()).saveResource(resource1);
+  verify(context,atLeastOnce()).saveResource(resource2);
+}

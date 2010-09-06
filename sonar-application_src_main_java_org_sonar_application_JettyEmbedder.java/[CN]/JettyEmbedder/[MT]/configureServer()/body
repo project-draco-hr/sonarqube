@@ -1,0 +1,24 @@
+{
+  QueuedThreadPool threadPool=new QueuedThreadPool();
+  threadPool.setMinThreads(5);
+  threadPool.setMaxThreads(50);
+  threadPool.setLowThreads(10);
+  server.setThreadPool(threadPool);
+  SelectChannelConnector connector=new SelectChannelConnector();
+  connector.setHost(host);
+  connector.setPort(port);
+  connector.setStatsOn(false);
+  connector.setAcceptors(2);
+  connector.setConfidentialPort(8443);
+  if (ajp13Port > 0) {
+    LoggerFactory.getLogger("org.sonar.INFO").info("AJP13 connector is on port " + ajp13Port);
+    Connector ajpConnector=new Ajp13SocketConnector();
+    ajpConnector.setPort(ajp13Port);
+    server.addConnector(ajpConnector);
+  }
+  server.addConnector(connector);
+  server.setStopAtShutdown(true);
+  server.setSendServerVersion(false);
+  server.setSendDateHeader(true);
+  server.setGracefulShutdown(1000);
+}

@@ -1,0 +1,22 @@
+{
+  boolean isArray=false;
+  String classCanonicalName=null;
+  while (signature.charAt(index) == ARRAY) {
+    isArray=true;
+    index++;
+  }
+  JvmJavaType jvmJavaType=JvmJavaType.valueOf(signature.substring(index,index + 1));
+  index=index + 1;
+  if (jvmJavaType == JvmJavaType.L || jvmJavaType == JvmJavaType.T) {
+    int semicolonIndex=searchEndOfParameterSignature(signature,index);
+    if (signature.indexOf('<',index) != -1) {
+      classCanonicalName=signature.substring(index,signature.indexOf('<',index));
+    }
+ else {
+      classCanonicalName=signature.substring(index,semicolonIndex);
+    }
+    index=semicolonIndex + 1;
+    jvmJavaType=JvmJavaType.L;
+  }
+  return new Parameter(jvmJavaType,classCanonicalName,isArray);
+}

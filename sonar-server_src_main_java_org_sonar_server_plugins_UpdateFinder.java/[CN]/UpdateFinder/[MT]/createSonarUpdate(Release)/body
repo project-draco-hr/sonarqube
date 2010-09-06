@@ -1,0 +1,29 @@
+{
+  SonarUpdate update=new SonarUpdate(sonarRelease);
+  for (  Map.Entry<Plugin,Version> entry : installedPlugins.entrySet()) {
+    Plugin plugin=entry.getKey();
+    Version pluginVersion=entry.getValue();
+    Release pluginRelease=plugin.getRelease(pluginVersion);
+    if (pluginRelease == null) {
+      update.addIncompatiblePlugin(plugin);
+    }
+ else     if (pluginRelease.supportSonarVersion(sonarRelease.getVersion())) {
+      update.addCompatiblePlugin(plugin);
+    }
+ else {
+      boolean ok=false;
+      for (      Release greaterPluginRelease : plugin.getReleasesGreaterThan(pluginVersion)) {
+        if (greaterPluginRelease.supportSonarVersion(sonarRelease.getVersion())) {
+          ok=true;
+        }
+      }
+      if (ok) {
+        update.addPluginToUpgrade(plugin);
+      }
+ else {
+        update.addIncompatiblePlugin(plugin);
+      }
+    }
+  }
+  return update;
+}

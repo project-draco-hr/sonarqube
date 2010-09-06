@@ -1,0 +1,19 @@
+{
+  Iterator<Map.Entry<Resource,Bucket>> it=buckets.entrySet().iterator();
+  while (it.hasNext()) {
+    Map.Entry<Resource,Bucket> entry=it.next();
+    Resource resource=entry.getKey();
+    if (!ResourceUtils.isSet(resource)) {
+      entry.getValue().clear();
+      it.remove();
+    }
+  }
+  Set<Dependency> projectDependencies=getDependenciesBetweenProjects();
+  dependencies.clear();
+  incomingDependenciesByResource.clear();
+  outgoingDependenciesByResource.clear();
+  for (  Dependency projectDependency : projectDependencies) {
+    projectDependency.setId(null);
+    registerDependency(projectDependency);
+  }
+}

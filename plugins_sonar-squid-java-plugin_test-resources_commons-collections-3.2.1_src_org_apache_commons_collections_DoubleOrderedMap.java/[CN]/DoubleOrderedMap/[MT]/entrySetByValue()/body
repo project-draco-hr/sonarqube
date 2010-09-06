@@ -1,0 +1,44 @@
+{
+  if (setOfEntries[VALUE] == null) {
+    setOfEntries[VALUE]=new AbstractSet(){
+      public Iterator iterator(){
+        return new DoubleOrderedMapIterator(VALUE){
+          protected Object doGetNext(){
+            return lastReturnedNode;
+          }
+        }
+;
+      }
+      public boolean contains(      Object o){
+        if (!(o instanceof Map.Entry)) {
+          return false;
+        }
+        Map.Entry entry=(Map.Entry)o;
+        Object key=entry.getKey();
+        Node node=lookup((Comparable)entry.getValue(),VALUE);
+        return (node != null) && node.getData(KEY).equals(key);
+      }
+      public boolean remove(      Object o){
+        if (!(o instanceof Map.Entry)) {
+          return false;
+        }
+        Map.Entry entry=(Map.Entry)o;
+        Object key=entry.getKey();
+        Node node=lookup((Comparable)entry.getValue(),VALUE);
+        if ((node != null) && node.getData(KEY).equals(key)) {
+          doRedBlackDelete(node);
+          return true;
+        }
+        return false;
+      }
+      public int size(){
+        return DoubleOrderedMap.this.size();
+      }
+      public void clear(){
+        DoubleOrderedMap.this.clear();
+      }
+    }
+;
+  }
+  return setOfEntries[VALUE];
+}

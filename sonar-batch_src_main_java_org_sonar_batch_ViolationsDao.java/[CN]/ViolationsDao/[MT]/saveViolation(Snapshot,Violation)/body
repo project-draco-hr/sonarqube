@@ -1,0 +1,18 @@
+{
+  if (profile == null || snapshot == null || violation == null) {
+    throw new IllegalArgumentException("Missing data to save violation : profile=" + profile + ",snapshot="+ snapshot+ ",violation="+ violation);
+  }
+  ActiveRule activeRule=profile.getActiveRule(violation.getRule());
+  if (activeRule == null) {
+    if (reuseExistingRulesConfig) {
+      activeRule=new ActiveRule(profile,violation.getRule(),violation.getRule().getPriority());
+    }
+ else {
+      LoggerFactory.getLogger(getClass()).debug("Violation is not saved because rule is not activated : violation={}",violation);
+    }
+  }
+  if (activeRule != null) {
+    RuleFailureModel model=toModel(snapshot,violation,activeRule);
+    session.save(model);
+  }
+}

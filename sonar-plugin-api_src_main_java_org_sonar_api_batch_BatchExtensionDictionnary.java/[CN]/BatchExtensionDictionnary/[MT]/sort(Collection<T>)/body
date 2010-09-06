@@ -1,0 +1,15 @@
+{
+  DirectAcyclicGraph dag=new DirectAcyclicGraph();
+  for (  T extension : extensions) {
+    dag.add(extension);
+    for (    Object dependency : getDependencies(extension)) {
+      dag.add(extension,dependency);
+    }
+    for (    Object generates : getDependents(extension)) {
+      dag.add(generates,extension);
+    }
+    completePhaseDependencies(dag,extension);
+  }
+  List sortedList=dag.sort();
+  return (Collection<T>)Collections2.filter(sortedList,Predicates.in(extensions));
+}

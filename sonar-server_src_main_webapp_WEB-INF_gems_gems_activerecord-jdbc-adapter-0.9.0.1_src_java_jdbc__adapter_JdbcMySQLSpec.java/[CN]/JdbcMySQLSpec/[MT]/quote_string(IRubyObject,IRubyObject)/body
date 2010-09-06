@@ -1,0 +1,41 @@
+{
+  ByteList bl=((RubyString)string).getByteList();
+  ByteList blNew=new ByteList();
+  int startOfExtend=bl.begin;
+  for (int i=bl.begin; i < bl.begin + bl.realSize; i++) {
+    ByteList rep=null;
+switch (bl.bytes[i]) {
+case 0:
+      rep=ZERO;
+    break;
+case '\n':
+  rep=NEWLINE;
+break;
+case '\r':
+rep=CARRIAGE;
+break;
+case 26:
+rep=ZED;
+break;
+case '"':
+rep=DBL;
+break;
+case '\'':
+rep=SINGLE;
+break;
+case '\\':
+rep=ESCAPE;
+break;
+default :
+continue;
+}
+if (i > startOfExtend) blNew.append(bl,startOfExtend - bl.begin,i - startOfExtend);
+blNew.append(rep,0,2);
+startOfExtend=i + 1;
+}
+if (startOfExtend == bl.begin) {
+return string;
+}
+if (bl.begin + bl.realSize > startOfExtend) blNew.append(bl,startOfExtend - bl.begin,bl.begin + bl.realSize - startOfExtend);
+return recv.getRuntime().newStringShared(blNew);
+}

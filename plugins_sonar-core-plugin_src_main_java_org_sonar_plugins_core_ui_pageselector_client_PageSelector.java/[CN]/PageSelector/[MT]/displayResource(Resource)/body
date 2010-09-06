@@ -1,0 +1,27 @@
+{
+  List<PageDef> pages=selectPages(resource);
+  PageDef selectedPage=selectPage(pages);
+  Title title=new Title(resource);
+  final TabPanel tabs=new TabPanel();
+  tabs.setWidth("100%");
+  int selectedTabIndex=-1;
+  for (int tabIndex=0; tabIndex < pages.size(); tabIndex++) {
+    PageDef page=pages.get(tabIndex);
+    tabs.add(new PagePanel(page),page.getName());
+    if (page == selectedPage) {
+      selectedTabIndex=tabIndex;
+    }
+  }
+  container.clear();
+  container.add(title);
+  container.add(tabs);
+  tabs.addSelectionHandler(new SelectionHandler<Integer>(){
+    public void onSelection(    SelectionEvent<Integer> tabId){
+      ((PagePanel)tabs.getWidget(tabId.getSelectedItem())).display();
+    }
+  }
+);
+  if (selectedTabIndex > -1) {
+    tabs.selectTab(selectedTabIndex);
+  }
+}

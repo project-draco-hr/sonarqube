@@ -1,0 +1,17 @@
+{
+  List<File> result=new ArrayList<File>();
+  if (directories == null) {
+    return result;
+  }
+  IOFileFilter suffixFilter=getFileSuffixFilter(langs);
+  WildcardPattern[] exclusionPatterns=getExclusionPatterns(applyExclusionPatterns);
+  for (  File dir : directories) {
+    if (dir.exists()) {
+      IOFileFilter exclusionFilter=new ExclusionFilter(dir,exclusionPatterns);
+      IOFileFilter visibleFileFilter=HiddenFileFilter.VISIBLE;
+      AndFileFilter filters=new AndFileFilter(new AndFileFilter(exclusionFilter,suffixFilter),visibleFileFilter);
+      result.addAll(FileUtils.listFiles(dir,filters,HiddenFileFilter.VISIBLE));
+    }
+  }
+  return result;
+}

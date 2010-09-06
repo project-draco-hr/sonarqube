@@ -1,0 +1,23 @@
+{
+  this.plugins=plugins;
+  this.rulesDao=dao;
+  languages=new HashSet<Language>();
+  rulesByLanguage=new HashMap<Language,List<RulesRepository<?>>>();
+  pluginsByLanguage=new HashMap<Language,List<Plugin>>();
+  this.repositories=repositories;
+  for (  RulesRepository<?> repository : repositories) {
+    languages.add(repository.getLanguage());
+    List<RulesRepository<?>> list=rulesByLanguage.get(repository.getLanguage());
+    if (list == null) {
+      list=new ArrayList<RulesRepository<?>>();
+      rulesByLanguage.put(repository.getLanguage(),list);
+    }
+    list.add(repository);
+    List<Plugin> languagePlugins=pluginsByLanguage.get(repository.getLanguage());
+    if (languagePlugins == null) {
+      languagePlugins=new ArrayList<Plugin>();
+      pluginsByLanguage.put(repository.getLanguage(),languagePlugins);
+    }
+    languagePlugins.add(plugins.getPluginByExtension(repository));
+  }
+}

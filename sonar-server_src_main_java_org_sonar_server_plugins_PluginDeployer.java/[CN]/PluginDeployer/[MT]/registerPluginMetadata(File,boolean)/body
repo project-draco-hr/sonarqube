@@ -1,0 +1,16 @@
+{
+  PluginMetadata metadata=PluginMetadata.createFromJar(file,corePlugin);
+  String pluginKey=metadata.getKey();
+  if (pluginKey != null) {
+    PluginMetadata existing=pluginByKeys.get(pluginKey);
+    if (existing != null) {
+      FileUtils.deleteQuietly(existing.getSourceFile());
+      pluginByKeys.remove(pluginKey);
+    }
+    pluginByKeys.put(pluginKey,metadata);
+  }
+ else   if (metadata.isOldManifest()) {
+    loadDeprecatedPlugin(metadata);
+    deprecatedPlugins.add(metadata);
+  }
+}

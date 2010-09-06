@@ -1,0 +1,17 @@
+{
+  List<String> ids=new ArrayList<String>();
+  List<String> libs=new ArrayList<String>();
+  File libDirectory=new File(getAppDirectory(),LIB_DIR);
+  Set<Artifact> artifacts=getNotProvidedDependencies();
+  for (  Artifact artifact : artifacts) {
+    String targetFileName=getDefaultFinalName(artifact);
+    FileUtils.copyFileIfModified(artifact.getFile(),new File(libDirectory,targetFileName));
+    libs.add(LIB_DIR + targetFileName);
+    ids.add(artifact.getDependencyConflictId());
+  }
+  if (!ids.isEmpty()) {
+    getLog().info(getMessage("Following dependencies are packaged in the plugin:",ids));
+    getLog().info(new StringBuilder().append("See following page for more details about plugin dependencies:\n").append("\n\thttp://docs.codehaus.org/display/SONAR/Coding+a+plugin\n").toString());
+  }
+  return libs;
+}

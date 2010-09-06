@@ -1,0 +1,24 @@
+{
+  Rule rule=new Rule();
+  rule.setKey(bugType);
+  rule.setConfigKey(bugType);
+  String rulesCateg=BUG_CATEGS.get(bug.getCategory());
+  if (StringUtils.isEmpty(rulesCateg)) {
+    throw new RuntimeException("Rules cat not found " + bug.getCategory());
+  }
+  rule.setRulesCategory(new RulesCategory(rulesCateg));
+  SMInputCursor descendents=childrens.childElementCursor();
+  while (descendents.getNext() != null) {
+    if (descendents.asEvent().isStartElement()) {
+      if (descendents.getLocalName().equals("ShortDescription")) {
+        String categName=bugCategoriesDecr.get(bug.getCategory());
+        if (StringUtils.isEmpty(categName))         throw new RuntimeException("Cat not found " + bug.getCategory());
+        rule.setName(categName + " - " + descendents.collectDescendantText());
+      }
+ else       if (descendents.getLocalName().equals("Details")) {
+        rule.setDescription(descendents.collectDescendantText());
+      }
+    }
+  }
+  return rule;
+}

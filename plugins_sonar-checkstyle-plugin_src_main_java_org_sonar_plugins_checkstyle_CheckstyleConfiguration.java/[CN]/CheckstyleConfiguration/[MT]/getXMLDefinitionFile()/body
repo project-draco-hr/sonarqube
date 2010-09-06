@@ -1,0 +1,19 @@
+{
+  if (project.getReuseExistingRulesConfig()) {
+    return findExistingXML();
+  }
+  Writer writer=null;
+  File xmlFile=new File(project.getFileSystem().getSonarWorkingDirectory(),"checkstyle.xml");
+  try {
+    writer=new OutputStreamWriter(new FileOutputStream(xmlFile,false),CharEncoding.UTF_8);
+    confExporter.exportProfile(profile,writer);
+    writer.flush();
+    return xmlFile;
+  }
+ catch (  IOException e) {
+    throw new SonarException("Fail to save the Checkstyle configuration to " + xmlFile.getPath(),e);
+  }
+ finally {
+    IOUtils.closeQuietly(writer);
+  }
+}

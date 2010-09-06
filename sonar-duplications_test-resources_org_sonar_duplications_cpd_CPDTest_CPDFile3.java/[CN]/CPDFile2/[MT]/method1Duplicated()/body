@@ -1,0 +1,14 @@
+{
+  CPD cpd=new CPD(20,cpdLanguage);
+  cpd.setEncoding(Charset.defaultCharset().name());
+  cpd.setLoadSourceCodeSlices(false);
+  cpd.add(FileUtils.toFile(CPD.class.getResource("/org/sonar/duplications/cpd/CPDTest/CPDFile1.java")));
+  cpd.add(FileUtils.toFile(CPD.class.getResource("/org/sonar/duplications/cpd/CPDTest/CPDFile2.java")));
+  cpd.go();
+  List<Match> matches=getMatches(cpd);
+  assertThat(matches.size(),is(1));
+  org.sonar.duplications.cpd.Match match=matches.get(0);
+  assertThat(match.getLineCount(),is(26));
+  assertThat(match.getFirstMark().getBeginLine(),is(16));
+  assertThat(match.getSourceCodeSlice(),is(nullValue()));
+}

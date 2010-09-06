@@ -1,0 +1,22 @@
+{
+  InputStream checkstyleConfig=null;
+  try {
+    checkstyleConfig=JavaAstScanner.class.getClassLoader().getResourceAsStream("checkstyle-configuration.xml");
+    String readenConfig=IOUtils.toString(checkstyleConfig);
+    readenConfig=readenConfig.replace("${charset}",charset.toString());
+    checkstyleConfig=new ByteArrayInputStream(readenConfig.getBytes());
+    Configuration config=ConfigurationLoader.loadConfiguration(new InputSource(checkstyleConfig),new PropertiesExpander(System.getProperties()),false);
+    Checker c=new Checker();
+    final ClassLoader moduleClassLoader=Checker.class.getClassLoader();
+    c.setModuleClassLoader(moduleClassLoader);
+    c.configure(config);
+    c.addListener(new CheckstyleAuditListener());
+    return c;
+  }
+ catch (  Exception e) {
+    throw new AnalysisException("Unable to create Checkstyle Checker object with 'checkstyle-configuration.xml' as Checkstyle configuration file name",e);
+  }
+ finally {
+    IOUtils.closeQuietly(checkstyleConfig);
+  }
+}

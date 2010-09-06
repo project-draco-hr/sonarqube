@@ -1,0 +1,38 @@
+{
+  lineHitsBuilder.clear();
+  branchHitsBuilder.clear();
+  boolean hasBranches=false;
+  while (lineCursor.getNext() != null) {
+    if (lineCursor.getLocalName().equals("class")) {
+      continue;
+    }
+    final String lineId=lineCursor.getAttrValue("num");
+    int hits;
+    String count=lineCursor.getAttrValue("count");
+    if (StringUtils.isBlank(count)) {
+      int trueCount=(int)ParsingUtils.parseNumber(lineCursor.getAttrValue("truecount"));
+      int falseCount=(int)ParsingUtils.parseNumber(lineCursor.getAttrValue("falsecount"));
+      hits=trueCount + falseCount;
+      String branchHits;
+      if (trueCount > 0 && falseCount > 0) {
+        branchHits="100%";
+      }
+ else       if (trueCount == 0 && falseCount == 0) {
+        branchHits="0%";
+      }
+ else {
+        branchHits="50%";
+      }
+      branchHitsBuilder.add(lineId,branchHits);
+      hasBranches=true;
+    }
+ else {
+      hits=(int)ParsingUtils.parseNumber(count);
+    }
+    lineHitsBuilder.add(lineId,hits);
+  }
+  context.saveMeasure(resource,lineHitsBuilder.build());
+  if (hasBranches) {
+    context.saveMeasure(resource,branchHitsBuilder.build());
+  }
+}

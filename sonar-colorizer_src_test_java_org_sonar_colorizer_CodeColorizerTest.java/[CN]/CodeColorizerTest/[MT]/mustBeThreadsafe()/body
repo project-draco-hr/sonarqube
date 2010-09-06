@@ -1,0 +1,23 @@
+{
+  final int taskCount=50;
+  final int threadCount=5;
+class ColorizerTask implements Callable<String> {
+    Reader java;
+    ColorizerTask() throws FileNotFoundException {
+      this.java=readFile("/org/sonar/colorizer/samples/Sample.java");
+    }
+    public String call() throws Exception {
+      return CodeColorizer.javaToHtml(java,HtmlOptions.ONLY_SYNTAX);
+    }
+  }
+  Collection<Callable<String>> tasks=new ArrayList<Callable<String>>();
+  for (int i=0; i < taskCount; i++) {
+    tasks.add(new ColorizerTask());
+  }
+  List<Future<String>> futures=Executors.newFixedThreadPool(threadCount).invokeAll(tasks);
+  assertThat(futures.size(),is(taskCount));
+  String html=futures.get(0).get();
+  for (  Future<String> future : futures) {
+    assertEquals(html,future.get());
+  }
+}

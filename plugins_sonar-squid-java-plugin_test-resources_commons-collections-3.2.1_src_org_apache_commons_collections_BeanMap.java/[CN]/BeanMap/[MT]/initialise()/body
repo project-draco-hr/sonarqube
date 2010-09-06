@@ -1,0 +1,29 @@
+{
+  if (getBean() == null)   return;
+  Class beanClass=getBean().getClass();
+  try {
+    BeanInfo beanInfo=Introspector.getBeanInfo(beanClass);
+    PropertyDescriptor[] propertyDescriptors=beanInfo.getPropertyDescriptors();
+    if (propertyDescriptors != null) {
+      for (int i=0; i < propertyDescriptors.length; i++) {
+        PropertyDescriptor propertyDescriptor=propertyDescriptors[i];
+        if (propertyDescriptor != null) {
+          String name=propertyDescriptor.getName();
+          Method readMethod=propertyDescriptor.getReadMethod();
+          Method writeMethod=propertyDescriptor.getWriteMethod();
+          Class aType=propertyDescriptor.getPropertyType();
+          if (readMethod != null) {
+            readMethods.put(name,readMethod);
+          }
+          if (writeMethod != null) {
+            writeMethods.put(name,writeMethod);
+          }
+          types.put(name,aType);
+        }
+      }
+    }
+  }
+ catch (  IntrospectionException e) {
+    logWarn(e);
+  }
+}

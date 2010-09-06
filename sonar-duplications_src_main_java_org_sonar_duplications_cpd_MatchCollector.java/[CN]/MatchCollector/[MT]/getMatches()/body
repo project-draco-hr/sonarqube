@@ -1,0 +1,57 @@
+{
+  List<Match> matchList=new ArrayList<Match>(startMap.values());
+  Collections.sort(matchList);
+  Set<Match.MatchCode> matchSet=new HashSet<Match.MatchCode>();
+  Match.MatchCode matchCode=new Match.MatchCode();
+  for (int i=matchList.size(); i > 1; i--) {
+    Match match1=matchList.get(i - 1);
+    TokenEntry mark1=match1.getMarkSet().iterator().next();
+    matchSet.clear();
+    matchSet.add(match1.getMatchCode());
+    for (int j=i - 1; j > 0; j--) {
+      Match match2=matchList.get(j - 1);
+      if (match1.getTokenCount() != match2.getTokenCount()) {
+        break;
+      }
+      TokenEntry mark2=null;
+      for (Iterator<TokenEntry> iter=match2.getMarkSet().iterator(); iter.hasNext(); ) {
+        mark2=iter.next();
+        if (mark2 != mark1) {
+          break;
+        }
+      }
+      int dupes=countDuplicateTokens(mark1,mark2);
+      if (dupes < match1.getTokenCount()) {
+        break;
+      }
+      matchSet.add(match2.getMatchCode());
+      match1.getMarkSet().addAll(match2.getMarkSet());
+      matchList.remove(i - 2);
+      i--;
+    }
+    if (matchSet.size() == 1) {
+      continue;
+    }
+    Set<TokenEntry> pruned=match1.getMarkSet();
+    boolean done=false;
+    ArrayList<TokenEntry> a1=new ArrayList<TokenEntry>(match1.getMarkSet());
+    Collections.sort(a1);
+    for (int outer=0; outer < a1.size() - 1 && !done; outer++) {
+      TokenEntry cmark1=a1.get(outer);
+      for (int inner=outer + 1; inner < a1.size() && !done; inner++) {
+        TokenEntry cmark2=a1.get(inner);
+        matchCode.setFirst(cmark1.getIndex());
+        matchCode.setSecond(cmark2.getIndex());
+        if (!matchSet.contains(matchCode)) {
+          if (pruned.size() > 2) {
+            pruned.remove(cmark2);
+          }
+          if (pruned.size() == 2) {
+            done=true;
+          }
+        }
+      }
+    }
+  }
+  return matchList;
+}

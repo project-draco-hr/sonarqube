@@ -1,0 +1,16 @@
+{
+  DefaultSonarIndex index=new DefaultSonarIndex(getSession(),null);
+  Resource from=new JavaFile("org.foo.Foo");
+  Resource to=new JavaFile("org.bar.Bar");
+  Dependency dependency=new Dependency(from,to);
+  index.registerDependency(dependency);
+  assertThat(index.getDependencies().size(),is(1));
+  assertTrue(index.getDependencies().contains(dependency));
+  assertThat(index.getEdge(from,to),is(dependency));
+  assertThat(index.getIncomingEdges(to).size(),is(1));
+  assertTrue(index.getIncomingEdges(to).contains(dependency));
+  assertThat(index.getIncomingEdges(from).isEmpty(),is(true));
+  assertThat(index.getOutgoingEdges(from).size(),is(1));
+  assertTrue(index.getOutgoingEdges(from).contains(dependency));
+  assertThat(index.getOutgoingEdges(to).isEmpty(),is(true));
+}

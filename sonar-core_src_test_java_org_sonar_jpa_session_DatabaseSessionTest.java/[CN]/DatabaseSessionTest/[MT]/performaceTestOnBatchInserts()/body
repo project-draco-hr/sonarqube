@@ -1,0 +1,12 @@
+{
+  Snapshot snapshot=new Snapshot(project1,true,"",new Date(1));
+  getSession().save(project1,snapshot);
+  getSession().commit();
+  Metric metric=new MeasuresDao(getSession()).getMetric("classes_count");
+  for (int i=0; i < NB_INSERTS; i++) {
+    MeasureModel pm=new MeasureModel(metric,1.0).setSnapshotId(snapshot.getId());
+    getSession().save(pm);
+  }
+  getSession().commit();
+  assertEquals(NB_INSERTS,getHQLCount(MeasureModel.class));
+}

@@ -1,0 +1,35 @@
+{
+  StringBuffer sb=sourceCode.getCodeBuffer();
+  BufferedReader reader=new BufferedReader(new CharArrayReader(sb.toString().toCharArray()));
+  try {
+    int lineNumber=1;
+    String line=reader.readLine();
+    while (line != null) {
+      StringTokenizer tokenizer=new StringTokenizer(line,TOKENS,true);
+      try {
+        String token=tokenizer.nextToken();
+        while (token != null) {
+          if (!token.equals(" ") && !token.equals("\t")) {
+            tokenEntries.add(new TokenEntry(token,sourceCode.getFileName(),lineNumber));
+          }
+          token=tokenizer.nextToken();
+        }
+      }
+ catch (      NoSuchElementException ex) {
+      }
+      line=reader.readLine();
+      lineNumber++;
+    }
+  }
+ catch (  Exception ex) {
+    ex.printStackTrace();
+  }
+ finally {
+    try {
+      reader.close();
+    }
+ catch (    Exception ex) {
+    }
+    tokenEntries.add(TokenEntry.getEOF());
+  }
+}

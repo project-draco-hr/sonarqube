@@ -1,0 +1,31 @@
+{
+  int oldCapacity=data.length;
+  if (newCapacity <= oldCapacity) {
+    return;
+  }
+  if (size == 0) {
+    threshold=calculateThreshold(newCapacity,loadFactor);
+    data=new HashEntry[newCapacity];
+  }
+ else {
+    HashEntry oldEntries[]=data;
+    HashEntry newEntries[]=new HashEntry[newCapacity];
+    modCount++;
+    for (int i=oldCapacity - 1; i >= 0; i--) {
+      HashEntry entry=oldEntries[i];
+      if (entry != null) {
+        oldEntries[i]=null;
+        do {
+          HashEntry next=entry.next;
+          int index=hashIndex(entry.hashCode,newCapacity);
+          entry.next=newEntries[index];
+          newEntries[index]=entry;
+          entry=next;
+        }
+ while (entry != null);
+      }
+    }
+    threshold=calculateThreshold(newCapacity,loadFactor);
+    data=newEntries;
+  }
+}

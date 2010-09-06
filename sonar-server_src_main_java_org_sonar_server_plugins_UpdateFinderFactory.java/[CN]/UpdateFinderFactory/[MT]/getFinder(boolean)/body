@@ -1,0 +1,14 @@
+{
+  UpdateCenter center=centerClient.getCenter(refresh);
+  UpdateFinder finder=null;
+  if (center != null) {
+    finder=new UpdateFinder(center,sonarVersion);
+    for (    JpaPlugin plugin : dao.getPlugins()) {
+      finder.registerInstalledPlugin(plugin.getKey(),Version.create(plugin.getVersion()));
+    }
+    for (    String filename : downloader.getDownloads()) {
+      finder.registerPendingPluginsByFilename(filename);
+    }
+  }
+  return finder;
+}

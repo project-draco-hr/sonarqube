@@ -1,0 +1,30 @@
+{
+  List<RulesProfile> profiles=session.getResults(RulesProfile.class,"language",language.getKey());
+  RulesProfile profileToActivate=null;
+  boolean oneProfileIsActivated=false;
+  if (profiles.isEmpty()) {
+    profileToActivate=new RulesProfile("Default " + language.getName(),language.getKey(),true,false);
+  }
+ else   if (profiles.size() == 1) {
+    profileToActivate=profiles.get(0);
+  }
+ else {
+    Iterator<RulesProfile> iterator=profiles.iterator();
+    while (iterator.hasNext() && !oneProfileIsActivated) {
+      RulesProfile profile=iterator.next();
+      oneProfileIsActivated|=profile.getDefaultProfile();
+      if (RulesProfile.SONAR_WAY_NAME.equals(profile.getName())) {
+        profileToActivate=profile;
+      }
+    }
+    if (!oneProfileIsActivated) {
+      if (profileToActivate == null) {
+        profileToActivate=profiles.get(0);
+      }
+    }
+  }
+  if (!oneProfileIsActivated && profileToActivate != null) {
+    profileToActivate.setDefaultProfile(true);
+    session.saveWithoutFlush(profileToActivate);
+  }
+}

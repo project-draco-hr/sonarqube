@@ -1,0 +1,22 @@
+{
+  return withConnectionAndRetry(recv,new SQLBlock(){
+    public IRubyObject call(    Connection c) throws SQLException {
+      Statement stmt=null;
+      try {
+        stmt=c.createStatement();
+        stmt.executeUpdate(rubyApi.convertToRubyString(sql).getUnicodeValue(),Statement.RETURN_GENERATED_KEYS);
+        return unmarshal_id_result(recv.getRuntime(),stmt.getGeneratedKeys());
+      }
+  finally {
+        if (null != stmt) {
+          try {
+            stmt.close();
+          }
+ catch (          Exception e) {
+          }
+        }
+      }
+    }
+  }
+);
+}

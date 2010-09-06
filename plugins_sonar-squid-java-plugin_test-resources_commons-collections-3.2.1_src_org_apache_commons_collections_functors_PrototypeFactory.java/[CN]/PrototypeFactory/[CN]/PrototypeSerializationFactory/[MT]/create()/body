@@ -1,0 +1,33 @@
+{
+  ByteArrayOutputStream baos=new ByteArrayOutputStream(512);
+  ByteArrayInputStream bais=null;
+  try {
+    ObjectOutputStream out=new ObjectOutputStream(baos);
+    out.writeObject(iPrototype);
+    bais=new ByteArrayInputStream(baos.toByteArray());
+    ObjectInputStream in=new ObjectInputStream(bais);
+    return in.readObject();
+  }
+ catch (  ClassNotFoundException ex) {
+    throw new FunctorException(ex);
+  }
+catch (  IOException ex) {
+    throw new FunctorException(ex);
+  }
+ finally {
+    try {
+      if (bais != null) {
+        bais.close();
+      }
+    }
+ catch (    IOException ex) {
+    }
+    try {
+      if (baos != null) {
+        baos.close();
+      }
+    }
+ catch (    IOException ex) {
+    }
+  }
+}

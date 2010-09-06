@@ -1,0 +1,40 @@
+{
+  if (obj == null) {
+    return emptyIterator();
+  }
+ else   if (obj instanceof Iterator) {
+    return (Iterator)obj;
+  }
+ else   if (obj instanceof Collection) {
+    return ((Collection)obj).iterator();
+  }
+ else   if (obj instanceof Object[]) {
+    return new ObjectArrayIterator((Object[])obj);
+  }
+ else   if (obj instanceof Enumeration) {
+    return new EnumerationIterator((Enumeration)obj);
+  }
+ else   if (obj instanceof Map) {
+    return ((Map)obj).values().iterator();
+  }
+ else   if (obj instanceof Dictionary) {
+    return new EnumerationIterator(((Dictionary)obj).elements());
+  }
+ else   if (obj != null && obj.getClass().isArray()) {
+    return new ArrayIterator(obj);
+  }
+ else {
+    try {
+      Method method=obj.getClass().getMethod("iterator",(Class[])null);
+      if (Iterator.class.isAssignableFrom(method.getReturnType())) {
+        Iterator it=(Iterator)method.invoke(obj,(Object[])null);
+        if (it != null) {
+          return it;
+        }
+      }
+    }
+ catch (    Exception ex) {
+    }
+    return singletonIterator(obj);
+  }
+}
