@@ -1,0 +1,25 @@
+{
+  SMInputFactory inputFactory=initStax();
+  ProfilePrototype profile=ProfilePrototype.create();
+  try {
+    SMHierarchicCursor rootC=inputFactory.rootElementCursor(reader);
+    rootC.advance();
+    SMInputCursor rootModulesCursor=rootC.childElementCursor(MODULE_NODE);
+    while (rootModulesCursor.getNext() != null) {
+      String configKey=rootModulesCursor.getAttrValue("name");
+      if (StringUtils.equals(TREEWALKER_MODULE,configKey)) {
+        SMInputCursor treewalkerCursor=rootModulesCursor.childElementCursor(MODULE_NODE);
+        while (treewalkerCursor.getNext() != null) {
+          processModule(profile,CHECKER_MODULE + "/" + TREEWALKER_MODULE+ "/",treewalkerCursor,messages);
+        }
+      }
+ else {
+        processModule(profile,CHECKER_MODULE + "/",rootModulesCursor,messages);
+      }
+    }
+  }
+ catch (  XMLStreamException e) {
+    messages.addError("unvalidXml","XML is not valid: " + e.getMessage());
+  }
+  return profile;
+}
