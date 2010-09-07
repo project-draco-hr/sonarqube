@@ -1,0 +1,14 @@
+{
+  DatabaseSession session=sessionFactory.getSession();
+  RulesProfile profile=session.getSingleResult(RulesProfile.class,"name",profileName,"language",language);
+  if (profile != null) {
+    session.remove(session);
+  }
+  profile=RulesProfile.create(profileName,language);
+  ValidationMessages messages=ValidationMessages.create();
+  ProfilePrototype prototype=XMLProfileImporter.create().importProfile(new StringReader(xmlBackup),messages);
+  completeProfileWithPrototype(profile,prototype,messages);
+  session.saveWithoutFlush(profile);
+  session.commit();
+  return messages;
+}
