@@ -1,0 +1,13 @@
+{
+  CheckstyleConfiguration conf=mockConf();
+  CheckstyleAuditListener listener=mockListener();
+  CheckstyleExecutor executor=new CheckstyleExecutor(conf,listener,getClass().getClassLoader());
+  executor.execute();
+  verify(listener,times(1)).auditStarted((AuditEvent)anyObject());
+  verify(listener,times(1)).auditFinished((AuditEvent)anyObject());
+  verify(listener,times(1)).fileStarted(argThat(newFilenameMatcher("Hello.java")));
+  verify(listener,times(1)).fileFinished(argThat(newFilenameMatcher("Hello.java")));
+  verify(listener,times(1)).fileStarted(argThat(newFilenameMatcher("World.java")));
+  verify(listener,times(1)).fileFinished(argThat(newFilenameMatcher("World.java")));
+  verify(listener,atLeast(1)).addError(argThat(newErrorMatcher("Hello.java","com.puppycrawl.tools.checkstyle.checks.coding.EmptyStatementCheck")));
+}
