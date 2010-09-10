@@ -1,7 +1,12 @@
 {
   List<ProfilePrototype> result=new ArrayList<ProfilePrototype>();
   for (  ProfileDefinition definition : definitions) {
-    result.add(definition.createPrototype());
+    ValidationMessages validation=ValidationMessages.create();
+    ProfilePrototype prototype=definition.createPrototype(validation);
+    validation.log(LOGGER);
+    if (prototype != null && !validation.hasErrors()) {
+      result.add(prototype);
+    }
   }
   return result;
 }
