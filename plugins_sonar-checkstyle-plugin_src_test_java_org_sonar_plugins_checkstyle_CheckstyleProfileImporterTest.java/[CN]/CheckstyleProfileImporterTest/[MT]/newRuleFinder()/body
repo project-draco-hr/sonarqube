@@ -1,0 +1,20 @@
+{
+  RuleFinder ruleFinder=mock(RuleFinder.class);
+  when(ruleFinder.find((RuleQuery)anyObject())).thenAnswer(new Answer<Rule>(){
+    public Rule answer(    InvocationOnMock iom) throws Throwable {
+      RuleQuery query=(RuleQuery)iom.getArguments()[0];
+      Rule rule=null;
+      if (query.getConfigKey().equals("Checker/JavadocPackage")) {
+        rule=Rule.create(query.getRepositoryKey(),"com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocPackageCheck","Javadoc Package").setConfigKey("Checker/JavadocPackage").setPriority(RulePriority.MAJOR);
+        rule.createParameter("format");
+        rule.createParameter("ignore");
+      }
+ else       if (query.getConfigKey().equals("Checker/TreeWalker/EqualsHashCode")) {
+        rule=Rule.create(query.getRepositoryKey(),"com.puppycrawl.tools.checkstyle.checks.coding.EqualsHashCodeCheck","Equals HashCode").setConfigKey("Checker/TreeWalker/EqualsHashCode").setPriority(RulePriority.BLOCKER);
+      }
+      return rule;
+    }
+  }
+);
+  return ruleFinder;
+}

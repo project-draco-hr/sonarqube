@@ -1,7 +1,14 @@
 {
-  ProfileDefinition definition=new FakeDefinition();
+  RuleFinder ruleFinder=mock(RuleFinder.class);
+  when(ruleFinder.findByKey(anyString(),anyString())).thenAnswer(new Answer<Rule>(){
+    public Rule answer(    InvocationOnMock iom) throws Throwable {
+      return Rule.create((String)iom.getArguments()[0],(String)iom.getArguments()[1],(String)iom.getArguments()[1]);
+    }
+  }
+);
+  ProfileDefinition definition=new FakeDefinition(ruleFinder);
   ValidationMessages validation=ValidationMessages.create();
-  ProfilePrototype profile=definition.createPrototype(validation);
-  assertThat(profile.getRule("squid","fake").getPriority(),is(RulePriority.BLOCKER));
+  RulesProfile profile=definition.createProfile(validation);
+  assertThat(profile.getActiveRule("squid","fake").getPriority(),is(RulePriority.BLOCKER));
   assertThat(validation.hasErrors(),is(false));
 }

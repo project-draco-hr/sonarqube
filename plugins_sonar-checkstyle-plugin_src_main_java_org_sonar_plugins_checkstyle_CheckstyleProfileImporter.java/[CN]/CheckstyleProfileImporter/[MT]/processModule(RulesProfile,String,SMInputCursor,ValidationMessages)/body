@@ -1,0 +1,18 @@
+{
+  String configKey=moduleCursor.getAttrValue("name");
+  if (isFilter(configKey)) {
+    messages.addWarningText("Checkstyle filters are not imported: " + configKey);
+  }
+ else   if (isIgnored(configKey)) {
+  }
+ else {
+    Rule rule=ruleFinder.find(RuleQuery.create().withRepositoryKey(CheckstyleConstants.REPOSITORY_KEY).withConfigKey(path + configKey));
+    if (rule == null) {
+      messages.addWarningText("Checkstyle rule not found: " + path + configKey);
+    }
+ else {
+      ActiveRule activeRule=profile.activateRule(rule,null);
+      processProperties(moduleCursor,messages,activeRule);
+    }
+  }
+}

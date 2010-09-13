@@ -1,5 +1,5 @@
 {
-  ProfilePrototype profile=ProfilePrototype.create();
+  RulesProfile profile=RulesProfile.create();
   SMInputFactory inputFactory=initStax();
   try {
     SMHierarchicCursor rootC=inputFactory.rootElementCursor(reader);
@@ -9,7 +9,13 @@
       String nodeName=cursor.getLocalName();
       if (StringUtils.equals("rules",nodeName)) {
         SMInputCursor rulesCursor=cursor.childElementCursor("rule");
-        processRules(rulesCursor,profile);
+        processRules(rulesCursor,profile,messages);
+      }
+ else       if (StringUtils.equals("name",nodeName)) {
+        profile.setName(StringUtils.trim(cursor.collectDescendantText(false)));
+      }
+ else       if (StringUtils.equals("language",nodeName)) {
+        profile.setLanguage(StringUtils.trim(cursor.collectDescendantText(false)));
       }
     }
   }
