@@ -1,0 +1,15 @@
+{
+  for (  RulesProfile profile : profiles) {
+    TimeProfiler profiler=new TimeProfiler().start("Save profile " + profile);
+    RulesProfile persistedProfile=findOrCreate(profile.getName(),profile.getLanguage(),session);
+    for (    ActiveRule activeRule : profile.getActiveRules()) {
+      ActiveRule persistedRule=persistedProfile.activateRule(activeRule.getRule(),activeRule.getPriority());
+      for (      ActiveRuleParam param : activeRule.getActiveRuleParams()) {
+        persistedRule.setParameter(param.getKey(),param.getValue());
+      }
+    }
+    session.saveWithoutFlush(persistedProfile);
+    session.commit();
+    profiler.stop();
+  }
+}

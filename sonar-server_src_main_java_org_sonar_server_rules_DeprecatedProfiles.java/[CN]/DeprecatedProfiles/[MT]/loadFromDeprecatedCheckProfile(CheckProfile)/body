@@ -5,9 +5,12 @@
     if (check.getPriority() != null) {
       priority=RulePriority.fromCheckPriority(check.getPriority());
     }
-    ProfilePrototype.RulePrototype rule=definition.activateRule(check.getRepositoryKey(),check.getTemplateKey(),priority);
-    for (    Map.Entry<String,String> entry : rule.getParameters().entrySet()) {
-      rule.setParameter(entry.getKey(),entry.getValue());
+    Rule rule=ruleFinder.findByKey(check.getRepositoryKey(),check.getTemplateKey());
+    if (rule != null) {
+      ActiveRule activeRule=definition.activateRule(rule,priority);
+      for (      Map.Entry<String,String> entry : check.getProperties().entrySet()) {
+        activeRule.setParameter(entry.getKey(),entry.getValue());
+      }
     }
   }
   return definition;

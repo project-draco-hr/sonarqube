@@ -3,14 +3,17 @@
   for (int index=0; index < repository.getProvidedProfiles().size(); index++) {
     RulesProfile deprecated=(RulesProfile)repository.getProvidedProfiles().get(index);
     DefaultProfileDefinition providedProfile=DefaultProfileDefinition.create(deprecated.getName(),repository.getLanguage().getKey());
-    for (    ActiveRule activeRule : deprecated.getActiveRules()) {
-      String repositoryKey=activeRule.getRepositoryKey();
+    for (    ActiveRule deprecatedActiveRule : deprecated.getActiveRules()) {
+      String repositoryKey=deprecatedActiveRule.getRepositoryKey();
       if (StringUtils.isBlank(repositoryKey)) {
         repositoryKey=getPluginKey(repository);
       }
-      ProfilePrototype.RulePrototype rule=providedProfile.activateRule(repositoryKey,activeRule.getRuleKey(),activeRule.getPriority());
-      for (      ActiveRuleParam arp : activeRule.getActiveRuleParams()) {
-        rule.setParameter(arp.getKey(),arp.getValue());
+      Rule rule=ruleFinder.findByKey(repositoryKey,deprecatedActiveRule.getRuleKey());
+      if (rule != null) {
+        ActiveRule activeRule=providedProfile.activateRule(rule,deprecatedActiveRule.getPriority());
+        for (        ActiveRuleParam arp : deprecatedActiveRule.getActiveRuleParams()) {
+          activeRule.setParameter(arp.getKey(),arp.getValue());
+        }
       }
     }
     result.add(providedProfile);

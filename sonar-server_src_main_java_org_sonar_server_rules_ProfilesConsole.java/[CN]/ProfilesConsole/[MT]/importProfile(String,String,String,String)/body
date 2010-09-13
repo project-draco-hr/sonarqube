@@ -1,0 +1,11 @@
+{
+  ValidationMessages messages=ValidationMessages.create();
+  ProfileImporter importer=getProfileImporter(importerKey);
+  RulesProfile profile=importer.importProfile(new StringReader(profileDefinition),messages);
+  if (!messages.hasErrors()) {
+    DatabaseSession session=sessionFactory.getSession();
+    session.saveWithoutFlush(profile);
+    session.commit();
+  }
+  return messages;
+}
