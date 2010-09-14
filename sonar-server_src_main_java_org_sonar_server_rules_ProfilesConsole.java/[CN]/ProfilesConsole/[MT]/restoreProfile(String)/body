@@ -1,0 +1,16 @@
+{
+  ValidationMessages messages=ValidationMessages.create();
+  RulesProfile profile=XMLProfileImporter.create(ruleFinder).importProfile(new StringReader(xmlBackup),messages);
+  if (profile != null) {
+    DatabaseSession session=sessionFactory.getSession();
+    RulesProfile existingProfile=session.getSingleResult(RulesProfile.class,"name",profile.getName(),"language",profile.getLanguage());
+    if (existingProfile != null) {
+      messages.addErrorText("The profile " + profile + " already exists. Please delete it before restoring.");
+    }
+ else     if (!messages.hasErrors()) {
+      session.saveWithoutFlush(profile);
+      session.commit();
+    }
+  }
+  return messages;
+}
