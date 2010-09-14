@@ -1,0 +1,12 @@
+{
+  List<Rule> rules=new ArrayList<Rule>(ruleFinder.findAll(RuleQuery.create().withRepositoryKey(getKey())));
+  try {
+    RulesProfile profile=RulesProfile.create(getKey(),getName());
+    List<ActiveRule> activeRules=((ConfigurationImportable)importableRepository).importConfiguration(IOUtils.toString(reader),rules);
+    profile.setActiveRules(activeRules);
+    return profile;
+  }
+ catch (  IOException e) {
+    throw new SonarException("Fail to load the profile definition",e);
+  }
+}

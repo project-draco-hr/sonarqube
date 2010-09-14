@@ -3,10 +3,15 @@
   ProfileImporter importer=getProfileImporter(importerKey);
   RulesProfile profile=importer.importProfile(new StringReader(profileDefinition),messages);
   if (!messages.hasErrors()) {
-    profile.setName(profileName);
-    profile.setLanguage(language);
     DatabaseSession session=sessionFactory.getSession();
-    session.saveWithoutFlush(profile);
+    RulesProfile persistedProfile=session.getSingleResult(RulesProfile.class,"name",profileName,"language",language);
+    for (    ActiveRule activeRule : profile.getActiveRules()) {
+      ActiveRule persistedActiveRule=persistedProfile.activateRule(activeRule.getRule(),activeRule.getPriority());
+      for (      ActiveRuleParam activeRuleParam : activeRule.getActiveRuleParams()) {
+        persistedActiveRule.setParameter(activeRuleParam.getKey(),activeRuleParam.getValue());
+      }
+    }
+    session.saveWithoutFlush(persistedProfile);
     session.commit();
   }
   return messages;
