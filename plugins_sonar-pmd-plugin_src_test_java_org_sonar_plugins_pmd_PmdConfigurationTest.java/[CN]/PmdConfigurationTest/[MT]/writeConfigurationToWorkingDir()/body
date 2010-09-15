@@ -1,11 +1,9 @@
 {
   Project project=MavenTestUtils.loadProjectFromPom(getClass(),"writeConfigurationToWorkingDir/pom.xml");
-  PmdRulesRepository repository=mock(PmdRulesRepository.class);
-  when(repository.exportConfiguration((RulesProfile)anyObject())).thenReturn("<conf/>");
-  PmdConfiguration configuration=new PmdConfiguration(repository,null,project);
+  PmdConfiguration configuration=new PmdConfiguration(new PmdProfileExporter(),RulesProfile.create(),project);
   List<String> rulesets=configuration.getRulesets();
   assertThat(rulesets.size(),is(1));
   File xmlFile=new File(rulesets.get(0));
   assertThat(xmlFile.exists(),is(true));
-  assertThat(FileUtils.readFileToString(xmlFile),is("<conf/>"));
+  assertThat(FileUtils.readFileToString(xmlFile),is("<ruleset/>"));
 }

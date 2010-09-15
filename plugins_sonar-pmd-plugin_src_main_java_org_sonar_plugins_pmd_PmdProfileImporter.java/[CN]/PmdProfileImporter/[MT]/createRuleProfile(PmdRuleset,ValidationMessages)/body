@@ -1,0 +1,22 @@
+{
+  RulesProfile profile=RulesProfile.create();
+  for (  PmdRule pmdRule : pmdRuleset.getPmdRules()) {
+    Rule rule=ruleFinder.find(RuleQuery.create().withRepositoryKey(PmdConstants.REPOSITORY_KEY).withConfigKey(pmdRule.getRef()));
+    if (rule != null) {
+      ActiveRule activeRule=profile.activateRule(rule,PmdLevelUtils.fromLevel(pmdRule.getPriority()));
+      if (pmdRule.getProperties() != null) {
+        for (        PmdProperty prop : pmdRule.getProperties()) {
+          if (rule.getParam(prop.getName()) == null) {
+            messages.addWarningText("The property '" + prop.getName() + "' is not supported in the pmd rule: "+ pmdRule.getRef());
+            continue;
+          }
+          activeRule.setParameter(prop.getName(),prop.getValue());
+        }
+      }
+    }
+ else {
+      messages.addWarningText("Unable to import unknown PMD rule '" + pmdRule.getRef() + "'");
+    }
+  }
+  return profile;
+}
