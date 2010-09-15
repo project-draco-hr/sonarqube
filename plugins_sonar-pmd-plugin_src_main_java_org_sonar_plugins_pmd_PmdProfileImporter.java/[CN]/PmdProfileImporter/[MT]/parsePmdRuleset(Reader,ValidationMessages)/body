@@ -1,14 +1,20 @@
 {
   try {
-    XStream xstream=new XStream();
-    xstream.setClassLoader(getClass().getClassLoader());
-    xstream.processAnnotations(PmdRuleset.class);
-    xstream.processAnnotations(PmdRule.class);
-    xstream.processAnnotations(PmdProperty.class);
-    return (PmdRuleset)xstream.fromXML(pmdConfigurationFile);
+    SAXBuilder parser=new SAXBuilder();
+    Document dom=parser.build(pmdConfigurationFile);
+    Element eltResultset=dom.getRootElement();
+    Namespace namespace=eltResultset.getNamespace();
+    PmdRuleset pmdResultset=new PmdRuleset();
+    for (    Element eltRule : getChildren(eltResultset,"rule",namespace)) {
+      PmdRule pmdRule=new PmdRule(eltRule.getAttributeValue("ref"));
+      parsePmdPriority(eltRule,pmdRule,namespace);
+      parsePmdProperties(eltRule,pmdRule,namespace);
+      pmdResultset.addRule(pmdRule);
+    }
+    return pmdResultset;
   }
- catch (  RuntimeException e) {
-    messages.addErrorText("The PMD configuration file is not valide: " + e.getMessage());
+ catch (  Exception e) {
+    messages.addErrorText("The PMD configuration file is not valid : " + e.getMessage());
     return new PmdRuleset();
   }
 }
