@@ -1,6 +1,14 @@
 {
   RulesProfile profile=RulesProfile.create();
   for (  PmdRule pmdRule : pmdRuleset.getPmdRules()) {
+    if (PmdConstants.XPATH_CLASS.equals(pmdRule.getClazz())) {
+      messages.addWarningText("PMD XPath rule '" + pmdRule.getName() + "' can't be imported automatically. The rule must be created manually through the Sonar web interface.");
+      continue;
+    }
+    if (pmdRule.getRef() == null) {
+      messages.addWarningText("A PMD rule without 'ref' attribute can't be imported. see '" + pmdRule.getClazz() + "'");
+      continue;
+    }
     Rule rule=ruleFinder.find(RuleQuery.create().withRepositoryKey(PmdConstants.REPOSITORY_KEY).withConfigKey(pmdRule.getRef()));
     if (rule != null) {
       ActiveRule activeRule=profile.activateRule(rule,PmdLevelUtils.fromLevel(pmdRule.getPriority()));
