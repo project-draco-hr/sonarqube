@@ -6,7 +6,7 @@
   when(conf.getString(CoreProperties.FINDBUGS_REPORT_PATH)).thenReturn(xmlFile.getAbsolutePath());
   when(project.getConfiguration()).thenReturn(conf);
   when(context.getResource(any(Resource.class))).thenReturn(new JavaFile("org.sonar.MyClass"));
-  FindbugsSensor analyser=new FindbugsSensor(createRulesProfileWithoutActiveRules(),createRulesManager(),null);
+  FindbugsSensor analyser=new FindbugsSensor(RulesProfile.create(),new FindbugsRuleFinder(),null);
   analyser.analyse(project,context);
   verify(context,times(3)).saveViolation(any(Violation.class));
   Violation wanted=new Violation(null,new JavaFile("org.sonar.commons.ZipUtils")).setMessage("Empty zip file entry created in org.sonar.commons.ZipUtils._zip(String, File, ZipOutputStream)").setLineId(107);

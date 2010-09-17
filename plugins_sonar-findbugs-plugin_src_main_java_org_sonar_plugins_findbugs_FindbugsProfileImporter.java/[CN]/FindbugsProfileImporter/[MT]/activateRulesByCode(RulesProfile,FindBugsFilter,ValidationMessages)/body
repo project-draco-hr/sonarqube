@@ -1,0 +1,14 @@
+{
+  for (  Map.Entry<String,RulePriority> codeLevel : filter.getCodeLevels(new FindbugsLevelUtils()).entrySet()) {
+    boolean someRulesHaveBeenActivated=false;
+    for (    Rule rule : ruleFinder.findAll(RuleQuery.create().withRepositoryKey(FindbugsConstants.REPOSITORY_KEY))) {
+      if (rule.getKey().equals(codeLevel.getKey()) || StringUtils.startsWith(rule.getKey(),codeLevel.getKey() + "_")) {
+        someRulesHaveBeenActivated=true;
+        profile.activateRule(rule,codeLevel.getValue());
+      }
+    }
+    if (!someRulesHaveBeenActivated) {
+      messages.addWarningText("Unable to find any rules associated to code  : '" + codeLevel.getKey() + "'");
+    }
+  }
+}
