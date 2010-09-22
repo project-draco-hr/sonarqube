@@ -1,9 +1,9 @@
 {
-  StringWriter writer=new StringWriter();
-  TimeProfiler profiler=new TimeProfiler(mockLogger(writer));
+  TimeProfiler profiler=new TimeProfiler(logger);
   profiler.start("Cycle analysis");
   profiler.start("New task");
   profiler.stop();
   profiler.stop();
-  assertThat(writer.toString(),not(containsString("Cycle analysis done")));
+  verify(logger,never()).info(eq("{} done: {} ms"),eq("Cycle analysis"),anyInt());
+  verify(logger,times(1)).info(eq("{} done: {} ms"),eq("New task"),anyInt());
 }
