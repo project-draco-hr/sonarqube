@@ -1,11 +1,13 @@
 {
-  for (  PluginMetadata deprecatedPlugin : deprecatedPlugins) {
-    if (deprecatedPlugin.getKey() != null && !pluginByKeys.containsKey(deprecatedPlugin.getKey())) {
-      pluginByKeys.put(deprecatedPlugin.getKey(),deprecatedPlugin);
-      deploy(deprecatedPlugin);
+  for (  PluginMetadata deprecatedPlugin : deprecatedPlugins.values()) {
+    PluginMetadata metadata=pluginByKeys.get(deprecatedPlugin.getKey());
+    if (metadata != null) {
+      FileUtils.deleteQuietly(deprecatedPlugin.getSourceFile());
+      Logs.INFO.info("Old plugin " + deprecatedPlugin.getFilename() + " replaced by new "+ metadata.getFilename());
     }
  else {
-      FileUtils.deleteQuietly(deprecatedPlugin.getSourceFile());
+      pluginByKeys.put(deprecatedPlugin.getKey(),deprecatedPlugin);
+      deploy(deprecatedPlugin);
     }
   }
 }
