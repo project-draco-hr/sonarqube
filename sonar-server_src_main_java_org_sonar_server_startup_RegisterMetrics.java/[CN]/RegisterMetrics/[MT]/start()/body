@@ -1,10 +1,12 @@
 {
   TimeProfiler profiler=new TimeProfiler().start("Load metrics");
   measuresDao.disableAutomaticMetrics();
-  List<Metric> metricsToRegister=new ArrayList<Metric>();
+  ArrayList<Metric> metricsToRegister=Lists.newArrayList();
   metricsToRegister.addAll(CoreMetrics.getMetrics());
+  HashMap<String,Metrics> metricsByRepository=Maps.newHashMap();
   if (metricsRepositories != null) {
     for (    Metrics metrics : metricsRepositories) {
+      checkMetrics(metricsByRepository,metrics);
       metricsToRegister.addAll(metrics.getMetrics());
     }
   }
