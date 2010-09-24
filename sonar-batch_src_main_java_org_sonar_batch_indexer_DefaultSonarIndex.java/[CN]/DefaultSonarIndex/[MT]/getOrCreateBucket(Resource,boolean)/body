@@ -3,13 +3,16 @@
   if (bucket != null) {
     return bucket;
   }
+  if (mustExist && lock.isLocked() && !ResourceUtils.isLibrary(resource)) {
+    throw new SonarException("The following resource has not been registered before saving violation/measure/event: " + resource);
+  }
   prepareResource(resource);
   bucket=new Bucket<Resource>(resource);
   buckets.put(resource,bucket);
   Bucket parentBucket=null;
   Resource parent=resource.getParent();
   if (parent != null) {
-    parentBucket=getOrCreateBucket(parent);
+    parentBucket=getOrCreateBucket(parent,mustExist);
   }
  else   if (!ResourceUtils.isLibrary(resource)) {
     parentBucket=selectedProjectBucket;
