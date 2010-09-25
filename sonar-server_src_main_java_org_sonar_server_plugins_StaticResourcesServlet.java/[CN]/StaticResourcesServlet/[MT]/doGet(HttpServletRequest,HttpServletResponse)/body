@@ -1,0 +1,26 @@
+{
+  String path=StringUtils.substringAfter(request.getRequestURI(),request.getContextPath() + request.getServletPath() + "/");
+  String pluginKey=StringUtils.substringBefore(path,"/");
+  String resource="/static/" + StringUtils.substringAfter(path,"/");
+  PluginClassLoaders pluginClassLoaders=Platform.getInstance().getContainer().getComponent(PluginClassLoaders.class);
+  ClassLoader classLoader=pluginClassLoaders.getClassLoader(pluginKey);
+  if (classLoader == null) {
+    return;
+  }
+  InputStream in=null;
+  OutputStream out=null;
+  try {
+    in=classLoader.getResourceAsStream(resource);
+    if (in != null) {
+      out=response.getOutputStream();
+      IOUtils.copy(in,out);
+    }
+  }
+ catch (  Exception e) {
+    LOG.error("Unable to load static resource '" + resource + "' from plugin '"+ pluginKey+ "'",e);
+  }
+ finally {
+    IOUtils.closeQuietly(in);
+    IOUtils.closeQuietly(out);
+  }
+}
