@@ -1,0 +1,15 @@
+{
+  List<ExtensionProvider> providers=container.getComponents(ExtensionProvider.class);
+  for (  ExtensionProvider provider : providers) {
+    Plugin plugin=getPluginForExtension(provider);
+    Object obj=provider.provide();
+    if (obj instanceof Iterable) {
+      for (      Object elt : (Iterable)obj) {
+        registerExtension(container,plugin,getPluginKey(plugin),elt);
+      }
+    }
+ else {
+      registerExtension(container,plugin,getPluginKey(plugin),obj);
+    }
+  }
+}
