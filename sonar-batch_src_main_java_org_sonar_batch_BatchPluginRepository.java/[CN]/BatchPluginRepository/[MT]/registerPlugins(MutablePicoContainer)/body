@@ -1,13 +1,13 @@
 {
-  try {
-    for (    JpaPlugin pluginMetadata : dao.getPlugins()) {
+  for (  JpaPlugin pluginMetadata : dao.getPlugins()) {
+    try {
       String classloaderKey=getClassloaderKey(pluginMetadata.getKey());
       Class claz=classloaders.get(classloaderKey).loadClass(pluginMetadata.getPluginClass());
       Plugin plugin=(Plugin)claz.newInstance();
-      registerPlugin(pico,plugin,BatchExtension.class);
+      registerPlugin(pico,plugin,pluginMetadata.getKey());
     }
-  }
- catch (  Exception e) {
-    throw new RuntimeException(e);
+ catch (    Exception e) {
+      throw new SonarException("Fail to load extensions from plugin " + pluginMetadata.getKey(),e);
+    }
   }
 }

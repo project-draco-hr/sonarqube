@@ -7,17 +7,16 @@
       urlsByKey.put(key,url);
     }
  catch (    MalformedURLException e) {
-      throw new RuntimeException("Can not build the classloader of the plugin " + pluginFile.getPluginKey(),e);
+      throw new SonarException("Can not build the classloader of the plugin " + pluginFile.getPluginKey(),e);
     }
   }
   classloaders=new HashMap<String,ClassLoader>();
   for (  String key : urlsByKey.keySet()) {
     Set<URL> urls=urlsByKey.get(key);
-    Logger logger=LoggerFactory.getLogger(getClass());
-    if (logger.isDebugEnabled()) {
-      logger.debug("Classloader of plugin " + key + ":");
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Classloader of plugin " + key + ":");
       for (      URL url : urls) {
-        logger.debug("   -> " + url);
+        LOG.debug("   -> " + url);
       }
     }
     classloaders.put(key,new RemoteClassLoader(urls,Thread.currentThread().getContextClassLoader()).getClassLoader());
