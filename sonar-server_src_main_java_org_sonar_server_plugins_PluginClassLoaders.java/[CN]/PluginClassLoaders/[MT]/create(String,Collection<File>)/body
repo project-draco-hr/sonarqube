@@ -1,0 +1,18 @@
+{
+  try {
+    ClassRealm realm;
+    realm=world.newRealm(pluginKey,getClass().getClassLoader());
+    for (    File file : classloaderFiles) {
+      realm.addConstituent(toUrl(file));
+    }
+    ClassLoader classloader=realm.getClassLoader();
+    classLoaderByPluginKey.put(pluginKey,classloader);
+    return classloader;
+  }
+ catch (  DuplicateRealmException e) {
+    throw new RuntimeException("Fail to load the classloader of the plugin: " + pluginKey,e);
+  }
+catch (  MalformedURLException e) {
+    throw new RuntimeException("Fail to load the classloader of the plugin: " + pluginKey,e);
+  }
+}
