@@ -1,0 +1,22 @@
+{
+  Map<String,String> properties=processProps(moduleCursor);
+  Rule rule;
+  String id=properties.get("id");
+  String warning;
+  if (StringUtils.isNotBlank(id)) {
+    rule=ruleFinder.find(RuleQuery.create().withRepositoryKey(CheckstyleConstants.REPOSITORY_KEY).withKey(id));
+    warning="Checkstyle rule with key '" + id + "' not found";
+  }
+ else {
+    String configKey=path + moduleName;
+    rule=ruleFinder.find(RuleQuery.create().withRepositoryKey(CheckstyleConstants.REPOSITORY_KEY).withConfigKey(configKey));
+    warning="Checkstyle rule with config key '" + configKey + "' not found";
+  }
+  if (rule == null) {
+    messages.addWarningText(warning);
+  }
+ else {
+    ActiveRule activeRule=profile.activateRule(rule,null);
+    activateProperties(activeRule,properties);
+  }
+}
