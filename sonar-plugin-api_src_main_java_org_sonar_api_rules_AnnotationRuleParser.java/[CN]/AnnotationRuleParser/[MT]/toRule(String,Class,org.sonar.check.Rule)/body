@@ -1,0 +1,14 @@
+{
+  String ruleKey=StringUtils.defaultIfEmpty(ruleAnnotation.key(),clazz.getCanonicalName());
+  Rule rule=Rule.create(repositoryKey,ruleKey,ruleAnnotation.name());
+  rule.setDescription(ruleAnnotation.description());
+  rule.setRulesCategory(RulesCategory.fromIsoCategory(ruleAnnotation.isoCategory()));
+  rule.setPriority(RulePriority.fromCheckPriority(ruleAnnotation.priority()));
+  Field[] fields=clazz.getDeclaredFields();
+  if (fields != null) {
+    for (    Field field : fields) {
+      addRuleProperty(rule,field);
+    }
+  }
+  return rule;
+}
