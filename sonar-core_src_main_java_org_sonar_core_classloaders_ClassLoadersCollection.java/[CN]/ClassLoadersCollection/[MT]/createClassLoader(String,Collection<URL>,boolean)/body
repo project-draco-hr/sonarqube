@@ -1,0 +1,19 @@
+{
+  try {
+    final ClassRealm realm;
+    if (childFirst) {
+      ClassRealm parentRealm=world.newRealm(key + "-parent",baseClassLoader);
+      realm=parentRealm.createChildRealm(key);
+    }
+ else {
+      realm=world.newRealm(key,baseClassLoader);
+    }
+    for (    URL constituent : urls) {
+      realm.addConstituent(constituent);
+    }
+    return realm.getClassLoader();
+  }
+ catch (  DuplicateRealmException e) {
+    throw new SonarException(e);
+  }
+}
