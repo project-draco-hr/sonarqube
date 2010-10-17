@@ -1,10 +1,9 @@
 {
   logger.info("parsing {}",reportsDir);
-  File[] xmlFiles=getReports(reportsDir);
-  if (xmlFiles.length == 0) {
-    insertZeroWhenNoReports(project,context);
+  new AbstractSurefireParser(){
+    @Override protected Resource<?> getUnitTestResource(    TestSuiteReport fileReport){
+      return new JavaFile(fileReport.getClassKey(),true);
+    }
   }
- else {
-    parseFiles(context,xmlFiles);
-  }
+.collect(project,context,reportsDir);
 }
