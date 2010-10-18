@@ -1,14 +1,13 @@
 {
-  try {
-    edu.umd.cs.findbugs.Project findbugsProject=new edu.umd.cs.findbugs.Project();
-    for (    File dir : project.getFileSystem().getSourceDirs()) {
-      findbugsProject.addSourceDir(dir.getAbsolutePath());
-    }
-    findbugsProject.addFile(project.getFileSystem().getBuildOutputDir().getAbsolutePath());
-    findbugsProject.setCurrentWorkingDirectory(project.getFileSystem().getBuildDir());
-    return findbugsProject;
+  File classesDir=project.getFileSystem().getBuildOutputDir();
+  if (classesDir == null || !classesDir.exists()) {
+    throw new SonarException("Findbugs needs sources to be compiled. " + "Please build project or edit pom.xml to set the <outputDirectory> property before executing sonar.");
   }
- catch (  Exception e) {
-    throw new SonarException(e);
+  edu.umd.cs.findbugs.Project findbugsProject=new edu.umd.cs.findbugs.Project();
+  for (  File dir : project.getFileSystem().getSourceDirs()) {
+    findbugsProject.addSourceDir(dir.getAbsolutePath());
   }
+  findbugsProject.addFile(classesDir.getAbsolutePath());
+  findbugsProject.setCurrentWorkingDirectory(project.getFileSystem().getBuildDir());
+  return findbugsProject;
 }
