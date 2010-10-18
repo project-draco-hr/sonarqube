@@ -1,0 +1,20 @@
+{
+  int initialOffset=offset;
+  while (offset < filteredBuffer.length) {
+    if (internalCodeReader.peek() == -1) {
+      break;
+    }
+    boolean consumed=false;
+    for (    Channel<OUTPUT> channel : channels) {
+      if (channel.consume(internalCodeReader,output)) {
+        consumed=true;
+        break;
+      }
+    }
+    if (!consumed) {
+      int charRead=internalCodeReader.pop();
+      filteredBuffer[offset++]=(char)charRead;
+    }
+  }
+  return offset - initialOffset;
+}
