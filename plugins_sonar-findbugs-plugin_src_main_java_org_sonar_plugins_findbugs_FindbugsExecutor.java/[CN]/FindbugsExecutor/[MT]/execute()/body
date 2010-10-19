@@ -8,7 +8,8 @@
     Project project=configuration.getFindbugsProject();
     engine.setProject(project);
     XMLBugReporter xmlBugReporter=new XMLBugReporter(project);
-    xmlBugReporter.setPriorityThreshold(Priority.LOW.getPriorityValue());
+    xmlBugReporter.setPriorityThreshold(Detector.LOW_PRIORITY);
+    xmlBugReporter.setAddMessages(true);
     File xmlReport=configuration.getTargetXMLReport();
     if (xmlReport != null) {
       LOG.info("Findbugs output report: " + xmlReport.getAbsolutePath());
@@ -19,13 +20,12 @@
     }
     xmlBugReporter.setOutputStream(new PrintStream(xmlOutput));
     engine.setBugReporter(xmlBugReporter);
-    engine.setProject(project);
-    engine.setDetectorFactoryCollection(DetectorFactoryCollection.instance());
     UserPreferences userPreferences=UserPreferences.createDefaultUserPreferences();
     userPreferences.setEffort(configuration.getEffort());
+    engine.setUserPreferences(userPreferences);
     engine.addFilter(configuration.saveIncludeConfigXml().getAbsolutePath(),true);
     engine.addFilter(configuration.saveExcludeConfigXml().getAbsolutePath(),false);
-    engine.setUserPreferences(userPreferences);
+    engine.setDetectorFactoryCollection(DetectorFactoryCollection.instance());
     engine.setAnalysisFeatureSettings(FindBugs.DEFAULT_EFFORT);
     engine.finishSettings();
     Executors.newSingleThreadExecutor().submit(new FindbugsTask(engine)).get(configuration.getTimeout(),TimeUnit.MILLISECONDS);
