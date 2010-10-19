@@ -1,5 +1,9 @@
 {
-  FindbugsXmlReportParser reportParser=new FindbugsXmlReportParser(executor.execute());
+  File report=getFindbugsReportFile(project);
+  if (report == null) {
+    report=executor.execute();
+  }
+  FindbugsXmlReportParser reportParser=new FindbugsXmlReportParser(report);
   List<FindbugsXmlReportParser.Violation> fbViolations=reportParser.getViolations();
   for (  FindbugsXmlReportParser.Violation fbViolation : fbViolations) {
     Rule rule=ruleFinder.findByKey(FindbugsConstants.REPOSITORY_KEY,fbViolation.getType());
