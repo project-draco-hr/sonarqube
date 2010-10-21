@@ -1,6 +1,11 @@
 {
+  if (project.getReuseExistingRulesConfig()) {
+    Logs.INFO.warn("Reusing existing Findbugs configuration not supported anymore.");
+  }
   File report=getFindbugsReportFile(project);
-  LOG.info("Findbugs output report: " + report.getAbsolutePath());
+  if (report == null) {
+    report=executor.execute();
+  }
   FindbugsXmlReportParser reportParser=new FindbugsXmlReportParser(report);
   List<FindbugsXmlReportParser.Violation> fbViolations=reportParser.getViolations();
   for (  FindbugsXmlReportParser.Violation fbViolation : fbViolations) {
