@@ -2,7 +2,7 @@
   if (project.getReuseExistingRulesConfig()) {
     String existingExcludeFilterConfig=getFindbugsMavenPlugin().getParameter("excludeFilterFile");
     if (!StringUtils.isBlank(existingExcludeFilterConfig)) {
-      return existingExcludeFilterConfig;
+      return new File(project.getFileSystem().getBasedir(),existingExcludeFilterConfig);
     }
   }
   FindBugsFilter findBugsFilter=new FindBugsFilter();
@@ -12,5 +12,5 @@
       findBugsFilter.addMatch(new Match(classFilter));
     }
   }
-  return project.getFileSystem().writeToWorkingDirectory(findBugsFilter.toXml(),"findbugs-exclude.xml").getAbsolutePath();
+  return project.getFileSystem().writeToWorkingDirectory(findBugsFilter.toXml(),"findbugs-exclude.xml");
 }
