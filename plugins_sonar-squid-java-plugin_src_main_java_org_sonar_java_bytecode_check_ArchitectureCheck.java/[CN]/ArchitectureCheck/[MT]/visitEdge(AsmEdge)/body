@@ -1,0 +1,15 @@
+{
+  if (edge != null) {
+    SourceCodeEdgeUsage usage=edge.getUsage();
+    if (usage.equals(SourceCodeEdgeUsage.USES) || usage.equals(SourceCodeEdgeUsage.CALLS_METHOD) || usage.equals(SourceCodeEdgeUsage.CALLS_FIELD)|| usage.equals(SourceCodeEdgeUsage.CONTAINS)) {
+      String internalNameTargetClass=edge.getTargetAsmClass().getInternalName();
+      String nameAsmClass=asmClass.getInternalName();
+      if (matchesPattern(nameAsmClass,fromClasses) && matchesPattern(internalNameTargetClass,toClasses)) {
+        SourceFile sourceFile=getSourceFile(asmClass);
+        CheckMessage message=new CheckMessage(this,nameAsmClass + " shouldn't directly use " + internalNameTargetClass);
+        message.setLine(edge.getSourceLineNumber());
+        sourceFile.log(message);
+      }
+    }
+  }
+}
