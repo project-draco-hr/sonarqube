@@ -1,15 +1,14 @@
 {
   if (edge != null) {
     String internalNameTargetClass=edge.getTargetAsmClass().getInternalName();
-    if (!internalNames.contains(internalNameTargetClass)) {
+    if (!internalNames.containsKey(internalNameTargetClass)) {
       String nameAsmClass=asmClass.getInternalName();
       if (matches(nameAsmClass,getFromMatchers()) && matches(internalNameTargetClass,getToMatchers())) {
-        SourceFile sourceFile=getSourceFile(asmClass);
-        CheckMessage message=new CheckMessage(this,"Architecture constraint : " + nameAsmClass + " must not use "+ internalNameTargetClass);
-        message.setLine(edge.getSourceLineNumber());
-        sourceFile.log(message);
-        internalNames.add(internalNameTargetClass);
+        logMessage(edge);
       }
+    }
+ else     if (internalNames.get(internalNameTargetClass).getLine() == 0 && edge.getSourceLineNumber() != 0) {
+      logMessage(edge);
     }
   }
 }
