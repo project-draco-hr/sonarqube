@@ -1,16 +1,32 @@
 {
   try {
-    ClassLoader resourcesClassLoader=new ResourcesClassLoader(urls,baseClassLoader);
+    ArrayList<URL> resources=Lists.newArrayList();
+    ArrayList<URL> others=Lists.newArrayList();
+    for (    URL url : urls) {
+      if (isResource(url)) {
+        resources.add(url);
+      }
+ else {
+        others.add(url);
+      }
+    }
+    ClassLoader parent;
+    if (resources.isEmpty()) {
+      parent=baseClassLoader;
+    }
+ else {
+      parent=new ResourcesClassLoader(resources,baseClassLoader);
+    }
     final ClassRealm realm;
     if (childFirst) {
-      ClassRealm parentRealm=world.newRealm(key + "-parent",resourcesClassLoader);
+      ClassRealm parentRealm=world.newRealm(key + "-parent",parent);
       realm=parentRealm.createChildRealm(key);
     }
  else {
-      realm=world.newRealm(key,resourcesClassLoader);
+      realm=world.newRealm(key,parent);
     }
-    for (    URL constituent : urls) {
-      realm.addConstituent(constituent);
+    for (    URL url : others) {
+      realm.addConstituent(url);
     }
     return realm.getClassLoader();
   }
