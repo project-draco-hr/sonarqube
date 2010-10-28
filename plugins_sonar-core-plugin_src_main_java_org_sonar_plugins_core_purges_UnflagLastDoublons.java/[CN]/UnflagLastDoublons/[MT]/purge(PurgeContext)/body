@@ -1,5 +1,5 @@
 {
   Query query=getSession().createQuery("SELECT olds.id FROM " + Snapshot.class.getSimpleName() + " olds "+ " where olds.last=true AND EXISTS (from "+ Snapshot.class.getSimpleName()+ " news WHERE news.last=true AND news.resourceId=olds.resourceId AND news.createdAt>olds.createdAt)");
-  List<Integer> snapshotIds=query.getResultList();
+  List<Integer> snapshotIds=selectIds(query);
   executeQuery(snapshotIds,"UPDATE " + Snapshot.class.getSimpleName() + " SET last=false WHERE id in (:ids)");
 }
