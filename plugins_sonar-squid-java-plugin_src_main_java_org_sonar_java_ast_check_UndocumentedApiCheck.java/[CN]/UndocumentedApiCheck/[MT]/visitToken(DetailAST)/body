@@ -1,9 +1,12 @@
 {
-  if (isPublicApi(ast) && !isDocumentedApi(ast)) {
-    SourceCode currentResource=peekSourceCode();
-    SourceFile sourceFile=currentResource.getParent(SourceFile.class);
-    CheckMessage message=new CheckMessage(this,"Avoid undocumented API");
-    message.setLine(ast.getLineNo());
-    sourceFile.log(message);
+  SourceCode currentResource=peekSourceCode();
+  SourceClass sourceClass=peekParentClass();
+  if (PatternUtils.matches(sourceClass.getKey(),getMatchers())) {
+    if (currentResource.getDouble(Metric.PUBLIC_API) > 0 && currentResource.getDouble(Metric.PUBLIC_DOC_API) == 0) {
+      SourceFile sourceFile=currentResource.getParent(SourceFile.class);
+      CheckMessage message=new CheckMessage(this,"Avoid undocumented API");
+      message.setLine(ast.getLineNo());
+      sourceFile.log(message);
+    }
   }
 }
