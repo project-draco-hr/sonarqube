@@ -1,14 +1,17 @@
 {
-  if (edge != null) {
+  if (asmClass != null && edge != null) {
     String internalNameTargetClass=edge.getTargetAsmClass().getInternalName();
     if (!internalNames.containsKey(internalNameTargetClass)) {
-      String nameAsmClass=asmClass.getInternalName();
-      if (PatternUtils.matches(nameAsmClass,getFromMatchers()) && PatternUtils.matches(internalNameTargetClass,getToMatchers())) {
-        logMessage(edge);
+      if (PatternUtils.matches(internalNameTargetClass,getToMatchers())) {
+        int sourceLineNumber=getSourceLineNumber(edge);
+        logMessage(asmClass.getInternalName(),internalNameTargetClass,sourceLineNumber);
       }
     }
- else     if (internalNames.get(internalNameTargetClass).getLine() == 0 && edge.getSourceLineNumber() != 0) {
-      logMessage(edge);
+ else {
+      int sourceLineNumber=getSourceLineNumber(edge);
+      if (internalNames.get(internalNameTargetClass).getLine() == 0 && sourceLineNumber != 0) {
+        logMessage(asmClass.getInternalName(),internalNameTargetClass,sourceLineNumber);
+      }
     }
   }
 }
