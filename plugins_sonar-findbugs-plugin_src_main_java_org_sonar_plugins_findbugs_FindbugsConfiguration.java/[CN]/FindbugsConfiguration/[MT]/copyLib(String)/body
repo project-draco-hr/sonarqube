@@ -1,15 +1,13 @@
 {
   try {
-    URI uri=new URI(url);
+    InputStream is=getClass().getResourceAsStream(name);
     File temp=File.createTempFile("findbugs",".jar");
     FileUtils.forceDeleteOnExit(temp);
-    downloader.download(uri,temp);
+    OutputStream os=FileUtils.openOutputStream(temp);
+    IOUtils.copy(is,os);
     return temp;
   }
- catch (  URISyntaxException e) {
-    throw new SonarException(e);
-  }
-catch (  IOException e) {
+ catch (  IOException e) {
     throw new SonarException(e);
   }
 }
