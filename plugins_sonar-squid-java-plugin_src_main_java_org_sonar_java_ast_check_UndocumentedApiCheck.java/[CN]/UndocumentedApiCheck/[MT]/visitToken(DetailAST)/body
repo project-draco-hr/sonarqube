@@ -2,7 +2,7 @@
   SourceCode currentResource=peekSourceCode();
   SourceClass sourceClass=peekParentClass();
   if (PatternUtils.matches(sourceClass.getKey(),getMatchers())) {
-    if (currentResource.getDouble(Metric.PUBLIC_API) > 0 && currentResource.getDouble(Metric.PUBLIC_DOC_API) == 0) {
+    if (PublicApiVisitor.isPublicApi(ast) && !PublicApiVisitor.isDocumentedApi(ast,getFileContents())) {
       SourceFile sourceFile=currentResource.getParent(SourceFile.class);
       CheckMessage message=new CheckMessage(this,"Avoid undocumented API");
       message.setLine(ast.getLineNo());
