@@ -1,24 +1,10 @@
 {
-  try {
-    Collection<File> bytecodeFiles=new ArrayList<File>();
-    if (hasProjectBytecodeFiles(project)) {
-      File classesDir=project.getFileSystem().getBuildOutputDir();
-      if (classesDir != null && classesDir.exists()) {
-        bytecodeFiles.add(classesDir);
-      }
-      MavenProject mavenProject=project.getPom();
-      FilterArtifacts filters=new FilterArtifacts();
-      filters.addFilter(new ProjectTransitivityFilter(mavenProject.getDependencyArtifacts(),false));
-      filters.addFilter(new ScopeFilter("compile",""));
-      Set<Artifact> artifacts=mavenProject.getArtifacts();
-      artifacts=filters.filter(artifacts);
-      for (      Artifact a : artifacts) {
-        bytecodeFiles.add(a.getFile());
-      }
+  Collection<File> bytecodeFiles=projectClasspath.getElements();
+  if (!hasProjectBytecodeFiles(project)) {
+    File classesDir=project.getFileSystem().getBuildOutputDir();
+    if (classesDir != null && classesDir.exists()) {
+      bytecodeFiles.remove(classesDir);
     }
-    return bytecodeFiles;
   }
- catch (  Exception e) {
-    throw new SonarException(e);
-  }
+  return bytecodeFiles;
 }
