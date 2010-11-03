@@ -5,7 +5,12 @@
       LOG.warn("Trying to save twice the source of " + resource);
     }
  else {
-      session.save(new SnapshotSource(bucket.getSnapshotId(),source));
+      try {
+        session.save(new SnapshotSource(bucket.getSnapshotId(),source));
+      }
+ catch (      Exception e) {
+        throw new SonarException("Unable to save source [resource=" + resource + ",snapshotId="+ bucket.getSnapshotId()+ "]",e);
+      }
       bucket.setSourceSaved(true);
     }
   }
