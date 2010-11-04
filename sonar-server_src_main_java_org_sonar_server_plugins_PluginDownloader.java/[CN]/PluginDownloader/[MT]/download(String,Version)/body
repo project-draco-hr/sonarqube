@@ -1,11 +1,15 @@
 {
   Plugin plugin=center.getCenter().getPlugin(pluginKey);
   if (plugin == null) {
-    throw new SonarException("This plugin does not exist: " + pluginKey);
+    String message="This plugin does not exist: " + pluginKey;
+    Logs.INFO.warn(message);
+    throw new SonarException(message);
   }
   Release release=plugin.getRelease(version);
-  if (release == null || release.getDownloadUrl() == null) {
-    throw new SonarException("This release can not be installed: " + pluginKey + ", version "+ version);
+  if (release == null || StringUtils.isBlank(release.getDownloadUrl())) {
+    String message="This release can not be installed: " + pluginKey + ", version "+ version;
+    Logs.INFO.warn(message);
+    throw new SonarException(message);
   }
   try {
     URI uri=new URI(release.getDownloadUrl());
@@ -13,6 +17,8 @@
     downloader.download(uri,new File(downloadDir,filename));
   }
  catch (  Exception e) {
-    throw new SonarException("Fail to download the plugin: " + pluginKey + ", version "+ version,e);
+    String message="Fail to download the plugin (" + pluginKey + ", version "+ version+ ") from "+ release.getDownloadUrl();
+    Logs.INFO.warn(message,e);
+    throw new SonarException(message,e);
   }
 }
