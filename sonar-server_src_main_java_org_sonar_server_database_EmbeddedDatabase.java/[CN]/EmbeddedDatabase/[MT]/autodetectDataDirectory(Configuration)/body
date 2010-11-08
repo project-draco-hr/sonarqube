@@ -1,7 +1,10 @@
 {
   String dirName=configuration.getString(DatabaseProperties.PROP_EMBEDDED_DATA_DIR);
   if (dirName == null) {
-    String sonarHome=configuration.getString(CoreProperties.SONAR_HOME);
+    File sonarHome=new File(configuration.getString(CoreProperties.SONAR_HOME));
+    if (!sonarHome.isDirectory() || !sonarHome.exists()) {
+      throw new ServerStartException("Sonar home directory does not exist");
+    }
     return new File(sonarHome,"data");
   }
   return new File(dirName);
