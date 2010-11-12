@@ -1,5 +1,7 @@
 {
-  final Date beforeDate=DateUtils.addHours(new Date(),MINIMUM_AGE_IN_HOURS);
+  int minimumPeriodInHours=PurgeUtils.getMinimumPeriodInHours(configuration);
+  final Date beforeDate=DateUtils.addHours(new Date(),-minimumPeriodInHours);
+  Logs.INFO.info("Deleting unprocessed data before " + beforeDate);
   Query query=getSession().createQuery("SELECT s.id FROM " + Snapshot.class.getSimpleName() + " s WHERE s.last=false AND status=:status AND s.createdAt<:date");
   query.setParameter("status",Snapshot.STATUS_UNPROCESSED);
   query.setParameter("date",beforeDate);
