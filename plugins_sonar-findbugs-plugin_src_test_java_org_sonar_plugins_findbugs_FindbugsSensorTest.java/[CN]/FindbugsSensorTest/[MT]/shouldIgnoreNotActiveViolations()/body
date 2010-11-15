@@ -1,0 +1,13 @@
+{
+  Project project=createProject();
+  FindbugsExecutor executor=mock(FindbugsExecutor.class);
+  SensorContext context=mock(SensorContext.class);
+  Configuration conf=mock(Configuration.class);
+  File xmlFile=new File(getClass().getResource("/org/sonar/plugins/findbugs/findbugsReportWithUnknownRule.xml").toURI());
+  when(conf.getString(CoreProperties.FINDBUGS_REPORT_PATH)).thenReturn(xmlFile.getAbsolutePath());
+  when(project.getConfiguration()).thenReturn(conf);
+  when(context.getResource(any(Resource.class))).thenReturn(new JavaFile("org.sonar.MyClass"));
+  FindbugsSensor analyser=new FindbugsSensor(createRulesProfileWithActiveRules(),new FindbugsRuleFinder(),executor);
+  analyser.analyse(project,context);
+  verify(context,never()).saveViolation(any(Violation.class));
+}
