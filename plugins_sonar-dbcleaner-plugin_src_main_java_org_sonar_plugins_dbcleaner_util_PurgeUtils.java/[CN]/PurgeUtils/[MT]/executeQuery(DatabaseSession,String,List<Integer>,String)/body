@@ -1,0 +1,16 @@
+{
+  if (ids == null || ids.isEmpty()) {
+    return;
+  }
+  TimeProfiler profiler=new TimeProfiler().setLevelToDebug().start("Execute " + description);
+  int index=0;
+  while (index < ids.size()) {
+    Query query=session.createQuery(hql);
+    List<Integer> paginedSids=ids.subList(index,Math.min(ids.size(),index + MAX_IN_ELEMENTS));
+    query.setParameter("ids",paginedSids);
+    query.executeUpdate();
+    index+=MAX_IN_ELEMENTS;
+    session.commit();
+  }
+  profiler.stop();
+}
