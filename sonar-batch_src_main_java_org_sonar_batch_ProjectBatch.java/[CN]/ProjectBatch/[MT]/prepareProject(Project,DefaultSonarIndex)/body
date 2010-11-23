@@ -1,5 +1,9 @@
 {
-  project.setLanguage(getComponent(Languages.class).get(project.getLanguageKey()));
+  Language language=getComponent(Languages.class).get(project.getLanguageKey());
+  if (language == null) {
+    throw new SonarException("Language with key '" + project.getLanguageKey() + "' not found");
+  }
+  project.setLanguage(language);
   index.selectProject(project,getComponent(ResourceFilters.class),getComponent(ViolationFilters.class),getComponent(MeasuresDao.class),getComponent(ViolationsDao.class));
   List<FileFilter> fileFilters=batchContainer.getComponents(FileFilter.class);
   ((DefaultProjectFileSystem)project.getFileSystem()).addFileFilters(fileFilters);
