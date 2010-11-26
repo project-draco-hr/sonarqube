@@ -1,0 +1,16 @@
+{
+  ResourceModel model;
+  try {
+    model=session.getSingleResult(ResourceModel.class,"key",resource.getEffectiveKey());
+    if (model == null) {
+      model=createModel(resource);
+    }
+ else {
+      mergeModel(model,resource);
+    }
+    return model;
+  }
+ catch (  NonUniqueResultException e) {
+    throw new SonarException("The resource '" + resource.getEffectiveKey() + "' is duplicated in database.");
+  }
+}
