@@ -1,0 +1,23 @@
+{
+  Snapshot snapshot=resourcePersister.saveResource(project,resource);
+  if (snapshot != null) {
+    if (delayedMode && measure.getPersistenceMode().useMemory()) {
+      MeasureModel model=createModel(measure);
+      model.setSnapshotId(snapshot.getId());
+      unsavedMeasures.add(model);
+    }
+ else     if (shouldPersistMeasure(resource,measure)) {
+      if (measure.getId() != null) {
+        MeasureModel model=session.reattach(MeasureModel.class,measure.getId());
+        model=mergeModel(measure,model);
+        model.save(session);
+      }
+ else {
+        MeasureModel model=createModel(measure);
+        model.setSnapshotId(snapshot.getId());
+        model.save(session);
+        measure.setId(model.getId());
+      }
+    }
+  }
+}

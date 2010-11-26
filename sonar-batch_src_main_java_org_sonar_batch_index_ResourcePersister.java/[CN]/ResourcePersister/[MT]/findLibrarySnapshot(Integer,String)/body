@@ -1,0 +1,13 @@
+{
+  Query query=session.createQuery("from " + Snapshot.class.getSimpleName() + " s WHERE s.resourceId=:resourceId AND s.version=:version AND s.scope=:scope AND s.qualifier<>:qualifier AND s.last=:last");
+  query.setParameter("resourceId",resourceId);
+  query.setParameter("version",version);
+  query.setParameter("scope",Resource.SCOPE_SET);
+  query.setParameter("qualifier",Resource.QUALIFIER_LIB);
+  query.setParameter("last",Boolean.TRUE);
+  List<Snapshot> snapshots=query.getResultList();
+  if (snapshots.isEmpty()) {
+    snapshots=session.getResults(Snapshot.class,"resourceId",resourceId,"version",version,"scope",Resource.SCOPE_SET,"qualifier",Resource.QUALIFIER_LIB);
+  }
+  return (snapshots.isEmpty() ? null : snapshots.get(0));
+}

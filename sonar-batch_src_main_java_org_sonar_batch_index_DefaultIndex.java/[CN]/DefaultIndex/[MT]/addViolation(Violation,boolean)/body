@@ -1,0 +1,27 @@
+{
+  Bucket bucket;
+  Resource resource=violation.getResource();
+  if (resource == null) {
+    violation.setResource(currentProject);
+  }
+  bucket=getOrAddBucket(violation.getResource());
+  if (!bucket.isExcluded()) {
+    boolean isIgnored=!force && violationFilters != null && violationFilters.isIgnored(violation);
+    if (!isIgnored) {
+      ActiveRule activeRule=profile.getActiveRule(violation.getRule());
+      if (activeRule == null) {
+        if (currentProject.getReuseExistingRulesConfig()) {
+          violation.setPriority(violation.getRule().getPriority());
+          doAddViolation(violation,bucket);
+        }
+ else {
+          LoggerFactory.getLogger(getClass()).debug("Rule is not activated, ignoring violation {}",violation);
+        }
+      }
+ else {
+        violation.setPriority(activeRule.getPriority());
+        doAddViolation(violation,bucket);
+      }
+    }
+  }
+}

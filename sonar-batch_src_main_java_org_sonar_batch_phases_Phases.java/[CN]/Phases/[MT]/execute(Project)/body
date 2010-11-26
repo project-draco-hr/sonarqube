@@ -1,0 +1,14 @@
+{
+  mavenPluginsConfigurator.execute(project);
+  mavenPhaseExecutor.execute(project);
+  persistenceManager.setDelayedMode(true);
+  sensorsExecutor.execute(project,sensorContext);
+  decoratorsExecutor.execute(project);
+  persistenceManager.dump();
+  persistenceManager.setDelayedMode(false);
+  if (project.isRoot()) {
+    updateStatusJob.execute();
+    postJobsExecutor.execute(project,sensorContext);
+  }
+  cleanMemory();
+}
