@@ -1,0 +1,18 @@
+{
+  DetailAST suppressWarningsAnnotation=getSuppressWarningsAnnotation(ast);
+  if (suppressWarningsAnnotation != null) {
+    DetailAST warningHolder=findWarningsHolder(suppressWarningsAnnotation);
+    for (DetailAST warning=warningHolder.findFirstToken(TokenTypes.EXPR); warning != null; warning=warning.getNextSibling()) {
+      if (warning.getType() == TokenTypes.EXPR) {
+        DetailAST fChild=warning.getFirstChild();
+        if (fChild.getType() == TokenTypes.STRING_LITERAL) {
+          String text=warning.getFirstChild().getText();
+          if (VALUE.equals(text)) {
+            return true;
+          }
+        }
+      }
+    }
+  }
+  return false;
+}

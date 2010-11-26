@@ -1,5 +1,14 @@
 {
   if (noSonarFilter != null) {
-    noSonarFilter.addResource(sonarFile,squidFile.getNoSonarTagLines());
+    Set<Integer> ignoredLines=new HashSet<Integer>(squidFile.getNoSonarTagLines());
+    for (    SourceCode sourceCode : squid.search(new QueryByParent(squidFile))) {
+      if (sourceCode instanceof SourceMethod && ((SourceMethod)sourceCode).isSuppressWarnings()) {
+        visitLines(sourceCode,ignoredLines);
+      }
+      if (sourceCode instanceof SourceClass && ((SourceClass)sourceCode).isSuppressWarnings()) {
+        visitLines(sourceCode,ignoredLines);
+      }
+    }
+    noSonarFilter.addResource(sonarFile,ignoredLines);
   }
 }
