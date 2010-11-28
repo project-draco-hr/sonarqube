@@ -1,14 +1,16 @@
 {
-  List<DecoratorContext> childrenContexts=new ArrayList<DecoratorContext>();
+  List<DecoratorContext> childrenContexts=Lists.newArrayList();
   for (  Resource child : index.getChildren(resource)) {
     boolean isModule=(child instanceof Project);
-    DefaultDecoratorContext childContext=(DefaultDecoratorContext)decorateResource(child,decorators,!isModule);
+    DefaultDecoratorContext childContext=(DefaultDecoratorContext)decorateResource(child,decorators,!isModule,profiler);
     childrenContexts.add(childContext.setReadOnly(true));
   }
   DefaultDecoratorContext context=new DefaultDecoratorContext(resource,index,childrenContexts,session);
   if (executeDecorators) {
     for (    Decorator decorator : decorators) {
+      profiler.start(decorator);
       decorator.decorate(resource,context);
+      profiler.stop();
     }
   }
   return context;
