@@ -20,7 +20,15 @@
     RuleMeasure ruleMeasure=(RuleMeasure)measure;
     merge.setRulesCategoryId(ruleMeasure.getRuleCategory());
     merge.setRulePriority(ruleMeasure.getRulePriority());
-    merge.setRule(ruleMeasure.getRule());
+    if (ruleMeasure.getRule() != null) {
+      Rule ruleWithId=ruleFinder.findByKey(ruleMeasure.getRule().getRepositoryKey(),ruleMeasure.getRule().getKey());
+      if (ruleWithId != null) {
+        merge.setRuleId(ruleWithId.getId());
+      }
+ else {
+        throw new SonarException("Can not save a measure with unknown rule " + ruleMeasure);
+      }
+    }
   }
   return merge;
 }
