@@ -1,17 +1,9 @@
 {
-  for (int index=0; index < projectTargetSnapshots.length; index++) {
-    Snapshot projectTargetSnapshot=projectTargetSnapshots[index];
-    if (projectTargetSnapshot != null) {
-      List<MeasureModel> pastMeasures=selectPastMeasures(resource.getId(),projectTargetSnapshot);
-      Map<MeasureKey,MeasureModel> pastMeasuresByKey=Maps.newHashMap();
-      for (      MeasureModel pastMeasure : pastMeasures) {
-        pastMeasuresByKey.put(new MeasureKey(pastMeasure),pastMeasure);
-      }
-      for (      Measure measure : context.getMeasures(MeasuresFilters.all())) {
-        MeasureModel pastMeasure=pastMeasuresByKey.get(new MeasureKey(measure));
-        if (calculateDiffValue(measure,pastMeasure,index)) {
-          context.saveMeasure(measure);
-        }
+  if (shouldCalculateDiffValues(resource)) {
+    for (int index=0; index < projectTargetSnapshots.length; index++) {
+      Snapshot projectTargetSnapshot=projectTargetSnapshots[index];
+      if (projectTargetSnapshot != null) {
+        calculateDiffValues(resource,context,index,projectTargetSnapshot);
       }
     }
   }
