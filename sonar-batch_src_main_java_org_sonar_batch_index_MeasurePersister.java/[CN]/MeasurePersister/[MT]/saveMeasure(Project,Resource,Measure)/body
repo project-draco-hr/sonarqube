@@ -1,10 +1,10 @@
 {
-  Snapshot snapshot=resourcePersister.saveResource(project,resource);
-  if (snapshot != null) {
-    if (delayedMode && measure.getPersistenceMode().useMemory()) {
-      unsavedMeasuresBySnapshotId.put(snapshot.getId(),measure);
-    }
- else     if (measure.getId() != null) {
+  if (delayedMode && measure.getPersistenceMode().useMemory()) {
+    unsavedMeasuresByResource.put(resource,measure);
+  }
+ else {
+    Snapshot snapshot=resourcePersister.saveResource(project,resource);
+    if (measure.getId() != null) {
       MeasureModel model=session.reattach(MeasureModel.class,measure.getId());
       model=mergeModel(measure,model);
       model.save(session);
