@@ -1,16 +1,4 @@
 {
-  Resource resource=violation.getResource();
-  if (!violationsByResource.containsKey(resource)) {
-    violationsByResource.put(resource,persistence.loadPreviousViolations(resource));
-  }
-  RuleFailureModel found=null;
-  List<RuleFailureModel> pastViolations=violationsByResource.get(resource);
-  for (  RuleFailureModel pastViolation : pastViolations) {
-    if (pastViolation.getLine() == violation.getLineId() && StringUtils.equals(pastViolation.getMessage(),violation.getMessage())) {
-      found=pastViolation;
-      break;
-    }
-  }
   bucket.addViolation(violation);
-  persistence.saveOrUpdateViolation(currentProject,violation,found);
+  persistence.saveViolation(currentProject,violation);
 }
