@@ -1,13 +1,16 @@
 {
   setupData("shared");
   resourcePersister=mock(ResourcePersister.class);
-  projectSnapshot=getSession().getSingleResult(Snapshot.class,"id",3001);
-  packageSnapshot=getSession().getSingleResult(Snapshot.class,"id",3002);
+  projectSnapshot=getSession().getSingleResult(Snapshot.class,"id",PROJECT_SNAPSHOT_ID);
+  packageSnapshot=getSession().getSingleResult(Snapshot.class,"id",PACKAGE_SNAPSHOT_ID);
+  fileSnapshot=getSession().getSingleResult(Snapshot.class,"id",FILE_SNAPSHOT_ID);
   ncloc=getSession().getSingleResult(Metric.class,"key","ncloc");
   coverage=getSession().getSingleResult(Metric.class,"key","coverage");
   when(resourcePersister.saveResource((Project)anyObject(),eq(project))).thenReturn(projectSnapshot);
   when(resourcePersister.saveResource((Project)anyObject(),eq(aPackage))).thenReturn(packageSnapshot);
+  when(resourcePersister.saveResource((Project)anyObject(),eq(aFile))).thenReturn(fileSnapshot);
   when(resourcePersister.getSnapshot(project)).thenReturn(projectSnapshot);
   when(resourcePersister.getSnapshot(aPackage)).thenReturn(packageSnapshot);
+  when(resourcePersister.getSnapshot(aFile)).thenReturn(fileSnapshot);
   measurePersister=new MeasurePersister(getSession(),resourcePersister,new DefaultRuleFinder(getSessionFactory()));
 }
