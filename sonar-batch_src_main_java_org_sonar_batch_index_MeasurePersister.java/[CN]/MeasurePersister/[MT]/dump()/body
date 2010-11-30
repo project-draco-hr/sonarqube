@@ -2,11 +2,14 @@
   LoggerFactory.getLogger(getClass()).debug("{} measures to dump",unsavedMeasuresByResource.size());
   Map<Resource,Collection<Measure>> map=unsavedMeasuresByResource.asMap();
   for (  Map.Entry<Resource,Collection<Measure>> entry : map.entrySet()) {
+    Resource resource=entry.getKey();
     Snapshot snapshot=resourcePersister.getSnapshot(entry.getKey());
     for (    Measure measure : entry.getValue()) {
-      MeasureModel model=createModel(measure);
-      model.setSnapshotId(snapshot.getId());
-      model.save(session);
+      if (shouldPersistMeasure(resource,measure)) {
+        MeasureModel model=createModel(measure);
+        model.setSnapshotId(snapshot.getId());
+        model.save(session);
+      }
     }
   }
   session.commit();
