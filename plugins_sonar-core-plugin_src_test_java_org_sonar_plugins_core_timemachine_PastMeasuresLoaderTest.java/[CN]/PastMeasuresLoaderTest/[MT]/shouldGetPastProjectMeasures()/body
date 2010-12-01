@@ -1,0 +1,12 @@
+{
+  setupData("shared");
+  List<Metric> metrics=selectMetrics();
+  Snapshot projectSnapshot=getSession().getSingleResult(Snapshot.class,"id",PROJECT_SNAPSHOT_ID);
+  PastMeasuresLoader loader=new PastMeasuresLoader(getSession(),metrics);
+  List<MeasureModel> measures=loader.getPastMeasures(PROJECT_ID,projectSnapshot);
+  assertThat(measures.size(),is(2));
+  for (  MeasureModel measure : measures) {
+    assertThat(measure.getId(),anyOf(is(1L),is(2L)));
+    assertThat(measure.getValue(),anyOf(is(60.0),is(80.0)));
+  }
+}

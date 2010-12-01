@@ -1,11 +1,9 @@
 {
   Measure measure=new Measure(CoreMetrics.NEW_VIOLATIONS);
-  for (int index=0; index < 3; index++) {
-    Integer days=timeMachineConfiguration.getDiffPeriodInDays(index);
-    if (days != null) {
-      double value=calculate(context,days) + sumChildren(context,index);
-      setDiffValue(measure,index,value);
-    }
+  for (  VariationTarget variationTarget : timeMachineConfiguration.getVariationTargets()) {
+    Date date=variationTarget.getDate();
+    double value=countViolationsAfterDate(context.getViolations(),date) + sumChildren(context,variationTarget.getIndex());
+    measure.setVariation(variationTarget.getIndex(),value);
   }
   context.saveMeasure(measure);
 }
