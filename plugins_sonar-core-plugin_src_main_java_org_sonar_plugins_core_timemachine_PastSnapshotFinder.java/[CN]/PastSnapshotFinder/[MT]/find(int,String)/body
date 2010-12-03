@@ -2,15 +2,14 @@
   if (StringUtils.isBlank(property)) {
     return null;
   }
-  PastSnapshot result=null;
-  Integer days=getValueInDays(property);
-  if (days != null) {
-    result=findSnapshotInDays(index,days);
-  }
- else {
-    String version=getValueVersion(property);
-    if (StringUtils.isNotBlank(version)) {
-      result=findSnapshotByVersion(index,version);
+  PastSnapshot result=findByDays(index,property);
+  if (result == null) {
+    result=findByDate(index,property);
+    if (result == null) {
+      result=findByLastAnalysis(index,property);
+      if (result == null) {
+        result=findByVersion(index,property);
+      }
     }
   }
   return result;
