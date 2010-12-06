@@ -1,4 +1,20 @@
 {
+  rightNow=new Date();
+  tenDaysAgo=DateUtils.addDays(rightNow,-10);
+  fiveDaysAgo=DateUtils.addDays(rightNow,-5);
+  PastSnapshot pastSnapshot=mock(PastSnapshot.class);
+  when(pastSnapshot.getIndex()).thenReturn(1);
+  when(pastSnapshot.getDate()).thenReturn(fiveDaysAgo);
+  PastSnapshot pastSnapshot2=mock(PastSnapshot.class);
+  when(pastSnapshot2.getIndex()).thenReturn(2);
+  when(pastSnapshot2.getDate()).thenReturn(tenDaysAgo);
+  TimeMachineConfiguration timeMachineConfiguration=mock(TimeMachineConfiguration.class);
+  when(timeMachineConfiguration.getProjectPastSnapshots()).thenReturn(Arrays.asList(pastSnapshot,pastSnapshot2));
   context=mock(DecoratorContext.class);
-  decorator=new NewViolationsDecorator(null);
+  resource=mock(Resource.class);
+  when(context.getResource()).thenReturn(resource);
+  decorator=new NewViolationsDecorator(timeMachineConfiguration);
+  rule1=Rule.create().setPluginName("rule1").setKey("rule1").setName("name1");
+  rule2=Rule.create().setPluginName("rule2").setKey("rule2").setName("name2");
+  rule3=Rule.create().setPluginName("rule3").setKey("rule3").setName("name3");
 }
