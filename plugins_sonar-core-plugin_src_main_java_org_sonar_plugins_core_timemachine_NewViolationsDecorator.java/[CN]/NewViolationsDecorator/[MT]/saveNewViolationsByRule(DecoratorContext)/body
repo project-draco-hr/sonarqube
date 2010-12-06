@@ -1,0 +1,23 @@
+{
+  ArrayListMultimap<Rule,Measure> childrenByRule=ArrayListMultimap.create();
+  Collection<Measure> children=context.getChildrenMeasures(MeasuresFilters.rules(CoreMetrics.NEW_VIOLATIONS));
+  for (  Measure childMeasure : children) {
+    RuleMeasure childRuleMeasure=(RuleMeasure)childMeasure;
+    Rule rule=childRuleMeasure.getRule();
+    if (rule != null && MeasureUtils.hasValue(childRuleMeasure)) {
+      childrenByRule.put(rule,childMeasure);
+      ruleToLevel.put(childRuleMeasure.getRule(),childRuleMeasure.getRulePriority());
+    }
+  }
+  for (  Rule rule : childrenByRule.keys()) {
+    RuleMeasure measure=RuleMeasure.createForRule(CoreMetrics.VIOLATIONS,rule,null);
+    measure.setRulePriority(ruleToLevel.get(rule));
+    for (    PastSnapshot variationSnapshot : timeMachineConfiguration.getProjectPastSnapshots()) {
+      int variationIndex=variationSnapshot.getIndex();
+      int value=countViolations(context.getViolations(),variationSnapshot.getDate(),rule);
+      double sum=sumChildren(variationIndex,childrenByRule.get(rule)) + value;
+      measure.setVariation(variationIndex,sum);
+    }
+    context.saveMeasure(measure);
+  }
+}

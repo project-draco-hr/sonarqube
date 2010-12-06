@@ -1,0 +1,11 @@
+{
+  Measure measure=new Measure(CoreMetrics.NEW_VIOLATIONS);
+  for (  PastSnapshot variationSnapshot : timeMachineConfiguration.getProjectPastSnapshots()) {
+    int variationIndex=variationSnapshot.getIndex();
+    Collection<Measure> children=context.getChildrenMeasures(CoreMetrics.NEW_VIOLATIONS);
+    int value=countViolations(context.getViolations(),variationSnapshot.getDate());
+    double sum=sumChildren(variationIndex,children) + value;
+    measure.setVariation(variationIndex,sum);
+  }
+  context.saveMeasure(measure);
+}

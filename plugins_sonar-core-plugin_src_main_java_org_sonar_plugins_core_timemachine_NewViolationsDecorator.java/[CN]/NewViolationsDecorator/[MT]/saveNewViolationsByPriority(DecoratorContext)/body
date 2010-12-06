@@ -1,0 +1,16 @@
+{
+  for (  RulePriority priority : RulePriority.values()) {
+    Measure measure1=new Measure(getMetricForPriority(priority));
+    Measure measure2=RuleMeasure.createForPriority(CoreMetrics.NEW_VIOLATIONS,priority,null);
+    for (    PastSnapshot variationSnapshot : timeMachineConfiguration.getProjectPastSnapshots()) {
+      int variationIndex=variationSnapshot.getIndex();
+      Collection<Measure> children=context.getChildrenMeasures(MeasuresFilters.rulePriority(CoreMetrics.NEW_VIOLATIONS,priority));
+      int count=countViolations(context.getViolations(),variationSnapshot.getDate(),priority);
+      double sum=sumChildren(variationIndex,children) + count;
+      measure1.setVariation(variationIndex,sum);
+      measure2.setVariation(variationIndex,sum);
+    }
+    context.saveMeasure(measure1);
+    context.saveMeasure(measure2);
+  }
+}
