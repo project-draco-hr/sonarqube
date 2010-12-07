@@ -1,10 +1,15 @@
 {
   List<RulesProfile> profiles=new ArrayList<RulesProfile>();
-  profiles.add(new RulesProfile("test name","test language",true,true));
-  profiles.add(new RulesProfile("test2 name","test2 language",false,false));
-  ActiveRule activeRule=new ActiveRule(null,new Rule("test plugin","test key"),RulePriority.MAJOR);
-  activeRule.getActiveRuleParams().add(new ActiveRuleParam(activeRule,new RuleParam(null,"test param key",null,null),"test value"));
-  profiles.get(0).getActiveRules().add(activeRule);
+  RulesProfile profile1=RulesProfile.create("test name","test language");
+  profile1.setDefaultProfile(true);
+  profile1.setProvided(true);
+  profiles.add(profile1);
+  RulesProfile profile2=RulesProfile.create("test2 name","test2 language");
+  profiles.add(profile2);
+  Rule rule=Rule.create("test plugin","test key",null);
+  rule.createParameter("test param key");
+  ActiveRule activeRule=profile1.activateRule(rule,RulePriority.MAJOR);
+  activeRule.setParameter("test param key","test value");
   profiles.get(0).getAlerts().add(new Alert(null,new Metric("test key"),Alert.OPERATOR_GREATER,"testError","testWarn"));
   return profiles;
 }
