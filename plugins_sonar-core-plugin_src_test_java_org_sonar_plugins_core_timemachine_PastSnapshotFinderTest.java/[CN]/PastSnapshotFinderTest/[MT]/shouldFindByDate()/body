@@ -1,7 +1,7 @@
 {
   final SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd");
   final Date date=format.parse("2010-05-18");
-  when(finderByDate.findByDate(date)).thenReturn(new Snapshot());
+  when(finderByDate.findByDate(date)).thenReturn(new PastSnapshot("date",new Snapshot()));
   PastSnapshot variationSnapshot=finder.find(2,"2010-05-18");
   verify(finderByDate).findByDate(argThat(new BaseMatcher<Date>(){
     public boolean matches(    Object o){
@@ -13,5 +13,5 @@
 ));
   assertThat(variationSnapshot.getIndex(),is(2));
   assertThat(variationSnapshot.getMode(),is("date"));
-  assertThat(variationSnapshot.getModeParameter(),is("2010-05-18"));
+  assertThat(variationSnapshot.getProjectSnapshot(),not(nullValue()));
 }
