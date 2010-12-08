@@ -1,0 +1,24 @@
+{
+  for (  Rule rule : rules) {
+    Rule parent=rule.getParent();
+    Rule matchingParentRuleInDb=rulesDao.getRuleByKey(parent.getRepositoryKey(),parent.getKey());
+    if (matchingParentRuleInDb == null) {
+      LoggerFactory.getLogger(getClass()).error("Unable to find parent rule " + parent.getRepositoryKey() + ":"+ parent.getKey());
+      continue;
+    }
+    rule.setParent(matchingParentRuleInDb);
+    Rule matchingRuleInDb=rulesDao.getRuleByKey(rule.getRepositoryKey(),rule.getKey());
+    if (matchingRuleInDb != null) {
+      matchingRuleInDb.setName(rule.getName());
+      matchingRuleInDb.setDescription(rule.getDescription());
+      matchingRuleInDb.setSeverity(rule.getSeverity());
+      matchingRuleInDb.setParams(rule.getParams());
+      matchingRuleInDb.setEnabled(true);
+      session.save(matchingRuleInDb);
+    }
+ else {
+      rule.setEnabled(true);
+      session.save(rule);
+    }
+  }
+}

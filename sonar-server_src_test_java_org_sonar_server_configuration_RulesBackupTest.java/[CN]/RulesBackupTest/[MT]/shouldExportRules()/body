@@ -1,0 +1,11 @@
+{
+  SonarConfig sonarConfig=new SonarConfig();
+  Rule rule=Rule.create("repo","key","name").setDescription("description");
+  Rule userRule=Rule.create("repo","key2","name2").setDescription("description2");
+  userRule.setParent(rule);
+  userRule.createParameter("param").setDefaultValue("value");
+  RulesBackup rulesBackup=new RulesBackup(Arrays.asList(userRule));
+  rulesBackup.exportXml(sonarConfig);
+  assertThat(sonarConfig.getRules().size(),is(1));
+  assertTrue(sonarConfig.getRules().iterator().next() == userRule);
+}
