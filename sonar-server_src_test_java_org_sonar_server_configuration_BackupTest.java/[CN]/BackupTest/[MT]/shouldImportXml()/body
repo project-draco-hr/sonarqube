@@ -1,5 +1,5 @@
 {
-  Backup backup=new Backup(Arrays.asList(new MetricsBackup(null),new PropertiesBackup(null),new ProfilesBackup((DatabaseSession)null)));
+  Backup backup=new Backup(Arrays.asList(new MetricsBackup(null),new PropertiesBackup(null),new RulesBackup((DatabaseSession)null),new ProfilesBackup((DatabaseSession)null)));
   String xml=getFileFromClasspath("backup-restore-valid.xml");
   SonarConfig sonarConfig=backup.getSonarConfigFromXml(xml);
   assertTrue(CollectionUtils.isEqualCollection(sonarConfig.getMetrics(),getMetrics()));
@@ -34,4 +34,18 @@
   assertEquals("testWarn",testAlert.getValueWarning());
   assertNotNull(testAlert.getMetric());
   assertEquals("test key",testAlert.getMetric().getKey());
+  Collection<Rule> rules=sonarConfig.getRules();
+  assertThat(rules.size(),is(1));
+  Rule rule=rules.iterator().next();
+  assertThat(rule.getParent().getRepositoryKey(),is("test plugin"));
+  assertThat(rule.getParent().getKey(),is("test key"));
+  assertThat(rule.getRepositoryKey(),is("test plugin"));
+  assertThat(rule.getKey(),is("test key2"));
+  assertThat(rule.getName(),is("test name"));
+  assertThat(rule.getDescription(),is("test description"));
+  assertThat(rule.getSeverity(),is(RulePriority.INFO));
+  assertThat(rule.getParams().size(),is(1));
+  RuleParam param=rule.getParams().get(0);
+  assertThat(param.getKey(),is("test param key"));
+  assertThat(param.getDefaultValue(),is("test param value"));
 }
