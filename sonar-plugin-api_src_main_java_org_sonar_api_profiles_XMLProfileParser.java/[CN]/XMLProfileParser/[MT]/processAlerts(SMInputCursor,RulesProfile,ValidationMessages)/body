@@ -1,0 +1,33 @@
+{
+  while (alertsCursor.getNext() != null) {
+    SMInputCursor alertCursor=alertsCursor.childElementCursor();
+    String metricKey=null, operator="", valueError="", valueWarning="";
+    while (alertCursor.getNext() != null) {
+      String nodeName=alertCursor.getLocalName();
+      if (StringUtils.equals("metric",nodeName)) {
+        metricKey=StringUtils.trim(alertCursor.collectDescendantText(false));
+      }
+ else       if (StringUtils.equals("operator",nodeName)) {
+        operator=StringUtils.trim(alertCursor.collectDescendantText(false));
+      }
+ else       if (StringUtils.equals("warning",nodeName)) {
+        valueWarning=StringUtils.trim(alertCursor.collectDescendantText(false));
+      }
+ else       if (StringUtils.equals("error",nodeName)) {
+        valueError=StringUtils.trim(alertCursor.collectDescendantText(false));
+      }
+    }
+    Metric metric=metricFinder.findByKey(metricKey);
+    if (metric == null) {
+      messages.addWarningText("Metric '" + metricKey + "' does not exist");
+    }
+ else {
+      Alert alert=new Alert();
+      alert.setMetric(metric);
+      alert.setOperator(operator);
+      alert.setValueError(valueError);
+      alert.setValueWarning(valueWarning);
+      profile.getAlerts().add(alert);
+    }
+  }
+}
