@@ -1,14 +1,16 @@
 {
-  RulesDao rulesDao=getDao().getRulesDao();
-  RulesBackup rulesBackup=new RulesBackup(getSession());
-  SonarConfig sonarConfig=new SonarConfig();
-  Rule rule=Rule.create("repo","key","name").setDescription("description");
-  Rule userRule=Rule.create("repo","key2","name2").setDescription("description2");
-  userRule.setParent(rule);
-  userRule.createParameter("param").setDefaultValue("value");
   getSession().save(rule);
-  sonarConfig.setRules(Arrays.asList(userRule));
+  sonarConfig.setRules(Arrays.asList(createUserRule()));
   rulesBackup.importXml(sonarConfig);
-  List<Rule> rules=rulesDao.getRules();
-  assertThat(rules.size(),is(2));
+  assertThat(getSession().getResults(Rule.class).size(),is(2));
+  Rule importedRule=getDao().getRulesDao().getRuleByKey("repo","key2");
+  assertThat(importedRule.getParent(),is(rule));
+  assertThat(importedRule.isEnabled(),is(true));
+  assertThat(importedRule.getName(),is("name2"));
+  assertThat(importedRule.getDescription(),is("description2"));
+  assertThat(importedRule.getSeverity(),is(RulePriority.INFO));
+  assertThat(importedRule.getParams().size(),is(1));
+  RuleParam param=importedRule.getParams().get(0);
+  assertThat(param.getKey(),is("param"));
+  assertThat(param.getDefaultValue(),is("value"));
 }
