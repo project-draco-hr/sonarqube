@@ -1,0 +1,11 @@
+{
+  when(resource.getScope()).thenReturn(Resource.SCOPE_SET);
+  when(context.getViolations()).thenReturn(createViolations());
+  when(context.getChildrenMeasures((MeasuresFilter)anyObject())).thenReturn(Collections.<Measure>emptyList());
+  when(context.getMeasure(CoreMetrics.VIOLATIONS)).thenReturn(new Measure(CoreMetrics.VIOLATIONS,3000.0));
+  when(context.getMeasure(CoreMetrics.MAJOR_VIOLATIONS)).thenReturn(new Measure(CoreMetrics.MAJOR_VIOLATIONS,500.0));
+  decorator.decorate(resource,context);
+  verify(context,never()).saveMeasure(argThat(new IsMeasure(CoreMetrics.VIOLATIONS)));
+  verify(context,never()).saveMeasure(argThat(new IsMeasure(CoreMetrics.MAJOR_VIOLATIONS)));
+  verify(context,times(1)).saveMeasure(argThat(new IsMeasure(CoreMetrics.CRITICAL_VIOLATIONS)));
+}
