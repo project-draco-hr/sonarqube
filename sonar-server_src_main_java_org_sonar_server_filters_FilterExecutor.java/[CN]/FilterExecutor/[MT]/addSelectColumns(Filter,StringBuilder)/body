@@ -22,12 +22,16 @@
   }
   for (int index=0; index < filter.getMeasureCriteria().size(); index++) {
     MeasureCriterion criterion=filter.getMeasureCriteria().get(index);
+    String column=(criterion.isVariation() ? Filter.getVariationColumn(filter.getPeriodIndex()) : "value");
     sql.append(", MAX(CASE WHEN pm.metric_id=");
     sql.append(criterion.getMetricId());
-    sql.append(" AND pm.value");
+    sql.append(" AND pm.");
+    sql.append(column);
     sql.append(criterion.getOperator());
     sql.append(criterion.getValue());
-    sql.append(" THEN value ELSE NULL END) AS crit_");
+    sql.append(" THEN ");
+    sql.append(column);
+    sql.append(" ELSE NULL END) AS crit_");
     sql.append(index);
     sql.append(" ");
   }

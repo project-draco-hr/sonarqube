@@ -8,8 +8,9 @@
         if (index > 0) {
           sql.append(" OR ");
         }
-        MeasureCriterion criteria=filter.getMeasureCriteria().get(index);
-        sql.append("(pm.metric_id=").append(criteria.getMetricId()).append(" and pm.value").append(criteria.getOperator()).append(criteria.getValue()).append(")");
+        MeasureCriterion criterion=filter.getMeasureCriteria().get(index);
+        String column=(criterion.isVariation() ? Filter.getVariationColumn(filter.getPeriodIndex()) : "value");
+        sql.append("(pm.metric_id=").append(criterion.getMetricId()).append(" and pm.").append(column).append(criterion.getOperator()).append(criterion.getValue()).append(")");
         index++;
       }
       if (filter.getSortedMetricId() != null && !filter.hasMeasureCriteriaOnMetric(filter.getSortedMetricId())) {
