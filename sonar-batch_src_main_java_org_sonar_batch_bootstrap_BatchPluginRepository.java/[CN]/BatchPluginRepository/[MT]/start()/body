@@ -1,0 +1,24 @@
+{
+  classLoaders=new ClassLoadersCollection(Thread.currentThread().getContextClassLoader());
+  for (  JpaPlugin pluginMetadata : dao.getPlugins()) {
+    String key=pluginMetadata.getKey();
+    List<URL> urls=Lists.newArrayList();
+    for (    JpaPluginFile pluginFile : pluginMetadata.getFiles()) {
+      File file=extensionDownloader.downloadExtension(pluginFile);
+      try {
+        urls.add(file.toURI().toURL());
+      }
+ catch (      MalformedURLException e) {
+        throw new SonarException("Can not get the URL of: " + file,e);
+      }
+    }
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Classloader of plugin " + key + ":");
+      for (      URL url : urls) {
+        LOG.debug("   -> " + url);
+      }
+    }
+    classLoaders.createClassLoader(key,urls,pluginMetadata.isUseChildFirstClassLoader() == Boolean.TRUE);
+  }
+  classLoaders.done();
+}
