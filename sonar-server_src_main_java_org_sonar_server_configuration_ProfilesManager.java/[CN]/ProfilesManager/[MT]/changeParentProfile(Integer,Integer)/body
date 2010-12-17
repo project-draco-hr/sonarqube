@@ -1,0 +1,20 @@
+{
+  RulesProfile profile=getSession().getEntity(RulesProfile.class,profileId);
+  if (profile != null && !profile.getProvided() && profileId != parentId) {
+    RulesProfile oldParent=getProfile(profile.getParentId());
+    RulesProfile newParent=getProfile(parentId);
+    if (oldParent != null) {
+      for (      ActiveRule activeRule : oldParent.getActiveRules()) {
+        deactivate(profile,activeRule.getRule());
+      }
+    }
+    if (newParent != null) {
+      for (      ActiveRule activeRule : newParent.getActiveRules()) {
+        activate(profile,activeRule);
+      }
+    }
+    profile.setParentId(parentId);
+    getSession().saveWithoutFlush(profile);
+    getSession().commit();
+  }
+}
