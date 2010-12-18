@@ -1,8 +1,12 @@
 {
   List<RulesProfile> children=getChildren(parentProfileId);
   ActiveRule parentActiveRule=getSession().getEntity(ActiveRule.class,activeRuleId);
+  if (parentActiveRule.isInherited() && !parentActiveRule.isOverrides()) {
+    parentActiveRule.setOverrides(true);
+    getSession().saveWithoutFlush(parentActiveRule);
+  }
   for (  RulesProfile child : children) {
-    activate(child,parentActiveRule);
+    activateOrChange(child,parentActiveRule);
   }
   getSession().commit();
 }

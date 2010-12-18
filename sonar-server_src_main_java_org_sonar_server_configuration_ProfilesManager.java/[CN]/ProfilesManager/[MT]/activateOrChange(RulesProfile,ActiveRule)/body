@@ -1,7 +1,15 @@
 {
   ActiveRule activeRule=profile.getActiveRule(parentActiveRule.getRule());
   if (activeRule != null) {
-    removeActiveRule(profile,activeRule);
+    if (activeRule.isInherited() && !activeRule.isOverrides()) {
+      removeActiveRule(profile,activeRule);
+    }
+ else {
+      activeRule.setInherited(true);
+      activeRule.setOverrides(true);
+      getSession().saveWithoutFlush(activeRule);
+      return;
+    }
   }
   activeRule=(ActiveRule)parentActiveRule.clone();
   activeRule.setRulesProfile(profile);
