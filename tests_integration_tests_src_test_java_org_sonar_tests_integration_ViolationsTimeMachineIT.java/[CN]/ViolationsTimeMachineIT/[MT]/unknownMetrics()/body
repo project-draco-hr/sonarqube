@@ -1,14 +1,15 @@
 {
-  List<TimeMachineData> snapshots=sonar.findAll(TimeMachineQuery.createForMetrics(PROJECT,"notfound"));
-  assertThat(snapshots.size(),is(2));
-  for (  TimeMachineData data : snapshots) {
-    assertThat(data.getValues().get(0),nullValue());
+  TimeMachine timemachine=sonar.find(TimeMachineQuery.createForMetrics(PROJECT,"notfound"));
+  assertThat(timemachine.getCells().length,is(2));
+  for (  TimeMachineCell cell : timemachine.getCells()) {
+    assertThat(cell.getValues()[0],nullValue());
   }
-  snapshots=sonar.findAll(TimeMachineQuery.createForMetrics(PROJECT,CoreMetrics.LINES_KEY,"notfound"));
-  assertThat(snapshots.size(),is(2));
-  for (  TimeMachineData data : snapshots) {
-    assertThat(data.getValues().get(1),nullValue());
+  timemachine=sonar.find(TimeMachineQuery.createForMetrics(PROJECT,CoreMetrics.LINES_KEY,"notfound"));
+  assertThat(timemachine.getCells().length,is(2));
+  for (  TimeMachineCell cell : timemachine.getCells()) {
+    assertThat(cell.getValues()[0],is(Double.class));
+    assertThat(cell.getValues()[1],nullValue());
   }
-  snapshots=sonar.findAll(TimeMachineQuery.createForMetrics(PROJECT));
-  assertThat(snapshots.size(),is(0));
+  timemachine=sonar.find(TimeMachineQuery.createForMetrics(PROJECT));
+  assertThat(timemachine.getCells().length,is(0));
 }
