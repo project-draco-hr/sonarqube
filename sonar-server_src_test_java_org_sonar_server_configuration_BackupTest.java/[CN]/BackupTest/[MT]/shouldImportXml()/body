@@ -11,7 +11,7 @@
     assertTrue(metric.getUserManaged());
   }
   Collection<RulesProfile> profiles=sonarConfig.getProfiles();
-  assertEquals(3,profiles.size());
+  assertEquals(2,profiles.size());
   Iterator<RulesProfile> profilesIter=profiles.iterator();
   RulesProfile testProfile=profilesIter.next();
   assertEquals("test name",testProfile.getName());
@@ -23,6 +23,8 @@
   assertNotNull(testActiveRule.getRule());
   assertEquals("test key",testActiveRule.getRule().getKey());
   assertEquals("test plugin",testActiveRule.getRule().getRepositoryKey());
+  assertThat(testActiveRule.isInherited(),is(false));
+  assertThat(testActiveRule.isOverridden(),is(false));
   assertEquals(1,testActiveRule.getActiveRuleParams().size());
   ActiveRuleParam testActiveRuleParam=testActiveRule.getActiveRuleParams().get(0);
   assertEquals("test value",testActiveRuleParam.getValue());
@@ -36,7 +38,11 @@
   assertNotNull(testAlert.getMetric());
   assertEquals("test key",testAlert.getMetric().getKey());
   testProfile=profilesIter.next();
-  assertEquals("test2 parent",testProfile.getParentName());
+  assertEquals("test2 name",testProfile.getName());
+  assertEquals("test name",testProfile.getParentName());
+  testActiveRule=testProfile.getActiveRules().get(0);
+  assertThat(testActiveRule.isInherited(),is(true));
+  assertThat(testActiveRule.isOverridden(),is(true));
   Collection<Rule> rules=sonarConfig.getRules();
   assertThat(rules.size(),is(1));
   Rule rule=rules.iterator().next();
