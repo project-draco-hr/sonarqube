@@ -3,6 +3,9 @@
   if (profile != null && !profile.getProvided()) {
     RulesProfile oldParent=getParentProfile(profile);
     RulesProfile newParent=getProfile(profile.getLanguage(),parentName);
+    if (isCycle(profile,newParent)) {
+      return;
+    }
     if (oldParent != null) {
       for (      ActiveRule activeRule : oldParent.getActiveRules()) {
         deactivate(profile,activeRule.getRule());
@@ -12,8 +15,6 @@
       for (      ActiveRule activeRule : newParent.getActiveRules()) {
         activateOrChange(profile,activeRule);
       }
-    }
- else {
     }
     profile.setParentName(newParent == null ? null : newParent.getName());
     getSession().saveWithoutFlush(profile);
