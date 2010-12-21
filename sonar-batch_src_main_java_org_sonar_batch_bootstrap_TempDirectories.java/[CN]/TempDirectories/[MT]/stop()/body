@@ -1,5 +1,10 @@
 {
   directoriesByKey.clear();
-  LoggerFactory.getLogger(getClass()).debug("Delete temporary directory: " + rootDir.getAbsolutePath());
-  FileUtils.deleteQuietly(rootDir);
+  LoggerFactory.getLogger(getClass()).debug("Delete temporary directories");
+  rootDir.setLastModified(System.currentTimeMillis() - AGE_BEFORE_DELETION - 60 * 60 * 1000);
+  File[] directoriesToDelete=rootDir.getParentFile().listFiles((FileFilter)new AndFileFilter(Arrays.asList(DirectoryFileFilter.DIRECTORY,new PrefixFileFilter(DIR_PREFIX),new AgeFileFilter(System.currentTimeMillis() - AGE_BEFORE_DELETION))));
+  for (  File dir : directoriesToDelete) {
+    LoggerFactory.getLogger(getClass()).debug("Delete temporary directory: " + dir);
+    FileUtils.deleteQuietly(dir);
+  }
 }
