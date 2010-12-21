@@ -1,20 +1,18 @@
 {
   ActiveRule activeRule=profile.getActiveRule(parentActiveRule.getRule());
   if (activeRule != null) {
-    if (activeRule.isInherited() && !activeRule.isOverridden()) {
+    if (activeRule.getInheritanceStatus() == ActiveRuleInheritanceStatus.INHERITED) {
       removeActiveRule(profile,activeRule);
     }
  else {
-      activeRule.setInherited(true);
-      activeRule.setOverridden(true);
+      activeRule.setInheritanceStatus(ActiveRuleInheritanceStatus.OVERRIDDEN);
       getSession().saveWithoutFlush(activeRule);
       return;
     }
   }
   activeRule=(ActiveRule)parentActiveRule.clone();
   activeRule.setRulesProfile(profile);
-  activeRule.setInherited(true);
-  activeRule.setOverridden(false);
+  activeRule.setInheritanceStatus(ActiveRuleInheritanceStatus.INHERITED);
   profile.getActiveRules().add(activeRule);
   getSession().saveWithoutFlush(activeRule);
   for (  RulesProfile child : getChildren(profile)) {
