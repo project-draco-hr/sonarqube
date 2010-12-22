@@ -1,0 +1,8 @@
+{
+  setupData("sharedFixture");
+  ServerUpgradeStatus upgradeStatus=mock(ServerUpgradeStatus.class);
+  final DeleteDeprecatedMeasures purge=new DeleteDeprecatedMeasures(getSessionFactory(),upgradeStatus);
+  purge.doPurge();
+  List rows=getSession().createQuery("from " + MeasureModel.class.getSimpleName() + " where ruleId is null and rulesCategoryId is not null").getResultList();
+  assertThat(rows.size(),is(0));
+}
