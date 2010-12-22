@@ -1,10 +1,12 @@
 {
+  ValidationMessages messages=ValidationMessages.create();
   RulesProfile profile=getSession().getEntity(RulesProfile.class,profileId);
   if (profile != null && !profile.getProvided()) {
     RulesProfile oldParent=getParentProfile(profile);
     RulesProfile newParent=getProfile(profile.getLanguage(),parentName);
     if (isCycle(profile,newParent)) {
-      return;
+      messages.addWarningText("Please do not select a child profile as parent.");
+      return messages;
     }
     if (oldParent != null) {
       for (      ActiveRule activeRule : oldParent.getActiveRules()) {
@@ -20,4 +22,5 @@
     getSession().saveWithoutFlush(profile);
     getSession().commit();
   }
+  return messages;
 }
