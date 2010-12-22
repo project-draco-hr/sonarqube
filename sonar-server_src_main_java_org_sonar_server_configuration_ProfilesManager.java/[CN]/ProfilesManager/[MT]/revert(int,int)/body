@@ -1,12 +1,12 @@
 {
   RulesProfile profile=getSession().getEntity(RulesProfile.class,profileId);
   ActiveRule activeRule=getSession().getEntity(ActiveRule.class,activeRuleId);
-  if (activeRule != null && activeRule.getInheritanceStatus() == ActiveRuleInheritanceStatus.OVERRIDDEN) {
+  if (activeRule != null && activeRule.doesOverride()) {
     ActiveRule parentActiveRule=getParentProfile(profile).getActiveRule(activeRule.getRule());
     removeActiveRule(profile,activeRule);
     activeRule=(ActiveRule)parentActiveRule.clone();
     activeRule.setRulesProfile(profile);
-    activeRule.setInheritanceStatus(ActiveRuleInheritanceStatus.INHERITED);
+    activeRule.setInheritance(ActiveRule.INHERITED);
     profile.getActiveRules().add(activeRule);
     getSession().saveWithoutFlush(activeRule);
     for (    RulesProfile child : getChildren(profile)) {
