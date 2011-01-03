@@ -1,3 +1,8 @@
 {
-  return xmlRuleParser.parse(getClass().getResourceAsStream("/org/sonar/plugins/findbugs/rules.xml"));
+  List<Rule> rules=new ArrayList<Rule>();
+  rules.addAll(xmlRuleParser.parse(getClass().getResourceAsStream("/org/sonar/plugins/findbugs/rules.xml")));
+  for (  File userExtensionXml : fileSystem.getExtensions(FindbugsConstants.REPOSITORY_KEY,"xml")) {
+    rules.addAll(xmlRuleParser.parse(userExtensionXml));
+  }
+  return rules;
 }
