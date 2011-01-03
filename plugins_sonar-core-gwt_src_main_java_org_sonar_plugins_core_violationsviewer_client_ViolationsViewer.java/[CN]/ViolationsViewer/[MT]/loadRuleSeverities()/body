@@ -2,9 +2,13 @@
   final ResourceQuery query=ResourceQuery.createForResource(resource,Metrics.BLOCKER_VIOLATIONS,Metrics.CRITICAL_VIOLATIONS,Metrics.MAJOR_VIOLATIONS,Metrics.MINOR_VIOLATIONS,Metrics.INFO_VIOLATIONS);
   Sonar.getInstance().find(query,new AbstractCallback<Resource>(loading){
     @Override protected void doOnResponse(    Resource resource){
+      String defaultFilter=Configuration.getRequestParameter("rule");
+      if (defaultFilter == null) {
+        defaultFilter=Configuration.getRequestParameter("priority");
+      }
       setResourceHasViolations(resource);
-      displayRuleSeverities(resource);
-      loadRules(resource);
+      displayRuleSeverities(resource,defaultFilter);
+      loadRules(resource,defaultFilter);
     }
   }
 );
