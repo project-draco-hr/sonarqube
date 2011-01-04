@@ -14,9 +14,10 @@
  else {
     sb.append("SELECT s.createdAt, m.metricId, m.value ");
   }
-  sb.append(" FROM " + MeasureModel.class.getSimpleName() + " m, "+ Snapshot.class.getSimpleName()+ " s WHERE m.snapshotId=s.id AND s.resourceId=:resourceId AND s.status=:status AND m.characteristic IS NULL ");
+  sb.append(" FROM " + MeasureModel.class.getSimpleName() + " m, "+ Snapshot.class.getSimpleName()+ " s WHERE m.snapshotId=s.id AND s.resourceId=:resourceId AND s.status=:status AND m.characteristic IS NULL AND s.qualifier<>:lib");
   params.put("resourceId",resource.getId());
   params.put("status",Snapshot.STATUS_PROCESSED);
+  params.put("lib",Project.QUALIFIER_LIB);
   sb.append(" AND m.ruleId IS NULL AND m.rulePriority IS NULL ");
   if (!metricIds.isEmpty()) {
     sb.append(" AND m.metricId IN (:metricIds) ");
