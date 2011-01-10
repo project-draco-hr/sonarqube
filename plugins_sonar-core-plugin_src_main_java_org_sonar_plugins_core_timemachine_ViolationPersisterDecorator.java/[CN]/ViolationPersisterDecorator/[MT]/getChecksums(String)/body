@@ -1,13 +1,17 @@
 {
   List<String> result=Lists.newArrayList();
+  StringInputStream stream=new StringInputStream(data);
   try {
-    List<String> lines=IOUtils.readLines(new StringInputStream(data));
+    List<String> lines=IOUtils.readLines(stream);
     for (    String line : lines) {
       result.add(getChecksum(line));
     }
   }
  catch (  IOException e) {
     throw new SonarException("Unable to calculate checksums",e);
+  }
+ finally {
+    IOUtils.closeQuietly(stream);
   }
   return result;
 }
