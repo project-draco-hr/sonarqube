@@ -1,0 +1,20 @@
+{
+  InputStream input=null;
+  FileOutputStream output=null;
+  String fullUrl=serverUrl + path;
+  try {
+    HttpURLConnection connection=newHttpConnection(new URL(fullUrl));
+    output=new FileOutputStream(toFile,false);
+    input=connection.getInputStream();
+    BootstrapperIOUtils.copyLarge(input,output);
+  }
+ catch (  Exception e) {
+    BootstrapperIOUtils.closeQuietly(output);
+    BootstrapperIOUtils.deleteFileQuietly(toFile);
+    throw new RuntimeException("Fail to download the file: " + fullUrl);
+  }
+ finally {
+    BootstrapperIOUtils.closeQuietly(input);
+    BootstrapperIOUtils.closeQuietly(output);
+  }
+}
