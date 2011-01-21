@@ -1,0 +1,9 @@
+{
+  Collection<SourceCode> classes=squid.search(new QueryByType(SourceClass.class));
+  for (  SourceCode squidClass : classes) {
+    JavaFile sonarFile=(JavaFile)get(squidClass.getParent(SourceFile.class));
+    JavaClass sonarClass=new JavaClass.Builder().setName(squidClass.getKey()).setFromLine(squidClass.getStartAtLine()).setToLine(squidClass.getEndAtLine()).create();
+    context.index(sonarClass,sonarFile);
+    put(squidClass,context.getResource(sonarClass));
+  }
+}
