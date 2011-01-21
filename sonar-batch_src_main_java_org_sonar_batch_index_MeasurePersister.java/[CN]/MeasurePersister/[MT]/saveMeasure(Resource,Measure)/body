@@ -1,0 +1,20 @@
+{
+  boolean saveLater=(measure.getPersistenceMode().useMemory() && delayedMode);
+  if (saveLater) {
+    unsavedMeasuresByResource.put(resource,measure);
+  }
+ else {
+    Snapshot snapshot=resourcePersister.getSnapshotOrFail(resource);
+    if (measure.getId() != null) {
+      MeasureModel model=session.reattach(MeasureModel.class,measure.getId());
+      model=mergeModel(measure,model);
+      model.save(session);
+    }
+ else     if (shouldPersistMeasure(resource,measure)) {
+      MeasureModel model=createModel(measure);
+      model.setSnapshotId(snapshot.getId());
+      model.save(session);
+      measure.setId(model.getId());
+    }
+  }
+}

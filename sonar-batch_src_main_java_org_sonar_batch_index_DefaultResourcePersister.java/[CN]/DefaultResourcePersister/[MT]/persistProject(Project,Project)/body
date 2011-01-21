@@ -1,0 +1,18 @@
+{
+  project.setEffectiveKey(project.getKey());
+  ResourceModel model=findOrCreateModel(project);
+  model.setLanguageKey(project.getLanguageKey());
+  Snapshot parentSnapshot=null;
+  if (parent != null) {
+    parentSnapshot=snapshotsByResource.get(project.getParent());
+    model.setRootId((Integer)ObjectUtils.defaultIfNull(parentSnapshot.getRootProjectId(),parentSnapshot.getResourceId()));
+  }
+  model=session.save(model);
+  project.setId(model.getId());
+  Snapshot snapshot=new Snapshot(model,parentSnapshot);
+  snapshot.setVersion(project.getAnalysisVersion());
+  snapshot.setCreatedAt(project.getAnalysisDate());
+  snapshot=session.save(snapshot);
+  session.commit();
+  return snapshot;
+}

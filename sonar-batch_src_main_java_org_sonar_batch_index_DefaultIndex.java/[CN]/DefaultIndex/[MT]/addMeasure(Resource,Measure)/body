@@ -1,6 +1,6 @@
 {
-  Bucket bucket=getOrAddBucket(resource);
-  if (!bucket.isExcluded()) {
+  Bucket bucket=doIndex(resource);
+  if (bucket != null && !bucket.isExcluded()) {
     Metric metric=metricFinder.findByKey(measure.getMetricKey());
     if (metric == null) {
       throw new SonarException("Unknown metric: " + measure.getMetricKey());
@@ -10,7 +10,7 @@
       bucket.addMeasure(measure);
     }
     if (measure.getPersistenceMode().useDatabase()) {
-      persistence.saveMeasure(currentProject,resource,measure);
+      persistence.saveMeasure(resource,measure);
     }
   }
   return measure;

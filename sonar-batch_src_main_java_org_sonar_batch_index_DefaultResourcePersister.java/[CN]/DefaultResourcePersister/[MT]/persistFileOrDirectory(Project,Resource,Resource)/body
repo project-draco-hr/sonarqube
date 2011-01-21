@@ -1,0 +1,12 @@
+{
+  ResourceModel model=findOrCreateModel(resource);
+  Snapshot projectSnapshot=snapshotsByResource.get(project);
+  model.setRootId(projectSnapshot.getResourceId());
+  model=session.save(model);
+  resource.setId(model.getId());
+  Snapshot parentSnapshot=(Snapshot)ObjectUtils.defaultIfNull(getSnapshot(parentReference),projectSnapshot);
+  Snapshot snapshot=new Snapshot(model,parentSnapshot);
+  snapshot=session.save(snapshot);
+  session.commit();
+  return snapshot;
+}

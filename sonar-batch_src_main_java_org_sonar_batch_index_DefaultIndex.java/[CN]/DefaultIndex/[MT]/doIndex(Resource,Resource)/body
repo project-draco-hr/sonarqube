@@ -1,0 +1,26 @@
+{
+  Bucket bucket=buckets.get(resource);
+  if (bucket != null) {
+    return bucket;
+  }
+  if (lock.isLocked() && !ResourceUtils.isLibrary(resource)) {
+    LOG.warn("Resource will be ignored in next Sonar versions, index is locked: " + resource);
+  }
+  Resource parent=null;
+  if (!ResourceUtils.isLibrary(resource)) {
+    parent=(Resource)ObjectUtils.defaultIfNull(parentReference,currentProject);
+  }
+  Bucket parentBucket=getBucket(parent,true);
+  if (parentBucket == null && parent != null) {
+    LOG.warn("Resource ignored, parent is not indexed: " + resource);
+    return null;
+  }
+  resource.setEffectiveKey(createUID(currentProject,resource));
+  bucket=new Bucket(resource).setParent(parentBucket);
+  buckets.put(resource,bucket);
+  boolean excluded=checkExclusion(resource,parentBucket);
+  if (!excluded) {
+    persistence.saveResource(currentProject,resource,(parentBucket != null ? parentBucket.getResource() : null));
+  }
+  return bucket;
+}
