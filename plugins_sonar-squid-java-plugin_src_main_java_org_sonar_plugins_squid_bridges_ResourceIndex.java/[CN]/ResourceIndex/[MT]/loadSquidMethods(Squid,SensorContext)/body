@@ -1,6 +1,10 @@
 {
   Collection<SourceCode> methods=squid.search(new QueryByType(SourceMethod.class));
   for (  SourceCode squidMethod : methods) {
-    JavaClass sonarClass=(JavaClass)get(squidMethod.getParent(SourceClass.class));
+    SourceClass squidClass=squidMethod.getParent(SourceClass.class);
+    JavaClass sonarClass=(JavaClass)get(squidClass);
+    JavaMethod sonarMethod=new JavaMethod.Builder().setClass(sonarClass).setSignature(squidMethod.getName()).setFromLine(squidMethod.getStartAtLine()).setToLine(squidMethod.getEndAtLine()).create();
+    context.index(sonarMethod,sonarClass);
+    put(squidMethod,sonarMethod);
   }
 }
