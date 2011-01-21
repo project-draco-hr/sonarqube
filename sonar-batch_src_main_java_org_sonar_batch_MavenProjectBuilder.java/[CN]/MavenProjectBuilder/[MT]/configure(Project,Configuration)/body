@@ -1,4 +1,18 @@
 {
   Date analysisDate=loadAnalysisDate(projectConfiguration);
-  project.setConfiguration(projectConfiguration).setExclusionPatterns(loadExclusionPatterns(projectConfiguration)).setAnalysisDate(analysisDate).setLatestAnalysis(isLatestAnalysis(project.getKey(),analysisDate)).setAnalysisVersion(loadAnalysisVersion(projectConfiguration,project.getPom())).setAnalysisType(loadAnalysisType(projectConfiguration)).setLanguageKey(loadLanguageKey(projectConfiguration)).setFileSystem(new DefaultProjectFileSystem(project));
+  DefaultProjectFileSystem fs=new DefaultProjectFileSystem(project);
+  MavenProject pom=project.getPom();
+  if (pom != null) {
+    for (    File dir : fs.resolvePaths(pom.getCompileSourceRoots())) {
+      fs.addSourceDir(dir);
+    }
+    for (    File dir : fs.resolvePaths(pom.getTestCompileSourceRoots())) {
+      fs.addTestDir(dir);
+    }
+    fs.setBaseDir(pom.getBasedir());
+    fs.setBuildDir(pom.getBuild().getDirectory());
+    projectConfiguration.setProperty("sonar.java.sourceVersion",MavenUtils.getJavaSourceVersion(pom));
+    projectConfiguration.setProperty("sonar.java.targetVersion",MavenUtils.getJavaVersion(pom));
+  }
+  project.setConfiguration(projectConfiguration).setExclusionPatterns(loadExclusionPatterns(projectConfiguration)).setAnalysisDate(analysisDate).setLatestAnalysis(isLatestAnalysis(project.getKey(),analysisDate)).setAnalysisVersion(loadAnalysisVersion(projectConfiguration,pom)).setAnalysisType(loadAnalysisType(projectConfiguration)).setLanguageKey(loadLanguageKey(projectConfiguration)).setFileSystem(fs);
 }

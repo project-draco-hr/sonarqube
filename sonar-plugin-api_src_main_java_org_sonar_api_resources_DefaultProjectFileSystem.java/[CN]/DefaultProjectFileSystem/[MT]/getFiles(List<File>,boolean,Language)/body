@@ -1,5 +1,5 @@
 {
-  List<File> result=new ArrayList<File>();
+  List<InputFile> result=Lists.newArrayList();
   if (directories == null) {
     return result;
   }
@@ -9,9 +9,12 @@
     if (dir.exists()) {
       IOFileFilter exclusionFilter=new ExclusionFilter(dir,exclusionPatterns);
       IOFileFilter visibleFileFilter=HiddenFileFilter.VISIBLE;
-      List dirFilters=Lists.newArrayList(visibleFileFilter,suffixFilter,exclusionFilter);
+      List<IOFileFilter> dirFilters=Lists.newArrayList(visibleFileFilter,suffixFilter,exclusionFilter);
       dirFilters.addAll(this.filters);
-      result.addAll(FileUtils.listFiles(dir,new AndFileFilter(dirFilters),HiddenFileFilter.VISIBLE));
+      List<File> files=(List<File>)FileUtils.listFiles(dir,new AndFileFilter(dirFilters),HiddenFileFilter.VISIBLE);
+      for (      File file : files) {
+        result.add(new DefaultInputFile(dir,file));
+      }
     }
   }
   return result;
