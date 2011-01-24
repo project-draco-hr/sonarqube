@@ -1,5 +1,8 @@
 {
-  index=new DefaultIndex(mock(PersistenceManager.class),new DefaultResourceCreationLock(),mock(ProjectTree.class),mock(MetricFinder.class));
+  lock=new DefaultResourceCreationLock();
+  MetricFinder metricFinder=mock(MetricFinder.class);
+  when(metricFinder.findByKey("ncloc")).thenReturn(CoreMetrics.NCLOC);
+  index=new DefaultIndex(mock(PersistenceManager.class),lock,mock(ProjectTree.class),metricFinder);
   Project project=new Project("project");
   ResourceFilter filter=new ResourceFilter(){
     public boolean isIgnored(    Resource resource){
