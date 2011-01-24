@@ -1,19 +1,26 @@
 {
-  MavenProject pom=new MavenProject();
-  String key=project.getProperties().getProperty("project.key");
+  MavenProject pom=new MavenProject(){
+    /** 
+ * This allows to specify base directory without specifying location of a pom.xml
+ */
+    public File getBasedir(){
+      return project.getBaseDir();
+    }
+  }
+;
+  Properties properties=project.getProperties();
+  String key=getPropertyOrDie(properties,CoreProperties.PROJECT_KEY_PROPERTY);
   String[] keys=key.split(":");
   pom.setGroupId(keys[0]);
   pom.setArtifactId(keys[1]);
-  pom.setVersion("0.1-SNAPSHOT");
-  pom.getModel().setProperties(project.getProperties());
+  pom.setVersion(getPropertyOrDie(properties,CoreProperties.PROJECT_VERSION_PROPERTY));
+  pom.getModel().setProperties(properties);
   pom.setArtifacts(Collections.EMPTY_SET);
-  String buildDirectory=project.getProperties().getProperty("project.build.directory");
-  File sonarDir=new File(buildDirectory,"sonar");
-  pom.setFile(new File(sonarDir,"fake-pom.xml"));
+  String buildDirectory=getPropertyOrDie(properties,"project.build.directory");
   pom.getBuild().setDirectory(buildDirectory);
   pom.getBuild().setOutputDirectory(buildDirectory + "/classes");
   Reporting reporting=new Reporting();
-  reporting.setOutputDirectory(buildDirectory + "/target/site");
+  reporting.setOutputDirectory(buildDirectory + "/site");
   pom.setReporting(reporting);
   for (  String dir : project.getSourceDirs()) {
     pom.addCompileSourceRoot(dir);
