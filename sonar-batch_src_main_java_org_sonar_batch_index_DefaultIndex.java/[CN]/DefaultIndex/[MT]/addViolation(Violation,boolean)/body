@@ -1,11 +1,10 @@
 {
-  Bucket bucket;
   Resource resource=violation.getResource();
   if (resource == null) {
     violation.setResource(currentProject);
   }
-  bucket=doIndex(violation.getResource());
-  if (!bucket.isExcluded()) {
+  Bucket bucket=checkIndexed(resource);
+  if (bucket != null && !bucket.isExcluded()) {
     boolean isIgnored=!force && violationFilters != null && violationFilters.isIgnored(violation);
     if (!isIgnored) {
       ActiveRule activeRule=profile.getActiveRule(violation.getRule());

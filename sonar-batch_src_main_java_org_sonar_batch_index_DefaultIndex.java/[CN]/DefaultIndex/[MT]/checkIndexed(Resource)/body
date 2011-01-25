@@ -1,0 +1,15 @@
+{
+  Bucket bucket=getBucket(reference,true);
+  if (bucket == null) {
+    if (lock.isLocked()) {
+      if (lock.isFailWhenLocked()) {
+        throw new ResourceNotIndexedException(reference);
+      }
+      LOG.warn("Resource will be ignored in next Sonar versions, index is locked: " + reference);
+    }
+ else {
+      bucket=doIndex(reference);
+    }
+  }
+  return bucket;
+}
