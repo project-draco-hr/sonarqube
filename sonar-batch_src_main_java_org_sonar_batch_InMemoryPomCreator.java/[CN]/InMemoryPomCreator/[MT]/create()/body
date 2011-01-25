@@ -1,14 +1,21 @@
 {
-  MavenProject pom=new MavenProject(){
+  Properties properties=project.getProperties();
+  final String[] binaries=StringUtils.split(properties.getProperty("sonar.projectBinaries",""),',');
+  final MavenProject pom=new MavenProject(){
     /** 
  * This allows to specify base directory without specifying location of a pom.xml
  */
-    public File getBasedir(){
+    @Override public File getBasedir(){
       return project.getBaseDir();
+    }
+    /** 
+ * This allows to specify project binaries.
+ */
+    @Override public List<String> getCompileClasspathElements() throws DependencyResolutionRequiredException {
+      return Arrays.asList(binaries);
     }
   }
 ;
-  Properties properties=project.getProperties();
   String key=getPropertyOrDie(properties,CoreProperties.PROJECT_KEY_PROPERTY);
   String[] keys=key.split(":");
   pom.setGroupId(keys[0]);
@@ -18,9 +25,11 @@
   pom.setArtifacts(Collections.EMPTY_SET);
   String buildDirectory=getPropertyOrDie(properties,"project.build.directory");
   pom.getBuild().setDirectory(buildDirectory);
-  pom.getBuild().setOutputDirectory(buildDirectory + "/classes");
+  String buildOutputDirectory=properties.getProperty("project.build.outputDirectory",buildDirectory + "/classes");
+  pom.getBuild().setOutputDirectory(buildOutputDirectory);
   Reporting reporting=new Reporting();
-  reporting.setOutputDirectory(buildDirectory + "/site");
+  String reportingOutputDirectory=properties.getProperty("project.reporting.outputDirectory",buildDirectory + "/site");
+  reporting.setOutputDirectory(reportingOutputDirectory);
   pom.setReporting(reporting);
   for (  String dir : project.getSourceDirs()) {
     pom.addCompileSourceRoot(dir);
