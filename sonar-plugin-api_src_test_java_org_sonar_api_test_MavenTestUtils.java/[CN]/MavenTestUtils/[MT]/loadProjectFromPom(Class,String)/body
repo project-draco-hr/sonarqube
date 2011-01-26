@@ -1,13 +1,7 @@
 {
   MavenProject pom=loadPom(clazz,path);
   Project project=new Project(pom.getGroupId() + ":" + pom.getArtifactId()).setPom(pom).setConfiguration(new MapConfiguration(pom.getProperties()));
-  DefaultProjectFileSystem fs=new DefaultProjectFileSystem(project);
+  DefaultProjectFileSystem fs=new DefaultProjectFileSystem(project,new Languages(Java.INSTANCE));
   project.setFileSystem(fs);
-  project.getConfiguration().setProperty("project.build.outputDirectory",pom.getBuild().getOutputDirectory());
-  if (pom.getReporting() != null) {
-    project.getConfiguration().setProperty("project.reporting.outputDirectory",pom.getReporting().getOutputDirectory());
-  }
-  fs.setBaseDir(project.getPom().getBasedir());
-  fs.setBuildDir(project.getPom().getBuild().getDirectory());
   return project;
 }
