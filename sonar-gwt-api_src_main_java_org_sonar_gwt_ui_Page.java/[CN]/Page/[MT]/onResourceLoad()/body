@@ -1,7 +1,11 @@
 {
   JavaScriptObject json=loadResource();
   if (json != null) {
-    Resource resource=ResourceUnmarshaller.getInstance().toModel(json);
+    if (WSUtils.getINSTANCE() == null) {
+      WSUtils.setInstance(new GwtUtils());
+    }
+    String jsonStr=(new JSONObject(json)).toString();
+    Resource resource=RESOURCE_UNMARSHALLER.toModel(jsonStr);
     RootPanel container=getRootPanel();
     container.clear();
     if (resource.getId().equals(currentResourceId) && currentWidget != null) {
