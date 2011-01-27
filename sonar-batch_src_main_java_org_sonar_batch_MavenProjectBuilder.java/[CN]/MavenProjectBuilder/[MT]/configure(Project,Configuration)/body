@@ -2,8 +2,12 @@
   Date analysisDate=loadAnalysisDate(projectConfiguration);
   MavenProject pom=project.getPom();
   if (pom != null) {
-    projectConfiguration.setProperty("sonar.java.sourceVersion",MavenUtils.getJavaSourceVersion(pom));
-    projectConfiguration.setProperty("sonar.java.targetVersion",MavenUtils.getJavaVersion(pom));
+    if (projectConfiguration.getProperty(JavaUtils.JAVA_SOURCE_PROPERTY) == null) {
+      projectConfiguration.setProperty(JavaUtils.JAVA_SOURCE_PROPERTY,MavenUtils.getJavaSourceVersion(pom));
+    }
+    if (projectConfiguration.getProperty(JavaUtils.JAVA_TARGET_PROPERTY) == null) {
+      projectConfiguration.setProperty(JavaUtils.JAVA_TARGET_PROPERTY,MavenUtils.getJavaVersion(pom));
+    }
   }
   project.setConfiguration(projectConfiguration).setExclusionPatterns(loadExclusionPatterns(projectConfiguration)).setAnalysisDate(analysisDate).setLatestAnalysis(isLatestAnalysis(project.getKey(),analysisDate)).setAnalysisVersion(loadAnalysisVersion(projectConfiguration,pom)).setAnalysisType(loadAnalysisType(projectConfiguration)).setLanguageKey(loadLanguageKey(projectConfiguration));
 }
