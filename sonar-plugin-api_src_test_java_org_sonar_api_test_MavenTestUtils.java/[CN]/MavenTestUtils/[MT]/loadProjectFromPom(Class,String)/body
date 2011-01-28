@@ -1,6 +1,10 @@
 {
   MavenProject pom=loadPom(clazz,path);
-  Project project=new Project(pom.getGroupId() + ":" + pom.getArtifactId()).setPom(pom).setConfiguration(new MapConfiguration(pom.getProperties()));
+  Configuration configuration=new MapConfiguration(pom.getProperties());
+  Project project=new Project(pom.getGroupId() + ":" + pom.getArtifactId()).setPom(pom).setConfiguration(configuration);
+  configuration.setProperty("sonar.java.source",MavenUtils.getJavaSourceVersion(pom));
+  configuration.setProperty("sonar.java.target",MavenUtils.getJavaVersion(pom));
+  configuration.setProperty(CoreProperties.ENCODING_PROPERTY,MavenUtils.getSourceEncoding(pom));
   DefaultProjectFileSystem fs=new DefaultProjectFileSystem(project,new Languages(Java.INSTANCE));
   project.setFileSystem(fs);
   return project;

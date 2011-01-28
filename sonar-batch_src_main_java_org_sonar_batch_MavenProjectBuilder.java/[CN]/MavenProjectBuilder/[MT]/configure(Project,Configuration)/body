@@ -2,11 +2,14 @@
   Date analysisDate=loadAnalysisDate(projectConfiguration);
   MavenProject pom=project.getPom();
   if (pom != null) {
-    if (projectConfiguration.getProperty(JavaUtils.JAVA_SOURCE_PROPERTY) == null) {
+    if (StringUtils.isBlank(projectConfiguration.getString(JavaUtils.JAVA_SOURCE_PROPERTY))) {
       projectConfiguration.setProperty(JavaUtils.JAVA_SOURCE_PROPERTY,MavenUtils.getJavaSourceVersion(pom));
     }
-    if (projectConfiguration.getProperty(JavaUtils.JAVA_TARGET_PROPERTY) == null) {
+    if (StringUtils.isBlank(projectConfiguration.getString(JavaUtils.JAVA_TARGET_PROPERTY))) {
       projectConfiguration.setProperty(JavaUtils.JAVA_TARGET_PROPERTY,MavenUtils.getJavaVersion(pom));
+    }
+    if (StringUtils.isBlank(projectConfiguration.getString(CoreProperties.ENCODING_PROPERTY))) {
+      projectConfiguration.setProperty(CoreProperties.ENCODING_PROPERTY,MavenUtils.getSourceEncoding(pom));
     }
   }
   project.setConfiguration(projectConfiguration).setExclusionPatterns(loadExclusionPatterns(projectConfiguration)).setAnalysisDate(analysisDate).setLatestAnalysis(isLatestAnalysis(project.getKey(),analysisDate)).setAnalysisVersion(loadAnalysisVersion(projectConfiguration,pom)).setAnalysisType(loadAnalysisType(projectConfiguration)).setLanguageKey(loadLanguageKey(projectConfiguration));
