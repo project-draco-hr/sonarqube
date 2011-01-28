@@ -1,0 +1,13 @@
+{
+  Project project=new Project("key");
+  Decorator metric1Decorator=new Metric1Decorator();
+  BatchExtensionDictionnary dictionnary=newDictionnary(metric1Decorator,withFormula1);
+  Collection<Decorator> decorators=new DecoratorsSelector(dictionnary).select(project);
+  Decorator firstDecorator=(Decorator)CollectionUtils.get(decorators,0);
+  Decorator secondDecorator=(Decorator)CollectionUtils.get(decorators,1);
+  assertThat(firstDecorator,is(Metric1Decorator.class));
+  assertThat(secondDecorator,is(FormulaDecorator.class));
+  FormulaDecorator formulaDecorator=(FormulaDecorator)secondDecorator;
+  assertThat(formulaDecorator.dependsUponDecorators().size(),is(1));
+  assertThat(CollectionUtils.get(formulaDecorator.dependsUponDecorators(),0),is((Object)firstDecorator));
+}

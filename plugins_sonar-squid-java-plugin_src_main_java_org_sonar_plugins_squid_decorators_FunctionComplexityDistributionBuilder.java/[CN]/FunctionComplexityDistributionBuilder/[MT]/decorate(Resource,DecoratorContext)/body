@@ -1,0 +1,17 @@
+{
+  if (shouldExecuteOn(resource,context)) {
+    RangeDistributionBuilder builder=new RangeDistributionBuilder(CoreMetrics.FUNCTION_COMPLEXITY_DISTRIBUTION,LIMITS);
+    for (    DecoratorContext childContext : context.getChildren()) {
+      if (childContext.getResource() instanceof JavaMethod) {
+        JavaMethod javaMethod=(JavaMethod)childContext.getResource();
+        Measure complexity=childContext.getMeasure(CoreMetrics.COMPLEXITY);
+        if (!javaMethod.isAccessor() && complexity != null) {
+          builder.add(complexity.getValue());
+        }
+      }
+    }
+    Measure measure=builder.build(true);
+    measure.setPersistenceMode(PersistenceMode.MEMORY);
+    context.saveMeasure(measure);
+  }
+}
