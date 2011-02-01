@@ -1,6 +1,9 @@
 {
+  File workDir=project.getWorkDir();
+  String buildDirectory=workDir.getAbsolutePath() + "/target";
   Properties properties=project.getProperties();
-  final String[] binaries=StringUtils.split(properties.getProperty("sonar.projectBinaries",""),',');
+  final String binaries=properties.getProperty("sonar.projectBinaries",buildDirectory + "/classes");
+  final String[] libraries=StringUtils.split(properties.getProperty("sonar.projectLibraries",""),',');
   final MavenProject pom=new MavenProject(){
     /** 
  * This allows to specify base directory without specifying location of a pom.xml
@@ -9,10 +12,13 @@
       return project.getBaseDir();
     }
     /** 
- * This allows to specify project binaries.
+ * This allows to specify project classpath (binaries + libraries).
  */
     @Override public List<String> getCompileClasspathElements() throws DependencyResolutionRequiredException {
-      return Arrays.asList(binaries);
+      List<String> cp=new ArrayList<String>();
+      cp.add(binaries);
+      cp.addAll(Arrays.asList(libraries));
+      return cp;
     }
   }
 ;
@@ -25,11 +31,8 @@
   pom.setDescription(properties.getProperty(CoreProperties.PROJECT_DESCRIPTION_PROPERTY,""));
   pom.getModel().setProperties(properties);
   pom.setArtifacts(Collections.EMPTY_SET);
-  File workDir=project.getWorkDir();
-  String buildDirectory=workDir.getAbsolutePath() + "/target";
   pom.getBuild().setDirectory(buildDirectory);
-  String buildOutputDirectory=buildDirectory + "/classes";
-  pom.getBuild().setOutputDirectory(buildOutputDirectory);
+  pom.getBuild().setOutputDirectory(binaries);
   Reporting reporting=new Reporting();
   String reportingOutputDirectory=buildDirectory + "/site";
   reporting.setOutputDirectory(reportingOutputDirectory);
