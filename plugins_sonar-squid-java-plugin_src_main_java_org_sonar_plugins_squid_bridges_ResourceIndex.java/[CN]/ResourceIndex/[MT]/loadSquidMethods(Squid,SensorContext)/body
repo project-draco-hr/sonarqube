@@ -3,8 +3,10 @@
   for (  SourceCode squidMethod : methods) {
     SourceClass squidClass=squidMethod.getParent(SourceClass.class);
     JavaClass sonarClass=(JavaClass)get(squidClass);
-    JavaMethod sonarMethod=new JavaMethod.Builder().setClass(sonarClass).setSignature(squidMethod.getName()).setFromLine(squidMethod.getStartAtLine()).setToLine(squidMethod.getEndAtLine()).setAccessor(squidMethod.getInt(Metric.ACCESSORS) > 0).create();
-    context.index(sonarMethod,sonarClass);
-    put(squidMethod,sonarMethod);
+    if (sonarClass != null) {
+      JavaMethod sonarMethod=new JavaMethod.Builder().setClass(sonarClass).setSignature(squidMethod.getName()).setFromLine(squidMethod.getStartAtLine()).setToLine(squidMethod.getEndAtLine()).setAccessor(squidMethod.getInt(Metric.ACCESSORS) > 0).create();
+      context.index(sonarMethod,sonarClass);
+      put(squidMethod,sonarMethod);
+    }
   }
 }
