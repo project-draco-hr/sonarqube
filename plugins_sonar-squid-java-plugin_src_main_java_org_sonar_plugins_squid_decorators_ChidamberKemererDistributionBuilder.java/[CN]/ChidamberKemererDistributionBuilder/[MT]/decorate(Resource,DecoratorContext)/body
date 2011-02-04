@@ -1,0 +1,14 @@
+{
+  if (shouldExecuteOn(resource)) {
+    RangeDistributionBuilder lcom4Distribution=new RangeDistributionBuilder(CoreMetrics.LCOM4_DISTRIBUTION,LCOM4_LIMITS);
+    RangeDistributionBuilder rfcDistribution=new RangeDistributionBuilder(CoreMetrics.RFC_DISTRIBUTION,RFC_LIMITS);
+    for (    DecoratorContext childContext : context.getChildren()) {
+      if (Scopes.isFile(childContext.getResource())) {
+        addMeasureToDistribution(childContext,lcom4Distribution,CoreMetrics.LCOM4);
+        addMeasureToDistribution(childContext,rfcDistribution,CoreMetrics.RFC);
+      }
+    }
+    saveDistribution(context,lcom4Distribution);
+    saveDistribution(context,rfcDistribution);
+  }
+}
