@@ -1,0 +1,25 @@
+{
+  List<PluginMetadata> created=Lists.newArrayList();
+  for (  PluginMetadata pluginMetadata : metadata) {
+    if (StringUtils.isEmpty(pluginMetadata.getBasePlugin())) {
+      create(pluginMetadata.getKey(),pluginMetadata.getDeployedFiles(),pluginMetadata.isUseChildFirstClassLoader());
+      created.add(pluginMetadata);
+    }
+  }
+  for (  PluginMetadata pluginMetadata : metadata) {
+    String pluginKey=pluginMetadata.getKey();
+    String basePluginKey=pluginMetadata.getBasePlugin();
+    if (StringUtils.isNotEmpty(pluginMetadata.getBasePlugin())) {
+      if (classLoaders.get(basePluginKey) != null) {
+        Logs.INFO.debug("Plugin {} extends {}",pluginKey,basePluginKey);
+        extend(basePluginKey,pluginKey,pluginMetadata.getDeployedFiles());
+        created.add(pluginMetadata);
+      }
+ else {
+        Logs.INFO.warn("Plugin {} extends nonexistent plugin {}",pluginKey,basePluginKey);
+      }
+    }
+  }
+  classLoaders.done();
+  return created;
+}

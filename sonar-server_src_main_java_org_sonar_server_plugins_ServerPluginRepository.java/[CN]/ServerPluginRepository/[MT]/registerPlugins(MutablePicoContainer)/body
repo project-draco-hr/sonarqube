@@ -1,17 +1,14 @@
 {
-  for (  JpaPlugin jpaPlugin : dao.getPlugins()) {
-    classloaders.getClassLoader(jpaPlugin.getKey());
-  }
-  classloaders.done();
-  for (  JpaPlugin jpaPlugin : dao.getPlugins()) {
+  List<PluginMetadata> register=classloaders.completeCreation();
+  for (  PluginMetadata pluginMetadata : register) {
     try {
-      Class pluginClass=classloaders.getClassLoader(jpaPlugin.getKey()).loadClass(jpaPlugin.getPluginClass());
+      Class pluginClass=classloaders.getClassLoader(pluginMetadata.getKey()).loadClass(pluginMetadata.getMainClass());
       pico.as(Characteristics.CACHE).addComponent(pluginClass);
       Plugin plugin=(Plugin)pico.getComponent(pluginClass);
-      registerPlugin(pico,plugin,jpaPlugin.getKey());
+      registerPlugin(pico,plugin,pluginMetadata.getKey());
     }
  catch (    ClassNotFoundException e) {
-      throw new SonarException("Please check the plugin manifest. The main plugin class does not exist: " + jpaPlugin.getPluginClass(),e);
+      throw new SonarException("Please check the plugin manifest. The main plugin class does not exist: " + pluginMetadata.getMainClass(),e);
     }
   }
   invokeExtensionProviders(pico);
