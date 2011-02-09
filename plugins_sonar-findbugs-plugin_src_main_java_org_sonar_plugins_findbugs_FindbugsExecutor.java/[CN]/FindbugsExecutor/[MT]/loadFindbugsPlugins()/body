@@ -1,0 +1,22 @@
+{
+  List<URL> plugins=Lists.newArrayList();
+  try {
+    Enumeration<URL> urls=Thread.currentThread().getContextClassLoader().getResources("findbugs.xml");
+    while (urls.hasMoreElements()) {
+      URL url=urls.nextElement();
+      String path=StringUtils.removeStart(StringUtils.substringBefore(url.toString(),"!"),"jar:");
+      Logs.INFO.info("Found findbugs plugin: " + path);
+      plugins.add(new URL(path));
+    }
+  }
+ catch (  IOException e) {
+    throw new SonarException(e);
+  }
+  resetDetectorFactoryCollection();
+  DetectorFactoryCollection detectorFactory=DetectorFactoryCollection.rawInstance();
+  detectorFactory.setPluginList(plugins.toArray(new URL[plugins.size()]));
+  for (  Plugin plugin : detectorFactory.plugins()) {
+    Logs.INFO.info("Loaded plugin " + plugin.getPluginId());
+  }
+  return detectorFactory;
+}
