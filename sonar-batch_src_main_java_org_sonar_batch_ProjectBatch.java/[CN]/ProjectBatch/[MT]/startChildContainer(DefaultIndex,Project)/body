@@ -1,32 +1,13 @@
 {
-  batchContainer=globalContainer.makeChildContainer();
-  batchContainer.as(Characteristics.CACHE).addComponent(project);
-  batchContainer.as(Characteristics.CACHE).addComponent(project.getPom());
-  batchContainer.as(Characteristics.CACHE).addComponent(ProjectClasspath.class);
-  batchContainer.as(Characteristics.CACHE).addComponent(DefaultProjectFileSystem.class);
-  batchContainer.as(Characteristics.CACHE).addComponent(project.getConfiguration());
-  batchContainer.getComponent(BatchPluginRepository.class).registerPlugins(batchContainer);
-  batchContainer.as(Characteristics.CACHE).addComponent(DaoFacade.class);
-  batchContainer.as(Characteristics.CACHE).addComponent(RulesDao.class);
-  batchContainer.as(Characteristics.CACHE).addComponent(globalContainer.getComponent(DefaultResourcePersister.class).getSnapshot(project));
-  batchContainer.as(Characteristics.CACHE).addComponent(org.sonar.api.database.daos.MeasuresDao.class);
-  batchContainer.as(Characteristics.CACHE).addComponent(ProfilesDao.class);
-  batchContainer.as(Characteristics.CACHE).addComponent(AsyncMeasuresDao.class);
-  batchContainer.as(Characteristics.CACHE).addComponent(AsyncMeasuresService.class);
-  batchContainer.as(Characteristics.CACHE).addComponent(DefaultRulesManager.class);
-  batchContainer.as(Characteristics.CACHE).addComponent(DefaultSensorContext.class);
-  batchContainer.as(Characteristics.CACHE).addComponent(Languages.class);
-  batchContainer.as(Characteristics.CACHE).addComponent(BatchExtensionDictionnary.class);
-  batchContainer.as(Characteristics.CACHE).addComponent(DefaultTimeMachine.class);
-  batchContainer.as(Characteristics.CACHE).addComponent(ViolationFilters.class);
-  batchContainer.as(Characteristics.CACHE).addComponent(ResourceFilters.class);
-  batchContainer.as(Characteristics.CACHE).addComponent(DefaultModelFinder.class);
-  batchContainer.as(Characteristics.CACHE).addComponent(TimeMachineConfiguration.class);
-  batchContainer.as(Characteristics.CACHE).addComponent(PastViolationsLoader.class);
-  batchContainer.addAdapter(new ProfileProvider());
-  batchContainer.addAdapter(new CheckProfileProvider());
-  loadCoreComponents(batchContainer);
-  batchContainer.as(Characteristics.CACHE).addComponent(new IocContainer(batchContainer));
-  batchContainer.start();
-  prepareProject(project,index);
+  Module projectComponents=globalComponents.installChild(new ProjectComponents(project));
+  projectComponents.install(new ProjectCoreComponents());
+  projectComponents.start();
+  Language language=projectComponents.getComponent(Languages.class).get(project.getLanguageKey());
+  if (language == null) {
+    throw new SonarException("Language with key '" + project.getLanguageKey() + "' not found");
+  }
+  project.setLanguage(language);
+  index.setCurrentProject(project,projectComponents.getComponent(ResourceFilters.class),projectComponents.getComponent(ViolationFilters.class),projectComponents.getComponent(RulesProfile.class));
+  project.setFileSystem(projectComponents.getComponent(ProjectFileSystem.class));
+  return projectComponents;
 }
