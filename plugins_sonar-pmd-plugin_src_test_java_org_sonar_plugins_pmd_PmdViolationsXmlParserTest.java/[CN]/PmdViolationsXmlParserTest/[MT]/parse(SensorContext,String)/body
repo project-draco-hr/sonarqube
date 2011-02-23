@@ -3,17 +3,16 @@
   when(fileSystem.getSourceDirs()).thenReturn(Arrays.asList(new File("/test/src/main/java")));
   Project project=mock(Project.class);
   when(project.getFileSystem()).thenReturn(fileSystem);
-  RulesManager manager=mock(RulesManager.class);
-  when(manager.getPluginRule(anyString(),anyString())).thenAnswer(new Answer<Rule>(){
-    public Rule answer(    InvocationOnMock invocation){
+  RuleFinder ruleFinder=mock(RuleFinder.class);
+  when(ruleFinder.findByKey(anyString(),anyString())).thenAnswer(new Answer<Rule>(){
+    public Rule answer(    InvocationOnMock invocation) throws Throwable {
       Object[] args=invocation.getArguments();
-      return new Rule((String)args[1],(String)args[1],null,(String)args[0],"");
+      return Rule.create((String)args[0],(String)args[1],"");
     }
   }
 );
-  RulesProfile profile=mock(RulesProfile.class);
-  when(profile.getActiveRule(anyString(),anyString())).thenReturn(new ActiveRule(null,null,RulePriority.MINOR));
-  PmdViolationsXmlParser parser=new PmdViolationsXmlParser(project,context,manager,profile);
+  when(context.getResource((JavaFile)any())).thenReturn(new JavaFile(""));
+  PmdViolationsXmlParser parser=new PmdViolationsXmlParser(project,ruleFinder,context);
   File xmlFile=new File(getClass().getResource(xmlPath).toURI());
   parser.parse(xmlFile);
 }

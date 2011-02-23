@@ -1,0 +1,13 @@
+{
+  SMInputCursor violationCursor=fileCursor.descendantElementCursor("violation");
+  while (violationCursor.getNext() != null) {
+    int lineId=Integer.parseInt(violationCursor.getAttrValue("beginline"));
+    String ruleKey=violationCursor.getAttrValue("rule");
+    String message=StringUtils.trim(violationCursor.collectDescendantText());
+    Rule rule=ruleFinder.findByKey(CoreProperties.PMD_PLUGIN,ruleKey);
+    if (rule != null) {
+      Violation violation=Violation.create(rule,resource).setLineId(lineId).setMessage(message);
+      context.saveViolation(violation);
+    }
+  }
+}
