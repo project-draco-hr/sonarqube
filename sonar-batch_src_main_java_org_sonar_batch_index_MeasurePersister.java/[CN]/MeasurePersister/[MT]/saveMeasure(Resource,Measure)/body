@@ -5,16 +5,20 @@
   }
  else {
     Snapshot snapshot=resourcePersister.getSnapshotOrFail(resource);
+    MeasureModel model=null;
     if (measure.getId() != null) {
-      MeasureModel model=session.reattach(MeasureModel.class,measure.getId());
+      model=session.reattach(MeasureModel.class,measure.getId());
       model=mergeModel(measure,model);
       model.save(session);
     }
  else     if (shouldPersistMeasure(resource,measure)) {
-      MeasureModel model=createModel(measure);
+      model=createModel(measure);
       model.setSnapshotId(snapshot.getId());
       model.save(session);
       measure.setId(model.getId());
+    }
+    if (model != null) {
+      memoryOptimizer.evictDataMeasure(measure,model);
     }
   }
 }
