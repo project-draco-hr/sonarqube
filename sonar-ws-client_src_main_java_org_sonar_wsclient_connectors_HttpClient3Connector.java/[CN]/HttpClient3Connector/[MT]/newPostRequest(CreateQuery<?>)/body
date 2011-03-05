@@ -1,17 +1,6 @@
 {
-  try {
-    String url=server.getHost() + URIUtil.encodeQuery(query.getUrl());
-    PostMethod method=new PostMethod(url);
-    method.setRequestHeader("Accept","application/json");
-    if (query.getBody() != null) {
-      method.setRequestEntity(new StringRequestEntity(query.getBody(),"text/plain; charset=UTF-8","UTF-8"));
-    }
-    return method;
-  }
- catch (  URIException e) {
-    throw new ConnectionException("Query: " + query,e);
-  }
-catch (  UnsupportedEncodingException e) {
-    throw new ConnectionException("Unsupported encoding",e);
-  }
+  PostMethod method=new PostMethod(server.getHost() + query.getUrl());
+  setJsonHeader(method);
+  setRequestEntity(method,query);
+  return method;
 }
