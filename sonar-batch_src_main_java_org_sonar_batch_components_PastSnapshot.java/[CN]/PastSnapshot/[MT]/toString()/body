@@ -1,15 +1,24 @@
 {
   if (StringUtils.equals(mode,PastSnapshotFinderByVersion.MODE)) {
-    return String.format("Compare to version " + modeParameter + "("+ getDate()+ ")");
+    return String.format("Compare to version %s (%s)",modeParameter,DateUtils.formatDate(getTargetDate()));
   }
   if (StringUtils.equals(mode,PastSnapshotFinderByDays.MODE)) {
-    return String.format("Compare over " + modeParameter + " days ("+ getDate()+ ")");
+    String label=String.format("Compare over %s days (%s",modeParameter,DateUtils.formatDate(getTargetDate()));
+    if (isRelatedToSnapshot()) {
+      label+=", analysis of " + getDate();
+    }
+    label+=")";
+    return label;
   }
   if (StringUtils.equals(mode,CoreProperties.TIMEMACHINE_MODE_PREVIOUS_ANALYSIS)) {
-    return String.format("Compare to previous analysis " + " (" + getDate() + ")");
+    return String.format("Compare to previous analysis  (%s)",DateUtils.formatDate(getDate()));
   }
   if (StringUtils.equals(mode,PastSnapshotFinderByDate.MODE)) {
-    return String.format("Compare to date " + getDate());
+    String label="Compare to date " + DateUtils.formatDate(getTargetDate());
+    if (isRelatedToSnapshot()) {
+      label+=String.format("(analysis of %s)",DateUtils.formatDate(getDate()));
+    }
+    return label;
   }
   return ReflectionToStringBuilder.toString(this);
 }
