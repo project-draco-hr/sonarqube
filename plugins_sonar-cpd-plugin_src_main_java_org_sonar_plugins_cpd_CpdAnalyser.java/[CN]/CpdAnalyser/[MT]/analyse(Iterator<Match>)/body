@@ -10,6 +10,8 @@
         LOG.warn("CPD - File not found : {}",firstAbsolutePath);
         continue;
       }
+      DuplicationsData firstFileData=getDuplicationsData(duplicationsData,firstFile);
+      firstFileData.incrementDuplicatedBlock();
       for (      TokenEntry tokenEntry : match.getMarkSet()) {
         String secondAbsolutePath=tokenEntry.getTokenSrcID();
         int secondLine=tokenEntry.getBeginLine();
@@ -21,7 +23,7 @@
           LOG.warn("CPD - File not found : {}",secondAbsolutePath);
           continue;
         }
-        processClassMeasure(duplicationsData,firstFile,firstLine,secondFile,secondLine,match.getLineCount(),match);
+        firstFileData.cumulate(secondFile,secondLine,firstLine,match.getLineCount(),match);
       }
     }
   }
