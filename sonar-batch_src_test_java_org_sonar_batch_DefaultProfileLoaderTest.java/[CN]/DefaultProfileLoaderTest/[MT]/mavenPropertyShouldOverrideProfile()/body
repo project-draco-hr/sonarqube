@@ -1,12 +1,10 @@
 {
-  ProfileProvider provider=new ProfileProvider();
-  ProfilesDao dao=mock(ProfilesDao.class);
   Project project=new Project("project").setLanguageKey(Java.KEY);
   MapConfiguration conf=new MapConfiguration(new HashMap());
-  conf.addProperty(ProfileProvider.PARAM_PROFILE,"profile1");
+  conf.addProperty(DefaultProfileLoader.PARAM_PROFILE,"profile1");
   project.setConfiguration(conf);
   when(dao.getProfile(Java.KEY,"profile1")).thenReturn(newProfile());
-  provider.provide(project,dao);
+  loader.load(project);
   verify(dao).getProfile(Java.KEY,"profile1");
   verify(dao,never()).getActiveProfile(Java.KEY,"project");
 }
