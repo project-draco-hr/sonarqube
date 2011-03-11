@@ -1,11 +1,6 @@
 {
-  LoggerFactory.getLogger(DecoratorsExecutor.class).info("Execute decorators...");
   Collection<Decorator> decorators=decoratorsSelector.select(project);
-  if (LOG.isDebugEnabled()) {
-    LOG.debug("Decorators: {}",StringUtils.join(decorators," -> "));
-  }
-  DecoratorsProfiler profiler=new DecoratorsProfiler(decorators);
-  decorateResource(project,decorators,true,profiler);
-  session.commit();
-  profiler.log();
+  eventBus.fireEvent(new DecoratorsPhaseEvent(decorators,true));
+  decorateResource(project,decorators,true);
+  eventBus.fireEvent(new DecoratorsPhaseEvent(decorators,false));
 }
