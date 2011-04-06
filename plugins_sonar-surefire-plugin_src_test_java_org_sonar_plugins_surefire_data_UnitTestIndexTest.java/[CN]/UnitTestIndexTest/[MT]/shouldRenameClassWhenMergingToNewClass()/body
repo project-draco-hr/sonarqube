@@ -1,0 +1,15 @@
+{
+  UnitTestIndex index=new UnitTestIndex();
+  UnitTestClassReport innerClass=index.index("org.sonar.Foo$Bar");
+  innerClass.add(new UnitTestResult().setStatus(UnitTestResult.STATUS_ERROR).setDurationMilliseconds(500L));
+  innerClass.add(new UnitTestResult().setStatus(UnitTestResult.STATUS_OK).setDurationMilliseconds(200L));
+  index.merge("org.sonar.Foo$Bar","org.sonar.Foo");
+  assertThat(index.size(),is(1));
+  UnitTestClassReport report=index.get("org.sonar.Foo");
+  assertThat(report.getTests(),is(2L));
+  assertThat(report.getFailures(),is(0L));
+  assertThat(report.getErrors(),is(1L));
+  assertThat(report.getSkipped(),is(0L));
+  assertThat(report.getResults().size(),is(2));
+  assertThat(report.getDurationMilliseconds(),is(500L + 200L));
+}

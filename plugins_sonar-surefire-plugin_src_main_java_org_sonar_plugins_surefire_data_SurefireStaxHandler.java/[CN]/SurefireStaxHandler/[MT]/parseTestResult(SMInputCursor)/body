@@ -1,0 +1,28 @@
+{
+  UnitTestResult detail=new UnitTestResult();
+  String name=getTestCaseName(testCaseCursor);
+  detail.setName(name);
+  String status=UnitTestResult.STATUS_OK;
+  long duration=getTimeAttributeInMS(testCaseCursor);
+  SMInputCursor childNode=testCaseCursor.descendantElementCursor();
+  if (childNode.getNext() != null) {
+    String elementName=childNode.getLocalName();
+    if ("skipped".equals(elementName)) {
+      status=UnitTestResult.STATUS_SKIPPED;
+      duration=0L;
+    }
+ else     if ("failure".equals(elementName)) {
+      status=UnitTestResult.STATUS_FAILURE;
+      setStackAndMessage(detail,childNode);
+    }
+ else     if ("error".equals(elementName)) {
+      status=UnitTestResult.STATUS_ERROR;
+      setStackAndMessage(detail,childNode);
+    }
+  }
+  while (childNode.getNext() != null) {
+  }
+  detail.setDurationMilliseconds(duration);
+  detail.setStatus(status);
+  return detail;
+}

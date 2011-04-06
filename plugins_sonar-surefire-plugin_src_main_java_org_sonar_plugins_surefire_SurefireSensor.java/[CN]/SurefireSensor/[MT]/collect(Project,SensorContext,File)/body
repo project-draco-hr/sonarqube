@@ -2,7 +2,10 @@
   logger.info("parsing {}",reportsDir);
   new AbstractSurefireParser(){
     @Override protected Resource<?> getUnitTestResource(    String classKey){
-      return new JavaFile(classKey,true);
+      if (!StringUtils.contains(classKey,"$")) {
+        return new JavaFile(classKey,true);
+      }
+      return null;
     }
   }
 .collect(project,context,reportsDir);
