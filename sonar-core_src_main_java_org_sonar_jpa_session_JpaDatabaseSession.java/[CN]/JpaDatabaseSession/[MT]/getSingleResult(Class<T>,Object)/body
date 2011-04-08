@@ -3,7 +3,8 @@
     return getSingleResult(getQueryForCriterias(entityClass,true,criterias),(T)null);
   }
  catch (  NonUniqueResultException ex) {
-    LoggerFactory.getLogger(JpaDatabaseSession.class).warn("NonUniqueResultException on entity {} with criterias : {}",entityClass.getSimpleName(),StringUtils.join(criterias,","));
-    throw ex;
+    NonUniqueResultException e=new NonUniqueResultException("Expected single result for entitiy " + entityClass.getSimpleName() + " with criterias : "+ StringUtils.join(criterias,","));
+    e.initCause(ex);
+    throw e;
   }
 }
