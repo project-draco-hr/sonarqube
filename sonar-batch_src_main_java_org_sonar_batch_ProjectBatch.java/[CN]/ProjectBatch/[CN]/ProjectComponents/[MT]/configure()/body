@@ -1,8 +1,17 @@
 {
+  ProjectDefinition projectDefinition=getComponent(ProjectTree.class).getProjectDefinition(project.getKey());
+  addComponent(projectDefinition);
+  for (  Object component : projectDefinition.getContainerExtensions()) {
+    addComponent(component);
+    if (component instanceof MavenProject) {
+      MavenProject pom=(MavenProject)component;
+      project.setPom(pom);
+      project.setPackaging(pom.getPackaging());
+    }
+  }
   addComponent(project);
-  addComponent(project.getPom());
-  addComponent(ProjectClasspath.class);
-  addComponent(MavenProjectFileSystem.class);
+  addComponent(DefaultProjectClasspath.class);
+  addComponent(DefaultProjectFileSystem2.class);
   addComponent(project.getConfiguration());
   getComponent(BatchPluginRepository.class).registerPlugins(getContainer());
   addComponent(DaoFacade.class);

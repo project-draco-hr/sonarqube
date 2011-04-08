@@ -1,0 +1,23 @@
+{
+  Map<String,MavenProject> paths=Maps.newHashMap();
+  Map<MavenProject,ProjectDefinition> defs=Maps.newHashMap();
+  try {
+    for (    MavenProject pom : poms) {
+      String basedir=pom.getBasedir().getCanonicalPath();
+      paths.put(basedir,pom);
+      defs.put(pom,convert(pom));
+    }
+    for (    Map.Entry<String,MavenProject> entry : paths.entrySet()) {
+      MavenProject pom=entry.getValue();
+      for (      Object moduleId : pom.getModules()) {
+        File modulePath=new File(pom.getBasedir(),(String)moduleId);
+        MavenProject module=paths.get(modulePath.getCanonicalPath());
+        defs.get(pom).addModule(defs.get(module));
+      }
+    }
+  }
+ catch (  IOException e) {
+    throw new SonarException(e);
+  }
+  return defs.get(poms.get(0));
+}
