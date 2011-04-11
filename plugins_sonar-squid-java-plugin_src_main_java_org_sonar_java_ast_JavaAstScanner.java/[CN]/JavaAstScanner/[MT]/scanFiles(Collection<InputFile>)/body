@@ -1,0 +1,19 @@
+{
+  if (LOG.isDebugEnabled()) {
+    LOG.debug("----- Java sources analyzed by Squid:");
+    for (    InputFile inputFile : inputFiles) {
+      LOG.debug(inputFile.toString());
+    }
+    LOG.debug("-----");
+  }
+  Stack<SourceCode> resourcesStack=new Stack<SourceCode>();
+  resourcesStack.add(project);
+  for (  JavaAstVisitor visitor : getVisitors()) {
+    visitor.setSourceCodeStack(resourcesStack);
+  }
+  CheckstyleSquidBridge.setASTVisitors(getVisitors());
+  CheckstyleSquidBridge.setSquidConfiguration(conf);
+  CheckstyleSquidBridge.setInputFiles(inputFiles);
+  launchCheckstyle(InputFileUtils.toFiles(inputFiles),conf.getCharset());
+  return this;
+}
