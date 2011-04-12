@@ -1,0 +1,20 @@
+{
+  Snapshot snapshot=resourcePersister.saveResource(project,violation.getResource());
+  RuleFailureModel model=createModel(violation);
+  if (pastViolation != null) {
+    model.setCreatedAt(pastViolation.getCreatedAt());
+    model.setPermanentId(pastViolation.getPermanentId());
+  }
+ else {
+    model.setCreatedAt(snapshot.getCreatedAt());
+  }
+  model.setSnapshotId(snapshot.getId());
+  model.setChecksum(checksum);
+  session.save(model);
+  if (model.getPermanentId() == null) {
+    model.setPermanentId(model.getId());
+    session.save(model);
+  }
+  violation.setMessage(model.getMessage());
+  violation.setCreatedAt(model.getCreatedAt());
+}
