@@ -1,16 +1,18 @@
 {
-  Context ctx=mock(Context.class);
+  Context envContext=mock(Context.class);
+  Context context=mock(Context.class);
   DataSource ds=mock(DataSource.class);
   DatabaseMetaData m=mock(DatabaseMetaData.class);
   c=mock(Connection.class);
   try {
-    when(ctx.lookup(anyString())).thenReturn(ds);
+    when(envContext.lookup(JndiDatabaseConnector.JNDI_ENV_CONTEXT)).thenReturn(context);
+    when(context.lookup("jdbc/sonar")).thenReturn(ds);
     when(ds.getConnection()).thenReturn(c);
-    when(m.getURL()).thenReturn("testdbcUrl");
+    when(m.getURL()).thenReturn("jdbc:test");
     when(c.getMetaData()).thenReturn(m);
   }
  catch (  Exception e) {
     throw new RuntimeException(e);
   }
-  return ctx;
+  return envContext;
 }

@@ -1,0 +1,16 @@
+{
+  try {
+    Logs.INFO.info("Creating JDBC datasource");
+    Properties properties=new Properties();
+    Configuration dsConfig=getConfiguration().subset("sonar.jdbc");
+    for (Iterator<String> it=dsConfig.getKeys(); it.hasNext(); ) {
+      String key=it.next();
+      properties.setProperty(key,dsConfig.getString(key));
+    }
+    datasource=BasicDataSourceFactory.createDataSource(properties);
+    CustomHibernateConnectionProvider.datasource=datasource;
+  }
+ catch (  Exception e) {
+    throw new SonarException("Fail to connect to database",e);
+  }
+}
