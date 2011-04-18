@@ -1,0 +1,19 @@
+{
+  Resource resource=violationQuery.getResource();
+  if (resource == null) {
+    throw new IllegalArgumentException("A resource must be set on the ViolationQuery in order to search for violations.");
+  }
+  Bucket bucket=buckets.get(resource);
+  if (bucket == null) {
+    return Collections.emptyList();
+  }
+  List<Violation> filteredViolations=Lists.newArrayList();
+  boolean ignoreSwitchedOff=violationQuery.ignoreSwitchedOff();
+  for (  Violation violation : bucket.getViolations()) {
+    if (ignoreSwitchedOff && violation.isSwitchedOff()) {
+      continue;
+    }
+    filteredViolations.add(violation);
+  }
+  return filteredViolations;
+}
