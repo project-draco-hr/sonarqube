@@ -1,12 +1,12 @@
 {
   StringWriter xmlOutput=new StringWriter();
   RulesProfile profile=RulesProfile.create();
-  Rule xpathTemplate=Rule.create(PmdConstants.REPOSITORY_KEY,"MyOwnRule","This is my own xpath rule.").setConfigKey(PmdConstants.XPATH_CLASS).setPluginName(PmdConstants.REPOSITORY_KEY);
+  Rule xpathTemplate=Rule.create(PmdConstants.REPOSITORY_KEY,"MyOwnRule","This is my own xpath rule.").setConfigKey(PmdConstants.XPATH_CLASS).setRepositoryKey(PmdConstants.REPOSITORY_KEY);
   xpathTemplate.createParameter(PmdConstants.XPATH_EXPRESSION_PARAM);
   xpathTemplate.createParameter(PmdConstants.XPATH_MESSAGE_PARAM);
   ActiveRule xpath=profile.activateRule(xpathTemplate,null);
   xpath.setParameter(PmdConstants.XPATH_EXPRESSION_PARAM,"//FieldDeclaration");
   xpath.setParameter(PmdConstants.XPATH_MESSAGE_PARAM,"This is bad");
   exporter.exportProfile(profile,xmlOutput);
-  assertEquals(TestUtils.getResourceContent("/org/sonar/plugins/pmd/export_xpath_rules.xml"),StringUtils.remove(xmlOutput.toString(),'\r'));
+  assertThat(xmlOutput.toString(),new IsEqualIgnoringEOL(TestUtils.getResourceContent("/org/sonar/plugins/pmd/export_xpath_rules.xml")));
 }
