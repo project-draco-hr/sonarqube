@@ -1,12 +1,6 @@
 {
-  Rule rule=Rule.create().setKey("rule");
-  rule.setId(50);
-  Violation violation=Violation.create(rule,null).setLineId(1).setMessage("message");
-  Rule otherRule=Rule.create().setKey("anotherRule");
-  otherRule.setId(244);
-  RuleFailureModel pastViolationOnOtherRule=newPastViolation(otherRule,1,"message");
-  Multimap<Rule,RuleFailureModel> pastViolationsByRule=LinkedHashMultimap.create();
-  pastViolationsByRule.put(otherRule,pastViolationOnOtherRule);
-  RuleFailureModel found=decorator.selectPastViolation(violation,pastViolationsByRule);
-  assertThat(found,nullValue());
+  Violation newViolation=newViolation("message",1,50,"checksum1");
+  RuleFailureModel pastViolation=newPastViolation("message",1,51,"checksum1");
+  Map<Violation,RuleFailureModel> mapping=decorator.mapViolations(Lists.newArrayList(newViolation),Lists.newArrayList(pastViolation));
+  assertThat(mapping.get(newViolation),is(nullValue()));
 }
