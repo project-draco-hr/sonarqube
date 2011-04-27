@@ -1,0 +1,14 @@
+{
+  Map<MeasureKey,Object[]> pastMeasuresByKey=Maps.newHashMap();
+  for (  Object[] pastMeasure : pastMeasures) {
+    pastMeasuresByKey.put(new MeasureKey(pastMeasure),pastMeasure);
+  }
+  for (  Measure measure : context.getMeasures(new CustomMeasureFilter())) {
+    Integer metricId=(measure.getMetric().getId() != null ? measure.getMetric().getId() : metricFinder.findByKey(measure.getMetric().getKey()).getId());
+    Integer characteristicId=(measure.getCharacteristic() != null ? measure.getCharacteristic().getId() : null);
+    Object[] pastMeasure=pastMeasuresByKey.get(new MeasureKey(metricId,characteristicId));
+    if (updateVariation(measure,pastMeasure,index)) {
+      context.saveMeasure(measure);
+    }
+  }
+}
