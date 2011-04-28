@@ -1,0 +1,23 @@
+{
+  WSUtils utils=WSUtils.getINSTANCE();
+  Review review=new Review();
+  review.setId(utils.getLong(json,"id"));
+  review.setCreatedAt(utils.getDateTime(json,"createdAt"));
+  review.setUpdatedAt(utils.getDateTime(json,"updatedAt"));
+  review.setAuthorLogin(utils.getString(json,"author"));
+  review.setAssigneeLogin(utils.getString(json,"assignee"));
+  review.setTitle(utils.getString(json,"title"));
+  review.setType(utils.getString(json,"type"));
+  review.setStatus(utils.getString(json,"status"));
+  review.setSeverity(utils.getString(json,"severity"));
+  review.setResourceKee(utils.getString(json,"resource"));
+  review.setLine(utils.getInteger(json,"line"));
+  Object comments=utils.getField(json,"comments");
+  if (comments != null) {
+    for (int i=0; i < utils.getArraySize(comments); i++) {
+      Object comment=utils.getArrayElement(comments,i);
+      review.addComments(utils.getDateTime(comment,"updatedAt"),utils.getString(comment,"author"),utils.getString(comment,"text"));
+    }
+  }
+  return review;
+}
