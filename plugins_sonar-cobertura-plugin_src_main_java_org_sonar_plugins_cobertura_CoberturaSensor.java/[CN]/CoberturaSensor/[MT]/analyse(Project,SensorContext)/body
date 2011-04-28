@@ -1,6 +1,12 @@
 {
-  File report=CoberturaUtils.getReport(project);
-  if (report != null) {
-    parseReport(report,context);
+  String path=(String)project.getProperty(CoreProperties.COBERTURA_REPORT_PATH_PROPERTY);
+  if (path == null) {
+    return;
   }
+  File report=project.getFileSystem().resolvePath(path);
+  if (!report.exists() || !report.isFile()) {
+    Logs.INFO.warn("Cobertura report not found at {}",report);
+    return;
+  }
+  parseReport(report,context);
 }

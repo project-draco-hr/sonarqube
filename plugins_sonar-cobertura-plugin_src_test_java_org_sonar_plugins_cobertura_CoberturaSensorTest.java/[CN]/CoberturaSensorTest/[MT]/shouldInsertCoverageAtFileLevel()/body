@@ -1,8 +1,7 @@
 {
   File coverage=new File(getClass().getResource("/org/sonar/plugins/cobertura/CoberturaSensorTest/shouldInsertCoverageAtFileLevel/coverage.xml").toURI());
-  SensorContext context=mock(SensorContext.class);
   when(context.getResource(any(Resource.class))).thenReturn(new JavaFile("org.sonar.MyClass"));
-  new CoberturaSensor().parseReport(coverage,context);
+  sensor.parseReport(coverage,context);
   verify(context).saveMeasure(argThat(new IsResource(Scopes.FILE,Qualifiers.CLASS,"org.sonar.samples.InnerClass")),argThat(new IsMeasure(CoreMetrics.LINES_TO_COVER,35.0)));
   verify(context).saveMeasure(argThat(new IsResource(Scopes.FILE,Qualifiers.CLASS,"org.sonar.samples.InnerClass")),argThat(new IsMeasure(CoreMetrics.UNCOVERED_LINES,22.0)));
   verify(context).saveMeasure(argThat(new IsResource(Scopes.FILE,Qualifiers.CLASS,"org.sonar.samples.InnerClass")),argThat(new IsMeasure(CoreMetrics.CONDITIONS_TO_COVER,4.0)));
