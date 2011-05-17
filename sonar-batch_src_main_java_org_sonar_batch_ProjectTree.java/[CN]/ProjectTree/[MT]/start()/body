@@ -1,19 +1,19 @@
 {
   projects=Lists.newArrayList();
-  Map<ProjectDefinition,Project> map=Maps.newHashMap();
+  projectsMap=Maps.newHashMap();
   for (  ProjectDefinition def : definitions) {
     Project project=projectBuilder.create(def);
-    map.put(def,project);
+    projectsMap.put(def,project);
     projects.add(project);
   }
-  for (  Map.Entry<ProjectDefinition,Project> entry : map.entrySet()) {
+  for (  Map.Entry<ProjectDefinition,Project> entry : projectsMap.entrySet()) {
     ProjectDefinition def=entry.getKey();
     Project project=entry.getValue();
     for (    ProjectDefinition module : def.getModules()) {
-      map.get(module).setParent(project);
+      projectsMap.get(module).setParent(project);
     }
   }
-  for (  Map.Entry<ProjectDefinition,Project> entry : map.entrySet()) {
+  for (  Map.Entry<ProjectDefinition,Project> entry : projectsMap.entrySet()) {
     projectBuilder.configure(entry.getValue(),entry.getKey());
   }
   applyModuleExclusions();
