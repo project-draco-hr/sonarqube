@@ -5,5 +5,11 @@
   Statement stmt=getConnection().createStatement();
   int count=stmt.executeUpdate(sqlRequest);
   assertThat(count,is(1));
-  assertTables("shouldCloseReviewWithoutCorrespondingViolation","reviews");
+  assertTables("shouldCloseReviewWithoutCorrespondingViolation",new String[]{"reviews"},new String[]{"updated_at"});
+  try {
+    assertTables("shouldCloseReviewWithoutCorrespondingViolation",new String[]{"reviews"});
+    fail("'updated_at' columns are identical whereas they should be different.");
+  }
+ catch (  ComparisonFailure e) {
+  }
 }
