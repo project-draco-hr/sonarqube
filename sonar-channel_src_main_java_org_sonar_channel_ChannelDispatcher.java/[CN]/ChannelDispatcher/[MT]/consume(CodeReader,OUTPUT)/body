@@ -1,19 +1,21 @@
 {
   int nextChar=code.peek();
   while (nextChar != -1) {
-    boolean channelConsumed=false;
+    boolean characterConsumed=false;
     for (    Channel<OUTPUT> channel : channels) {
       if (channel.consume(code,output)) {
-        channelConsumed=true;
+        characterConsumed=true;
         break;
       }
     }
-    if (!channelConsumed) {
-      String message="None of the channel has been able to handle character '" + (char)code.peek() + "' (decimal value "+ code.peek()+ ") at line "+ code.getLinePosition()+ ", column "+ code.getColumnPosition();
-      if (failIfNoChannelToConsumeOneCharacter) {
-        throw new IllegalStateException(message);
+    if (!characterConsumed) {
+      if (logger.isDebugEnabled() || failIfNoChannelToConsumeOneCharacter) {
+        String message="None of the channel has been able to handle character '" + (char)code.peek() + "' (decimal value "+ code.peek()+ ") at line "+ code.getLinePosition()+ ", column "+ code.getColumnPosition();
+        if (failIfNoChannelToConsumeOneCharacter) {
+          throw new IllegalStateException(message);
+        }
+        logger.debug(message);
       }
-      logger.debug(message);
       code.pop();
     }
     nextChar=code.peek();
