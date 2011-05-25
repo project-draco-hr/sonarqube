@@ -1,0 +1,23 @@
+{
+  addComponent(configuration);
+  addComponent(ServerMetadata.class);
+  addComponent(TempDirectories.class);
+  addComponent(HttpDownloader.class);
+  addComponent(ExtensionDownloader.class);
+  addComponent(BootstrapClassLoader.class);
+  URLClassLoader bootstrapClassLoader=getComponent(BootstrapClassLoader.class).getClassLoader();
+  Thread.currentThread().setContextClassLoader(bootstrapClassLoader);
+  addComponent(new DriverDatabaseConnector(configuration,bootstrapClassLoader));
+  addComponent(ThreadLocalDatabaseSessionFactory.class);
+  addAdapter(new DatabaseSessionProvider());
+  for (  Object component : boostrapperComponents) {
+    addComponent(component);
+  }
+  if (!isMavenPluginExecutorRegistered()) {
+    addComponent(FakeMavenPluginExecutor.class);
+  }
+  addComponent(JpaPluginDao.class);
+  addComponent(BatchPluginRepository.class);
+  addComponent(BatchExtensionInstaller.class);
+  addComponent(ProjectExtensionInstaller.class);
+}

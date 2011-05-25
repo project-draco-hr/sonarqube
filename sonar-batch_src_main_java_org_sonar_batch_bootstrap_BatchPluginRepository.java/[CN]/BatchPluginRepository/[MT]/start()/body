@@ -1,13 +1,14 @@
 {
-  register=Lists.newArrayList();
-  classLoaders=new ClassLoadersCollection(Thread.currentThread().getContextClassLoader());
+  List<JpaPlugin> pluginsMetadata=Lists.newArrayList();
+  pluginsByKey=Maps.newHashMap();
+  ClassLoadersCollection classLoaders=new ClassLoadersCollection(Thread.currentThread().getContextClassLoader());
   List<JpaPlugin> jpaPlugins=dao.getPlugins();
   for (  JpaPlugin pluginMetadata : jpaPlugins) {
     if (StringUtils.isEmpty(pluginMetadata.getBasePlugin())) {
       String key=pluginMetadata.getKey();
       List<URL> urls=download(pluginMetadata);
       classLoaders.createClassLoader(key,urls,pluginMetadata.isUseChildFirstClassLoader() == Boolean.TRUE);
-      register.add(pluginMetadata);
+      pluginsMetadata.add(pluginMetadata);
     }
   }
   for (  JpaPlugin pluginMetadata : jpaPlugins) {
@@ -18,11 +19,21 @@
         LOG.debug("Plugin {} extends {}",pluginKey,basePluginKey);
         List<URL> urls=download(pluginMetadata);
         classLoaders.extend(basePluginKey,pluginKey,urls);
-        register.add(pluginMetadata);
+        pluginsMetadata.add(pluginMetadata);
       }
  else {
         LOG.warn("Plugin {} extends nonexistent plugin {}",pluginKey,basePluginKey);
       }
+    }
+  }
+  for (  JpaPlugin pluginMetadata : jpaPlugins) {
+    try {
+      Class claz=classLoaders.get(pluginMetadata.getKey()).loadClass(pluginMetadata.getPluginClass());
+      Plugin plugin=(Plugin)claz.newInstance();
+      pluginsByKey.put(pluginMetadata.getKey(),plugin);
+    }
+ catch (    Exception e) {
+      throw new SonarException("Fail to load plugin " + pluginMetadata.getKey(),e);
     }
   }
   classLoaders.done();
