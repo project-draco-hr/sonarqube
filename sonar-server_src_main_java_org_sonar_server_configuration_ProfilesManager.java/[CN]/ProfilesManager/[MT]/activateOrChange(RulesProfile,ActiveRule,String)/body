@@ -1,0 +1,27 @@
+{
+  ActiveRule oldActiveRule=profile.getActiveRule(parentActiveRule.getRule());
+  if (oldActiveRule != null) {
+    if (oldActiveRule.isInherited()) {
+      removeActiveRule(profile,oldActiveRule);
+    }
+ else {
+      oldActiveRule.setInheritance(ActiveRule.OVERRIDES);
+      getSession().saveWithoutFlush(oldActiveRule);
+      return;
+    }
+  }
+  ActiveRule newActiveRule=(ActiveRule)parentActiveRule.clone();
+  newActiveRule.setRulesProfile(profile);
+  newActiveRule.setInheritance(ActiveRule.INHERITED);
+  profile.addActiveRule(newActiveRule);
+  getSession().saveWithoutFlush(newActiveRule);
+  if (oldActiveRule != null) {
+    ruleChanged(profile,oldActiveRule,newActiveRule,userLogin);
+  }
+ else {
+    ruleEnabled(profile,newActiveRule,userLogin);
+  }
+  for (  RulesProfile child : getChildren(profile)) {
+    activateOrChange(child,newActiveRule,userLogin);
+  }
+}

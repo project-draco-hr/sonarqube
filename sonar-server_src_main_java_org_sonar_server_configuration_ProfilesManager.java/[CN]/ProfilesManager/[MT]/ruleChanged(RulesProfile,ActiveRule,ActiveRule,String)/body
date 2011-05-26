@@ -1,0 +1,18 @@
+{
+  incrementProfileVersionIfNeeded(profile);
+  ActiveRuleChange rc=new ActiveRuleChange(userLogin,profile,newActiveRule.getRule());
+  if (oldActiveRule.getSeverity() != newActiveRule.getSeverity()) {
+    rc.setOldSeverity(oldActiveRule.getSeverity());
+    rc.setNewSeverity(newActiveRule.getSeverity());
+  }
+  if (oldActiveRule.getRule().getParams() != null) {
+    for (    RuleParam p : oldActiveRule.getRule().getParams()) {
+      String oldParam=oldActiveRule.getParameter(p.getKey());
+      String newParam=newActiveRule.getParameter(p.getKey());
+      if (oldParam != newParam) {
+        rc.setParameterChange(p.getKey(),oldParam,newParam);
+      }
+    }
+  }
+  getSession().saveWithoutFlush(rc);
+}

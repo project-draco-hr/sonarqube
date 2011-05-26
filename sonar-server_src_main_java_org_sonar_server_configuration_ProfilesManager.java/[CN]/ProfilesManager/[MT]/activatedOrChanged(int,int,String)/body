@@ -1,0 +1,11 @@
+{
+  ActiveRule parentActiveRule=getSession().getEntity(ActiveRule.class,activeRuleId);
+  if (parentActiveRule.isInherited()) {
+    parentActiveRule.setInheritance(ActiveRule.OVERRIDES);
+    getSession().saveWithoutFlush(parentActiveRule);
+  }
+  for (  RulesProfile child : getChildren(parentProfileId)) {
+    activateOrChange(child,parentActiveRule,userLogin);
+  }
+  getSession().commit();
+}
