@@ -1,0 +1,13 @@
+{
+  ExtensionDownloader extensionDownloader=mock(ExtensionDownloader.class);
+  when(extensionDownloader.downloadExtension(any(JpaPluginFile.class))).thenReturn(FileUtils.toFile(getClass().getResource("/org/sonar/batch/bootstrap/BatchPluginRepositoryTest/sonar-artifact-size-plugin-0.2.jar")));
+  BatchPluginRepository repository=new BatchPluginRepository(null,extensionDownloader);
+  JpaPlugin plugin=new JpaPlugin("artifactsize");
+  plugin.setPluginClass("org.sonar.plugins.artifactsize.ArtifactSizePlugin");
+  plugin.createFile("sonar-artifact-size-plugin-0.2.jar");
+  repository.doStart(Arrays.asList(plugin));
+  Plugin entryPoint=repository.getPlugin("artifactsize");
+  assertThat(entryPoint,not(nullValue()));
+  ClassRealm classloader=(ClassRealm)entryPoint.getClass().getClassLoader();
+  assertThat(classloader.getId(),is("artifactsize"));
+}
