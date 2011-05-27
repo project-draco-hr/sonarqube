@@ -1,0 +1,20 @@
+{
+  projects=Lists.newArrayList();
+  projectsByDef=Maps.newHashMap();
+  for (  ProjectDefinition def : definitions) {
+    Project project=configurator.create(def);
+    projectsByDef.put(def,project);
+    projects.add(project);
+  }
+  for (  Map.Entry<ProjectDefinition,Project> entry : projectsByDef.entrySet()) {
+    ProjectDefinition def=entry.getKey();
+    Project project=entry.getValue();
+    for (    ProjectDefinition module : def.getSubProjects()) {
+      projectsByDef.get(module).setParent(project);
+    }
+  }
+  for (  Map.Entry<ProjectDefinition,Project> entry : projectsByDef.entrySet()) {
+    configurator.configure(entry.getValue(),entry.getKey());
+  }
+  applyExclusions();
+}
