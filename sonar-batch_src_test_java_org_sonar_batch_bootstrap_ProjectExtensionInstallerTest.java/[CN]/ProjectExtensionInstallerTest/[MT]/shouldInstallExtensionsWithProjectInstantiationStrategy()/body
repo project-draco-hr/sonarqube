@@ -1,0 +1,17 @@
+{
+  BatchPluginRepository pluginRepository=mock(BatchPluginRepository.class);
+  Map<String,Plugin> pluginsMap=Maps.newHashMap();
+  pluginsMap.put("fooPlugin",new SonarPlugin(){
+    public List getExtensions(){
+      return Arrays.asList(BatchService.class,ProjectService.class,ServerService.class);
+    }
+  }
+);
+  when(pluginRepository.getPluginsByKey()).thenReturn(pluginsMap);
+  Module module=new FakeModule().init();
+  ProjectExtensionInstaller installer=new ProjectExtensionInstaller(pluginRepository,new EnvironmentInformation("ant","1.7"));
+  installer.install(module,new Project("foo"));
+  assertThat(module.getComponent(BatchService.class),nullValue());
+  assertThat(module.getComponent(ProjectService.class),not(nullValue()));
+  assertThat(module.getComponent(ServerService.class),nullValue());
+}
