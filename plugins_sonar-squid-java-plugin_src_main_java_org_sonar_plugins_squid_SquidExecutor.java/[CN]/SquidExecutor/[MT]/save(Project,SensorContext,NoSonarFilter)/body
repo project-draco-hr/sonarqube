@@ -2,7 +2,11 @@
   if (sourceScanned) {
     TimeProfiler profiler=new TimeProfiler(getClass()).start("Squid extraction");
     ResourceIndex resourceIndex=new ResourceIndex().loadSquidResources(squid,context,project);
-    List<Bridge> bridges=BridgeFactory.create(bytecodeScanned,context,checkFactory,resourceIndex,squid,noSonarFilter);
+    boolean skipPackageDesignAnalysis=CoreProperties.DESIGN_SKIP_PACKAGE_DESIGN_DEFAULT_VALUE;
+    if (project.getConfiguration() != null) {
+      skipPackageDesignAnalysis=project.getConfiguration().getBoolean(CoreProperties.DESIGN_SKIP_PACKAGE_DESIGN_PROPERTY,CoreProperties.DESIGN_SKIP_PACKAGE_DESIGN_DEFAULT_VALUE);
+    }
+    List<Bridge> bridges=BridgeFactory.create(bytecodeScanned,skipPackageDesignAnalysis,context,checkFactory,resourceIndex,squid,noSonarFilter);
     saveProject(resourceIndex,bridges);
     savePackages(resourceIndex,bridges);
     saveFiles(resourceIndex,bridges);
