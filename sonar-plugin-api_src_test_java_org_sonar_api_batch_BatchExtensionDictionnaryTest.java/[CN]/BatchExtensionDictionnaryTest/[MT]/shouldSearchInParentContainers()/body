@@ -1,0 +1,11 @@
+{
+  TransientPicoContainer grandParent=new TransientPicoContainer();
+  grandParent.as(Characteristics.CACHE).addComponent("ncloc",CoreMetrics.NCLOC);
+  DefaultPicoContainer parent=(DefaultPicoContainer)grandParent.makeChildContainer();
+  parent.as(Characteristics.CACHE).addComponent("coverage",CoreMetrics.COVERAGE);
+  DefaultPicoContainer child=(DefaultPicoContainer)parent.makeChildContainer();
+  child.as(Characteristics.CACHE).addComponent("complexity",CoreMetrics.COMPLEXITY);
+  BatchExtensionDictionnary dictionnary=new BatchExtensionDictionnary(child);
+  assertThat(dictionnary.select(Metric.class).size(),is(3));
+  assertThat(dictionnary.select(Metric.class),hasItems(CoreMetrics.NCLOC,CoreMetrics.COVERAGE,CoreMetrics.COMPLEXITY));
+}
