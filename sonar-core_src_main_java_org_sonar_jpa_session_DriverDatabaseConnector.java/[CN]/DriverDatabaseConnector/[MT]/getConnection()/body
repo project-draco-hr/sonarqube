@@ -1,11 +1,14 @@
 {
-  try {
-    Driver driver=(Driver)classloader.loadClass(getDriver()).newInstance();
-    DriverManager.registerDriver(new DriverProxy(driver));
-  }
- catch (  Exception e) {
-    SQLException ex=new SQLException("SQL driver not found " + getDriver());
-    throw (SQLException)ex.initCause(e);
+  if (!driverProxyRegistered) {
+    driverProxyRegistered=true;
+    try {
+      Driver driver=(Driver)classloader.loadClass(getDriver()).newInstance();
+      DriverManager.registerDriver(new DriverProxy(driver));
+    }
+ catch (    Exception e) {
+      SQLException ex=new SQLException("SQL driver not found " + getDriver());
+      throw (SQLException)ex.initCause(e);
+    }
   }
   return DriverManager.getConnection(getUrl(),getUsername(),getPassword());
 }
