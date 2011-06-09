@@ -1,21 +1,10 @@
 {
-  setupData("shared");
   deployer.start();
-  List<JpaPlugin> plugins=dao.getPlugins();
-  assertThat(plugins.size(),is(1));
-  JpaPlugin plugin=plugins.get(0);
-  assertThat(plugin.getKey(),is("buildbreaker"));
-  assertThat(plugin.getFiles().size(),is(1));
+  assertThat(deployer.getMetadata().size(),Is.is(1));
+  PluginMetadata plugin=deployer.getMetadata("buildbreaker");
   assertThat(plugin.isCore(),is(false));
   assertThat(plugin.isUseChildFirstClassLoader(),is(false));
-  JpaPluginFile pluginFile=plugin.getFiles().get(0);
-  assertThat(pluginFile.getFilename(),is("sonar-build-breaker-plugin-0.1.jar"));
-  assertThat(pluginFile.getPath(),is("buildbreaker/sonar-build-breaker-plugin-0.1.jar"));
   File deployedJar=new File(deployDir,"plugins/buildbreaker/sonar-build-breaker-plugin-0.1.jar");
   assertThat(deployedJar.exists(),is(true));
   assertThat(deployedJar.isFile(),is(true));
-  classloaders.completeCreation();
-  ClassLoader classloader=classloaders.getClassLoader("buildbreaker");
-  assertNotNull(classloader);
-  assertNotNull(classloader.loadClass("org.sonar.plugins.buildbreaker.BuildBreakerPlugin"));
 }

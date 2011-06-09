@@ -1,0 +1,15 @@
+{
+  ArtifactDownloader.RemotePluginLocation checkstyleLocation=ArtifactDownloader.RemotePluginLocation.create("checkstyle");
+  ArtifactDownloader.RemotePluginLocation checkstyleExtLocation=ArtifactDownloader.RemotePluginLocation.create("checkstyleextensions");
+  ArtifactDownloader downloader=mock(ArtifactDownloader.class);
+  when(downloader.downloadPlugin(eq(checkstyleLocation))).thenReturn(copyFile("sonar-checkstyle-plugin-2.8.jar"));
+  when(downloader.downloadPlugin(eq(checkstyleExtLocation))).thenReturn(copyFile("sonar-checkstyle-extensions-plugin-0.1-SNAPSHOT.jar"));
+  repository=new BatchPluginRepository(downloader,new PropertiesConfiguration());
+  repository.doStart(Arrays.asList(checkstyleLocation,checkstyleExtLocation));
+  assertThat(repository.getPlugins().size(),Matchers.is(2));
+  assertThat(repository.getPlugin("checkstyle"),not(nullValue()));
+  assertThat(repository.getPlugin("checkstyleextensions"),not(nullValue()));
+  assertThat(repository.getMetadata().size(),Matchers.is(2));
+  assertThat(repository.getMetadata("checkstyle").getName(),Matchers.is("Checkstyle"));
+  assertThat(repository.getMetadata("checkstyleextensions").getVersion(),Matchers.is("0.1-SNAPSHOT"));
+}

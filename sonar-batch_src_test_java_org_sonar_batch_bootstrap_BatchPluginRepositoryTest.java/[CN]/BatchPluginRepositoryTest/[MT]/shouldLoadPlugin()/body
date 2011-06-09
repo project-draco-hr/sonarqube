@@ -1,13 +1,11 @@
 {
-  ArtifactDownloader extensionDownloader=mock(ArtifactDownloader.class);
-  when(extensionDownloader.downloadExtension(any(JpaPluginFile.class))).thenReturn(FileUtils.toFile(getClass().getResource("/org/sonar/batch/bootstrap/BatchPluginRepositoryTest/sonar-artifact-size-plugin-0.2.jar")));
-  BatchPluginRepository repository=new BatchPluginRepository(null,extensionDownloader,new PropertiesConfiguration());
-  JpaPlugin plugin=new JpaPlugin("artifactsize");
-  plugin.setPluginClass("org.sonar.plugins.artifactsize.ArtifactSizePlugin");
-  plugin.createFile("sonar-artifact-size-plugin-0.2.jar");
-  repository.doStart(Arrays.asList(plugin));
-  Plugin entryPoint=repository.getPlugin("artifactsize");
-  assertThat(entryPoint,not(nullValue()));
-  ClassRealm classloader=(ClassRealm)entryPoint.getClass().getClassLoader();
-  assertThat(classloader.getId(),is("artifactsize"));
+  ArtifactDownloader.RemotePluginLocation checkstyleLocation=ArtifactDownloader.RemotePluginLocation.create("checkstyle");
+  ArtifactDownloader downloader=mock(ArtifactDownloader.class);
+  when(downloader.downloadPlugin(eq(checkstyleLocation))).thenReturn(copyFile("sonar-checkstyle-plugin-2.8.jar"));
+  repository=new BatchPluginRepository(downloader,new PropertiesConfiguration());
+  repository.doStart(Arrays.asList(checkstyleLocation));
+  assertThat(repository.getPlugins().size(),Matchers.is(1));
+  assertThat(repository.getPlugin("checkstyle"),not(nullValue()));
+  assertThat(repository.getMetadata().size(),Matchers.is(1));
+  assertThat(repository.getMetadata("checkstyle").getName(),Matchers.is("Checkstyle"));
 }

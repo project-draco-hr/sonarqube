@@ -1,0 +1,15 @@
+{
+  String url=baseUrl + "/deploy/plugins/index.txt";
+  try {
+    String indexContent=httpDownloader.downloadPlainText(new URI(url),"UTF-8");
+    String[] rows=StringUtils.split(indexContent,CharUtils.LF);
+    List<RemotePluginLocation> remoteLocations=Lists.newArrayList();
+    for (    String row : rows) {
+      remoteLocations.add(RemotePluginLocation.createFromRow(row));
+    }
+    return remoteLocations;
+  }
+ catch (  Exception e) {
+    throw new SonarException("Fail to download plugins index: " + url,e);
+  }
+}

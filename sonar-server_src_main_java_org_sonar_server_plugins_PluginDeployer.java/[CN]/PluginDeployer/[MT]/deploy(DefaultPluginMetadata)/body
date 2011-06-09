@@ -1,0 +1,16 @@
+{
+  try {
+    LOG.debug("Deploy plugin " + plugin);
+    File pluginDeployDir=new File(fileSystem.getDeployedPluginsDir(),plugin.getKey());
+    FileUtils.forceMkdir(pluginDeployDir);
+    FileUtils.cleanDirectory(pluginDeployDir);
+    List<File> deprecatedExtensions=fileSystem.getExtensions(plugin.getKey());
+    for (    File deprecatedExtension : deprecatedExtensions) {
+      plugin.addDeprecatedExtension(deprecatedExtension);
+    }
+    extractor.install(plugin,pluginDeployDir);
+  }
+ catch (  IOException e) {
+    throw new RuntimeException("Fail to deploy the plugin " + plugin,e);
+  }
+}

@@ -1,18 +1,11 @@
 {
-  setupData("shared");
   deployer.start();
-  List<JpaPlugin> plugins=dao.getPlugins();
-  assertThat(plugins.size(),is(1));
-  JpaPlugin plugin=plugins.get(0);
-  assertThat(plugin.getFiles().size(),is(2));
-  JpaPluginFile pluginFile=plugin.getFiles().get(1);
-  assertThat(pluginFile.getFilename(),is("foo-extension.txt"));
-  assertThat(pluginFile.getPath(),is("foo/foo-extension.txt"));
+  assertThat(deployer.getMetadata().size(),Is.is(1));
+  PluginMetadata plugin=deployer.getMetadata("foo");
+  assertThat(plugin.getDeployedFiles().size(),is(2));
+  File extFile=plugin.getDeployedFiles().get(1);
+  assertThat(extFile.getName(),is("foo-extension.txt"));
   File deployedJar=new File(deployDir,"plugins/foo/foo-extension.txt");
   assertThat(deployedJar.exists(),is(true));
   assertThat(deployedJar.isFile(),is(true));
-  classloaders.completeCreation();
-  ClassLoader classloader=classloaders.getClassLoader("foo");
-  File extensionFile=FileUtils.toFile(classloader.getResource("foo-extension.txt"));
-  assertThat(extensionFile.exists(),is(true));
 }

@@ -1,0 +1,20 @@
+{
+  if (done) {
+    throw new IllegalStateException("Plugin classloaders are already initialized");
+  }
+  try {
+    ClassRealm base=world.getRealm(plugin.getBasePlugin());
+    if (base == null) {
+      LOG.debug("Exclude plugin " + plugin.getKey() + " because base plugin is not installed: "+ plugin.getBasePlugin());
+      return false;
+    }
+    base.createChildRealm(plugin.getKey());
+    for (    File file : plugin.getDeployedFiles()) {
+      base.addURL(file.toURI().toURL());
+    }
+    return true;
+  }
+ catch (  Exception e) {
+    throw new SonarException(e);
+  }
+}
