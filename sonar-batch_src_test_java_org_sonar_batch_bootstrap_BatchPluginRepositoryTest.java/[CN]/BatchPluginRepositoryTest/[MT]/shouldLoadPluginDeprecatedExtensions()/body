@@ -1,12 +1,12 @@
 {
-  RemotePlugin checkstyle=new RemotePlugin("checkstyle",true);
+  RemotePlugin checkstyle=new RemotePlugin("checkstyle",true).addFilename("checkstyle-ext.xml");
   ArtifactDownloader downloader=mock(ArtifactDownloader.class);
-  when(downloader.downloadPlugin(checkstyle)).thenReturn(copyFiles("sonar-checkstyle-plugin-2.8.jar"));
+  when(downloader.downloadPlugin(checkstyle)).thenReturn(copyFiles("sonar-checkstyle-plugin-2.8.jar","checkstyle-ext.xml"));
   repository=new BatchPluginRepository(downloader,new PropertiesConfiguration());
   repository.doStart(Arrays.asList(checkstyle));
   assertThat(repository.getPlugins().size(),Matchers.is(1));
   assertThat(repository.getPlugin("checkstyle"),not(nullValue()));
   assertThat(repository.getMetadata().size(),Matchers.is(1));
   assertThat(repository.getMetadata("checkstyle").getName(),Matchers.is("Checkstyle"));
-  assertThat(repository.getMetadata("checkstyle").getDeployedFiles().size(),Matchers.is(4));
+  assertThat(repository.getMetadata("checkstyle").getDeployedFiles().size(),Matchers.is(5));
 }
