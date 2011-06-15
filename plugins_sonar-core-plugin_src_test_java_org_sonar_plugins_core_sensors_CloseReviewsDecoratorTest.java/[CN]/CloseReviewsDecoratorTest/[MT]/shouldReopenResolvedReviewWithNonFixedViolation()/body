@@ -1,0 +1,16 @@
+{
+  setupData("fixture");
+  CloseReviewsDecorator reviewsDecorator=new CloseReviewsDecorator(null,null);
+  getConnection().createStatement().executeUpdate(reviewsDecorator.generateUpdateToCloseReviewsForFixedViolation(666,222));
+  String sqlRequest=reviewsDecorator.generateUpdateToReopenResolvedReviewsForNonFixedViolation(666);
+  Statement stmt=getConnection().createStatement();
+  int count=stmt.executeUpdate(sqlRequest);
+  assertThat(count,is(1));
+  assertTables("shouldReopenResolvedReviewWithNonFixedViolation",new String[]{"reviews"},new String[]{"updated_at"});
+  try {
+    assertTables("shouldReopenResolvedReviewWithNonFixedViolation",new String[]{"reviews"});
+    fail("'updated_at' columns are identical whereas they should be different.");
+  }
+ catch (  ComparisonFailure e) {
+  }
+}
