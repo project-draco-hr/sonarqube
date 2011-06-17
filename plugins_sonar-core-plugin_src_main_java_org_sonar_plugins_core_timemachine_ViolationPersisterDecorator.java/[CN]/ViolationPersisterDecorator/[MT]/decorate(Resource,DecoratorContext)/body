@@ -1,15 +1,3 @@
 {
-  if (context.getViolations().isEmpty()) {
-    return;
-  }
-  List<Violation> newViolations=context.getViolations();
-  List<RuleFailureModel> pastViolations=pastViolationsLoader.getPastViolations(resource);
-  checksums=getChecksums(pastViolationsLoader.getSource(resource));
-  Map<Violation,RuleFailureModel> violationMap=mapViolations(newViolations,pastViolations);
-  for (  Violation newViolation : newViolations) {
-    String checksum=getChecksumForLine(checksums,newViolation.getLineId());
-    violationPersister.saveViolation(context.getProject(),newViolation,violationMap.get(newViolation),checksum);
-  }
-  violationPersister.commit();
-  checksums.clear();
+  saveViolations(context.getProject(),context.getViolations());
 }
