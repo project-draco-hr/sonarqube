@@ -1,15 +1,10 @@
 {
   String hql="from " + Snapshot.class.getSimpleName() + " where version=:version AND resourceId=:resourceId AND status=:status AND qualifier<>:lib order by createdAt desc";
   List<Snapshot> snapshots=session.createQuery(hql).setParameter("version",version).setParameter("resourceId",projectSnapshot.getResourceId()).setParameter("status",Snapshot.STATUS_PROCESSED).setParameter("lib",Qualifiers.LIBRARY).setMaxResults(1).getResultList();
-  Snapshot snapshot;
-  Date targetDate;
   if (snapshots.isEmpty()) {
-    snapshot=null;
-    targetDate=new Date(projectSnapshot.getCreatedAt().getTime() - 1000 * 60);
+    return new PastSnapshot(MODE);
   }
- else {
-    snapshot=snapshots.get(0);
-    targetDate=snapshot.getCreatedAt();
-  }
+  Snapshot snapshot=snapshots.get(0);
+  Date targetDate=snapshot.getCreatedAt();
   return new PastSnapshot(MODE,targetDate,snapshot).setModeParameter(version);
 }
