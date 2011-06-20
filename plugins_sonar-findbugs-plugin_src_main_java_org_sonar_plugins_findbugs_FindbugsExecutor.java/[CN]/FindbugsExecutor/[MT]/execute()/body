@@ -3,6 +3,7 @@
   ClassLoader initialClassLoader=Thread.currentThread().getContextClassLoader();
   Thread.currentThread().setContextClassLoader(FindBugs2.class.getClassLoader());
   OutputStream xmlOutput=null;
+  ExecutorService executorService=Executors.newSingleThreadExecutor();
   try {
     DetectorFactoryCollection detectorFactory=loadFindbugsPlugins();
     final FindBugs2 engine=new FindBugs2();
@@ -29,7 +30,7 @@
     engine.setDetectorFactoryCollection(detectorFactory);
     engine.setAnalysisFeatureSettings(FindBugs.DEFAULT_EFFORT);
     engine.finishSettings();
-    Executors.newSingleThreadExecutor().submit(new FindbugsTask(engine)).get(configuration.getTimeout(),TimeUnit.MILLISECONDS);
+    executorService.submit(new FindbugsTask(engine)).get(configuration.getTimeout(),TimeUnit.MILLISECONDS);
     profiler.stop();
     resetDetectorFactoryCollection();
     return xmlReport;
@@ -38,6 +39,7 @@
     throw new SonarException("Can not execute Findbugs",e);
   }
  finally {
+    executorService.shutdown();
     IOUtils.closeQuietly(xmlOutput);
     Thread.currentThread().setContextClassLoader(initialClassLoader);
   }
