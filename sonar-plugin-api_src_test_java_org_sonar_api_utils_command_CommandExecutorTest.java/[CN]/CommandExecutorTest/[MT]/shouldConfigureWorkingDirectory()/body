@@ -1,0 +1,10 @@
+{
+  String executable=getScript("echo");
+  File dir=new File("target/tmp/CommandExecutorTest/shouldConfigureWorkingDirectory");
+  FileUtils.forceMkdir(dir);
+  FileUtils.cleanDirectory(dir);
+  int exitCode=CommandExecutor.create().execute(Command.create(executable).setDirectory(dir),1000L);
+  assertThat(exitCode,is(0));
+  File log=new File(dir,"echo.log");
+  assertThat(FileUtils.readFileToString(log),containsString(dir.getCanonicalPath()));
+}
