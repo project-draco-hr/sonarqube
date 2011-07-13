@@ -1,0 +1,29 @@
+{
+  TIME_PROFILER.start("Scheduling " + notification);
+  SetMultimap<Integer,NotificationChannel> recipients=HashMultimap.create();
+  for (  NotificationChannel channel : channels) {
+    for (    NotificationDispatcher dispatcher : dispatchers) {
+      final Set<Integer> possibleRecipients=Sets.newHashSet();
+      NotificationDispatcher.Context context=new NotificationDispatcher.Context(){
+        public void addUser(        Integer userId){
+          possibleRecipients.add(userId);
+        }
+      }
+;
+      dispatcher.dispatch(notification,context);
+      for (      Integer userId : possibleRecipients) {
+        if (isEnabled(userId,channel,dispatcher)) {
+          recipients.put(userId,channel);
+        }
+      }
+    }
+  }
+  for (  Map.Entry<Integer,NotificationChannel> entry : recipients.entries()) {
+    Integer userId=entry.getKey();
+    NotificationChannel channel=entry.getValue();
+    LOG.info("For user {} via {}",userId,channel.getKey());
+    Serializable notificationData=channel.createDataForPersistance(notification,userId);
+    queue.add(notificationData,channel);
+  }
+  TIME_PROFILER.stop();
+}

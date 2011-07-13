@@ -1,0 +1,27 @@
+{
+  String serverUrl="http://nemo.sonarsource.org";
+  String domain="nemo.sonarsource.org";
+  String listId="<sonar." + domain + ">";
+  String from=StringUtils.defaultString(email.getFrom(),FROM_DEFAULT) + " <noreply@" + domain+ ">";
+  String subject=SUBJECT_PREFIX + " " + StringUtils.defaultString(email.getSubject(),SUBJECT_DEFAULT);
+  String permalink=null;
+  StringBuilder sb=new StringBuilder();
+  if (StringUtils.isNotEmpty(email.getMessageId())) {
+    subject="Re: " + subject;
+    String messageId="<" + email.getMessageId() + "@"+ domain+ ">";
+    appendHeader(sb,"Message-Id",messageId);
+    appendHeader(sb,"In-Reply-To",messageId);
+    appendHeader(sb,"References",messageId);
+    permalink=serverUrl + '/' + email.getMessageId();
+  }
+  appendHeader(sb,"List-Id",listId);
+  appendHeader(sb,"List-Archive",serverUrl);
+  appendHeader(sb,"From",from);
+  appendHeader(sb,"To",email.getTo());
+  appendHeader(sb,"Subject",subject);
+  sb.append('\n').append(email.getMessage()).append('\n');
+  if (permalink != null) {
+    sb.append('\n').append("--\n").append("View it in Sonar: ").append(permalink);
+  }
+  return sb.toString();
+}
