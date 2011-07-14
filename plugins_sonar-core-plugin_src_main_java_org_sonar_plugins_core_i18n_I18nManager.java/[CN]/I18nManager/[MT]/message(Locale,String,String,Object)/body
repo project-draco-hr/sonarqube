@@ -1,53 +1,24 @@
 {
-  String result=defaultText;
+  String translatedMessage=defaultText;
   try {
-    String bundleBaseName=keys.get(key);
-    if (bundleBaseName == null) {
-      if (result == null) {
-        throw new MissingResourceException("UNKNOWN KEY : Key '" + key + "' not found in any bundle, and no default value provided. The key is returned.",bundleBaseName,key);
-      }
-      LOG.warn("UNKNOWN KEY : Key '{}' not found in any bundle. Default value '{}' is returned.",key,defaultText);
-      unknownKeys.put(key,defaultText);
+    if (isKeyForRuleDescription(key)) {
+      translatedMessage=findRuleDescription(locale,key,defaultText);
     }
  else {
-      try {
-        ResourceBundle bundle=ResourceBundle.getBundle(bundleBaseName,locale,bundleClassLoader);
-        String value=bundle.getString(key);
-        if ("".equals(value)) {
-          if (result == null) {
-            throw new MissingResourceException("VOID KEY : Key '" + key + "' (from bundle '"+ bundleBaseName+ "') returns a void value.",bundleBaseName,key);
-          }
-          LOG.warn("VOID KEY : Key '{}' (from bundle '{}') returns a void value. Default value '{}' is returned.",new Object[]{key,bundleBaseName,defaultText});
-        }
- else {
-          result=value;
-        }
-      }
- catch (      MissingResourceException e) {
-        if (result == null) {
-          throw e;
-        }
-        LOG.warn("BUNDLE NOT LOADED : Failed loading bundle {} from classloader {}. Default value '{}' is returned.",new Object[]{bundleBaseName,bundleClassLoader,defaultText});
-      }
+      translatedMessage=findStandardMessage(locale,key,defaultText,objects);
     }
   }
  catch (  MissingResourceException e) {
     LOG.warn(e.getMessage());
-    if (result == null) {
+    if (translatedMessage == null) {
       return key;
     }
   }
 catch (  Exception e) {
     LOG.error("Exception when retrieving I18n string: ",e);
-    if (result == null) {
+    if (translatedMessage == null) {
       return key;
     }
   }
-  if (objects.length > 0) {
-    LOG.debug("Translation : {}, {}, {}, {}",new String[]{locale.toString(),key,defaultText,Arrays.deepToString(objects)});
-    return MessageFormat.format(result,objects);
-  }
- else {
-    return result;
-  }
+  return translatedMessage;
 }
