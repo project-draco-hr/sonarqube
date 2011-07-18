@@ -1,4 +1,12 @@
 {
-  EmailMessage email=(EmailMessage)notificationData;
-  LOG.info("Email:\n{}",create(email));
+  if (StringUtils.isBlank(configuration.getSmtpHost())) {
+    LOG.warn("SMTP host was not configured - email will not be sent");
+    return;
+  }
+  try {
+    send((EmailMessage)notificationData);
+  }
+ catch (  EmailException e) {
+    LOG.error("Unable to send email",e);
+  }
 }

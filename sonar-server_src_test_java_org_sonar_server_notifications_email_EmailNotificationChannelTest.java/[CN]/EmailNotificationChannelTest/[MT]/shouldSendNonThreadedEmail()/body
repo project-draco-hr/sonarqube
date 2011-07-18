@@ -1,0 +1,15 @@
+{
+  configure();
+  EmailMessage emailMessage=new EmailMessage().setTo("user@nowhere").setSubject("Foo").setMessage("Bar");
+  channel.deliver(emailMessage);
+  assertThat(server.getReceivedEmailSize(),is(1));
+  SmtpMessage email=(SmtpMessage)server.getReceivedEmail().next();
+  assertThat(email.getHeaderValue("In-Reply-To"),nullValue());
+  assertThat(email.getHeaderValue("References"),nullValue());
+  assertThat(email.getHeaderValue("List-Id"),is("<sonar.nemo.sonarsource.org>"));
+  assertThat(email.getHeaderValue("List-Archive"),is("http://nemo.sonarsource.org"));
+  assertThat(email.getHeaderValue("From"),is("Sonar <server@nowhere>"));
+  assertThat(email.getHeaderValue("To"),is("<user@nowhere>"));
+  assertThat(email.getHeaderValue("Subject"),is("[SONAR] Foo"));
+  assertThat(email.getBody(),is("Bar"));
+}
