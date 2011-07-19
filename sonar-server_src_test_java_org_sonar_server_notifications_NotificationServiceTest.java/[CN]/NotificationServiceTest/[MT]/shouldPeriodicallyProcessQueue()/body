@@ -1,8 +1,12 @@
 {
+  NotificationQueueElement queueElement=mock(NotificationQueueElement.class);
+  Notification notification=mock(Notification.class);
+  when(queueElement.getNotification()).thenReturn(notification);
+  when(manager.getFromQueue()).thenReturn(queueElement).thenReturn(null);
+  doNothing().when(service).deliver(any(Notification.class));
+  service.setPeriod(10);
   service.start();
-  NotificationQueue.Element element=mock(NotificationQueue.Element.class);
-  when(queue.get()).thenReturn(element);
   Thread.sleep(50);
-  verify(service,atLeastOnce()).deliver(element);
   service.stop();
+  verify(service).deliver(notification);
 }

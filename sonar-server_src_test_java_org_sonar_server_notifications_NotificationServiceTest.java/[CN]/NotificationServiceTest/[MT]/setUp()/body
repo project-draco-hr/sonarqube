@@ -1,5 +1,29 @@
 {
-  queue=mock(NotificationQueue.class);
-  service=spy(new NotificationService(queue));
-  service.setPeriod(10);
+  emailChannel=mock(NotificationChannel.class);
+  when(emailChannel.getKey()).thenReturn("email");
+  gtalkChannel=mock(NotificationChannel.class);
+  when(gtalkChannel.getKey()).thenReturn("gtalk");
+  commentOnReviewAssignedToMe=mock(NotificationDispatcher.class);
+  when(commentOnReviewAssignedToMe.getKey()).thenReturn("comment on review assigned to me");
+  doAnswer(new Answer<Object>(){
+    public Object answer(    InvocationOnMock invocation) throws Throwable {
+      ((NotificationDispatcher.Context)invocation.getArguments()[1]).addUser(assignee);
+      return null;
+    }
+  }
+).when(commentOnReviewAssignedToMe).dispatch(any(Notification.class),any(NotificationDispatcher.Context.class));
+  commentOnReviewCreatedByMe=mock(NotificationDispatcher.class);
+  when(commentOnReviewCreatedByMe.getKey()).thenReturn("comment on review created by me");
+  doAnswer(new Answer<Object>(){
+    public Object answer(    InvocationOnMock invocation) throws Throwable {
+      ((NotificationDispatcher.Context)invocation.getArguments()[1]).addUser(creator);
+      return null;
+    }
+  }
+).when(commentOnReviewCreatedByMe).dispatch(any(Notification.class),any(NotificationDispatcher.Context.class));
+  NotificationDispatcher[] dispatchers=new NotificationDispatcher[]{commentOnReviewAssignedToMe,commentOnReviewCreatedByMe};
+  NotificationChannel[] channels=new NotificationChannel[]{emailChannel,gtalkChannel};
+  manager=mock(DefaultNotificationManager.class);
+  service=spy(new NotificationService(manager,dispatchers,channels));
+  doReturn(false).when(service).isEnabled(any(String.class),any(NotificationChannel.class),any(NotificationDispatcher.class));
 }

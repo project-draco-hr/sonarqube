@@ -1,0 +1,30 @@
+{
+  TIME_PROFILER.start("Delivering notification " + notification);
+  SetMultimap<String,NotificationChannel> recipients=HashMultimap.create();
+  for (  NotificationChannel channel : channels) {
+    for (    NotificationDispatcher dispatcher : dispatchers) {
+      final Set<String> possibleRecipients=Sets.newHashSet();
+      NotificationDispatcher.Context context=new NotificationDispatcher.Context(){
+        public void addUser(        String username){
+          if (username != null) {
+            possibleRecipients.add(username);
+          }
+        }
+      }
+;
+      dispatcher.dispatch(notification,context);
+      for (      String username : possibleRecipients) {
+        if (isEnabled(username,channel,dispatcher)) {
+          recipients.put(username,channel);
+        }
+      }
+    }
+  }
+  for (  Map.Entry<String,NotificationChannel> entry : recipients.entries()) {
+    String username=entry.getKey();
+    NotificationChannel channel=entry.getValue();
+    LOG.info("For user {} via {}",username,channel);
+    channel.deliver(notification,username);
+  }
+  TIME_PROFILER.stop();
+}
