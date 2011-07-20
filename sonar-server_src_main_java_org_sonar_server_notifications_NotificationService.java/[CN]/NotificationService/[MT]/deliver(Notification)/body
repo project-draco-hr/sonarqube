@@ -20,11 +20,13 @@
       }
     }
   }
-  for (  Map.Entry<String,NotificationChannel> entry : recipients.entries()) {
+  for (  Map.Entry<String,Collection<NotificationChannel>> entry : recipients.asMap().entrySet()) {
     String username=entry.getKey();
-    NotificationChannel channel=entry.getValue();
-    LOG.info("For user {} via {}",username,channel);
-    channel.deliver(notification,username);
+    Collection<NotificationChannel> channels=entry.getValue();
+    LOG.info("For user {} via {}",username,channels);
+    for (    NotificationChannel channel : channels) {
+      channel.deliver(notification,username);
+    }
   }
   TIME_PROFILER.stop();
 }
