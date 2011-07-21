@@ -1,0 +1,15 @@
+{
+  Notification notification=new Notification("review-changed").setFieldValue("reviewId",author).setFieldValue("author",author).setFieldValue("creator",newValues.get("creator")).setFieldValue("assignee",newValues.get("assignee"));
+  Set<String> fields=Sets.newHashSet();
+  fields.addAll(oldValues.keySet());
+  fields.addAll(newValues.keySet());
+  for (  String field : fields) {
+    String oldValue=oldValues.get(field);
+    String newValue=newValues.get(field);
+    if (!StringUtils.equals(oldValue,newValue)) {
+      notification.setFieldValue("new." + field,newValue);
+      notification.setFieldValue("old." + field,oldValue);
+    }
+  }
+  notificationManager.scheduleForSending(notification);
+}
