@@ -6,12 +6,12 @@
     handleMissingBundle(ruleNameKey,defaultText,bundleBaseName);
   }
  else {
-    Locale localeToUse=defineLocaleToUse(locale);
-    String htmlFilePath=computeHtmlFilePath(bundleBaseName,ruleDescriptionKey,localeToUse);
-    ClassLoader classLoader=bundleClassLoader.getClassLoaderForBundle(bundleBaseName,localeToUse);
-    InputStream stream=classLoader.getResourceAsStream(htmlFilePath);
+    InputStream stream=extractRuleDescription(locale,ruleDescriptionKey,bundleBaseName);
+    if (stream == null && !Locale.ENGLISH.equals(locale)) {
+      stream=extractRuleDescription(Locale.ENGLISH,ruleDescriptionKey,bundleBaseName);
+    }
     if (stream == null) {
-      throw new MissingResourceException("MISSING RULE DESCRIPTION : file '" + htmlFilePath + "' not found in any bundle. Default value is returned.",bundleBaseName,ruleDescriptionKey);
+      throw new MissingResourceException("MISSING RULE DESCRIPTION : HTML file  not found in any bundle. Default value is returned.",bundleBaseName,ruleDescriptionKey);
     }
     translation=IOUtils.toString(stream,"UTF-8");
   }
