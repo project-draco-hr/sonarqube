@@ -1,13 +1,11 @@
 {
   setupData("fixture");
-  CloseReviewsDecorator reviewsDecorator=new CloseReviewsDecorator(null,null);
-  String sqlRequest=reviewsDecorator.generateUpdateToCloseReviewsForFixedViolation(666,222);
-  Statement stmt=getConnection().createStatement();
-  int count=stmt.executeUpdate(sqlRequest);
+  int count=reviewsDecorator.closeReviews(666,222);
   assertThat(count,is(3));
-  assertTables("shouldCloseReviewWithoutCorrespondingViolation",new String[]{"reviews"},new String[]{"updated_at"});
+  verify(notificationManager,times(3)).scheduleForSending(any(Notification.class));
+  checkTables("shouldCloseReviewWithoutCorrespondingViolation",new String[]{"updated_at"},new String[]{"reviews"});
   try {
-    assertTables("shouldCloseReviewWithoutCorrespondingViolation",new String[]{"reviews"});
+    checkTables("shouldCloseReviewWithoutCorrespondingViolation",new String[]{"reviews"});
     fail("'updated_at' columns are identical whereas they should be different.");
   }
  catch (  ComparisonFailure e) {

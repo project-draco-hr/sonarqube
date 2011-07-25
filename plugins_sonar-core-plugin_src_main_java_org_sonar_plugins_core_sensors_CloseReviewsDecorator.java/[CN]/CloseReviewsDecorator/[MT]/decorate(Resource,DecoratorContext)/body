@@ -3,17 +3,10 @@
   if (currentSnapshot != null) {
     int resourceId=currentSnapshot.getResourceId();
     int snapshotId=currentSnapshot.getId();
-    Query query=databaseSession.createNativeQuery(generateUpdateToCloseReviewsForFixedViolation(resourceId,snapshotId));
-    int rowUpdated=query.executeUpdate();
-    LOG.debug("- {} reviews set to 'closed' on resource #{}",rowUpdated,resourceId);
-    query=databaseSession.createNativeQuery(generateUpdateToReopenResolvedReviewsForNonFixedViolation(resourceId));
-    rowUpdated=query.executeUpdate();
-    LOG.debug("- {} reviews set to 'reopened' on resource #{}",rowUpdated,resourceId);
+    closeReviews(resourceId,snapshotId);
+    reopenReviews(resourceId);
     if (ResourceUtils.isRootProject(resource)) {
-      query=databaseSession.createNativeQuery(generateUpdateToCloseReviewsForDeletedResources(resourceId,currentSnapshot.getId()));
-      query.setParameter(1,Boolean.TRUE);
-      rowUpdated=query.executeUpdate();
-      LOG.debug("- {} reviews set to 'closed' on project #{}",rowUpdated,resourceId);
+      closeReviewsForDeletedResources(resourceId,currentSnapshot.getId());
     }
     databaseSession.commit();
   }
