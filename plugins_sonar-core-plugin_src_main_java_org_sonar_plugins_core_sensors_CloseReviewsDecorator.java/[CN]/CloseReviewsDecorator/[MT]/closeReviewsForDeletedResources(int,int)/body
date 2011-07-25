@@ -1,10 +1,10 @@
 {
-  String conditions=" WHERE status!='CLOSED' AND project_id=" + projectId + " AND resource_id IN ( SELECT prev.project_id FROM snapshots prev  WHERE prev.root_project_id="+ projectId+ " AND prev.islast=TRUE AND NOT EXISTS ( SELECT cur.id FROM snapshots cur WHERE cur.root_snapshot_id="+ projectSnapshotId+ " AND cur.created_at > prev.created_at AND cur.root_project_id="+ projectId+ " AND cur.project_id=prev.project_id ) )";
-  List<Review> reviews=databaseSession.getEntityManager().createNativeQuery("SELECT * FROM reviews " + conditions,Review.class).getResultList();
+  String conditions=" WHERE status!='CLOSED' AND project_id=" + projectId + " AND resource_id IN ( SELECT prev.project_id FROM snapshots prev  WHERE prev.root_project_id="+ projectId+ " AND prev.islast=? AND NOT EXISTS ( SELECT cur.id FROM snapshots cur WHERE cur.root_snapshot_id="+ projectSnapshotId+ " AND cur.created_at > prev.created_at AND cur.root_project_id="+ projectId+ " AND cur.project_id=prev.project_id ) )";
+  List<Review> reviews=databaseSession.getEntityManager().createNativeQuery("SELECT * FROM reviews " + conditions,Review.class).setParameter(1,Boolean.TRUE).getResultList();
   for (  Review review : reviews) {
     notifyClosed(review);
   }
-  int rowUpdated=databaseSession.createNativeQuery("UPDATE reviews SET status='CLOSED', updated_at=CURRENT_TIMESTAMP" + conditions).executeUpdate();
+  int rowUpdated=databaseSession.createNativeQuery("UPDATE reviews SET status='CLOSED', updated_at=CURRENT_TIMESTAMP" + conditions).setParameter(1,Boolean.TRUE).executeUpdate();
   LOG.debug("- {} reviews set to 'closed' on project #{}",rowUpdated,projectSnapshotId);
   return rowUpdated;
 }
