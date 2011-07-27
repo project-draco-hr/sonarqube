@@ -1,5 +1,5 @@
 {
-  TIME_PROFILER.start("Delivering notification " + notification);
+  Logs.INFO.debug("Delivering notification " + notification);
   SetMultimap<String,NotificationChannel> recipients=HashMultimap.create();
   for (  NotificationChannel channel : channels) {
     for (    NotificationDispatcher dispatcher : dispatchers) {
@@ -12,7 +12,12 @@
         }
       }
 ;
-      dispatcher.dispatch(notification,context);
+      try {
+        dispatcher.dispatch(notification,context);
+      }
+ catch (      Exception e) {
+        Logs.INFO.warn("Unable to dispatch notification " + notification + " using "+ dispatcher,e);
+      }
       for (      String username : possibleRecipients) {
         if (isEnabled(username,channel,dispatcher)) {
           recipients.put(username,channel);
@@ -23,10 +28,14 @@
   for (  Map.Entry<String,Collection<NotificationChannel>> entry : recipients.asMap().entrySet()) {
     String username=entry.getKey();
     Collection<NotificationChannel> userChannels=entry.getValue();
-    LOG.info("For user {} via {}",username,userChannels);
+    Logs.INFO.debug("For user {} via {}",username,userChannels);
     for (    NotificationChannel channel : userChannels) {
-      channel.deliver(notification,username);
+      try {
+        channel.deliver(notification,username);
+      }
+ catch (      Exception e) {
+        Logs.INFO.warn("Unable to deliver notification " + notification + " for user "+ username+ " via "+ channel,e);
+      }
     }
   }
-  TIME_PROFILER.stop();
 }
