@@ -1,10 +1,12 @@
 {
-  doReturn(true).when(service).isEnabled(USER_SIMON,emailChannel,commentOnReviewAssignedToMe);
-  doReturn(true).when(service).isEnabled(USER_SIMON,emailChannel,commentOnReviewCreatedByMe);
+  doReturn(true).when(manager).isEnabled(USER_SIMON,"email","comment on review assigned to me");
+  doReturn(true).when(manager).isEnabled(USER_SIMON,"email","comment on review created by me");
   Notification notification=mock(Notification.class);
   creator=USER_SIMON;
   assignee=USER_SIMON;
   service.deliver(notification);
+  verify(emailChannel,atLeast(1)).getKey();
+  verify(gtalkChannel,atLeast(1)).getKey();
   verify(emailChannel).deliver(notification,USER_SIMON);
   verifyNoMoreInteractions(emailChannel);
   verifyNoMoreInteractions(gtalkChannel);
