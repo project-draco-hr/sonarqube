@@ -1,0 +1,25 @@
+{
+  ClassLoader classloader=getClassLoaderForProperty(relatedProperty);
+  String result=null;
+  if (classloader != null) {
+    String bundleBase=propertyToBundles.get(relatedProperty);
+    String filePath=bundleBase.replace('.','/');
+    if (locale != Locale.ENGLISH) {
+      filePath+="_" + locale.toString();
+    }
+    filePath+="/" + filename;
+    InputStream input=classloader.getResourceAsStream(filePath);
+    if (input != null) {
+      try {
+        result=IOUtils.toString(input,"UTF-8");
+      }
+ catch (      IOException e) {
+        throw new SonarException("Fail to load file: " + filePath,e);
+      }
+ finally {
+        IOUtils.closeQuietly(input);
+      }
+    }
+  }
+  return result;
+}
