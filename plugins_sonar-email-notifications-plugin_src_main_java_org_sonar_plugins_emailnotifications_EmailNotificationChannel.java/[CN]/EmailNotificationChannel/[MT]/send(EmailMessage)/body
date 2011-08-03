@@ -1,41 +1,48 @@
 {
-  LOG.info("Sending email: {}",emailMessage);
-  String host=null;
+  ClassLoader classloader=Thread.currentThread().getContextClassLoader();
+  Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
   try {
-    host=new URL(configuration.getServerBaseURL()).getHost();
-  }
- catch (  MalformedURLException e) {
-  }
-  SimpleEmail email=new SimpleEmail();
-  if (StringUtils.isNotBlank(host)) {
-    if (StringUtils.isNotEmpty(emailMessage.getMessageId())) {
-      String messageId="<" + emailMessage.getMessageId() + "@"+ host+ ">";
-      email.addHeader(IN_REPLY_TO_HEADER,messageId);
-      email.addHeader(REFERENCES_HEADER,messageId);
+    LOG.info("Sending email: {}",emailMessage);
+    String host=null;
+    try {
+      host=new URL(configuration.getServerBaseURL()).getHost();
     }
-    email.addHeader(LIST_ID_HEADER,"Sonar <sonar." + host + ">");
-    email.addHeader(LIST_ARCHIVE_HEADER,configuration.getServerBaseURL());
-  }
-  email.setFrom(configuration.getFrom(),StringUtils.defaultIfBlank(emailMessage.getFrom(),FROM_NAME_DEFAULT));
-  email.addTo(emailMessage.getTo()," ");
-  String subject=StringUtils.defaultIfBlank(StringUtils.trimToEmpty(configuration.getPrefix()) + " ","") + StringUtils.defaultString(emailMessage.getSubject(),SUBJECT_DEFAULT);
-  email.setSubject(subject);
-  email.setMsg(emailMessage.getMessage());
-  email.setHostName(configuration.getSmtpHost());
-  if (StringUtils.equalsIgnoreCase(configuration.getSecureConnection(),"SSL")) {
-    email.setSSL(true);
-    email.setSslSmtpPort(configuration.getSmtpPort());
-  }
- else   if (StringUtils.isBlank(configuration.getSecureConnection())) {
-    email.setSmtpPort(Integer.parseInt(configuration.getSmtpPort()));
-  }
+ catch (    MalformedURLException e) {
+    }
+    SimpleEmail email=new SimpleEmail();
+    if (StringUtils.isNotBlank(host)) {
+      if (StringUtils.isNotEmpty(emailMessage.getMessageId())) {
+        String messageId="<" + emailMessage.getMessageId() + "@"+ host+ ">";
+        email.addHeader(IN_REPLY_TO_HEADER,messageId);
+        email.addHeader(REFERENCES_HEADER,messageId);
+      }
+      email.addHeader(LIST_ID_HEADER,"Sonar <sonar." + host + ">");
+      email.addHeader(LIST_ARCHIVE_HEADER,configuration.getServerBaseURL());
+    }
+    email.setFrom(configuration.getFrom(),StringUtils.defaultIfBlank(emailMessage.getFrom(),FROM_NAME_DEFAULT));
+    email.addTo(emailMessage.getTo()," ");
+    String subject=StringUtils.defaultIfBlank(StringUtils.trimToEmpty(configuration.getPrefix()) + " ","") + StringUtils.defaultString(emailMessage.getSubject(),SUBJECT_DEFAULT);
+    email.setSubject(subject);
+    email.setMsg(emailMessage.getMessage());
+    email.setHostName(configuration.getSmtpHost());
+    if (StringUtils.equalsIgnoreCase(configuration.getSecureConnection(),"SSL")) {
+      email.setSSL(true);
+      email.setSslSmtpPort(configuration.getSmtpPort());
+    }
+ else     if (StringUtils.isBlank(configuration.getSecureConnection())) {
+      email.setSmtpPort(Integer.parseInt(configuration.getSmtpPort()));
+    }
  else {
-    throw new SonarException("Unknown type of SMTP secure connection: " + configuration.getSecureConnection());
+      throw new SonarException("Unknown type of SMTP secure connection: " + configuration.getSecureConnection());
+    }
+    if (StringUtils.isNotBlank(configuration.getSmtpUsername()) || StringUtils.isNotBlank(configuration.getSmtpPassword())) {
+      email.setAuthentication(configuration.getSmtpUsername(),configuration.getSmtpPassword());
+    }
+    email.setSocketConnectionTimeout(SOCKET_TIMEOUT);
+    email.setSocketTimeout(SOCKET_TIMEOUT);
+    email.send();
   }
-  if (StringUtils.isNotBlank(configuration.getSmtpUsername()) || StringUtils.isNotBlank(configuration.getSmtpPassword())) {
-    email.setAuthentication(configuration.getSmtpUsername(),configuration.getSmtpPassword());
+  finally {
+    Thread.currentThread().setContextClassLoader(classloader);
   }
-  email.setSocketConnectionTimeout(SOCKET_TIMEOUT);
-  email.setSocketTimeout(SOCKET_TIMEOUT);
-  email.send();
 }
