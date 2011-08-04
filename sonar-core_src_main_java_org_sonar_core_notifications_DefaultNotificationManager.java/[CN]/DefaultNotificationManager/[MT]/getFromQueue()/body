@@ -1,8 +1,9 @@
 {
   DatabaseSession session=sessionFactory.getSession();
-  String hql="FROM " + NotificationQueueElement.class.getSimpleName() + " ORDER BY createdAt ASC LIMIT 1";
-  List<NotificationQueueElement> notifications=session.createQuery(hql).getResultList();
+  String hql="FROM " + NotificationQueueElement.class.getSimpleName() + " ORDER BY createdAt ASC";
+  List<NotificationQueueElement> notifications=session.createQuery(hql).setMaxResults(1).getResultList();
   if (notifications.isEmpty()) {
+    sessionFactory.clear();
     return null;
   }
   NotificationQueueElement notification=notifications.get(0);

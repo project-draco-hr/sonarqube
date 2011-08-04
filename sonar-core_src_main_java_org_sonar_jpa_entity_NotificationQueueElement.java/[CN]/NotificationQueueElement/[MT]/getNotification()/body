@@ -2,8 +2,9 @@
   if (this.data == null) {
     return null;
   }
+  ByteArrayInputStream byteArrayInputStream=null;
   try {
-    ByteArrayInputStream byteArrayInputStream=new ByteArrayInputStream(this.data);
+    byteArrayInputStream=new ByteArrayInputStream(this.data);
     ObjectInputStream objectInputStream=new ObjectInputStream(byteArrayInputStream);
     Object result=objectInputStream.readObject();
     objectInputStream.close();
@@ -14,5 +15,8 @@
   }
 catch (  ClassNotFoundException e) {
     throw new SonarException(e);
+  }
+ finally {
+    IOUtils.closeQuietly(byteArrayInputStream);
   }
 }
