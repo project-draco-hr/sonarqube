@@ -1,0 +1,22 @@
+{
+  List<ServerKey> keys=Lists.newArrayList();
+  if (StringUtils.isNotBlank(organization)) {
+    try {
+      Enumeration<NetworkInterface> networkInterfaces=NetworkInterface.getNetworkInterfaces();
+      while (networkInterfaces.hasMoreElements()) {
+        NetworkInterface networkInterface=networkInterfaces.nextElement();
+        Enumeration<InetAddress> addresses=networkInterface.getInetAddresses();
+        while (addresses.hasMoreElements()) {
+          ServerKey key=new ServerKey(organization,addresses.nextElement());
+          if (key.isValid()) {
+            keys.add(key);
+          }
+        }
+      }
+    }
+ catch (    SocketException e) {
+      LoggerFactory.getLogger(getClass()).error("Fail to generate server key. Network interfaces can't be browsed.",e);
+    }
+  }
+  return keys;
+}
