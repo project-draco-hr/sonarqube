@@ -1,0 +1,16 @@
+{
+  FileUtils.forceMkdir(indexFile.getParentFile());
+  FileWriter writer=new FileWriter(indexFile,false);
+  try {
+    for (    PluginMetadata metadata : repository.getMetadata()) {
+      if (!repository.isDisabled(metadata.getKey())) {
+        writer.append(RemotePlugin.create((DefaultPluginMetadata)metadata).marshal());
+        writer.append(CharUtils.LF);
+      }
+    }
+    writer.flush();
+  }
+  finally {
+    IOUtils.closeQuietly(writer);
+  }
+}
