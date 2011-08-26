@@ -1,0 +1,32 @@
+{
+  List<InputFile> inputFiles=project.getFileSystem().mainFiles(project.getLanguageKey());
+  if (inputFiles.isEmpty()) {
+    return;
+  }
+  CloneIndex index=new PackedMemoryCloneIndex();
+  TokenChunker tokenChunker=JavaTokenProducer.build();
+  StatementChunker statementChunker=JavaStatementBuilder.build();
+  BlockChunker blockChunker=new BlockChunker(BLOCK_SIZE);
+  for (  InputFile inputFile : inputFiles) {
+    File file=inputFile.getFile();
+    TokenQueue tokenQueue=tokenChunker.chunk(file);
+    List<Statement> statements=statementChunker.chunk(tokenQueue);
+    Resource resource=getResource(inputFile);
+    List<Block> blocks=blockChunker.chunk(resource.getKey(),statements);
+    for (    Block block : blocks) {
+      index.insert(block);
+    }
+  }
+  for (  InputFile inputFile : inputFiles) {
+    Resource resource=getResource(inputFile);
+    List<Block> fileBlocks=Lists.newArrayList(index.getByResourceId(resource.getKey()));
+    List<CloneGroup> clones=OriginalCloneDetectionAlgorithm.detect(index,fileBlocks);
+    if (!clones.isEmpty()) {
+      DuplicationsData data=new DuplicationsData();
+      for (      CloneGroup clone : clones) {
+        poplulateData(data,clone);
+      }
+      data.save(context,resource);
+    }
+  }
+}
