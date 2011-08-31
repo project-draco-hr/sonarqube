@@ -4,6 +4,13 @@
     return;
   }
   CloneIndex index=new PackedMemoryCloneIndex();
+  if (isCrossProject(project)) {
+    Logs.INFO.info("Enabled cross-project analysis");
+    Snapshot currentSnapshot=resourcePersister.getSnapshot(project);
+    Snapshot lastSnapshot=resourcePersister.getLastSnapshot(currentSnapshot,false);
+    DbCloneIndex db=new DbCloneIndex(dbSession,currentSnapshot.getId(),lastSnapshot == null ? null : lastSnapshot.getId());
+    index=new CombinedCloneIndex(index,db);
+  }
   TokenChunker tokenChunker=JavaTokenProducer.build();
   StatementChunker statementChunker=JavaStatementBuilder.build();
   BlockChunker blockChunker=new BlockChunker(BLOCK_SIZE);
@@ -12,14 +19,14 @@
     TokenQueue tokenQueue=tokenChunker.chunk(file);
     List<Statement> statements=statementChunker.chunk(tokenQueue);
     Resource resource=getResource(inputFile);
-    List<Block> blocks=blockChunker.chunk(resource.getKey(),statements);
+    List<Block> blocks=blockChunker.chunk(getFullKey(project,resource),statements);
     for (    Block block : blocks) {
       index.insert(block);
     }
   }
   for (  InputFile inputFile : inputFiles) {
     Resource resource=getResource(inputFile);
-    List<Block> fileBlocks=Lists.newArrayList(index.getByResourceId(resource.getKey()));
+    List<Block> fileBlocks=Lists.newArrayList(index.getByResourceId(getFullKey(project,resource)));
     List<CloneGroup> clones=OriginalCloneDetectionAlgorithm.detect(index,fileBlocks);
     if (!clones.isEmpty()) {
       DuplicationsData data=new DuplicationsData();
