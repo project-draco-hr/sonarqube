@@ -3,30 +3,30 @@
   if (inputFiles.isEmpty()) {
     return;
   }
-  CloneIndex index=new PackedMemoryCloneIndex();
+  final SonarCloneIndex index;
   if (isCrossProject(project)) {
     Logs.INFO.info("Enabled cross-project analysis");
-    Snapshot currentSnapshot=resourcePersister.getSnapshot(project);
-    Snapshot lastSnapshot=resourcePersister.getLastSnapshot(currentSnapshot,false);
-    DbCloneIndex db=new DbCloneIndex(dbSession,currentSnapshot.getId(),lastSnapshot == null ? null : lastSnapshot.getId());
-    index=new CombinedCloneIndex(index,db);
+    index=new SonarCloneIndex(new DbCloneIndex(dbSession,resourcePersister,project));
+  }
+ else {
+    index=new SonarCloneIndex();
   }
   TokenChunker tokenChunker=JavaTokenProducer.build();
   StatementChunker statementChunker=JavaStatementBuilder.build();
   BlockChunker blockChunker=new BlockChunker(BLOCK_SIZE);
   for (  InputFile inputFile : inputFiles) {
+    Resource resource=getResource(inputFile);
+    String resourceKey=getFullKey(project,resource);
     File file=inputFile.getFile();
     TokenQueue tokenQueue=tokenChunker.chunk(file);
     List<Statement> statements=statementChunker.chunk(tokenQueue);
-    Resource resource=getResource(inputFile);
-    List<Block> blocks=blockChunker.chunk(getFullKey(project,resource),statements);
-    for (    Block block : blocks) {
-      index.insert(block);
-    }
+    List<Block> blocks=blockChunker.chunk(resourceKey,statements);
+    index.insert(resource,blocks);
   }
   for (  InputFile inputFile : inputFiles) {
     Resource resource=getResource(inputFile);
-    List<Block> fileBlocks=Lists.newArrayList(index.getByResourceId(getFullKey(project,resource)));
+    String resourceKey=getFullKey(project,resource);
+    Collection<Block> fileBlocks=index.getByResource(resource,resourceKey);
     List<CloneGroup> clones=OriginalCloneDetectionAlgorithm.detect(index,fileBlocks);
     if (!clones.isEmpty()) {
       DuplicationsData data=new DuplicationsData();
