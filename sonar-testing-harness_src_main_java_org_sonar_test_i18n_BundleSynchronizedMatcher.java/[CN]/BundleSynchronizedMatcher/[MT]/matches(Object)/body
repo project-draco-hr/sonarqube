@@ -1,0 +1,24 @@
+{
+  if (!(arg0 instanceof String)) {
+    return false;
+  }
+  bundleName=(String)arg0;
+  File bundle=getBundleFileFromClasspath(bundleName);
+  String defaultBundleName=extractDefaultBundleName(bundleName);
+  File defaultBundle=null;
+  if (isCoreBundle(defaultBundleName)) {
+    defaultBundle=getBundleFileFromGithub(defaultBundleName);
+  }
+ else {
+    defaultBundle=getBundleFileFromClasspath(defaultBundleName);
+  }
+  try {
+    missingKeys=retrieveMissingKeys(bundle,defaultBundle);
+    nonExistingKeys=retrieveMissingKeys(defaultBundle,bundle);
+    return missingKeys.isEmpty() && nonExistingKeys.isEmpty();
+  }
+ catch (  IOException e) {
+    fail("An error occured while reading the bundles: " + e.getMessage());
+    return false;
+  }
+}
