@@ -1,0 +1,14 @@
+{
+  Token t1=new Token("a",1,1);
+  Token t2=new Token("b",2,1);
+  TokenQueue tokenQueue=spy(new TokenQueue(Arrays.asList(t1,t2)));
+  List<Token> output=mock(List.class);
+  UptoTokenMatcher matcher=new UptoTokenMatcher(new String[]{";"});
+  assertThat(matcher.matchToken(tokenQueue,output),is(false));
+  verify(tokenQueue,times(2)).poll();
+  verify(tokenQueue,times(2)).peek();
+  verifyNoMoreInteractions(tokenQueue);
+  verify(output).add(t1);
+  verify(output).add(t2);
+  verifyNoMoreInteractions(output);
+}

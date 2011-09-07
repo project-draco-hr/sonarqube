@@ -1,0 +1,13 @@
+{
+  Token t1=new Token("(",1,1);
+  TokenQueue tokenQueue=spy(new TokenQueue(Arrays.asList(t1)));
+  List<Token> output=mock(List.class);
+  BridgeTokenMatcher matcher=new BridgeTokenMatcher("(",")");
+  assertThat(matcher.matchToken(tokenQueue,output),is(false));
+  verify(tokenQueue,times(1)).isNextTokenValue("(");
+  verify(tokenQueue,times(1)).poll();
+  verify(tokenQueue,times(2)).peek();
+  verifyNoMoreInteractions(tokenQueue);
+  verify(output).add(t1);
+  verifyNoMoreInteractions(output);
+}

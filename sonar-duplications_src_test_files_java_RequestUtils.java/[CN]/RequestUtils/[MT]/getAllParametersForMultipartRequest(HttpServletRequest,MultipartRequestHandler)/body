@@ -1,0 +1,21 @@
+{
+  Map parameters=new HashMap();
+  Hashtable elements=multipartHandler.getAllElements();
+  Enumeration e=elements.keys();
+  while (e.hasMoreElements()) {
+    String key=(String)e.nextElement();
+    parameters.put(key,elements.get(key));
+  }
+  if (request instanceof MultipartRequestWrapper) {
+    request=(HttpServletRequest)((MultipartRequestWrapper)request).getRequest();
+    e=request.getParameterNames();
+    while (e.hasMoreElements()) {
+      String key=(String)e.nextElement();
+      parameters.put(key,request.getParameterValues(key));
+    }
+  }
+ else {
+    log.debug("Gathering multipart parameters for unwrapped request");
+  }
+  return parameters;
+}

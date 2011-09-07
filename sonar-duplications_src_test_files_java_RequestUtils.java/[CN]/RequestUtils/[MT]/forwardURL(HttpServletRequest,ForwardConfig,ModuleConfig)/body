@@ -1,0 +1,55 @@
+{
+  if (moduleConfig == null) {
+    moduleConfig=ModuleUtils.getInstance().getModuleConfig(request);
+  }
+  String path=forward.getPath();
+  String prefix=moduleConfig.getPrefix();
+  if (forward.getModule() != null) {
+    prefix=forward.getModule();
+    if ("/".equals(prefix)) {
+      prefix="";
+    }
+  }
+  StringBuffer sb=new StringBuffer();
+  String forwardPattern=moduleConfig.getControllerConfig().getForwardPattern();
+  if (forwardPattern == null) {
+    sb.append(prefix);
+    if (!path.startsWith("/")) {
+      sb.append("/");
+    }
+    sb.append(path);
+  }
+ else {
+    boolean dollar=false;
+    for (int i=0; i < forwardPattern.length(); i++) {
+      char ch=forwardPattern.charAt(i);
+      if (dollar) {
+switch (ch) {
+case 'M':
+          sb.append(prefix);
+        break;
+case 'P':
+      if (!path.startsWith("/")) {
+        sb.append("/");
+      }
+    sb.append(path);
+  break;
+case '$':
+sb.append('$');
+break;
+default :
+;
+}
+dollar=false;
+continue;
+}
+ else if (ch == '$') {
+dollar=true;
+}
+ else {
+sb.append(ch);
+}
+}
+}
+return (sb.toString());
+}

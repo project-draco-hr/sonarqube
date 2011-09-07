@@ -1,0 +1,21 @@
+{
+  if (statements.size() < blockSize) {
+    return Collections.emptyList();
+  }
+  Statement[] statementsArr=statements.toArray(new Statement[statements.size()]);
+  List<Block> blocks=Lists.newArrayListWithCapacity(statementsArr.length - blockSize + 1);
+  long hash=0;
+  int first=0;
+  int last=0;
+  for (; last < blockSize - 1; last++) {
+    hash=hash * PRIME_BASE + statementsArr[last].getValue().hashCode();
+  }
+  for (; last < statementsArr.length; last++, first++) {
+    Statement firstStatement=statementsArr[first];
+    Statement lastStatement=statementsArr[last];
+    hash=hash * PRIME_BASE + lastStatement.getValue().hashCode();
+    blocks.add(new Block(resourceId,new ByteArray(hash),first,firstStatement.getStartLine(),lastStatement.getEndLine()));
+    hash-=power * firstStatement.getValue().hashCode();
+  }
+  return blocks;
+}

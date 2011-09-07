@@ -1,0 +1,23 @@
+{
+  ensureSorted();
+  int[] hash=sequenceHash.toIntArray();
+  if (hash.length != hashInts) {
+    throw new IllegalArgumentException("Expected " + hashInts + " ints in hash, but got "+ hash.length);
+  }
+  int offset=size * blockInts;
+  for (int i=0; i < hashInts; i++) {
+    blockData[offset++]=hash[i];
+  }
+  int index=DataUtils.binarySearch(byBlockHash);
+  List<Block> result=Lists.newArrayList();
+  while (index < size && !isLessByHash(size,index)) {
+    String resourceId=resourceIds[index];
+    offset=index * blockInts + hashInts;
+    int indexInFile=blockData[offset++];
+    int firstLineNumber=blockData[offset++];
+    int lastLineNumber=blockData[offset];
+    result.add(new Block(resourceId,sequenceHash,indexInFile,firstLineNumber,lastLineNumber));
+    index++;
+  }
+  return result;
+}

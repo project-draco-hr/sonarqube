@@ -1,0 +1,12 @@
+{
+  TokenChannel channel=new TokenChannel("ABC","normalized");
+  TokenQueue output=mock(TokenQueue.class);
+  CodeReader codeReader=new CodeReader("ABCD");
+  assertThat(channel.consume(codeReader,output),is(true));
+  ArgumentCaptor<Token> token=ArgumentCaptor.forClass(Token.class);
+  verify(output).add(token.capture());
+  assertThat(token.getValue(),is(new Token("normalized",1,0)));
+  verifyNoMoreInteractions(output);
+  assertThat(codeReader.getLinePosition(),is(1));
+  assertThat(codeReader.getColumnPosition(),is(3));
+}

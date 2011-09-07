@@ -1,0 +1,12 @@
+{
+  TokenChannel channel=new TokenChannel("AB\nC");
+  TokenQueue output=mock(TokenQueue.class);
+  CodeReader codeReader=new CodeReader("AB\nCD");
+  assertThat(channel.consume(codeReader,output),is(true));
+  ArgumentCaptor<Token> token=ArgumentCaptor.forClass(Token.class);
+  verify(output).add(token.capture());
+  assertThat(token.getValue(),is(new Token("AB\nC",1,0)));
+  verifyNoMoreInteractions(output);
+  assertThat(codeReader.getLinePosition(),is(2));
+  assertThat(codeReader.getColumnPosition(),is(1));
+}

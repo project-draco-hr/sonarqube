@@ -1,0 +1,21 @@
+{
+  List<Block[]> pairs=beginGroup.pairs(endGroup,cloneLength);
+  ClonePart origin=null;
+  List<ClonePart> parts=Lists.newArrayList();
+  for (int i=0; i < pairs.size(); i++) {
+    Block[] pair=pairs.get(i);
+    ClonePart part=new ClonePart(pair[0].getResourceId(),pair[0].getIndexInFile(),pair[0].getFirstLineNumber(),pair[1].getLastLineNumber());
+    parts.add(part);
+    if (originResourceId.equals(part.getResourceId())) {
+      if (origin == null) {
+        origin=part;
+      }
+ else {
+        if (part.getUnitStart() < origin.getUnitStart()) {
+          origin=part;
+        }
+      }
+    }
+  }
+  filter.add(new CloneGroup(cloneLength,origin,parts));
+}

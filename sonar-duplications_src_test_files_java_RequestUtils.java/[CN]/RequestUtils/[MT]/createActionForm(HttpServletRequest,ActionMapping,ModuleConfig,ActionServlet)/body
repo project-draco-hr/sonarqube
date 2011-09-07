@@ -1,0 +1,17 @@
+{
+  String attribute=mapping.getAttribute();
+  if (attribute == null) {
+    return (null);
+  }
+  String name=mapping.getName();
+  FormBeanConfig config=moduleConfig.findFormBeanConfig(name);
+  if (config == null) {
+    log.warn("No FormBeanConfig found under '" + name + "'");
+    return (null);
+  }
+  ActionForm instance=lookupActionForm(request,attribute,mapping.getScope());
+  if ((instance != null) && config.canReuse(instance)) {
+    return (instance);
+  }
+  return createActionForm(config,servlet);
+}

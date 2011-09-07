@@ -1,0 +1,23 @@
+{
+  originResourceId=fileBlocks.iterator().next().getResourceId();
+  BlocksGroup[] sameHashBlocksGroups=createGroups(fileBlocks);
+  for (int i=1; i < sameHashBlocksGroups.length; i++) {
+    if (sameHashBlocksGroups[i].size() < 2 || sameHashBlocksGroups[i].subsumedBy(sameHashBlocksGroups[i - 1],1)) {
+      continue;
+    }
+    BlocksGroup currentBlocksGroup=sameHashBlocksGroups[i];
+    for (int j=i + 1; j < sameHashBlocksGroups.length; j++) {
+      BlocksGroup intersectedBlocksGroup=currentBlocksGroup.intersect(sameHashBlocksGroups[j]);
+      if (intersectedBlocksGroup.size() < currentBlocksGroup.size()) {
+        Block first=currentBlocksGroup.first(originResourceId);
+        if (first.getIndexInFile() == j - 2) {
+          reportClones(sameHashBlocksGroups[i],currentBlocksGroup,j - i);
+        }
+      }
+      currentBlocksGroup=intersectedBlocksGroup;
+      if (currentBlocksGroup.size() < 2 || currentBlocksGroup.subsumedBy(sameHashBlocksGroups[i - 1],j - i + 1)) {
+        break;
+      }
+    }
+  }
+}

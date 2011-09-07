@@ -1,0 +1,76 @@
+{
+  HashMap properties=new HashMap();
+  Enumeration names=null;
+  Map multipartParameters=null;
+  String contentType=request.getContentType();
+  String method=request.getMethod();
+  boolean isMultipart=false;
+  if (bean instanceof ActionForm) {
+    ((ActionForm)bean).setMultipartRequestHandler(null);
+  }
+  MultipartRequestHandler multipartHandler=null;
+  if ((contentType != null) && (contentType.startsWith("multipart/form-data")) && (method.equalsIgnoreCase("POST"))) {
+    ActionServletWrapper servlet;
+    if (bean instanceof ActionForm) {
+      servlet=((ActionForm)bean).getServletWrapper();
+    }
+ else {
+      throw new ServletException("bean that's supposed to be " + "populated from a multipart request is not of type " + "\"org.apache.struts.action.ActionForm\", but type "+ "\"" + bean.getClass().getName() + "\"");
+    }
+    multipartHandler=getMultipartHandler(request);
+    if (multipartHandler != null) {
+      isMultipart=true;
+      servlet.setServletFor(multipartHandler);
+      multipartHandler.setMapping((ActionMapping)request.getAttribute(Globals.MAPPING_KEY));
+      multipartHandler.handleRequest(request);
+      Boolean maxLengthExceeded=(Boolean)request.getAttribute(MultipartRequestHandler.ATTRIBUTE_MAX_LENGTH_EXCEEDED);
+      if ((maxLengthExceeded != null) && (maxLengthExceeded.booleanValue())) {
+        ((ActionForm)bean).setMultipartRequestHandler(multipartHandler);
+        return;
+      }
+      multipartParameters=getAllParametersForMultipartRequest(request,multipartHandler);
+      names=Collections.enumeration(multipartParameters.keySet());
+    }
+  }
+  if (!isMultipart) {
+    names=request.getParameterNames();
+  }
+  while (names.hasMoreElements()) {
+    String name=(String)names.nextElement();
+    String stripped=name;
+    if (prefix != null) {
+      if (!stripped.startsWith(prefix)) {
+        continue;
+      }
+      stripped=stripped.substring(prefix.length());
+    }
+    if (suffix != null) {
+      if (!stripped.endsWith(suffix)) {
+        continue;
+      }
+      stripped=stripped.substring(0,stripped.length() - suffix.length());
+    }
+    Object parameterValue=null;
+    if (isMultipart) {
+      parameterValue=multipartParameters.get(name);
+      parameterValue=rationalizeMultipleFileProperty(bean,name,parameterValue);
+    }
+ else {
+      parameterValue=request.getParameterValues(name);
+    }
+    if (!(stripped.startsWith("org.apache.struts."))) {
+      properties.put(stripped,parameterValue);
+    }
+  }
+  try {
+    BeanUtils.populate(bean,properties);
+  }
+ catch (  Exception e) {
+    throw new ServletException("BeanUtils.populate",e);
+  }
+ finally {
+    if (multipartHandler != null) {
+      ((ActionForm)bean).setMultipartRequestHandler(multipartHandler);
+    }
+  }
+}

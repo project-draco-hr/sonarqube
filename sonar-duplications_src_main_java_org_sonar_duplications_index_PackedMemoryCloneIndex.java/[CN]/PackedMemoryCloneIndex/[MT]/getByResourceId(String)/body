@@ -1,0 +1,22 @@
+{
+  ensureSorted();
+  resourceIds[size]=resourceId;
+  resourceIdsIndex[size]=size;
+  int index=DataUtils.binarySearch(byResourceId);
+  List<Block> result=Lists.newArrayList();
+  int realIndex=resourceIdsIndex[index];
+  while (index < size && FastStringComparator.INSTANCE.compare(resourceIds[realIndex],resourceId) == 0) {
+    int offset=realIndex * blockInts;
+    int[] hash=new int[hashInts];
+    for (int j=0; j < hashInts; j++) {
+      hash[j]=blockData[offset++];
+    }
+    int indexInFile=blockData[offset++];
+    int firstLineNumber=blockData[offset++];
+    int lastLineNumber=blockData[offset];
+    result.add(new Block(resourceId,new ByteArray(hash),indexInFile,firstLineNumber,lastLineNumber));
+    index++;
+    realIndex=resourceIdsIndex[index];
+  }
+  return result;
+}

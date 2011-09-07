@@ -1,0 +1,27 @@
+{
+  CloneIndex cloneIndex=createIndex(blocksForResource("b").withHashes("3","4","5","6"),blocksForResource("c").withHashes("5","6","7"));
+  List<Block> fileBlocks=blocksForResource("a").withHashes("1","2","3","4","5","6","7","8","9");
+  List<CloneGroup> clones=OriginalCloneDetectionAlgorithm.detect(cloneIndex,fileBlocks);
+  print(clones);
+  assertThat(clones.size(),is(3));
+  Iterator<CloneGroup> clonesIterator=clones.iterator();
+  CloneGroup clone=clonesIterator.next();
+  assertThat(clone.getCloneUnitLength(),is(4));
+  assertThat(clone.getCloneParts().size(),is(2));
+  assertThat(clone.getOriginPart(),is(newClonePart("a",2,4)));
+  assertThat(clone.getCloneParts(),hasItem(newClonePart("a",2,4)));
+  assertThat(clone.getCloneParts(),hasItem(newClonePart("b",0,4)));
+  clone=clonesIterator.next();
+  assertThat(clone.getCloneUnitLength(),is(2));
+  assertThat(clone.getCloneParts().size(),is(3));
+  assertThat(clone.getOriginPart(),is(newClonePart("a",4,2)));
+  assertThat(clone.getCloneParts(),hasItem(newClonePart("a",4,2)));
+  assertThat(clone.getCloneParts(),hasItem(newClonePart("b",2,2)));
+  assertThat(clone.getCloneParts(),hasItem(newClonePart("c",0,2)));
+  clone=clonesIterator.next();
+  assertThat(clone.getCloneUnitLength(),is(3));
+  assertThat(clone.getCloneParts().size(),is(2));
+  assertThat(clone.getOriginPart(),is(newClonePart("a",4,3)));
+  assertThat(clone.getCloneParts(),hasItem(newClonePart("a",4,3)));
+  assertThat(clone.getCloneParts(),hasItem(newClonePart("c",0,3)));
+}

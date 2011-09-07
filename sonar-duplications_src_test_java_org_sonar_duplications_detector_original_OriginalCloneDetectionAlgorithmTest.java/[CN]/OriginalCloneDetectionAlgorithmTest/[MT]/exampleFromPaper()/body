@@ -1,0 +1,21 @@
+{
+  CloneIndex cloneIndex=createIndex(blocksForResource("y").withHashes("2","3","4","5"),blocksForResource("z").withHashes("3","4"));
+  List<Block> fileBlocks=blocksForResource("x").withHashes("1","2","3","4","5","6");
+  List<CloneGroup> clones=OriginalCloneDetectionAlgorithm.detect(cloneIndex,fileBlocks);
+  print(clones);
+  assertThat(clones.size(),is(2));
+  Iterator<CloneGroup> clonesIterator=clones.iterator();
+  CloneGroup clone=clonesIterator.next();
+  assertThat(clone.getCloneUnitLength(),is(4));
+  assertThat(clone.getCloneParts().size(),is(2));
+  assertThat(clone.getOriginPart(),is(newClonePart("x",1,4)));
+  assertThat(clone.getCloneParts(),hasItem(newClonePart("x",1,4)));
+  assertThat(clone.getCloneParts(),hasItem(newClonePart("y",0,4)));
+  clone=clonesIterator.next();
+  assertThat(clone.getCloneUnitLength(),is(2));
+  assertThat(clone.getCloneParts().size(),is(3));
+  assertThat(clone.getOriginPart(),is(newClonePart("x",2,2)));
+  assertThat(clone.getCloneParts(),hasItem(newClonePart("x",2,2)));
+  assertThat(clone.getCloneParts(),hasItem(newClonePart("y",1,2)));
+  assertThat(clone.getCloneParts(),hasItem(newClonePart("z",0,2)));
+}

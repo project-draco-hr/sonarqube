@@ -1,0 +1,13 @@
+{
+  TokenQueue tokenQueue=mock(TokenQueue.class);
+  TokenMatcher matcher=mock(TokenMatcher.class);
+  List<Statement> output=mock(List.class);
+  StatementChannel channel=StatementChannel.create(matcher);
+  assertThat(channel.consume(tokenQueue,output),is(false));
+  ArgumentCaptor<List> matchedTokenList=ArgumentCaptor.forClass(List.class);
+  verify(matcher).matchToken(Mockito.eq(tokenQueue),matchedTokenList.capture());
+  verifyNoMoreInteractions(matcher);
+  verify(tokenQueue).pushForward(matchedTokenList.getValue());
+  verifyNoMoreInteractions(tokenQueue);
+  verifyNoMoreInteractions(output);
+}

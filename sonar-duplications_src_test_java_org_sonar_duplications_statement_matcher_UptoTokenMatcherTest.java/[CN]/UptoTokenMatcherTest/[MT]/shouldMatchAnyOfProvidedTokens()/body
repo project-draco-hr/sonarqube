@@ -1,0 +1,19 @@
+{
+  Token t1=new Token("a",1,1);
+  Token t2=new Token("{",2,1);
+  Token t3=new Token("b",3,1);
+  Token t4=new Token("}",4,1);
+  TokenQueue tokenQueue=spy(new TokenQueue(Arrays.asList(t1,t2,t3,t4)));
+  List<Token> output=mock(List.class);
+  UptoTokenMatcher matcher=new UptoTokenMatcher(new String[]{"{","}"});
+  assertThat(matcher.matchToken(tokenQueue,output),is(true));
+  assertThat(matcher.matchToken(tokenQueue,output),is(true));
+  verify(tokenQueue,times(4)).poll();
+  verify(tokenQueue,times(2)).peek();
+  verifyNoMoreInteractions(tokenQueue);
+  verify(output).add(t1);
+  verify(output).add(t2);
+  verify(output).add(t3);
+  verify(output).add(t4);
+  verifyNoMoreInteractions(output);
+}

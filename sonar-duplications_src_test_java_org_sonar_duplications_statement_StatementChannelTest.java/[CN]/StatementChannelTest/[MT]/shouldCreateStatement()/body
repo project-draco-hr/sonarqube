@@ -1,0 +1,16 @@
+{
+  Token token=new Token("a",1,1);
+  TokenQueue tokenQueue=spy(new TokenQueue(Arrays.asList(token)));
+  TokenMatcher matcher=spy(new AnyTokenMatcher());
+  StatementChannel channel=StatementChannel.create(matcher);
+  List<Statement> output=mock(List.class);
+  assertThat(channel.consume(tokenQueue,output),is(true));
+  verify(matcher).matchToken(Mockito.eq(tokenQueue),Mockito.anyList());
+  verifyNoMoreInteractions(matcher);
+  ArgumentCaptor<Statement> statement=ArgumentCaptor.forClass(Statement.class);
+  verify(output).add(statement.capture());
+  assertThat(statement.getValue().getValue(),is("a"));
+  assertThat(statement.getValue().getStartLine(),is(1));
+  assertThat(statement.getValue().getEndLine(),is(1));
+  verifyNoMoreInteractions(output);
+}

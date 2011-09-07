@@ -1,0 +1,17 @@
+{
+  Token nextToken=tokenQueue.peek();
+  while (nextToken != null) {
+    boolean channelConsumed=false;
+    for (    StatementChannel channel : channels) {
+      if (channel.consume(tokenQueue,statements)) {
+        channelConsumed=true;
+        break;
+      }
+    }
+    if (!channelConsumed) {
+      throw new IllegalStateException("None of the statement channel has been able to consume token: " + nextToken);
+    }
+    nextToken=tokenQueue.peek();
+  }
+  return true;
+}
