@@ -1,0 +1,28 @@
+{
+  int resourceSnapshotId=getSnapshotIdFor(resource);
+  String sql="SELECT to_blocks.hash, resource.kee, to_blocks.index_in_file, to_blocks.start_line, to_blocks.end_line" + " FROM duplications_index to_blocks, duplications_index from_blocks, snapshots snapshot, projects resource" + " WHERE from_blocks.snapshot_id = :resource_snapshot_id"+ " AND to_blocks.hash = from_blocks.hash"+ " AND to_blocks.snapshot_id = snapshot.id"+ " AND snapshot.islast = :is_last"+ " AND snapshot.project_id = resource.id";
+  if (lastSnapshotId != null) {
+    sql+=" AND to_blocks.project_snapshot_id != :last_project_snapshot_id";
+  }
+  Query query=session.getEntityManager().createNativeQuery(sql).setParameter("resource_snapshot_id",resourceSnapshotId).setParameter("is_last",Boolean.TRUE);
+  if (lastSnapshotId != null) {
+    query.setParameter("last_project_snapshot_id",lastSnapshotId);
+  }
+  ((HibernateQuery)query).getHibernateQuery().setResultTransformer(Transformers.TO_LIST);
+  List<List<Object>> blocks=query.getResultList();
+  cache.clear();
+  for (  List<Object> dbBlock : blocks) {
+    String hash=(String)dbBlock.get(0);
+    String resourceKey=(String)dbBlock.get(1);
+    int indexInFile=(Integer)dbBlock.get(2);
+    int startLine=(Integer)dbBlock.get(3);
+    int endLine=(Integer)dbBlock.get(4);
+    Block block=new Block(resourceKey,new ByteArray(hash),indexInFile,startLine,endLine);
+    Collection<Block> sameHash=cache.get(block.getBlockHash());
+    if (sameHash == null) {
+      sameHash=Lists.newArrayList();
+      cache.put(block.getBlockHash(),sameHash);
+    }
+    sameHash.add(block);
+  }
+}
