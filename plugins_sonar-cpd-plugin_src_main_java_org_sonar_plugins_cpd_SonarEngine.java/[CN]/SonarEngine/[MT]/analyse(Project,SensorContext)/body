@@ -18,9 +18,18 @@
   for (  InputFile inputFile : inputFiles) {
     Resource resource=getResource(inputFile);
     String resourceKey=getFullKey(project,resource);
-    File file=inputFile.getFile();
-    TokenQueue tokenQueue=tokenChunker.chunk(file);
-    List<Statement> statements=statementChunker.chunk(tokenQueue);
+    List<Statement> statements;
+    Reader reader=null;
+    try {
+      reader=new InputStreamReader(new FileInputStream(inputFile.getFile()),project.getFileSystem().getSourceCharset());
+      statements=statementChunker.chunk(tokenChunker.chunk(reader));
+    }
+ catch (    FileNotFoundException e) {
+      throw new SonarException(e);
+    }
+ finally {
+      IOUtils.closeQuietly(reader);
+    }
     List<Block> blocks=blockChunker.chunk(resourceKey,statements);
     index.insert(resource,blocks);
   }
