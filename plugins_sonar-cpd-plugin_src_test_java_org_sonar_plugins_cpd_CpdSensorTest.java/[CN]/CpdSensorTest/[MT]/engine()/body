@@ -1,7 +1,8 @@
 {
   PropertiesConfiguration conf=new PropertiesConfiguration();
-  conf.setProperty("sonar.cpd.skip","true");
   Project project=createJavaProject().setConfiguration(conf);
   CpdSensor sensor=new CpdSensor(new SonarEngine(),new PmdEngine(new CpdMapping[0]));
-  assertTrue(sensor.isSkipped(project));
+  assertThat(sensor.isSonarEngineEnabled(project),is(true));
+  conf.setProperty("sonar.cpd.engine","pmd");
+  assertThat(sensor.isSonarEngineEnabled(project),is(false));
 }
