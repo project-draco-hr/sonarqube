@@ -1,7 +1,9 @@
 {
-  File bundle=new File("target/l10n/download/" + defaultBundleName);
+  File localBundle=new File("target/l10n/download/" + defaultBundleName);
   try {
-    saveUrl(remote_file_path + defaultBundleName,bundle);
+    String sonarVersion=getSonarVersionFromBundle();
+    String remoteFile=computeGitHubURL(defaultBundleName,sonarVersion);
+    saveUrlToLocalFile(remoteFile,localBundle);
   }
  catch (  MalformedURLException e) {
     fail("Could not download the original core bundle at: " + remote_file_path + defaultBundleName);
@@ -9,7 +11,7 @@
 catch (  IOException e) {
     fail("Could not download the original core bundle at: " + remote_file_path + defaultBundleName);
   }
-  assertThat("File 'target/tmp/" + defaultBundleName + "' has been downloaded but does not exist.",bundle,notNullValue());
-  assertThat("File 'target/tmp/" + defaultBundleName + "' has been downloaded but does not exist.",bundle.exists(),is(true));
-  return bundle;
+  assertThat("File 'target/tmp/" + defaultBundleName + "' has been downloaded but does not exist.",localBundle,notNullValue());
+  assertThat("File 'target/tmp/" + defaultBundleName + "' has been downloaded but does not exist.",localBundle.exists(),is(true));
+  return localBundle;
 }
