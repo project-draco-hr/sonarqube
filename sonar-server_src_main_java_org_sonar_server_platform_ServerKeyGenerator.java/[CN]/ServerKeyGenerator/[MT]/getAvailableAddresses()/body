@@ -1,4 +1,5 @@
 {
+  List<InetAddress> result=Lists.newArrayList();
   try {
     Enumeration<NetworkInterface> networkInterfaces=NetworkInterface.getNetworkInterfaces();
     while (networkInterfaces.hasMoreElements()) {
@@ -6,14 +7,14 @@
       Enumeration<InetAddress> addresses=networkInterface.getInetAddresses();
       while (addresses.hasMoreElements()) {
         InetAddress ownedAddress=addresses.nextElement();
-        if (ownedAddress.equals(address)) {
-          return true;
+        if (isFixed(ownedAddress)) {
+          result.add(ownedAddress);
         }
       }
     }
   }
  catch (  SocketException e) {
-    LoggerFactory.getLogger(ServerKeyGenerator.class).error("Fail to verify server key. Network interfaces can't be browsed.",e);
+    LoggerFactory.getLogger(ServerKeyGenerator.class).error("Fail to browse network interfaces",e);
   }
-  return false;
+  return result;
 }
