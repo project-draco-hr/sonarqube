@@ -1,0 +1,20 @@
+{
+  List<InetAddress> result=Lists.newArrayList();
+  try {
+    Enumeration<NetworkInterface> networkInterfaces=NetworkInterface.getNetworkInterfaces();
+    while (networkInterfaces.hasMoreElements()) {
+      NetworkInterface networkInterface=networkInterfaces.nextElement();
+      Enumeration<InetAddress> addresses=networkInterface.getInetAddresses();
+      while (addresses.hasMoreElements()) {
+        InetAddress ownedAddress=addresses.nextElement();
+        if (isFixed(ownedAddress)) {
+          result.add(ownedAddress);
+        }
+      }
+    }
+  }
+ catch (  SocketException e) {
+    LoggerFactory.getLogger(ServerIdGenerator.class).error("Fail to browse network interfaces",e);
+  }
+  return result;
+}
