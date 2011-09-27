@@ -33,17 +33,37 @@
     List<Block> blocks=blockChunker.chunk(resourceKey,statements);
     index.insert(resource,blocks);
   }
-  for (  InputFile inputFile : inputFiles) {
-    Resource resource=getResource(inputFile);
-    String resourceKey=getFullKey(project,resource);
-    Collection<Block> fileBlocks=index.getByResource(resource,resourceKey);
-    List<CloneGroup> clones=OriginalCloneDetectionAlgorithm.detect(index,fileBlocks);
-    if (!clones.isEmpty()) {
-      DuplicationsData data=new DuplicationsData(resource,context);
-      for (      CloneGroup clone : clones) {
-        poplulateData(data,clone);
+  ExecutorService executorService=Executors.newSingleThreadExecutor();
+  try {
+    for (    InputFile inputFile : inputFiles) {
+      Logs.INFO.debug("Detection of duplications for {}",inputFile.getFile());
+      Resource resource=getResource(inputFile);
+      String resourceKey=getFullKey(project,resource);
+      Collection<Block> fileBlocks=index.getByResource(resource,resourceKey);
+      List<CloneGroup> clones;
+      try {
+        clones=executorService.submit(new Task(index,fileBlocks)).get(TIMEOUT,TimeUnit.SECONDS);
       }
-      data.save();
+ catch (      TimeoutException e) {
+        clones=null;
+        Logs.INFO.warn("Timeout during detection of duplications for " + inputFile.getFile(),e);
+      }
+catch (      InterruptedException e) {
+        throw new SonarException(e);
+      }
+catch (      ExecutionException e) {
+        throw new SonarException(e);
+      }
+      if (clones != null && !clones.isEmpty()) {
+        DuplicationsData data=new DuplicationsData(resource,context);
+        for (        CloneGroup clone : clones) {
+          poplulateData(data,clone);
+        }
+        data.save();
+      }
     }
+  }
+  finally {
+    executorService.shutdown();
   }
 }
