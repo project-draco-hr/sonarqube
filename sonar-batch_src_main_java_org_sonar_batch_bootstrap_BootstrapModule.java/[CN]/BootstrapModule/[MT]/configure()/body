@@ -1,24 +1,26 @@
 {
-  addComponent(reactor);
-  addComponent(configuration);
-  addComponent(DryRun.class);
-  addComponent(ServerMetadata.class);
-  addComponent(TempDirectories.class);
-  addComponent(HttpDownloader.class);
-  addComponent(ArtifactDownloader.class);
-  addComponent(JdbcDriverHolder.class);
-  URLClassLoader bootstrapClassLoader=getComponent(JdbcDriverHolder.class).getClassLoader();
+  addCoreSingleton(reactor);
+  addCoreSingleton(new PropertiesConfiguration());
+  addCoreSingleton(BatchSettings.class);
+  addCoreSingleton(DryRun.class);
+  addCoreSingleton(ServerMetadata.class);
+  addCoreSingleton(TempDirectories.class);
+  addCoreSingleton(HttpDownloader.class);
+  addCoreSingleton(ArtifactDownloader.class);
+  addCoreSingleton(JdbcDriverHolder.class);
+  URLClassLoader bootstrapClassLoader=getComponentByType(JdbcDriverHolder.class).getClassLoader();
   Thread.currentThread().setContextClassLoader(bootstrapClassLoader);
-  addComponent(new DriverDatabaseConnector(configuration,bootstrapClassLoader));
-  addComponent(ThreadLocalDatabaseSessionFactory.class);
+  addCoreSingleton(new DriverDatabaseConnector(getComponentByType(Settings.class),bootstrapClassLoader));
+  addCoreSingleton(ThreadLocalDatabaseSessionFactory.class);
   addAdapter(new DatabaseSessionProvider());
   for (  Object component : boostrapperComponents) {
-    addComponent(component);
+    addCoreSingleton(component);
   }
   if (!isMavenPluginExecutorRegistered()) {
-    addComponent(FakeMavenPluginExecutor.class);
+    addCoreSingleton(FakeMavenPluginExecutor.class);
   }
-  addComponent(BatchPluginRepository.class);
-  addComponent(BatchExtensionInstaller.class);
-  addComponent(ProjectExtensionInstaller.class);
+  addCoreSingleton(BatchPluginRepository.class);
+  addCoreSingleton(BatchExtensionInstaller.class);
+  addCoreSingleton(ProjectExtensionInstaller.class);
+  addCoreSingleton(BatchSettingsEnhancer.class);
 }

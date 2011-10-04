@@ -1,18 +1,14 @@
 {
-  coreContainer=rootContainer.makeChildContainer();
-  coreContainer.as(Characteristics.CACHE).addComponent(PluginDeployer.class);
-  coreContainer.as(Characteristics.CACHE).addComponent(DefaultServerPluginRepository.class);
-  coreContainer.as(Characteristics.CACHE).addComponent(DefaultServerFileSystem.class);
-  coreContainer.as(Characteristics.CACHE).addComponent(ThreadLocalDatabaseSessionFactory.class);
-  coreContainer.as(Characteristics.CACHE).addComponent(HttpDownloader.class);
-  coreContainer.as(Characteristics.CACHE).addComponent(UpdateCenterClient.class);
-  coreContainer.as(Characteristics.CACHE).addComponent(UpdateCenterMatrixFactory.class);
-  coreContainer.as(Characteristics.CACHE).addComponent(PluginDownloader.class);
-  coreContainer.as(Characteristics.CACHE).addComponent(ServerIdGenerator.class);
-  coreContainer.as(Characteristics.CACHE).addComponent(ServerImpl.class);
-  coreContainer.as(Characteristics.NO_CACHE).addComponent(FilterExecutor.class);
-  coreContainer.as(Characteristics.NO_CACHE).addAdapter(new DatabaseSessionProvider());
-  coreContainer.start();
-  DatabaseConfiguration dbConfiguration=new DatabaseConfiguration(coreContainer.getComponent(DatabaseSessionFactory.class));
-  coreContainer.getComponent(CompositeConfiguration.class).addConfiguration(dbConfiguration);
+  coreContainer=rootContainer.createChild();
+  coreContainer.addSingleton(PluginDeployer.class);
+  coreContainer.addSingleton(DefaultServerPluginRepository.class);
+  coreContainer.addSingleton(ServerExtensionInstaller.class);
+  coreContainer.addSingleton(DefaultServerFileSystem.class);
+  coreContainer.addSingleton(ThreadLocalDatabaseSessionFactory.class);
+  coreContainer.addPicoAdapter(new DatabaseSessionProvider());
+  coreContainer.startComponents();
+  DatabaseSessionFactory sessionFactory=coreContainer.getComponentByType(DatabaseSessionFactory.class);
+  ServerSettings serverSettings=coreContainer.getComponentByType(ServerSettings.class);
+  serverSettings.setSessionFactory(sessionFactory);
+  serverSettings.load();
 }

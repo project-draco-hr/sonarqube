@@ -3,7 +3,7 @@
   when(emailChannel.getKey()).thenReturn("email");
   gtalkChannel=mock(NotificationChannel.class);
   when(gtalkChannel.getKey()).thenReturn("gtalk");
-  commentOnReviewAssignedToMe=mock(NotificationDispatcher.class);
+  NotificationDispatcher commentOnReviewAssignedToMe=mock(NotificationDispatcher.class);
   when(commentOnReviewAssignedToMe.getKey()).thenReturn("comment on review assigned to me");
   doAnswer(new Answer<Object>(){
     public Object answer(    InvocationOnMock invocation) throws Throwable {
@@ -12,7 +12,7 @@
     }
   }
 ).when(commentOnReviewAssignedToMe).dispatch(any(Notification.class),any(NotificationDispatcher.Context.class));
-  commentOnReviewCreatedByMe=mock(NotificationDispatcher.class);
+  NotificationDispatcher commentOnReviewCreatedByMe=mock(NotificationDispatcher.class);
   when(commentOnReviewCreatedByMe.getKey()).thenReturn("comment on review created by me");
   doAnswer(new Answer<Object>(){
     public Object answer(    InvocationOnMock invocation) throws Throwable {
@@ -24,8 +24,8 @@
   NotificationDispatcher[] dispatchers=new NotificationDispatcher[]{commentOnReviewAssignedToMe,commentOnReviewCreatedByMe};
   NotificationChannel[] channels=new NotificationChannel[]{emailChannel,gtalkChannel};
   manager=mock(DefaultNotificationManager.class);
-  Configuration configuration=new BaseConfiguration();
-  configuration.setProperty("sonar.notifications.delay","1");
-  service=spy(new NotificationService(configuration,manager,dispatchers,channels));
+  Settings settings=new Settings(new PropertyDefinitions(NotificationService.class));
+  settings.setProperty("sonar.notifications.delay",1L);
+  service=spy(new NotificationService(settings,manager,dispatchers,channels));
   doReturn(false).when(manager).isEnabled(any(String.class),any(String.class),any(String.class));
 }

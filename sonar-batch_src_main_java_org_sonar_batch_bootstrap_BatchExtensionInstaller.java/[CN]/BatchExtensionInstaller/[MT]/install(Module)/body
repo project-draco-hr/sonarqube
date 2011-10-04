@@ -1,9 +1,25 @@
 {
-  for (  Plugin plugin : pluginRepository.getPlugins()) {
+  ListMultimap<PluginMetadata,Object> installedExtensionsByPlugin=ArrayListMultimap.create();
+  for (  Map.Entry<PluginMetadata,Plugin> entry : pluginRepository.getPluginsByMetadata().entrySet()) {
+    PluginMetadata metadata=entry.getKey();
+    Plugin plugin=entry.getValue();
+    module.addExtension(metadata,plugin);
     for (    Object extension : plugin.getExtensions()) {
-      installExtension(module,extension);
+      if (installExtension(module,metadata,extension)) {
+        installedExtensionsByPlugin.put(metadata,extension);
+      }
+ else {
+        module.declareExtension(metadata,extension);
+      }
     }
   }
-  installExtensionProviders(module);
+  for (  Map.Entry<PluginMetadata,Object> entry : installedExtensionsByPlugin.entries()) {
+    PluginMetadata plugin=entry.getKey();
+    Object extension=entry.getValue();
+    if (isExtensionProvider(extension)) {
+      ExtensionProvider provider=(ExtensionProvider)module.getComponentByKey(extension);
+      installProvider(module,plugin,provider);
+    }
+  }
   installMetrics(module);
 }

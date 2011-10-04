@@ -1,15 +1,10 @@
 {
   BatchPluginRepository pluginRepository=mock(BatchPluginRepository.class);
-  when(pluginRepository.getPlugins()).thenReturn(Arrays.asList((Plugin)new SonarPlugin(){
-    public List getExtensions(){
-      return Arrays.asList(BatchServiceProvider.class,ProjectServiceProvider.class);
-    }
-  }
-));
+  when(pluginRepository.getPluginsByMetadata()).thenReturn(newPlugin(BatchServiceProvider.class,ProjectServiceProvider.class));
   Module module=new FakeModule().init();
   BatchExtensionInstaller installer=new BatchExtensionInstaller(pluginRepository,new EnvironmentInformation("ant","1.7"),new DryRun(false));
   installer.install(module);
-  assertThat(module.getComponent(BatchService.class),not(nullValue()));
-  assertThat(module.getComponent(ProjectService.class),nullValue());
-  assertThat(module.getComponent(ServerService.class),nullValue());
+  assertThat(module.getComponentByType(BatchService.class),not(nullValue()));
+  assertThat(module.getComponentByType(ProjectService.class),nullValue());
+  assertThat(module.getComponentByType(ServerService.class),nullValue());
 }

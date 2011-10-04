@@ -4,9 +4,9 @@
   ArtifactDownloader downloader=mock(ArtifactDownloader.class);
   when(downloader.downloadPlugin(checkstyle)).thenReturn(copyFiles("sonar-checkstyle-plugin-2.8.jar"));
   when(downloader.downloadPlugin(checkstyleExt)).thenReturn(copyFiles("sonar-checkstyle-extensions-plugin-0.1-SNAPSHOT.jar"));
-  PropertiesConfiguration conf=new PropertiesConfiguration();
-  conf.setProperty(CoreProperties.BATCH_EXCLUDE_PLUGINS,"checkstyle");
-  repository=new BatchPluginRepository(downloader,conf);
+  Settings settings=new Settings();
+  settings.setProperty(CoreProperties.BATCH_EXCLUDE_PLUGINS,"checkstyle");
+  repository=new BatchPluginRepository(downloader,settings);
   repository.doStart(Arrays.asList(checkstyle,checkstyleExt));
   assertThat(repository.getPlugins().size(),Matchers.is(0));
   assertThat(repository.getMetadata().size(),Matchers.is(0));

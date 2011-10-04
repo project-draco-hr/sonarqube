@@ -1,25 +1,24 @@
 {
-  MutablePicoContainer startupContainer=servicesContainer.makeChildContainer();
+  ComponentContainer startupContainer=servicesContainer.createChild();
   try {
-    startupContainer.as(Characteristics.CACHE).addComponent(MavenRepository.class);
-    startupContainer.as(Characteristics.CACHE).addComponent(GwtPublisher.class);
-    startupContainer.as(Characteristics.CACHE).addComponent(RegisterMetrics.class);
-    startupContainer.as(Characteristics.CACHE).addComponent(RegisterRules.class);
-    startupContainer.as(Characteristics.CACHE).addComponent(RegisterProvidedProfiles.class);
-    startupContainer.as(Characteristics.CACHE).addComponent(EnableProfiles.class);
-    startupContainer.as(Characteristics.CACHE).addComponent(ActivateDefaultProfiles.class);
-    startupContainer.as(Characteristics.CACHE).addComponent(JdbcDriverDeployer.class);
-    startupContainer.as(Characteristics.CACHE).addComponent(ServerMetadataPersister.class);
-    startupContainer.as(Characteristics.CACHE).addComponent(RegisterQualityModels.class);
-    startupContainer.as(Characteristics.CACHE).addComponent(DeleteDeprecatedMeasures.class);
-    startupContainer.as(Characteristics.CACHE).addComponent(GeneratePluginIndex.class);
-    startupContainer.start();
-    startupContainer.getComponent(ServerLifecycleNotifier.class).notifyStart();
+    startupContainer.addSingleton(MavenRepository.class);
+    startupContainer.addSingleton(GwtPublisher.class);
+    startupContainer.addSingleton(RegisterMetrics.class);
+    startupContainer.addSingleton(RegisterRules.class);
+    startupContainer.addSingleton(RegisterProvidedProfiles.class);
+    startupContainer.addSingleton(EnableProfiles.class);
+    startupContainer.addSingleton(ActivateDefaultProfiles.class);
+    startupContainer.addSingleton(JdbcDriverDeployer.class);
+    startupContainer.addSingleton(ServerMetadataPersister.class);
+    startupContainer.addSingleton(RegisterQualityModels.class);
+    startupContainer.addSingleton(DeleteDeprecatedMeasures.class);
+    startupContainer.addSingleton(GeneratePluginIndex.class);
+    startupContainer.startComponents();
+    startupContainer.getComponentByType(ServerLifecycleNotifier.class).notifyStart();
   }
   finally {
-    startupContainer.stop();
-    servicesContainer.removeChildContainer(startupContainer);
-    startupContainer=null;
-    servicesContainer.getComponent(DatabaseSessionFactory.class).clear();
+    startupContainer.stopComponents();
+    servicesContainer.removeChild();
+    servicesContainer.getComponentByType(DatabaseSessionFactory.class).clear();
   }
 }

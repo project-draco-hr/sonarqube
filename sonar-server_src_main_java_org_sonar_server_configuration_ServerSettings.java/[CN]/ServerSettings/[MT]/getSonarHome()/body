@@ -1,0 +1,18 @@
+{
+  String home=System.getProperty("sonar.home");
+  if (StringUtils.isBlank(home)) {
+    home=System.getenv("SONAR_HOME");
+    if (StringUtils.isBlank(home)) {
+      Properties warProps=openWarProperties();
+      home=warProps.getProperty("sonar.home");
+    }
+  }
+  if (StringUtils.isBlank(home)) {
+    throw new IllegalStateException("Please set location to SONAR_HOME");
+  }
+  File dir=new File(home);
+  if (!dir.isDirectory() || !dir.exists()) {
+    throw new IllegalStateException("SONAR_HOME is not valid: " + home);
+  }
+  return dir;
+}

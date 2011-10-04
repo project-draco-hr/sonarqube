@@ -2,10 +2,9 @@
   try {
     Logs.INFO.info("Creating JDBC datasource");
     Properties properties=new Properties();
-    Configuration dsConfig=getConfiguration().subset("sonar.jdbc");
-    for (Iterator<String> it=dsConfig.getKeys(); it.hasNext(); ) {
-      String key=it.next();
-      properties.setProperty(key,dsConfig.getString(key));
+    List<String> jdbcKeys=configuration.getKeysStartingWith("sonar.jdbc.");
+    for (    String jdbcKey : jdbcKeys) {
+      properties.setProperty(StringUtils.removeStart(jdbcKey,"sonar.jdbc."),configuration.getString(jdbcKey));
     }
     properties.setProperty("accessToUnderlyingConnectionAllowed","true");
     datasource=BasicDataSourceFactory.createDataSource(properties);
