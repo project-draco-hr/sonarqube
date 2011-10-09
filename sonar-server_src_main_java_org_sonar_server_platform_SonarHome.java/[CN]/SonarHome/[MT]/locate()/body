@@ -1,0 +1,17 @@
+{
+  String home=System.getProperty(PROPERTY);
+  if (StringUtils.isBlank(home)) {
+    home=System.getenv(PROPERTY);
+    if (StringUtils.isBlank(home)) {
+      home=openWarProperties().getProperty(PROPERTY);
+    }
+  }
+  if (StringUtils.isBlank(home)) {
+    throw new IllegalStateException("Sonar home is not defined. " + "Please set the environment variable/system property " + PROPERTY + " or edit the file WEB-INF/classes/sonar-war.properties");
+  }
+  File dir=new File(home);
+  if (!dir.isDirectory() || !dir.exists()) {
+    throw new IllegalStateException(PROPERTY + " is not valid: " + home+ ". Please fix the environment variable/system property SONAR_HOME or "+ "the file WEB-INF/classes/sonar-war.properties");
+  }
+  return dir;
+}
