@@ -1,6 +1,8 @@
 {
   ExecutorService executorService=null;
   Process process=null;
+  StreamGobbler outputGobbler=null;
+  StreamGobbler errorGobbler=null;
   try {
     LoggerFactory.getLogger(getClass()).debug("Executing command: " + command);
     ProcessBuilder builder=new ProcessBuilder(command.toStrings());
@@ -8,15 +10,14 @@
       builder.directory(command.getDirectory());
     }
     process=builder.start();
-    StreamGobbler outputGobbler=new StreamGobbler(process.getInputStream());
-    StreamGobbler errorGobbler=new StreamGobbler(process.getErrorStream());
+    outputGobbler=new StreamGobbler(process.getInputStream());
+    errorGobbler=new StreamGobbler(process.getErrorStream());
     outputGobbler.start();
     errorGobbler.start();
     final Process finalProcess=process;
     Callable<Integer> call=new Callable<Integer>(){
       public Integer call() throws Exception {
-        finalProcess.waitFor();
-        return finalProcess.exitValue();
+        return finalProcess.waitFor();
       }
     }
 ;
@@ -32,6 +33,15 @@ catch (  Exception e) {
     throw new CommandException(command,e);
   }
  finally {
+    if (outputGobbler != null) {
+      waitUntilFinish(outputGobbler);
+    }
+    if (errorGobbler != null) {
+      waitUntilFinish(errorGobbler);
+    }
+    if (process != null) {
+      closeStreams(process);
+    }
     if (executorService != null) {
       executorService.shutdown();
     }
