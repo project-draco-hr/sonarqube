@@ -1,0 +1,29 @@
+{
+  CoverageMeasuresBuilder builder=CoverageMeasuresBuilder.create();
+  for (int lineId=coverage.getFirstLine(); lineId <= coverage.getLastLine(); lineId++) {
+    final int hits;
+    ILine line=coverage.getLine(lineId);
+switch (line.getInstructionCounter().getStatus()) {
+case ICounter.FULLY_COVERED:
+case ICounter.PARTLY_COVERED:
+      hits=1;
+    break;
+case ICounter.NOT_COVERED:
+  hits=0;
+break;
+case ICounter.EMPTY:
+continue;
+default :
+JaCoCoUtils.LOG.warn("Unknown status for line {} in {}",lineId,resource);
+continue;
+}
+builder.setHits(lineId,hits);
+ICounter branchCounter=line.getBranchCounter();
+int conditions=branchCounter.getTotalCount();
+if (conditions > 0) {
+int coveredConditions=branchCounter.getCoveredCount();
+builder.setConditions(lineId,conditions,coveredConditions);
+}
+}
+saveMeasures(context,resource,builder.createMeasures());
+}

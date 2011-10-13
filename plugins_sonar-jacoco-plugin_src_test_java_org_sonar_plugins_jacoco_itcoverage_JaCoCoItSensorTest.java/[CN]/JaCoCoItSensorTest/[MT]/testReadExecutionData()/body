@@ -1,0 +1,22 @@
+{
+  File jacocoExecutionData=new File(getClass().getResource("/org/sonar/plugins/jacoco/JaCoCoSensorTest/jacoco.exec").getFile());
+  File buildOutputDir=jacocoExecutionData.getParentFile();
+  SensorContext context=mock(SensorContext.class);
+  final JavaFile resource=new JavaFile("org.sonar.plugins.jacoco.tests.Hello");
+  when(context.getResource(any(Resource.class))).thenReturn(resource);
+  ProjectFileSystem pfs=mock(ProjectFileSystem.class);
+  when(pfs.getBuildOutputDir()).thenReturn(buildOutputDir);
+  when(pfs.resolvePath(anyString())).thenReturn(jacocoExecutionData);
+  Project project=mock(Project.class);
+  when(project.getFileSystem()).thenReturn(pfs);
+  sensor.analyse(project,context);
+  verify(context).getResource(eq(resource));
+  verify(context).saveMeasure(eq(resource),argThat(new IsMeasure(JaCoCoItMetrics.IT_LINES_TO_COVER,7.0)));
+  verify(context).saveMeasure(eq(resource),argThat(new IsMeasure(JaCoCoItMetrics.IT_UNCOVERED_LINES,3.0)));
+  verify(context).saveMeasure(eq(resource),argThat(new IsMeasure(JaCoCoItMetrics.IT_COVERAGE_LINE_HITS_DATA,"6=1;7=1;8=1;11=1;15=0;16=0;18=0")));
+  verify(context).saveMeasure(eq(resource),argThat(new IsMeasure(JaCoCoItMetrics.IT_CONDITIONS_TO_COVER,2.0)));
+  verify(context).saveMeasure(eq(resource),argThat(new IsMeasure(JaCoCoItMetrics.IT_UNCOVERED_CONDITIONS,2.0)));
+  verify(context).saveMeasure(eq(resource),argThat(new IsMeasure(JaCoCoItMetrics.IT_CONDITIONS_BY_LINE,"15=2")));
+  verify(context).saveMeasure(eq(resource),argThat(new IsMeasure(JaCoCoItMetrics.IT_COVERED_CONDITIONS_BY_LINE,"15=0")));
+  verifyNoMoreInteractions(context);
+}

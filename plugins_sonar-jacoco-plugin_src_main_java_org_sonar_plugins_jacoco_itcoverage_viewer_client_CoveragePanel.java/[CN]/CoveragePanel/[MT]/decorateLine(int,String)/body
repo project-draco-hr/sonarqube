@@ -1,0 +1,42 @@
+{
+  Row row=new Row().setLineIndex(index,"");
+  Integer hits=hitsByLine.get(index);
+  Integer conditions=conditionsByLine.get(index);
+  Integer coveredConditions=coveredConditionsByLine.get(index);
+  String branchCoverage=branchCoverageByLine.get(index);
+  if (branchCoverage == null && conditions != null && coveredConditions != null) {
+    branchCoverage=String.valueOf(conditions - coveredConditions) + "/" + String.valueOf(conditions);
+  }
+  boolean hasLineCoverage=(hits != null);
+  boolean hasBranchCoverage=(branchCoverage != null);
+  boolean lineIsCovered=(hasLineCoverage && hits > 0);
+  boolean branchIsCovered=("100%".equals(branchCoverage) || (conditions != null && coveredConditions != null && coveredConditions == conditions));
+  row.setSource(source,"");
+  row.setValue("&nbsp;","");
+  row.setValue2("&nbsp;","");
+  if (lineIsCovered) {
+    if (branchIsCovered) {
+      row.setValue(String.valueOf(hits),"green");
+      row.setValue2(branchCoverage,"green");
+    }
+ else     if (hasBranchCoverage) {
+      row.setValue(String.valueOf(hits),"orange");
+      row.setValue2(branchCoverage,"orange");
+      row.setSource(source,"orange");
+    }
+ else {
+      row.setValue(String.valueOf(hits),"green");
+    }
+  }
+ else   if (hasLineCoverage) {
+    row.setValue(String.valueOf(hits),"red");
+    row.setSource(source,"red");
+    if (hasBranchCoverage) {
+      row.setValue2(branchCoverage,"red");
+    }
+ else {
+      row.setValue2("&nbsp;","red");
+    }
+  }
+  return Arrays.asList(row);
+}

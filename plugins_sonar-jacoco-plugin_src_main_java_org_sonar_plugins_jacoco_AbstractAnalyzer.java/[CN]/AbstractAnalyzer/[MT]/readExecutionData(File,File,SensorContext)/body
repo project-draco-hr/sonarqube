@@ -1,0 +1,28 @@
+{
+  SessionInfoStore sessionInfoStore=new SessionInfoStore();
+  ExecutionDataStore executionDataStore=new ExecutionDataStore();
+  if (jacocoExecutionData == null || !jacocoExecutionData.exists() || !jacocoExecutionData.isFile()) {
+    JaCoCoUtils.LOG.info("Can't find JaCoCo execution data : {}. Project coverage is set to 0%.",jacocoExecutionData);
+  }
+ else {
+    JaCoCoUtils.LOG.info("Analysing {}",jacocoExecutionData);
+    ExecutionDataReader reader=new ExecutionDataReader(new FileInputStream(jacocoExecutionData));
+    reader.setSessionInfoVisitor(sessionInfoStore);
+    reader.setExecutionDataVisitor(executionDataStore);
+    reader.read();
+  }
+  CoverageBuilder coverageBuilder=new CoverageBuilder();
+  Analyzer analyzer=new Analyzer(executionDataStore,coverageBuilder);
+  analyzeAll(analyzer,buildOutputDir);
+  int analyzedResources=0;
+  for (  ISourceFileCoverage coverage : coverageBuilder.getSourceFiles()) {
+    JavaFile resource=getResource(coverage);
+    if (context.getResource(resource) != null) {
+      analyzeFile(resource,coverage,context);
+      analyzedResources++;
+    }
+  }
+  if (analyzedResources == 0) {
+    JaCoCoUtils.LOG.warn("Coverage information was not collected. Perhaps you forget to include debug information into compiled classes?");
+  }
+}
