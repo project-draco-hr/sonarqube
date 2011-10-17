@@ -1,4 +1,7 @@
 {
   Collection<SourceCode> classes=indexer.search(new QueryByType(SourceClass.class));
-  return scan(classes,new AsmClassProviderImpl(ClassworldsClassLoader.create(bytecodeFilesOrDirectories)));
+  ClassLoader classLoader=ClassworldsClassLoader.create(bytecodeFilesOrDirectories);
+  scan(classes,new AsmClassProviderImpl(classLoader));
+  ((SquidClassLoader)classLoader).close();
+  return this;
 }
