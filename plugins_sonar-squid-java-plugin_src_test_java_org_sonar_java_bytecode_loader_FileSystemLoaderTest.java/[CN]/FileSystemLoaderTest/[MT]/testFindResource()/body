@@ -1,0 +1,15 @@
+{
+  File dir=SquidTestUtils.getFile("/bytecode/bin/");
+  FileSystemLoader loader=new FileSystemLoader(dir);
+  assertThat(loader.findResource("notfound"),nullValue());
+  URL url=loader.findResource("tags/TagName.class");
+  assertThat(url,notNullValue());
+  assertThat(url.toString(),allOf(startsWith("file:"),endsWith("TagName.class")));
+  loader.close();
+  try {
+    loader.findResource("tags/TagName.class");
+    fail();
+  }
+ catch (  IllegalStateException e) {
+  }
+}

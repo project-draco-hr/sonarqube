@@ -1,7 +1,9 @@
 {
   File jar=SquidTestUtils.getFile("/bytecode/lib/hello.jar");
-  JarLoader jarLoader=new JarLoader(jar);
-  URL url=jarLoader.findResource("META-INF/MANIFEST.MF");
+  JarLoader loader=new JarLoader(jar);
+  assertThat(loader.findResource("notfound"),nullValue());
+  URL url=loader.findResource("META-INF/MANIFEST.MF");
+  assertThat(url,notNullValue());
   assertThat(url.toString(),allOf(startsWith("jar:"),endsWith("hello.jar!/META-INF/MANIFEST.MF")));
   InputStream is=url.openStream();
   try {
@@ -10,5 +12,11 @@
   finally {
     IOUtils.closeQuietly(is);
   }
-  jarLoader.close();
+  loader.close();
+  try {
+    loader.findResource("META-INF/MANIFEST.MF");
+    fail();
+  }
+ catch (  IllegalStateException e) {
+  }
 }
