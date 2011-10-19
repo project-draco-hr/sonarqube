@@ -1,30 +1,39 @@
 {
-  String patternStr=removeSlahesToIgnore(wildcardPattern);
-  patternStr=StringUtils.replace(patternStr,"**/**","**");
-  patternStr=StringUtils.replace(patternStr,"**/","(&/|)");
-  patternStr=StringUtils.replace(patternStr,"/**","/&");
-  patternStr=StringUtils.replace(patternStr,"**","&");
-  StringBuilder sb=new StringBuilder();
-  for (  char c : patternStr.toCharArray()) {
-switch (c) {
-case '&':
-      sb.append(".*");
-    break;
-case '*':
-  sb.append("[^\\").append(directorySeparator).append("]*");
-break;
-case '?':
-sb.append("[^\\").append(directorySeparator).append("]");
-break;
-case '.':
-sb.append("\\.");
-break;
-case '/':
-sb.append("\\").append(directorySeparator);
-break;
-default :
-sb.append(c);
-}
-}
-return sb.toString();
+  final String escapedDirectorySeparator='\\' + directorySeparator;
+  final StringBuilder sb=new StringBuilder(antPattern.length());
+  sb.append('^');
+  int i=antPattern.startsWith("/") || antPattern.startsWith("\\") ? 1 : 0;
+  while (i < antPattern.length()) {
+    final char ch=antPattern.charAt(i);
+    if (ch == '(' || ch == ')' || ch == '[' || ch == ']' || ch == '^' || ch == '$' || ch == '.' || ch == '{' || ch == '}' || ch == '+' || ch == '|') {
+      sb.append('\\').append(ch);
+    }
+ else     if (ch == '*') {
+      if (i + 1 < antPattern.length() && antPattern.charAt(i + 1) == '*') {
+        if (i + 2 < antPattern.length() && isSlash(antPattern.charAt(i + 2))) {
+          sb.append("(?:.*").append(escapedDirectorySeparator).append("|)");
+          i+=2;
+        }
+ else {
+          sb.append(".*");
+          i+=1;
+        }
+      }
+ else {
+        sb.append("[^").append(escapedDirectorySeparator).append("]*?");
+      }
+    }
+ else     if (ch == '?') {
+      sb.append("[^").append(escapedDirectorySeparator).append("]");
+    }
+ else     if (isSlash(ch)) {
+      sb.append(escapedDirectorySeparator);
+    }
+ else {
+      sb.append(ch);
+    }
+    i++;
+  }
+  sb.append('$');
+  return sb.toString();
 }
