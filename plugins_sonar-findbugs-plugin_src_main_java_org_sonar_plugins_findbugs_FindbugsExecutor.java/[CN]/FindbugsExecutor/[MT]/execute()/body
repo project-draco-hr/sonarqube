@@ -3,6 +3,8 @@
   SecurityManager currentSecurityManager=System.getSecurityManager();
   ClassLoader initialClassLoader=Thread.currentThread().getContextClassLoader();
   Thread.currentThread().setContextClassLoader(FindBugs2.class.getClassLoader());
+  Locale initialLocale=Locale.getDefault();
+  Locale.setDefault(configuration.getLocale());
   OutputStream xmlOutput=null;
   Collection<Plugin> customPlugins=null;
   ExecutorService executorService=Executors.newSingleThreadExecutor();
@@ -49,5 +51,6 @@
     executorService.shutdown();
     IOUtils.closeQuietly(xmlOutput);
     Thread.currentThread().setContextClassLoader(initialClassLoader);
+    Locale.setDefault(initialLocale);
   }
 }
