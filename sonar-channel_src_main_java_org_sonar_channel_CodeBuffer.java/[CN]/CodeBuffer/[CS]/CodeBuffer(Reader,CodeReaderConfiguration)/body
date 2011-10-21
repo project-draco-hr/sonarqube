@@ -8,9 +8,12 @@
     for (    CodeReaderFilter<?> codeReaderFilter : configuration.getCodeReaderFilters()) {
       reader=new Filter(reader,codeReaderFilter,configuration);
     }
-    fillBuffer(reader);
+    buffer=IOUtils.toCharArray(reader);
   }
-  finally {
-    if (reader != null)     IOUtils.closeQuietly(reader);
+ catch (  IOException e) {
+    throw new ChannelException(e.getMessage(),e);
+  }
+ finally {
+    IOUtils.closeQuietly(reader);
   }
 }
