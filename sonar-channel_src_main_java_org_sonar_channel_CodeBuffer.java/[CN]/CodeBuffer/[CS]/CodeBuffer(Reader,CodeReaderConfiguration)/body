@@ -1,11 +1,16 @@
 {
-  lastChar=-1;
-  cursor=new Cursor();
-  tabWidth=configuration.getTabWidth();
-  Reader reader=initialCodeReader;
-  for (  CodeReaderFilter<?> codeReaderFilter : configuration.getCodeReaderFilters()) {
-    reader=new Filter(reader,codeReaderFilter,configuration);
+  Reader reader=null;
+  try {
+    lastChar=-1;
+    cursor=new Cursor();
+    tabWidth=configuration.getTabWidth();
+    reader=initialCodeReader;
+    for (    CodeReaderFilter<?> codeReaderFilter : configuration.getCodeReaderFilters()) {
+      reader=new Filter(reader,codeReaderFilter,configuration);
+    }
+    fillBuffer(reader);
   }
-  fillBuffer(reader);
-  IOUtils.closeQuietly(reader);
+  finally {
+    if (reader != null)     IOUtils.closeQuietly(reader);
+  }
 }
