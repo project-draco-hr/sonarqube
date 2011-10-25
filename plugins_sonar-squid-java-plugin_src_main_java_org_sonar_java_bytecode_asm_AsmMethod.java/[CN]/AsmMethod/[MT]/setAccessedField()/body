@@ -2,15 +2,19 @@
   if (!isConstructor()) {
     for (    AsmEdge edge : getOutgoingEdges()) {
       if (isCallToNonStaticInternalField(edge)) {
-        if (accessedField != null && accessedField != edge.getTo()) {
+        if (isFieldAccesingDifferentField((AsmField)edge.getTo())) {
           accessedField=null;
           break;
         }
         accessedField=(AsmField)edge.getTo();
       }
  else       if (isCallToNonStaticInternalMethod(edge)) {
-        accessedField=null;
-        break;
+        AsmMethod method=(AsmMethod)edge.getTo();
+        if (isMethodNotAccessorOrAccessingDifferentField(method)) {
+          accessedField=null;
+          break;
+        }
+        accessedField=method.getAccessedField();
       }
     }
   }
