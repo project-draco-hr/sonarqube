@@ -1,0 +1,17 @@
+{
+  AsmField accessedField=null;
+  for (  AsmEdge edge : asmMethod.getOutgoingEdges()) {
+    if (isCallToNonStaticInternalField(edge)) {
+      if (accessedField != null && accessedField != edge.getTo()) {
+        accessedField=null;
+        break;
+      }
+      accessedField=(AsmField)edge.getTo();
+    }
+ else     if (isCallToNonStaticInternalMethod(edge)) {
+      accessedField=null;
+      break;
+    }
+  }
+  return accessedField;
+}
