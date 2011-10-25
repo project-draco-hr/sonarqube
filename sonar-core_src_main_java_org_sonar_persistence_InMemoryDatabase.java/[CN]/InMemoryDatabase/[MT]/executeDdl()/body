@@ -1,0 +1,17 @@
+{
+  try {
+    Connection connection=datasource.getConnection();
+    List<String> lines=IOUtils.readLines(getClass().getResourceAsStream("/org/sonar/persistence/master_derby.ddl"));
+    for (    String line : lines) {
+      if (StringUtils.isNotBlank(line) && !StringUtils.startsWith(line,"--")) {
+        Statement statement=connection.createStatement();
+        statement.execute(line);
+        statement.close();
+      }
+    }
+    connection.commit();
+  }
+ catch (  Exception e) {
+    e.printStackTrace();
+  }
+}
