@@ -1,17 +1,19 @@
 {
+  Connection connection=null;
   try {
-    Connection connection=datasource.getConnection();
-    List<String> lines=IOUtils.readLines(getClass().getResourceAsStream("/org/sonar/persistence/master_derby.ddl"));
-    for (    String line : lines) {
-      if (StringUtils.isNotBlank(line) && !StringUtils.startsWith(line,"--")) {
-        Statement statement=connection.createStatement();
-        statement.execute(line);
-        statement.close();
+    connection=datasource.getConnection();
+    DdlUtils.execute(connection,"derby");
+  }
+ catch (  SQLException e) {
+    throw new IllegalStateException("Fail to execute DDL",e);
+  }
+ finally {
+    if (connection != null) {
+      try {
+        connection.close();
+      }
+ catch (      SQLException e) {
       }
     }
-    connection.commit();
-  }
- catch (  Exception e) {
-    e.printStackTrace();
   }
 }

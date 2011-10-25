@@ -1,0 +1,24 @@
+{
+  if (!supportsDialect(dialect)) {
+    throw new IllegalArgumentException("Unsupported dialect: " + dialect);
+  }
+  List<String> lines=loadStatementsForDialect(dialect);
+  for (  String line : lines) {
+    if (StringUtils.isNotBlank(line) && !StringUtils.startsWith(line,"--")) {
+      try {
+        Statement statement=connection.createStatement();
+        statement.execute(line);
+        statement.close();
+      }
+ catch (      Exception e) {
+        throw new IllegalStateException("Fail to execute DDL: " + line,e);
+      }
+    }
+  }
+  try {
+    connection.commit();
+  }
+ catch (  SQLException e) {
+    throw new IllegalStateException("Fail to commit DDL",e);
+  }
+}
