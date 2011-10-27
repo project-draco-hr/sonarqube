@@ -1,10 +1,9 @@
 {
-  if (dbConnector == null) {
-    dbConnector=new MemoryDatabaseConnector();
-    dbConnector.start();
-    session=new JpaDatabaseSession(dbConnector);
-    session.start();
-  }
-  databaseTester=new JdbcDatabaseTester(MemoryDatabaseConnector.DRIVER,MemoryDatabaseConnector.URL,MemoryDatabaseConnector.USER,MemoryDatabaseConnector.PASSWORD);
-  databaseTester.onTearDown();
+  database=new HsqlDatabase();
+  database.start();
+  dbConnector=new MemoryDatabaseConnector(database);
+  dbConnector.start();
+  session=new JpaDatabaseSession(dbConnector);
+  session.start();
+  databaseTester=new DataSourceDatabaseTester(database.getDataSource());
 }

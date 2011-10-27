@@ -1,5 +1,7 @@
 {
-  MemoryDatabaseConnector connector=new MemoryDatabaseConnector(SchemaMigration.VERSION_UNKNOWN);
+  HsqlDatabase hsqlDatabase=new HsqlDatabase();
+  hsqlDatabase.start();
+  MemoryDatabaseConnector connector=new MemoryDatabaseConnector(hsqlDatabase,SchemaMigration.VERSION_UNKNOWN);
   connector.start();
   Connection connection=Mockito.mock(Connection.class);
   try {
@@ -11,4 +13,6 @@
       connection.close();
     }
   }
+  connector.stop();
+  hsqlDatabase.stop();
 }

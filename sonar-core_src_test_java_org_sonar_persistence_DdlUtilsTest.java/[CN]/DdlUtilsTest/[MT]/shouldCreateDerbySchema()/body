@@ -1,0 +1,15 @@
+{
+  int tables=0;
+  DriverManager.registerDriver(new EmbeddedDriver());
+  Connection connection=DriverManager.getConnection("jdbc:derby:memory:sonar;create=true");
+  DdlUtils.createSchema(connection,"derby");
+  ResultSet resultSet=connection.getMetaData().getTables("",null,null,new String[]{"TABLE"});
+  while (resultSet.next()) {
+    tables++;
+  }
+  resultSet.close();
+  connection.commit();
+  connection.close();
+  assertThat(tables,greaterThan(30));
+  DerbyUtils.dropInMemoryDatabase();
+}

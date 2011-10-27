@@ -1,14 +1,10 @@
 {
   if (!started) {
-    String jdbcConnectionUrl=testConnection();
-    dialect=DialectRepository.find(configuration.getString("sonar.jdbc.dialect"),jdbcConnectionUrl);
+    testConnection();
     started=true;
   }
   if (!operational) {
     boolean upToDate=upToDateSchemaVersion();
-    if (!upToDate && startsFailIfSchemaOutdated) {
-      throw new DatabaseException(databaseVersion,SchemaMigration.LAST_VERSION);
-    }
     if (upToDate) {
       Logs.INFO.info("Initializing Hibernate");
       factory=createEntityManagerFactory();
