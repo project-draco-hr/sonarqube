@@ -1,22 +1,13 @@
 {
   int resourceSnapshotId=getSnapshotIdFor(resource);
-  String sql="SELECT DISTINCT to_blocks.hash, res.kee, to_blocks.index_in_file, to_blocks.start_line, to_blocks.end_line" + " FROM duplications_index to_blocks, duplications_index from_blocks, snapshots snapshot, projects res" + " WHERE from_blocks.snapshot_id = :resource_snapshot_id"+ " AND to_blocks.hash = from_blocks.hash"+ " AND to_blocks.snapshot_id = snapshot.id"+ " AND snapshot.islast = :is_last"+ " AND snapshot.project_id = res.id";
-  if (lastSnapshotId != null) {
-    sql+=" AND to_blocks.project_snapshot_id != :last_project_snapshot_id";
-  }
-  Query query=session.getEntityManager().createNativeQuery(sql).setParameter("resource_snapshot_id",resourceSnapshotId).setParameter("is_last",Boolean.TRUE);
-  if (lastSnapshotId != null) {
-    query.setParameter("last_project_snapshot_id",lastSnapshotId);
-  }
-  ((HibernateQuery)query).getHibernateQuery().setResultTransformer(Transformers.TO_LIST);
-  List<List<Object>> blocks=query.getResultList();
+  List<DuplicationUnit> units=dao.selectCandidates(resourceSnapshotId,lastSnapshotId);
   cache.clear();
-  for (  List<Object> dbBlock : blocks) {
-    String hash=(String)dbBlock.get(0);
-    String resourceKey=(String)dbBlock.get(1);
-    int indexInFile=((Number)dbBlock.get(2)).intValue();
-    int startLine=((Number)dbBlock.get(3)).intValue();
-    int endLine=((Number)dbBlock.get(4)).intValue();
+  for (  DuplicationUnit unit : units) {
+    String hash=unit.getHash();
+    String resourceKey=unit.getResourceKey();
+    int indexInFile=unit.getIndexInFile();
+    int startLine=unit.getStartLine();
+    int endLine=unit.getEndLine();
     Block block=new Block(resourceKey,new ByteArray(hash),indexInFile,startLine,endLine);
     Collection<Block> sameHash=cache.get(block.getBlockHash());
     if (sameHash == null) {

@@ -1,0 +1,19 @@
+{
+  try {
+    IDataSet[] dataSets=new IDataSet[dataSetStream.length];
+    for (int i=0; i < dataSetStream.length; i++) {
+      ReplacementDataSet dataSet=new ReplacementDataSet(new FlatXmlDataSet(dataSetStream[i]));
+      dataSet.addReplacementObject("[null]",null);
+      dataSets[i]=dataSet;
+    }
+    CompositeDataSet compositeDataSet=new CompositeDataSet(dataSets);
+    databaseTester.setDataSet(compositeDataSet);
+    IDatabaseConnection connection=databaseTester.getConnection();
+    DatabaseOperation.CLEAN_INSERT.execute(connection,databaseTester.getDataSet());
+    connection.getConnection().commit();
+    connection.close();
+  }
+ catch (  Exception e) {
+    throw translateException("Could not setup DBUnit data",e);
+  }
+}
