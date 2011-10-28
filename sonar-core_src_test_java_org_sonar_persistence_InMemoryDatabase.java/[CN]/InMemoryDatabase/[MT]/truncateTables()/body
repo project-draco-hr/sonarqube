@@ -1,0 +1,25 @@
+{
+  Connection connection=null;
+  try {
+    connection=datasource.getConnection();
+    DatabaseMetaData meta=connection.getMetaData();
+    ResultSet res=meta.getTables(null,null,null,new String[]{"TABLE"});
+    while (res.next()) {
+      String tableName=res.getString("TABLE_NAME");
+      connection.prepareStatement("TRUNCATE TABLE " + tableName).execute();
+    }
+    res.close();
+    res=meta.getColumns(null,null,null,"ID");
+    while (res.next()) {
+      String tableName=res.getString("TABLE_NAME");
+      connection.prepareStatement("ALTER TABLE " + tableName + " ALTER COLUMN ID RESTART WITH 1").execute();
+    }
+    res.close();
+  }
+ catch (  SQLException e) {
+    throw new IllegalStateException("Fail to truncate tables",e);
+  }
+ finally {
+    closeQuietly(connection);
+  }
+}
