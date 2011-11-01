@@ -5,18 +5,18 @@
   }
   final SonarDuplicationsIndex index;
   if (isCrossProject(project)) {
-    Logs.INFO.info("Cross-project analysis enabled");
+    LOG.info("Cross-project analysis enabled");
     index=new SonarDuplicationsIndex(new DbDuplicationsIndex(resourcePersister,project,dao));
   }
  else {
-    Logs.INFO.info("Cross-project analysis disabled");
+    LOG.info("Cross-project analysis disabled");
     index=new SonarDuplicationsIndex();
   }
   TokenChunker tokenChunker=JavaTokenProducer.build();
   StatementChunker statementChunker=JavaStatementBuilder.build();
   BlockChunker blockChunker=new BlockChunker(BLOCK_SIZE);
   for (  InputFile inputFile : inputFiles) {
-    Logs.INFO.debug("Populating index from {}",inputFile.getFile());
+    LOG.debug("Populating index from {}",inputFile.getFile());
     Resource resource=getResource(inputFile);
     String resourceKey=getFullKey(project,resource);
     List<Statement> statements;
@@ -37,7 +37,7 @@
   ExecutorService executorService=Executors.newSingleThreadExecutor();
   try {
     for (    InputFile inputFile : inputFiles) {
-      Logs.INFO.debug("Detection of duplications for {}",inputFile.getFile());
+      LOG.debug("Detection of duplications for {}",inputFile.getFile());
       Resource resource=getResource(inputFile);
       String resourceKey=getFullKey(project,resource);
       Collection<Block> fileBlocks=index.getByResource(resource,resourceKey);
@@ -47,7 +47,7 @@
       }
  catch (      TimeoutException e) {
         clones=null;
-        Logs.INFO.warn("Timeout during detection of duplications for " + inputFile.getFile(),e);
+        LOG.warn("Timeout during detection of duplications for " + inputFile.getFile(),e);
       }
 catch (      InterruptedException e) {
         throw new SonarException(e);
