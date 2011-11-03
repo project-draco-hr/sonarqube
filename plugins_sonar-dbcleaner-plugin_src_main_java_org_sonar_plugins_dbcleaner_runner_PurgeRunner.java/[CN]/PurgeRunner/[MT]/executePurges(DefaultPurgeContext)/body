@@ -1,8 +1,17 @@
 {
   TimeProfiler profiler=new TimeProfiler();
   for (  Purge purge : purges) {
-    profiler.start("Purge " + purge.getClass().getName());
-    purge.purge(context);
-    profiler.stop();
+    try {
+      profiler.start("Purge " + purge.getClass().getName());
+      purge.purge(context);
+      session.commit();
+      profiler.stop();
+    }
+ catch (    javax.persistence.PersistenceException e) {
+      LOG.warn("Fail to execute purge: " + purge,e);
+    }
+catch (    HibernateException e) {
+      LOG.warn("Fail to execute purge: " + purge,e);
+    }
   }
 }
