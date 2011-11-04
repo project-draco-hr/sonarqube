@@ -1,34 +1,9 @@
 {
-  for (  Project project : projects) {
-    String[] excludedArtifactIds=settings.getStringArray("sonar.skippedModules");
-    String[] includedArtifactIds=settings.getStringArray("sonar.includedModules");
-    Set<String> includedModulesIdSet=Sets.newHashSet();
-    Set<String> excludedModulesIdSet=Sets.newHashSet();
-    if (includedArtifactIds != null) {
-      includedModulesIdSet.addAll(Arrays.asList(includedArtifactIds));
-    }
-    if (excludedArtifactIds != null) {
-      excludedModulesIdSet.addAll(Arrays.asList(excludedArtifactIds));
-      includedModulesIdSet.removeAll(excludedModulesIdSet);
-    }
-    if (!includedModulesIdSet.isEmpty()) {
-      for (      Project currentProject : projects) {
-        if (!includedModulesIdSet.contains(getArtifactId(currentProject))) {
-          exclude(currentProject);
-        }
-      }
-    }
- else {
-      for (      String excludedArtifactId : excludedModulesIdSet) {
-        Project excludedProject=getProjectByArtifactId(excludedArtifactId);
-        exclude(excludedProject);
-      }
-    }
-  }
   for (Iterator<Project> it=projects.iterator(); it.hasNext(); ) {
     Project project=it.next();
-    if (project.isExcluded()) {
-      LoggerFactory.getLogger(getClass()).info("Module {} is excluded from analysis",project.getName());
+    if (projectFilter.isExcluded(project)) {
+      project.setExcluded(true);
+      LoggerFactory.getLogger(getClass()).info("Project {} excluded",project.getName());
       project.removeFromParent();
       it.remove();
     }
