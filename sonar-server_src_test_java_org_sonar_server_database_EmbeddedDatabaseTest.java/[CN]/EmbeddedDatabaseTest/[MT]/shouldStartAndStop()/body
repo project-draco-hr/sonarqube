@@ -1,5 +1,5 @@
 {
-  database=new EmbeddedDatabase(new File(TEST_ROOT_DIR + TEST_DB_DIR_PREFIX + "Start"+ testPort),defaultProps);
+  database=new EmbeddedDatabase(new File(TEST_ROOT_DIR + TEST_DB_DIR_PREFIX + testPort),defaultProps);
   database.start();
   ClientDriver.class.newInstance();
   Connection conn;
@@ -8,12 +8,12 @@
     conn.close();
   }
  catch (  Exception ex) {
-    fail("Unable to connect");
+    fail("Unable to connect after start");
   }
   try {
     conn=DriverManager.getConnection("jdbc:derby://localhost:" + testPort + "/sonar;user=foo;password=bar");
     conn.close();
-    fail("Able to connect");
+    fail("Able to connect with wrong username and password");
   }
  catch (  Exception ex) {
   }
@@ -21,4 +21,11 @@
   assertTrue(testDb.exists());
   assertTrue(testDb.isDirectory());
   database.stop();
+  try {
+    conn=DriverManager.getConnection(driverUrl);
+    conn.close();
+    fail("Able to connect after stop");
+  }
+ catch (  Exception ex) {
+  }
 }
