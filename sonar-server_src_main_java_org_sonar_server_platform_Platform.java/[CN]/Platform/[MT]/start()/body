@@ -1,10 +1,16 @@
 {
   if (!started && isUpToDateDatabase()) {
-    TimeProfiler profiler=new TimeProfiler().start("Start services");
-    startCoreComponents();
-    startServiceComponents();
-    executeStartupTasks();
-    started=true;
-    profiler.stop();
+    try {
+      TimeProfiler profiler=new TimeProfiler().start("Start services");
+      startCoreComponents();
+      startServiceComponents();
+      executeStartupTasks();
+      started=true;
+      profiler.stop();
+    }
+ catch (    Exception e) {
+      LoggerFactory.getLogger(getClass()).error("Fail to start server",e);
+      throw new IllegalStateException("Fail to start server",e);
+    }
   }
 }
