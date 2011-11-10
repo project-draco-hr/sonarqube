@@ -1,0 +1,19 @@
+{
+  List<String> tables=listTables();
+  Connection connection=myBatis.openSession().getConnection();
+  Statement statement=connection.createStatement();
+  for (  String table : tables) {
+    statement.executeUpdate(databaseCommands.truncate(table));
+    connection.commit();
+    try {
+      statement.executeUpdate(databaseCommands.resetPrimaryKey(table));
+      connection.commit();
+    }
+ catch (    Exception e) {
+      connection.rollback();
+    }
+  }
+  statement.close();
+  connection.commit();
+  connection.close();
+}
