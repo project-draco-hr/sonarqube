@@ -1,0 +1,14 @@
+{
+  Snapshot currentSnapshot=resourcePersister.getSnapshot(resource);
+  if (currentSnapshot != null) {
+    Date currentDate=new Date();
+    for (    Violation violation : context.getViolations()) {
+      RuleFailureModel ruleFailure=violationTrackingDecorator.getReferenceViolation(violation);
+      if (ruleFailure != null) {
+        violationsPerPermanentId.put(ruleFailure.getPermanentId(),violation);
+      }
+    }
+    updateReviews(currentSnapshot.getResourceId(),currentDate);
+    databaseSession.commit();
+  }
+}
