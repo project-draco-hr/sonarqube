@@ -1,0 +1,14 @@
+{
+  Multiset<RulePriority> severitiesBag=HashMultiset.create();
+  for (  Violation violation : context.getViolations()) {
+    severitiesBag.add(violation.getSeverity());
+  }
+  for (  RulePriority severity : RulePriority.values()) {
+    Metric metric=severityToMetric(severity);
+    if (context.getMeasure(metric) == null) {
+      Collection<Measure> children=context.getChildrenMeasures(MeasuresFilters.metric(metric));
+      int sum=MeasureUtils.sum(true,children).intValue() + severitiesBag.count(severity);
+      context.saveMeasure(metric,(double)sum);
+    }
+  }
+}

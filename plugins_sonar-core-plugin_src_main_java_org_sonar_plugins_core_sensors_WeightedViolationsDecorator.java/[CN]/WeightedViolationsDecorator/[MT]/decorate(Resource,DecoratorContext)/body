@@ -1,14 +1,3 @@
 {
-  loadWeights(context);
-  double debt=0.0;
-  Multiset<RulePriority> violationsByPriority=TreeMultiset.create();
-  for (  RuleMeasure violations : context.getMeasures(MeasuresFilters.rules(CoreMetrics.VIOLATIONS))) {
-    if (MeasureUtils.hasValue(violations)) {
-      violationsByPriority.add(violations.getRulePriority(),violations.getValue().intValue());
-      double add=(int)weights.get(violations.getRulePriority()) * violations.getValue();
-      debt+=add;
-    }
-  }
-  Measure debtMeasure=new Measure(CoreMetrics.WEIGHTED_VIOLATIONS,debt,KeyValueFormat.format(violationsByPriority));
-  saveMeasure(context,debtMeasure);
+  decorate(context,RuleUtils.getPriorityWeights(context.getProject().getConfiguration()));
 }

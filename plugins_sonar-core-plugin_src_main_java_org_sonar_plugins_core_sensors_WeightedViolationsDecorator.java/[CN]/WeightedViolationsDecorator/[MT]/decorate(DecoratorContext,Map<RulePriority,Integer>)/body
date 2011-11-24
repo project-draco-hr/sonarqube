@@ -1,0 +1,14 @@
+{
+  double debt=0.0;
+  Multiset<RulePriority> distribution=TreeMultiset.create();
+  for (  RulePriority severity : RulePriority.values()) {
+    Measure measure=context.getMeasure(severityToMetric(severity));
+    if (measure != null && MeasureUtils.hasValue(measure)) {
+      distribution.add(severity,measure.getIntValue());
+      double add=weights.get(severity) * measure.getIntValue();
+      debt+=add;
+    }
+  }
+  Measure debtMeasure=new Measure(CoreMetrics.WEIGHTED_VIOLATIONS,debt,KeyValueFormat.format(distribution));
+  saveMeasure(context,debtMeasure);
+}
