@@ -1,11 +1,11 @@
 {
-  Configuration conf=new BaseConfiguration();
-  conf.setProperty("sonar.cobertura.maxmen","FOO");
+  Settings settings=new Settings(new PropertyDefinitions(CoberturaPlugin.class));
+  settings.setProperty("sonar.cobertura.maxmen","FOO");
+  CoberturaMavenPluginHandler coberturaMavenPluginHandler=new CoberturaMavenPluginHandler(settings);
   Project project=mock(Project.class);
-  when(project.getConfiguration()).thenReturn(conf);
   when(project.getPom()).thenReturn(new MavenProject());
   when(project.getExclusionPatterns()).thenReturn(new String[0]);
   MavenPlugin coberturaPlugin=new MavenPlugin(CoberturaUtils.COBERTURA_GROUP_ID,CoberturaUtils.COBERTURA_ARTIFACT_ID,null);
-  handler.configure(project,coberturaPlugin);
+  coberturaMavenPluginHandler.configure(project,coberturaPlugin);
   assertThat(coberturaPlugin.getParameter("maxmem"),is("FOO"));
 }
