@@ -6,14 +6,16 @@
   StringBuilder hql=new StringBuilder("SELECT o FROM ").append(entityClass.getSimpleName()).append(" o");
   if (criterias != null) {
     hql.append(" WHERE ");
-    Map<String,Object> mappedCriterias=new HashMap<String,Object>();
+    Map<String,Object> mappedCriterias=Maps.newHashMap();
     for (int i=0; i < criterias.length; i+=2) {
       mappedCriterias.put((String)criterias[i],criterias[i + 1]);
     }
     buildCriteriasHQL(hql,mappedCriterias);
     Query query=getEntityManager().createQuery(hql.toString());
     for (    Map.Entry<String,Object> entry : mappedCriterias.entrySet()) {
-      query.setParameter(entry.getKey(),entry.getValue());
+      if (entry.getValue() != null) {
+        query.setParameter(entry.getKey(),entry.getValue());
+      }
     }
     return query;
   }
