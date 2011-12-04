@@ -1,0 +1,20 @@
+{
+  ReviewDao reviewDao=mock(ReviewDao.class);
+  final Date reviewCreatedAt=DateUtils.parseDate("2011-12-25");
+  Review review=new Review().setRuleId(3).setViolationPermanentId(100).setCreatedAt(reviewCreatedAt).setSeverity("BLOCKER");
+  when(reviewDao.selectByQuery(Matchers.<ReviewQuery>anyObject())).thenReturn(Arrays.<Review>asList(review));
+  RuleFinder ruleFinder=mock(RuleFinder.class);
+  when(ruleFinder.findById(3)).thenReturn(new Rule());
+  DecoratorContext context=mock(DecoratorContext.class);
+  ManualViolationInjector injector=new ManualViolationInjector(reviewDao,ruleFinder);
+  injector.decorate(new Project("key").setId(100),context);
+  verify(context,times(1)).saveViolation(argThat(new BaseMatcher<Violation>(){
+    public boolean matches(    Object o){
+      Violation v=(Violation)o;
+      return v.getPermanentId() == 100 && v.getRule() != null && v.isManual() && v.getCreatedAt().equals(reviewCreatedAt) && v.getSeverity().equals(RulePriority.BLOCKER);
+    }
+    public void describeTo(    Description description){
+    }
+  }
+));
+}

@@ -14,19 +14,24 @@
   if (bucket != null && !bucket.isExcluded()) {
     boolean isIgnored=!force && violationFilters != null && violationFilters.isIgnored(violation);
     if (!isIgnored) {
-      ActiveRule activeRule=profile.getActiveRule(violation.getRule());
-      if (activeRule == null) {
-        if (currentProject.getReuseExistingRulesConfig()) {
-          violation.setSeverity(violation.getRule().getSeverity());
-          doAddViolation(violation,bucket);
-        }
- else {
-          LoggerFactory.getLogger(getClass()).debug("Rule is not activated, ignoring violation {}",violation);
-        }
+      if (violation.isManual()) {
+        doAddViolation(violation,bucket);
       }
  else {
-        violation.setSeverity(activeRule.getSeverity());
-        doAddViolation(violation,bucket);
+        ActiveRule activeRule=profile.getActiveRule(violation.getRule());
+        if (activeRule == null) {
+          if (currentProject.getReuseExistingRulesConfig()) {
+            violation.setSeverity(violation.getRule().getSeverity());
+            doAddViolation(violation,bucket);
+          }
+ else {
+            LoggerFactory.getLogger(getClass()).debug("Rule is not activated, ignoring violation {}",violation);
+          }
+        }
+ else {
+          violation.setSeverity(activeRule.getSeverity());
+          doAddViolation(violation,bucket);
+        }
       }
     }
   }
