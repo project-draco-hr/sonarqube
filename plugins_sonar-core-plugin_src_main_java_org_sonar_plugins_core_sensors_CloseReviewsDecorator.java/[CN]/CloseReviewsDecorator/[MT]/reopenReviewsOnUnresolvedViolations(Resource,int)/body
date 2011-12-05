@@ -1,0 +1,12 @@
+{
+  String conditions=" WHERE status='RESOLVED' AND resolution<>'FALSE-POSITIVE' AND manual_violation=:manualViolation AND resource_id=" + resourceId;
+  List<Review> reviews=databaseSession.getEntityManager().createNativeQuery("SELECT * FROM reviews " + conditions,Review.class).setParameter("manualViolation",false).getResultList();
+  for (  Review review : reviews) {
+    notifyReopened(resource,review);
+  }
+  int rowUpdated=databaseSession.createNativeQuery("UPDATE reviews SET status='REOPENED', resolution=NULL, updated_at=CURRENT_TIMESTAMP" + conditions).setParameter("manualViolation",false).executeUpdate();
+  if (rowUpdated > 0) {
+    LOG.debug("- {} reviews reopened on #{}",rowUpdated,resourceId);
+  }
+  return rowUpdated;
+}
