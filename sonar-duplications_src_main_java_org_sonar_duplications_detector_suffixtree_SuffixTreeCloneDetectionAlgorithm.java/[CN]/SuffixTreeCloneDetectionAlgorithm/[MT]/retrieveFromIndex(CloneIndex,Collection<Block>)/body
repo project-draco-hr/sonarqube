@@ -1,0 +1,45 @@
+{
+  String originResourceId=fileBlocks.iterator().next().getResourceId();
+  Set<ByteArray> hashes=Sets.newHashSet();
+  for (  Block fileBlock : fileBlocks) {
+    hashes.add(fileBlock.getBlockHash());
+  }
+  Map<String,List<Block>> collection=Maps.newHashMap();
+  for (  ByteArray hash : hashes) {
+    Collection<Block> blocks=index.getBySequenceHash(hash);
+    for (    Block blockFromIndex : blocks) {
+      String resourceId=blockFromIndex.getResourceId();
+      if (!originResourceId.equals(resourceId)) {
+        List<Block> list=collection.get(resourceId);
+        if (list == null) {
+          list=Lists.newArrayList();
+          collection.put(resourceId,list);
+        }
+        list.add(blockFromIndex);
+      }
+    }
+  }
+  if (collection.isEmpty() && hashes.size() == fileBlocks.size()) {
+    return null;
+  }
+  GeneralisedHashText text=new GeneralisedHashText();
+  List<Block> sortedFileBlocks=Lists.newArrayList(fileBlocks);
+  Collections.sort(sortedFileBlocks,BLOCK_COMPARATOR);
+  text.addAll(sortedFileBlocks);
+  text.addTerminator();
+  for (  List<Block> list : collection.values()) {
+    Collections.sort(list,BLOCK_COMPARATOR);
+    int i=0;
+    while (i < list.size()) {
+      int j=i + 1;
+      while ((j < list.size()) && (list.get(j).getIndexInFile() == list.get(j - 1).getIndexInFile() + 1)) {
+        j++;
+      }
+      text.addAll(list.subList(i,j));
+      text.addTerminator();
+      i=j;
+    }
+  }
+  text.finish();
+  return text;
+}

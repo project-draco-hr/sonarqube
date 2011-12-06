@@ -1,0 +1,14 @@
+{
+  CloneIndex cloneIndex=createIndex();
+  List<Block> fileBlocks=Arrays.asList(new Block("a",new ByteArray("1".getBytes()),0,0,1),new Block("a",new ByteArray("2".getBytes()),1,0,1),new Block("a",new ByteArray("1".getBytes()),2,0,1));
+  List<CloneGroup> clones=detect(cloneIndex,fileBlocks);
+  print(clones);
+  assertThat(clones.size(),is(1));
+  Iterator<CloneGroup> clonesIterator=clones.iterator();
+  CloneGroup clone=clonesIterator.next();
+  assertThat(clone.getCloneUnitLength(),is(1));
+  assertThat(clone.getCloneParts().size(),is(2));
+  assertThat(clone.getOriginPart(),is(new ClonePart("a",0,0,1)));
+  assertThat(clone.getCloneParts(),hasItem(new ClonePart("a",0,0,1)));
+  assertThat(clone.getCloneParts(),hasItem(new ClonePart("a",2,0,1)));
+}
