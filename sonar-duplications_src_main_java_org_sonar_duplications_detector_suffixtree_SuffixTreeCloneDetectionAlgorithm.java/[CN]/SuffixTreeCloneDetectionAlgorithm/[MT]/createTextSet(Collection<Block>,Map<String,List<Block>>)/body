@@ -1,0 +1,19 @@
+{
+  TextSet.Builder textSetBuilder=TextSet.builder();
+  List<Block> sortedFileBlocks=Lists.newArrayList(fileBlocks);
+  Collections.sort(sortedFileBlocks,BLOCK_COMPARATOR);
+  textSetBuilder.add(sortedFileBlocks);
+  for (  List<Block> list : fromIndex.values()) {
+    Collections.sort(list,BLOCK_COMPARATOR);
+    int i=0;
+    while (i < list.size()) {
+      int j=i + 1;
+      while ((j < list.size()) && (list.get(j).getIndexInFile() == list.get(j - 1).getIndexInFile() + 1)) {
+        j++;
+      }
+      textSetBuilder.add(list.subList(i,j));
+      i=j;
+    }
+  }
+  return textSetBuilder.build();
+}
