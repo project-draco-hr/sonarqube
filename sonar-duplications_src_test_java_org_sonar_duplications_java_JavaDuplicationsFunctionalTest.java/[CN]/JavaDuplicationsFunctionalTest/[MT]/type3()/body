@@ -1,0 +1,9 @@
+{
+  String fragment0=source("public int getSoLinger() throws SocketException {","  Object o = impl.getOption( SocketOptions.SO_LINGER);","  if (o instanceof Integer) {","    return((Integer) o).intValue();","  }","  else return -1;","}");
+  String fragment1=source("public synchronized int getSoTimeout() throws SocketException {","  Object o = impl.getOption( SocketOptions.SO_TIMEOUT);","  if (o instanceof Integer) {","    return((Integer) o).intValue();","  }","  else return -0;","}");
+  List<CloneGroup> duplications=detect2(fragment0,fragment1);
+  assertThat(duplications.size(),is(1));
+  ClonePart part=duplications.get(0).getOriginPart();
+  assertThat(part.getLineStart(),is(3));
+  assertThat(part.getLineEnd(),is(6));
+}
