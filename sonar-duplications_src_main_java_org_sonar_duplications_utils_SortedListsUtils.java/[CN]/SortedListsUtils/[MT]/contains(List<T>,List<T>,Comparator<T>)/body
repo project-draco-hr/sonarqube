@@ -1,22 +1,24 @@
 {
-  int j=0;
-  for (int i=0; i < list.size(); i++) {
-    T e1=list.get(i);
-    boolean found=false;
-    for (; j < container.size(); j++) {
-      T e2=container.get(j);
-      int c=comparator.compare(e1,e2);
-      if (c == 0) {
-        found=true;
-        break;
+  Iterator<T> listIterator=list.iterator();
+  Iterator<T> containerIterator=container.iterator();
+  T listElement=listIterator.next();
+  T containerElement=containerIterator.next();
+  while (true) {
+    int r=comparator.compare(containerElement,listElement);
+    if (r == 0) {
+      if (!listIterator.hasNext()) {
+        return true;
       }
- else       if (c < 0) {
+      listElement=listIterator.next();
+    }
+ else     if (r < 0) {
+      if (!containerIterator.hasNext()) {
         return false;
       }
+      containerElement=containerIterator.next();
     }
-    if (!found) {
+ else {
       return false;
     }
   }
-  return true;
 }
