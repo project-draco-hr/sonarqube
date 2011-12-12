@@ -1,0 +1,16 @@
+{
+  if (!ResourceUtils.isPersistable(resource)) {
+    return;
+  }
+  Map<Integer,Violation> violationMap=filterViolationsPerPermanent(context.getViolations());
+  if (!violationMap.isEmpty()) {
+    Set<Integer> permanentIds=violationMap.keySet();
+    List<Review> reviews=selectReviewsWithManualSeverity(permanentIds);
+    for (    Review review : reviews) {
+      Violation violation=violationMap.get(review.getViolationPermanentId());
+      if (violation != null) {
+        violation.setSeverity(RulePriority.valueOf(review.getSeverity()));
+      }
+    }
+  }
+}

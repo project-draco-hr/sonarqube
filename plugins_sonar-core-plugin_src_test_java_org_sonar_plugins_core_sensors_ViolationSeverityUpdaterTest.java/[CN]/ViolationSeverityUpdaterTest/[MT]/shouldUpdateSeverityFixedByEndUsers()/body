@@ -1,0 +1,14 @@
+{
+  ReviewDao reviewDao=mock(ReviewDao.class);
+  when(reviewDao.selectByQuery(argThat(newReviewQueryMatcher(380)))).thenReturn(Arrays.<Review>asList(new Review().setManualSeverity(true).setSeverity(RulePriority.BLOCKER.toString()).setViolationPermanentId(380)));
+  DecoratorContext context=mock(DecoratorContext.class);
+  Violation newViolation=Violation.create(new Rule(),project).setSeverity(RulePriority.MINOR);
+  Violation unchangedViolation=Violation.create(new Rule(),project).setPermanentId(120).setSeverity(RulePriority.MINOR);
+  Violation changedViolation=Violation.create(new Rule(),project).setPermanentId(380).setSeverity(RulePriority.MINOR);
+  when(context.getViolations()).thenReturn(Arrays.<Violation>asList(newViolation,unchangedViolation,changedViolation));
+  ViolationSeverityUpdater updater=new ViolationSeverityUpdater(reviewDao);
+  updater.decorate(project,context);
+  assertThat(newViolation.getSeverity(),Is.is(RulePriority.MINOR));
+  assertThat(unchangedViolation.getSeverity(),Is.is(RulePriority.MINOR));
+  assertThat(changedViolation.getSeverity(),Is.is(RulePriority.BLOCKER));
+}
