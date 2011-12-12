@@ -1,0 +1,35 @@
+{
+  Date now=new Date();
+  org.sonar.persistence.model.Dashboard dashboardDataModel=new org.sonar.persistence.model.Dashboard();
+  dashboardDataModel.setKey(dashboard.getId());
+  dashboardDataModel.setName(i18nManager.message(Locale.ENGLISH,"dashboard." + dashboard.getId() + ".name",dashboard.getName()));
+  dashboardDataModel.setDescription(dashboard.getDescription());
+  dashboardDataModel.setColumnLayout(dashboard.getLayout());
+  dashboardDataModel.setShared(true);
+  dashboardDataModel.setCreatedAt(now);
+  dashboardDataModel.setUpdatedAt(now);
+  DashboardWidgets dashboardWidgets=dashboard.getClass().getAnnotation(DashboardWidgets.class);
+  if (dashboardWidgets != null) {
+    for (    DashboardWidget dashboardWidget : dashboardWidgets.value()) {
+      Widget widget=new Widget();
+      widget.setKey(dashboardWidget.id());
+      widget.setName(i18nManager.message(Locale.ENGLISH,"widget." + dashboardWidget.id() + ".name",""));
+      widget.setColumnIndex(dashboardWidget.columnIndex());
+      widget.setRowIndex(dashboardWidget.rowIndex());
+      widget.setConfigured(true);
+      widget.setCreatedAt(now);
+      widget.setUpdatedAt(now);
+      dashboardDataModel.addWidget(widget);
+      WidgetProperty[] dashboardWidgetProperties=dashboardWidget.properties();
+      for (int i=0; i < dashboardWidgetProperties.length; i++) {
+        WidgetProperty dashboardWidgetProperty=dashboardWidgetProperties[i];
+        org.sonar.persistence.model.WidgetProperty widgetProperty=new org.sonar.persistence.model.WidgetProperty();
+        widgetProperty.setKey(dashboardWidgetProperty.key());
+        widgetProperty.setValue(dashboardWidgetProperty.defaultValue());
+        widgetProperty.setValueType(dashboardWidgetProperty.type().toString());
+        widget.addWidgetProperty(widgetProperty);
+      }
+    }
+  }
+  return dashboardDataModel;
+}
