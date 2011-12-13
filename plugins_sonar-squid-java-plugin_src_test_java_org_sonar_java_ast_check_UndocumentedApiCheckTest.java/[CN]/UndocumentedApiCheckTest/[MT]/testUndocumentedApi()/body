@@ -1,15 +1,9 @@
 {
   SourceFile file=(SourceFile)squid.search("UndocumentedApi.java");
-  List<CheckMessage> messages=Lists.newArrayList(file.getCheckMessages());
-  Collections.sort(messages,new Comparator<CheckMessage>(){
-    public int compare(    CheckMessage o1,    CheckMessage o2){
-      return o1.getLine() - o2.getLine();
-    }
-  }
-);
   assertThat(file.getInt(Metric.PUBLIC_API) - file.getInt(Metric.PUBLIC_DOC_API),is(3));
-  assertThat(file.getCheckMessages().size(),is(3));
-  assertThat(messages.get(0).getLine(),is(10));
-  assertThat(messages.get(1).getLine(),is(14));
-  assertThat(messages.get(2).getLine(),is(17));
+  CheckMessages checkMessages=new CheckMessages(file);
+  checkMessages.assertNext().atLine(10);
+  checkMessages.assertNext().atLine(14);
+  checkMessages.assertNext().atLine(17);
+  checkMessages.assertNoMore();
 }
