@@ -1,0 +1,21 @@
+{
+  SqlSession session=mybatis.openSession();
+  DashboardMapper dashboardMapper=session.getMapper(DashboardMapper.class);
+  WidgetMapper widgetMapper=session.getMapper(WidgetMapper.class);
+  WidgetPropertyMapper widgetPropertyMapper=session.getMapper(WidgetPropertyMapper.class);
+  try {
+    dashboardMapper.insert(dashboardDto);
+    for (    WidgetDto widgetDto : dashboardDto.getWidgets()) {
+      widgetDto.setDashboardId(dashboardDto.getId());
+      widgetMapper.insert(widgetDto);
+      for (      WidgetPropertyDto widgetPropertyDto : widgetDto.getWidgetProperties()) {
+        widgetPropertyDto.setWidgetId(widgetDto.getId());
+        widgetPropertyMapper.insert(widgetPropertyDto);
+      }
+    }
+    session.commit();
+  }
+  finally {
+    session.close();
+  }
+}
