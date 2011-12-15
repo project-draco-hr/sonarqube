@@ -1,0 +1,31 @@
+{
+  LinkedList<Node> stack=Lists.newLinkedList();
+  stack.add(tree.getRootNode());
+  while (!stack.isEmpty()) {
+    Node node=stack.removeLast();
+    node.startSize=list.size();
+    if (node.getEdges().isEmpty()) {
+      list.add(node.depth);
+      node.endSize=list.size();
+    }
+ else {
+      if (node != tree.getRootNode()) {
+        innerNodes.add(node);
+      }
+      for (      Edge edge : node.getEdges()) {
+        Node endNode=edge.getEndNode();
+        endNode.depth=node.depth + edge.getSpan() + 1;
+        stack.addLast(endNode);
+      }
+    }
+  }
+  ListIterator<Node> iterator=innerNodes.listIterator(innerNodes.size());
+  while (iterator.hasPrevious()) {
+    Node node=iterator.previous();
+    int max=-1;
+    for (    Edge edge : node.getEdges()) {
+      max=Math.max(edge.getEndNode().endSize,max);
+    }
+    node.endSize=max;
+  }
+}
