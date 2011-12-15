@@ -1,0 +1,19 @@
+{
+  TimeProfiler profiler=new TimeProfiler().start("Register dashboards");
+  List<DashboardDto> loadedDashboards=Lists.newArrayList();
+  DashboardDto mainDashboard=null;
+  for (  DashboardTemplate dashboardTemplate : dashboardTemplates) {
+    Dashboard dashboard=dashboardTemplate.createDashboard();
+    if (shouldBeRegistered(dashboard)) {
+      DashboardDto dashboardDto=loadDashboard(dashboard);
+      if (MAIN_DASHBOARD_ID.equals(dashboard.getId())) {
+        mainDashboard=dashboardDto;
+      }
+ else {
+        loadedDashboards.add(dashboardDto);
+      }
+    }
+  }
+  activateDashboards(loadedDashboards,mainDashboard);
+  profiler.stop();
+}
