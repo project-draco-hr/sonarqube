@@ -1,0 +1,22 @@
+{
+  if (StringUtils.isBlank(resourceName)) {
+    return;
+  }
+  String normalizedName=normalize(resourceName);
+  if (normalizedName.length() >= MINIMUM_KEY_SIZE) {
+    SqlSession sqlSession=mybatis.openSession(ExecutorType.BATCH);
+    try {
+      ResourceIndexMapper mapper=sqlSession.getMapper(ResourceIndexMapper.class);
+      ResourceIndexDto dto=new ResourceIndexDto().setResourceId(resourceId).setProjectId(projectId);
+      for (int position=0; position <= normalizedName.length() - MINIMUM_KEY_SIZE; position++) {
+        dto.setPosition(position);
+        dto.setKey(StringUtils.substring(normalizedName,position));
+        mapper.insert(dto);
+      }
+      sqlSession.commit();
+    }
+  finally {
+      sqlSession.close();
+    }
+  }
+}
