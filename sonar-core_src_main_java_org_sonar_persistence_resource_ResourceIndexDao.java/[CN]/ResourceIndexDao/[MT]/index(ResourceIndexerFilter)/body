@@ -1,0 +1,17 @@
+{
+  TimeProfiler profiler=new TimeProfiler().start("Index resources");
+  final SqlSession sqlSession=mybatis.openSession(ExecutorType.BATCH);
+  try {
+    sqlSession.select("selectResourcesToIndex",filter,new ResultHandler(){
+      public void handleResult(      ResultContext context){
+        ResourceDto resource=(ResourceDto)context.getResultObject();
+        index(resource,sqlSession);
+      }
+    }
+);
+  }
+  finally {
+    sqlSession.close();
+    profiler.stop();
+  }
+}
