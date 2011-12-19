@@ -1,0 +1,30 @@
+{
+  String name=resource.getName();
+  if (StringUtils.isBlank(name)) {
+    return;
+  }
+  String normalizedName=normalize(name);
+  if (normalizedName.length() >= MINIMUM_KEY_SIZE) {
+    ResourceIndexerMapper mapper=session.getMapper(ResourceIndexerMapper.class);
+    Integer rootId;
+    if (resource.getRootId() != null) {
+      ResourceDto root=mapper.selectRootId(resource.getRootId());
+      if (root != null) {
+        rootId=(Integer)ObjectUtils.defaultIfNull(root.getRootId(),root.getId());
+      }
+ else {
+        rootId=resource.getRootId();
+      }
+    }
+ else {
+      rootId=resource.getId();
+    }
+    ResourceIndexDto dto=new ResourceIndexDto().setResourceId(resource.getId()).setProjectId(rootId).setNameSize(name.length());
+    for (int position=0; position <= normalizedName.length() - MINIMUM_KEY_SIZE; position++) {
+      dto.setPosition(position);
+      dto.setKey(StringUtils.substring(normalizedName,position));
+      mapper.insert(dto);
+    }
+    session.commit();
+  }
+}
