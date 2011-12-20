@@ -1,0 +1,16 @@
+{
+  String[] includedArtifactIds=settings.getStringArray("sonar.includedModules");
+  boolean excluded=false;
+  if (!isRoot && includedArtifactIds.length > 0) {
+    excluded=!ArrayUtils.contains(includedArtifactIds,artifactId);
+  }
+  if (!excluded) {
+    String[] excludedArtifactIds=settings.getStringArray("sonar.skippedModules");
+    excluded=ArrayUtils.contains(excludedArtifactIds,artifactId);
+  }
+  if (excluded && isRoot) {
+    LoggerFactory.getLogger(getClass()).warn("The root module can't be excluded: " + artifactId);
+    excluded=false;
+  }
+  return excluded;
+}
