@@ -15,7 +15,8 @@
       IOFileFilter visibleFileFilter=HiddenFileFilter.VISIBLE;
       List<IOFileFilter> fileFilters=Lists.newArrayList(visibleFileFilter,suffixFilter,exclusionFilter,initialFilesFilter);
       fileFilters.addAll(this.filters);
-      List<File> files=(List<File>)FileUtils.listFiles(dir,new AndFileFilter(fileFilters),HiddenFileFilter.VISIBLE);
+      IOFileFilter dotPrefixDirFilter=FileFilterUtils.notFileFilter(FileFilterUtils.prefixFileFilter("."));
+      List<File> files=(List<File>)FileUtils.listFiles(dir,new AndFileFilter(fileFilters),FileFilterUtils.and(HiddenFileFilter.VISIBLE,dotPrefixDirFilter));
       for (      File file : files) {
         String relativePath=DefaultProjectFileSystem.getRelativePath(file,dir);
         result.add(InputFileUtils.create(dir,relativePath));
