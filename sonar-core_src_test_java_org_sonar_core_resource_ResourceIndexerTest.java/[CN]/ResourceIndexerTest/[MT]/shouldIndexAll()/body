@@ -1,0 +1,14 @@
+{
+  ResourceIndexerDao dao=mock(ResourceIndexerDao.class);
+  ResourceIndexer indexer=new ResourceIndexer(dao);
+  indexer.indexAll();
+  verify(dao).index(argThat(new BaseMatcher<ResourceIndexerFilter>(){
+    public boolean matches(    Object o){
+      ResourceIndexerFilter filter=(ResourceIndexerFilter)o;
+      return filter.isEnabled() && filter.getScopes().length == 2 && filter.getQualifiers().length == ResourceIndexer.INDEXABLE_QUALIFIERS.length;
+    }
+    public void describeTo(    Description description){
+    }
+  }
+));
+}
