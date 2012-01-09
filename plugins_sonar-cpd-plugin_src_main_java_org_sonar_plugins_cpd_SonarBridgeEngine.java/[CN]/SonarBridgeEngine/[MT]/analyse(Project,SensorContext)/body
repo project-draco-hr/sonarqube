@@ -1,0 +1,27 @@
+{
+  ProjectFileSystem fileSystem=project.getFileSystem();
+  List<InputFile> inputFiles=fileSystem.mainFiles(project.getLanguageKey());
+  if (inputFiles.isEmpty()) {
+    return;
+  }
+  CpdMapping mapping=getMapping(project.getLanguage());
+  BlockChunker blockChunker=new BlockChunker(getMinimumTokens(project));
+  CloneIndex index=new PackedMemoryCloneIndex();
+  TokenizerBridge bridge=new TokenizerBridge(mapping.getTokenizer(),fileSystem.getSourceCharset().name());
+  for (  InputFile inputFile : inputFiles) {
+    Resource resource=mapping.createResource(inputFile.getFile(),fileSystem.getSourceDirs());
+    String resourceId=getFullKey(project,resource);
+    List<Block> blocks=blockChunker.chunk(resourceId,bridge.tokenize(inputFile.getFile()));
+    for (    Block block : blocks) {
+      index.insert(block);
+    }
+  }
+  bridge.clearCache();
+  for (  InputFile inputFile : inputFiles) {
+    Resource resource=mapping.createResource(inputFile.getFile(),fileSystem.getSourceDirs());
+    String resourceId=getFullKey(project,resource);
+    Collection<Block> fileBlocks=index.getByResourceId(resourceId);
+    List<CloneGroup> duplications=SuffixTreeCloneDetectionAlgorithm.detect(index,fileBlocks);
+    SonarEngine.save(context,resource,duplications);
+  }
+}
