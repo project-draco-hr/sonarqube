@@ -1,0 +1,19 @@
+{
+  SqlSession sqlSession=mybatis.openSession();
+  try {
+    ReviewMapper mapper=sqlSession.getMapper(ReviewMapper.class);
+    Integer result=0;
+    if (query.needToPartitionQuery()) {
+      for (      ReviewQuery partitionedQuery : query.partition()) {
+        result+=mapper.countByQuery(partitionedQuery);
+      }
+    }
+ else {
+      result=mapper.countByQuery(query);
+    }
+    return result;
+  }
+  finally {
+    sqlSession.close();
+  }
+}

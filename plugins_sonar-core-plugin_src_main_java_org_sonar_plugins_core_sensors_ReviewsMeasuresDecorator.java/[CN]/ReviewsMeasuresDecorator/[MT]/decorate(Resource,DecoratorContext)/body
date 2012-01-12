@@ -1,0 +1,19 @@
+{
+  if (!ResourceUtils.isFile(resource)) {
+    return;
+  }
+  ReviewQuery openReviewQuery=ReviewQuery.create().setResourceId(resource.getId()).addStatus(ReviewDto.STATUS_OPEN).addStatus(ReviewDto.STATUS_REOPENED);
+  Integer openReviewsCount=reviewDao.countByQuery(openReviewQuery);
+  context.saveMeasure(CoreMetrics.ACTIVE_REVIEWS,openReviewsCount.doubleValue());
+  ReviewQuery unassignedReviewQuery=ReviewQuery.copy(openReviewQuery).setNoAssignee();
+  Integer unassignedReviewsCount=reviewDao.countByQuery(unassignedReviewQuery);
+  context.saveMeasure(CoreMetrics.UNASSIGNED_REVIEWS,unassignedReviewsCount.doubleValue());
+  ReviewQuery plannedReviewQuery=ReviewQuery.copy(openReviewQuery).setPlanned();
+  int plannedReviewsCount=reviewDao.countByQuery(plannedReviewQuery);
+  context.saveMeasure(CoreMetrics.UNPLANNED_REVIEWS,(double)(openReviewsCount - plannedReviewsCount));
+  ReviewQuery falsePositiveReviewQuery=ReviewQuery.create().setResourceId(resource.getId()).addResolution(ReviewDto.RESOLUTION_FALSE_POSITIVE);
+  Integer falsePositiveReviewsCount=reviewDao.countByQuery(falsePositiveReviewQuery);
+  context.saveMeasure(CoreMetrics.FALSE_POSITIVE_REVIEWS,falsePositiveReviewsCount.doubleValue());
+  int violationsCount=context.getViolations().size();
+  context.saveMeasure(CoreMetrics.VIOLATIONS_WITHOUT_REVIEW,(double)(violationsCount - openReviewsCount - falsePositiveReviewsCount));
+}
