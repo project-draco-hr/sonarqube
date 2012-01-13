@@ -1,0 +1,24 @@
+{
+  List<Field> result=Lists.newArrayList();
+  Class c=clazz;
+  while (c != null) {
+    for (    Field declaredField : c.getDeclaredFields()) {
+      if (!Modifier.isPublic(declaredField.getModifiers())) {
+        if (forceAccess) {
+          declaredField.setAccessible(true);
+        }
+ else {
+          continue;
+        }
+      }
+      result.add(declaredField);
+    }
+    c=c.getSuperclass();
+  }
+  for (  Object anInterface : ClassUtils.getAllInterfaces(clazz)) {
+    for (    Field declaredField : ((Class)anInterface).getDeclaredFields()) {
+      result.add(declaredField);
+    }
+  }
+  return result;
+}
