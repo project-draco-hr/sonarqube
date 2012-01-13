@@ -1,0 +1,21 @@
+{
+  ReviewDao reviewDao=mock(ReviewDao.class);
+  when(reviewDao.countByQuery(argThat(openReviewQueryMatcher()))).thenReturn(10);
+  when(reviewDao.countByQuery(argThat(unassignedReviewQueryMatcher()))).thenReturn(2);
+  when(reviewDao.countByQuery(argThat(plannedReviewQueryMatcher()))).thenReturn(3);
+  when(reviewDao.countByQuery(argThat(falsePositiveReviewQueryMatcher()))).thenReturn(4);
+  ReviewsMeasuresDecorator decorator=new ReviewsMeasuresDecorator(reviewDao);
+  Resource<?> resource=new Project("foo").setId(1);
+  DecoratorContext context=mock(DecoratorContext.class);
+  when(context.getMeasure(CoreMetrics.VIOLATIONS)).thenReturn(new Measure(CoreMetrics.VIOLATIONS,35d));
+  when(context.getChildrenMeasures(CoreMetrics.ACTIVE_REVIEWS)).thenReturn(Lists.newArrayList(new Measure(CoreMetrics.ACTIVE_REVIEWS,7d)));
+  when(context.getChildrenMeasures(CoreMetrics.UNASSIGNED_REVIEWS)).thenReturn(Lists.newArrayList(new Measure(CoreMetrics.UNASSIGNED_REVIEWS,1d)));
+  when(context.getChildrenMeasures(CoreMetrics.UNPLANNED_REVIEWS)).thenReturn(Lists.newArrayList(new Measure(CoreMetrics.UNPLANNED_REVIEWS,2d)));
+  when(context.getChildrenMeasures(CoreMetrics.FALSE_POSITIVE_REVIEWS)).thenReturn(Lists.newArrayList(new Measure(CoreMetrics.FALSE_POSITIVE_REVIEWS,2d)));
+  decorator.decorate(resource,context);
+  verify(context).saveMeasure(CoreMetrics.ACTIVE_REVIEWS,10d + 7d);
+  verify(context).saveMeasure(CoreMetrics.UNASSIGNED_REVIEWS,2d + 1d);
+  verify(context).saveMeasure(CoreMetrics.UNPLANNED_REVIEWS,7d + 2d);
+  verify(context).saveMeasure(CoreMetrics.FALSE_POSITIVE_REVIEWS,4d + 2d);
+  verify(context).saveMeasure(CoreMetrics.VIOLATIONS_WITHOUT_REVIEW,35d - (10d + 7d));
+}
