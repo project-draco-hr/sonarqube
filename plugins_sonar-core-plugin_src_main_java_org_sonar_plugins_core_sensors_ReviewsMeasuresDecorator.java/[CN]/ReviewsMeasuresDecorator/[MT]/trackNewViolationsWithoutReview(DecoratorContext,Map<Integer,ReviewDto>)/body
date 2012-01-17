@@ -1,0 +1,12 @@
+{
+  List<Violation> violations=context.getViolations();
+  Measure measure=new Measure(CoreMetrics.NEW_VIOLATIONS_WITHOUT_REVIEW);
+  for (  PastSnapshot pastSnapshot : timeMachineConfiguration.getProjectPastSnapshots()) {
+    int newUnreviewedViolations=countNewUnreviewedViolationsForSnapshot(pastSnapshot,violations,openReviewsByViolationPermanentIds);
+    int variationIndex=pastSnapshot.getIndex();
+    Collection<Measure> children=context.getChildrenMeasures(CoreMetrics.NEW_VIOLATIONS_WITHOUT_REVIEW);
+    double sumNewUnreviewedViolations=MeasureUtils.sumOnVariation(true,variationIndex,children) + newUnreviewedViolations;
+    measure.setVariation(variationIndex,sumNewUnreviewedViolations);
+  }
+  context.saveMeasure(measure);
+}

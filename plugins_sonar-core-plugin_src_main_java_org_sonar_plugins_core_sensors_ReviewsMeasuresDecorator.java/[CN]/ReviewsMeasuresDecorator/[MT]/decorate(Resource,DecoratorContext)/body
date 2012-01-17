@@ -3,7 +3,12 @@
     return;
   }
   ReviewQuery openReviewQuery=ReviewQuery.create().setResourceId(resource.getId()).addStatus(ReviewDto.STATUS_OPEN).addStatus(ReviewDto.STATUS_REOPENED);
-  Double resourceOpenReviewsCount=reviewDao.countByQuery(openReviewQuery).doubleValue();
+  List<ReviewDto> openReviews=reviewDao.selectByQuery(openReviewQuery);
+  Map<Integer,ReviewDto> openReviewsByViolationPermanentIds=Maps.newHashMap();
+  for (  ReviewDto reviewDto : openReviews) {
+    openReviewsByViolationPermanentIds.put(reviewDto.getViolationPermanentId(),reviewDto);
+  }
+  Double resourceOpenReviewsCount=(double)openReviewsByViolationPermanentIds.size();
   Double totalOpenReviewsCount=resourceOpenReviewsCount + getChildrenSum(resource,context,CoreMetrics.ACTIVE_REVIEWS);
   context.saveMeasure(CoreMetrics.ACTIVE_REVIEWS,totalOpenReviewsCount);
   ReviewQuery unassignedReviewQuery=ReviewQuery.copy(openReviewQuery).setNoAssignee();
@@ -20,4 +25,5 @@
   context.saveMeasure(CoreMetrics.FALSE_POSITIVE_REVIEWS,totalFalsePositiveReviewsCount);
   Double violationsCount=MeasureUtils.getValue(context.getMeasure(CoreMetrics.VIOLATIONS),0.0);
   context.saveMeasure(CoreMetrics.VIOLATIONS_WITHOUT_REVIEW,violationsCount - totalOpenReviewsCount);
+  trackNewViolationsWithoutReview(context,openReviewsByViolationPermanentIds);
 }
