@@ -1,6 +1,13 @@
 {
+  final String completeKey;
+  if (StringUtils.isNotBlank(branch)) {
+    completeKey=String.format("%s:%s",moduleKey,branch);
+  }
+ else {
+    completeKey=moduleKey;
+  }
   DatabaseSession session=prepareDbSession(dbFactory);
-  ResourceModel resource=session.getSingleResult(ResourceModel.class,"key",moduleKey);
+  ResourceModel resource=session.getSingleResult(ResourceModel.class,"key",completeKey);
   if (resource != null) {
     return session.createQuery("from " + Property.class.getSimpleName() + " p where p.resourceId=:resourceId and p.userId is null").setParameter("resourceId",resource.getId()).getResultList();
   }
