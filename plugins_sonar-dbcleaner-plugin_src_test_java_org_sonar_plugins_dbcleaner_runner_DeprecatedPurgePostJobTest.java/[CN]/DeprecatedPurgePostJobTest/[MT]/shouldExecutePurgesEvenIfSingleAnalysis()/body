@@ -1,0 +1,18 @@
+{
+  setupData("shared");
+  final int currentSID=1000;
+  Snapshot snapshot=getSession().getSingleResult(Snapshot.class,"id",currentSID);
+  Purge purge1=mock(Purge.class);
+  Purge purge2=mock(Purge.class);
+  Purge[] purges=new Purge[]{purge1,purge2};
+  new DeprecatedPurgePostJob(getSession(),new Project("key"),snapshot,purges).purge();
+  verify(purge1).purge(argThat(new BaseMatcher<PurgeContext>(){
+    public boolean matches(    Object o){
+      PurgeContext context=(PurgeContext)o;
+      return context.getSnapshotId() == currentSID && context.getPreviousSnapshotId() == null;
+    }
+    public void describeTo(    Description description){
+    }
+  }
+));
+}

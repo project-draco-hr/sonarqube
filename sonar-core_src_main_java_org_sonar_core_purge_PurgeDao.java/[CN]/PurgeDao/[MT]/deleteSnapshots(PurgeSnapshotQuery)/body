@@ -1,0 +1,19 @@
+{
+  SqlSession session=mybatis.openSession(ExecutorType.BATCH);
+  try {
+    final PurgeMapper mapper=session.getMapper(PurgeMapper.class);
+    final BatchSession batchSession=new BatchSession(session);
+    session.select("selectSnapshotIds",query,new ResultHandler(){
+      public void handleResult(      ResultContext context){
+        Long snapshotId=(Long)context.getResultObject();
+        batchSession.increment(deleteSnapshot(snapshotId,mapper));
+      }
+    }
+);
+    batchSession.commit();
+    return this;
+  }
+  finally {
+    MyBatis.closeSessionQuietly(session);
+  }
+}
