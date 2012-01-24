@@ -3,15 +3,7 @@
   if (inputFiles.isEmpty()) {
     return;
   }
-  final SonarDuplicationsIndex index;
-  if (isCrossProject(project)) {
-    LOG.info("Cross-project analysis enabled");
-    index=new SonarDuplicationsIndex(new DbDuplicationsIndex(resourcePersister,project,dao));
-  }
- else {
-    LOG.info("Cross-project analysis disabled");
-    index=new SonarDuplicationsIndex();
-  }
+  final SonarDuplicationsIndex index=indexFactory.create(project);
   TokenChunker tokenChunker=JavaTokenProducer.build();
   StatementChunker statementChunker=JavaStatementBuilder.build();
   BlockChunker blockChunker=new BlockChunker(BLOCK_SIZE);
