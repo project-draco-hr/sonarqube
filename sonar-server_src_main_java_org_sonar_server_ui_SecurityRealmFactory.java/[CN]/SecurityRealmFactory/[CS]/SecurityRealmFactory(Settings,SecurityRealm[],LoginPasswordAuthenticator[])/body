@@ -6,15 +6,13 @@
   if (!StringUtils.isEmpty(realmName)) {
     selectedRealm=selectRealm(realms,realmName);
     if (selectedRealm == null) {
-      LOG.error("Realm not found. Please check the property '" + REALM_PROPERTY + "' in conf/sonar.properties");
-      throw new AuthenticatorNotFoundException(realmName);
+      throw new SonarException("Realm '" + realmName + "' not found. Please check the property '"+ REALM_PROPERTY+ "' in conf/sonar.properties");
     }
   }
   if (selectedRealm == null && !StringUtils.isEmpty(className)) {
     LoginPasswordAuthenticator authenticator=selectAuthenticator(authenticators,className);
     if (authenticator == null) {
-      LOG.error("Authenticator plugin not found. Please check the property '" + CoreProperties.CORE_AUTHENTICATOR_CLASS + "' in conf/sonar.properties");
-      throw new AuthenticatorNotFoundException(className);
+      throw new SonarException("Authenticator '" + className + "' not found. Please check the property '"+ CoreProperties.CORE_AUTHENTICATOR_CLASS+ "' in conf/sonar.properties");
     }
     selectedRealm=new CompatibilityRealm(authenticator);
   }
