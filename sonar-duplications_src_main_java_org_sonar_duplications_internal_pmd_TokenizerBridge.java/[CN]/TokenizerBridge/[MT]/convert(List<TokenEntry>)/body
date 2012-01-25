@@ -1,18 +1,22 @@
 {
-  ImmutableList.Builder<Statement> result=ImmutableList.builder();
-  int currentLine=Integer.MIN_VALUE;
+  ImmutableList.Builder<TokensLine> result=ImmutableList.builder();
   StringBuilder sb=new StringBuilder();
+  int startLine=Integer.MIN_VALUE;
+  int startIndex=0;
+  int currentIndex=0;
   for (  TokenEntry token : tokens) {
     if (token != TokenEntry.EOF) {
       String value=token.getValue();
       int line=token.getBeginLine();
-      if (line != currentLine) {
-        addNewStatement(result,currentLine,sb);
-        currentLine=line;
+      if (line != startLine) {
+        addNewTokensLine(result,startIndex,currentIndex,startLine,sb);
+        startIndex=currentIndex + 1;
+        startLine=line;
       }
+      currentIndex++;
       sb.append(value);
     }
   }
-  addNewStatement(result,currentLine,sb);
+  addNewTokensLine(result,startIndex,currentIndex,startLine,sb);
   return result.build();
 }

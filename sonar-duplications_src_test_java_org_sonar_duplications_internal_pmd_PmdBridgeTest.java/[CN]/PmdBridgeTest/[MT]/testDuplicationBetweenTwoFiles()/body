@@ -1,0 +1,16 @@
+{
+  File file1=new File("test-resources/org/sonar/duplications/cpd/CPDTest/CPDFile1.java");
+  File file2=new File("test-resources/org/sonar/duplications/cpd/CPDTest/CPDFile2.java");
+  addToIndex(file1);
+  addToIndex(file2);
+  List<CloneGroup> duplications=detect(file1);
+  assertThat(duplications.size(),is(1));
+  CloneGroup duplication=duplications.get(0);
+  assertThat(duplication.getOriginPart().getResourceId(),is(file1.getAbsolutePath()));
+  assertThat(duplication.getCloneParts().size(),is(2));
+  assertThat("length in tokens",duplication.getLengthInUnits(),is(115));
+  ClonePart part=duplication.getCloneParts().get(0);
+  assertThat(part.getResourceId(),is(file1.getAbsolutePath()));
+  assertThat(part.getStartLine(),is(18));
+  assertThat(part.getEndLine(),is(41));
+}

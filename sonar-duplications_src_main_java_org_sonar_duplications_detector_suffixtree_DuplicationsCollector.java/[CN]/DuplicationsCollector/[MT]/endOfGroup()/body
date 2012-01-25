@@ -1,7 +1,25 @@
 {
+  int lengthInUnits=0;
+  ClonePart origin=null;
+  List<ClonePart> parts=Lists.newArrayListWithCapacity(count);
+  for (  int[] b : blockNumbers) {
+    Block firstBlock=text.getBlock(b[0]);
+    Block lastBlock=text.getBlock(b[1]);
+    ClonePart part=new ClonePart(firstBlock.getResourceId(),firstBlock.getIndexInFile(),firstBlock.getFirstLineNumber(),lastBlock.getLastLineNumber());
+    if (originResourceId.equals(part.getResourceId())) {
+      if (origin == null) {
+        origin=part;
+        lengthInUnits=lastBlock.getEndUnit() - firstBlock.getStartUnit() + 1;
+      }
+ else       if (part.getUnitStart() < origin.getUnitStart()) {
+        origin=part;
+      }
+    }
+    parts.add(part);
+  }
   Collections.sort(parts,ContainsInComparator.CLONEPART_COMPARATOR);
   CloneGroup group=new CloneGroup(length,origin,parts);
+  group.setLengthInUnits(lengthInUnits);
   filter(group);
-  parts=null;
-  origin=null;
+  reset();
 }

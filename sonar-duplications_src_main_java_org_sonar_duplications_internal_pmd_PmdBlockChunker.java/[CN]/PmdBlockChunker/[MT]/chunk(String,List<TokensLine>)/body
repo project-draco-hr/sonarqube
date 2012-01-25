@@ -1,0 +1,24 @@
+{
+  if (fragments.size() < blockSize) {
+    return Collections.emptyList();
+  }
+  TokensLine[] fragmentsArr=fragments.toArray(new TokensLine[fragments.size()]);
+  List<Block> blocks=Lists.newArrayListWithCapacity(fragmentsArr.length - blockSize + 1);
+  long hash=0;
+  int first=0;
+  int last=0;
+  for (; last < blockSize - 1; last++) {
+    hash=hash * PRIME_BASE + fragmentsArr[last].getHashCode();
+  }
+  for (; last < fragmentsArr.length; last++, first++) {
+    TokensLine firstFragment=fragmentsArr[first];
+    TokensLine lastFragment=fragmentsArr[last];
+    hash=hash * PRIME_BASE + lastFragment.getHashCode();
+    Block block=new Block(resourceId,new ByteArray(hash),first,firstFragment.getStartLine(),lastFragment.getEndLine());
+    block.setStartUnit(firstFragment.getStartUnit());
+    block.setEndUnit(lastFragment.getEndUnit());
+    blocks.add(block);
+    hash-=power * firstFragment.getHashCode();
+  }
+  return blocks;
+}

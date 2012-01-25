@@ -6,20 +6,26 @@
   }
   CpdMapping mapping=getMapping(project.getLanguage());
   SonarDuplicationsIndex index=indexFactory.create(project);
-  BlockChunker blockChunker=new BlockChunker(BLOCK_SIZE);
   TokenizerBridge bridge=new TokenizerBridge(mapping.getTokenizer(),fileSystem.getSourceCharset().name());
   for (  InputFile inputFile : inputFiles) {
     Resource resource=mapping.createResource(inputFile.getFile(),fileSystem.getSourceDirs());
     String resourceId=SonarEngine.getFullKey(project,resource);
-    List<Block> blocks=blockChunker.chunk(resourceId,bridge.tokenize(inputFile.getFile()));
+    List<Block> blocks=bridge.chunk(resourceId,inputFile.getFile());
     index.insert(resource,blocks);
   }
-  bridge.clearCache();
+  final int minimumTokens=PmdEngine.getMinimumTokens(project);
+  Predicate<CloneGroup> minimumTokensPredicate=new Predicate<CloneGroup>(){
+    public boolean apply(    CloneGroup input){
+      return input.getLengthInUnits() >= minimumTokens;
+    }
+  }
+;
   for (  InputFile inputFile : inputFiles) {
     Resource resource=mapping.createResource(inputFile.getFile(),fileSystem.getSourceDirs());
     String resourceKey=SonarEngine.getFullKey(project,resource);
     Collection<Block> fileBlocks=index.getByResource(resource,resourceKey);
     List<CloneGroup> duplications=SuffixTreeCloneDetectionAlgorithm.detect(index,fileBlocks);
-    SonarEngine.save(context,resource,duplications);
+    Iterable<CloneGroup> filtered=Iterables.filter(duplications,minimumTokensPredicate);
+    SonarEngine.save(context,resource,filtered);
   }
 }
