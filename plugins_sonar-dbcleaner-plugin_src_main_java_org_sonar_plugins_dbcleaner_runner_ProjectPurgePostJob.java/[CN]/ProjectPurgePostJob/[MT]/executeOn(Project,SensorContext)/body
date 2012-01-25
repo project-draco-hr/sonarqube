@@ -1,15 +1,9 @@
 {
-  final Date beforeBuildDate=new Date();
-  ProjectPurgeContext purgeContext=new ProjectPurgeContext(){
-    public Long getRootProjectId(){
-      return new Long(project.getId());
-    }
-    public Date getBeforeBuildDate(){
-      return beforeBuildDate;
-    }
+  long projectId=(long)project.getId();
+  deleteAbortedBuilds(projectId);
+  deleteFileHistory(projectId);
+  if (settings.getBoolean(DbCleanerConstants.PROPERTY_CLEAN_DIRECTORY)) {
+    deleteDirectoryHistory(projectId);
   }
-;
-  Logger logger=LoggerFactory.getLogger(getClass());
-  logger.info("Optimizing project");
-  task.execute(purgeContext);
+  purgeProject(projectId);
 }

@@ -1,0 +1,15 @@
+{
+  List<Long> projectSnapshotIds=purgeMapper.selectSnapshotIds(PurgeSnapshotQuery.create().setResourceId(projectId).setIslast(false).setNotPurged(true));
+  for (  final Long projectSnapshotId : projectSnapshotIds) {
+    PurgeSnapshotQuery query=PurgeSnapshotQuery.create().setRootSnapshotId(projectSnapshotId).setNotPurged(true);
+    session.select("org.sonar.core.purge.PurgeMapper.selectSnapshotIds",query,new ResultHandler(){
+      public void handleResult(      ResultContext resultContext){
+        Long snapshotId=(Long)resultContext.getResultObject();
+        purgeSnapshot(snapshotId,purgeMapper);
+      }
+    }
+);
+    purgeSnapshot(projectSnapshotId,purgeMapper);
+  }
+  session.commit();
+}

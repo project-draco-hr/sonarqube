@@ -1,0 +1,17 @@
+{
+  SqlSession session=mybatis.openSession(ExecutorType.BATCH);
+  PurgeMapper purgeMapper=session.getMapper(PurgeMapper.class);
+  try {
+    List<Long> projectIds=resourceDao.getDescendantProjectIdsAndSelf(rootProjectId,session);
+    for (    Long projectId : projectIds) {
+      purgeProject(projectId,session,purgeMapper);
+    }
+    for (    Long projectId : projectIds) {
+      disableOrphanResources(projectId,session,purgeMapper);
+    }
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+  return this;
+}

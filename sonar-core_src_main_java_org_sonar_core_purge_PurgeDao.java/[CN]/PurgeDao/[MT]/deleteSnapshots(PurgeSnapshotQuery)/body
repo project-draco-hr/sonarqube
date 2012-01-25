@@ -1,19 +1,18 @@
 {
-  SqlSession session=mybatis.openSession(ExecutorType.BATCH);
+  final BatchSession session=mybatis.openBatchSession();
   try {
     final PurgeMapper mapper=session.getMapper(PurgeMapper.class);
-    final BatchSession batchSession=new BatchSession(session);
-    session.select("selectSnapshotIds",query,new ResultHandler(){
+    session.select("org.sonar.core.purge.PurgeMapper.selectSnapshotIds",query,new ResultHandler(){
       public void handleResult(      ResultContext context){
         Long snapshotId=(Long)context.getResultObject();
-        batchSession.increment(deleteSnapshot(snapshotId,mapper));
+        session.increment(deleteSnapshot(snapshotId,mapper));
       }
     }
 );
-    batchSession.commit();
+    session.commit();
     return this;
   }
   finally {
-    MyBatis.closeSessionQuietly(session);
+    MyBatis.closeQuietly(session);
   }
 }
