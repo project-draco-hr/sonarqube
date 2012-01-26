@@ -1,0 +1,14 @@
+{
+  List<Long> childrenIds=mapper.selectProjectIdsByRootId(rootProjectId);
+  for (  Long childId : childrenIds) {
+    deleteProject(childId,session,mapper);
+  }
+  session.select("org.sonar.core.purge.PurgeMapper.selectResourceTreeIdsByRootId",rootProjectId,new ResultHandler(){
+    public void handleResult(    ResultContext context){
+      Long resourceId=(Long)context.getResultObject();
+      deleteResource(resourceId,session,mapper);
+    }
+  }
+);
+  session.commit();
+}

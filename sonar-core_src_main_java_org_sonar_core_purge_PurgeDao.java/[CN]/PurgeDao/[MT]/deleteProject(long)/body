@@ -1,18 +1,8 @@
 {
-  final BatchSession session=mybatis.openBatchSession();
+  final SqlSession session=mybatis.openBatchSession();
+  final PurgeMapper mapper=session.getMapper(PurgeMapper.class);
   try {
-    final PurgeMapper mapper=session.getMapper(PurgeMapper.class);
-    List<Long> projectIds=resourceDao.getDescendantProjectIdsAndSelf(rootProjectId,session);
-    for (    Long projectId : projectIds) {
-      session.select("org.sonar.core.purge.PurgeMapper.selectResourceIdsByRootId",projectId,new ResultHandler(){
-        public void handleResult(        ResultContext context){
-          Long resourceId=(Long)context.getResultObject();
-          deleteResource(resourceId,session,mapper);
-        }
-      }
-);
-    }
-    session.commit();
+    deleteProject(rootProjectId,session,mapper);
     return this;
   }
   finally {
