@@ -1,0 +1,14 @@
+{
+  SqlSession session=mybatis.openSession(ExecutorType.REUSE);
+  try {
+    PurgeMapper mapper=session.getMapper(PurgeMapper.class);
+    List<PurgeableSnapshotDto> result=Lists.newArrayList();
+    result.addAll(mapper.selectPurgeableSnapshotsWithVersionEvent(resourceId));
+    result.addAll(mapper.selectPurgeableSnapshotsWithoutVersionEvent(resourceId));
+    Collections.sort(result);
+    return result;
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}
