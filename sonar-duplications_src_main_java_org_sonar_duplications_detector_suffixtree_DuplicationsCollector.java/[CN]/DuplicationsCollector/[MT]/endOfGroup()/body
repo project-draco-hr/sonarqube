@@ -1,6 +1,6 @@
 {
-  int lengthInUnits=0;
   ClonePart origin=null;
+  CloneGroup.Builder builder=CloneGroup.builder().setLength(length);
   List<ClonePart> parts=Lists.newArrayListWithCapacity(count);
   for (  int[] b : blockNumbers) {
     Block firstBlock=text.getBlock(b[0]);
@@ -9,7 +9,7 @@
     if (originResourceId.equals(part.getResourceId())) {
       if (origin == null) {
         origin=part;
-        lengthInUnits=lastBlock.getEndUnit() - firstBlock.getStartUnit() + 1;
+        builder.setLengthInUnits(lastBlock.getEndUnit() - firstBlock.getStartUnit() + 1);
       }
  else       if (part.getUnitStart() < origin.getUnitStart()) {
         origin=part;
@@ -18,8 +18,7 @@
     parts.add(part);
   }
   Collections.sort(parts,ContainsInComparator.CLONEPART_COMPARATOR);
-  CloneGroup group=new CloneGroup(length,origin,parts);
-  group.setLengthInUnits(lengthInUnits);
-  filter(group);
+  builder.setOrigin(origin).setParts(parts);
+  filter(builder.build());
   reset();
 }
