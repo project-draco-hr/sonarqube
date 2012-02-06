@@ -13,13 +13,7 @@
     List<Block> blocks=bridge.chunk(resourceId,inputFile.getFile());
     index.insert(resource,blocks);
   }
-  final int minimumTokens=PmdEngine.getMinimumTokens(project);
-  Predicate<CloneGroup> minimumTokensPredicate=new Predicate<CloneGroup>(){
-    public boolean apply(    CloneGroup input){
-      return input.getLengthInUnits() >= minimumTokens;
-    }
-  }
-;
+  Predicate<CloneGroup> minimumTokensPredicate=DuplicationPredicates.numberOfUnitsNotLessThan(PmdEngine.getMinimumTokens(project));
   for (  InputFile inputFile : inputFiles) {
     Resource resource=mapping.createResource(inputFile.getFile(),fileSystem.getSourceDirs());
     String resourceKey=SonarEngine.getFullKey(project,resource);

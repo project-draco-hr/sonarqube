@@ -1,0 +1,29 @@
+{
+  ExecutorService executorService=Executors.newSingleThreadExecutor();
+  try {
+    for (    InputFile inputFile : inputFiles) {
+      LOG.debug("Detection of duplications for {}",inputFile.getFile());
+      Resource resource=getResource(inputFile);
+      String resourceKey=getFullKey(project,resource);
+      Collection<Block> fileBlocks=index.getByResource(resource,resourceKey);
+      List<CloneGroup> clones;
+      try {
+        clones=executorService.submit(new Task(index,fileBlocks)).get(TIMEOUT,TimeUnit.SECONDS);
+      }
+ catch (      TimeoutException e) {
+        clones=null;
+        LOG.warn("Timeout during detection of duplications for " + inputFile.getFile(),e);
+      }
+catch (      InterruptedException e) {
+        throw new SonarException(e);
+      }
+catch (      ExecutionException e) {
+        throw new SonarException(e);
+      }
+      save(context,resource,clones);
+    }
+  }
+  finally {
+    executorService.shutdown();
+  }
+}
