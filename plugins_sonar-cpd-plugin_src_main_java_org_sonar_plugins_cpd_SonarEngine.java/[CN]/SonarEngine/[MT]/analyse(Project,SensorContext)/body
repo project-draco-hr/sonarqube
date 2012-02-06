@@ -3,54 +3,6 @@
   if (inputFiles.isEmpty()) {
     return;
   }
-  final SonarDuplicationsIndex index=indexFactory.create(project);
-  TokenChunker tokenChunker=JavaTokenProducer.build();
-  StatementChunker statementChunker=JavaStatementBuilder.build();
-  BlockChunker blockChunker=new BlockChunker(BLOCK_SIZE);
-  for (  InputFile inputFile : inputFiles) {
-    LOG.debug("Populating index from {}",inputFile.getFile());
-    Resource resource=getResource(inputFile);
-    String resourceKey=getFullKey(project,resource);
-    List<Statement> statements;
-    Reader reader=null;
-    try {
-      reader=new InputStreamReader(new FileInputStream(inputFile.getFile()),project.getFileSystem().getSourceCharset());
-      statements=statementChunker.chunk(tokenChunker.chunk(reader));
-    }
- catch (    FileNotFoundException e) {
-      throw new SonarException(e);
-    }
- finally {
-      IOUtils.closeQuietly(reader);
-    }
-    List<Block> blocks=blockChunker.chunk(resourceKey,statements);
-    index.insert(resource,blocks);
-  }
-  ExecutorService executorService=Executors.newSingleThreadExecutor();
-  try {
-    for (    InputFile inputFile : inputFiles) {
-      LOG.debug("Detection of duplications for {}",inputFile.getFile());
-      Resource resource=getResource(inputFile);
-      String resourceKey=getFullKey(project,resource);
-      Collection<Block> fileBlocks=index.getByResource(resource,resourceKey);
-      List<CloneGroup> clones;
-      try {
-        clones=executorService.submit(new Task(index,fileBlocks)).get(TIMEOUT,TimeUnit.SECONDS);
-      }
- catch (      TimeoutException e) {
-        clones=null;
-        LOG.warn("Timeout during detection of duplications for " + inputFile.getFile(),e);
-      }
-catch (      InterruptedException e) {
-        throw new SonarException(e);
-      }
-catch (      ExecutionException e) {
-        throw new SonarException(e);
-      }
-      save(context,resource,clones);
-    }
-  }
-  finally {
-    executorService.shutdown();
-  }
+  SonarDuplicationsIndex index=createIndex(project,inputFiles);
+  detect(index,context,project,inputFiles);
 }
