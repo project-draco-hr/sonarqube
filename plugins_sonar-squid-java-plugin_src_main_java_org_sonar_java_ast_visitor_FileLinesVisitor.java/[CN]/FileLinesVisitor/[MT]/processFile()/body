@@ -1,0 +1,17 @@
+{
+  SourceFile file=(SourceFile)peekSourceCode();
+  Source source=getSource();
+  StringBuilder data=new StringBuilder();
+  for (int line=1; line <= source.getNumberOfLines(); line++) {
+    int linesOfCode=source.getMeasure(Metric.LINES_OF_CODE,line,line);
+    if (linesOfCode == 1) {
+      if (data.length() > 0) {
+        data.append(',');
+      }
+      data.append(line);
+    }
+  }
+  JavaFile javaFile=SquidUtils.convertJavaFileKeyFromSquidFormat(file.getKey());
+  Measure measure=new Measure(CoreMetrics.NCLOC_DATA,data.toString()).setPersistenceMode(PersistenceMode.DATABASE);
+  sonarAccessor.getSensorContext().saveMeasure(javaFile,measure);
+}
