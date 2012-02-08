@@ -11,9 +11,13 @@
   for (  JavaAstVisitor visitor : getVisitors()) {
     visitor.setSourceCodeStack(resourcesStack);
   }
-  CheckstyleSquidBridge.setASTVisitors(getVisitors());
-  CheckstyleSquidBridge.setSquidConfiguration(conf);
-  CheckstyleSquidBridge.setInputFiles(inputFiles);
-  launchCheckstyle(InputFileUtils.toFiles(inputFiles),conf.getCharset());
+  CheckstyleSquidBridgeContext bridgeContext=new CheckstyleSquidBridgeContext().setASTVisitors(getVisitors()).setSquidConfiguration(conf).setInputFiles(inputFiles);
+  CheckstyleSquidBridge.setContext(bridgeContext);
+  try {
+    launchCheckstyle(InputFileUtils.toFiles(inputFiles),conf.getCharset());
+  }
+  finally {
+    CheckstyleSquidBridge.setContext(null);
+  }
   return this;
 }
