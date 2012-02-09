@@ -1,0 +1,12 @@
+{
+  String conditions=" WHERE resource_id=:" + RESOURCE_ID + " AND "+ "( "+ "  ( "+ "    manual_violation=:"+ AUTOMATIC_VIOLATION+ " AND status!='CLOSED' AND "+ "    rule_failure_permanent_id NOT IN (SELECT permanent_id FROM rule_failures WHERE snapshot_id=:"+ SNAPSHOT_ID+ " AND permanent_id IS NOT NULL)"+ "  )"+ "  OR "+ "  (manual_violation=:"+ MANUAL_VIOLATION+ " AND status='RESOLVED')"+ ")";
+  List<Review> reviews=databaseSession.getEntityManager().createNativeQuery("SELECT * FROM reviews " + conditions,Review.class).setParameter(RESOURCE_ID,resourceId).setParameter(SNAPSHOT_ID,snapshotId).setParameter(AUTOMATIC_VIOLATION,false).setParameter(MANUAL_VIOLATION,true).getResultList();
+  for (  Review review : reviews) {
+    notifyClosed(resource,review);
+  }
+  int rowUpdated=databaseSession.createNativeQuery("UPDATE reviews SET status='CLOSED', updated_at=CURRENT_TIMESTAMP" + conditions).setParameter(RESOURCE_ID,resourceId).setParameter(SNAPSHOT_ID,snapshotId).setParameter(AUTOMATIC_VIOLATION,false).setParameter(MANUAL_VIOLATION,true).executeUpdate();
+  if (rowUpdated > 0) {
+    LOG.debug("- {} reviews closed on #{}",rowUpdated,resourceId);
+  }
+  return rowUpdated;
+}
