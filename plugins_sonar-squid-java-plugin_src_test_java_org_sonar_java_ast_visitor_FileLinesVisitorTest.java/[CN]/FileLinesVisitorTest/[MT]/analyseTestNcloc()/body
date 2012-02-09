@@ -1,7 +1,7 @@
 {
   ArgumentCaptor<Resource> resourceCaptor=ArgumentCaptor.forClass(Resource.class);
-  when(context.createFileLinesContext(resourceCaptor.capture())).thenReturn(measures);
-  squid.register(SonarAccessor.class).setSensorContext(context);
+  when(factory.createFor(resourceCaptor.capture())).thenReturn(measures);
+  squid.register(SonarAccessor.class).setFileLinesContextFactory(factory);
   squid.register(JavaAstScanner.class).scanFile(SquidTestUtils.getInputFile("/metrics/ncloc/TestNcloc.java"));
   assertThat(resourceCaptor.getValue().getKey(),is("[default].TestNcloc"));
   verify(measures).setIntValue(CoreMetrics.NCLOC_DATA_KEY,1,1);
