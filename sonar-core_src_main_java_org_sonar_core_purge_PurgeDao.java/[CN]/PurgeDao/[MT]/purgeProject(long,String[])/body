@@ -2,9 +2,10 @@
   SqlSession session=mybatis.openBatchSession();
   PurgeMapper purgeMapper=session.getMapper(PurgeMapper.class);
   try {
-    List<Long> projectIds=Lists.newArrayList(rootProjectId);
-    projectIds.addAll(resourceDao.getDescendantProjectIds(rootProjectId,session));
+    List<Long> projectIds=getProjectIds(rootProjectId,session);
     for (    Long projectId : projectIds) {
+      deleteAbortedBuilds(projectId,session,purgeMapper);
+      deleteHistoricalData(projectId,scopesWithoutHistoricalData,session,purgeMapper);
       purgeProject(projectId,session,purgeMapper);
     }
     for (    Long projectId : projectIds) {
