@@ -23,11 +23,12 @@
           LOG.warn("CPD - File not found : {}",secondAbsolutePath);
           continue;
         }
-        firstFileData.cumulate(secondFile,secondLine,firstLine,match.getLineCount());
+        String resourceKey=SonarEngine.getFullKey(project,secondFile);
+        firstFileData.cumulate(resourceKey,secondLine,firstLine,match.getLineCount());
       }
     }
   }
-  for (  DuplicationsData data : duplicationsData.values()) {
-    data.save();
+  for (  Map.Entry<Resource,DuplicationsData> entry : duplicationsData.entrySet()) {
+    entry.getValue().save(context,entry.getKey());
   }
 }
