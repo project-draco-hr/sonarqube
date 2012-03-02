@@ -2,7 +2,7 @@
   if (!ResourceUtils.isPersistable(resource) || ResourceUtils.isUnitTestClass(resource)) {
     return;
   }
-  Collection<ReviewDto> openReviews=reviewDao.selectOpenByResourceId(resource.getId(),ReviewPredicates.StatusPredicate.create(ReviewDto.STATUS_OPEN,ReviewDto.STATUS_REOPENED));
+  Collection<ReviewDto> openReviews=reviewDao.selectOpenByResourceId(resource.getId(),ReviewPredicates.status(ReviewDto.STATUS_OPEN,ReviewDto.STATUS_REOPENED));
   Map<Integer,ReviewDto> openReviewsByViolationPermanentId=Maps.newHashMap();
   int countUnassigned=0;
   int unplanned=0;
@@ -19,7 +19,7 @@
   context.saveMeasure(CoreMetrics.ACTIVE_REVIEWS,(double)totalOpenReviews);
   context.saveMeasure(CoreMetrics.UNASSIGNED_REVIEWS,(double)(countUnassigned + sumChildren(resource,context,CoreMetrics.UNASSIGNED_REVIEWS)));
   context.saveMeasure(CoreMetrics.UNPLANNED_REVIEWS,(double)(unplanned + sumChildren(resource,context,CoreMetrics.UNPLANNED_REVIEWS)));
-  Collection<ReviewDto> falsePositives=reviewDao.selectOpenByResourceId(resource.getId(),ReviewPredicates.ResolutionPredicate.create(ReviewDto.RESOLUTION_FALSE_POSITIVE));
+  Collection<ReviewDto> falsePositives=reviewDao.selectOpenByResourceId(resource.getId(),ReviewPredicates.resolution(ReviewDto.RESOLUTION_FALSE_POSITIVE));
   context.saveMeasure(CoreMetrics.FALSE_POSITIVE_REVIEWS,(double)(falsePositives.size() + sumChildren(resource,context,CoreMetrics.FALSE_POSITIVE_REVIEWS)));
   Double violationsCount=MeasureUtils.getValue(context.getMeasure(CoreMetrics.VIOLATIONS),0.0);
   context.saveMeasure(CoreMetrics.UNREVIEWED_VIOLATIONS,violationsCount - totalOpenReviews);
