@@ -2,28 +2,26 @@
   if (!ResourceUtils.isPersistable(resource) || ResourceUtils.isUnitTestClass(resource)) {
     return;
   }
-  ReviewQuery openReviewQuery=ReviewQuery.create().setResourceId(resource.getId()).addStatus(ReviewDto.STATUS_OPEN).addStatus(ReviewDto.STATUS_REOPENED);
-  List<ReviewDto> openReviews=reviewDao.selectByQuery(openReviewQuery);
-  Map<Integer,ReviewDto> openReviewsByViolationPermanentIds=Maps.newHashMap();
-  for (  ReviewDto reviewDto : openReviews) {
-    openReviewsByViolationPermanentIds.put(reviewDto.getViolationPermanentId(),reviewDto);
+  Collection<ReviewDto> openReviews=reviewDao.selectOpenByResourceId(resource.getId(),ReviewPredicates.StatusPredicate.create(ReviewDto.STATUS_OPEN,ReviewDto.STATUS_REOPENED));
+  Map<Integer,ReviewDto> openReviewsByViolationPermanentId=Maps.newHashMap();
+  int countUnassigned=0;
+  int unplanned=0;
+  for (  ReviewDto openReview : openReviews) {
+    openReviewsByViolationPermanentId.put(openReview.getViolationPermanentId(),openReview);
+    if (openReview.getAssigneeId() == null) {
+      countUnassigned++;
+    }
+    if (openReview.getActionPlanId() == null) {
+      unplanned++;
+    }
   }
-  Double resourceOpenReviewsCount=(double)openReviewsByViolationPermanentIds.size();
-  Double totalOpenReviewsCount=resourceOpenReviewsCount + getChildrenSum(resource,context,CoreMetrics.ACTIVE_REVIEWS);
-  context.saveMeasure(CoreMetrics.ACTIVE_REVIEWS,totalOpenReviewsCount);
-  ReviewQuery unassignedReviewQuery=ReviewQuery.copy(openReviewQuery).setNoAssignee();
-  Double ressourceUnassignedReviewsCount=reviewDao.countByQuery(unassignedReviewQuery).doubleValue();
-  Double totalUnassignedReviewsCount=ressourceUnassignedReviewsCount + getChildrenSum(resource,context,CoreMetrics.UNASSIGNED_REVIEWS);
-  context.saveMeasure(CoreMetrics.UNASSIGNED_REVIEWS,totalUnassignedReviewsCount);
-  ReviewQuery plannedReviewQuery=ReviewQuery.copy(openReviewQuery).setPlanned();
-  Double resourcePlannedReviewsCount=reviewDao.countByQuery(plannedReviewQuery).doubleValue();
-  Double childrenUnplannedReviewsCount=getChildrenSum(resource,context,CoreMetrics.UNPLANNED_REVIEWS);
-  context.saveMeasure(CoreMetrics.UNPLANNED_REVIEWS,(resourceOpenReviewsCount - resourcePlannedReviewsCount) + childrenUnplannedReviewsCount);
-  ReviewQuery falsePositiveReviewQuery=ReviewQuery.create().setResourceId(resource.getId()).addResolution(ReviewDto.RESOLUTION_FALSE_POSITIVE);
-  Double resourceFalsePositiveReviewsCount=reviewDao.countByQuery(falsePositiveReviewQuery).doubleValue();
-  Double totalFalsePositiveReviewsCount=resourceFalsePositiveReviewsCount + getChildrenSum(resource,context,CoreMetrics.FALSE_POSITIVE_REVIEWS);
-  context.saveMeasure(CoreMetrics.FALSE_POSITIVE_REVIEWS,totalFalsePositiveReviewsCount);
+  int totalOpenReviews=openReviews.size() + sumChildren(resource,context,CoreMetrics.ACTIVE_REVIEWS);
+  context.saveMeasure(CoreMetrics.ACTIVE_REVIEWS,(double)totalOpenReviews);
+  context.saveMeasure(CoreMetrics.UNASSIGNED_REVIEWS,(double)(countUnassigned + sumChildren(resource,context,CoreMetrics.UNASSIGNED_REVIEWS)));
+  context.saveMeasure(CoreMetrics.UNPLANNED_REVIEWS,(double)(unplanned + sumChildren(resource,context,CoreMetrics.UNPLANNED_REVIEWS)));
+  Collection<ReviewDto> falsePositives=reviewDao.selectOpenByResourceId(resource.getId(),ReviewPredicates.ResolutionPredicate.create(ReviewDto.RESOLUTION_FALSE_POSITIVE));
+  context.saveMeasure(CoreMetrics.FALSE_POSITIVE_REVIEWS,(double)(falsePositives.size() + sumChildren(resource,context,CoreMetrics.FALSE_POSITIVE_REVIEWS)));
   Double violationsCount=MeasureUtils.getValue(context.getMeasure(CoreMetrics.VIOLATIONS),0.0);
-  context.saveMeasure(CoreMetrics.UNREVIEWED_VIOLATIONS,violationsCount - totalOpenReviewsCount);
-  trackNewViolationsWithoutReview(context,openReviewsByViolationPermanentIds);
+  context.saveMeasure(CoreMetrics.UNREVIEWED_VIOLATIONS,violationsCount - totalOpenReviews);
+  trackNewViolationsWithoutReview(context,openReviewsByViolationPermanentId);
 }

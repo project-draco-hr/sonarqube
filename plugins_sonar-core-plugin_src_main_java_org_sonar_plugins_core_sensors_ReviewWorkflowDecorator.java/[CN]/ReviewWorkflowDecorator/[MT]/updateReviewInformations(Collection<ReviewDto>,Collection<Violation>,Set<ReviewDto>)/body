@@ -1,0 +1,18 @@
+{
+  Map<Integer,Violation> violationsByPermanentId=Maps.uniqueIndex(violations,new Function<Violation,Integer>(){
+    public Integer apply(    Violation violation){
+      return violation.getPermanentId();
+    }
+  }
+);
+  for (  ReviewDto review : openReviews) {
+    Violation violation=violationsByPermanentId.get(review.getViolationPermanentId());
+    if (violation != null) {
+      if (!hasUpToDateInformation(review,violation)) {
+        review.setLine(violation.getLineId());
+        review.setTitle(violation.getMessage());
+        updated.add(review);
+      }
+    }
+  }
+}

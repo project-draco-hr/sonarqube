@@ -4,12 +4,11 @@
   }
   Map<Integer,Violation> violationMap=filterViolationsPerPermanent(context.getViolations());
   if (!violationMap.isEmpty()) {
-    Set<Integer> permanentIds=violationMap.keySet();
-    List<ReviewDto> reviewDtos=selectReviewsWithManualSeverity(permanentIds);
-    for (    ReviewDto reviewDto : reviewDtos) {
-      Violation violation=violationMap.get(reviewDto.getViolationPermanentId());
+    Collection<ReviewDto> reviews=selectReviewsWithManualSeverity(resource.getId());
+    for (    ReviewDto review : reviews) {
+      Violation violation=violationMap.get(review.getViolationPermanentId());
       if (violation != null) {
-        violation.setSeverity(RulePriority.valueOf(reviewDto.getSeverity()));
+        violation.setSeverity(RulePriority.valueOf(review.getSeverity()));
       }
     }
   }
