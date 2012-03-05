@@ -1,21 +1,16 @@
 {
   List<Long> projectSnapshotIds=purgeMapper.selectSnapshotIds(PurgeSnapshotQuery.create().setResourceId(project.getId()).setIslast(false).setNotPurged(true));
   for (  final Long projectSnapshotId : projectSnapshotIds) {
+    LOG.info("<- Clean snapshot " + projectSnapshotId);
     if (!ArrayUtils.isEmpty(scopesWithoutHistoricalData)) {
       PurgeSnapshotQuery query=PurgeSnapshotQuery.create().setIslast(false).setScopes(scopesWithoutHistoricalData).setRootSnapshotId(projectSnapshotId);
-      deleteSnapshots(query,session,purgeMapper);
+      deleteSnapshots(query,purgeMapper);
+      session.commit();
     }
     PurgeSnapshotQuery query=PurgeSnapshotQuery.create().setRootSnapshotId(projectSnapshotId).setNotPurged(true);
-    session.select("org.sonar.core.purge.PurgeMapper.selectSnapshotIds",query,new ResultHandler(){
-      public void handleResult(      ResultContext resultContext){
-        Long snapshotId=(Long)resultContext.getResultObject();
-        if (snapshotId != null) {
-          purgeSnapshot(snapshotId,purgeMapper);
-        }
-      }
-    }
-);
-    purgeSnapshot(projectSnapshotId,purgeMapper);
+    purgeSnapshots(query,purgeMapper);
+    session.commit();
+    purgeSnapshots(PurgeSnapshotQuery.create().setId(projectSnapshotId).setNotPurged(true),purgeMapper);
+    session.commit();
   }
-  session.commit();
 }
