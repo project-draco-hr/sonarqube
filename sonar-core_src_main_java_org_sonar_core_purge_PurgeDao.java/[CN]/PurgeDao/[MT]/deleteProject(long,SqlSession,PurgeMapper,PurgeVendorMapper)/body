@@ -3,13 +3,7 @@
   for (  Long childId : childrenIds) {
     deleteProject(childId,session,mapper,vendorMapper);
   }
-  session.select("org.sonar.core.purge.PurgeMapper.selectResourceTreeIdsByRootId",rootProjectId,new ResultHandler(){
-    public void handleResult(    ResultContext context){
-      Long resourceId=(Long)context.getResultObject();
-      if (resourceId != null) {
-        deleteResource(resourceId,mapper,vendorMapper);
-      }
-    }
-  }
-);
+  List<Long> resourceIds=mapper.selectResourceIdsByRootId(rootProjectId);
+  deleteResources(resourceIds,session,mapper,vendorMapper);
+  session.commit();
 }
