@@ -1,0 +1,11 @@
+{
+  setupData("shouldReopenViolations");
+  DecoratorContext context=mock(DecoratorContext.class);
+  Violation violation=new Violation(new Rule());
+  violation.setPermanentId(1000);
+  when(context.getViolations()).thenReturn(Lists.newArrayList(violation));
+  Resource resource=new JavaFile("org.foo.Bar");
+  decorator.decorate(resource,context);
+  verify(notifications).notifyReopened(any(ReviewDto.class),any(Project.class),eq(resource));
+  checkTablesWithExcludedColumns("shouldReopenViolations",new String[]{"updated_at"},"reviews");
+}

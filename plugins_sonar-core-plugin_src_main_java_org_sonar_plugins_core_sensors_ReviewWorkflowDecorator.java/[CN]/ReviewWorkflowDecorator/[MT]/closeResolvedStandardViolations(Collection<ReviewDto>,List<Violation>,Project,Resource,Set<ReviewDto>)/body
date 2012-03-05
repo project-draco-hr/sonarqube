@@ -1,0 +1,14 @@
+{
+  Set<Integer> violationIds=Sets.newHashSet(Collections2.transform(violations,new Function<Violation,Integer>(){
+    public Integer apply(    Violation violation){
+      return violation.getPermanentId();
+    }
+  }
+));
+  for (  ReviewDto openReview : openReviews) {
+    if (!openReview.isManualViolation() && !violationIds.contains(openReview.getViolationPermanentId())) {
+      close(openReview,project,resource);
+      updated.add(openReview);
+    }
+  }
+}
