@@ -4,13 +4,13 @@
     LOG.info("<- Clean snapshot " + projectSnapshotId);
     if (!ArrayUtils.isEmpty(scopesWithoutHistoricalData)) {
       PurgeSnapshotQuery query=PurgeSnapshotQuery.create().setIslast(false).setScopes(scopesWithoutHistoricalData).setRootSnapshotId(projectSnapshotId);
-      deleteSnapshots(query,session,purgeMapper);
+      PurgeCommands.deleteSnapshots(query,session,purgeMapper);
       session.commit();
     }
     PurgeSnapshotQuery query=PurgeSnapshotQuery.create().setRootSnapshotId(projectSnapshotId).setNotPurged(true);
-    purgeSnapshots(query,session,purgeMapper);
+    PurgeCommands.purgeSnapshots(query,session,purgeMapper);
     session.commit();
-    purgeSnapshots(PurgeSnapshotQuery.create().setId(projectSnapshotId).setNotPurged(true),session,purgeMapper);
+    PurgeCommands.purgeSnapshots(PurgeSnapshotQuery.create().setId(projectSnapshotId).setNotPurged(true),session,purgeMapper);
     session.commit();
   }
 }
