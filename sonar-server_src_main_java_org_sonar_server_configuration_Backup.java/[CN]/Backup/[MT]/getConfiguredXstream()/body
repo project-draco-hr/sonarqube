@@ -2,11 +2,13 @@
   XStream xStream=new XStream(new XppDriver(){
     @Override public HierarchicalStreamWriter createWriter(    Writer out){
       return new PrettyPrintWriter(out){
-        @Override protected void writeText(        QuickWriter writer,        String text){
-          writer.write("<![CDATA[");
-          text=StringUtils.replace(text,"]]>","]]]]><![CDATA[>");
-          writer.write(text);
-          writer.write("]]>");
+        @Override protected void writeText(        QuickWriter writer,        @Nullable String text){
+          if (text != null) {
+            writer.write("<![CDATA[");
+            text=StringUtils.replace(text,"]]>","]]]]><![CDATA[>");
+            writer.write(text);
+            writer.write("]]>");
+          }
         }
       }
 ;
