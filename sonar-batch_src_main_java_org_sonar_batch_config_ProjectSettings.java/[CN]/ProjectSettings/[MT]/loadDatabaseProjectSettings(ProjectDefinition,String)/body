@@ -2,8 +2,12 @@
   if (projectDef.getParent() != null) {
     loadDatabaseProjectSettings(projectDef.getParent(),branch);
   }
-  List<Property> props=ConfigurationUtils.getProjectProperties(dbFactory,projectDef.getKey(),branch);
-  for (  Property dbProperty : props) {
+  String projectKey=projectDef.getKey();
+  if (StringUtils.isNotBlank(branch)) {
+    projectKey=String.format("%s:%s",projectKey,branch);
+  }
+  List<PropertyDto> props=propertiesDao.selectProjectProperties(projectKey);
+  for (  PropertyDto dbProperty : props) {
     setProperty(dbProperty.getKey(),dbProperty.getValue());
   }
 }
