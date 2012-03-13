@@ -1,0 +1,13 @@
+{
+  URL resource=getClass().getResource("/org/sonar/api/config/AesCipherTest/bad_secret_key.txt");
+  Settings settings=new Settings();
+  settings.setProperty(CoreProperties.ENCRYPTION_SECRET_KEY_FILE,new File(resource.toURI()).getCanonicalPath());
+  AesCipher cipher=new AesCipher(settings);
+  try {
+    cipher.decrypt("9mx5Zq4JVyjeChTcVjEide4kWCwusFl7P2dSVXtg9IY=");
+    fail();
+  }
+ catch (  RuntimeException e) {
+    assertThat(e.getCause(),is(InvalidKeyException.class));
+  }
+}

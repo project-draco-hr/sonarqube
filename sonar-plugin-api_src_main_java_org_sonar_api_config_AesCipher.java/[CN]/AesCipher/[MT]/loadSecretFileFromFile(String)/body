@@ -1,14 +1,14 @@
 {
   if (StringUtils.isBlank(path)) {
-    throw new IllegalStateException("Secret key not found. Please set the property " + CoreProperties.ENCRYPTION_PATH_TO_SECRET_KEY);
+    throw new IllegalStateException("Secret key not found. Please set the property " + CoreProperties.ENCRYPTION_SECRET_KEY_FILE);
   }
   File file=new File(path);
   if (!file.exists() || !file.isFile()) {
-    throw new IllegalStateException("The property " + CoreProperties.ENCRYPTION_PATH_TO_SECRET_KEY + " does not link to a valid file: "+ path);
+    throw new IllegalStateException("The property " + CoreProperties.ENCRYPTION_SECRET_KEY_FILE + " does not link to a valid file: "+ path);
   }
   String s=FileUtils.readFileToString(file);
   if (StringUtils.isBlank(s)) {
     throw new IllegalStateException("No secret key in the file: " + path);
   }
-  return new SecretKeySpec(Base64.decodeBase64(s),"AES");
+  return new SecretKeySpec(Base64.decodeBase64(StringUtils.trim(s)),"AES");
 }
