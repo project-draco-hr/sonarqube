@@ -1,0 +1,21 @@
+{
+  if (StringUtils.isBlank(path)) {
+    throw new IllegalStateException("Impossible to decrypt text without the private key. Please set the property " + CoreProperties.ENCRYPTION_PATH_TO_PRIVATE_KEY);
+  }
+  File file=new File(path);
+  if (!file.exists() || !file.isFile()) {
+    throw new IllegalStateException("The property " + CoreProperties.ENCRYPTION_PATH_TO_PRIVATE_KEY + " does not link to a valid file: "+ path);
+  }
+  String s=FileUtils.readFileToString(file);
+  if (StringUtils.isBlank(s)) {
+    throw new IllegalStateException("No private key in the file: " + path);
+  }
+  String[] fields=StringUtils.split(StringUtils.trim(s),",");
+  if (fields.length != 2) {
+    throw new IllegalStateException("Badly formatted private key in the file: " + path);
+  }
+  BigInteger modulus=new BigInteger(fields[0]);
+  BigInteger exponent=new BigInteger(fields[1]);
+  KeyFactory keyFactory=KeyFactory.getInstance("RSA");
+  return keyFactory.generatePrivate(new RSAPrivateKeySpec(modulus,exponent));
+}
