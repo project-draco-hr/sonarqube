@@ -1,0 +1,51 @@
+{
+  Multimap<Integer,RuleFailureModel> pastViolationsByRule=LinkedHashMultimap.create();
+  for (  RuleFailureModel pastViolation : pastViolations) {
+    pastViolationsByRule.put(pastViolation.getRuleId(),pastViolation);
+  }
+  for (  Violation newViolation : newViolations) {
+    mapViolation(newViolation,findPastViolationWithSamePermanentId(newViolation,pastViolationsByRule.get(newViolation.getRule().getId())),pastViolationsByRule,referenceViolationsMap);
+  }
+  for (  Violation newViolation : newViolations) {
+    if (isNotAlreadyMapped(newViolation,referenceViolationsMap)) {
+      mapViolation(newViolation,findPastViolationWithSameLineAndChecksum(newViolation,pastViolationsByRule.get(newViolation.getRule().getId())),pastViolationsByRule,referenceViolationsMap);
+    }
+  }
+  if (referenceViolationsMap.size() != newViolations.size()) {
+    if (rec != null) {
+      List<ViolationPair> possiblePairs=Lists.newArrayList();
+      for (      Violation newViolation : newViolations) {
+        for (        RuleFailureModel pastViolation : pastViolationsByRule.get(newViolation.getRule().getId())) {
+          int weight=rec.computeLengthOfMaximalBlock(pastViolation.getLine() - 1,newViolation.getLineId() - 1);
+          possiblePairs.add(new ViolationPair(pastViolation,newViolation,weight));
+        }
+      }
+      Collections.sort(possiblePairs,ViolationPair.COMPARATOR);
+      Set<RuleFailureModel> pp=Sets.newHashSet(pastViolations);
+      for (      ViolationPair pair : possiblePairs) {
+        Violation newViolation=pair.getNewViolation();
+        RuleFailureModel pastViolation=pair.getPastViolation();
+        if (isNotAlreadyMapped(newViolation,referenceViolationsMap) && pp.contains(pastViolation)) {
+          pp.remove(pastViolation);
+          mapViolation(newViolation,pastViolation,pastViolationsByRule,referenceViolationsMap);
+        }
+      }
+    }
+    for (    Violation newViolation : newViolations) {
+      if (isNotAlreadyMapped(newViolation,referenceViolationsMap)) {
+        mapViolation(newViolation,findPastViolationWithSameChecksumAndMessage(newViolation,pastViolationsByRule.get(newViolation.getRule().getId())),pastViolationsByRule,referenceViolationsMap);
+      }
+    }
+    for (    Violation newViolation : newViolations) {
+      if (isNotAlreadyMapped(newViolation,referenceViolationsMap)) {
+        mapViolation(newViolation,findPastViolationWithSameLineAndMessage(newViolation,pastViolationsByRule.get(newViolation.getRule().getId())),pastViolationsByRule,referenceViolationsMap);
+      }
+    }
+    for (    Violation newViolation : newViolations) {
+      if (isNotAlreadyMapped(newViolation,referenceViolationsMap)) {
+        mapViolation(newViolation,findPastViolationWithSameChecksum(newViolation,pastViolationsByRule.get(newViolation.getRule().getId())),pastViolationsByRule,referenceViolationsMap);
+      }
+    }
+  }
+  return referenceViolationsMap;
+}

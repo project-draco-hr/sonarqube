@@ -4,6 +4,9 @@
   if (!context.getViolations(violationQuery).isEmpty()) {
     List<Violation> newViolations=prepareNewViolations(context);
     List<RuleFailureModel> referenceViolations=referenceAnalysis.getViolations(resource);
-    mapViolations(newViolations,referenceViolations);
+    String referenceSource=referenceAnalysis.getSource(resource);
+    String source=index.getSource(context.getResource());
+    ViolationTrackingBlocksRecognizer rec=new ViolationTrackingBlocksRecognizer(referenceSource,source);
+    mapViolations(newViolations,referenceViolations,rec);
   }
 }

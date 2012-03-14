@@ -1,32 +1,3 @@
 {
-  Multimap<Integer,RuleFailureModel> pastViolationsByRule=LinkedHashMultimap.create();
-  for (  RuleFailureModel pastViolation : pastViolations) {
-    pastViolationsByRule.put(pastViolation.getRuleId(),pastViolation);
-  }
-  for (  Violation newViolation : newViolations) {
-    mapViolation(newViolation,findPastViolationWithSamePermanentId(newViolation,pastViolationsByRule.get(newViolation.getRule().getId())),pastViolationsByRule,referenceViolationsMap);
-  }
-  for (  Violation newViolation : newViolations) {
-    if (isNotAlreadyMapped(newViolation,referenceViolationsMap)) {
-      mapViolation(newViolation,findPastViolationWithSameLineAndChecksum(newViolation,pastViolationsByRule.get(newViolation.getRule().getId())),pastViolationsByRule,referenceViolationsMap);
-    }
-  }
-  if (referenceViolationsMap.size() != newViolations.size()) {
-    for (    Violation newViolation : newViolations) {
-      if (isNotAlreadyMapped(newViolation,referenceViolationsMap)) {
-        mapViolation(newViolation,findPastViolationWithSameChecksumAndMessage(newViolation,pastViolationsByRule.get(newViolation.getRule().getId())),pastViolationsByRule,referenceViolationsMap);
-      }
-    }
-    for (    Violation newViolation : newViolations) {
-      if (isNotAlreadyMapped(newViolation,referenceViolationsMap)) {
-        mapViolation(newViolation,findPastViolationWithSameLineAndMessage(newViolation,pastViolationsByRule.get(newViolation.getRule().getId())),pastViolationsByRule,referenceViolationsMap);
-      }
-    }
-    for (    Violation newViolation : newViolations) {
-      if (isNotAlreadyMapped(newViolation,referenceViolationsMap)) {
-        mapViolation(newViolation,findPastViolationWithSameChecksum(newViolation,pastViolationsByRule.get(newViolation.getRule().getId())),pastViolationsByRule,referenceViolationsMap);
-      }
-    }
-  }
-  return referenceViolationsMap;
+  return mapViolations(newViolations,pastViolations,null);
 }
