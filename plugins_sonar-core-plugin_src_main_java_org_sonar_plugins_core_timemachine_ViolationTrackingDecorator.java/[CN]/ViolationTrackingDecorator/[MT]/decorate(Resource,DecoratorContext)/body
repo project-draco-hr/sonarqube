@@ -2,11 +2,15 @@
   referenceViolationsMap.clear();
   ViolationQuery violationQuery=ViolationQuery.create().forResource(resource).setSwitchMode(ViolationQuery.SwitchMode.BOTH);
   if (!context.getViolations(violationQuery).isEmpty()) {
-    List<Violation> newViolations=prepareNewViolations(context);
-    List<RuleFailureModel> referenceViolations=referenceAnalysis.getViolations(resource);
-    String referenceSource=referenceAnalysis.getSource(resource);
-    String source=index.getSource(context.getResource());
-    ViolationTrackingBlocksRecognizer rec=new ViolationTrackingBlocksRecognizer(referenceSource,source);
-    mapViolations(newViolations,referenceViolations,rec);
+    return;
   }
+  String source=index.getSource(resource);
+  String referenceSource=referenceAnalysis.getSource(resource);
+  List<Violation> newViolations=prepareNewViolations(context,source);
+  List<RuleFailureModel> referenceViolations=referenceAnalysis.getViolations(resource);
+  ViolationTrackingBlocksRecognizer rec=null;
+  if (source != null && referenceSource != null) {
+    rec=new ViolationTrackingBlocksRecognizer(referenceSource,source);
+  }
+  mapViolations(newViolations,referenceViolations,rec);
 }
