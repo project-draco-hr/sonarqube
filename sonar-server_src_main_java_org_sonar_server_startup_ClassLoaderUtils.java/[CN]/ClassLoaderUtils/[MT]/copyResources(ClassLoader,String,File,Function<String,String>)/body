@@ -1,0 +1,15 @@
+{
+  Collection<String> relativePaths=listFiles(classLoader,rootPath);
+  for (  String relativePath : relativePaths) {
+    URL resource=classLoader.getResource(relativePath);
+    String filename=relocationFunction.apply(relativePath);
+    File toFile=new File(toDir,filename);
+    try {
+      FileUtils.copyURLToFile(resource,toFile);
+    }
+ catch (    IOException e) {
+      throw new IllegalStateException("Fail to extract " + relativePath + " to "+ toFile.getAbsolutePath());
+    }
+  }
+  return toDir;
+}

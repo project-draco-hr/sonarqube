@@ -1,0 +1,11 @@
+{
+  File tempDir=this.temp.getRoot();
+  ClassLoader classLoader=new URLClassLoader(new URL[]{getClass().getResource("/org/sonar/server/startup/ApplicationDeployerTest/FakeRubyRailsApp.jar").toURI().toURL()},null);
+  ApplicationDeployer.deployRubyRailsApp(tempDir,new FakeRubyRailsApp(),classLoader);
+  File appDir=new File(tempDir,"fake");
+  assertThat(appDir.isDirectory(),is(true));
+  assertThat(appDir.exists(),is(true));
+  assertThat(FileUtils.listFiles(appDir,null,true).size(),is(2));
+  assertThat(new File(appDir,"app/controllers/fake_controller.rb").exists(),is(true));
+  assertThat(new File(appDir,"app/views/fake/index.html.erb").exists(),is(true));
+}

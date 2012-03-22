@@ -1,0 +1,26 @@
+{
+  try {
+    Collection<String> paths=Lists.newArrayList();
+    rootPath=StringUtils.removeStart(rootPath,"/");
+    URL root=classloader.getResource(rootPath);
+    if (root == null) {
+      return paths;
+    }
+    if (!"jar".equals(root.getProtocol())) {
+      throw new IllegalStateException("Unsupported protocol: " + root.getProtocol());
+    }
+    String jarPath=root.getPath().substring(5,root.getPath().indexOf("!"));
+    JarFile jar=new JarFile(URLDecoder.decode(jarPath,CharEncoding.UTF_8));
+    Enumeration<JarEntry> entries=jar.entries();
+    while (entries.hasMoreElements()) {
+      String name=entries.nextElement().getName();
+      if (name.startsWith(rootPath) && predicate.apply(name)) {
+        paths.add(name);
+      }
+    }
+    return paths;
+  }
+ catch (  Exception e) {
+    throw Throwables.propagate(e);
+  }
+}
