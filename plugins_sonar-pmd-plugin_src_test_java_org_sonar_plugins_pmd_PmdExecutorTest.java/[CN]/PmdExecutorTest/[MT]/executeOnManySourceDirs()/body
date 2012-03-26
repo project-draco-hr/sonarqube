@@ -10,9 +10,10 @@
   PmdConfiguration conf=mock(PmdConfiguration.class);
   File file=FileUtils.toFile(getClass().getResource("/org/sonar/plugins/pmd/PmdExecutorTest/executeOnManySourceDirs/pmd.xml").toURI().toURL());
   when(conf.getRulesets()).thenReturn(Arrays.asList(file.getAbsolutePath()));
+  File xmlReport=new File(workDir,"pmd-result.xml");
+  when(conf.getTargetXMLReport()).thenReturn(xmlReport);
   PmdExecutor executor=new PmdExecutor(project,conf);
   executor.execute();
-  File xmlReport=new File(workDir,"pmd-result.xml");
   assertThat(xmlReport.exists(),is(true));
   String xml=FileUtils.readFileToString(xmlReport);
   assertThat(StringUtils.countMatches(xml,"<file"),is(2));
