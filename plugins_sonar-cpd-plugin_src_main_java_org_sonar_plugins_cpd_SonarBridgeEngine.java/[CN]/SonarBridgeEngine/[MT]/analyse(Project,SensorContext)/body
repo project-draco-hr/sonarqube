@@ -8,18 +8,39 @@
   SonarDuplicationsIndex index=indexFactory.create(project);
   TokenizerBridge bridge=new TokenizerBridge(mapping.getTokenizer(),fileSystem.getSourceCharset().name(),getBlockSize(project));
   for (  InputFile inputFile : inputFiles) {
+    LOG.debug("Populating index from {}",inputFile.getFile());
     Resource resource=mapping.createResource(inputFile.getFile(),fileSystem.getSourceDirs());
     String resourceId=SonarEngine.getFullKey(project,resource);
     List<Block> blocks=bridge.chunk(resourceId,inputFile.getFile());
     index.insert(resource,blocks);
   }
   Predicate<CloneGroup> minimumTokensPredicate=DuplicationPredicates.numberOfUnitsNotLessThan(PmdEngine.getMinimumTokens(project));
-  for (  InputFile inputFile : inputFiles) {
-    Resource resource=mapping.createResource(inputFile.getFile(),fileSystem.getSourceDirs());
-    String resourceKey=SonarEngine.getFullKey(project,resource);
-    Collection<Block> fileBlocks=index.getByResource(resource,resourceKey);
-    List<CloneGroup> duplications=SuffixTreeCloneDetectionAlgorithm.detect(index,fileBlocks);
-    Iterable<CloneGroup> filtered=Iterables.filter(duplications,minimumTokensPredicate);
-    SonarEngine.save(context,resource,filtered);
+  ExecutorService executorService=Executors.newSingleThreadExecutor();
+  try {
+    for (    InputFile inputFile : inputFiles) {
+      LOG.debug("Detection of duplications for {}",inputFile.getFile());
+      Resource resource=mapping.createResource(inputFile.getFile(),fileSystem.getSourceDirs());
+      String resourceKey=SonarEngine.getFullKey(project,resource);
+      Collection<Block> fileBlocks=index.getByResource(resource,resourceKey);
+      Iterable<CloneGroup> filtered;
+      try {
+        List<CloneGroup> duplications=executorService.submit(new SonarEngine.Task(index,fileBlocks)).get(TIMEOUT,TimeUnit.SECONDS);
+        filtered=Iterables.filter(duplications,minimumTokensPredicate);
+      }
+ catch (      TimeoutException e) {
+        filtered=null;
+        LOG.warn("Timeout during detection of duplications for " + inputFile.getFile(),e);
+      }
+catch (      InterruptedException e) {
+        throw new SonarException(e);
+      }
+catch (      ExecutionException e) {
+        throw new SonarException(e);
+      }
+      SonarEngine.save(context,resource,filtered);
+    }
+  }
+  finally {
+    executorService.shutdown();
   }
 }
