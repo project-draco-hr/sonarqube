@@ -1,0 +1,9 @@
+{
+  ServerFileSystem fileSystem=mock(ServerFileSystem.class);
+  File file=FileUtils.toFile(getClass().getResource("/org/sonar/plugins/pmd/rules-extension.xml"));
+  when(fileSystem.getExtensions("pmd","xml")).thenReturn(Collections.singletonList(file));
+  PmdRuleRepository repository=new PmdRuleRepository(fileSystem,new XMLRuleParser());
+  List<Rule> rules=repository.createRules();
+  assertThat(rules.size(),greaterThan(100));
+  assertThat(rules.get(rules.size() - 1).getKey(),is("Extension"));
+}
