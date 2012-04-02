@@ -1,0 +1,8 @@
+{
+  JavaFile javaFile=JavaFile.fromRelativePath("UndocumentedApi.java",true);
+  when(context.isIndexed(javaFile,true)).thenReturn(true);
+  Mockito.doThrow(new SonarException("Duplicate source for resource")).when(context).saveSource(any(JavaFile.class),anyString());
+  thrown.expect(SonarException.class);
+  thrown.expectMessage("Duplicate source for resource");
+  importer.importSource(context,javaFile,inputFile,Charset.defaultCharset());
+}
