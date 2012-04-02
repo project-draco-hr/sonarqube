@@ -1,0 +1,19 @@
+{
+  boolean indexed=false;
+  SqlSession session=mybatis.openSession();
+  try {
+    ResourceIndexerMapper mapper=session.getMapper(ResourceIndexerMapper.class);
+    ResourceDto resource=mapper.selectResourceToIndex(id);
+    if (resource != null) {
+      Integer rootId=resource.getRootId();
+      if (rootId == null) {
+        rootId=resource.getId().intValue();
+      }
+      indexed=indexResource(resource.getId().intValue(),resource.getName(),resource.getQualifier(),rootId,session,mapper);
+    }
+    return indexed;
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}
