@@ -1,0 +1,13 @@
+{
+  File fileToImport=new File("unexisting-file.java");
+  inputFile=mock(InputFile.class);
+  when(inputFile.getRelativePath()).thenReturn("UndocumentedApi.java");
+  when(inputFile.getFile()).thenReturn(fileToImport);
+  when(inputFile.getFileBaseDir()).thenReturn(fileToImport.getParentFile());
+  JavaFile javaFile=JavaFile.fromRelativePath("UndocumentedApi.java",true);
+  when(context.isIndexed(javaFile,true)).thenReturn(true);
+  thrown.expect(SonarException.class);
+  thrown.expectMessage("Unable to read and import the source file");
+  thrown.expectMessage("unexisting-file.java");
+  importer.importSource(context,javaFile,inputFile,Charset.defaultCharset());
+}
