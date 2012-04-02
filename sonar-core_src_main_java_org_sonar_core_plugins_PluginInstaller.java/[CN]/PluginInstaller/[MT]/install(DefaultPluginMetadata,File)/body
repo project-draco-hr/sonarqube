@@ -1,35 +1,9 @@
 {
   try {
     File pluginFile=metadata.getFile();
-    File pluginBasedir;
-    if (toDir != null) {
-      pluginBasedir=toDir;
-      FileUtils.forceMkdir(pluginBasedir);
-      File targetFile=new File(pluginBasedir,pluginFile.getName());
-      FileUtils.copyFile(pluginFile,targetFile);
-      metadata.addDeployedFile(targetFile);
-    }
- else {
-      pluginBasedir=pluginFile.getParentFile();
-      metadata.addDeployedFile(pluginFile);
-    }
-    if (metadata.getPathsToInternalDeps().length > 0) {
-      ZipUtils.unzip(pluginFile,pluginBasedir,new LibFilter());
-      for (      String depPath : metadata.getPathsToInternalDeps()) {
-        File dependency=new File(pluginBasedir,depPath);
-        if (!dependency.isFile() || !dependency.exists()) {
-          throw new IllegalArgumentException("Dependency " + depPath + " can not be found in "+ pluginFile.getName());
-        }
-        metadata.addDeployedFile(dependency);
-      }
-    }
-    for (    File extension : metadata.getDeprecatedExtensions()) {
-      File toFile=new File(pluginBasedir,extension.getName());
-      if (!toFile.equals(extension)) {
-        FileUtils.copyFile(extension,toFile);
-      }
-      metadata.addDeployedFile(toFile);
-    }
+    File pluginBasedir=copyPlugin(metadata,toDir,pluginFile);
+    copyDependencies(metadata,pluginFile,pluginBasedir);
+    copyDeprecatedExtensions(metadata,pluginBasedir);
     return metadata;
   }
  catch (  IOException e) {
