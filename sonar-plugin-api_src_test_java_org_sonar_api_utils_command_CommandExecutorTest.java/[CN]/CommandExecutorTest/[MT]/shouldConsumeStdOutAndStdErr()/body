@@ -1,0 +1,25 @@
+{
+  final StringBuilder stdOutBuilder=new StringBuilder();
+  StreamConsumer stdOutConsumer=new StreamConsumer(){
+    public void consumeLine(    String line){
+      stdOutBuilder.append(line).append(SystemUtils.LINE_SEPARATOR);
+    }
+  }
+;
+  final StringBuilder stdErrBuilder=new StringBuilder();
+  StreamConsumer stdErrConsumer=new StreamConsumer(){
+    public void consumeLine(    String line){
+      stdErrBuilder.append(line).append(SystemUtils.LINE_SEPARATOR);
+    }
+  }
+;
+  Command command=Command.create(getScript("output")).setDirectory(workDir);
+  int exitCode=CommandExecutor.create().execute(command,stdOutConsumer,stdErrConsumer,1000L);
+  assertThat(exitCode,is(0));
+  String stdOut=stdOutBuilder.toString();
+  String stdErr=stdErrBuilder.toString();
+  assertThat(stdOut,containsString("stdOut: first line"));
+  assertThat(stdOut,containsString("stdOut: second line"));
+  assertThat(stdErr,containsString("stdErr: first line"));
+  assertThat(stdErr,containsString("stdErr: second line"));
+}

@@ -1,43 +1,4 @@
 {
-  ExecutorService executorService=null;
-  Process process=null;
-  StreamGobbler outputGobbler=null;
-  StreamGobbler errorGobbler=null;
-  try {
-    LoggerFactory.getLogger(getClass()).debug("Executing command: " + command);
-    ProcessBuilder builder=new ProcessBuilder(command.toStrings());
-    if (command.getDirectory() != null) {
-      builder.directory(command.getDirectory());
-    }
-    process=builder.start();
-    outputGobbler=new StreamGobbler(process.getInputStream());
-    errorGobbler=new StreamGobbler(process.getErrorStream());
-    outputGobbler.start();
-    errorGobbler.start();
-    final Process finalProcess=process;
-    Callable<Integer> call=new Callable<Integer>(){
-      public Integer call() throws Exception {
-        return finalProcess.waitFor();
-      }
-    }
-;
-    executorService=Executors.newSingleThreadExecutor();
-    Future<Integer> ft=executorService.submit(call);
-    return ft.get(timeoutMilliseconds,TimeUnit.MILLISECONDS);
-  }
- catch (  TimeoutException te) {
-    process.destroy();
-    throw new CommandException(command,"Timeout exceeded: " + timeoutMilliseconds + " ms",te);
-  }
-catch (  Exception e) {
-    throw new CommandException(command,e);
-  }
- finally {
-    waitUntilFinish(outputGobbler);
-    waitUntilFinish(errorGobbler);
-    closeStreams(process);
-    if (executorService != null) {
-      executorService.shutdown();
-    }
-  }
+  LOG.info("Executing command: " + command);
+  return execute(command,new DefaultConsumer(),new DefaultConsumer(),timeoutMilliseconds);
 }
