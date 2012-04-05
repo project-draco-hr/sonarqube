@@ -12,22 +12,27 @@
     }
   }
   if (referenceViolationsMap.size() != newViolations.size()) {
-    if (rec != null) {
-      List<ViolationPair> possiblePairs=Lists.newArrayList();
-      for (      Violation newViolation : newViolations) {
-        for (        RuleFailureModel pastViolation : pastViolationsByRule.get(newViolation.getRule().getId())) {
-          int weight=rec.computeLengthOfMaximalBlock(pastViolation.getLine() - 1,newViolation.getLineId() - 1);
-          possiblePairs.add(new ViolationPair(pastViolation,newViolation,weight));
+    ViolationTrackingBlocksRecognizer rec=null;
+    if (source != null && resource != null) {
+      String referenceSource=referenceAnalysis.getSource(resource);
+      if (referenceSource != null) {
+        rec=new ViolationTrackingBlocksRecognizer(referenceSource,source);
+        List<ViolationPair> possiblePairs=Lists.newArrayList();
+        for (        Violation newViolation : newViolations) {
+          for (          RuleFailureModel pastViolation : pastViolationsByRule.get(newViolation.getRule().getId())) {
+            int weight=rec.computeLengthOfMaximalBlock(pastViolation.getLine() - 1,newViolation.getLineId() - 1);
+            possiblePairs.add(new ViolationPair(pastViolation,newViolation,weight));
+          }
         }
-      }
-      Collections.sort(possiblePairs,ViolationPair.COMPARATOR);
-      Set<RuleFailureModel> pp=Sets.newHashSet(pastViolations);
-      for (      ViolationPair pair : possiblePairs) {
-        Violation newViolation=pair.getNewViolation();
-        RuleFailureModel pastViolation=pair.getPastViolation();
-        if (isNotAlreadyMapped(newViolation,referenceViolationsMap) && pp.contains(pastViolation)) {
-          pp.remove(pastViolation);
-          mapViolation(newViolation,pastViolation,pastViolationsByRule,referenceViolationsMap);
+        Collections.sort(possiblePairs,ViolationPair.COMPARATOR);
+        Set<RuleFailureModel> pp=Sets.newHashSet(pastViolations);
+        for (        ViolationPair pair : possiblePairs) {
+          Violation newViolation=pair.getNewViolation();
+          RuleFailureModel pastViolation=pair.getPastViolation();
+          if (isNotAlreadyMapped(newViolation,referenceViolationsMap) && pp.contains(pastViolation)) {
+            pp.remove(pastViolation);
+            mapViolation(newViolation,pastViolation,pastViolationsByRule,referenceViolationsMap);
+          }
         }
       }
     }
