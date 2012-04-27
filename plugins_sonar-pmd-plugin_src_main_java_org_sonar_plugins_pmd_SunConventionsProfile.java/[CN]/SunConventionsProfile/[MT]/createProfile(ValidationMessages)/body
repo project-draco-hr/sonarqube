@@ -1,7 +1,13 @@
 {
-  Reader pmdSonarWayProfile=new InputStreamReader(this.getClass().getResourceAsStream("/org/sonar/plugins/pmd/profile-sun-conventions.xml"));
-  RulesProfile profile=importer.importProfile(pmdSonarWayProfile,messages);
-  profile.setName(RulesProfile.SUN_CONVENTIONS_NAME);
-  profile.setLanguage(Java.KEY);
-  return profile;
+  Reader config=null;
+  try {
+    config=new InputStreamReader(this.getClass().getResourceAsStream("/org/sonar/plugins/pmd/profile-sun-conventions.xml"));
+    RulesProfile profile=importer.importProfile(config,validation);
+    profile.setLanguage(Java.KEY);
+    profile.setName(RulesProfile.SUN_CONVENTIONS_NAME);
+    return profile;
+  }
+  finally {
+    Closeables.closeQuietly(config);
+  }
 }

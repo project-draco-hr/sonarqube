@@ -1,7 +1,13 @@
 {
-  Reader pmdSonarWayProfile=new InputStreamReader(this.getClass().getResourceAsStream("/org/sonar/plugins/pmd/profile-sonar-way.xml"));
-  RulesProfile profile=importer.importProfile(pmdSonarWayProfile,messages);
-  profile.setLanguage(Java.KEY);
-  profile.setName(RulesProfile.SONAR_WAY_NAME);
-  return profile;
+  Reader config=null;
+  try {
+    config=new InputStreamReader(this.getClass().getResourceAsStream("/org/sonar/plugins/pmd/profile-sonar-way.xml"));
+    RulesProfile profile=importer.importProfile(config,validation);
+    profile.setLanguage(Java.KEY);
+    profile.setName(RulesProfile.SONAR_WAY_NAME);
+    return profile;
+  }
+  finally {
+    Closeables.closeQuietly(config);
+  }
 }
