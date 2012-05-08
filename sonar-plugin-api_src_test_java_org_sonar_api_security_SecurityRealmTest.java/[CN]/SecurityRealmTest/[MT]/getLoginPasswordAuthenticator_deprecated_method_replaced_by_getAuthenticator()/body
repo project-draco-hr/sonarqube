@@ -1,0 +1,13 @@
+{
+  final LoginPasswordAuthenticator deprecatedAuthenticator=mock(LoginPasswordAuthenticator.class);
+  SecurityRealm realm=new SecurityRealm(){
+    @Override public LoginPasswordAuthenticator getLoginPasswordAuthenticator(){
+      return deprecatedAuthenticator;
+    }
+  }
+;
+  Authenticator proxy=realm.doGetAuthenticator();
+  Authenticator.Context context=new Authenticator.Context("foo","bar",mock(HttpServletRequest.class));
+  proxy.doAuthenticate(context);
+  verify(deprecatedAuthenticator).authenticate("foo","bar");
+}

@@ -1,0 +1,16 @@
+{
+  ExternalUsersProvider provider=new ExternalUsersProvider(){
+    @Override public UserDetails doGetUserDetails(    Context context){
+      Preconditions.checkNotNull(context.getUsername());
+      Preconditions.checkNotNull(context.getRequest());
+      UserDetails user=new UserDetails();
+      user.setName(context.getUsername());
+      user.setEmail("foo@bar.com");
+      return user;
+    }
+  }
+;
+  UserDetails user=provider.doGetUserDetails(new ExternalUsersProvider.Context("foo",mock(HttpServletRequest.class)));
+  assertThat(user.getName()).isEqualTo("foo");
+  assertThat(user.getEmail()).isEqualTo("foo@bar.com");
+}
