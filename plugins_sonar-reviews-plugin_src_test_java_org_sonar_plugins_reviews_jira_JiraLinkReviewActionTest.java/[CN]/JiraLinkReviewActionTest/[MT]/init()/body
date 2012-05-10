@@ -1,0 +1,14 @@
+{
+  soapClient=mock(JiraSOAPClient.class);
+  RemoteIssue remoteIssue=new RemoteIssue();
+  remoteIssue.setKey("FOO-15");
+  when(soapClient.createIssue(any(ReviewDto.class))).thenReturn(remoteIssue);
+  reviewDao=mock(ReviewDao.class);
+  when(reviewDao.findById(45L)).thenReturn(new ReviewDto().setId(45L));
+  userFinder=mock(UserFinder.class);
+  User user=new User();
+  user.setId(12);
+  when(userFinder.findByLogin("paul")).thenReturn(user);
+  reviewCommentDao=mock(ReviewCommentDao.class);
+  action=new JiraLinkReviewAction(soapClient,reviewDao,reviewCommentDao,userFinder);
+}

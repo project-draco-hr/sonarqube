@@ -1,0 +1,16 @@
+{
+  Map<String,String> reviewContext=Maps.newHashMap();
+  reviewContext.put(JiraLinkReviewAction.REVIEW_ID_PARAM,"45");
+  reviewContext.put(JiraLinkReviewAction.USER_LOGIN_PARAM,"paul");
+  reviewContext.put(JiraLinkReviewAction.COMMENT_TEXT_PARAM,"Hello world");
+  action.execute(reviewContext);
+  verify(reviewDao).findById(45L);
+  verify(userFinder).findByLogin("paul");
+  verify(soapClient).createIssue(new ReviewDto().setId(45L));
+  ArgumentCaptor<ReviewCommentDto> commentCaptor=ArgumentCaptor.forClass(ReviewCommentDto.class);
+  verify(reviewCommentDao).insert(commentCaptor.capture());
+  ReviewCommentDto comment=commentCaptor.getValue();
+  assertThat(comment.getReviewId(),is(45L));
+  assertThat(comment.getUserId(),is(12L));
+  assertThat(comment.getText(),is("Hello world\n\nReview linked to JIRA issue: http://localhost:8080/browse/FOO-15"));
+}
