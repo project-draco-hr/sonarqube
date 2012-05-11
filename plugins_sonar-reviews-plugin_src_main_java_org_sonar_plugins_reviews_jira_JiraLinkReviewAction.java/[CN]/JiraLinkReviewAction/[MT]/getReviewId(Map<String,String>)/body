@@ -1,14 +1,8 @@
 {
   String reviewId=reviewContext.get(REVIEW_ID_PARAM);
-  ReviewDto review;
-  try {
-    review=reviewDao.findById(Long.parseLong(reviewId));
-  }
- catch (  NumberFormatException e) {
-    throw new IllegalArgumentException("The given review with id is not a valid number: " + (reviewId == null ? "NULL" : reviewId));
-  }
-  if (review == null) {
-    throw new IllegalArgumentException("The review with id '" + reviewId + "' does not exist.");
-  }
+  Preconditions.checkState(StringUtils.isNotBlank(reviewId),"The review id is missing.");
+  Preconditions.checkState(StringUtils.isNumeric(reviewId),"The given review with id is not a valid number: " + reviewId);
+  ReviewDto review=reviewDao.findById(Long.parseLong(reviewId));
+  Preconditions.checkNotNull(review,"The review with id '" + reviewId + "' does not exist.");
   return review;
 }
