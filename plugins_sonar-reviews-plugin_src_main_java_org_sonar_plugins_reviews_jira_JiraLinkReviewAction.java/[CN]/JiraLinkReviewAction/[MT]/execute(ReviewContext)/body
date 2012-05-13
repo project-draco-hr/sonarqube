@@ -1,0 +1,13 @@
+{
+  ReviewDto review=getReviewId(reviewContext);
+  User user=getUser(reviewContext);
+  RemoteIssue issue=null;
+  try {
+    issue=jiraSOAPClient.createIssue(review);
+  }
+ catch (  RemoteException e) {
+    throw new IllegalStateException("Impossible to create an issue on JIRA: " + e.getMessage(),e);
+  }
+  addCommentToReview(review,issue,user,reviewContext.getParamValue(COMMENT_TEXT_PARAM));
+  updateReviewWithIssueInfo(review,issue);
+}

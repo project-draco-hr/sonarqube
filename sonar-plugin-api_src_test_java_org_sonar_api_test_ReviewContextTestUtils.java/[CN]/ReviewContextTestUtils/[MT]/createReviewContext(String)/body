@@ -1,0 +1,16 @@
+{
+  Map<String,Map<String,String>> reviewContextMap=Maps.newLinkedHashMap();
+  for (  String innerMap : StringUtils.split(properties,';')) {
+    if (StringUtils.isNotBlank(innerMap)) {
+      String mapName=StringUtils.substringBefore(innerMap,"=").trim();
+      Map<String,String> currentMap=Maps.newLinkedHashMap();
+      for (      String keyValuePairList : StringUtils.substringsBetween(innerMap,"{","}")) {
+        for (        String keyValuePair : StringUtils.split(keyValuePairList,',')) {
+          currentMap.put(StringUtils.substringBefore(keyValuePair,"=").trim(),StringUtils.substringAfter(keyValuePair,"=").trim());
+        }
+      }
+      reviewContextMap.put(mapName,currentMap);
+    }
+  }
+  return ReviewContext.createFromMap(reviewContextMap);
+}

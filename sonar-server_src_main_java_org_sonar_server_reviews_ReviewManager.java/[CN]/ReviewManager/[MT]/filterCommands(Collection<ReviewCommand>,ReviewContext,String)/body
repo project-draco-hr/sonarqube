@@ -1,0 +1,18 @@
+{
+  Preconditions.checkNotNull(initialCommands,"The list of review commands must not be NULL when filtering commands.");
+  Preconditions.checkState(StringUtils.isNotBlank(interfaceName),"The interface name must not be blank when searching for available commands.");
+  Class interfaceClass=null;
+  try {
+    interfaceClass=Class.forName(interfaceName);
+  }
+ catch (  ClassNotFoundException e) {
+    throw new IllegalArgumentException("The following interface for review commands does not exist: " + interfaceName);
+  }
+  List<ReviewCommand> commands=Lists.newArrayList();
+  for (  ReviewCommand reviewCommand : initialCommands) {
+    if (interfaceClass.isAssignableFrom(reviewCommand.getClass()) && reviewCommand.isAvailableFor(reviewContext)) {
+      commands.add(reviewCommand);
+    }
+  }
+  return commands;
+}
