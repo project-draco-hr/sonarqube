@@ -3,10 +3,11 @@
   ClassLoader initialClassLoader=Thread.currentThread().getContextClassLoader();
   Thread.currentThread().setContextClassLoader(FindBugs2.class.getClassLoader());
   OutputStream xmlOutput=null;
+  Collection<Plugin> customPlugins=null;
   ExecutorService executorService=Executors.newSingleThreadExecutor();
   try {
-    DetectorFactoryCollection detectorFactory=loadFindbugsPlugins();
     final FindBugs2 engine=new FindBugs2();
+    customPlugins=loadFindbugsPlugins();
     Project project=configuration.getFindbugsProject();
     engine.setProject(project);
     XMLBugReporter xmlBugReporter=new XMLBugReporter(project);
@@ -35,18 +36,18 @@
         LOG.warn("FindBugs filter-file not found: {}",filterFile);
       }
     }
-    engine.setDetectorFactoryCollection(detectorFactory);
+    engine.setDetectorFactoryCollection(DetectorFactoryCollection.instance());
     engine.setAnalysisFeatureSettings(FindBugs.DEFAULT_EFFORT);
     engine.finishSettings();
     executorService.submit(new FindbugsTask(engine)).get(configuration.getTimeout(),TimeUnit.MILLISECONDS);
     profiler.stop();
-    resetDetectorFactoryCollection();
     return xmlReport;
   }
  catch (  Exception e) {
     throw new SonarException("Can not execute Findbugs",e);
   }
  finally {
+    resetCustomPluginList(customPlugins);
     executorService.shutdown();
     IOUtils.closeQuietly(xmlOutput);
     Thread.currentThread().setContextClassLoader(initialClassLoader);

@@ -1,22 +1,30 @@
 {
-  List<URL> plugins=Lists.newArrayList();
+  ClassLoader contextClassLoader=Thread.currentThread().getContextClassLoader();
+  List<String> pluginJarPathList=Lists.newArrayList();
   try {
-    Enumeration<URL> urls=Thread.currentThread().getContextClassLoader().getResources("findbugs.xml");
+    Enumeration<URL> urls=contextClassLoader.getResources("findbugs.xml");
     while (urls.hasMoreElements()) {
       URL url=urls.nextElement();
-      String path=StringUtils.removeStart(StringUtils.substringBefore(url.toString(),"!"),"jar:");
-      Logs.INFO.info("Found findbugs plugin: " + path);
-      plugins.add(new URL(path));
+      pluginJarPathList.add(StringUtils.removeStart(StringUtils.substringBefore(url.toString(),"!"),"jar:file:"));
     }
   }
  catch (  IOException e) {
     throw new SonarException(e);
   }
-  resetDetectorFactoryCollection();
-  DetectorFactoryCollection detectorFactory=DetectorFactoryCollection.rawInstance();
-  detectorFactory.setPluginList(plugins.toArray(new URL[plugins.size()]));
-  for (  Plugin plugin : detectorFactory.plugins()) {
-    Logs.INFO.info("Loaded plugin " + plugin.getPluginId());
+  List<Plugin> customPluginList=Lists.newArrayList();
+  for (  String path : pluginJarPathList) {
+    try {
+      Plugin plugin=Plugin.addCustomPlugin(new File(path).toURI(),contextClassLoader);
+      if (plugin != null) {
+        customPluginList.add(plugin);
+        LOG.info("Found findbugs plugin: " + path);
+      }
+    }
+ catch (    PluginException e) {
+      LOG.warn("Failed to load plugin for custom detector: " + path);
+    }
+catch (    DuplicatePluginIdException e) {
+    }
   }
-  return detectorFactory;
+  return customPluginList;
 }
