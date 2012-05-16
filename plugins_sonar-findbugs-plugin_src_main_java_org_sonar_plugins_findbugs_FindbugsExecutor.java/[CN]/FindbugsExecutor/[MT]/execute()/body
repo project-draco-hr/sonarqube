@@ -1,5 +1,6 @@
 {
   TimeProfiler profiler=new TimeProfiler().start("Execute Findbugs " + FindbugsVersion.getVersion());
+  SecurityManager currentSecurityManager=System.getSecurityManager();
   ClassLoader initialClassLoader=Thread.currentThread().getContextClassLoader();
   Thread.currentThread().setContextClassLoader(FindBugs2.class.getClassLoader());
   OutputStream xmlOutput=null;
@@ -47,6 +48,7 @@
     throw new SonarException("Can not execute Findbugs",e);
   }
  finally {
+    System.setSecurityManager(currentSecurityManager);
     resetCustomPluginList(customPlugins);
     executorService.shutdown();
     IOUtils.closeQuietly(xmlOutput);
