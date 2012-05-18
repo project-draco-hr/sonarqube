@@ -1,7 +1,11 @@
 {
   sql.append(" FROM snapshots s ");
   if (filter.mustJoinMeasuresTable()) {
-    sql.append(" INNER JOIN project_measures pm ON s.id=pm.snapshot_id ");
+    sql.append(" INNER JOIN project_measures pm ");
+    if (MsSql.ID.equals(dialect.getId())) {
+      sql.append(" WITH (INDEX(measures_sid_metric)) ");
+    }
+    sql.append(" ON s.id=pm.snapshot_id ");
   }
   sql.append(" INNER JOIN projects p ON s.project_id=p.id ");
 }
