@@ -1,0 +1,16 @@
+{
+  String fullUrl=getUrlFor(path);
+  HttpURLConnection conn=getConnection(fullUrl,"GET");
+  InputStream input=(InputStream)conn.getContent();
+  try {
+    int statusCode=conn.getResponseCode();
+    if (statusCode != HttpURLConnection.HTTP_OK) {
+      throw new IOException("Status returned by url : '" + fullUrl + "' is invalid : "+ statusCode);
+    }
+    return IOUtil.toString(input);
+  }
+  finally {
+    IOUtil.close(input);
+    conn.disconnect();
+  }
+}

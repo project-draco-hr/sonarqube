@@ -1,0 +1,21 @@
+{
+  String remoteServerId=null;
+  try {
+    remoteServerId=remoteServer.getServerId();
+  }
+ catch (  IOException e) {
+    throw new SonarException("Impossible to get the ID of the remote server: " + server.getURL(),e);
+  }
+  if (!version.getSonarCoreId().equals(remoteServerId)) {
+    StringBuilder message=new StringBuilder("The current batch process and the configured remote server do not share the same DB configuration.\n");
+    message.append("\t- Batch side: ");
+    message.append(settings.getString(DatabaseProperties.PROP_URL));
+    message.append(" (");
+    String userName=settings.getString(DatabaseProperties.PROP_USER);
+    message.append(userName == null ? "sonar" : userName);
+    message.append(" / *****)\n\t- Server side: check the configuration at ");
+    message.append(server.getURL());
+    message.append("/system\n");
+    throw new BadDatabaseVersion(message.toString());
+  }
+}
