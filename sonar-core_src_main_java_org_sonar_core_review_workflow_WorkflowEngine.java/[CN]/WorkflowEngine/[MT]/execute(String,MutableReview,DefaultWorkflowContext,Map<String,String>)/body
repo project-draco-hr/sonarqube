@@ -1,0 +1,12 @@
+{
+  Preconditions.checkArgument(!Strings.isNullOrEmpty(commandKey),"Missing command");
+  Preconditions.checkArgument(workflow.hasCommand(commandKey),"Unknown command: " + commandKey);
+  Preconditions.checkState(verifyConditions(review,context,commandKey),"Conditions are not respected");
+  completeProjectSettings(context);
+  ImmutableMap<String,String> immutableParameters=ImmutableMap.copyOf(parameters);
+  Review initialReview=((DefaultReview)review).cloneImmutable();
+  for (  Function function : workflow.getFunctions(commandKey)) {
+    function.doExecute(review,initialReview,context,immutableParameters);
+  }
+  store.store(review);
+}

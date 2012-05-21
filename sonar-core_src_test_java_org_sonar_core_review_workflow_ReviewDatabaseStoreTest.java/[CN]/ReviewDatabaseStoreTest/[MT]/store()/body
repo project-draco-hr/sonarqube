@@ -1,0 +1,17 @@
+{
+  setupData("store");
+  ReviewDatabaseStore store=new ReviewDatabaseStore(getMyBatis());
+  MutableReview review=new DefaultReview().setReviewId(1234L);
+  review.setAssigneeId(33L);
+  review.setStatus("CLOSED");
+  review.setResolution("RESOLVED");
+  review.setProperty("who","me");
+  review.setProperty("why","because");
+  Comment comment=review.createComment();
+  comment.setMarkdownText("this is a comment");
+  comment.setUserId(555L);
+  Date now=DateUtils.parseDate("2012-05-18");
+  store.store(review,now);
+  checkTables("store","reviews");
+  checkTables("store",new String[]{"id"},"review_comments");
+}
