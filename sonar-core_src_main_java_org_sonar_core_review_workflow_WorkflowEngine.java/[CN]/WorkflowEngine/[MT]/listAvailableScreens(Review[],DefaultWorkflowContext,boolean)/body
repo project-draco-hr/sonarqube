@@ -1,10 +1,13 @@
 {
   ListMultimap<Long,Screen> result=ArrayListMultimap.create();
   completeProjectSettings(context);
-  for (  Review review : reviews) {
-    for (    Map.Entry<String,Screen> entry : workflow.getScreensByCommand().entrySet()) {
-      if (!verifyConditions || verifyConditions(review,context,entry.getKey())) {
-        result.put(review.getViolationId(),entry.getValue());
+  for (  Map.Entry<String,Screen> entry : workflow.getScreensByCommand().entrySet()) {
+    String commandKey=entry.getKey();
+    if (!verifyConditions || verifyConditions(null,context,workflow.getContextConditions(commandKey))) {
+      for (      Review review : reviews) {
+        if (!verifyConditions || verifyConditions(review,context,workflow.getReviewConditions(commandKey))) {
+          result.put(review.getViolationId(),entry.getValue());
+        }
       }
     }
   }
