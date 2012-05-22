@@ -1,13 +1,18 @@
 {
-  Filter filter=Filter.create();
-  filter.setShared(true);
-  filter.setFavouritesOnly(false);
-  filter.setDefaultPeriod("list");
-  when(filterTemplate.createFilter()).thenReturn(filter);
+  when(filterTemplate.createFilter()).thenReturn(Filter.create().setShared(true).setFavouritesOnly(false).setDefaultPeriod("list").setResourceKeyLike("*KEY*").setResourceNameLike("*NAME*").setLanguage("java").setSearchFor("TRK,BRC"));
   FilterDto dto=register.createDtoFromExtension("Fake",filterTemplate.createFilter());
+  CriteriaDto criteriaResourceKeyDto=Iterables.get(dto.getCriterias(),0);
+  CriteriaDto criteriaResourceNameDto=Iterables.get(dto.getCriterias(),1);
+  CriteriaDto criteriaLangageDto=Iterables.get(dto.getCriterias(),2);
+  CriteriaDto criteriaSearchForDto=Iterables.get(dto.getCriterias(),3);
   assertThat(dto.getUserId()).isNull();
   assertThat(dto.getName()).isEqualTo("Fake");
   assertThat(dto.isShared()).isTrue();
   assertThat(dto.isFavourites()).isFalse();
   assertThat(dto.getDefaultView()).isEqualTo("list");
+  assertThat(dto.getCriterias()).hasSize(4);
+  assertThat(dto.getCriterias()).satisfies(contains(new CriteriaDto().setFamily("key").setOperator("=").setTextValue("*KEY*")));
+  assertThat(dto.getCriterias()).satisfies(contains(new CriteriaDto().setFamily("name").setOperator("=").setTextValue("*NAME*")));
+  assertThat(dto.getCriterias()).satisfies(contains(new CriteriaDto().setFamily("language").setOperator("=").setTextValue("java")));
+  assertThat(dto.getCriterias()).satisfies(contains(new CriteriaDto().setFamily("qualifier").setOperator("=").setTextValue("TRK,BRC")));
 }
