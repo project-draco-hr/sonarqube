@@ -1,8 +1,14 @@
 {
-  FilterDto filterDto=new FilterDto().setName(name).setShared(filter.isShared()).setFavourites(filter.isFavouritesOnly()).setDefaultView(filter.getDefaultPeriod());
+  FilterDto filterDto=new FilterDto().setName(name).setPageSize((long)filter.getPageSize()).setShared(filter.isShared()).setFavourites(filter.isFavouritesOnly()).setDefaultView(filter.getDefaultPeriod());
   addCriteria(filterDto,"key","=",filter.getResourceKeyLike());
   addCriteria(filterDto,"name","=",filter.getResourceNameLike());
   addCriteria(filterDto,"language","=",filter.getLanguage());
   addCriteria(filterDto,"qualifier","=",filter.getSearchFor());
+  for (  Criterion criterion : filter.getCriteria()) {
+    filterDto.add(new CriterionDto().setFamily(criterion.getFamily()).setKey(criterion.getKey()).setOperator(criterion.getOperator()).setTextValue(criterion.getTextValue()).setValue(criterion.getValue()).setVariation(criterion.isVariation()));
+  }
+  for (  FilterColumn column : filter.getColumns()) {
+    filterDto.add(new FilterColumnDto().setFamily(column.getFamily()).setKey(column.getKey()).setOrderIndex(column.getOrderIndex()).setSortDirection(column.getSortDirection()).setVariation(column.isVariation()));
+  }
   return filterDto;
 }
