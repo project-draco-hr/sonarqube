@@ -30,7 +30,7 @@
   if (filter.hasQualifiers()) {
     sql.append(" AND s.qualifier IN (:qualifiers) ");
   }
- else {
+ else   if (!filter.isOnDirectChildren()) {
     sql.append(" AND s.qualifier IS NULL ");
   }
   if (filter.hasLanguages()) {
@@ -40,7 +40,12 @@
     sql.append(filter.getFavouriteIds().isEmpty() ? " AND s.project_id IS NULL " : " AND s.project_id IN (:favourites) ");
   }
   if (filter.hasBaseSnapshot()) {
-    sql.append(" AND s.root_snapshot_id=:root_sid AND s.path LIKE :path ");
+    if (filter.isOnDirectChildren()) {
+      sql.append(" AND s.parent_snapshot_id=:parent_sid ");
+    }
+ else {
+      sql.append(" AND s.root_snapshot_id=:root_sid AND s.path LIKE :path ");
+    }
   }
   if (filter.getDateCriterion() != null) {
     sql.append(" AND s.created_at");

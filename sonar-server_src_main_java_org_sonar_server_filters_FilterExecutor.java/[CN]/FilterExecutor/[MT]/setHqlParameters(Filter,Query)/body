@@ -17,8 +17,13 @@
     query.setParameter("date",filter.getDateCriterion().getDate());
   }
   if (filter.hasBaseSnapshot()) {
-    query.setParameter("root_sid",filter.getRootSnapshotId());
-    query.setParameter("path",new StringBuilder().append(filter.getBaseSnapshotPath()).append(filter.getBaseSnapshotId()).append(".%").toString());
+    if (filter.isOnDirectChildren()) {
+      query.setParameter("parent_sid",filter.getBaseSnapshotId());
+    }
+ else {
+      query.setParameter("root_sid",filter.getRootSnapshotId());
+      query.setParameter("path",new StringBuilder().append(filter.getBaseSnapshotPath()).append(filter.getBaseSnapshotId()).append(".%").toString());
+    }
   }
   if (StringUtils.isNotBlank(filter.getKeyRegexp())) {
     query.setParameter("kee",StringUtils.upperCase(StringUtils.replaceChars(filter.getKeyRegexp(),'*','%')));
