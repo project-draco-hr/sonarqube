@@ -1,4 +1,6 @@
 {
+  String jarPath=null;
+  JarFile jar=null;
   try {
     Collection<String> paths=Lists.newArrayList();
     rootPath=StringUtils.removeStart(rootPath,"/");
@@ -9,8 +11,8 @@
       if (StringUtils.substringAfterLast(rootPath,"/").indexOf('.') >= 0) {
         rootDirectory=StringUtils.substringBeforeLast(rootPath,"/");
       }
-      String jarPath=root.getPath().substring(5,root.getPath().indexOf("!"));
-      JarFile jar=new JarFile(URLDecoder.decode(jarPath,CharEncoding.UTF_8));
+      jarPath=root.getPath().substring(5,root.getPath().indexOf("!"));
+      jar=new JarFile(URLDecoder.decode(jarPath,CharEncoding.UTF_8));
       Enumeration<JarEntry> entries=jar.entries();
       while (entries.hasMoreElements()) {
         String name=entries.nextElement().getName();
@@ -23,5 +25,15 @@
   }
  catch (  Exception e) {
     throw Throwables.propagate(e);
+  }
+ finally {
+    if (jar != null) {
+      try {
+        jar.close();
+      }
+ catch (      Exception e) {
+        LoggerFactory.getLogger(ClassLoaderUtils.class).error("Fail to close JAR file: " + jarPath,e);
+      }
+    }
   }
 }
