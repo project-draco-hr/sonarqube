@@ -1,12 +1,13 @@
 {
   SqlSession session=mybatis.openBatchSession();
   PurgeMapper purgeMapper=session.getMapper(PurgeMapper.class);
+  PurgeCommands commands=new PurgeCommands(session,purgeMapper,session.getMapper(PurgeVendorMapper.class));
   try {
     List<ResourceDto> projects=getProjects(rootResourceId,session);
     for (    ResourceDto project : projects) {
       LOG.info("-> Clean " + project.getLongName() + " [id="+ project.getId()+ "]");
-      deleteAbortedBuilds(project,session,purgeMapper);
-      purge(project,scopesWithoutHistoricalData,session,purgeMapper);
+      deleteAbortedBuilds(project,commands);
+      purge(project,scopesWithoutHistoricalData,commands);
     }
     for (    ResourceDto project : projects) {
       disableOrphanResources(project,session,purgeMapper);
