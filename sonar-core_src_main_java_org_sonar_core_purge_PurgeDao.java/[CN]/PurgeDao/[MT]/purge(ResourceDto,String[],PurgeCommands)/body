@@ -1,0 +1,13 @@
+{
+  List<Long> projectSnapshotIds=purgeCommands.selectSnapshotIds(PurgeSnapshotQuery.create().setResourceId(project.getId()).setIslast(false).setNotPurged(true));
+  for (  final Long projectSnapshotId : projectSnapshotIds) {
+    LOG.info("<- Clean snapshot " + projectSnapshotId);
+    if (!ArrayUtils.isEmpty(scopesWithoutHistoricalData)) {
+      PurgeSnapshotQuery query=PurgeSnapshotQuery.create().setIslast(false).setScopes(scopesWithoutHistoricalData).setRootSnapshotId(projectSnapshotId);
+      purgeCommands.deleteSnapshots(query);
+    }
+    PurgeSnapshotQuery query=PurgeSnapshotQuery.create().setRootSnapshotId(projectSnapshotId).setNotPurged(true);
+    purgeCommands.purgeSnapshots(query);
+    purgeCommands.purgeSnapshots(PurgeSnapshotQuery.create().setId(projectSnapshotId).setNotPurged(true));
+  }
+}
