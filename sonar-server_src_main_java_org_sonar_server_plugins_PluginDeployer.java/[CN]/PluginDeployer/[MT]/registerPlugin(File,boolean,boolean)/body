@@ -1,16 +1,14 @@
 {
   DefaultPluginMetadata metadata=installer.extractMetadata(file,isCore);
-  if (StringUtils.isNotBlank(metadata.getKey())) {
-    PluginMetadata existing=pluginByKeys.get(metadata.getKey());
-    if (existing != null) {
-      if (canDelete) {
-        FileUtils.deleteQuietly(existing.getFile());
-        Logs.INFO.info("Plugin " + metadata.getKey() + " replaced by new version");
-      }
- else {
-        throw new ServerStartException("Found two plugins with the same key '" + metadata.getKey() + "': "+ metadata.getFile().getName()+ " and "+ existing.getFile().getName());
-      }
-    }
-    pluginByKeys.put(metadata.getKey(),metadata);
+  if (StringUtils.isBlank(metadata.getKey())) {
+    return;
+  }
+  PluginMetadata existing=pluginByKeys.put(metadata.getKey(),metadata);
+  if ((existing != null) && !canDelete) {
+    throw new ServerStartException("Found two plugins with the same key '" + metadata.getKey() + "': "+ metadata.getFile().getName()+ " and "+ existing.getFile().getName());
+  }
+  if (existing != null) {
+    FileUtils.deleteQuietly(existing.getFile());
+    LOG.info("Plugin " + metadata.getKey() + " replaced by new version");
   }
 }
