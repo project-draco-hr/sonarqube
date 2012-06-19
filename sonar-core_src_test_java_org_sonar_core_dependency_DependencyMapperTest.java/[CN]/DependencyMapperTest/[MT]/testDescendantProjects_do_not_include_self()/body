@@ -1,0 +1,16 @@
+{
+  setupData("fixture");
+  SqlSession session=getMyBatis().openSession();
+  try {
+    List<DependencyDto> dependencies=session.getMapper(DependencyMapper.class).selectAll();
+    assertThat(dependencies).hasSize(2);
+    DependencyDto dep=dependencies.get(0);
+    assertThat(dep.getUsage()).isEqualTo("compile");
+    assertThat(dep.getFromResourceId()).isEqualTo(100L);
+    assertThat(dep.getToResourceId()).isEqualTo(101L);
+    assertThat(dep.getId()).isEqualTo(1L);
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}
