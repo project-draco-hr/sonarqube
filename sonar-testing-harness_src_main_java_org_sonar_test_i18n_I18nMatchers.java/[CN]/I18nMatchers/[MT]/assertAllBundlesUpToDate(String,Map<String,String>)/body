@@ -9,7 +9,17 @@
     String bundleName=bundle.getName();
     if (bundleName.indexOf('_') > 0) {
       try {
-        assertThat(bundleName,isBundleUpToDate(sonarVersion));
+        String baseBundleName=BundleSynchronizedMatcher.extractDefaultBundleName(bundleName);
+        String pluginId=StringUtils.substringBefore(baseBundleName,".");
+        if (BundleSynchronizedMatcher.isCoreBundle(baseBundleName)) {
+          assertThat(bundleName,isBundleUpToDate(sonarVersion));
+        }
+ else         if (pluginIdsToBundleUrlMap != null && pluginIdsToBundleUrlMap.get(pluginId) != null) {
+          assertThat(bundleName,isBundleUpToDate(new URI(pluginIdsToBundleUrlMap.get(pluginId))));
+        }
+ else {
+          assertThat(bundleName,isBundleUpToDate());
+        }
       }
  catch (      AssertionError e) {
         failedAssertionMessages.put(bundleName,e.getMessage());
