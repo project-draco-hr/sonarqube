@@ -1,0 +1,17 @@
+{
+  SqlSession session=mybatis.openBatchSession();
+  ResourceKeyUpdaterMapper mapper=session.getMapper(ResourceKeyUpdaterMapper.class);
+  try {
+    Set<ResourceDto> modules=collectAllModules(projectId,oldPrefix,mapper);
+    checkNewNameOfAllModules(modules,oldPrefix,newPrefix,mapper);
+    Set<ResourceDto> allResources=Sets.newHashSet(modules);
+    for (    ResourceDto module : modules) {
+      allResources.addAll(mapper.selectProjectResources(module.getId()));
+    }
+    runBatchUpdateForAllResources(allResources,oldPrefix,newPrefix,mapper);
+    session.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}
