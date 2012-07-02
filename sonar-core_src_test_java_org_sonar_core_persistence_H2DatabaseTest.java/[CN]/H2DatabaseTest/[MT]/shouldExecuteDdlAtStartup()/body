@@ -1,0 +1,18 @@
+{
+  int tables=0;
+  H2Database db=new H2Database();
+  try {
+    db.start();
+    assertNotNull(db.getDataSource());
+    Connection connection=db.getDataSource().getConnection();
+    assertNotNull(connection);
+    ResultSet resultSet=connection.getMetaData().getTables("",null,null,new String[]{"TABLE"});
+    while (resultSet.next()) {
+      tables++;
+    }
+  }
+  finally {
+    db.stop();
+  }
+  assertThat(tables,greaterThan(30));
+}

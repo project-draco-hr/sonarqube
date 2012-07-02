@@ -1,12 +1,22 @@
 {
+  File dbHome=getDataDirectory(settings);
   if (dbHome.exists() && !dbHome.isDirectory()) {
     throw new SonarException("Database home " + dbHome.getPath() + " is not a directory");
   }
   if (!dbHome.exists()) {
     dbHome.mkdirs();
   }
-  System.setProperty("derby.system.home",dbHome.getPath());
-  saveDerbyPropertiesFile();
-  startListening();
-  Logs.INFO.info("Embedded database started. Data stored in: " + dbHome.getAbsolutePath());
+  String port=getSetting(DatabaseProperties.PROP_EMBEDDED_PORT,DatabaseProperties.PROP_EMBEDDED_PORT_DEFAULT_VALUE);
+  String user=getSetting(DatabaseProperties.PROP_USER,DatabaseProperties.PROP_USER_DEFAULT_VALUE);
+  String password=getSetting(DatabaseProperties.PROP_PASSWORD,DatabaseProperties.PROP_PASSWORD_DEFAULT_VALUE);
+  try {
+    createDatabase(dbHome,user,password);
+    Server server=Server.createTcpServer("-tcpPort",port,"-tcpAllowOthers","-ifExists","-baseDir",dbHome.getAbsolutePath());
+    LOG.info("Starting embedded database on port " + server.getPort());
+    server.start();
+    LOG.info("Embedded database started. Data stored in: " + dbHome.getAbsolutePath());
+  }
+ catch (  Exception e) {
+    throw new SonarException("Unable to start database",e);
+  }
 }

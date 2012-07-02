@@ -1,17 +1,12 @@
 {
   Settings settings=new Settings();
-  settings.setProperty("sonar.jdbc.url","jdbc:derby:memory:sonar;create=true;user=sonar;password=sonar");
-  settings.setProperty("sonar.jdbc.driverClassName","org.apache.derby.jdbc.EmbeddedDriver");
+  settings.setProperty("sonar.jdbc.url","jdbc:h2:mem:sonar");
+  settings.setProperty("sonar.jdbc.driverClassName","org.h2.Driver");
   settings.setProperty("sonar.jdbc.username","sonar");
   settings.setProperty("sonar.jdbc.password","sonar");
   settings.setProperty("sonar.jdbc.maxActive","1");
-  try {
-    DefaultDatabase db=new DefaultDatabase(settings);
-    db.start();
-    assertThat(db.getDialect().getId(),Is.is("derby"));
-    assertThat(((BasicDataSource)db.getDataSource()).getMaxActive(),Is.is(1));
-  }
-  finally {
-    DerbyUtils.dropInMemoryDatabase();
-  }
+  DefaultDatabase db=new DefaultDatabase(settings);
+  db.start();
+  assertThat(db.getDialect().getId(),Is.is("h2"));
+  assertThat(((BasicDataSource)db.getDataSource()).getMaxActive(),Is.is(1));
 }
