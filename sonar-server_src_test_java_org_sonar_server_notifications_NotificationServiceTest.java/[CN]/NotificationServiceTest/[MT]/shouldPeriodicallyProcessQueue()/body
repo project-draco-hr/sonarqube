@@ -1,11 +1,14 @@
 {
   NotificationQueueElement queueElement=mock(NotificationQueueElement.class);
-  Notification notification=mock(Notification.class);
-  when(queueElement.getNotification()).thenReturn(notification);
+  Notification startNotification=mock(Notification.class);
+  Notification afterDelayNotification=mock(Notification.class);
+  Notification stopNotification=mock(Notification.class);
+  when(queueElement.getNotification()).thenReturn(startNotification,afterDelayNotification,stopNotification);
   when(manager.getFromQueue()).thenReturn(queueElement).thenReturn(null).thenReturn(queueElement).thenReturn(null).thenReturn(queueElement).thenReturn(null);
   doNothing().when(service).deliver(any(Notification.class));
   service.start();
-  Thread.sleep(1500);
+  verify(service,timeout(15000)).deliver(startNotification);
+  verify(service,timeout(1500)).deliver(afterDelayNotification);
   service.stop();
-  verify(service,times(3)).deliver(notification);
+  verify(service,timeout(1500)).deliver(stopNotification);
 }
