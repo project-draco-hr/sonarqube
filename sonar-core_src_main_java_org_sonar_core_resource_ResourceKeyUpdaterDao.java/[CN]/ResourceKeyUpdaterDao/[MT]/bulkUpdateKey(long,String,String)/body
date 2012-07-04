@@ -2,13 +2,19 @@
   SqlSession session=mybatis.openBatchSession();
   ResourceKeyUpdaterMapper mapper=session.getMapper(ResourceKeyUpdaterMapper.class);
   try {
-    Set<ResourceDto> modules=collectAllModules(projectId,oldPrefix,mapper);
-    checkNewNameOfAllModules(modules,oldPrefix,newPrefix,mapper);
-    Set<ResourceDto> allResources=Sets.newHashSet(modules);
+    Set<ResourceDto> modules=collectAllModules(projectId,stringToReplace,mapper);
+    checkNewNameOfAllModules(modules,stringToReplace,replacementString,mapper);
+    Map<ResourceDto,List<ResourceDto>> allResourcesByModuleMap=Maps.newHashMap();
     for (    ResourceDto module : modules) {
-      allResources.addAll(mapper.selectProjectResources(module.getId()));
+      allResourcesByModuleMap.put(module,mapper.selectProjectResources(module.getId()));
     }
-    runBatchUpdateForAllResources(allResources,oldPrefix,newPrefix,mapper);
+    for (    ResourceDto module : modules) {
+      String oldModuleKey=module.getKey();
+      String newModuleKey=computeNewKey(module,stringToReplace,replacementString);
+      Collection<ResourceDto> resources=Lists.newArrayList(module);
+      resources.addAll(allResourcesByModuleMap.get(module));
+      runBatchUpdateForAllResources(resources,oldModuleKey,newModuleKey,mapper);
+    }
     session.commit();
   }
   finally {
