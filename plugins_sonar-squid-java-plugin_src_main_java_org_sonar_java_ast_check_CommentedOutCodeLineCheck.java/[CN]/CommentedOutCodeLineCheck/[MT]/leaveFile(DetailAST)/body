@@ -1,15 +1,27 @@
 {
-  SourceFile sourceFile=(SourceFile)peekSourceCode();
+  List<Integer> commentedOutCodeLines=Lists.newArrayList();
   for (  TextBlock comment : comments) {
     String[] lines=comment.getText();
     for (int i=0; i < lines.length; i++) {
       if (codeRecognizer.isLineOfCode(lines[i])) {
-        CheckMessage message=new CheckMessage(this,"This block of commented-out lines of code should be removed.");
-        message.setLine(comment.getStartLineNo() + i);
-        sourceFile.log(message);
+        for (int j=i; j < lines.length; j++) {
+          commentedOutCodeLines.add(comment.getStartLineNo() + j);
+        }
         break;
       }
     }
+  }
+  SourceFile sourceFile=(SourceFile)peekSourceCode();
+  Collections.sort(commentedOutCodeLines);
+  int prev=Integer.MIN_VALUE;
+  for (int i=0; i < commentedOutCodeLines.size(); i++) {
+    int current=commentedOutCodeLines.get(i);
+    if (prev + 1 < current) {
+      CheckMessage message=new CheckMessage(this,"This block of commented-out lines of code should be removed.");
+      message.setLine(current);
+      sourceFile.log(message);
+    }
+    prev=current;
   }
   comments=null;
 }
