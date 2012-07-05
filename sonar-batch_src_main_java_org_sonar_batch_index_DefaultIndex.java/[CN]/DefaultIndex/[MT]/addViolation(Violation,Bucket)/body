@@ -1,0 +1,16 @@
+{
+  if (!violation.isManual()) {
+    ActiveRule activeRule=profile.getActiveRule(violation.getRule());
+    if (activeRule != null) {
+      violation.setSeverity(activeRule.getSeverity());
+    }
+ else     if (currentProject.getReuseExistingRulesConfig()) {
+      violation.setSeverity(violation.getRule().getSeverity());
+    }
+ else {
+      LoggerFactory.getLogger(getClass()).debug("Rule is not activated, ignoring violation {}",violation);
+      return;
+    }
+  }
+  doAddViolation(violation,bucket);
+}

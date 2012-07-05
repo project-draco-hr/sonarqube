@@ -11,28 +11,11 @@
     return;
   }
   Bucket bucket=checkIndexed(resource);
-  if (bucket != null && !bucket.isExcluded()) {
-    boolean isIgnored=!force && violationFilters != null && violationFilters.isIgnored(violation);
-    if (!isIgnored) {
-      if (violation.isManual()) {
-        doAddViolation(violation,bucket);
-      }
- else {
-        ActiveRule activeRule=profile.getActiveRule(violation.getRule());
-        if (activeRule == null) {
-          if (currentProject.getReuseExistingRulesConfig()) {
-            violation.setSeverity(violation.getRule().getSeverity());
-            doAddViolation(violation,bucket);
-          }
- else {
-            LoggerFactory.getLogger(getClass()).debug("Rule is not activated, ignoring violation {}",violation);
-          }
-        }
- else {
-          violation.setSeverity(activeRule.getSeverity());
-          doAddViolation(violation,bucket);
-        }
-      }
-    }
+  if (bucket == null || bucket.isExcluded()) {
+    return;
+  }
+  boolean isIgnored=!force && violationFilters != null && violationFilters.isIgnored(violation);
+  if (!isIgnored) {
+    addViolation(violation,bucket);
   }
 }
