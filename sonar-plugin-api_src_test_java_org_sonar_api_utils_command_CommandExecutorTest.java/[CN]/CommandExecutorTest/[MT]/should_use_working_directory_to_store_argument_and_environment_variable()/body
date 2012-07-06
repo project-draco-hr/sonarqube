@@ -1,0 +1,11 @@
+{
+  Command command=Command.create(getScript("echo")).setDirectory(workDir).addArgument("1").setEnvironmentVariable("ENVVAR","2");
+  int exitCode=CommandExecutor.create().execute(command,1000L);
+  assertThat(exitCode).isEqualTo(0);
+  File logFile=new File(workDir,"echo.log");
+  assertThat(logFile).exists();
+  String log=FileUtils.readFileToString(logFile);
+  assertThat(log).contains(workDir.getCanonicalPath());
+  assertThat(log).contains("Parameter: 1");
+  assertThat(log).contains("Environment variable: 2");
+}
