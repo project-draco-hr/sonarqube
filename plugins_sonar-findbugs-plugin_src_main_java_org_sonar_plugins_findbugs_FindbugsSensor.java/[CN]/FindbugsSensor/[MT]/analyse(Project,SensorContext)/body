@@ -1,24 +1,28 @@
 {
   if (project.getReuseExistingRulesConfig()) {
-    Logs.INFO.warn("Reusing existing Findbugs configuration not supported any more.");
+    LOG.warn("Reusing existing Findbugs configuration not supported any more.");
   }
   File report=getFindbugsReportFile(project);
   if (report == null) {
     report=executor.execute();
   }
   FindbugsXmlReportParser reportParser=new FindbugsXmlReportParser(report);
-  List<FindbugsXmlReportParser.Violation> fbViolations=reportParser.getViolations();
-  for (  FindbugsXmlReportParser.Violation fbViolation : fbViolations) {
-    Rule rule=ruleFinder.findByKey(FindbugsConstants.REPOSITORY_KEY,fbViolation.getType());
-    if (rule != null) {
-      JavaFile resource=new JavaFile(fbViolation.getSonarJavaFileKey());
-      if (context.getResource(resource) != null) {
-        Violation violation=Violation.create(rule,resource).setLineId(fbViolation.getStart()).setMessage(fbViolation.getLongMessage());
-        context.saveViolation(violation);
-      }
+  List<FindbugsXmlReportParser.XmlBugInstance> bugInstances=reportParser.getBugInstances();
+  for (  FindbugsXmlReportParser.XmlBugInstance bugInstance : bugInstances) {
+    FindbugsXmlReportParser.XmlSourceLineAnnotation sourceLine=bugInstance.getPrimarySourceLine();
+    if (sourceLine == null) {
+      LOG.warn("No source line for " + bugInstance.getType());
+      continue;
     }
- else {
-      Logs.INFO.warn("Findbugs rule '{}' not active in Sonar.",fbViolation.getType());
+    Rule rule=ruleFinder.findByKey(FindbugsConstants.REPOSITORY_KEY,bugInstance.getType());
+    if (rule == null) {
+      LOG.warn("Findbugs rule '{}' not active in Sonar.",bugInstance.getType());
+      continue;
+    }
+    JavaFile resource=new JavaFile(sourceLine.getSonarJavaFileKey());
+    if (context.getResource(resource) != null) {
+      Violation violation=Violation.create(rule,resource).setLineId(sourceLine.getStart()).setMessage(bugInstance.getLongMessage());
+      context.saveViolation(violation);
     }
   }
 }
