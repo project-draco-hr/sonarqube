@@ -5,5 +5,16 @@
     RuleParam param=rule.createParameter(fieldKey);
     param.setDescription(propertyAnnotation.description());
     param.setDefaultValue(propertyAnnotation.defaultValue());
+    if (!StringUtils.isBlank(propertyAnnotation.type())) {
+      try {
+        param.setType(PropertyType.valueOf(propertyAnnotation.type().trim()).name());
+      }
+ catch (      IllegalArgumentException e) {
+        throw new IllegalArgumentException("Invalid property type [" + propertyAnnotation.type() + "]",e);
+      }
+    }
+ else {
+      param.setType(guessType(field.getType()).name());
+    }
   }
 }
