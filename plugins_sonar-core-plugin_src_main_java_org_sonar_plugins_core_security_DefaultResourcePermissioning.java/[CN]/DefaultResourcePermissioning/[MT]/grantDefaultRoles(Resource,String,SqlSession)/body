@@ -1,7 +1,8 @@
 {
   UserMapper userMapper=session.getMapper(UserMapper.class);
   RoleMapper roleMapper=session.getMapper(RoleMapper.class);
-  String[] groupNames=settings.getStringArrayBySeparator("sonar.role." + role + "."+ resource.getQualifier()+ ".defaultGroups",",");
+  String strategy=getStrategy(resource);
+  String[] groupNames=settings.getStringArrayBySeparator("sonar.role." + role + "."+ strategy+ ".defaultGroups",",");
   for (  String groupName : groupNames) {
     GroupRoleDto groupRole=new GroupRoleDto().setRole(role).setResourceId(new Long(resource.getId()));
     if (DefaultGroups.isAnyone(groupName)) {
@@ -14,7 +15,7 @@
       }
     }
   }
-  String[] logins=settings.getStringArrayBySeparator("sonar.role." + role + "."+ resource.getQualifier()+ ".defaultUsers",",");
+  String[] logins=settings.getStringArrayBySeparator("sonar.role." + role + "."+ strategy+ ".defaultUsers",",");
   for (  String login : logins) {
     UserDto user=userMapper.selectUserByLogin(login);
     if (user != null) {
