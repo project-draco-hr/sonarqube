@@ -1,0 +1,15 @@
+{
+  List<MeasureDto> batch=Lists.newArrayList();
+  Map<Resource,Collection<Measure>> map=unsavedMeasuresByResource.asMap();
+  for (  Map.Entry<Resource,Collection<Measure>> entry : map.entrySet()) {
+    Resource resource=entry.getKey();
+    Snapshot snapshot=resourcePersister.getSnapshot(entry.getKey());
+    for (    Measure measure : entry.getValue()) {
+      if (shouldPersistMeasure(resource,measure)) {
+        batch.add(new MeasureDto(model(measure).setSnapshotId(snapshot.getId())));
+      }
+    }
+  }
+  unsavedMeasuresByResource.clear();
+  return batch;
+}
