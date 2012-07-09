@@ -3,16 +3,14 @@
     unsavedMeasuresByResource.put(resource,measure);
     return;
   }
+  MeasureModel model=null;
   if (measure.getId() != null) {
-    MeasureModel model=session.reattach(MeasureModel.class,measure.getId());
-    model=mergeModel(measure,model);
-    model.save(session);
-    memoryOptimizer.evictDataMeasure(measure,model);
+    model=update(measure);
   }
  else   if (shouldPersistMeasure(resource,measure)) {
-    Snapshot snapshot=resourcePersister.getSnapshotOrFail(resource);
-    MeasureModel model=createModel(measure).setSnapshotId(snapshot.getId());
-    model.save(session);
+    model=insert(measure,resourcePersister.getSnapshotOrFail(resource));
+  }
+  if (model != null) {
     memoryOptimizer.evictDataMeasure(measure,model);
   }
 }

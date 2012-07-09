@@ -1,16 +1,22 @@
 {
   LoggerFactory.getLogger(getClass()).debug("{} measures to dump",unsavedMeasuresByResource.size());
-  Map<Resource,Collection<Measure>> map=unsavedMeasuresByResource.asMap();
-  for (  Map.Entry<Resource,Collection<Measure>> entry : map.entrySet()) {
-    Resource resource=entry.getKey();
-    Snapshot snapshot=resourcePersister.getSnapshot(entry.getKey());
-    for (    Measure measure : entry.getValue()) {
-      if (shouldPersistMeasure(resource,measure)) {
-        MeasureModel model=createModel(measure).setSnapshotId(snapshot.getId());
-        model.save(session);
+  SqlSession session=mybatis.openSession();
+  try {
+    MeasureModelMapper mapper=session.getMapper(MeasureModelMapper.class);
+    Map<Resource,Collection<Measure>> map=unsavedMeasuresByResource.asMap();
+    for (    Map.Entry<Resource,Collection<Measure>> entry : map.entrySet()) {
+      Resource resource=entry.getKey();
+      Snapshot snapshot=resourcePersister.getSnapshot(entry.getKey());
+      for (      Measure measure : entry.getValue()) {
+        if (shouldPersistMeasure(resource,measure)) {
+          mapper.insert(new MeasureDto(model(measure).setSnapshotId(snapshot.getId())));
+        }
       }
     }
+    session.commit();
   }
-  session.commit();
+  finally {
+    MyBatis.closeQuietly(session);
+  }
   unsavedMeasuresByResource.clear();
 }

@@ -1,10 +1,11 @@
 {
-  Measure measure=new Measure(ncloc()).setValue(200.0);
+  setupData("empty");
+  Measure measure=new Measure(ncloc());
+  measure.setValue(200.0);
   measurePersister.setDelayedMode(true);
   measurePersister.saveMeasure(project,measure);
   measure.setValue(300.0);
   measurePersister.saveMeasure(project,measure);
   measurePersister.dump();
-  List<MeasureModel> coverageMeasures=getSession().getResults(MeasureModel.class,"snapshotId",PROJECT_SNAPSHOT_ID,"metricId",1);
-  assertThat(coverageMeasures).onProperty("value").containsExactly(300.0);
+  checkTables("shouldAddDelayedMeasureSeveralTimes","project_measures");
 }
