@@ -1,24 +1,18 @@
 {
-  boolean saveLater=(measure.getPersistenceMode().useMemory() && delayedMode);
-  if (saveLater) {
+  if (shouldSaveLater(measure)) {
     unsavedMeasuresByResource.put(resource,measure);
+    return;
   }
- else {
+  if (measure.getId() != null) {
+    MeasureModel model=session.reattach(MeasureModel.class,measure.getId());
+    model=mergeModel(measure,model);
+    model.save(session);
+    memoryOptimizer.evictDataMeasure(measure,model);
+  }
+ else   if (shouldPersistMeasure(resource,measure)) {
     Snapshot snapshot=resourcePersister.getSnapshotOrFail(resource);
-    MeasureModel model=null;
-    if (measure.getId() != null) {
-      model=session.reattach(MeasureModel.class,measure.getId());
-      model=mergeModel(measure,model);
-      model.save(session);
-    }
- else     if (shouldPersistMeasure(resource,measure)) {
-      model=createModel(measure);
-      model.setSnapshotId(snapshot.getId());
-      model.save(session);
-      measure.setId(model.getId());
-    }
-    if (model != null) {
-      memoryOptimizer.evictDataMeasure(measure,model);
-    }
+    MeasureModel model=createModel(measure).setSnapshotId(snapshot.getId());
+    model.save(session);
+    memoryOptimizer.evictDataMeasure(measure,model);
   }
 }
