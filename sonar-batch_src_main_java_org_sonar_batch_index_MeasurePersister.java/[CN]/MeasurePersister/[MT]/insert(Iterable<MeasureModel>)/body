@@ -1,11 +1,9 @@
 {
-  MeasureModel value=model(measure);
-  value.setSnapshotId(snapshot.getId());
   SqlSession session=mybatis.openSession();
   try {
     MeasureMapper mapper=session.getMapper(MeasureMapper.class);
-    mapper.insert(value);
-    if (value.getMeasureData() != null) {
+    for (    MeasureModel value : values) {
+      mapper.insert(value);
       mapper.insertData(value);
     }
     session.commit();
@@ -13,5 +11,4 @@
   finally {
     MyBatis.closeQuietly(session);
   }
-  return value;
 }
