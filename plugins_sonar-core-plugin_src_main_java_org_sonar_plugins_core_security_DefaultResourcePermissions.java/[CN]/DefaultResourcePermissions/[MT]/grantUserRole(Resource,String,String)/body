@@ -1,0 +1,18 @@
+{
+  if (resource.getId() != null) {
+    SqlSession session=myBatis.openSession();
+    try {
+      UserDto user=session.getMapper(UserMapper.class).selectUserByLogin(login);
+      if (user != null) {
+        UserRoleDto userRole=new UserRoleDto().setRole(role).setUserId(user.getId()).setResourceId(Long.valueOf(resource.getId()));
+        RoleMapper roleMapper=session.getMapper(RoleMapper.class);
+        roleMapper.deleteUserRole(userRole);
+        roleMapper.insertUserRole(userRole);
+        session.commit();
+      }
+    }
+  finally {
+      MyBatis.closeQuietly(session);
+    }
+  }
+}
