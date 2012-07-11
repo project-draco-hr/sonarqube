@@ -1,11 +1,12 @@
 {
-  InputStream input=getPathToMapper(mapperClass);
+  String mapperName=mapperClass.getName();
+  InputStream input=null;
   try {
-    XMLMapperBuilder mapperParser=new XMLMapperBuilder(input,mybatisConf,mapperClass.getName(),mybatisConf.getSqlFragments());
-    mapperParser.parse();
-    mybatisConf.addLoadedResource(mapperClass.getName());
+    input=getClass().getResourceAsStream("/" + mapperName.replace('.','/') + ".xml");
+    new XMLMapperBuilder(input,configuration,mapperName,configuration.getSqlFragments()).parse();
+    configuration.addLoadedResource(mapperName);
   }
   finally {
-    IOUtils.closeQuietly(input);
+    Closeables.closeQuietly(input);
   }
 }
