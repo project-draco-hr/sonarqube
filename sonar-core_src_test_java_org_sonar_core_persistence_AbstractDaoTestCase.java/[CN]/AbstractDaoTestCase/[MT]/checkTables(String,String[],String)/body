@@ -1,16 +1,22 @@
 {
+  IDatabaseConnection connection=null;
   try {
-    IDataSet dataSet=getCurrentDataSet();
+    connection=createConnection();
+    IDataSet dataSet=connection.createDataSet();
     IDataSet expectedDataSet=getExpectedData(testName);
     for (    String table : tables) {
       ITable filteredTable=DefaultColumnFilter.excludedColumnsTable(dataSet.getTable(table),excludedColumnNames);
-      Assertion.assertEquals(expectedDataSet.getTable(table),filteredTable);
+      ITable filteredExpectedTable=DefaultColumnFilter.excludedColumnsTable(expectedDataSet.getTable(table),excludedColumnNames);
+      Assertion.assertEquals(filteredExpectedTable,filteredTable);
     }
   }
- catch (  DataSetException e) {
+ catch (  DatabaseUnitException e) {
+    fail(e.getMessage());
+  }
+catch (  SQLException e) {
     throw translateException("Error while checking results",e);
   }
-catch (  DatabaseUnitException e) {
-    fail(e.getMessage());
+ finally {
+    closeQuietly(connection);
   }
 }

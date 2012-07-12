@@ -5,10 +5,11 @@
     database=new DefaultDatabase(settings);
   }
  else {
-    database=new H2Database();
+    database=new H2Database("sonarMyBatis");
   }
   database.start();
+  databaseCommands=DatabaseCommands.forDialect(database.getDialect());
+  databaseTester=new DataSourceDatabaseTester(database.getDataSource());
   myBatis=new MyBatis(database,settings,new Logback());
   myBatis.start();
-  databaseCommands=DatabaseCommands.forDialect(database.getDialect());
 }
