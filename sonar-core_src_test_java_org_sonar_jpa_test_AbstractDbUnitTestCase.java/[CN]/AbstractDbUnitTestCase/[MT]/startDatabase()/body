@@ -1,10 +1,13 @@
 {
-  database=new H2Database("sonarHibernate");
-  database.start();
-  dbConnector=new MemoryDatabaseConnector(database);
-  dbConnector.start();
-  databaseCommands=DatabaseCommands.forDialect(database.getDialect());
-  databaseTester=new DataSourceDatabaseTester(database.getDataSource());
-  session=new JpaDatabaseSession(dbConnector);
-  session.start();
+  if (database == null) {
+    database=new H2Database("sonarHibernate");
+    database.start();
+    databaseCommands=DatabaseCommands.forDialect(database.getDialect());
+    databaseTester=new DataSourceDatabaseTester(database.getDataSource());
+    DefaultDatabaseConnector dbConnector=new MemoryDatabaseConnector(database);
+    dbConnector.start();
+    session=new JpaDatabaseSession(dbConnector);
+    session.start();
+  }
+  databaseCommands.truncateDatabase(database.getDataSource().getConnection());
 }

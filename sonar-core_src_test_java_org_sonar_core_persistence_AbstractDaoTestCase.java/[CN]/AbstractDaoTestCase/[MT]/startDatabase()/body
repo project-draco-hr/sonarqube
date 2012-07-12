@@ -1,15 +1,18 @@
 {
-  Settings settings=new Settings().setProperties(Maps.fromProperties(System.getProperties()));
-  boolean hasDialect=settings.hasKey("sonar.jdbc.dialect");
-  if (hasDialect) {
-    database=new DefaultDatabase(settings);
-  }
+  if (database == null) {
+    Settings settings=new Settings().setProperties(Maps.fromProperties(System.getProperties()));
+    boolean hasDialect=settings.hasKey("sonar.jdbc.dialect");
+    if (hasDialect) {
+      database=new DefaultDatabase(settings);
+    }
  else {
-    database=new H2Database("sonarMyBatis");
+      database=new H2Database("sonarMyBatis");
+    }
+    database.start();
+    databaseCommands=DatabaseCommands.forDialect(database.getDialect());
+    databaseTester=new DataSourceDatabaseTester(database.getDataSource());
+    myBatis=new MyBatis(database,settings,new Logback());
+    myBatis.start();
   }
-  database.start();
-  databaseCommands=DatabaseCommands.forDialect(database.getDialect());
-  databaseTester=new DataSourceDatabaseTester(database.getDataSource());
-  myBatis=new MyBatis(database,settings,new Logback());
-  myBatis.start();
+  databaseCommands.truncateDatabase(database.getDataSource().getConnection());
 }
