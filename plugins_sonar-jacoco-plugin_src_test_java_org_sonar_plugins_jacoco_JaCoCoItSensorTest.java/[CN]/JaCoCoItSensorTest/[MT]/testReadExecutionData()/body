@@ -1,13 +1,11 @@
 {
-  File jacocoExecutionData=new File(getClass().getResource("/org/sonar/plugins/jacoco/JaCoCoSensorTest/jacoco.exec").getFile());
-  File buildOutputDir=jacocoExecutionData.getParentFile();
+  JavaFile resource=new JavaFile("org.sonar.plugins.jacoco.tests.Hello");
   SensorContext context=mock(SensorContext.class);
-  final JavaFile resource=new JavaFile("org.sonar.plugins.jacoco.tests.Hello");
-  when(context.getResource(any(Resource.class))).thenReturn(resource);
   ProjectFileSystem pfs=mock(ProjectFileSystem.class);
-  when(pfs.getBuildOutputDir()).thenReturn(buildOutputDir);
-  when(pfs.resolvePath(anyString())).thenReturn(jacocoExecutionData);
   Project project=mock(Project.class);
+  when(context.getResource(any(Resource.class))).thenReturn(resource);
+  when(pfs.getBuildOutputDir()).thenReturn(outputDir);
+  when(pfs.resolvePath(anyString())).thenReturn(jacocoExecutionData);
   when(project.getFileSystem()).thenReturn(pfs);
   sensor.analyse(project,context);
   verify(context).getResource(eq(resource));
