@@ -1,0 +1,15 @@
+{
+  Collection<Property> newProperties=Arrays.asList(new Property("key1","value1"),new Property("key2","value2"));
+  SonarConfig config=new SonarConfig();
+  config.setProperties(newProperties);
+  backup.importXml(config);
+  verify(persistentSettings).saveProperties(argThat(new BaseMatcher<Map<String,String>>(){
+    public boolean matches(    Object o){
+      Map<String,String> map=(Map<String,String>)o;
+      return map.get("key1").equals("value1") && map.get("key2").equals("value2");
+    }
+    public void describeTo(    Description description){
+    }
+  }
+));
+}

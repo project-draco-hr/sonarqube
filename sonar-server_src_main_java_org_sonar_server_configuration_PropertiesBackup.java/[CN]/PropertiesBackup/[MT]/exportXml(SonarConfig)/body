@@ -1,13 +1,9 @@
 {
-  List<Property> xmlProperties=new ArrayList<Property>();
-  List<Property> dbProperties=databaseSession.createQuery(FROM_GLOBAL_PROPERTIES).getResultList();
-  if (dbProperties != null) {
-    for (    Property dbProperty : dbProperties) {
-      String propKey=dbProperty.getKey();
-      if (!CoreProperties.SERVER_ID.equals(propKey)) {
-        xmlProperties.add(new Property(dbProperty.getKey(),dbProperty.getValue()));
-      }
+  List<Property> xmlProperties=Lists.newArrayList();
+  for (  Map.Entry<String,String> entry : persistentSettings.getProperties().entrySet()) {
+    if (!CoreProperties.SERVER_ID.equals(entry.getKey())) {
+      xmlProperties.add(new Property(entry.getKey(),entry.getValue()));
     }
-    sonarConfig.setProperties(xmlProperties);
   }
+  sonarConfig.setProperties(xmlProperties);
 }
