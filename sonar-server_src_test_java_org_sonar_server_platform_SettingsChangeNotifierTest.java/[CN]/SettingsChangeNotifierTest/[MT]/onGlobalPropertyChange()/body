@@ -1,0 +1,14 @@
+{
+  GlobalPropertyChangeHandler handler=mock(GlobalPropertyChangeHandler.class);
+  SettingsChangeNotifier notifier=new SettingsChangeNotifier(new GlobalPropertyChangeHandler[]{handler});
+  notifier.onGlobalPropertyChange("foo","bar");
+  verify(handler).onChange(argThat(new BaseMatcher<GlobalPropertyChangeHandler.PropertyChange>(){
+    public boolean matches(    Object o){
+      GlobalPropertyChangeHandler.PropertyChange change=(GlobalPropertyChangeHandler.PropertyChange)o;
+      return change.getKey().equals("foo") && change.getNewValue().equals("bar");
+    }
+    public void describeTo(    Description description){
+    }
+  }
+));
+}
