@@ -1,10 +1,12 @@
 {
   try {
     id=new SimpleDateFormat("yyyyMMddHHmmss").format(startedAt);
-    version=loadVersionFromManifest(manifest);
+    version=read(pomProperties).getProperty("version","");
+    implementationBuild=read(buildProperties).getProperty("Implementation-Build");
     if (StringUtils.isBlank(version)) {
       throw new ServerStartException("Unknown Sonar version");
     }
+    LOG.info("Sonar {}",Joiner.on(" / ").skipNulls().join("Server",version,implementationBuild));
   }
  catch (  IOException e) {
     throw new ServerStartException("Can not load metadata",e);
