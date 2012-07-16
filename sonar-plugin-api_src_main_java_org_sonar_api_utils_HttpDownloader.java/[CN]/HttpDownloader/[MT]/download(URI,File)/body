@@ -1,18 +1,9 @@
 {
-  InputStream input=null;
-  FileOutputStream output=null;
   try {
-    HttpURLConnection connection=newHttpConnection(uri);
-    output=new FileOutputStream(toFile,false);
-    input=connection.getInputStream();
-    IOUtils.copy(input,output);
+    Files.copy(new HttpInputSupplier(uri),toFile);
   }
- catch (  Exception e) {
+ catch (  IOException e) {
     FileUtils.deleteQuietly(toFile);
-    throw new SonarException("Fail to download the file: " + uri + " ("+ getProxySynthesis(uri)+ ")",e);
-  }
- finally {
-    IOUtils.closeQuietly(input);
-    IOUtils.closeQuietly(output);
+    throw failToDownload(uri,e);
   }
 }

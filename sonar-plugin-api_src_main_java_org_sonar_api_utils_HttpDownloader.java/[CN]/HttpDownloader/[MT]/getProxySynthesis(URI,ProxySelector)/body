@@ -1,14 +1,12 @@
 {
-  List<String> descriptions=Lists.newArrayList();
   List<Proxy> proxies=proxySelector.select(uri);
   if (proxies.size() == 1 && proxies.get(0).type().equals(Proxy.Type.DIRECT)) {
-    descriptions.add("no proxy");
+    return "no proxy";
   }
- else {
-    for (    Proxy proxy : proxies) {
-      if (!proxy.type().equals(Proxy.Type.DIRECT)) {
-        descriptions.add("proxy: " + proxy.address().toString());
-      }
+  List<String> descriptions=Lists.newArrayList();
+  for (  Proxy proxy : proxies) {
+    if (proxy.type() != Proxy.Type.DIRECT) {
+      descriptions.add("proxy: " + proxy.address());
     }
   }
   return Joiner.on(", ").join(descriptions);
