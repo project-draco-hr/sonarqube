@@ -1,12 +1,14 @@
 {
+  Connection connection=dataSource.getConnection();
   connection.setAutoCommit(false);
   Statement statement=connection.createStatement();
   for (  String table : DatabaseUtils.TABLE_NAMES) {
-    String truncateCommand=truncate(table);
-    statement.executeUpdate(truncateCommand);
-    connection.commit();
     try {
-      for (      String resetCommand : resetPrimaryKey(table)) {
+      ResultSet result=statement.executeQuery("SELECT CASE WHEN MAX(ID) IS NULL THEN 1 ELSE MAX(ID)+1 END FROM " + table);
+      result.next();
+      int maxId=result.getInt(1);
+      result.close();
+      for (      String resetCommand : resetPrimaryKey(table,maxId)) {
         statement.executeUpdate(resetCommand);
       }
       connection.commit();
@@ -16,6 +18,5 @@
     }
   }
   statement.close();
-  connection.commit();
   connection.close();
 }
