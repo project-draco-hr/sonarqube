@@ -1,9 +1,27 @@
 {
-  assumeThat(SystemUtils.IS_OS_WINDOWS,is(false));
-  tester=new ServletTester();
-  tester.setContextPath("/");
-  tester.addServlet(RedirectServlet.class,"/redirect/");
-  tester.addServlet(FakeServlet.class,"/");
-  baseUrl=tester.createSocketConnector(true);
-  tester.start();
+  socketConnection=new SocketConnection(new Container(){
+    public void handle(    Request req,    Response resp){
+      try {
+        if (req.getPath().getPath().contains("/redirect/")) {
+          resp.setCode(303);
+          resp.add("Location","/");
+        }
+ else {
+          resp.getPrintStream().append("agent=" + req.getValues("User-Agent").get(0));
+        }
+      }
+ catch (      IOException e) {
+      }
+ finally {
+        try {
+          resp.close();
+        }
+ catch (        IOException e) {
+        }
+      }
+    }
+  }
+);
+  SocketAddress address=socketConnection.connect(new InetSocketAddress(0));
+  baseUrl="http://localhost:" + ((InetSocketAddress)address).getPort();
 }
