@@ -1,9 +1,12 @@
 {
   try {
-    Class claz=get(metadata.getKey()).loadClass(metadata.getMainClass());
-    return (Plugin)claz.newInstance();
+    Class clazz=get(plugin.getKey()).loadClass(plugin.getMainClass());
+    return (Plugin)clazz.newInstance();
   }
- catch (  Throwable e) {
-    throw new SonarException("Fail to load plugin " + metadata.getKey(),e);
+ catch (  UnsupportedClassVersionError e) {
+    throw new SonarException("The plugin " + plugin.getKey() + " is not supported with Java "+ SystemUtils.JAVA_VERSION_TRIMMED,e);
+  }
+catch (  Throwable e) {
+    throw new SonarException("Fail to load the plugin " + plugin.getKey(),e);
   }
 }
