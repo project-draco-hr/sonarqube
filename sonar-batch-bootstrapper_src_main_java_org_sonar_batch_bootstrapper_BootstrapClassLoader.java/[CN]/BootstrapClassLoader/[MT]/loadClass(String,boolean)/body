@@ -2,11 +2,15 @@
   Class<?> c=findLoadedClass(name);
   if (c == null) {
     try {
-      if ((getParent() != null) && canLoadFromParent(name)) {
+      if (getParent() != null && canLoadFromParent(name)) {
         c=getParent().loadClass(name);
       }
  else {
-        c=getSystemClassLoader().loadClass(name);
+        ClassLoader systemClassLoader=getSystemClassLoader();
+        if (systemClassLoader.getParent() != null) {
+          systemClassLoader=systemClassLoader.getParent();
+        }
+        c=systemClassLoader.loadClass(name);
       }
     }
  catch (    ClassNotFoundException e) {
