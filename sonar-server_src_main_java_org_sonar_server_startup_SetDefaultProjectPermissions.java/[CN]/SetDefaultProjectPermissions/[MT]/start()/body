@@ -1,16 +1,10 @@
 {
-  if (persistentSettings.getSettings().getKeysStartingWith("sonar.role.").isEmpty()) {
-    LoggerFactory.getLogger(SetDefaultProjectPermissions.class).info("Setting default project permissions");
-    Map<String,String> props=Maps.newHashMap();
-    props.put("sonar.role.admin.TRK.defaultGroups",SONAR_ADMINISTRATORS);
-    props.put("sonar.role.user.TRK.defaultGroups",ANYONE_AND_USERS);
-    props.put("sonar.role.codeviewer.TRK.defaultGroups",ANYONE_AND_USERS);
-    props.put("sonar.role.admin.VW.defaultGroups",SONAR_ADMINISTRATORS);
-    props.put("sonar.role.user.VW.defaultGroups",ANYONE_AND_USERS);
-    props.put("sonar.role.codeviewer.VW.defaultGroups",ANYONE_AND_USERS);
-    props.put("sonar.role.admin.SVW.defaultGroups",SONAR_ADMINISTRATORS);
-    props.put("sonar.role.user.SVW.defaultGroups",ANYONE_AND_USERS);
-    props.put("sonar.role.codeviewer.SVW.defaultGroups",ANYONE_AND_USERS);
+  Map<String,String> props=Maps.newHashMap();
+  props.putAll(missingProperties("TRK"));
+  props.putAll(missingProperties("VW"));
+  props.putAll(missingProperties("SVW"));
+  if (!props.isEmpty()) {
+    LoggerFactory.getLogger(SetDefaultProjectPermissions.class).info("Set default project roles");
     persistentSettings.saveProperties(props);
   }
 }
