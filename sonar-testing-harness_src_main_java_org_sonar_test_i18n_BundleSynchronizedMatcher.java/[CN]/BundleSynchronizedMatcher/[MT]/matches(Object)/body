@@ -3,25 +3,19 @@
     return false;
   }
   bundleName=(String)arg0;
-  File bundle=getBundleFileFromClasspath(bundleName);
-  String defaultBundleName=extractDefaultBundleName(bundleName);
-  File defaultBundle;
-  if (isCoreBundle(defaultBundleName)) {
-    defaultBundle=getBundleFileFromGithub(defaultBundleName);
-  }
- else   if (referenceEnglishBundleURI != null) {
-    defaultBundle=getBundleFileFromProvidedURI(defaultBundleName);
-  }
- else {
-    defaultBundle=getBundleFileFromClasspath(defaultBundleName);
-  }
+  InputStream bundleInputStream=getBundleFileInputStream(bundleName);
+  InputStream defaultBundleInputStream=getDefaultBundleFileInputStream(bundleName);
   try {
-    missingKeys=retrieveMissingTranslations(bundle,defaultBundle);
-    additionalKeys=retrieveMissingTranslations(defaultBundle,bundle);
+    missingKeys=retrieveMissingTranslations(bundleInputStream,defaultBundleInputStream);
+    additionalKeys=retrieveMissingTranslations(defaultBundleInputStream,bundleInputStream);
     return missingKeys.isEmpty();
   }
  catch (  IOException e) {
     fail("An error occured while reading the bundles: " + e.getMessage());
     return false;
+  }
+ finally {
+    IOUtils.closeQuietly(bundleInputStream);
+    IOUtils.closeQuietly(defaultBundleInputStream);
   }
 }

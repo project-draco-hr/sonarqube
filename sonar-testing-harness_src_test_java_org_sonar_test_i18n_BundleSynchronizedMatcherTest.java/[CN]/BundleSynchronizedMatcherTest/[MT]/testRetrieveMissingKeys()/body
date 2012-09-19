@@ -1,0 +1,17 @@
+{
+  InputStream defaultBundleIS=this.getClass().getResourceAsStream(BundleSynchronizedMatcher.L10N_PATH + "myPlugin.properties");
+  InputStream frBundleIS=this.getClass().getResourceAsStream(BundleSynchronizedMatcher.L10N_PATH + "myPlugin_fr.properties");
+  InputStream qbBundleIS=this.getClass().getResourceAsStream(BundleSynchronizedMatcher.L10N_PATH + "myPlugin_fr_QB.properties");
+  try {
+    SortedMap<String,String> diffs=BundleSynchronizedMatcher.retrieveMissingTranslations(frBundleIS,defaultBundleIS);
+    assertThat(diffs.size(),is(1));
+    assertThat(diffs.keySet(),hasItem("second.prop"));
+    diffs=BundleSynchronizedMatcher.retrieveMissingTranslations(qbBundleIS,defaultBundleIS);
+    assertThat(diffs.size(),is(0));
+  }
+  finally {
+    IOUtils.closeQuietly(defaultBundleIS);
+    IOUtils.closeQuietly(frBundleIS);
+    IOUtils.closeQuietly(qbBundleIS);
+  }
+}
