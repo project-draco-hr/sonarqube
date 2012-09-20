@@ -1,0 +1,12 @@
+{
+  RuleI18nManager ruleI18nManager=mock(RuleI18nManager.class);
+  task=new RegisterRules(getSessionFactory(),new RuleRepository[]{new RuleWithoutDescriptionRepository()},ruleI18nManager);
+  setupData("shared");
+  try {
+    task.start();
+    fail("Rule must have a description");
+  }
+ catch (  SonarException e) {
+    assertThat(e.getMessage(),containsString("No description found for the rule 'Rule 1' (repository: rule-without-description-repo) " + "because the entry 'rule.rule-without-description-repo.rule1.name' is missing from the bundle."));
+  }
+}
