@@ -1,11 +1,10 @@
 {
-  String profileName=(String)project.getProperty(PARAM_PROFILE);
+  String profileName=StringUtils.defaultIfBlank(settings.getString("sonar.profile." + project.getLanguageKey()),settings.getString("sonar.profile"));
   RulesProfile profile;
-  if (profileName == null) {
-    Project root=project.getRoot();
-    profile=dao.getActiveProfile(root.getLanguageKey(),root.getKey());
+  if (StringUtils.isBlank(profileName)) {
+    profile=dao.getDefaultProfile(project.getLanguageKey());
     if (profile == null) {
-      throw new SonarException("You must intall a Sonar plugin that supports language '" + root.getLanguageKey() + "' in order to analyse the following project: "+ root.getKey());
+      throw new SonarException("You must install a plugin that supports the language '" + project.getLanguageKey() + "'");
     }
   }
  else {
