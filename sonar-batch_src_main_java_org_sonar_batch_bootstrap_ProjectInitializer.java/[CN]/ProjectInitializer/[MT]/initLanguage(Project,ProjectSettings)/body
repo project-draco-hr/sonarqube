@@ -1,0 +1,13 @@
+{
+  project.setLanguageKey(StringUtils.defaultIfBlank(settings.getString("sonar.language"),Java.KEY));
+  Language language=languages.get(project.getLanguageKey());
+  if (language == null) {
+    throw new SonarException("Language with key '" + project.getLanguageKey() + "' not found");
+  }
+  project.setLanguage(language);
+  if (!dryRun.isEnabled() && project.getId() != null) {
+    ResourceDto dto=resourceDao.getResource(project.getId());
+    dto.setLanguage(project.getLanguageKey());
+    resourceDao.insertOrUpdate(dto);
+  }
+}
