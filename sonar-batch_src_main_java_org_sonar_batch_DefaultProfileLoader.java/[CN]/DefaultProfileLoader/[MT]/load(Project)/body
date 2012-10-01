@@ -1,23 +1,11 @@
 {
-  String profileName=StringUtils.defaultIfBlank(settings.getString("sonar.profile." + project.getLanguageKey()),settings.getString("sonar.profile"));
-  RulesProfile profile;
+  String profileName=StringUtils.defaultIfBlank(settings.getString("sonar.profile"),settings.getString("sonar.profile." + project.getLanguageKey()));
   if (StringUtils.isBlank(profileName)) {
-    profile=dao.getDefaultProfile(project.getLanguageKey());
-    if (profile == null) {
-      throw new SonarException("You must install a plugin that supports the language '" + project.getLanguageKey() + "'");
-    }
+    throw new SonarException("You must install a plugin that supports the language '" + project.getLanguageKey() + "'");
   }
- else {
-    profile=dao.getProfile(project.getLanguageKey(),profileName);
-    if (profile == null) {
-      throw new SonarException("Quality profile not found : " + profileName + ", language "+ project.getLanguageKey());
-    }
+  RulesProfile profile=dao.getProfile(project.getLanguageKey(),profileName);
+  if (profile == null) {
+    throw new SonarException("Quality profile not found : " + profileName + ", language "+ project.getLanguageKey());
   }
-  profile.getActiveRules().size();
-  for (  ActiveRule activeRule : profile.getActiveRules()) {
-    activeRule.getActiveRuleParams().size();
-    activeRule.getRule().getParams().size();
-  }
-  profile.getAlerts().size();
-  return profile;
+  return hibernateHack(profile);
 }

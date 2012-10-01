@@ -1,0 +1,18 @@
+{
+  TimeProfiler profiler=new TimeProfiler().start("Register Quality Profiles");
+  session=sessionFactory.getSession();
+  ListMultimap<String,RulesProfile> profilesByLanguage=loadDefinitions();
+  for (  String language : profilesByLanguage.keySet()) {
+    List<RulesProfile> profiles=profilesByLanguage.get(language);
+    verifyLanguage(language,profiles);
+    for (    Map.Entry<String,Collection<RulesProfile>> entry : groupByName(profiles).entrySet()) {
+      String name=entry.getKey();
+      if (shouldRegister(language,name)) {
+        register(language,name,entry.getValue());
+      }
+    }
+    setDefault(language,profiles);
+  }
+  session.commit();
+  profiler.stop();
+}
