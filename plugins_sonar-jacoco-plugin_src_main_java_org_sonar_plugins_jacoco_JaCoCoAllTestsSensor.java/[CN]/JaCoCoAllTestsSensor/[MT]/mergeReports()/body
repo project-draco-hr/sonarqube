@@ -1,0 +1,23 @@
+{
+  String reportUTs=configuration.getReportPath();
+  String reportITs=configuration.getItReportPath();
+  String reportAllTests=MERGED_EXEC;
+  File baseDir=projectFileSystem.getBasedir();
+  File destFile=new File(baseDir,reportAllTests);
+  final SessionInfoStore infoStore=new SessionInfoStore();
+  final ExecutionDataStore dataStore=new ExecutionDataStore();
+  loadSourceFiles(infoStore,dataStore,new File(baseDir,reportUTs),new File(baseDir,reportITs));
+  BufferedOutputStream outputStream=null;
+  try {
+    outputStream=new BufferedOutputStream(new FileOutputStream(destFile));
+    ExecutionDataWriter dataWriter=new ExecutionDataWriter(outputStream);
+    infoStore.accept(dataWriter);
+    dataStore.accept(dataWriter);
+  }
+ catch (  IOException e) {
+    throw new SonarException(String.format("Unable to write merged file %s",destFile.getAbsolutePath()),e);
+  }
+ finally {
+    Closeables.closeQuietly(outputStream);
+  }
+}
