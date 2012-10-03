@@ -1,0 +1,22 @@
+{
+  File reportUTs=project.getFileSystem().resolvePath(configuration.getReportPath());
+  File reportITs=project.getFileSystem().resolvePath(configuration.getItReportPath());
+  File reportOverall=project.getFileSystem().resolvePath(JACOCO_OVERALL);
+  reportOverall.getParentFile().mkdirs();
+  SessionInfoStore infoStore=new SessionInfoStore();
+  ExecutionDataStore dataStore=new ExecutionDataStore();
+  loadSourceFiles(infoStore,dataStore,reportUTs,reportITs);
+  BufferedOutputStream outputStream=null;
+  try {
+    outputStream=new BufferedOutputStream(new FileOutputStream(reportOverall));
+    ExecutionDataWriter dataWriter=new ExecutionDataWriter(outputStream);
+    infoStore.accept(dataWriter);
+    dataStore.accept(dataWriter);
+  }
+ catch (  IOException e) {
+    throw new SonarException(String.format("Unable to write overall coverage report %s",reportOverall.getAbsolutePath()),e);
+  }
+ finally {
+    Closeables.closeQuietly(outputStream);
+  }
+}
