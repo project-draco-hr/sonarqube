@@ -1,0 +1,19 @@
+{
+  File outputDir=TestUtils.getResource(JaCoCoAllTestsSensorTest.class,".");
+  Files.copy(TestUtils.getResource("HelloWorld.class.toCopy"),new File(outputDir,"HelloWorld.class"));
+  JavaFile resource=new JavaFile("com.sonar.coverages.HelloWorld");
+  when(project.getFileSystem()).thenReturn(pfs);
+  when(context.getResource(any(Resource.class))).thenReturn(resource);
+  when(configuration.getReportPath()).thenReturn("ut.exec");
+  when(configuration.getItReportPath()).thenReturn("it.exec");
+  when(pfs.getBuildOutputDir()).thenReturn(outputDir);
+  when(pfs.resolvePath("ut.exec")).thenReturn(new File(outputDir,"ut.exec"));
+  when(pfs.resolvePath("it.exec")).thenReturn(new File(outputDir,"it.exec"));
+  when(pfs.resolvePath("target/sonar/merged.exec")).thenReturn(new File("target/sonar/merged.exec"));
+  sensor.analyse(project,context);
+  verify(context).getResource(resource);
+  verify(context).saveMeasure(resource,new Measure(CoreMetrics.MERGED_LINES_TO_COVER,5.0));
+  verify(context).saveMeasure(resource,new Measure(CoreMetrics.MERGED_UNCOVERED_LINES,0.0));
+  verify(context).saveMeasure(resource,new Measure(CoreMetrics.MERGED_COVERAGE_LINE_HITS_DATA,"3=1;6=1;7=1;10=1;11=1"));
+  verifyNoMoreInteractions(context);
+}
