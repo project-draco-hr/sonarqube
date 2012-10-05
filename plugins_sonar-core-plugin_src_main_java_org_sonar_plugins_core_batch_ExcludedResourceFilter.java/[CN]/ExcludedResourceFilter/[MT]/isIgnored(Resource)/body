@@ -1,13 +1,11 @@
 {
-  if (ResourceUtils.isUnitTestClass(resource)) {
+  String[] patterns=ResourceUtils.isUnitTestClass(resource) ? project.getTestExclusionPatterns() : project.getExclusionPatterns();
+  if (patterns == null) {
     return false;
   }
-  String[] patterns=project.getExclusionPatterns();
-  if (patterns != null) {
-    for (    String pattern : patterns) {
-      if (resource.matchFilePattern(pattern)) {
-        return true;
-      }
+  for (  String pattern : patterns) {
+    if (resource.matchFilePattern(pattern)) {
+      return true;
     }
   }
   return false;
