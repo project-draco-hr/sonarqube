@@ -25,7 +25,9 @@
   List<Long> characteristicIds=purgeMapper.selectCharacteristicIdsToPurge();
   if (!characteristicIds.isEmpty()) {
     for (    Long snapshotId : snapshotIds) {
-      purgeMapper.deleteSnapshotMeasuresOnCharacteristics(snapshotId,characteristicIds);
+      for (      List<Long> ids : Iterables.partition(characteristicIds,MAX_CHARACTERISTICS_PER_QUERY)) {
+        purgeMapper.deleteSnapshotMeasuresOnCharacteristics(snapshotId,ids);
+      }
     }
     session.commit();
   }
