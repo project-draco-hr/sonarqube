@@ -2,7 +2,14 @@
   String bundleKey=propertyToBundles.get(key);
   ResourceBundle resourceBundle=null;
   if (bundleKey != null) {
-    resourceBundle=getBundle(bundleKey,locale);
+    try {
+      resourceBundle=ResourceBundle.getBundle(bundleKey,locale,languagePackClassLoader);
+      String message=resourceBundle.getString(key);
+      return MessageFormat.format(message,parameters);
+    }
+ catch (    MissingResourceException e1) {
+      resourceBundle=getBundleFromCorrespondingPluginClassloader(bundleKey,locale);
+    }
   }
   return message(resourceBundle,key,defaultValue,parameters);
 }
