@@ -1,0 +1,25 @@
+{
+  List<MeasureFilterRow> rows=Lists.newArrayList();
+  boolean sortTextValues=!filter.sort().isSortedByDatabase();
+  while (rs.next()) {
+    MeasureFilterRow row=new MeasureFilterRow(rs.getLong(1),rs.getLong(2),rs.getLong(3));
+    if (sortTextValues) {
+      row.setSortText(rs.getString(4));
+    }
+    rows.add(row);
+  }
+  if (sortTextValues) {
+    Function<MeasureFilterRow,String> function=new Function<MeasureFilterRow,String>(){
+      public String apply(      @Nullable MeasureFilterRow row){
+        return (row != null ? StringUtils.defaultString(row.getSortText()) : "");
+      }
+    }
+;
+    Ordering<MeasureFilterRow> ordering=Ordering.from(String.CASE_INSENSITIVE_ORDER).onResultOf(function).nullsFirst();
+    if (!filter.sort().isAsc()) {
+      ordering=ordering.reverse();
+    }
+    rows=ordering.sortedCopy(rows);
+  }
+  return rows;
+}

@@ -1,0 +1,23 @@
+{
+  List<MeasureFilterRow> rows;
+  SqlSession session=null;
+  try {
+    session=mybatis.openSession();
+    MesasureFilterContext context=prepareContext(filter,userId,session);
+    if (isValid(filter,context)) {
+      MeasureFilterSql sql=new MeasureFilterSql(database,filter,context);
+      Connection connection=session.getConnection();
+      rows=sql.execute(connection);
+    }
+ else {
+      rows=Collections.emptyList();
+    }
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException(e);
+  }
+ finally {
+    MyBatis.closeQuietly(session);
+  }
+  return rows;
+}

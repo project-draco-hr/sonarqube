@@ -1,0 +1,15 @@
+{
+  sql.append(" SELECT s.id, s.project_id rid, s.root_project_id rootid, ").append(filter.sort().column()).append(" sortval");
+  for (int index=0; index < filter.measureConditions().size(); index++) {
+    MeasureFilterValueCondition condition=filter.measureConditions().get(index);
+    sql.append(", ").append(nullSelect(condition.metric())).append(" crit_").append(index);
+  }
+  sql.append(" FROM snapshots s INNER JOIN projects p ON s.project_id=p.id ");
+  if (filter.sort().onMeasures()) {
+    sql.append(" LEFT OUTER JOIN project_measures pm ON s.id=pm.snapshot_id AND pm.metric_id=");
+    sql.append(filter.sort().metric().getId());
+    sql.append(" AND pm.rule_id IS NULL AND pm.rule_priority IS NULL AND pm.characteristic_id IS NULL AND pm.person_id IS NULL ");
+  }
+  sql.append(" WHERE ");
+  appendResourceConditions();
+}

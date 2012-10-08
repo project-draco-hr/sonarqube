@@ -1,0 +1,27 @@
+{
+  sql.append("SELECT block.id, max(block.rid) rid, max(block.rootid) rootid, max(sortval) sortval");
+  for (int index=0; index < filter.measureConditions().size(); index++) {
+    sql.append(", max(crit_").append(index).append(")");
+  }
+  sql.append(" FROM (");
+  appendSortBlock();
+  for (int index=0; index < filter.measureConditions().size(); index++) {
+    MeasureFilterValueCondition condition=filter.measureConditions().get(index);
+    sql.append(" UNION ");
+    appendConditionBlock(index,condition);
+  }
+  sql.append(") block GROUP BY block.id");
+  if (!filter.measureConditions().isEmpty()) {
+    sql.append(" HAVING ");
+    for (int index=0; index < filter.measureConditions().size(); index++) {
+      if (index > 0) {
+        sql.append(" AND ");
+      }
+      sql.append(" max(crit_").append(index).append(") IS NOT NULL ");
+    }
+  }
+  if (filter.sort().isSortedByDatabase()) {
+    sql.append(" ORDER BY sortval");
+    sql.append(filter.sort().isAsc() ? " ASC " : " DESC ");
+  }
+}
