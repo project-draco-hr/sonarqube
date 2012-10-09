@@ -1,38 +1,40 @@
 {
   sql.append(" s.status='P' AND s.islast=").append(database.getDialect().getTrueSqlValue());
-  sql.append(" AND p.copy_resource_id IS NULL ");
-  if (!filter.resourceQualifiers().isEmpty()) {
+  if (context.getBaseSnapshot() == null) {
+    sql.append(" AND p.copy_resource_id IS NULL ");
+  }
+  if (!filter.getResourceQualifiers().isEmpty()) {
     sql.append(" AND s.qualifier IN ");
-    appendInStatement(filter.resourceQualifiers(),sql);
+    appendInStatement(filter.getResourceQualifiers(),sql);
   }
-  if (!filter.resourceScopes().isEmpty()) {
+  if (!filter.getResourceScopes().isEmpty()) {
     sql.append(" AND s.scope IN ");
-    appendInStatement(filter.resourceScopes(),sql);
+    appendInStatement(filter.getResourceScopes(),sql);
   }
-  if (!filter.resourceLanguages().isEmpty()) {
+  if (!filter.getResourceLanguages().isEmpty()) {
     sql.append(" AND p.language IN ");
-    appendInStatement(filter.resourceLanguages(),sql);
+    appendInStatement(filter.getResourceLanguages(),sql);
   }
-  if (filter.fromDate() != null) {
+  if (filter.getFromDate() != null) {
     sql.append(" AND s.created_at >= ? ");
-    dateParameters.add(new java.sql.Date(filter.fromDate().getTime()));
+    dateParameters.add(new java.sql.Date(filter.getFromDate().getTime()));
   }
-  if (filter.toDate() != null) {
+  if (filter.getToDate() != null) {
     sql.append(" AND s.created_at <= ? ");
-    dateParameters.add(new java.sql.Date(filter.toDate().getTime()));
+    dateParameters.add(new java.sql.Date(filter.getToDate().getTime()));
   }
-  if (filter.userFavourites() && context.getUserId() != null) {
+  if (filter.isOnFavourites() && context.getUserId() != null) {
     sql.append(" AND s.project_id IN (SELECT props.resource_id FROM properties props WHERE props.prop_key='favourite' AND props.user_id=");
     sql.append(context.getUserId());
     sql.append(" AND props.resource_id IS NOT NULL) ");
   }
-  if (StringUtils.isNotBlank(filter.resourceName())) {
+  if (StringUtils.isNotBlank(filter.getResourceName())) {
     sql.append(" AND s.project_id IN (SELECT rindex.resource_id FROM resource_index rindex WHERE rindex.kee like '");
-    sql.append(StringEscapeUtils.escapeSql(StringUtils.lowerCase(filter.resourceName())));
+    sql.append(StringEscapeUtils.escapeSql(StringUtils.lowerCase(filter.getResourceName())));
     sql.append("%'");
-    if (!filter.resourceQualifiers().isEmpty()) {
+    if (!filter.getResourceQualifiers().isEmpty()) {
       sql.append(" AND rindex.qualifier IN ");
-      appendInStatement(filter.resourceQualifiers(),sql);
+      appendInStatement(filter.getResourceQualifiers(),sql);
     }
     sql.append(") ");
   }
@@ -44,7 +46,7 @@
  else {
       Long rootSnapshotId=(baseSnapshot.getRootId() != null ? baseSnapshot.getRootId() : baseSnapshot.getId());
       sql.append(" AND s.root_snapshot_id=").append(rootSnapshotId);
-      sql.append(" AND s.path LIKE '").append(baseSnapshot.getPath()).append(baseSnapshot.getId()).append(".%'");
+      sql.append(" AND s.path LIKE '").append(StringUtils.defaultString(baseSnapshot.getPath())).append(baseSnapshot.getId()).append(".%'");
     }
   }
 }

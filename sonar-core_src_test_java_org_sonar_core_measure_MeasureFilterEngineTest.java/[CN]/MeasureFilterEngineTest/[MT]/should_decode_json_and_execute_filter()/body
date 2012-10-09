@@ -1,0 +1,21 @@
+{
+  MeasureFilterDecoder decoder=mock(MeasureFilterDecoder.class);
+  MeasureFilter filter=new MeasureFilter();
+  when(decoder.decode("{}")).thenReturn(filter);
+  MeasureFilterExecutor executor=mock(MeasureFilterExecutor.class);
+  Logger logger=mock(Logger.class);
+  when(logger.isDebugEnabled()).thenReturn(true);
+  MeasureFilterEngine engine=new MeasureFilterEngine(decoder,executor);
+  final long userId=50L;
+  engine.execute("{}",userId,logger);
+  verify(executor).execute(refEq(filter),argThat(new BaseMatcher<MeasureFilterContext>(){
+    public boolean matches(    Object o){
+      MeasureFilterContext context=(MeasureFilterContext)o;
+      return "{}".equals(context.getJson()) && context.getUserId() == userId;
+    }
+    public void describeTo(    Description description){
+    }
+  }
+));
+  verify(logger).debug(anyString());
+}
