@@ -1,18 +1,7 @@
 {
-  boolean valid=!(filter.isOnBaseResourceChildren() && context.getBaseSnapshot() == null) && !(filter.isOnFavourites() && context.getUserId() == null);
-  for (  MeasureFilterCondition condition : filter.getMeasureConditions()) {
-    if (condition.period() != null && condition.period() < 1) {
-      valid=false;
-    }
-    if (condition.metric() == null) {
-      valid=false;
-    }
-  }
-  if (filter.sort().getPeriod() != null && filter.sort().getPeriod() < 1) {
-    valid=false;
-  }
-  if (filter.sort().onMeasures() && filter.sort().metric() == null) {
-    valid=false;
-  }
+  boolean valid=!(filter.isOnBaseResourceChildren() && context.getBaseSnapshot() == null);
+  valid&=!(filter.isOnFavourites() && context.getUserId() == null);
+  valid&=validateMeasureConditions(filter);
+  valid&=validateSort(filter);
   return valid;
 }
