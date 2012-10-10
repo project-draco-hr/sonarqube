@@ -23,10 +23,10 @@
     sql.append(" AND s.created_at <= ? ");
     dateParameters.add(new java.sql.Date(filter.getToDate().getTime()));
   }
-  if (filter.isOnFavourites() && context.getUserId() != null) {
-    sql.append(" AND s.project_id IN (SELECT props.resource_id FROM properties props WHERE props.prop_key='favourite' AND props.user_id=");
+  if (filter.isOnFavourites()) {
+    sql.append(" AND props.prop_key='favourite' AND props.resource_id IS NOT NULL AND props.user_id=");
     sql.append(context.getUserId());
-    sql.append(" AND props.resource_id IS NOT NULL) ");
+    sql.append(" ");
   }
   if (StringUtils.isNotBlank(filter.getResourceName())) {
     sql.append(" AND s.project_id IN (SELECT rindex.resource_id FROM resource_index rindex WHERE rindex.kee like '");

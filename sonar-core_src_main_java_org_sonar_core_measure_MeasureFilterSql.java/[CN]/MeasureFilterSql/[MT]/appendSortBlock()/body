@@ -5,6 +5,9 @@
     sql.append(", ").append(nullSelect(condition.metric())).append(" crit_").append(index);
   }
   sql.append(" FROM snapshots s INNER JOIN projects p ON s.project_id=p.id ");
+  if (filter.isOnFavourites()) {
+    sql.append(" INNER JOIN properties props ON props.resource_id=s.project_id ");
+  }
   if (filter.sort().onMeasures()) {
     sql.append(" LEFT OUTER JOIN project_measures pm ON s.id=pm.snapshot_id AND pm.metric_id=");
     sql.append(filter.sort().metric().getId());
