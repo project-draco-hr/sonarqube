@@ -1,18 +1,20 @@
 {
   for (  File file : files) {
-    InputStream resourceStream=null;
-    try {
-      resourceStream=new BufferedInputStream(new FileInputStream(file));
-      ExecutionDataReader reader=new ExecutionDataReader(resourceStream);
-      reader.setSessionInfoVisitor(infoStore);
-      reader.setExecutionDataVisitor(dataStore);
-      reader.read();
-    }
- catch (    IOException e) {
-      throw new SonarException(String.format("Unable to read %s",file.getAbsolutePath()),e);
-    }
+    if (file.exists()) {
+      InputStream resourceStream=null;
+      try {
+        resourceStream=new BufferedInputStream(new FileInputStream(file));
+        ExecutionDataReader reader=new ExecutionDataReader(resourceStream);
+        reader.setSessionInfoVisitor(infoStore);
+        reader.setExecutionDataVisitor(dataStore);
+        reader.read();
+      }
+ catch (      IOException e) {
+        throw new SonarException(String.format("Unable to read %s",file.getAbsolutePath()),e);
+      }
  finally {
-      Closeables.closeQuietly(resourceStream);
+        Closeables.closeQuietly(resourceStream);
+      }
     }
   }
 }
