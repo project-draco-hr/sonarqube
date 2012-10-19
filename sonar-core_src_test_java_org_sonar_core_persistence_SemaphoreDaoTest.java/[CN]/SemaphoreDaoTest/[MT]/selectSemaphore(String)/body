@@ -1,0 +1,18 @@
+{
+  Connection connection=getConnection();
+  PreparedStatement statement=null;
+  ResultSet rs=null;
+  try {
+    statement=connection.prepareStatement("SELECT * FROM semaphores WHERE name='" + name + "'");
+    rs=statement.executeQuery();
+    if (rs.next()) {
+      return new Semaphore(rs.getString("name"),rs.getTimestamp("created_at"),rs.getTimestamp("updated_at"),rs.getTimestamp("locked_at"));
+    }
+    return null;
+  }
+  finally {
+    DatabaseUtils.closeQuietly(rs);
+    DatabaseUtils.closeQuietly(statement);
+    DatabaseUtils.closeQuietly(connection);
+  }
+}

@@ -1,0 +1,13 @@
+{
+  Preconditions.checkArgument(!Strings.isNullOrEmpty(name),"Semaphore name must not be empty");
+  Preconditions.checkArgument(durationInSeconds > 0,"Semaphore duration must be positive");
+  SqlSession session=mybatis.openSession();
+  try {
+    SemaphoreMapper mapper=session.getMapper(SemaphoreMapper.class);
+    initialize(name,session,mapper);
+    return doLock(name,durationInSeconds,session,mapper);
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}
