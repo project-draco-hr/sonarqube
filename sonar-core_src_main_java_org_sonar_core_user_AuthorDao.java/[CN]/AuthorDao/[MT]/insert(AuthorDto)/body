@@ -1,11 +1,20 @@
 {
   SqlSession session=mybatis.openSession();
+  AuthorMapper mapper=session.getMapper(AuthorMapper.class);
   try {
-    AuthorMapper mapper=session.getMapper(AuthorMapper.class);
     mapper.insert(authorDto);
     session.commit();
   }
-  finally {
+ catch (  RuntimeException e) {
+    AuthorDto persistedAuthor=mapper.selectByLogin(authorDto.getLogin());
+    if (persistedAuthor != null) {
+      authorDto.setId(persistedAuthor.getId());
+    }
+ else {
+      throw e;
+    }
+  }
+ finally {
     MyBatis.closeQuietly(session);
   }
 }
