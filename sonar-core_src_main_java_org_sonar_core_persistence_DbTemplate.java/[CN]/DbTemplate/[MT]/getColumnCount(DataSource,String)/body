@@ -1,0 +1,20 @@
+{
+  Connection connection=null;
+  ResultSet metaData=null;
+  try {
+    connection=dataSource.getConnection();
+    metaData=connection.getMetaData().getColumns(null,null,table,null);
+    int nbColumns=0;
+    while (metaData.next()) {
+      nbColumns++;
+    }
+    return nbColumns;
+  }
+ catch (  SQLException e) {
+    throw new SonarException("Fail to get column count for table " + table,e);
+  }
+ finally {
+    closeQuietly(metaData);
+    closeQuietly(connection);
+  }
+}
