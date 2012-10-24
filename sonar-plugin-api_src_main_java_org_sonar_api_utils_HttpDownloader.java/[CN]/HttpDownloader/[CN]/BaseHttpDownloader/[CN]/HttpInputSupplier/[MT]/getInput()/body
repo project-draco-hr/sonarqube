@@ -1,6 +1,10 @@
 {
-  LoggerFactory.getLogger(getClass()).debug("Download: " + uri + " ("+ getProxySynthesis(uri)+ ")");
+  LoggerFactory.getLogger(getClass()).debug("Download: " + uri + " ("+ getProxySynthesis(uri,ProxySelector.getDefault())+ ")");
   HttpURLConnection connection=(HttpURLConnection)uri.toURL().openConnection();
+  if (!Strings.isNullOrEmpty(login)) {
+    String encoded=new String(Base64.encodeBase64((login + ":" + password).getBytes()));
+    connection.setRequestProperty("Authorization","Basic " + encoded);
+  }
   connection.setConnectTimeout(TIMEOUT_MILLISECONDS);
   connection.setReadTimeout(TIMEOUT_MILLISECONDS);
   connection.setUseCaches(true);

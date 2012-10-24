@@ -1,13 +1,23 @@
 {
+  String login=settings.getString(CoreProperties.LOGIN);
+  String password=settings.getString(CoreProperties.PASSWORD);
+  String resourceKey=settings.getString("sonar.resource");
+  if (null == resourceKey) {
+    throw new SonarException("No resource key was provided using sonar.resource property");
+  }
+  URI uri=URI.create(server.getURL() + API_SYNCHRO + "?resource="+ resourceKey);
+  HttpDownloader.BaseHttpDownloader downloader=new HttpDownloader.BaseHttpDownloader(settings,null);
+  InputSupplier<InputStream> inputSupplier;
+  if (Strings.isNullOrEmpty(login)) {
+    inputSupplier=downloader.newInputSupplier(uri);
+  }
+ else {
+    inputSupplier=downloader.newInputSupplier(uri,login,password);
+  }
   try {
-    Files.copy(new InputSupplier<InputStream>(){
-      public InputStream getInput(){
-        return httpDownloader.openStream(URI.create(server.getURL() + API_SYNCHRO));
-      }
-    }
-,toFile);
+    Files.copy(inputSupplier,toFile);
   }
  catch (  IOException e) {
-    throw new SonarException("Unable to download database",e);
+    throw new SonarException("Unable to save local database to file: " + toFile,e);
   }
 }
