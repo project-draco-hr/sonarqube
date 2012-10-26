@@ -1,0 +1,15 @@
+{
+  TempDirectories tempDirs=mock(TempDirectories.class);
+  File toDir=temp.newFolder();
+  when(tempDirs.getDir("plugins/checkstyle")).thenReturn(toDir);
+  ServerClient server=mock(ServerClient.class);
+  PluginDownloader downloader=new PluginDownloader(tempDirs,server);
+  RemotePlugin plugin=new RemotePlugin("checkstyle",true).addFilename("checkstyle-plugin.jar").addFilename("checkstyle-extensions.jar");
+  List<File> files=downloader.downloadPlugin(plugin);
+  File pluginFile=new File(toDir,"checkstyle-plugin.jar");
+  File extFile=new File(toDir,"checkstyle-extensions.jar");
+  assertThat(files).hasSize(2);
+  assertThat(files).containsOnly(pluginFile,extFile);
+  verify(server).download("/deploy/plugins/checkstyle/checkstyle-plugin.jar",pluginFile);
+  verify(server).download("/deploy/plugins/checkstyle/checkstyle-extensions.jar",extFile);
+}
