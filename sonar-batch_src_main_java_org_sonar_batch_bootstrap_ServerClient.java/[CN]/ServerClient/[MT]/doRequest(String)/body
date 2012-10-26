@@ -1,0 +1,19 @@
+{
+  Preconditions.checkArgument(pathStartingWithSlash.startsWith("/"),"Path must start with slash /");
+  URI uri=URI.create(getURL() + pathStartingWithSlash);
+  String login=settings.getString(CoreProperties.LOGIN);
+  try {
+    HttpDownloader.BaseHttpDownloader downloader=new HttpDownloader.BaseHttpDownloader(settings,env.toString());
+    InputSupplier<InputStream> inputSupplier;
+    if (Strings.isNullOrEmpty(login)) {
+      inputSupplier=downloader.newInputSupplier(uri);
+    }
+ else {
+      inputSupplier=downloader.newInputSupplier(uri,login,settings.getString(CoreProperties.PASSWORD));
+    }
+    return inputSupplier;
+  }
+ catch (  Exception e) {
+    throw new SonarException(String.format("Unable to request: %s",uri),e);
+  }
+}

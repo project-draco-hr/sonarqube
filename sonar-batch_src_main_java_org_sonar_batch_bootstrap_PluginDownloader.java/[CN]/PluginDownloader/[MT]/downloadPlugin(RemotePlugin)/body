@@ -1,0 +1,18 @@
+{
+  try {
+    File targetDir=workingDirectories.getDir("plugins/" + remote.getKey());
+    FileUtils.forceMkdir(targetDir);
+    LOG.debug("Downloading plugin " + remote.getKey() + " into "+ targetDir);
+    List<File> files=Lists.newArrayList();
+    for (    String filename : remote.getFilenames()) {
+      String url="/deploy/plugins/" + remote.getKey() + "/"+ filename;
+      File toFile=new File(targetDir,filename);
+      server.download(url,toFile);
+      files.add(toFile);
+    }
+    return files;
+  }
+ catch (  Exception e) {
+    throw new SonarException("Fail to download plugin: " + remote.getKey(),e);
+  }
+}
