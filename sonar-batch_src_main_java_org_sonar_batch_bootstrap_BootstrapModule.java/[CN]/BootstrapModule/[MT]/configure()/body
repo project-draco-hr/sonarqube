@@ -1,40 +1,26 @@
 {
-  addCoreSingleton(reactor);
-  addCoreSingleton(new PropertiesConfiguration());
-  addCoreSingleton(BatchSettings.class);
-  addCoreSingleton(DryRun.class);
-  addCoreSingleton(Logback.class);
-  addCoreSingleton(ServerMetadata.class);
-  addCoreSingleton(TempDirectories.class);
-  addCoreSingleton(HttpDownloader.class);
-  addCoreSingleton(UriReader.class);
-  addCoreSingleton(ArtifactDownloader.class);
-  addCoreSingleton(JdbcDriverHolder.class);
-  addCoreSingleton(EmailSettings.class);
-  addCoreSingleton(I18nManager.class);
-  addCoreSingleton(RuleI18nManager.class);
-  URLClassLoader bootstrapClassLoader=getComponentByType(JdbcDriverHolder.class).getClassLoader();
-  Thread.currentThread().setContextClassLoader(bootstrapClassLoader);
-  addCoreSingleton(RemoteServerMetadata.class);
-  addCoreSingleton(LocalMode.class);
-  addCoreSingleton(LocalDatabase.class);
-  addCoreSingleton(BatchDatabase.class);
-  addCoreSingleton(MyBatis.class);
-  addCoreSingleton(DatabaseVersion.class);
-  for (  Class daoClass : DaoUtils.getDaoClasses()) {
-    addCoreSingleton(daoClass);
-  }
-  addCoreSingleton(DefaultDatabaseConnector.class);
-  addCoreSingleton(ThreadLocalDatabaseSessionFactory.class);
-  addAdapter(new DatabaseSessionProvider());
-  addCoreSingleton(DatabaseBatchCompatibility.class);
+  container.addSingleton(reactor);
+  container.addSingleton(new PropertiesConfiguration());
+  container.addSingleton(BootstrapSettings.class);
+  container.addSingleton(BatchPluginRepository.class);
+  container.addSingleton(ExtensionInstaller.class);
+  container.addSingleton(DryRun.class);
+  container.addSingleton(Logback.class);
+  container.addSingleton(ServerMetadata.class);
+  container.addSingleton(TempDirectories.class);
+  container.addSingleton(HttpDownloader.class);
+  container.addSingleton(UriReader.class);
+  container.addSingleton(ArtifactDownloader.class);
+  container.addSingleton(EmailSettings.class);
+  container.addSingleton(RemoteServerMetadata.class);
+  container.addSingleton(I18nManager.class);
+  container.addSingleton(RuleI18nManager.class);
   for (  Object component : boostrapperComponents) {
-    addCoreSingleton(component);
+    container.addSingleton(component);
   }
+  container.addSingleton(BootstrapExtensionExecutor.class);
   if (!isMavenPluginExecutorRegistered()) {
-    addCoreSingleton(FakeMavenPluginExecutor.class);
+    container.addSingleton(FakeMavenPluginExecutor.class);
   }
-  addCoreSingleton(BatchPluginRepository.class);
-  addCoreSingleton(BatchExtensionInstaller.class);
-  addCoreSingleton(BatchDatabaseSettingsLoader.class);
+  addDatabaseComponents();
 }
