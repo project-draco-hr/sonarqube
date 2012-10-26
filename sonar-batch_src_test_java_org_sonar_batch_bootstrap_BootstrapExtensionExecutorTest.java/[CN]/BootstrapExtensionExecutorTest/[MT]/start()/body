@@ -1,0 +1,22 @@
+{
+  ComponentContainer container=new ComponentContainer();
+  container.addSingleton(reactor);
+  container.addSingleton(new Settings());
+  final Startable bootstrapComponent=mock(Startable.class);
+  ExtensionInstaller installer=mock(ExtensionInstaller.class);
+  doAnswer(new Answer(){
+    public Object answer(    InvocationOnMock invocationOnMock) throws Throwable {
+      ComponentContainer childContainer=(ComponentContainer)invocationOnMock.getArguments()[0];
+      childContainer.addSingleton(bootstrapComponent);
+      return null;
+    }
+  }
+).when(installer).install(any(ComponentContainer.class),eq(InstantiationStrategy.BOOTSTRAP));
+  BootstrapExtensionExecutor executor=new BootstrapExtensionExecutor(container,installer);
+  executor.start();
+  verify(installer).install(any(ComponentContainer.class),eq(InstantiationStrategy.BOOTSTRAP));
+  verify(bootstrapComponent).start();
+  verify(bootstrapComponent).stop();
+  assertThat(container.getComponentByType(ProjectExclusions.class)).isNull();
+  assertThat(container.getChild()).isNull();
+}

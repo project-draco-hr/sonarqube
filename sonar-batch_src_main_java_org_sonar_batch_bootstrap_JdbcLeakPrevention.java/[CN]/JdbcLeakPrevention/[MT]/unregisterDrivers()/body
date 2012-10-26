@@ -1,0 +1,16 @@
+{
+  Set<Driver> registeredDrivers=registeredDrivers();
+  List<String> unregisteredNames=new ArrayList<String>();
+  Enumeration<Driver> drivers=DriverManager.getDrivers();
+  while (drivers.hasMoreElements()) {
+    Driver driver=drivers.nextElement();
+    if (driver.getClass().getClassLoader() != this.getClass().getClassLoader()) {
+      continue;
+    }
+    if (registeredDrivers.contains(driver)) {
+      unregisteredNames.add(driver.getClass().getCanonicalName());
+    }
+    DriverManager.deregisterDriver(driver);
+  }
+  return unregisteredNames;
+}

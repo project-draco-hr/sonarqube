@@ -1,0 +1,14 @@
+{
+  final ExtensionInstaller extensionInstaller=mock(ExtensionInstaller.class);
+  Module bootstrapModule=new Module(){
+    @Override protected void configure(){
+      container.addSingleton(extensionInstaller);
+    }
+  }
+;
+  bootstrapModule.init();
+  BatchModule module=new BatchModule();
+  bootstrapModule.installChild(module);
+  verify(extensionInstaller).install(any(ComponentContainer.class),eq(InstantiationStrategy.BATCH));
+  assertThat(module.container.getComponentByType(MetricProvider.class)).isNotNull();
+}
