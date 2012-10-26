@@ -1,0 +1,20 @@
+{
+  Connection connection=null;
+  Statement statement=null;
+  ResultSet resultSet=null;
+  try {
+    connection=dataSource.getConnection();
+    statement=connection.createStatement();
+    resultSet=statement.executeQuery("SELECT count(*) from " + table);
+    return resultSet.next() ? resultSet.getInt(1) : 0;
+  }
+ catch (  SQLException e) {
+    LOG.error("Fail to get row count for table " + table,e);
+    throw new SonarException("Fail to get row count for table " + table,e);
+  }
+ finally {
+    DatabaseUtils.closeQuietly(resultSet);
+    DatabaseUtils.closeQuietly(statement);
+    DatabaseUtils.closeQuietly(connection);
+  }
+}
