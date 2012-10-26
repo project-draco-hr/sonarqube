@@ -1,0 +1,12 @@
+{
+  Metrics factory=new Metrics(){
+    public List<Metric> getMetrics(){
+      return Arrays.asList(new Metric.Builder("custom","Custom",Metric.ValueType.FLOAT).create());
+    }
+  }
+;
+  MetricProvider provider=new MetricProvider(new Metrics[]{factory});
+  List<Metric> metrics=provider.provide();
+  assertThat(metrics.size()).isEqualTo(1 + CoreMetrics.getMetrics().size());
+  assertThat(metrics).onProperty("key").contains("custom");
+}

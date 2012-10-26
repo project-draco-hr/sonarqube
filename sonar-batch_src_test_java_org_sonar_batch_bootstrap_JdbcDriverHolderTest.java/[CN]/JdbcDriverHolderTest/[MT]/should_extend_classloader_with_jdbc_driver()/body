@@ -1,8 +1,16 @@
 {
-  assertThat(getClass().getClassLoader().getResource("foo/foo.txt")).isNull();
-  URL url=getClass().getResource("/org/sonar/batch/bootstrap/JdbcDriverHolderTest/foo.jar");
-  JdbcDriverHolder.JdbcDriverClassLoader classloader=JdbcDriverHolder.initClassloader(new File(url.toURI()));
-  assertThat(classloader).isNotNull();
-  assertThat(classloader.getResource("foo/foo.txt")).isNotNull();
-  assertThat(Thread.currentThread().getContextClassLoader()).isSameAs(classloader);
+  assertThat(Thread.currentThread().getContextClassLoader().getResource("foo/foo.txt")).isNull();
+  File fakeDriver=new File(getClass().getResource("/org/sonar/batch/bootstrap/JdbcDriverHolderTest/jdbc-driver.jar").toURI());
+  TempDirectories tempDirectories=mock(TempDirectories.class);
+  when(tempDirectories.getRoot()).thenReturn(fakeDriver.getParentFile());
+  ServerClient server=mock(ServerClient.class);
+  JdbcDriverHolder holder=new JdbcDriverHolder(mock(DryRun.class),tempDirectories,server);
+  holder.start();
+  verify(server).download("/deploy/jdbc-driver.jar",fakeDriver);
+  assertThat(holder.getClassLoader().getResource("foo/foo.txt")).isNotNull();
+  assertThat(Thread.currentThread().getContextClassLoader()).isSameAs(holder.getClassLoader());
+  assertThat(holder.getClassLoader().getParent()).isSameAs(getClass().getClassLoader());
+  holder.stop();
+  assertThat(Thread.currentThread().getContextClassLoader()).isSameAs(getClass().getClassLoader());
+  assertThat(holder.getClassLoader()).isNull();
 }
