@@ -1,20 +1,18 @@
 {
   for (  File report : reports) {
-    if (report.exists()) {
-      InputStream resourceStream=null;
-      try {
-        resourceStream=new BufferedInputStream(new FileInputStream(report));
-        ExecutionDataReader reader=new ExecutionDataReader(resourceStream);
-        reader.setSessionInfoVisitor(infoStore);
-        reader.setExecutionDataVisitor(dataStore);
-        reader.read();
-      }
- catch (      IOException e) {
-        throw new SonarException(String.format("Unable to read %s",report.getAbsolutePath()),e);
-      }
+    InputStream resourceStream=null;
+    try {
+      resourceStream=new BufferedInputStream(new FileInputStream(report));
+      ExecutionDataReader reader=new ExecutionDataReader(resourceStream);
+      reader.setSessionInfoVisitor(infoStore);
+      reader.setExecutionDataVisitor(dataStore);
+      reader.read();
+    }
+ catch (    IOException e) {
+      throw new SonarException(String.format("Unable to read %s",report.getAbsolutePath()),e);
+    }
  finally {
-        Closeables.closeQuietly(resourceStream);
-      }
+      Closeables.closeQuietly(resourceStream);
     }
   }
 }
