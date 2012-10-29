@@ -3,4 +3,13 @@
     return;
   }
   LOG.info("Exporting dry run results");
+  List<Map<String,? extends Serializable>> results=Lists.newArrayList();
+  for (  Resource resource : sonarIndex.getResources()) {
+    List<Violation> violations=sonarIndex.getViolations(ViolationQuery.create().forResource(resource));
+    for (    Violation violation : violations) {
+      results.add(ImmutableMap.of("resource",violation.getResource().getKey(),"line",violation.getLineId(),"message",violation.getMessage()));
+    }
+  }
+  String json=new Gson().toJson(results);
+  System.out.println(json);
 }
