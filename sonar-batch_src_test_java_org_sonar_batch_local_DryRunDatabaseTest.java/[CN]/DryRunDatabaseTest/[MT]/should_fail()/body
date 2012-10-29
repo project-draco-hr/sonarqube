@@ -1,0 +1,8 @@
+{
+  when(dryRun.isEnabled()).thenReturn(true);
+  when(tempDirectories.getFile("dry_run","db.h2.db")).thenReturn(new File("/tmp/dry_run/db.h2.db"));
+  doThrow(new SonarException("BUG")).when(server).download("/api/synchro?resource=group:project",new File("/tmp/dry_run/db.h2.db"));
+  thrown.expect(SonarException.class);
+  thrown.expectMessage("BUG");
+  dryRunDatabase.start();
+}
