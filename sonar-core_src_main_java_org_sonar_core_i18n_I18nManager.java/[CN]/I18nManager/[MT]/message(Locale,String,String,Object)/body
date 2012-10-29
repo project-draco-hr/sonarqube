@@ -1,15 +1,16 @@
 {
   String bundleKey=propertyToBundles.get(key);
-  ResourceBundle resourceBundle=null;
+  String value=null;
   if (bundleKey != null) {
     try {
-      resourceBundle=ResourceBundle.getBundle(bundleKey,locale,languagePackClassLoader);
-      String message=resourceBundle.getString(key);
-      return formatMessage(message,parameters);
+      ResourceBundle resourceBundle=ResourceBundle.getBundle(bundleKey,locale,i18nClassloader);
+      value=resourceBundle.getString(key);
     }
  catch (    MissingResourceException e1) {
-      resourceBundle=getBundleFromCorrespondingPluginClassloader(bundleKey,locale);
     }
   }
-  return message(resourceBundle,key,defaultValue,parameters);
+  if (value == null) {
+    value=defaultValue;
+  }
+  return formatMessage(value,parameters);
 }

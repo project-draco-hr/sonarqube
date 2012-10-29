@@ -3,26 +3,23 @@
   if (fileCache != null && fileCache.containsKey(locale)) {
     return fileCache.get(locale);
   }
-  ClassLoader classloader=getClassLoaderForProperty(relatedProperty,locale);
   String result=null;
-  if (classloader != null) {
-    String bundleBase=propertyToBundles.get(relatedProperty);
-    String filePath=bundleBase.replace('.','/');
-    if (!"en".equals(locale.getLanguage())) {
-      filePath+="_" + locale.getLanguage();
+  String bundleBase=propertyToBundles.get(relatedProperty);
+  String filePath=bundleBase.replace('.','/');
+  if (!"en".equals(locale.getLanguage())) {
+    filePath+="_" + locale.getLanguage();
+  }
+  filePath+="/" + filename;
+  InputStream input=i18nClassloader.getResourceAsStream(filePath);
+  if (input != null) {
+    result=readInputStream(filePath,input);
+  }
+  if (keepInCache) {
+    if (fileCache == null) {
+      fileCache=Maps.newHashMap();
+      fileContentCache.put(filename,fileCache);
     }
-    filePath+="/" + filename;
-    InputStream input=classloader.getResourceAsStream(filePath);
-    if (input != null) {
-      result=readInputStream(filePath,input);
-    }
-    if (keepInCache) {
-      if (fileCache == null) {
-        fileCache=Maps.newHashMap();
-        fileContentCache.put(filename,fileCache);
-      }
-      fileCache.put(locale,result);
-    }
+    fileCache.put(locale,result);
   }
   return result;
 }
