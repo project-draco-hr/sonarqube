@@ -1,0 +1,23 @@
+{
+  final Project project=new Project("foo");
+  project.setConfiguration(new PropertiesConfiguration());
+  final ProjectTree projectTree=mock(ProjectTree.class);
+  when(projectTree.getProjectDefinition(project)).thenReturn(ProjectDefinition.create());
+  final ResourcePersister resourcePersister=mock(ResourcePersister.class);
+  when(resourcePersister.getSnapshot(Matchers.<Resource>any())).thenReturn(new Snapshot());
+  final ExtensionInstaller extensionInstaller=mock(ExtensionInstaller.class);
+  Module batchModule=new Module(){
+    @Override protected void configure(){
+      container.addSingleton(extensionInstaller);
+      container.addSingleton(projectTree);
+      container.addSingleton(resourcePersister);
+      container.addSingleton(mock(PropertiesDao.class));
+    }
+  }
+;
+  batchModule.init();
+  ProjectModule projectModule=new ProjectModule(project);
+  batchModule.installChild(projectModule);
+  verify(extensionInstaller).install(any(ComponentContainer.class),eq(InstantiationStrategy.PER_PROJECT));
+  assertThat(projectModule.container.getComponentByType(ProjectSettings.class)).isNotNull();
+}

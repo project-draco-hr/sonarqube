@@ -1,0 +1,11 @@
+{
+  Project project=mock(Project.class);
+  when(project.getPom()).thenReturn(null);
+  BatchPluginRepository pluginRepository=mock(BatchPluginRepository.class);
+  when(pluginRepository.getPluginsByMetadata()).thenReturn(newPlugin(MavenService.class));
+  ComponentContainer container=new ComponentContainer();
+  container.addSingleton(project);
+  ExtensionInstaller installer=new ExtensionInstaller(pluginRepository,new EnvironmentInformation("maven","2.2.1"),new Settings());
+  installer.install(container,InstantiationStrategy.PER_PROJECT);
+  assertThat(container.getComponentByType(MavenService.class)).isNull();
+}
