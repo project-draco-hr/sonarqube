@@ -6,9 +6,12 @@
     writer=new JsonWriter(output);
     writer.beginArray();
     for (    Resource resource : resources) {
+      List<Map<String,Object>> resourceViolations=Lists.newArrayList();
       for (      Violation violation : getViolations(resource)) {
-        gson.toJson(new ViolationToMap().apply(violation),writer);
+        resourceViolations.add(ImmutableMap.<String,Object>of("line",violation.getLineId(),"message",violation.getMessage(),"severity",violation.getSeverity().name(),"rule_key",violation.getRule().getKey(),"rule_name",violation.getRule().getName()));
       }
+      Map<String,Object> obj=ImmutableMap.of("resource",resource.getKey(),"violations",resourceViolations);
+      gson.toJson(obj,Map.class,writer);
     }
     writer.endArray();
   }
