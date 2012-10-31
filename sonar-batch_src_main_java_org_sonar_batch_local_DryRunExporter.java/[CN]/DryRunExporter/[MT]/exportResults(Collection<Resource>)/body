@@ -1,10 +1,16 @@
 {
   File exportFile=new File(projectFileSystem.getSonarWorkingDirectory(),dryRun.getExportPath());
   LOG.info("Exporting DryRun results to " + exportFile.getAbsolutePath());
+  Writer output=null;
   try {
-    Files.write(json,exportFile,Charsets.UTF_8);
+    output=new BufferedWriter(new FileWriter(exportFile));
+    writeJson(resources,output);
+    output.flush();
   }
  catch (  IOException e) {
     throw new SonarException("Unable to write DryRun results in file " + exportFile.getAbsolutePath());
+  }
+ finally {
+    Closeables.closeQuietly(output);
   }
 }
