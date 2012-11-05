@@ -1,0 +1,13 @@
+{
+  LoggerFactory.getLogger(BootstrapSettingsLoader.class).info("Load project settings");
+  String branch=settings.getString(CoreProperties.PROJECT_BRANCH_PROPERTY);
+  String projectKey=reactor.getRoot().getKey();
+  if (StringUtils.isNotBlank(branch)) {
+    projectKey=String.format("%s:%s",projectKey,branch);
+  }
+  List<Property> wsProperties=wsClient.findAll(PropertyQuery.createForAll().setResourceKeyOrId(projectKey));
+  for (  Property wsProperty : wsProperties) {
+    setIfNotDefined(wsProperty);
+  }
+  settings.updateDeprecatedCommonsConfiguration();
+}
