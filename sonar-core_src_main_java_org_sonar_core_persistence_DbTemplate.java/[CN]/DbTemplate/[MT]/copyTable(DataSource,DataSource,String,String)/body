@@ -1,5 +1,13 @@
 {
   LOG.info("Copy table " + table);
+  String selectQuery="select * from " + table;
+  if (whereClauses.length > 0) {
+    List<String> clauses=Lists.newArrayList();
+    for (    String whereClause : whereClauses) {
+      clauses.add('(' + whereClause + ')');
+    }
+    selectQuery+=" WHERE " + Joiner.on(" AND ").join(clauses);
+  }
   truncate(dest,table);
   Connection sourceConnection=null;
   Statement sourceStatement=null;
@@ -10,7 +18,7 @@
   try {
     sourceConnection=source.getConnection();
     sourceStatement=sourceConnection.createStatement();
-    sourceResultSet=sourceStatement.executeQuery(query);
+    sourceResultSet=sourceStatement.executeQuery(selectQuery);
     if (sourceResultSet.next()) {
       int colCount=sourceResultSet.getMetaData().getColumnCount();
       destConnection=dest.getConnection();
