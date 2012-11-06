@@ -1,0 +1,7 @@
+{
+  when(tempDirectories.getFile("dry_run","db.h2.db")).thenReturn(new File("/tmp/dry_run/db.h2.db"));
+  doThrow(new SonarException(new IOException("HTTP 401"))).when(server).download("/batch_bootstrap/db?project=group:project",new File("/tmp/dry_run/db.h2.db"));
+  thrown.expect(SonarException.class);
+  thrown.expectMessage("You don't have access rights to project [group:project]");
+  dryRunDatabase.start();
+}

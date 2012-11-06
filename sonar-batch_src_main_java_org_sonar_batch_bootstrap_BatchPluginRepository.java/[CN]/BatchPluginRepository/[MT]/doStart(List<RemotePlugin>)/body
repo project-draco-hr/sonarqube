@@ -1,12 +1,14 @@
 {
+  Set<String> whiteList=initWhiteList();
+  Set<String> blackList=initBlackList();
   PluginInstaller extractor=new PluginInstaller();
   metadataByKey=Maps.newHashMap();
   for (  RemotePlugin remote : remotePlugins) {
-    if (isAccepted(remote.getKey())) {
+    if (isAccepted(remote.getKey(),whiteList,blackList)) {
       List<File> pluginFiles=pluginDownloader.downloadPlugin(remote);
       List<File> extensionFiles=pluginFiles.subList(1,pluginFiles.size());
       PluginMetadata metadata=extractor.installInSameLocation(pluginFiles.get(0),remote.isCore(),extensionFiles);
-      if (StringUtils.isBlank(metadata.getBasePlugin()) || isAccepted(metadata.getBasePlugin())) {
+      if (StringUtils.isBlank(metadata.getBasePlugin()) || isAccepted(metadata.getBasePlugin(),whiteList,blackList)) {
         LOG.debug("Excluded plugin: " + metadata.getKey());
         metadataByKey.put(metadata.getKey(),metadata);
       }
