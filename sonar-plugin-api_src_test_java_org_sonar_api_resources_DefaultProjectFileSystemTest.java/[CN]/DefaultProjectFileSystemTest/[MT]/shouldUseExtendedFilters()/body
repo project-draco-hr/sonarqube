@@ -1,7 +1,7 @@
 {
-  DefaultProjectFileSystem fsWithoutFilter=newDefaultProjectFileSystem(project);
-  assertThat(fsWithoutFilter.getSourceFiles().size(),is(2));
-  assertThat(fsWithoutFilter.getSourceFiles(),hasItem(named("Bar.java")));
+  ProjectFileSystem fsWithoutFilter=project.getFileSystem();
+  assertThat(fsWithoutFilter.getSourceFiles()).hasSize(2);
+  assertThat(fsWithoutFilter.getSourceFiles()).onProperty("name").contains("Bar.java");
   FileFilter filter=new FileFilter(){
     public boolean accept(    File file){
       return !StringUtils.equals(file.getName(),"Bar.java");
@@ -9,6 +9,6 @@
   }
 ;
   DefaultProjectFileSystem fsWithFilter=new DefaultProjectFileSystem(project,new Languages(Java.INSTANCE),filter);
-  assertThat(fsWithFilter.getSourceFiles().size(),is(1));
-  assertThat(fsWithFilter.getSourceFiles(),not(hasItem(named("Bar.java"))));
+  assertThat(fsWithFilter.getSourceFiles()).hasSize(1);
+  assertThat(fsWithFilter.getSourceFiles()).onProperty("name").excludes("Bar.java");
 }
