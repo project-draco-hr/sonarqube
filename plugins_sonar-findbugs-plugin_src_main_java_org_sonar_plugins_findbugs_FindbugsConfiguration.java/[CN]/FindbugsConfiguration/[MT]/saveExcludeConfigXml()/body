@@ -1,10 +1,5 @@
 {
-  FindBugsFilter findBugsFilter=new FindBugsFilter();
-  if (project.getExclusionPatterns() != null) {
-    for (    String exclusion : project.getExclusionPatterns()) {
-      ClassFilter classFilter=new ClassFilter(FindbugsAntConverter.antToJavaRegexpConvertor(exclusion));
-      findBugsFilter.addMatch(new Match(classFilter));
-    }
-  }
-  return project.getFileSystem().writeToWorkingDirectory(findBugsFilter.toXml(),"findbugs-exclude.xml");
+  StringWriter xml=new StringWriter();
+  exporter.exportExclusions(project.getExclusionPatterns(),xml);
+  return project.getFileSystem().writeToWorkingDirectory(xml.toString(),"findbugs-exclude.xml");
 }
