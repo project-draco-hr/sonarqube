@@ -1,17 +1,13 @@
 {
-  if (StringUtils.isBlank(key)) {
+  if (StringUtils.isBlank(dirname)) {
     return rootDir;
   }
-  File dir=directoriesByKey.get(key);
-  if (dir == null) {
-    dir=new File(rootDir,key);
-    try {
-      FileUtils.forceMkdir(dir);
-      directoriesByKey.put(key,dir);
-    }
- catch (    IOException e) {
-      throw new SonarException("Can not create the temp directory: " + dir,e);
-    }
+  File dir=new File(rootDir,dirname);
+  try {
+    FileUtils.forceMkdir(dir);
+    return dir;
   }
-  return dir;
+ catch (  IOException e) {
+    throw new IllegalStateException("Fail to create temp directory: " + dir,e);
+  }
 }
