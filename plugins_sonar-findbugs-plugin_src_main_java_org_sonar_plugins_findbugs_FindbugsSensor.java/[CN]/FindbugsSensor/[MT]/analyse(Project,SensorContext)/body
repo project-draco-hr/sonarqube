@@ -2,14 +2,9 @@
   if (project.getReuseExistingRulesConfig()) {
     LOG.warn("Reusing existing Findbugs configuration not supported any more.");
   }
-  File report=getFindbugsReportFile(project);
-  if (report == null) {
-    report=executor.execute();
-  }
-  FindbugsXmlReportParser reportParser=new FindbugsXmlReportParser(report);
-  List<FindbugsXmlReportParser.XmlBugInstance> bugInstances=reportParser.getBugInstances();
-  for (  FindbugsXmlReportParser.XmlBugInstance bugInstance : bugInstances) {
-    FindbugsXmlReportParser.XmlSourceLineAnnotation sourceLine=bugInstance.getPrimarySourceLine();
+  BugCollection collection=executor.execute();
+  for (  BugInstance bugInstance : collection) {
+    SourceLineAnnotation sourceLine=bugInstance.getPrimarySourceLineAnnotation();
     if (sourceLine == null) {
       LOG.warn("No source line for " + bugInstance.getType());
       continue;
@@ -19,9 +14,12 @@
       LOG.warn("Findbugs rule '{}' not active in Sonar.",bugInstance.getType());
       continue;
     }
-    JavaFile resource=new JavaFile(sourceLine.getSonarJavaFileKey());
+    String longMessage=bugInstance.getMessageWithoutPrefix();
+    String className=bugInstance.getPrimarySourceLineAnnotation().getClassName();
+    int start=bugInstance.getPrimarySourceLineAnnotation().getStartLine();
+    JavaFile resource=new JavaFile(getSonarJavaFileKey(className));
     if (context.getResource(resource) != null) {
-      Violation violation=Violation.create(rule,resource).setLineId(sourceLine.getStart()).setMessage(bugInstance.getLongMessage());
+      Violation violation=Violation.create(rule,resource).setLineId(start).setMessage(longMessage);
       context.saveViolation(violation);
     }
   }
