@@ -1,0 +1,16 @@
+{
+  JsonUtils.requestJson(getUrl(query),new JsonUtils.JSONHandler(){
+    public void onResponse(    JavaScriptObject obj){
+      Unmarshaller<MODEL> unmarshaller=Unmarshallers.forModel(query.getModelClass());
+      String json=(new JSONObject(obj)).toString();
+      callback.onResponse(unmarshaller.toModel(json),obj);
+    }
+    public void onTimeout(){
+      callback.onTimeout();
+    }
+    public void onError(    int errorCode,    String errorMessage){
+      callback.onError(errorCode,errorMessage);
+    }
+  }
+);
+}
