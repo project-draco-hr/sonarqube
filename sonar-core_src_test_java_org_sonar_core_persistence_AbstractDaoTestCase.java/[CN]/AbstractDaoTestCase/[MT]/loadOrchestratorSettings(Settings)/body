@@ -1,0 +1,17 @@
+{
+  URI uri=new URI(settings.getString("orchestrator.configUrl"));
+  HttpURLConnection connection=(HttpURLConnection)uri.toURL().openConnection();
+  int responseCode=connection.getResponseCode();
+  if (responseCode >= 400) {
+    throw new IllegalStateException("Fail to request: " + uri + ". Status code="+ responseCode);
+  }
+  InputStream input=connection.getInputStream();
+  try {
+    Properties props=new Properties();
+    props.load(input);
+    settings.addProperties(props);
+  }
+  finally {
+    IOUtils.closeQuietly(input);
+  }
+}
