@@ -1,0 +1,15 @@
+{
+  Handler handler=new AbstractHandler(){
+    public void handle(    String target,    HttpServletRequest request,    HttpServletResponse response,    int dispatch) throws IOException, ServletException {
+      Request baseRequest=request instanceof Request ? (Request)request : HttpConnection.getCurrentConnection().getRequest();
+      setResponseBody(getMockResponseData());
+      setRequestBody(IOUtils.toString(baseRequest.getInputStream()));
+      response.setStatus(mockResponseStatus);
+      response.setContentType("text/xml;charset=utf-8");
+      write(getResponseBody(),response.getOutputStream());
+      baseRequest.setHandled(true);
+    }
+  }
+;
+  return handler;
+}
