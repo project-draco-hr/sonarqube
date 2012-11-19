@@ -10,6 +10,10 @@
     Properties props=new Properties();
     props.load(input);
     settings.addProperties(props);
+    for (    Map.Entry<String,String> entry : settings.getProperties().entrySet()) {
+      String interpolatedValue=StrSubstitutor.replace(entry.getValue(),System.getenv(),"${","}");
+      settings.setProperty(entry.getKey(),interpolatedValue);
+    }
   }
   finally {
     IOUtils.closeQuietly(input);
