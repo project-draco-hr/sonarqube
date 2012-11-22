@@ -1,0 +1,40 @@
+{
+  MeasureFilter filter=new MeasureFilter();
+  filter.setBaseResourceKey((String)properties.get("base"));
+  filter.setResourceScopes((List<String>)properties.get("scopes"));
+  filter.setResourceQualifiers((List<String>)(properties.get("qualifiers")));
+  filter.setResourceLanguages((List<String>)(properties.get("languages")));
+  if (properties.containsKey("onBaseChildren")) {
+    filter.setOnBaseResourceChildren(Boolean.valueOf((String)properties.get("onBaseChildren")));
+  }
+  filter.setResourceName((String)properties.get("nameRegexp"));
+  filter.setResourceKeyRegexp((String)properties.get("keyRegexp"));
+  if (properties.containsKey("fromDate")) {
+    filter.setFromDate(toDate((String)properties.get("fromDate")));
+  }
+ else   if (properties.containsKey("afterDays")) {
+    filter.setFromDate(toDays((String)properties.get("afterDays")));
+  }
+  if (properties.containsKey("toDate")) {
+    filter.setToDate(toDate((String)properties.get("toDate")));
+  }
+ else   if (properties.containsKey("beforeDays")) {
+    filter.setToDate(toDays((String)properties.get("beforeDays")));
+  }
+  if (properties.containsKey("favourites")) {
+    filter.setUserFavourites(Boolean.valueOf((String)properties.get("favourites")));
+  }
+  if (properties.containsKey("asc")) {
+    filter.setSortAsc(Boolean.valueOf((String)properties.get("asc")));
+  }
+  String s=(String)properties.get("sort");
+  if (s != null) {
+    if (StringUtils.startsWith(s,"metric:")) {
+      filter.setSortOnMetric(metricFinder.findByKey(StringUtils.substringAfter(s,"metric:")));
+    }
+ else {
+      filter.setSortOn(MeasureFilterSort.Field.valueOf(s.toUpperCase()));
+    }
+  }
+  return filter;
+}
