@@ -5,11 +5,17 @@
       writeNode(writer,"operator",alert.getOperator());
       writeNode(writer,"value-error",alert.getValueError());
       writeNode(writer,"value-warning",alert.getValueWarning());
+      writeNode(writer,"period",alert.getPeriod() != null ? Integer.toString(alert.getPeriod()) : "");
       writeNode(writer,"metric-key",alert.getMetric().getKey());
     }
     public Object unmarshal(    HierarchicalStreamReader reader,    UnmarshallingContext context){
       Map<String,String> values=readNode(reader);
-      return new Alert(null,new Metric(values.get("metric-key")),values.get("operator"),values.get("value-error"),values.get("value-warning"));
+      Alert alert=new Alert(null,new Metric(values.get("metric-key")),values.get("operator"),values.get("value-error"),values.get("value-warning"));
+      String periodText=values.get("period");
+      if (StringUtils.isNotEmpty(periodText)) {
+        alert.setPeriod(Integer.parseInt(periodText));
+      }
+      return alert;
     }
     public boolean canConvert(    Class type){
       return type.equals(Alert.class);
