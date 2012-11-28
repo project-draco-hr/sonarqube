@@ -1,15 +1,7 @@
 {
-  Alert alert1=mock(Alert.class);
-  when(alert1.getMetric()).thenReturn(CoreMetrics.CLASSES);
-  when(alert1.getValueError()).thenReturn("10000");
-  when(alert1.getAlertLabel(Metric.Level.ERROR)).thenReturn("error classes");
-  when(alert1.getPeriod()).thenReturn(null);
-  Alert alert2=mock(Alert.class);
-  when(alert2.getMetric()).thenReturn(CoreMetrics.COVERAGE);
-  when(alert2.getValueWarning()).thenReturn("80");
-  when(alert2.getAlertLabel(Metric.Level.WARN)).thenReturn("warning coverage");
-  when(alert2.getPeriod()).thenReturn(null);
-  when(profile.getAlerts()).thenReturn(Arrays.asList(alert1,alert2));
+  when(i18n.message(Mockito.any(Locale.class),Mockito.eq("metric.classes.name"),Mockito.isNull(String.class))).thenReturn("Classes");
+  when(i18n.message(Mockito.any(Locale.class),Mockito.eq("metric.coverage.name"),Mockito.isNull(String.class))).thenReturn("Coverages");
+  when(profile.getAlerts()).thenReturn(Arrays.asList(new Alert(null,CoreMetrics.CLASSES,Alert.OPERATOR_SMALLER,null,"10000"),new Alert(null,CoreMetrics.COVERAGE,Alert.OPERATOR_SMALLER,"50.0","80.0")));
   decorator.decorate(project,context);
-  verify(context).saveMeasure(argThat(matchesMetric(CoreMetrics.ALERT_STATUS,Metric.Level.ERROR,"error classes, warning coverage")));
+  verify(context).saveMeasure(argThat(matchesMetric(CoreMetrics.ALERT_STATUS,Metric.Level.ERROR,"Classes < 10000, Coverages < 50.0")));
 }
