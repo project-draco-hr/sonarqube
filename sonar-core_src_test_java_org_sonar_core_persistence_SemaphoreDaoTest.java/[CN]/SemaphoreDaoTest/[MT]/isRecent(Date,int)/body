@@ -1,4 +1,11 @@
 {
-  Date now=new Date();
-  return date.before(now) && DateUtils.addSeconds(date,durationInSeconds).after(now);
+  SqlSession session=getMyBatis().openSession();
+  try {
+    SemaphoreDao dao=new SemaphoreDao(getMyBatis());
+    Date now=dao.now(session);
+    return date.before(now) && DateUtils.addSeconds(date,durationInSeconds).after(now);
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
 }
