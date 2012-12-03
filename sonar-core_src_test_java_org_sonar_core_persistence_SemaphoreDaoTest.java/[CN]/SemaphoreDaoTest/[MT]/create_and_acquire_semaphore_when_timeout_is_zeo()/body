@@ -1,0 +1,14 @@
+{
+  SemaphoreDao dao=new SemaphoreDao(getMyBatis());
+  Lock lock=dao.acquire("foo",0);
+  assertThat(lock.isAcquired()).isTrue();
+  assertThat(lock.getDurationSinceLocked()).isNull();
+  Semaphore semaphore=selectSemaphore("foo");
+  assertThat(semaphore).isNotNull();
+  assertThat(semaphore.name).isEqualTo("foo");
+  assertThat(isRecent(semaphore.createdAt,60)).isTrue();
+  assertThat(isRecent(semaphore.updatedAt,60)).isTrue();
+  assertThat(isRecent(semaphore.lockedAt,60)).isTrue();
+  dao.release("foo");
+  assertThat(selectSemaphore("foo")).isNull();
+}

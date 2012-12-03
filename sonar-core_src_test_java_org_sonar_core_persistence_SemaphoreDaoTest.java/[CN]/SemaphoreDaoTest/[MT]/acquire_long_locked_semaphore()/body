@@ -1,7 +1,9 @@
 {
   setupData("old_semaphore");
   SemaphoreDao dao=new SemaphoreDao(getMyBatis());
-  assertThat(dao.acquire("foo",60)).isTrue();
+  Lock lock=dao.acquire("foo",60);
+  assertThat(lock.isAcquired()).isTrue();
+  assertThat(lock.getDurationSinceLocked()).isNull();
   Semaphore semaphore=selectSemaphore("foo");
   assertThat(semaphore).isNotNull();
   assertThat(semaphore.name).isEqualTo("foo");

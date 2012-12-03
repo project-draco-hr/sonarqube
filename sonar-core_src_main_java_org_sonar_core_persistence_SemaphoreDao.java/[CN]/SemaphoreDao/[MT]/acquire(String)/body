@@ -1,0 +1,19 @@
+{
+  Preconditions.checkArgument(!Strings.isNullOrEmpty(name),"Semaphore name must not be empty");
+  SqlSession session=mybatis.openSession();
+  try {
+    SemaphoreMapper mapper=session.getMapper(SemaphoreMapper.class);
+    SemaphoreDto semaphore=mapper.selectSemaphore(name);
+    Date now=mapper.now();
+    if (semaphore != null) {
+      return createLock(semaphore,mapper,false);
+    }
+ else {
+      semaphore=createSemaphore(name,now,session,mapper);
+      return createLock(semaphore,mapper,true);
+    }
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}
