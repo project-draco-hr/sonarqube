@@ -1,4 +1,10 @@
 {
-  String xml=exporter.exportExclusions(project.getExclusionPatterns());
-  return project.getFileSystem().writeToWorkingDirectory(xml,"findbugs-exclude.xml");
+  FindBugsFilter findBugsFilter=new FindBugsFilter();
+  if (project.getExclusionPatterns() != null) {
+    for (    String exclusion : project.getExclusionPatterns()) {
+      ClassFilter classFilter=new ClassFilter(FindbugsAntConverter.antToJavaRegexpConvertor(exclusion));
+      findBugsFilter.addMatch(new Match(classFilter));
+    }
+  }
+  return project.getFileSystem().writeToWorkingDirectory(findBugsFilter.toXml(),"findbugs-exclude.xml");
 }

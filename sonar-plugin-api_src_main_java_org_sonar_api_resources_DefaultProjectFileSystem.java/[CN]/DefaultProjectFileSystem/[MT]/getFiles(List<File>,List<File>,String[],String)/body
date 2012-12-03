@@ -4,15 +4,14 @@
     return result;
   }
   IOFileFilter suffixFilter=getFileSuffixFilter(langs);
-  WildcardPattern[] exclusionPatterns=WildcardPattern.create(exclusions);
-  WildcardPattern[] inclusionPatterns=WildcardPattern.create(inclusions);
+  WildcardPattern[] exclusionPatterns=WildcardPattern.create(patterns);
   IOFileFilter initialFilesFilter=TrueFileFilter.INSTANCE;
   if (initialFiles != null && !initialFiles.isEmpty()) {
     initialFilesFilter=new FileSelectionFilter(initialFiles);
   }
   for (  File dir : directories) {
     if (dir.exists()) {
-      IOFileFilter exclusionFilter=new ExclusionFilter(dir,exclusionPatterns,inclusionPatterns);
+      IOFileFilter exclusionFilter=new ExclusionFilter(dir,exclusionPatterns);
       IOFileFilter visibleFileFilter=HiddenFileFilter.VISIBLE;
       List<IOFileFilter> fileFilters=Lists.newArrayList(visibleFileFilter,suffixFilter,exclusionFilter,initialFilesFilter);
       fileFilters.addAll(this.filters);

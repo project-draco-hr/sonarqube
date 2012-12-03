@@ -1,6 +1,9 @@
 {
-  when(resource.matchFilePattern("**/bar/*")).thenReturn(true);
-  Project project=new Project("foo").setConfiguration(configWithExclusions("**/foo/*.java","**/bar/*"));
+  PropertiesConfiguration conf=new PropertiesConfiguration();
+  conf.setProperty(CoreProperties.PROJECT_EXCLUSIONS_PROPERTY,new String[]{"**/foo/*.java","**/bar/*"});
+  Project project=new Project("foo").setConfiguration(conf);
   ExcludedResourceFilter filter=new ExcludedResourceFilter(project);
-  assertThat(filter.isIgnored(resource)).isTrue();
+  Resource resource=mock(Resource.class);
+  when(resource.matchFilePattern("**/bar/*")).thenReturn(true);
+  assertThat(filter.isIgnored(resource),is(true));
 }
