@@ -1,22 +1,9 @@
 {
-  Connection connection=null;
-  PreparedStatement statement=null;
-  ResultSet rs=null;
+  SqlSession session=getMyBatis().openSession();
   try {
-    connection=getConnection();
-    statement=connection.prepareStatement("select current_timestamp");
-    rs=statement.executeQuery();
-    if (rs.next()) {
-      return new Date();
-    }
-    return null;
+    return dao.now(session);
   }
- catch (  Exception e) {
-    throw new RuntimeException(e);
-  }
- finally {
-    DatabaseUtils.closeQuietly(rs);
-    DatabaseUtils.closeQuietly(statement);
-    DatabaseUtils.closeQuietly(connection);
+  finally {
+    MyBatis.closeQuietly(session);
   }
 }
