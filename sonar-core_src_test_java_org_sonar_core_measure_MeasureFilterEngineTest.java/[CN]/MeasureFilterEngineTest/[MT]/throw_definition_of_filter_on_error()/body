@@ -1,9 +1,10 @@
 {
   thrown.expect(IllegalStateException.class);
-  thrown.expectMessage("filter=<xml>");
-  MeasureFilterDecoder decoder=mock(MeasureFilterDecoder.class);
-  when(decoder.decode("<xml>")).thenThrow(new ParseException(0));
+  thrown.expectMessage("filter={qualifiers=TRK}");
+  Map<String,Object> filterMap=ImmutableMap.of("qualifiers",(Object)"TRK");
+  MeasureFilterFactory factory=mock(MeasureFilterFactory.class);
+  when(factory.create(filterMap)).thenThrow(new IllegalArgumentException());
   MeasureFilterExecutor executor=mock(MeasureFilterExecutor.class);
-  MeasureFilterEngine engine=new MeasureFilterEngine(decoder,null,executor);
-  engine.execute("<xml>",50L);
+  MeasureFilterEngine engine=new MeasureFilterEngine(factory,executor);
+  engine.execute(filterMap,50L);
 }

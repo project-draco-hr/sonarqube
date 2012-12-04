@@ -1,0 +1,15 @@
+{
+  when(filterTemplate.createFilter()).thenReturn(Filter.create().setFavouritesOnly(false).setDisplayAs("list").add(Criterion.createForMetric("complexity",Criterion.LT,12f,false)).add(Criterion.createForMetric("lcom4",Criterion.GTE,5f,false)).add(FilterColumn.create("metric","distance","ASC",false)));
+  MeasureFilterDto dto=registerMeasure.createDtoFromExtension("Fake",filterTemplate.createFilter());
+  assertThat(dto.getName()).isEqualTo("Fake");
+  assertThat(dto.isShared()).isTrue();
+  assertThat(dto.getData()).doesNotContain("onFavourites=true");
+  assertThat(dto.getData()).contains("display=list");
+  assertThat(dto.getData()).contains("c1_metric=complexity");
+  assertThat(dto.getData()).contains("c1_op=lt");
+  assertThat(dto.getData()).contains("c1_val=12.0");
+  assertThat(dto.getData()).contains("c2_metric=lcom4");
+  assertThat(dto.getData()).contains("c2_op=gte");
+  assertThat(dto.getData()).contains("c2_val=5.0");
+  assertThat(dto.getData()).contains("cols=metric:distance");
+}

@@ -1,0 +1,22 @@
+{
+  Map<String,Object> filterMap=ImmutableMap.of("qualifiers",(Object)"TRK");
+  MeasureFilterFactory factory=mock(MeasureFilterFactory.class);
+  MeasureFilter filter=new MeasureFilter();
+  when(factory.create(filterMap)).thenReturn(filter);
+  MeasureFilterExecutor executor=mock(MeasureFilterExecutor.class);
+  Logger logger=mock(Logger.class);
+  when(logger.isDebugEnabled()).thenReturn(true);
+  MeasureFilterEngine engine=new MeasureFilterEngine(factory,executor);
+  final long userId=50L;
+  engine.execute(filterMap,userId,logger);
+  verify(executor).execute(refEq(filter),argThat(new BaseMatcher<MeasureFilterContext>(){
+    public boolean matches(    Object o){
+      MeasureFilterContext context=(MeasureFilterContext)o;
+      return "{qualifiers=TRK}".equals(context.getData()) && context.getUserId() == userId;
+    }
+    public void describeTo(    Description description){
+    }
+  }
+));
+  verify(logger).debug(anyString());
+}
