@@ -2,7 +2,9 @@
   Preconditions.checkNotNull(trees);
   Map<String,ResourceTypeTree> treeMap=Maps.newHashMap();
   Map<String,ResourceType> typeMap=Maps.newLinkedHashMap();
+  Collection<ResourceType> rootsSet=Sets.newHashSet();
   for (  ResourceTypeTree tree : trees) {
+    rootsSet.add(tree.getRootType());
     for (    ResourceType type : tree.getTypes()) {
       if (treeMap.containsKey(type.getQualifier())) {
         throw new IllegalStateException("Qualifier " + type.getQualifier() + " is defined in several trees");
@@ -13,4 +15,5 @@
   }
   treeByQualifier=ImmutableMap.copyOf(treeMap);
   typeByQualifier=ImmutableMap.copyOf(typeMap);
+  rootTypes=ImmutableList.copyOf(rootsSet);
 }
