@@ -1,0 +1,21 @@
+{
+  String s=(String)properties.get("sort");
+  if (s != null) {
+    if (StringUtils.startsWith(s,"metric:")) {
+      String[] fields=StringUtils.split(s,':');
+      Metric metric=metricFinder.findByKey(fields[1]);
+      if (metric != null) {
+        filter.setSortOnMetric(metric);
+        if (fields.length == 3) {
+          filter.setSortOnPeriod(Integer.parseInt(fields[2]));
+        }
+      }
+    }
+ else {
+      filter.setSortOn(MeasureFilterSort.Field.valueOf(s.toUpperCase()));
+    }
+  }
+  if (properties.containsKey("asc")) {
+    filter.setSortAsc(Boolean.valueOf((String)properties.get("asc")));
+  }
+}

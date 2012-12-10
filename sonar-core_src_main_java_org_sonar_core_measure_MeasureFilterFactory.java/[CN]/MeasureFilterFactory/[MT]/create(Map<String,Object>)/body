@@ -12,38 +12,11 @@
   }
   filter.setResourceName((String)properties.get("nameSearch"));
   filter.setResourceKeyRegexp((String)properties.get("keyRegexp"));
-  if (properties.containsKey("fromDate")) {
-    filter.setFromDate(toDate((String)properties.get("fromDate")));
-  }
- else   if (properties.containsKey("ageMaxDays")) {
-    filter.setFromDate(toDays((String)properties.get("ageMaxDays")));
-  }
-  if (properties.containsKey("toDate")) {
-    filter.setToDate(toDate((String)properties.get("toDate")));
-  }
- else   if (properties.containsKey("ageMinDays")) {
-    filter.setToDate(toDays((String)properties.get("ageMinDays")));
-  }
   if (properties.containsKey("onFavourites")) {
     filter.setUserFavourites(Boolean.valueOf((String)properties.get("onFavourites")));
   }
-  if (properties.containsKey("asc")) {
-    filter.setSortAsc(Boolean.valueOf((String)properties.get("asc")));
-  }
-  String s=(String)properties.get("sort");
-  if (s != null) {
-    if (StringUtils.startsWith(s,"metric:")) {
-      filter.setSortOnMetric(metricFinder.findByKey(StringUtils.substringAfter(s,"metric:")));
-    }
- else {
-      filter.setSortOn(MeasureFilterSort.Field.valueOf(s.toUpperCase()));
-    }
-  }
-  for (int index=1; index <= 3; index++) {
-    MeasureFilterCondition condition=toCondition(properties,index);
-    if (condition != null) {
-      filter.addCondition(condition);
-    }
-  }
+  fillDateConditions(filter,properties);
+  fillSorting(filter,properties);
+  fillMeasureConditions(properties,filter);
   return filter;
 }
