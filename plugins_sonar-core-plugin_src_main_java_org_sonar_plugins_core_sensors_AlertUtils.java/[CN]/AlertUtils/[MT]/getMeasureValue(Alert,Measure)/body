@@ -1,17 +1,13 @@
 {
   Metric metric=alert.getMetric();
-  if (isADouble(metric)) {
-    return getValue(alert,measure);
+  Comparable<?> numberValue=getNumberValue(alert,measure);
+  if (numberValue != null) {
+    return numberValue;
   }
-  if (isAInteger(metric)) {
-    return parseInteger(alert,measure);
-  }
-  if (alert.getPeriod() == null) {
-    if (isAString(metric)) {
-      return measure.getData();
-    }
-    if (isABoolean(metric)) {
-      return measure.getValue().intValue();
+ else   if (alert.getPeriod() == null) {
+    Comparable<?> value=getStringOrBooleanValue(alert,measure);
+    if (value != null) {
+      return value;
     }
   }
   throw new NotImplementedException(metric.getType().toString());
