@@ -1,10 +1,10 @@
 {
-  thrown.expect(IllegalStateException.class);
-  thrown.expectMessage("filter={qualifiers=TRK}");
   Map<String,Object> filterMap=ImmutableMap.of("qualifiers",(Object)"TRK");
   MeasureFilterFactory factory=mock(MeasureFilterFactory.class);
   when(factory.create(filterMap)).thenThrow(new IllegalArgumentException());
   MeasureFilterExecutor executor=mock(MeasureFilterExecutor.class);
   MeasureFilterEngine engine=new MeasureFilterEngine(factory,executor);
-  engine.execute(filterMap,50L);
+  MeasureFilterResult result=engine.execute(filterMap,50L);
+  assertThat(result.isSuccess()).isFalse();
+  assertThat(result.getError()).isEqualTo(MeasureFilterResult.Error.UNKNOWN);
 }

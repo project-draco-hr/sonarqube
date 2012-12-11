@@ -1,5 +1,5 @@
 {
-  sql.append("SELECT block.id, max(block.rid) as rid, max(block.rootid) as rootid, max(sortval) as sortval");
+  sql.append("SELECT block.id, max(block.rid) AS rid, max(block.rootid) AS rootid, max(sortval) AS sortval1, CASE WHEN sortval IS NULL THEN 1 ELSE 0 END AS sortval2 ");
   for (int index=0; index < filter.getMeasureConditions().size(); index++) {
     sql.append(", max(crit_").append(index).append(")");
   }
@@ -10,7 +10,7 @@
     sql.append(" UNION ");
     appendConditionBlock(index,condition);
   }
-  sql.append(") block GROUP BY block.id");
+  sql.append(") block GROUP BY block.id, sortval2");
   if (!filter.getMeasureConditions().isEmpty()) {
     sql.append(" HAVING ");
     for (int index=0; index < filter.getMeasureConditions().size(); index++) {
@@ -21,8 +21,7 @@
     }
   }
   if (filter.sort().isSortedByDatabase()) {
-    sql.append(" ORDER BY sortval ");
-    sql.append(filter.sort().isAsc() ? "ASC" : "DESC");
-    sql.append(" NULLS LAST");
+    sql.append(" ORDER BY sortval2 ASC, sortval1 ");
+    sql.append(filter.sort().isAsc() ? "ASC " : "DESC ");
   }
 }

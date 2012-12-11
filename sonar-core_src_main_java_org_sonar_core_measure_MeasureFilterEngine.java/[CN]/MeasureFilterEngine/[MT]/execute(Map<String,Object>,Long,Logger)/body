@@ -1,15 +1,24 @@
 {
+  long start=System.currentTimeMillis();
+  MeasureFilterResult result=new MeasureFilterResult();
   MeasureFilterContext context=new MeasureFilterContext();
   context.setUserId(userId);
   context.setData(String.format("{%s}",Joiner.on('|').withKeyValueSeparator("=").join(filterMap)));
   try {
-    long start=System.currentTimeMillis();
     MeasureFilter filter=factory.create(filterMap);
     List<MeasureFilterRow> rows=executor.execute(filter,context);
-    log(context,rows,(System.currentTimeMillis() - start),logger);
-    return rows;
+    if (rows.size() <= MAX_ROWS) {
+      result.setRows(rows);
+    }
+ else {
+      result.setError(MeasureFilterResult.Error.TOO_MANY_RESULTS);
+    }
+    result.setDurationInMs(System.currentTimeMillis() - start);
+    log(context,result,logger);
   }
  catch (  Exception e) {
-    throw new IllegalStateException("Fail to execute filter: " + context,e);
+    result.setError(MeasureFilterResult.Error.UNKNOWN);
+    logger.error("Fail to execute measure filter: " + context,e);
   }
+  return result;
 }
