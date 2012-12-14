@@ -1,0 +1,23 @@
+{
+  sb.append(" s.status='P' AND s.islast=").append(database.getDialect().getTrueSqlValue());
+  if (context.getBaseSnapshot() == null) {
+    sb.append(" AND p.copy_resource_id IS NULL ");
+  }
+  if (!filter.getResourceQualifiers().isEmpty()) {
+    sb.append(" AND s.qualifier IN ");
+    appendInStatement(filter.getResourceQualifiers(),sb);
+  }
+  if (!filter.getResourceScopes().isEmpty()) {
+    sb.append(" AND s.scope IN ");
+    appendInStatement(filter.getResourceScopes(),sb);
+  }
+  if (!filter.getResourceLanguages().isEmpty()) {
+    sb.append(" AND p.language IN ");
+    appendInStatement(filter.getResourceLanguages(),sb);
+  }
+  appendDateConditions(sb);
+  appendFavouritesCondition(sb);
+  appendResourceNameCondition(sb);
+  appendResourceKeyCondition(sb);
+  appendResourceBaseCondition(sb);
+}

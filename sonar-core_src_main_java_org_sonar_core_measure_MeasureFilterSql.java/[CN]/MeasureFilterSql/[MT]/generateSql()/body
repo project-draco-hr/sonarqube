@@ -1,0 +1,28 @@
+{
+  StringBuilder sb=new StringBuilder(1000);
+  sb.append("SELECT s.id, s.project_id, s.root_project_id, ");
+  sb.append(filter.sort().column());
+  sb.append(" FROM snapshots s INNER JOIN projects p ON s.project_id=p.id ");
+  for (int index=0; index < filter.getMeasureConditions().size(); index++) {
+    MeasureFilterCondition condition=filter.getMeasureConditions().get(index);
+    sb.append(" INNER JOIN project_measures pmcond").append(index);
+    sb.append(" ON s.id=pmcond").append(index).append(".snapshot_id AND ");
+    condition.appendSqlCondition(sb,index);
+  }
+  if (filter.isOnFavourites()) {
+    sb.append(" INNER JOIN properties props ON props.resource_id=s.project_id ");
+  }
+  if (filter.sort().isOnMeasure()) {
+    sb.append(" LEFT OUTER JOIN project_measures pmsort ON s.id=pmsort.snapshot_id AND pmsort.metric_id=");
+    sb.append(filter.sort().metric().getId());
+    sb.append(" AND pmsort.rule_id IS NULL AND pmsort.rule_priority IS NULL AND pmsort.characteristic_id IS NULL AND pmsort.person_id IS NULL ");
+  }
+  sb.append(" WHERE ");
+  appendResourceConditions(sb);
+  for (int index=0; index < filter.getMeasureConditions().size(); index++) {
+    MeasureFilterCondition condition=filter.getMeasureConditions().get(index);
+    sb.append(" AND ");
+    condition.appendSqlCondition(sb,index);
+  }
+  return sb.toString();
+}
