@@ -1,0 +1,13 @@
+{
+  final ExtensionInstaller extensionInstaller=mock(ExtensionInstaller.class);
+  Module bootstrapModule=new Module(){
+    @Override protected void configure(){
+      container.addSingleton(extensionInstaller);
+    }
+  }
+;
+  bootstrapModule.init();
+  ProjectLessTaskModule module=new ProjectLessTaskModule(new ListTaskDefinition());
+  bootstrapModule.installChild(module);
+  verify(extensionInstaller).installTaskExtensions(any(ComponentContainer.class),eq(false));
+}
