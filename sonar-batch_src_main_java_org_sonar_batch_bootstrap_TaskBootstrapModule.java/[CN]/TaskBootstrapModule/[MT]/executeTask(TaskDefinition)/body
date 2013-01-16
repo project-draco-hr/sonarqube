@@ -1,14 +1,14 @@
 {
   boolean projectPresent=container.getComponentByType(ProjectReactor.class) != null;
-  if (task.getTaskDescriptor().isRequiresProject() && !projectPresent) {
-    throw new SonarException("Task " + task.getTaskDescriptor().getName() + " requires to be run on a project");
+  if (ExtensionUtils.requiresProject(taskDefinition.getTask()) && !projectPresent) {
+    throw new SonarException("Task " + taskDefinition.getName() + " requires to be run on a project");
   }
   Module childModule;
   if (projectPresent) {
-    childModule=new ProjectTaskModule(task);
+    childModule=new ProjectTaskModule(taskDefinition);
   }
  else {
-    childModule=new ProjectLessTaskModule(task);
+    childModule=new ProjectLessTaskModule(taskDefinition);
   }
   try {
     installChild(childModule);
