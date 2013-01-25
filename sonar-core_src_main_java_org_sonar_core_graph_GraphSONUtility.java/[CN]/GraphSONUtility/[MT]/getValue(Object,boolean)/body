@@ -1,0 +1,29 @@
+{
+  Object returnValue=value;
+  if (includeType) {
+    String type=determineType(value);
+    JSONObject valueAndType=new JSONObject();
+    valueAndType.put(GraphSONTokens.TYPE,type);
+    if (type.equals(GraphSONTokens.TYPE_LIST)) {
+      JSONArray list=(JSONArray)value;
+      JSONArray valueArray=new JSONArray();
+      valueAndType.put(GraphSONTokens.VALUE,valueArray);
+      for (int ix=0; ix < list.size(); ix++) {
+        addObject(valueArray,getValue(list.get(ix),includeType));
+      }
+    }
+ else     if (type.equals(GraphSONTokens.TYPE_MAP)) {
+      JSONObject convertedMap=new JSONObject();
+      JSONObject jsonObject=(JSONObject)value;
+      for (      Object key : jsonObject.keySet()) {
+        convertedMap.put(key,jsonObject.get(key));
+      }
+      valueAndType.put(GraphSONTokens.VALUE,convertedMap);
+    }
+ else {
+      putObject(valueAndType,GraphSONTokens.VALUE,value);
+    }
+    returnValue=valueAndType;
+  }
+  return returnValue;
+}

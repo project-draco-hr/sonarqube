@@ -1,0 +1,66 @@
+{
+  Object propertyValue;
+  if (hasEmbeddedTypes) {
+    JSONObject json=(JSONObject)node;
+    if (json.get(GraphSONTokens.TYPE).equals(GraphSONTokens.TYPE_UNKNOWN)) {
+      propertyValue=null;
+    }
+ else     if (json.get(GraphSONTokens.TYPE).equals(GraphSONTokens.TYPE_BOOLEAN)) {
+      propertyValue=json.get(GraphSONTokens.VALUE);
+    }
+ else     if (json.get(GraphSONTokens.TYPE).equals(GraphSONTokens.TYPE_FLOAT)) {
+      propertyValue=((Double)json.get(GraphSONTokens.VALUE)).floatValue();
+    }
+ else     if (json.get(GraphSONTokens.TYPE).equals(GraphSONTokens.TYPE_DOUBLE)) {
+      propertyValue=json.get(GraphSONTokens.VALUE);
+    }
+ else     if (json.get(GraphSONTokens.TYPE).equals(GraphSONTokens.TYPE_INTEGER)) {
+      propertyValue=((Long)json.get(GraphSONTokens.VALUE)).intValue();
+    }
+ else     if (json.get(GraphSONTokens.TYPE).equals(GraphSONTokens.TYPE_LONG)) {
+      propertyValue=json.get(GraphSONTokens.VALUE);
+    }
+ else     if (json.get(GraphSONTokens.TYPE).equals(GraphSONTokens.TYPE_STRING)) {
+      propertyValue=json.get(GraphSONTokens.VALUE);
+    }
+ else     if (json.get(GraphSONTokens.TYPE).equals(GraphSONTokens.TYPE_LIST)) {
+      propertyValue=readProperties(((JSONArray)json.get(GraphSONTokens.VALUE)).iterator(),hasEmbeddedTypes);
+    }
+ else     if (json.get(GraphSONTokens.TYPE).equals(GraphSONTokens.TYPE_MAP)) {
+      propertyValue=readProperties((JSONObject)json.get(GraphSONTokens.VALUE),false,hasEmbeddedTypes);
+    }
+ else {
+      propertyValue=node.toString();
+    }
+  }
+ else {
+    if (node == null) {
+      propertyValue=null;
+    }
+ else     if (node instanceof Boolean) {
+      propertyValue=node;
+    }
+ else     if (node instanceof Double) {
+      propertyValue=node;
+    }
+ else     if (node instanceof Integer) {
+      propertyValue=node;
+    }
+ else     if (node instanceof Long) {
+      propertyValue=node;
+    }
+ else     if (node instanceof String) {
+      propertyValue=node;
+    }
+ else     if (node instanceof JSONArray) {
+      propertyValue=readProperties(((JSONArray)node).iterator(),hasEmbeddedTypes);
+    }
+ else     if (node instanceof JSONObject) {
+      propertyValue=readProperties((JSONObject)node,false,hasEmbeddedTypes);
+    }
+ else {
+      propertyValue=node;
+    }
+  }
+  return propertyValue;
+}

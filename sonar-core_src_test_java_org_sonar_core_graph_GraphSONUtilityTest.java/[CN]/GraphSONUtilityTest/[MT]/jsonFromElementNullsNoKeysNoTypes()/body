@@ -1,0 +1,31 @@
+{
+  Graph g=new TinkerGraph();
+  Vertex v=g.addVertex(1);
+  v.setProperty("key",null);
+  Map<String,Object> map=new HashMap<String,Object>();
+  map.put("innerkey",null);
+  List<String> innerList=new ArrayList<String>();
+  innerList.add(null);
+  innerList.add("innerstring");
+  map.put("list",innerList);
+  v.setProperty("keyMap",map);
+  List<String> list=new ArrayList<String>();
+  list.add(null);
+  list.add("string");
+  v.setProperty("keyList",list);
+  JSONObject json=GraphSONUtility.jsonFromElement(v,null,GraphSONMode.NORMAL);
+  assertThat(json).isNotNull();
+  assertThat(json.get("key")).isNull();
+  ;
+  JSONObject jsonMap=(JSONObject)json.get("keyMap");
+  assertThat(jsonMap).isNotNull();
+  assertThat(jsonMap.get("innerkey")).isNull();
+  JSONArray jsonInnerArray=(JSONArray)jsonMap.get("list");
+  assertThat(jsonInnerArray).isNotNull();
+  assertThat(jsonInnerArray.get(0)).isNull();
+  assertThat(jsonInnerArray.get(1)).isEqualTo("innerstring");
+  JSONArray jsonArray=(JSONArray)json.get("keyList");
+  assertThat(jsonArray).isNotNull();
+  assertThat(jsonArray.get(0)).isNull();
+  assertThat(jsonArray.get(1)).isEqualTo("string");
+}

@@ -1,0 +1,29 @@
+{
+  TinkerGraph graph=TinkerGraphFactory.createTinkerGraph();
+  ByteArrayOutputStream stream=new ByteArrayOutputStream();
+  GraphSONWriter writer=new GraphSONWriter(graph);
+  writer.outputGraph(stream,null,null,GraphSONMode.EXTENDED);
+  stream.flush();
+  stream.close();
+  String jsonString=new String(stream.toByteArray());
+  byte[] bytes=jsonString.getBytes();
+  InputStream inputStream=new ByteArrayInputStream(bytes);
+  TinkerGraph emptyGraph=new TinkerGraph();
+  GraphSONReader.inputGraph(emptyGraph,inputStream);
+  Assert.assertEquals(6,getIterableCount(emptyGraph.getVertices()));
+  Assert.assertEquals(6,getIterableCount(emptyGraph.getEdges()));
+  for (  Vertex v : graph.getVertices()) {
+    Vertex found=emptyGraph.getVertex(v.getId());
+    Assert.assertNotNull(v);
+    for (    String key : found.getPropertyKeys()) {
+      Assert.assertEquals(v.getProperty(key),found.getProperty(key));
+    }
+  }
+  for (  Edge e : graph.getEdges()) {
+    Edge found=emptyGraph.getEdge(e.getId());
+    Assert.assertNotNull(e);
+    for (    String key : found.getPropertyKeys()) {
+      Assert.assertEquals(e.getProperty(key),found.getProperty(key));
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  final boolean isEdge=element instanceof Edge;
+  final boolean showTypes=mode == GraphSONMode.EXTENDED;
+  final Set<String> propertyKeys=isEdge ? this.edgePropertyKeys : this.vertexPropertyKeys;
+  final ElementPropertiesRule elementPropertyConfig=isEdge ? this.edgePropertiesRule : this.vertexPropertiesRule;
+  final org.json.simple.JSONObject jsonElement=createJSONMap(createPropertyMap(element,propertyKeys,elementPropertyConfig),propertyKeys,showTypes);
+  if ((isEdge && this.includeReservedEdgeId) || (!isEdge && this.includeReservedVertexId)) {
+    putObject(jsonElement,GraphSONTokens._ID,element.getId());
+  }
+  if (element instanceof Edge) {
+    final Edge edge=(Edge)element;
+    if (this.includeReservedEdgeId) {
+      putObject(jsonElement,GraphSONTokens._ID,element.getId());
+    }
+    if (this.includeReservedEdgeType) {
+      jsonElement.put(GraphSONTokens._TYPE,GraphSONTokens.EDGE);
+    }
+    if (this.includeReservedEdgeOutV) {
+      putObject(jsonElement,GraphSONTokens._OUT_V,edge.getVertex(Direction.OUT).getId());
+    }
+    if (this.includeReservedEdgeInV) {
+      putObject(jsonElement,GraphSONTokens._IN_V,edge.getVertex(Direction.IN).getId());
+    }
+    if (this.includeReservedEdgeLabel) {
+      jsonElement.put(GraphSONTokens._LABEL,edge.getLabel());
+    }
+  }
+ else   if (element instanceof Vertex) {
+    if (this.includeReservedVertexId) {
+      putObject(jsonElement,GraphSONTokens._ID,element.getId());
+    }
+    if (this.includeReservedVertexType) {
+      jsonElement.put(GraphSONTokens._TYPE,GraphSONTokens.VERTEX);
+    }
+  }
+  return jsonElement;
+}
