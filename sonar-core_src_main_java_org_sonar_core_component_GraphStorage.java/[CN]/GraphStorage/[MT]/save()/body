@@ -1,0 +1,21 @@
+{
+  LoggerFactory.getLogger(GraphStorage.class).info("Persisting graphs of components");
+  BatchSession session=myBatis.openBatchSession();
+  GraphDtoMapper mapper=session.getMapper(GraphDtoMapper.class);
+  try {
+    TinkerGraph subGraph=new TinkerGraph();
+    GraphWriter writer=new GraphWriter();
+    for (    Vertex component : componentGraph.getRootVertex().getVertices(Direction.OUT,"component")) {
+      Long snapshotId=(Long)component.getProperty("sid");
+      if (snapshotId != null) {
+        String data=writer.write(componentGraph.getUnderlyingGraph());
+        mapper.insert(new GraphDto().setData(data).setFormat("graphson").setPerspective("testplan").setVersion(1).setSnapshotId(snapshotId).setRootVertexId(component.getId().toString()));
+        subGraph.clear();
+      }
+    }
+    session.commit();
+  }
+  finally {
+    session.close();
+  }
+}

@@ -1,0 +1,21 @@
+{
+  List<Edge> edges=Lists.newArrayList();
+  if (path.hasNext()) {
+    for (    Object element : (Iterable)path.next()) {
+      if (element instanceof Vertex) {
+        Vertex v=(Vertex)element;
+        Vertex toVertex=toGraph.addVertex(v.getId());
+        ElementHelper.copyProperties(v,toVertex);
+      }
+ else       if (element instanceof Edge) {
+        edges.add((Edge)element);
+      }
+    }
+    for (    Edge edge : edges) {
+      Vertex from=edge.getVertex(Direction.IN);
+      Vertex to=edge.getVertex(Direction.OUT);
+      Edge copyEdge=toGraph.addEdge(edge.getId(),toGraph.getVertex(from.getId()),toGraph.getVertex(to.getId()),edge.getLabel());
+      ElementHelper.copyProperties(edge,copyEdge);
+    }
+  }
+}
