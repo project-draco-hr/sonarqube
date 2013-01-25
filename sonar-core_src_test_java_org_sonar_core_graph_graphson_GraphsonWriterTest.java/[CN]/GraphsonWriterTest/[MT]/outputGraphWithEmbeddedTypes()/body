@@ -1,0 +1,19 @@
+{
+  Graph g=TinkerGraphFactory.createTinkerGraph();
+  ByteArrayOutputStream stream=new ByteArrayOutputStream();
+  GraphSONWriter writer=new GraphSONWriter();
+  writer.write(g,stream,GraphSONMode.EXTENDED);
+  stream.flush();
+  stream.close();
+  String jsonString=new String(stream.toByteArray());
+  JSONObject rootNode=(JSONObject)JSONValue.parse(jsonString);
+  assertThat(rootNode).isNotNull();
+  assertThat(rootNode.containsKey(GraphSONTokens.MODE)).isTrue();
+  assertThat(rootNode.get(GraphSONTokens.MODE)).isEqualTo("EXTENDED");
+  assertThat(rootNode.containsKey(GraphSONTokens.VERTICES)).isTrue();
+  JSONArray vertices=(JSONArray)rootNode.get(GraphSONTokens.VERTICES);
+  assertThat(vertices).hasSize(6);
+  assertThat(rootNode.containsKey(GraphSONTokens.EDGES)).isTrue();
+  JSONArray edges=(JSONArray)rootNode.get(GraphSONTokens.EDGES);
+  assertThat(edges).hasSize(6);
+}
