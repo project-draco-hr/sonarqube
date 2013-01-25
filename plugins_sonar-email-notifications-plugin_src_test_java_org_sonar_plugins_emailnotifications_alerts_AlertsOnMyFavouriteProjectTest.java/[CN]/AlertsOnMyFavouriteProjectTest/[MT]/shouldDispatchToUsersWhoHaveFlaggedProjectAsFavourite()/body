@@ -1,0 +1,11 @@
+{
+  NotificationDispatcher.Context context=mock(NotificationDispatcher.Context.class);
+  PropertiesDao propertiesDao=mock(PropertiesDao.class);
+  when(propertiesDao.findUserIdsForFavouriteResource(34L)).thenReturn(Lists.newArrayList("user1","user2"));
+  AlertsOnMyFavouriteProject dispatcher=new AlertsOnMyFavouriteProject(propertiesDao);
+  Notification notification=new Notification("alerts").setFieldValue("projectId","34");
+  dispatcher.dispatch(notification,context);
+  verify(context).addUser("user1");
+  verify(context).addUser("user2");
+  verifyNoMoreInteractions(context);
+}
