@@ -1,0 +1,14 @@
+{
+  File fileToCache=tempFolder.newFile();
+  FileUtils.write(fileToCache,"Sample data");
+  String md5=cache.cacheFile(fileToCache,"foo.txt");
+  File tmpCache=new File(cache.getCacheLocation(),".tmp");
+  assertThat(tmpCache).exists();
+  assertThat(tmpCache.list()).isEmpty();
+  File fileInCache=new File(new File(cache.getCacheLocation(),md5),"foo.txt");
+  assertThat(fileInCache).exists();
+  String content=FileUtils.readFileToString(fileInCache);
+  assertThat(content).isEqualTo("Sample data");
+  File fileFromCache=cache.getFileFromCache("foo.txt",md5);
+  assertThat(fileFromCache.getCanonicalPath()).isEqualTo(fileInCache.getCanonicalPath());
+}

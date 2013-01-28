@@ -1,0 +1,29 @@
+{
+  File tmpFileName=null;
+  try {
+    if (!sourceFile.getParentFile().equals(getTmpDir())) {
+      tmpFileName=getTemporaryFile();
+      Files.move(sourceFile,tmpFileName);
+    }
+ else {
+      tmpFileName=sourceFile;
+    }
+    FileInputStream fis=new FileInputStream(tmpFileName);
+    String md5=DigestUtils.md5Hex(fis);
+    File finalDir=new File(cacheLocation,md5);
+    File finalFileName=new File(finalDir,filename);
+    FileUtils.forceMkdir(finalDir);
+    boolean rename=tmpFileName.renameTo(finalFileName);
+    if (!rename) {
+      if (!finalFileName.exists()) {
+        LOG.warn("Unable to rename " + tmpFileName.getAbsolutePath() + " to "+ finalFileName.getAbsolutePath());
+        LOG.warn("A copy/delete will be tempted but with no garantee of atomicity");
+        FileUtils.moveFile(tmpFileName,finalFileName);
+      }
+    }
+    return md5;
+  }
+  finally {
+    FileUtils.deleteQuietly(tmpFileName);
+  }
+}
