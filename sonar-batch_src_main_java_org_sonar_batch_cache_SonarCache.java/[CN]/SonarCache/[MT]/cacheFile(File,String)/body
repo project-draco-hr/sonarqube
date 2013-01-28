@@ -8,8 +8,15 @@
  else {
       tmpFileName=sourceFile;
     }
-    FileInputStream fis=new FileInputStream(tmpFileName);
-    String md5=DigestUtils.md5Hex(fis);
+    String md5;
+    FileInputStream fis=null;
+    try {
+      fis=new FileInputStream(tmpFileName);
+      md5=DigestUtils.md5Hex(fis);
+    }
+  finally {
+      Closeables.closeQuietly(fis);
+    }
     File finalDir=new File(cacheLocation,md5);
     File finalFileName=new File(finalDir,filename);
     FileUtils.forceMkdir(finalDir);
