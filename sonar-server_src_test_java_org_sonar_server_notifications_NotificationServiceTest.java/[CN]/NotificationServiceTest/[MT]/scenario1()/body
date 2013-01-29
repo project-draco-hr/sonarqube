@@ -1,7 +1,7 @@
 {
   setUpMocks(CREATOR_SIMON,ASSIGNEE_SIMON);
-  when(manager.isEnabled(CREATOR_SIMON,"email","comment on review created by me")).thenReturn(true);
-  when(manager.isEnabled(ASSIGNEE_SIMON,"email","comment on review assigned to me")).thenReturn(true);
+  doAnswer(addUser(ASSIGNEE_SIMON,emailChannel)).when(commentOnReviewAssignedToMe).dispatch(same(notification),any(NotificationDispatcher.Context.class));
+  doAnswer(addUser(CREATOR_SIMON,emailChannel)).when(commentOnReviewCreatedByMe).dispatch(same(notification),any(NotificationDispatcher.Context.class));
   service.start();
   verify(emailChannel,timeout(2000)).deliver(notification,ASSIGNEE_SIMON);
   service.stop();

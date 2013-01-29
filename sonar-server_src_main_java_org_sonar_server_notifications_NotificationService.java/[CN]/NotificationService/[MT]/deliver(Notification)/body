@@ -1,28 +1,22 @@
 {
-  Logs.INFO.debug("Delivering notification " + notification);
-  SetMultimap<String,NotificationChannel> recipients=HashMultimap.create();
-  for (  NotificationChannel channel : channels) {
-    for (    NotificationDispatcher dispatcher : dispatchers) {
-      final Set<String> possibleRecipients=Sets.newHashSet();
-      NotificationDispatcher.Context context=new NotificationDispatcher.Context(){
-        public void addUser(        String username){
-          if (username != null) {
-            possibleRecipients.add(username);
-          }
+  LOG.debug("Delivering notification " + notification);
+  final SetMultimap<String,NotificationChannel> recipients=HashMultimap.create();
+  for (  NotificationDispatcher dispatcher : dispatchers) {
+    NotificationDispatcher.Context context=new NotificationDispatcher.Context(){
+      public void addUser(      String username){
+      }
+      public void addUser(      String userLogin,      NotificationChannel notificationChannel){
+        if (userLogin != null) {
+          recipients.put(userLogin,notificationChannel);
         }
       }
+    }
 ;
-      try {
-        dispatcher.performDispatch(notification,context);
-      }
- catch (      Exception e) {
-        Logs.INFO.warn("Unable to dispatch notification " + notification + " using "+ dispatcher,e);
-      }
-      for (      String username : possibleRecipients) {
-        if (manager.isEnabled(username,channel.getKey(),dispatcher.getKey())) {
-          recipients.put(username,channel);
-        }
-      }
+    try {
+      dispatcher.performDispatch(notification,context);
+    }
+ catch (    Exception e) {
+      LOG.warn("Unable to dispatch notification " + notification + " using "+ dispatcher,e);
     }
   }
   dispatch(notification,recipients);
