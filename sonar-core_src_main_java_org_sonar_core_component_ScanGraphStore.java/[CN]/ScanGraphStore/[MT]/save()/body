@@ -3,7 +3,6 @@
   BatchSession session=myBatis.openBatchSession();
   GraphDtoMapper mapper=session.getMapper(GraphDtoMapper.class);
   try {
-    TinkerGraph subGraph=new TinkerGraph();
     GraphWriter writer=new GraphWriter();
     for (    ComponentVertex component : projectGraph.getComponents()) {
       Long snapshotId=(Long)component.element().getProperty("sid");
@@ -11,9 +10,9 @@
         for (        PerspectiveBuilder builder : builders) {
           Perspective perspective=builder.load(component);
           if (perspective != null) {
-            String data=writer.write(projectGraph.getUnderlyingGraph());
+            Graph subGraph=SubGraph.extract(component.element(),builder.path());
+            String data=writer.write(subGraph);
             mapper.insert(new GraphDto().setData(data).setFormat("graphson").setPerspective(builder.getPerspectiveKey()).setVersion(1).setResourceId((Long)component.element().getProperty("rid")).setSnapshotId(snapshotId).setRootVertexId(component.element().getId().toString()));
-            subGraph.clear();
           }
         }
       }
