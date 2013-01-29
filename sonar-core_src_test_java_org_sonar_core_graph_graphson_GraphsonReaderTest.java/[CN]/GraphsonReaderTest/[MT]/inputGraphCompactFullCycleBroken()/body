@@ -1,18 +1,17 @@
 {
   TinkerGraph graph=TinkerGraphFactory.createTinkerGraph();
-  ByteArrayOutputStream stream=new ByteArrayOutputStream();
+  StringWriter stream=new StringWriter();
   Set<String> edgeKeys=new HashSet<String>();
   edgeKeys.add(GraphsonTokens._IN_V);
   edgeKeys.add(GraphsonTokens._OUT_V);
   edgeKeys.add(GraphsonTokens._LABEL);
-  Set<String> vertexKeys=new HashSet<String>();
+  Set<String> vertexKeys=Sets.newHashSet();
   GraphsonWriter writer=new GraphsonWriter();
   writer.write(graph,stream,GraphsonMode.COMPACT,vertexKeys,edgeKeys);
   stream.flush();
   stream.close();
-  String jsonString=new String(stream.toByteArray());
-  byte[] bytes=jsonString.getBytes();
-  InputStream inputStream=new ByteArrayInputStream(bytes);
+  String jsonString=writer.toString();
+  StringReader input=new StringReader(jsonString);
   TinkerGraph emptyGraph=new TinkerGraph();
-  new GraphsonReader().read(inputStream,emptyGraph);
+  new GraphsonReader().read(input,emptyGraph);
 }

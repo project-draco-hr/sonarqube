@@ -1,15 +1,14 @@
 {
   TinkerGraph graph=TinkerGraphFactory.createTinkerGraph();
-  ByteArrayOutputStream stream=new ByteArrayOutputStream();
+  StringWriter stream=new StringWriter();
   GraphsonWriter writer=new GraphsonWriter();
   writer.write(graph,stream,GraphsonMode.EXTENDED);
   stream.flush();
   stream.close();
-  String jsonString=new String(stream.toByteArray());
-  byte[] bytes=jsonString.getBytes();
-  InputStream inputStream=new ByteArrayInputStream(bytes);
+  String jsonString=stream.toString();
+  StringReader input=new StringReader(jsonString);
   TinkerGraph emptyGraph=new TinkerGraph();
-  new GraphsonReader().read(inputStream,emptyGraph);
+  new GraphsonReader().read(input,emptyGraph);
   Assert.assertEquals(6,getIterableCount(emptyGraph.getVertices()));
   Assert.assertEquals(6,getIterableCount(emptyGraph.getEdges()));
   for (  Vertex v : graph.getVertices()) {
