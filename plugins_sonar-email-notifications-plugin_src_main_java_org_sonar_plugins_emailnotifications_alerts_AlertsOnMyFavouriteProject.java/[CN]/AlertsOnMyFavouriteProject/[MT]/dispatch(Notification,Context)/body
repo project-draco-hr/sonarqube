@@ -1,7 +1,10 @@
 {
-  Long projectId=Long.parseLong(notification.getFieldValue("projectId"));
-  List<String> userLogins=propertiesDao.findUserIdsForFavouriteResource(projectId);
+  Multimap<String,NotificationChannel> subscribedRecipients=notificationManager.findSubscribedRecipientsForDispatcher(this,null);
+  List<String> userLogins=propertiesDao.findUserIdsForFavouriteResource(Long.parseLong(notification.getFieldValue("projectId")));
   for (  String userLogin : userLogins) {
-    context.addUser(userLogin);
+    Collection<NotificationChannel> channels=subscribedRecipients.get(userLogin);
+    for (    NotificationChannel channel : channels) {
+      context.addUser(userLogin,channel);
+    }
   }
 }
