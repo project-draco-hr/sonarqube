@@ -1,0 +1,25 @@
+{
+  FileUtils.forceMkdir(indexFile.getParentFile());
+  FileWriter writer=new FileWriter(indexFile,false);
+  try {
+    for (    String path : getLibs(servletContext)) {
+      writer.append(path);
+      InputStream is=servletContext.getResourceAsStream("/WEB-INF/lib/" + path);
+      try {
+        String md5=DigestUtils.md5Hex(is);
+        writer.append("|").append(md5);
+      }
+ catch (      IOException e) {
+        LOG.warn("Unable to compute checksum of {}",path,e);
+      }
+ finally {
+        Closeables.closeQuietly(is);
+      }
+      writer.append(CharUtils.LF);
+    }
+    writer.flush();
+  }
+  finally {
+    IOUtils.closeQuietly(writer);
+  }
+}
