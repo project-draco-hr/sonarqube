@@ -1,8 +1,34 @@
 {
   if (!settings.getBoolean(CoreProperties.DRY_RUN)) {
-    LOG.info("Install JDBC driver");
-    File jdbcDriver=new File(tempDirectories.getRoot(),"jdbc-driver.jar");
-    serverClient.download("/deploy/jdbc-driver.jar",jdbcDriver);
-    classLoader=initClassloader(jdbcDriver);
+    try {
+      LOG.info("Install JDBC driver");
+      String[] nameAndMd5=downloadJdbcDriverIndex();
+      String filename=nameAndMd5[0];
+      String remoteMd5=nameAndMd5[1];
+      File driverInCache=getSonarCache().getFileFromCache(filename,remoteMd5);
+      if (driverInCache == null) {
+        File tmpDownloadFile=getSonarCache().getTemporaryFile();
+        String url="/deploy/" + filename;
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Downloading {} to {}",url,tmpDownloadFile.getAbsolutePath());
+        }
+ else {
+          LOG.info("Downloading {}",filename);
+        }
+        serverClient.download(url,tmpDownloadFile);
+        String md5=getSonarCache().cacheFile(tmpDownloadFile,filename);
+        driverInCache=getSonarCache().getFileFromCache(filename,md5);
+        if (!md5.equals(remoteMd5)) {
+          throw new SonarException("INVALID CHECKSUM: File " + driverInCache.getAbsolutePath() + " was expected to have checksum "+ remoteMd5+ " but was downloaded with checksum "+ md5);
+        }
+      }
+      classLoader=initClassloader(driverInCache);
+    }
+ catch (    SonarException e) {
+      throw e;
+    }
+catch (    Exception e) {
+      throw new SonarException("Fail to install JDBC driver",e);
+    }
   }
 }

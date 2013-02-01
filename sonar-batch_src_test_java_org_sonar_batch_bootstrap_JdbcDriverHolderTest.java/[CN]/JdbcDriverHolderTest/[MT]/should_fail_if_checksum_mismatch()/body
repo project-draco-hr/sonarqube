@@ -3,18 +3,13 @@
   BatchSonarCache batchCache=mock(BatchSonarCache.class);
   when(batchCache.getCache()).thenReturn(cache);
   File fakeDriver=new File(getClass().getResource("/org/sonar/batch/bootstrap/JdbcDriverHolderTest/jdbc-driver.jar").toURI());
-  when(cache.cacheFile(Mockito.any(File.class),Mockito.anyString())).thenReturn("fakemd5");
+  when(cache.cacheFile(Mockito.any(File.class),Mockito.anyString())).thenReturn("anotherfakemd5");
   when(cache.getFileFromCache(Mockito.anyString(),Mockito.anyString())).thenReturn(null).thenReturn(fakeDriver);
-  assertThat(Thread.currentThread().getContextClassLoader().getResource("foo/foo.txt")).isNull();
   ServerClient server=mock(ServerClient.class);
   when(server.request("/deploy/jdbc-driver.txt")).thenReturn("ojdbc14.jar|fakemd5");
   when(server.request("/deploy/ojdbc14.jar")).thenReturn("fakecontent");
   JdbcDriverHolder holder=new JdbcDriverHolder(batchCache,new Settings(),server);
+  thrown.expect(SonarException.class);
+  thrown.expectMessage("INVALID CHECKSUM");
   holder.start();
-  assertThat(holder.getClassLoader().getResource("foo/foo.txt")).isNotNull();
-  assertThat(Thread.currentThread().getContextClassLoader()).isSameAs(holder.getClassLoader());
-  assertThat(holder.getClassLoader().getParent()).isSameAs(getClass().getClassLoader());
-  holder.stop();
-  assertThat(Thread.currentThread().getContextClassLoader()).isSameAs(getClass().getClassLoader());
-  assertThat(holder.getClassLoader()).isNull();
 }
