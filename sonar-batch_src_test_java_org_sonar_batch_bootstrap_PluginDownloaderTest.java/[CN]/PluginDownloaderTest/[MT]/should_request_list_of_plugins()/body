@@ -1,7 +1,8 @@
 {
+  FileCache cache=mock(FileCache.class);
   ServerClient server=mock(ServerClient.class);
   when(server.request("/deploy/plugins/index.txt")).thenReturn("checkstyle,true\nsqale,false");
-  PluginDownloader downloader=new PluginDownloader(new BatchSonarCache(new Settings()),server);
+  PluginDownloader downloader=new PluginDownloader(cache,server);
   List<RemotePlugin> plugins=downloader.downloadPluginIndex();
   assertThat(plugins).hasSize(2);
   assertThat(plugins.get(0).getKey()).isEqualTo("checkstyle");

@@ -1,7 +1,7 @@
 {
   File driver=fileSystem.getJdbcDriver();
   File deployedDriver=new File(fileSystem.getDeployDir(),driver.getName());
-  if (deployedDriver == null || !deployedDriver.exists() || deployedDriver.length() != driver.length()) {
+  if (!deployedDriver.exists() || deployedDriver.length() != driver.length()) {
     try {
       FileUtils.copyFile(driver,deployedDriver);
     }
@@ -10,16 +10,11 @@
     }
   }
   File deployedDriverIndex=fileSystem.getDeployedJdbcDriverIndex();
-  InputStream is=null;
   try {
-    is=FileUtils.openInputStream(deployedDriver);
-    String md5=DigestUtils.md5Hex(is);
-    FileUtils.writeStringToFile(deployedDriverIndex,deployedDriver.getName() + "|" + md5);
+    String hash=new FileHashes().of(deployedDriver);
+    FileUtils.writeStringToFile(deployedDriverIndex,deployedDriver.getName() + "|" + hash);
   }
  catch (  IOException e) {
-    throw new RuntimeException("Can not generate index of JDBC driver",e);
-  }
- finally {
-    Closeables.closeQuietly(is);
+    throw new IllegalStateException("Can not generate index of JDBC driver",e);
   }
 }

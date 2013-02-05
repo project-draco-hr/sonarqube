@@ -1,32 +1,25 @@
 {
   try {
     List<File> files=Lists.newArrayList();
-    for (    RemotePluginFile file : remote.getFiles()) {
-      File fileInCache=getSonarCache().getFileFromCache(file.getFilename(),file.getMd5());
-      if (fileInCache == null) {
-        File tmpDownloadFile=getSonarCache().getTemporaryFile();
-        String url="/deploy/plugins/" + remote.getKey() + "/"+ file.getFilename();
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Downloading {} to {}",url,tmpDownloadFile.getAbsolutePath());
-        }
+    for (    final RemotePluginFile file : remote.getFiles()) {
+      File cachedFile=fileCache.get(file.getFilename(),file.getHash(),new FileCache.Downloader(){
+        public void download(        String filename,        File toFile) throws IOException {
+          String url="/deploy/plugins/" + remote.getKey() + "/"+ file.getFilename();
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("Download {} to {}",url,toFile.getAbsolutePath());
+          }
  else {
-          LOG.info("Downloading {}",file.getFilename());
-        }
-        server.download(url,tmpDownloadFile);
-        String md5=getSonarCache().cacheFile(tmpDownloadFile,file.getFilename());
-        fileInCache=getSonarCache().getFileFromCache(file.getFilename(),md5);
-        if (!md5.equals(file.getMd5())) {
-          throw new SonarException("INVALID CHECKSUM: File " + fileInCache.getAbsolutePath() + " was expected to have checksum "+ file.getMd5()+ " but was downloaded with checksum "+ md5);
+            LOG.info("Download {}",file.getFilename());
+          }
+          server.download(url,toFile);
         }
       }
-      files.add(fileInCache);
+);
+      files.add(cachedFile);
     }
     return files;
   }
- catch (  SonarException e) {
-    throw e;
-  }
-catch (  Exception e) {
+ catch (  Exception e) {
     throw new SonarException("Fail to download plugin: " + remote.getKey(),e);
   }
 }

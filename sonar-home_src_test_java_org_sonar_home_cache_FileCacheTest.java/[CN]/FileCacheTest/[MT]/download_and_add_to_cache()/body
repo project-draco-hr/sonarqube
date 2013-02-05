@@ -1,0 +1,16 @@
+{
+  FileHashes hashes=mock(FileHashes.class);
+  FileCache cache=new FileCache(tempFolder.newFolder(),log,hashes);
+  when(hashes.of(any(File.class))).thenReturn("ABCDE");
+  FileCache.Downloader downloader=new FileCache.Downloader(){
+    public void download(    String filename,    File toFile) throws IOException {
+      FileUtils.write(toFile,"body");
+    }
+  }
+;
+  File cachedFile=cache.get("sonar-foo-plugin-1.5.jar","ABCDE",downloader);
+  assertThat(cachedFile).isNotNull().exists().isFile();
+  assertThat(cachedFile.getName()).isEqualTo("sonar-foo-plugin-1.5.jar");
+  assertThat(cachedFile.getParentFile().getParentFile()).isEqualTo(cache.getDir());
+  assertThat(FileUtils.readFileToString(cachedFile)).isEqualTo("body");
+}
