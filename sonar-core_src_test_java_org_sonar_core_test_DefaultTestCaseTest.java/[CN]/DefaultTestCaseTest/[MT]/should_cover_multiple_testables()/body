@@ -1,8 +1,10 @@
 {
-  BeanGraph beanGraph=BeanGraph.createInMemory();
-  DefaultTestable testable1=beanGraph.createVertex(DefaultTestable.class);
-  DefaultTestable testable2=beanGraph.createVertex(DefaultTestable.class);
-  DefaultTestCase testCase=beanGraph.createVertex(DefaultTestCase.class);
+  ScanGraph graph=ScanGraph.create();
+  ComponentVertex file1=graph.addComponent(MockSourceFile.createMain("org.foo.Bar"));
+  DefaultTestable testable1=graph.createAdjacentVertex(file1,DefaultTestable.class,"testable");
+  ComponentVertex file2=graph.addComponent(MockSourceFile.createMain("org.foo.File"));
+  DefaultTestable testable2=graph.createAdjacentVertex(file2,DefaultTestable.class,"testable");
+  DefaultTestCase testCase=graph.createVertex(DefaultTestCase.class);
   testCase.setCoverageBlock(testable1,Arrays.asList(10,11,12));
   testCase.setCoverageBlock(testable2,Arrays.asList(12,13,14));
   assertThat(testCase.doesCover()).isTrue();
