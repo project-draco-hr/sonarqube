@@ -5,7 +5,9 @@
   when(project.getFileSystem()).thenReturn(fileSystem);
   when(fileSystem.getSourceCharset()).thenReturn(Charset.forName(CharEncoding.UTF_8));
   when(project.getConfiguration()).thenReturn(new MapConfiguration(new HashMap<String,String>()));
-  when(fileSystem.getSourceFiles(any(Language.class))).thenReturn(newArrayList(getFile("FileWithBom.java")));
+  File file=new File(Files.createTempDir(),"Test.java");
+  Files.write("\uFEFFpublic class Test",file,Charset.defaultCharset());
+  when(fileSystem.getSourceFiles(any(Language.class))).thenReturn(newArrayList(file));
   importer.shouldExecuteOnProject(project);
   importer.analyse(project,context);
   verify(context).saveSource(eq(FakeSourceImporter.TEST_RESOURCE),argThat(new ArgumentMatcher<String>(){
