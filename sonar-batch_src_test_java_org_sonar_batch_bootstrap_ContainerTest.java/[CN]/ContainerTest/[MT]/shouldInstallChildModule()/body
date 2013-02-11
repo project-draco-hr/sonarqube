@@ -1,0 +1,14 @@
+{
+  Container parent=new FakeModule(FakeService.class);
+  parent.init();
+  parent.start();
+  Container child=parent.installChild(new FakeModule(ChildService.class));
+  assertThat(parent.container.getComponentByType(ChildService.class),Matchers.nullValue());
+  assertThat(child.container.getComponentByType(FakeService.class),not(nullValue()));
+  assertThat(child.container.getComponentByType(ChildService.class).started,is(false));
+  assertThat(child.container.getComponentByType(ChildService.class).dependency,not(nullValue()));
+  child.start();
+  assertThat(child.container.getComponentByType(ChildService.class).started,is(true));
+  child.stop();
+  assertThat(child.container.getComponentByType(ChildService.class).started,is(false));
+}
