@@ -1,5 +1,12 @@
 {
-  DefaultPluginMetadata metadata=extractMetadata(pluginFile,isCore);
-  metadata.setDeprecatedExtensions(deprecatedExtensions);
-  return install(metadata,toDir);
+  try {
+    File deployedPlugin=copyPlugin(pluginBasedir,pluginFile);
+    DefaultPluginMetadata metadata=extractMetadata(deployedPlugin,isCore);
+    metadata.setDeprecatedExtensions(deprecatedExtensions);
+    install(metadata,pluginBasedir,deployedPlugin);
+    return metadata;
+  }
+ catch (  IOException e) {
+    throw new SonarException("Fail to install plugin: " + pluginFile,e);
+  }
 }
