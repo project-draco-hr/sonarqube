@@ -1,14 +1,19 @@
 {
   Preconditions.checkArgument(!Strings.isNullOrEmpty(name),"Semaphore name must not be empty");
-  Preconditions.checkArgument(maxDurationInSeconds >= 0,"Semaphore max duration must be positive: " + maxDurationInSeconds);
+  Preconditions.checkArgument(maxAgeInSeconds >= 0,"Semaphore max age must be positive: " + maxAgeInSeconds);
   SqlSession session=mybatis.openSession();
   try {
     SemaphoreMapper mapper=session.getMapper(SemaphoreMapper.class);
-    Date lockedAt=org.sonar.api.utils.DateUtils.parseDate("2001-01-01");
-    createDto(name,lockedAt,session);
-    boolean isAcquired=doAcquire(name,maxDurationInSeconds,session,mapper);
     SemaphoreDto semaphore=selectSemaphore(name,session);
-    return createLock(semaphore,session,isAcquired);
+    Date now=mapper.now();
+    if (semaphore != null) {
+      boolean isAcquired=acquireIfOutdated(name,maxAgeInSeconds,session,mapper);
+      return createLock(semaphore,session,isAcquired);
+    }
+ else {
+      semaphore=createDto(name,now,session);
+      return createLock(semaphore,session,true);
+    }
   }
   finally {
     MyBatis.closeQuietly(session);

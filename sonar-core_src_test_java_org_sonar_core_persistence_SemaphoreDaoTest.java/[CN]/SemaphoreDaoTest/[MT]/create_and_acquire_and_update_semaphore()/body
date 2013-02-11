@@ -1,0 +1,12 @@
+{
+  Semaphores.Semaphore lock=dao.acquire("foo",60);
+  assertThat(lock.isLocked()).isTrue();
+  assertThat(lock.getDurationSinceLocked()).isNull();
+  SemaphoreDto semaphore=selectSemaphore("foo");
+  assertThat(semaphore.getCreatedAt().getTime()).isEqualTo(semaphore.getUpdatedAt().getTime());
+  dao.update(lock);
+  semaphore=selectSemaphore("foo");
+  assertThat(semaphore.getCreatedAt().getTime()).isLessThan(semaphore.getUpdatedAt().getTime());
+  dao.release("foo");
+  assertThat(selectSemaphore("foo")).isNull();
+}
