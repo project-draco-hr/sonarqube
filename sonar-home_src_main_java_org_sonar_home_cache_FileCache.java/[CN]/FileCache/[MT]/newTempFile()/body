@@ -1,0 +1,19 @@
+{
+  String baseName=System.currentTimeMillis() + "-";
+  Random random=new Random();
+  for (int counter=0; counter < TEMP_FILE_ATTEMPTS; counter++) {
+    try {
+      String filename=baseName + random.nextInt(1000);
+      File tempFile=new File(tmpDir,filename);
+      if (tempFile.createNewFile()) {
+        return tempFile;
+      }
+    }
+ catch (    IOException e) {
+      if (counter == TEMP_FILE_ATTEMPTS - 1) {
+        throw new IllegalStateException();
+      }
+    }
+  }
+  throw new IllegalStateException("Fail to create temporary file in " + tmpDir);
+}
