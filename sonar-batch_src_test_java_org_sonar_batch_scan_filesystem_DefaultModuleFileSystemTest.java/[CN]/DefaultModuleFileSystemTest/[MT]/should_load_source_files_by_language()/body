@@ -1,0 +1,11 @@
+{
+  File basedir=new File("test-resources/DefaultModuleFileSystemTest/main_and_test_files");
+  DefaultModuleFileSystem fileSystem=new DefaultModuleFileSystem.Builder().baseDir(basedir).sourceCharset(StandardCharsets.UTF_8).workingDir(temp.newFolder()).addSourceDir(new File(basedir,"src/main/java")).addTestDir(new File(basedir,"src/test/java")).languageFileFilters(new LanguageFileFilters(new Languages(new Java(),new Php()))).build();
+  List<File> files=fileSystem.sourceFilesOfLang("java");
+  assertThat(files).hasSize(2);
+  for (  File sourceFiles : files) {
+    assertThat(sourceFiles).exists().isFile();
+    assertThat(sourceFiles.getName()).isIn("Hello.java","Foo.java");
+  }
+  assertThat(fileSystem.sourceFilesOfLang("php")).isEmpty();
+}
