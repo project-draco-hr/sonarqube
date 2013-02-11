@@ -1,3 +1,15 @@
 {
-  return !fileType.equals(context.fileType()) || !pattern.match(context.fileRelativePath());
+  WildcardPattern[] inclusionPatterns=(context.fileType() == FileType.TEST ? testInclusions : sourceInclusions);
+  for (  WildcardPattern pattern : inclusionPatterns) {
+    if (!pattern.match(context.fileRelativePath())) {
+      return false;
+    }
+  }
+  WildcardPattern[] exclusionPatterns=(context.fileType() == FileType.TEST ? testExclusions : sourceExclusions);
+  for (  WildcardPattern pattern : exclusionPatterns) {
+    if (pattern.match(context.fileRelativePath())) {
+      return false;
+    }
+  }
+  return true;
 }

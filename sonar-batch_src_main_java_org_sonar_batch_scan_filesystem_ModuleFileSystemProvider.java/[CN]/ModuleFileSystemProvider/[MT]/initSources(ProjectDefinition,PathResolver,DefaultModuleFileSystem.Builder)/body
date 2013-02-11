@@ -1,9 +1,18 @@
 {
-  for (  String sourcePath : module.getSourceDirs()) {
-    builder.addSourceDir(pathResolver.relativeFile(module.getBaseDir(),sourcePath));
+  if (!module.getSourceDirs().isEmpty()) {
+    LOG.info("Source dirs: ");
+    for (    String sourcePath : module.getSourceDirs()) {
+      File dir=pathResolver.relativeFile(module.getBaseDir(),sourcePath);
+      LOG.info("  " + dir.getAbsolutePath());
+      builder.addSourceDir(dir);
+    }
   }
   List<File> sourceFiles=pathResolver.relativeFiles(module.getBaseDir(),module.getSourceFiles());
   if (!sourceFiles.isEmpty()) {
+    LOG.info("Source files: ");
+    for (    File sourceFile : sourceFiles) {
+      LOG.info("  " + sourceFile.getAbsolutePath());
+    }
     builder.addFileFilter(new WhiteListFileFilter(FileFilter.FileType.SOURCE,ImmutableSet.copyOf(sourceFiles)));
   }
 }
