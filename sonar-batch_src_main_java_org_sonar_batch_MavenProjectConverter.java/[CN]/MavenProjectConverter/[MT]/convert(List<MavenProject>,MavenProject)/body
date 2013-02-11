@@ -11,12 +11,15 @@
       for (      Object m : pom.getModules()) {
         String moduleId=(String)m;
         File modulePath=new File(pom.getBasedir(),moduleId);
-        MavenProject module=findMavenProject(modulePath,paths);
+        if (modulePath.exists() && modulePath.isDirectory()) {
+          modulePath=new File(modulePath,"pom.xml");
+        }
+        MavenProject module=paths.get(modulePath.getCanonicalPath());
         ProjectDefinition parentProject=defs.get(pom);
+        ProjectDefinition subProject=defs.get(module);
         if (parentProject == null) {
           throw new IllegalStateException(UNABLE_TO_DETERMINE_PROJECT_STRUCTURE_EXCEPTION_MESSAGE);
         }
-        ProjectDefinition subProject=defs.get(module);
         if (subProject == null) {
           throw new IllegalStateException(UNABLE_TO_DETERMINE_PROJECT_STRUCTURE_EXCEPTION_MESSAGE);
         }
