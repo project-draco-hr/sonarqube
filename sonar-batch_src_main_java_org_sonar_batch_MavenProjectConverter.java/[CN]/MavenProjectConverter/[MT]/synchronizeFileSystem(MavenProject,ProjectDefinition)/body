@@ -1,6 +1,14 @@
 {
   into.setBaseDir(pom.getBasedir());
-  into.setWorkDir(new File(resolvePath(pom.getBuild().getDirectory(),pom.getBasedir()),"sonar"));
+  File buildDir=resolvePath(pom.getBuild().getDirectory(),pom.getBasedir());
+  if (buildDir != null) {
+    into.setBuildDir(buildDir);
+    into.setWorkDir(new File(buildDir,"sonar"));
+  }
   into.setSourceDirs((String[])pom.getCompileSourceRoots().toArray(new String[pom.getCompileSourceRoots().size()]));
   into.setTestDirs((String[])pom.getTestCompileSourceRoots().toArray(new String[pom.getTestCompileSourceRoots().size()]));
+  File binaryDir=resolvePath(pom.getBuild().getOutputDirectory(),pom.getBasedir());
+  if (binaryDir != null) {
+    into.addBinaryDir(binaryDir);
+  }
 }

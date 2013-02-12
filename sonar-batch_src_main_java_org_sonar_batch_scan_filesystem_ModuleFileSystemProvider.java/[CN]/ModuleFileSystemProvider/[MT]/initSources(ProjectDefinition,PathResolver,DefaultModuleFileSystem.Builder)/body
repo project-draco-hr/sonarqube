@@ -1,11 +1,14 @@
 {
-  if (!module.getSourceDirs().isEmpty()) {
-    LOG.info("Source dirs: ");
-    for (    String sourcePath : module.getSourceDirs()) {
-      File dir=pathResolver.relativeFile(module.getBaseDir(),sourcePath);
-      LOG.info("  " + dir.getAbsolutePath());
+  List<String> paths=Lists.newArrayList();
+  for (  String sourcePath : module.getSourceDirs()) {
+    File dir=pathResolver.relativeFile(module.getBaseDir(),sourcePath);
+    if (dir.isDirectory() && dir.exists()) {
+      paths.add(dir.getAbsolutePath());
       builder.addSourceDir(dir);
     }
+  }
+  if (!paths.isEmpty()) {
+    LOG.info("Source dirs: " + Joiner.on(", ").join(paths));
   }
   List<File> sourceFiles=pathResolver.relativeFiles(module.getBaseDir(),module.getSourceFiles());
   if (!sourceFiles.isEmpty()) {
