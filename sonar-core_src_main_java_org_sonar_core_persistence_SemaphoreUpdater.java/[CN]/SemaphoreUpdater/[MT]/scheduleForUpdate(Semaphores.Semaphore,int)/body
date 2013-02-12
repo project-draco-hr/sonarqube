@@ -1,11 +1,12 @@
 {
-  final Runnable updater=new Runnable(){
+  ScheduledExecutorService scheduler=Executors.newScheduledThreadPool(1);
+  Runnable updater=new Runnable(){
     public void run(){
       LOG.debug("Updating semaphore " + semaphore.getName());
       dao.update(semaphore);
     }
   }
 ;
-  final ScheduledFuture<?> updateHandle=scheduler.scheduleWithFixedDelay(updater,updatePeriodInSeconds,updatePeriodInSeconds,TimeUnit.SECONDS);
-  handlers.put(semaphore.getName(),updateHandle);
+  scheduler.scheduleWithFixedDelay(updater,updatePeriodInSeconds,updatePeriodInSeconds,TimeUnit.SECONDS);
+  handlers.put(semaphore.getName(),scheduler);
 }
