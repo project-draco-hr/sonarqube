@@ -1,27 +1,24 @@
 {
-  PluginsGroup group=center.getCenter().getGroup(groupKey);
-  if (group == null) {
-    String message="This plugin does not exist: " + groupKey;
+  Plugin plugin=center.getCenter().getPlugin(pluginKey);
+  if (plugin == null) {
+    String message="This plugin does not exist: " + pluginKey;
     Logs.INFO.warn(message);
     throw new SonarException(message);
   }
-  for (  Plugin plugin : group.getPlugins()) {
-    String pluginKey=plugin.getKey();
-    Release release=plugin.getRelease(version);
-    if (release == null || StringUtils.isBlank(release.getDownloadUrl())) {
-      String message="This release can not be installed: " + pluginKey + ", version "+ version;
-      Logs.INFO.warn(message);
-      throw new SonarException(message);
-    }
-    try {
-      URI uri=new URI(release.getDownloadUrl());
-      String filename=StringUtils.substringAfterLast(uri.getPath(),"/");
-      downloader.download(uri,new File(downloadDir,filename));
-    }
- catch (    Exception e) {
-      String message="Fail to download the plugin (" + pluginKey + ", version "+ version+ ") from "+ release.getDownloadUrl();
-      Logs.INFO.warn(message,e);
-      throw new SonarException(message,e);
-    }
+  Release release=plugin.getRelease(version);
+  if (release == null || StringUtils.isBlank(release.getDownloadUrl())) {
+    String message="This release can not be installed: " + pluginKey + ", version "+ version;
+    Logs.INFO.warn(message);
+    throw new SonarException(message);
+  }
+  try {
+    URI uri=new URI(release.getDownloadUrl());
+    String filename=StringUtils.substringAfterLast(uri.getPath(),"/");
+    downloader.download(uri,new File(downloadDir,filename));
+  }
+ catch (  Exception e) {
+    String message="Fail to download the plugin (" + pluginKey + ", version "+ version+ ") from "+ release.getDownloadUrl();
+    Logs.INFO.warn(message,e);
+    throw new SonarException(message,e);
   }
 }
