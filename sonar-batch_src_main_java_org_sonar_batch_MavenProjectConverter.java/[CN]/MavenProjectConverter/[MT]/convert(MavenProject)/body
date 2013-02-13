@@ -2,6 +2,18 @@
   String key=new StringBuilder().append(pom.getGroupId()).append(":").append(pom.getArtifactId()).toString();
   ProjectDefinition definition=ProjectDefinition.create();
   definition.setProperties(pom.getModel().getProperties()).setKey(key).setVersion(pom.getVersion()).setName(pom.getName()).setDescription(pom.getDescription()).addContainerExtension(pom);
+  String version=MavenUtils.getJavaSourceVersion(pom);
+  if (version != null) {
+    definition.setProperty(JavaUtils.JAVA_SOURCE_PROPERTY,version);
+  }
+  version=MavenUtils.getJavaVersion(pom);
+  if (version != null) {
+    definition.setProperty(JavaUtils.JAVA_TARGET_PROPERTY,version);
+  }
+  String encoding=MavenUtils.getSourceEncoding(pom);
+  if (encoding != null) {
+    definition.setProperty(CoreProperties.ENCODING_PROPERTY,encoding);
+  }
   convertMavenLinksToProperties(definition,pom);
   synchronizeFileSystem(pom,definition);
   return definition;
