@@ -1,5 +1,5 @@
 {
-  LOG.debug("Copy table %s",table);
+  LOG.debug("Copy table {}",table);
   String selectQuery=selectQuery(table,whereClauses);
   truncate(dest,table);
   Connection sourceConnection=null;
@@ -19,12 +19,18 @@
       destConnection.setAutoCommit(false);
       String insertSql=new StringBuilder().append("INSERT INTO ").append(table).append("(").append(Joiner.on(",").join(columnNames)).append(") VALUES(").append(StringUtils.repeat("?",",",colCount)).append(")").toString();
       destStatement=destConnection.prepareStatement(insertSql);
+      int count=0;
       do {
         for (int col=1; col <= colCount; col++) {
           Object value=sourceResultSet.getObject(columnNames.get(col - 1));
           destStatement.setObject(col,value);
         }
+        count++;
         destStatement.addBatch();
+        if (count % BatchSession.MAX_BATCH_SIZE == 0) {
+          destStatement.executeBatch();
+          destConnection.commit();
+        }
       }
  while (sourceResultSet.next());
       destStatement.executeBatch();
