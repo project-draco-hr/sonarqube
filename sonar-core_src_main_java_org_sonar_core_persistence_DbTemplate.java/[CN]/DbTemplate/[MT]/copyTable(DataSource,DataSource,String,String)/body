@@ -1,13 +1,6 @@
 {
   LOG.debug("Copy table %s",table);
-  String selectQuery="select * from " + table;
-  if (whereClauses.length > 0) {
-    List<String> clauses=Lists.newArrayList();
-    for (    String whereClause : whereClauses) {
-      clauses.add('(' + whereClause + ')');
-    }
-    selectQuery+=" WHERE " + Joiner.on(" AND ").join(clauses);
-  }
+  String selectQuery=selectQuery(table,whereClauses);
   truncate(dest,table);
   Connection sourceConnection=null;
   Statement sourceStatement=null;
@@ -20,13 +13,15 @@
     sourceStatement=sourceConnection.createStatement();
     sourceResultSet=sourceStatement.executeQuery(selectQuery);
     if (sourceResultSet.next()) {
-      int colCount=sourceResultSet.getMetaData().getColumnCount();
+      List<String> columnNames=columnNames(sourceResultSet);
+      int colCount=columnNames.size();
       destConnection=dest.getConnection();
       destConnection.setAutoCommit(false);
-      destStatement=destConnection.prepareStatement("INSERT INTO " + table + " VALUES("+ StringUtils.repeat("?",",",colCount)+ ")");
+      String insertSql=new StringBuilder().append("INSERT INTO ").append(table).append("(").append(Joiner.on(",").join(columnNames)).append(") VALUES(").append(StringUtils.repeat("?",",",colCount)).append(")").toString();
+      destStatement=destConnection.prepareStatement(insertSql);
       do {
         for (int col=1; col <= colCount; col++) {
-          Object value=sourceResultSet.getObject(col);
+          Object value=sourceResultSet.getObject(columnNames.get(col - 1));
           destStatement.setObject(col,value);
         }
         destStatement.addBatch();
@@ -38,7 +33,7 @@
   }
  catch (  SQLException e) {
     LOG.error("Fail to copy table " + table,e);
-    throw new SonarException("Fail to copy table " + table,e);
+    throw new IllegalStateException("Fail to copy table " + table,e);
   }
  finally {
     DatabaseUtils.closeQuietly(destStatement);
