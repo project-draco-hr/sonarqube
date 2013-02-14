@@ -3,14 +3,14 @@
   TokenChunker tokenChunker=JavaTokenProducer.build();
   StatementChunker statementChunker=JavaStatementBuilder.build();
   BlockChunker blockChunker=new BlockChunker(BLOCK_SIZE);
-  for (  InputFile inputFile : inputFiles) {
-    LOG.debug("Populating index from {}",inputFile.getFile());
-    Resource resource=getResource(inputFile);
+  for (  File file : sourceFiles) {
+    LOG.debug("Populating index from {}",file);
+    Resource<?> resource=getResource(file);
     String resourceKey=getFullKey(project,resource);
     List<Statement> statements;
     Reader reader=null;
     try {
-      reader=new InputStreamReader(new FileInputStream(inputFile.getFile()),project.getFileSystem().getSourceCharset());
+      reader=new InputStreamReader(new FileInputStream(file),fileSystem.sourceCharset());
       statements=statementChunker.chunk(tokenChunker.chunk(reader));
     }
  catch (    FileNotFoundException e) {
