@@ -1,25 +1,24 @@
 {
-  ProjectFileSystem fileSystem=project.getFileSystem();
-  List<InputFile> inputFiles=fileSystem.mainFiles(project.getLanguageKey());
-  if (inputFiles.isEmpty()) {
+  List<File> sourceFiles=fileSystem.sourceFilesOfLang(project.getLanguageKey());
+  if (sourceFiles.isEmpty()) {
     return;
   }
   CpdMapping mapping=getMapping(project.getLanguage());
   SonarDuplicationsIndex index=indexFactory.create(project);
-  TokenizerBridge bridge=new TokenizerBridge(mapping.getTokenizer(),fileSystem.getSourceCharset().name(),getBlockSize(project));
-  for (  InputFile inputFile : inputFiles) {
-    LOG.debug("Populating index from {}",inputFile.getFile());
-    Resource resource=mapping.createResource(inputFile.getFile(),fileSystem.getSourceDirs());
+  TokenizerBridge bridge=new TokenizerBridge(mapping.getTokenizer(),fileSystem.sourceCharset().name(),getBlockSize(project));
+  for (  File file : sourceFiles) {
+    LOG.debug("Populating index from {}",file);
+    Resource<?> resource=mapping.createResource(file,fileSystem.sourceDirs());
     String resourceId=SonarEngine.getFullKey(project,resource);
-    List<Block> blocks=bridge.chunk(resourceId,inputFile.getFile());
+    List<Block> blocks=bridge.chunk(resourceId,file);
     index.insert(resource,blocks);
   }
   Predicate<CloneGroup> minimumTokensPredicate=DuplicationPredicates.numberOfUnitsNotLessThan(getMinimumTokens(project));
   ExecutorService executorService=Executors.newSingleThreadExecutor();
   try {
-    for (    InputFile inputFile : inputFiles) {
-      LOG.debug("Detection of duplications for {}",inputFile.getFile());
-      Resource resource=mapping.createResource(inputFile.getFile(),fileSystem.getSourceDirs());
+    for (    File file : sourceFiles) {
+      LOG.debug("Detection of duplications for {}",file);
+      Resource<?> resource=mapping.createResource(file,fileSystem.sourceDirs());
       String resourceKey=SonarEngine.getFullKey(project,resource);
       Collection<Block> fileBlocks=index.getByResource(resource,resourceKey);
       Iterable<CloneGroup> filtered;
@@ -29,7 +28,7 @@
       }
  catch (      TimeoutException e) {
         filtered=null;
-        LOG.warn("Timeout during detection of duplications for " + inputFile.getFile(),e);
+        LOG.warn("Timeout during detection of duplications for " + file,e);
       }
 catch (      InterruptedException e) {
         throw new SonarException(e);
