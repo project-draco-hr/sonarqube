@@ -12,30 +12,59 @@
     }
   }
   if (referenceViolationsMap.size() != newViolations.size()) {
-    ViolationTrackingBlocksRecognizer rec=null;
     if (source != null && resource != null) {
       String referenceSource=referenceAnalysis.getSource(resource);
       if (referenceSource != null) {
-        rec=new ViolationTrackingBlocksRecognizer(referenceSource,source);
-        List<ViolationPair> possiblePairs=Lists.newArrayList();
-        for (        Violation newViolation : newViolations) {
-          if (newViolation.getLineId() != null && rec.isValidLineInSource(newViolation.getLineId() - 1)) {
-            for (            RuleFailureModel pastViolation : pastViolationsByRule.get(newViolation.getRule().getId())) {
-              if (pastViolation.getLine() != null && rec.isValidLineInReference(pastViolation.getLine() - 1)) {
-                int weight=rec.computeLengthOfMaximalBlock(pastViolation.getLine() - 1,newViolation.getLineId() - 1);
-                possiblePairs.add(new ViolationPair(pastViolation,newViolation,weight));
-              }
-            }
+        HashedSequence<StringText> hashedReference=HashedSequence.wrap(new StringText(referenceSource),StringTextComparator.IGNORE_WHITESPACE);
+        HashedSequence<StringText> hashedSource=HashedSequence.wrap(new StringText(source),StringTextComparator.IGNORE_WHITESPACE);
+        HashedSequenceComparator<StringText> hashedComparator=new HashedSequenceComparator<StringText>(StringTextComparator.IGNORE_WHITESPACE);
+        ViolationTrackingBlocksRecognizer rec=new ViolationTrackingBlocksRecognizer(hashedReference,hashedSource,hashedComparator);
+        Multimap<Integer,Violation> newViolationsByLines=newViolationsByLines(newViolations,rec);
+        Multimap<Integer,RuleFailureModel> pastViolationsByLines=pastViolationsByLines(pastViolations,rec);
+        RollingHashSequence<HashedSequence<StringText>> a=RollingHashSequence.wrap(hashedReference,hashedComparator,5);
+        RollingHashSequence<HashedSequence<StringText>> b=RollingHashSequence.wrap(hashedSource,hashedComparator,5);
+        RollingHashSequenceComparator<HashedSequence<StringText>> cmp=new RollingHashSequenceComparator<HashedSequence<StringText>>(hashedComparator);
+        Map<Integer,HashOccurrence> map=Maps.newHashMap();
+        for (        Integer line : pastViolationsByLines.keySet()) {
+          int hash=cmp.hash(a,line - 1);
+          HashOccurrence hashOccurrence=map.get(hash);
+          if (hashOccurrence == null) {
+            hashOccurrence=new HashOccurrence();
+            hashOccurrence.lineA=line;
+            hashOccurrence.countA=1;
+            map.put(hash,hashOccurrence);
+          }
+ else {
+            hashOccurrence.countA++;
           }
         }
-        Collections.sort(possiblePairs,ViolationPair.COMPARATOR);
-        Set<RuleFailureModel> pp=Sets.newHashSet(pastViolations);
-        for (        ViolationPair pair : possiblePairs) {
-          Violation newViolation=pair.getNewViolation();
-          RuleFailureModel pastViolation=pair.getPastViolation();
-          if (isNotAlreadyMapped(newViolation,referenceViolationsMap) && pp.contains(pastViolation)) {
-            pp.remove(pastViolation);
-            mapViolation(newViolation,pastViolation,pastViolationsByRule,referenceViolationsMap);
+        for (        Integer line : newViolationsByLines.keySet()) {
+          int hash=cmp.hash(b,line - 1);
+          HashOccurrence hashOccurrence=map.get(hash);
+          if (hashOccurrence != null) {
+            hashOccurrence.lineB=line;
+            hashOccurrence.countB++;
+          }
+        }
+        Set<RuleFailureModel> unmappedPastViolations=Sets.newHashSet(pastViolations);
+        for (        HashOccurrence hashOccurrence : map.values()) {
+          if (hashOccurrence.countA == 1 && hashOccurrence.countB == 1) {
+            map(newViolationsByLines.get(hashOccurrence.lineB),pastViolationsByLines.get(hashOccurrence.lineA),unmappedPastViolations,pastViolationsByRule);
+            pastViolationsByLines.removeAll(hashOccurrence.lineA);
+            newViolationsByLines.removeAll(hashOccurrence.lineB);
+          }
+        }
+        if (pastViolationsByLines.keySet().size() * newViolationsByLines.keySet().size() < 250000) {
+          List<LinePair> possibleLinePairs=Lists.newArrayList();
+          for (          Integer oldLine : pastViolationsByLines.keySet()) {
+            for (            Integer newLine : newViolationsByLines.keySet()) {
+              int weight=rec.computeLengthOfMaximalBlock(oldLine - 1,newLine - 1);
+              possibleLinePairs.add(new LinePair(oldLine,newLine,weight));
+            }
+          }
+          Collections.sort(possibleLinePairs,LINE_PAIR_COMPARATOR);
+          for (          LinePair linePair : possibleLinePairs) {
+            map(newViolationsByLines.get(linePair.lineB),pastViolationsByLines.get(linePair.lineA),unmappedPastViolations,pastViolationsByRule);
           }
         }
       }

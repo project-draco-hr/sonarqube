@@ -1,0 +1,10 @@
+{
+  StringText seq=new StringText("line0 \n line1 \n line2");
+  StringTextComparator cmp=StringTextComparator.IGNORE_WHITESPACE;
+  RollingHashSequence<StringText> seq2=RollingHashSequence.wrap(seq,cmp,1);
+  RollingHashSequenceComparator<StringText> cmp2=new RollingHashSequenceComparator<StringText>(cmp);
+  assertThat(seq2.length()).isEqualTo(3);
+  assertThat(cmp2.hash(seq2,0)).isEqualTo(cmp.hash(seq,0) * 31 + cmp.hash(seq,1));
+  assertThat(cmp2.hash(seq2,1)).isEqualTo((cmp.hash(seq,0) * 31 + cmp.hash(seq,1)) * 31 + cmp.hash(seq,2));
+  assertThat(cmp2.hash(seq2,2)).isEqualTo((cmp.hash(seq,1) * 31 + cmp.hash(seq,2)) * 31);
+}

@@ -1,0 +1,21 @@
+{
+  int size=base.length();
+  int[] hashes=new int[size];
+  RollingHashCalculator hashCalulator=new RollingHashCalculator(lines * 2 + 1);
+  for (int i=0; i <= Math.min(size - 1,lines); i++) {
+    hashCalulator.add(cmp.hash(base,i));
+  }
+  for (int i=0; i < size; i++) {
+    hashes[i]=hashCalulator.getHash();
+    if (i - lines >= 0) {
+      hashCalulator.remove(cmp.hash(base,i - lines));
+    }
+    if (i + lines + 1 < size) {
+      hashCalulator.add(cmp.hash(base,i + lines + 1));
+    }
+ else {
+      hashCalulator.add(0);
+    }
+  }
+  return new RollingHashSequence<S>(base,hashes);
+}
