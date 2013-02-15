@@ -1,4 +1,5 @@
 {
+  unmappedPastViolations.addAll(pastViolations);
   Multimap<Integer,RuleFailureModel> pastViolationsByRule=LinkedHashMultimap.create();
   for (  RuleFailureModel pastViolation : pastViolations) {
     pastViolationsByRule.put(pastViolation.getRuleId(),pastViolation);
@@ -7,7 +8,7 @@
     mapViolation(newViolation,findPastViolationWithSamePermanentId(newViolation,pastViolationsByRule.get(newViolation.getRule().getId())),pastViolationsByRule,referenceViolationsMap);
   }
   for (  Violation newViolation : newViolations) {
-    if (isNotAlreadyMapped(newViolation,referenceViolationsMap)) {
+    if (isNotAlreadyMapped(newViolation)) {
       mapViolation(newViolation,findPastViolationWithSameLineAndChecksum(newViolation,pastViolationsByRule.get(newViolation.getRule().getId())),pastViolationsByRule,referenceViolationsMap);
     }
   }
@@ -20,7 +21,7 @@
         HashedSequenceComparator<StringText> hashedComparator=new HashedSequenceComparator<StringText>(StringTextComparator.IGNORE_WHITESPACE);
         ViolationTrackingBlocksRecognizer rec=new ViolationTrackingBlocksRecognizer(hashedReference,hashedSource,hashedComparator);
         Multimap<Integer,Violation> newViolationsByLines=newViolationsByLines(newViolations,rec);
-        Multimap<Integer,RuleFailureModel> pastViolationsByLines=pastViolationsByLines(pastViolations,rec);
+        Multimap<Integer,RuleFailureModel> pastViolationsByLines=pastViolationsByLines(unmappedPastViolations,rec);
         RollingHashSequence<HashedSequence<StringText>> a=RollingHashSequence.wrap(hashedReference,hashedComparator,5);
         RollingHashSequence<HashedSequence<StringText>> b=RollingHashSequence.wrap(hashedSource,hashedComparator,5);
         RollingHashSequenceComparator<HashedSequence<StringText>> cmp=new RollingHashSequenceComparator<HashedSequence<StringText>>(hashedComparator);
@@ -46,10 +47,9 @@
             hashOccurrence.countB++;
           }
         }
-        Set<RuleFailureModel> unmappedPastViolations=Sets.newHashSet(pastViolations);
         for (        HashOccurrence hashOccurrence : map.values()) {
           if (hashOccurrence.countA == 1 && hashOccurrence.countB == 1) {
-            map(newViolationsByLines.get(hashOccurrence.lineB),pastViolationsByLines.get(hashOccurrence.lineA),unmappedPastViolations,pastViolationsByRule);
+            map(newViolationsByLines.get(hashOccurrence.lineB),pastViolationsByLines.get(hashOccurrence.lineA),pastViolationsByRule);
             pastViolationsByLines.removeAll(hashOccurrence.lineA);
             newViolationsByLines.removeAll(hashOccurrence.lineB);
           }
@@ -64,26 +64,27 @@
           }
           Collections.sort(possibleLinePairs,LINE_PAIR_COMPARATOR);
           for (          LinePair linePair : possibleLinePairs) {
-            map(newViolationsByLines.get(linePair.lineB),pastViolationsByLines.get(linePair.lineA),unmappedPastViolations,pastViolationsByRule);
+            map(newViolationsByLines.get(linePair.lineB),pastViolationsByLines.get(linePair.lineA),pastViolationsByRule);
           }
         }
       }
     }
     for (    Violation newViolation : newViolations) {
-      if (isNotAlreadyMapped(newViolation,referenceViolationsMap)) {
+      if (isNotAlreadyMapped(newViolation)) {
         mapViolation(newViolation,findPastViolationWithSameChecksumAndMessage(newViolation,pastViolationsByRule.get(newViolation.getRule().getId())),pastViolationsByRule,referenceViolationsMap);
       }
     }
     for (    Violation newViolation : newViolations) {
-      if (isNotAlreadyMapped(newViolation,referenceViolationsMap)) {
+      if (isNotAlreadyMapped(newViolation)) {
         mapViolation(newViolation,findPastViolationWithSameLineAndMessage(newViolation,pastViolationsByRule.get(newViolation.getRule().getId())),pastViolationsByRule,referenceViolationsMap);
       }
     }
     for (    Violation newViolation : newViolations) {
-      if (isNotAlreadyMapped(newViolation,referenceViolationsMap)) {
+      if (isNotAlreadyMapped(newViolation)) {
         mapViolation(newViolation,findPastViolationWithSameChecksum(newViolation,pastViolationsByRule.get(newViolation.getRule().getId())),pastViolationsByRule,referenceViolationsMap);
       }
     }
   }
+  unmappedPastViolations.clear();
   return referenceViolationsMap;
 }
