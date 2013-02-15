@@ -1,0 +1,15 @@
+{
+  java.io.File includedFile=temp.newFile("Foo.java");
+  java.io.File excludedFile=temp.newFile("Bar.java");
+  Settings settings=new Settings();
+  settings.setProperty(CoreProperties.PROJECT_EXCLUSIONS_PROPERTY,"file:" + excludedFile.getCanonicalPath());
+  ExclusionFilters filter=new ExclusionFilters(new FileExclusions(settings));
+  FileFilterContext context=new FileFilterContext(mock(ModuleFileSystem.class));
+  context.setType(FileType.SOURCE);
+  context.setRelativePath("org/bar/Foo.java");
+  context.setCanonicalPath(includedFile.getCanonicalPath());
+  assertThat(filter.accept(includedFile,context)).isTrue();
+  context.setRelativePath("org/bar/Bar.java");
+  context.setCanonicalPath(excludedFile.getCanonicalPath());
+  assertThat(filter.accept(excludedFile,context)).isFalse();
+}

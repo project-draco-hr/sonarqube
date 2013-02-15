@@ -1,0 +1,15 @@
+{
+  Settings settings=new Settings();
+  settings.setProperty(CoreProperties.PROJECT_INCLUSIONS_PROPERTY,"**/*Dao.java");
+  ExclusionFilters filter=new ExclusionFilters(new FileExclusions(settings));
+  FileFilterContext context=new FileFilterContext(mock(ModuleFileSystem.class));
+  context.setType(FileType.SOURCE);
+  context.setRelativePath("com/mycompany/Foo.java");
+  assertThat(filter.accept(temp.newFile(),context)).isFalse();
+  context.setRelativePath("com/mycompany/FooDao.java");
+  assertThat(filter.accept(temp.newFile(),context)).isTrue();
+  context=new FileFilterContext(mock(ModuleFileSystem.class));
+  context.setType(FileType.TEST);
+  context.setRelativePath("com/mycompany/Foo.java");
+  assertThat(filter.accept(temp.newFile(),context)).isTrue();
+}
