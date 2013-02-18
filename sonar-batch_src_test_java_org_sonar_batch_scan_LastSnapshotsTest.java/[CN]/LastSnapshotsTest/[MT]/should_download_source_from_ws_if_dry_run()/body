@@ -1,0 +1,11 @@
+{
+  setupData("last_snapshot");
+  ServerClient server=mock(ServerClient.class);
+  when(server.request(anyString(),eq(false))).thenReturn("downloaded source of Bar.c");
+  Settings settings=new Settings();
+  settings.setProperty(CoreProperties.DRY_RUN,true);
+  LastSnapshots lastSnapshots=new LastSnapshots(settings,getSession(),server);
+  String source=lastSnapshots.getSource(newFile());
+  assertThat(source).isEqualTo("downloaded source of Bar.c");
+  verify(server).request("/api/sources?resource=myproject:org/foo/Bar.c&format=txt",false);
+}
