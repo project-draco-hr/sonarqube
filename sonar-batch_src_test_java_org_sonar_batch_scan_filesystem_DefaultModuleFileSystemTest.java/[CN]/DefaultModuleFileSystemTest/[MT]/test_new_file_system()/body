@@ -1,0 +1,15 @@
+{
+  File basedir=temp.newFolder("base");
+  File workingDir=temp.newFolder("work");
+  LanguageFilters languageFilters=mock(LanguageFilters.class);
+  FileSystemFilter fileFilter=mock(FileSystemFilter.class);
+  DefaultModuleFileSystem fileSystem=new DefaultModuleFileSystem().setBaseDir(basedir).setWorkingDir(workingDir).addBinaryDir(new File(basedir,"target/classes")).addSourceDir(new File(basedir,"src/main/java")).addSourceDir(new File(basedir,"src/main/groovy")).addTestDir(new File(basedir,"src/test/java")).addFilters(fileFilter).setLanguageFilters(languageFilters);
+  assertThat(fileSystem).isNotNull();
+  assertThat(fileSystem.baseDir().getCanonicalPath()).isEqualTo(basedir.getCanonicalPath());
+  assertThat(fileSystem.workingDir().getCanonicalPath()).isEqualTo(workingDir.getCanonicalPath());
+  assertThat(fileSystem.sourceDirs()).hasSize(2);
+  assertThat(fileSystem.testDirs()).hasSize(1);
+  assertThat(fileSystem.binaryDirs()).hasSize(1);
+  assertThat(fileSystem.filters()).containsOnly(fileFilter);
+  assertThat(fileSystem.languageFilters()).isSameAs(languageFilters);
+}
