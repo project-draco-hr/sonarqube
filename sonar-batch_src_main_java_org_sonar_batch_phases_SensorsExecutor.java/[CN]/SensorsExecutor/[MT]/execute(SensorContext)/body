@@ -2,6 +2,7 @@
   Collection<Sensor> sensors=selector.select(Sensor.class,project,true);
   eventBus.fireEvent(new SensorsPhaseEvent(Lists.newArrayList(sensors),true));
   for (  Sensor sensor : sensors) {
+    session.commitAndClose();
     executeMavenPlugin(sensor);
     eventBus.fireEvent(new SensorExecutionEvent(sensor,true));
     sensor.analyse(project,context);
