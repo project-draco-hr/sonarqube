@@ -1,0 +1,10 @@
+{
+  setupData("last_snapshot");
+  ServerClient server=mock(ServerClient.class);
+  when(server.request(anyString(),eq(false))).thenThrow(new HttpDownloader.HttpException(new URI(""),500));
+  Settings settings=new Settings();
+  settings.setProperty(CoreProperties.DRY_RUN,true);
+  LastSnapshots lastSnapshots=new LastSnapshots(settings,getSession(),server);
+  thrown.expect(HttpDownloader.HttpException.class);
+  lastSnapshots.getSource(newFile());
+}
