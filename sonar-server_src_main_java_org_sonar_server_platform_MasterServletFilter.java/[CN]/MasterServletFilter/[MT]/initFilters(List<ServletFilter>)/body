@@ -1,0 +1,14 @@
+{
+  List<Filter> filterList=Lists.newArrayList();
+  for (  ServletFilter extension : filterExtensions) {
+    try {
+      LoggerFactory.getLogger(MasterServletFilter.class).info(String.format("Initializing servlet filter %s [pattern=%s]",extension,extension.doGetPattern()));
+      extension.init(config);
+      filterList.add(extension);
+    }
+ catch (    Exception e) {
+      throw new IllegalStateException("Fail to initialize servlet filter: " + extension + ". Message: "+ e.getMessage(),e);
+    }
+  }
+  filters=filterList.toArray(new ServletFilter[filterList.size()]);
+}
