@@ -1,6 +1,11 @@
 {
   if (ResourceUtils.isFile(resource)) {
-    return isIgnoredFileResource(resource);
+    PathPattern[] inclusionPatterns=(ResourceUtils.isUnitTestClass(resource) ? testInclusions : sourceInclusions);
+    if (isIgnoredByInclusions(resource,inclusionPatterns)) {
+      return true;
+    }
+    PathPattern[] exclusionPatterns=(ResourceUtils.isUnitTestClass(resource) ? testExclusions : sourceExclusions);
+    return isIgnoredByExclusions(resource,exclusionPatterns);
   }
   return false;
 }
