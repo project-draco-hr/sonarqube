@@ -13,18 +13,15 @@
     sourceStatement=sourceConnection.createStatement();
     sourceResultSet=sourceStatement.executeQuery(selectQuery);
     if (sourceResultSet.next()) {
-      List<String> columnNames=columnNames(sourceResultSet);
-      int colCount=columnNames.size();
+      String[] columnNames=columnNames(sourceResultSet);
+      int[] columnTypes=columnTypes(sourceResultSet);
       destConnection=dest.getConnection();
       destConnection.setAutoCommit(false);
-      String insertSql=new StringBuilder().append("INSERT INTO ").append(table).append("(").append(Joiner.on(",").join(columnNames)).append(") VALUES(").append(StringUtils.repeat("?",",",colCount)).append(")").toString();
+      String insertSql=new StringBuilder().append("INSERT INTO ").append(table).append("(").append(Joiner.on(",").join(columnNames)).append(") VALUES(").append(StringUtils.repeat("?",",",columnNames.length)).append(")").toString();
       destStatement=destConnection.prepareStatement(insertSql);
       int count=0;
       do {
-        for (int col=1; col <= colCount; col++) {
-          Object value=sourceResultSet.getObject(columnNames.get(col - 1));
-          destStatement.setObject(col,value);
-        }
+        copyColumns(sourceResultSet,destStatement,columnNames,columnTypes);
         count++;
         destStatement.addBatch();
         if (count % BatchSession.MAX_BATCH_SIZE == 0) {
