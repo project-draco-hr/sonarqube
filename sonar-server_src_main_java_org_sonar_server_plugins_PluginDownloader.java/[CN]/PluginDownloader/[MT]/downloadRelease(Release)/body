@@ -1,5 +1,13 @@
 {
-  URI uri=new URI(release.getDownloadUrl());
-  String filename=StringUtils.substringAfterLast(uri.getPath(),"/");
-  downloader.download(uri,new File(downloadDir,filename));
+  String url=release.getDownloadUrl();
+  if (!url.startsWith("file:")) {
+    URI uri=new URI(url);
+    String filename=StringUtils.substringAfterLast(uri.getPath(),"/");
+    downloader.download(uri,new File(downloadDir,filename));
+  }
+ else {
+    String filePath=url.replaceFirst("file:","");
+    File file=new File(filePath);
+    FileUtils.copyFileToDirectory(file,downloadDir);
+  }
 }

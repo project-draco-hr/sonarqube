@@ -1,0 +1,8 @@
+{
+  Plugin test=new Plugin("test");
+  Release test10=new Release(test,"1.0").setDownloadUrl("http://server/test-1.0.jar");
+  test.addRelease(test10);
+  when(updateCenter.findInstallablePlugins("foo",Version.create("1.0"))).thenReturn(newArrayList(test10));
+  pluginDownloader.download("foo",Version.create("1.0"));
+  verify(httpDownloader).download(any(URI.class),argThat(new HasFileName("test-1.0.jar")));
+}
