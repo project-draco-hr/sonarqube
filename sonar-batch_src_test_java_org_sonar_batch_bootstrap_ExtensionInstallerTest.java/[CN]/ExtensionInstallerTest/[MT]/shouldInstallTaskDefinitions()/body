@@ -1,0 +1,9 @@
+{
+  TaskDefinition definition=TaskDefinition.create();
+  BatchPluginRepository pluginRepository=mock(BatchPluginRepository.class);
+  when(pluginRepository.getPluginsByMetadata()).thenReturn(newPlugin(definition));
+  ComponentContainer container=new ComponentContainer();
+  ExtensionInstaller installer=new ExtensionInstaller(pluginRepository,new EnvironmentInformation("ant","1.7"),new Settings());
+  installer.installTaskDefinitionExtensions(container);
+  assertThat(container.getComponentsByType(TaskDefinition.class)).containsExactly(definition);
+}
