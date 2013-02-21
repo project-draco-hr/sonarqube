@@ -6,11 +6,12 @@
   when(violation.getMessage()).thenReturn("VIOLATION");
   when(violation.getRule()).thenReturn(rule);
   when(violation.getSeverity()).thenReturn(RulePriority.INFO);
+  when(violation.isSwitchedOff()).thenReturn(true);
   when(violation.getCreatedAt()).thenReturn(DateUtils.parseDate("2013-01-30"));
   when(ruleI18nManager.getName(rule,Locale.getDefault())).thenReturn("RULE_NAME");
   doReturn(Arrays.asList(violation)).when(dryRunExporter).getViolations(resource);
   StringWriter output=new StringWriter();
   dryRunExporter.writeJson(ImmutableSet.of(resource),output);
   String json=output.toString();
-  assertThat(json).startsWith("{\"version\":\"3.4\",\"violations_per_resource\":{\"KEY\":[{\"line\":1,\"message\":\"VIOLATION\",\"severity\":\"INFO\",\"rule_key\":\"RULE_KEY\",\"rule_repository\":\"pmd\",\"rule_name\":\"RULE_NAME\",\"is_new\":false,\"created_at\":\"2013-01-30T00:00");
+  assertThat(json).startsWith("{\"version\":\"3.4\",\"violations_per_resource\":{\"KEY\":[{\"line\":1,\"message\":\"VIOLATION\",\"severity\":\"INFO\",\"rule_key\":\"RULE_KEY\",\"rule_repository\":\"pmd\",\"rule_name\":\"RULE_NAME\",\"switched_off\":true,\"is_new\":false,\"created_at\":\"2013-01-30T00:00");
 }
