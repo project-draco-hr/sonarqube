@@ -1,0 +1,34 @@
+{
+  int metricCriterionId=1;
+  for (  Criterion criterion : filter.getCriteria()) {
+    if ("qualifier".equals(criterion.getFamily())) {
+      fields.add("qualifiers=" + criterion.getTextValue());
+    }
+ else     if ("name".equals(criterion.getFamily())) {
+      fields.add("nameSearch=" + criterion.getTextValue());
+    }
+ else     if ("key".equals(criterion.getFamily())) {
+      fields.add("keyRegexp=" + criterion.getTextValue());
+    }
+ else     if ("language".equals(criterion.getFamily())) {
+      fields.add("languages=" + criterion.getTextValue());
+    }
+ else     if ("date".equals(criterion.getFamily())) {
+      if ("<".equals(criterion.getOperator())) {
+        fields.add("ageMaxDays=" + criterion.getValue());
+      }
+ else       if (">".equals(criterion.getOperator())) {
+        fields.add("ageMinDays=" + criterion.getValue());
+      }
+    }
+ else     if ("direct-children".equals(criterion.getFamily()) && "true".equals(criterion.getTextValue())) {
+      fields.add("onBaseComponents=true");
+    }
+ else     if ("metric".equals(criterion.getFamily()) && StringUtils.isNotBlank(criterion.getKey()) && StringUtils.isNotBlank(criterion.getOperator())&& criterion.getValue() != null) {
+      fields.add("c" + metricCriterionId + "_metric="+ criterion.getKey());
+      fields.add("c" + metricCriterionId + "_op="+ criterion.getOperator());
+      fields.add("c" + metricCriterionId + "_val="+ criterion.getValue());
+      metricCriterionId+=1;
+    }
+  }
+}
