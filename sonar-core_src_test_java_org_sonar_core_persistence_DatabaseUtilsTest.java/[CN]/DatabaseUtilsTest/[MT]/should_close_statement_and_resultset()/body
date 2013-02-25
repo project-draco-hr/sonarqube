@@ -1,7 +1,11 @@
 {
   Connection connection=getConnection();
   try {
-    PreparedStatement statement=connection.prepareStatement("SELECT 1");
+    String sql="SELECT 1";
+    if (Oracle.ID.equals(getDatabase().getDialect().getId())) {
+      sql="SELECT 1 FROM DUAL";
+    }
+    PreparedStatement statement=connection.prepareStatement(sql);
     ResultSet rs=statement.executeQuery();
     DatabaseUtils.closeQuietly(rs);
     DatabaseUtils.closeQuietly(statement);
