@@ -1,0 +1,12 @@
+{
+  Rule ruleWithoutId=Rule.create("repoKey","ruleKey","Rule");
+  Rule ruleWithId=Rule.create("repoKey","ruleKey","Rule");
+  ruleWithId.setId(123);
+  when(ruleFinder.findByKey("repoKey","ruleKey")).thenReturn(ruleWithId);
+  File file=new File("org/foo/Bar.java");
+  Violation violation=Violation.create(ruleWithoutId,file);
+  index.addViolation(violation);
+  List<Violation> violations=index.getViolations(file);
+  assertThat(violations.size(),is(1));
+  assertThat(violations.get(0).getRule().getId(),Matchers.is(123));
+}
