@@ -1,5 +1,16 @@
 {
   if (handlers.containsKey(name)) {
-    handlers.get(name).shutdownNow();
+    handlers.get(name).shutdown();
+    try {
+      if (!handlers.get(name).awaitTermination(1,TimeUnit.SECONDS)) {
+        LOG.error("Unable to cancel semaphore updater in 1 second");
+      }
+    }
+ catch (    InterruptedException e) {
+      LOG.error("Unable to cancel semaphore updater",e);
+    }
+ finally {
+      handlers.remove(name);
+    }
   }
 }
