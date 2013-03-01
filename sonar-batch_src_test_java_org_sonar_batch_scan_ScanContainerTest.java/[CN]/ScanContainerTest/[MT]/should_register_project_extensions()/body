@@ -1,16 +1,22 @@
 {
   final Project project=new Project("foo");
   project.setConfiguration(new PropertiesConfiguration());
+  final ProjectTree projectTree=mock(ProjectTree.class);
+  when(projectTree.getProjectDefinition(project)).thenReturn(ProjectDefinition.create());
+  final ResourcePersister resourcePersister=mock(ResourcePersister.class);
+  when(resourcePersister.getSnapshot(Matchers.<Resource>any())).thenReturn(new Snapshot());
   final ExtensionInstaller extensionInstaller=mock(ExtensionInstaller.class);
   Container batchModule=new Container(){
     @Override protected void configure(){
       container.addSingleton(extensionInstaller);
+      container.addSingleton(projectTree);
+      container.addSingleton(resourcePersister);
       container.addSingleton(new BatchSettings());
     }
   }
 ;
   batchModule.init();
-  ScanContainer projectModule=new ScanContainer(project,ProjectDefinition.create(),new Snapshot());
+  ScanContainer projectModule=new ScanContainer(project);
   batchModule.installChild(projectModule);
   verify(extensionInstaller).installInspectionExtensions(any(ComponentContainer.class));
   Assertions.assertThat(projectModule.container().getComponentByType(ProjectSettings.class)).isNotNull();
