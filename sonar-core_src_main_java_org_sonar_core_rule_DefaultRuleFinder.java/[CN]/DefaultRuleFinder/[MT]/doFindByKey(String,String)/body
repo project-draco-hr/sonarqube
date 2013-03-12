@@ -1,3 +1,4 @@
 {
-  return sessionFactory.getSession().getSingleResult(Rule.class,"pluginName",repositoryKey,"key",key,"enabled",true);
+  DatabaseSession session=sessionFactory.getSession();
+  return (Rule)session.getSingleResult(session.createQuery("FROM " + Rule.class.getSimpleName() + " r WHERE r.key=:key and r.pluginName=:pluginName and r.status<>:status").setParameter("key",key).setParameter("pluginName",repositoryKey).setParameter("status",RuleStatus.REMOVED.name()),null);
 }

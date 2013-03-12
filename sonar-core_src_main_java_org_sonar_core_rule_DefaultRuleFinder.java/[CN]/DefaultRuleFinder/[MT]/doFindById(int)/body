@@ -1,3 +1,4 @@
 {
-  return sessionFactory.getSession().getSingleResult(Rule.class,"id",ruleId,"enabled",true);
+  DatabaseSession session=sessionFactory.getSession();
+  return (Rule)session.getSingleResult(session.createQuery("FROM " + Rule.class.getSimpleName() + " r WHERE r.id=:id and r.status<>:status").setParameter("id",ruleId).setParameter("status",RuleStatus.REMOVED.name()),null);
 }
