@@ -1,0 +1,20 @@
+{
+  File file=new File(getClass().getResource("/org/sonar/api/rules/XMLRuleParserTest/rules.xml").toURI());
+  List<Rule> rules=new XMLRuleParser().parse(file);
+  assertThat(rules.size(),is(2));
+  Rule rule=rules.get(0);
+  assertThat(rule.getName(),is("Local Variable Name"));
+  assertThat(rule.getDescription(),is("Checks that local, non-final variable names conform to a format specified by the format property."));
+  assertThat(rule.getSeverity(),Is.is(RulePriority.BLOCKER));
+  assertThat(rule.getCardinality(),Is.is(Cardinality.MULTIPLE));
+  assertThat(rule.getConfigKey(),is("Checker/TreeWalker/LocalVariableName"));
+  assertThat(rule.getStatus(),is("READY"));
+  assertThat(rule.getParams().size(),is(2));
+  RuleParam prop=rule.getParam("ignore");
+  assertThat(prop.getKey(),is("ignore"));
+  assertThat(prop.getDescription(),is("Ignore ?"));
+  assertThat(prop.getDefaultValue(),is("false"));
+  Rule minimalRule=rules.get(1);
+  assertThat(minimalRule.getKey(),is("com.puppycrawl.tools.checkstyle.checks.coding.MagicNumberCheck"));
+  assertThat(minimalRule.getParams().size(),is(0));
+}

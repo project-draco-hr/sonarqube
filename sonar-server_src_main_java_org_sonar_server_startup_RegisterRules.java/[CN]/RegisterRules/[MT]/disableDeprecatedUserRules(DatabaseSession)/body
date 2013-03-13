@@ -1,10 +1,11 @@
 {
   List<Integer> deprecatedUserRuleIds=Lists.newLinkedList();
   deprecatedUserRuleIds.addAll(session.createQuery("SELECT r.id FROM " + Rule.class.getSimpleName() + " r WHERE r.parent IS NOT NULL AND NOT EXISTS(FROM "+ Rule.class.getSimpleName()+ " p WHERE r.parent=p)").getResultList());
-  deprecatedUserRuleIds.addAll(session.createQuery("SELECT r.id FROM " + Rule.class.getSimpleName() + " r WHERE r.parent IS NOT NULL AND EXISTS(FROM "+ Rule.class.getSimpleName()+ " p WHERE r.parent=p and p.enabled=false)").getResultList());
+  deprecatedUserRuleIds.addAll(session.createQuery("SELECT r.id FROM " + Rule.class.getSimpleName() + " r WHERE r.parent IS NOT NULL AND EXISTS(FROM "+ Rule.class.getSimpleName()+ " p WHERE r.parent=p and p.status=:status)").setParameter("status",RuleStatus.REMOVED.name()).getResultList());
   for (  Integer deprecatedUserRuleId : deprecatedUserRuleIds) {
     Rule rule=session.getSingleResult(Rule.class,"id",deprecatedUserRuleId);
-    rule.setEnabled(false);
+    rule.setStatus(RuleStatus.REMOVED.name());
+    rule.setUpdatedAt(new Date());
     session.saveWithoutFlush(rule);
   }
 }
