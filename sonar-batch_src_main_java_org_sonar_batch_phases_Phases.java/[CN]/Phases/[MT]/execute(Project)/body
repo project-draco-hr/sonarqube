@@ -1,8 +1,8 @@
 {
-  pi.execute(project);
-  eventBus.fireEvent(new ProjectAnalysisEvent(project,true));
-  mavenPluginsConfigurator.execute(project);
-  mavenPhaseExecutor.execute(project);
+  pi.execute(module);
+  eventBus.fireEvent(new ProjectAnalysisEvent(module,true));
+  mavenPluginsConfigurator.execute(module);
+  mavenPhaseExecutor.execute(module);
   initializersExecutor.execute();
   fsLogger.log();
   persistenceManager.setDelayedMode(true);
@@ -10,7 +10,7 @@
   decoratorsExecutor.execute();
   persistenceManager.dump();
   persistenceManager.setDelayedMode(false);
-  if (project.isRoot()) {
+  if (module.isRoot()) {
     graphStorage.save();
     if (updateStatusJob != null) {
       updateStatusJob.execute();
@@ -18,5 +18,5 @@
     postJobsExecutor.execute(sensorContext);
   }
   cleanMemory();
-  eventBus.fireEvent(new ProjectAnalysisEvent(project,false));
+  eventBus.fireEvent(new ProjectAnalysisEvent(module,false));
 }

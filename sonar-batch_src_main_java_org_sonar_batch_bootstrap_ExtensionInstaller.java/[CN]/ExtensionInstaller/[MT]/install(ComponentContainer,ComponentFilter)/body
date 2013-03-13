@@ -1,0 +1,23 @@
+{
+  boolean dryRun=isDryRun();
+  for (  Map.Entry<PluginMetadata,Plugin> entry : pluginRepository.getPluginsByMetadata().entrySet()) {
+    PluginMetadata metadata=entry.getKey();
+    Plugin plugin=entry.getValue();
+    for (    Object extension : plugin.getExtensions()) {
+      doInstall(container,matcher,metadata,dryRun,extension);
+    }
+  }
+  List<ExtensionProvider> providers=container.getComponentsByType(ExtensionProvider.class);
+  for (  ExtensionProvider provider : providers) {
+    Object object=provider.provide();
+    if (object instanceof Iterable) {
+      for (      Object extension : (Iterable)object) {
+        doInstall(container,matcher,null,dryRun,extension);
+      }
+    }
+ else {
+      doInstall(container,matcher,null,dryRun,object);
+    }
+  }
+  return this;
+}

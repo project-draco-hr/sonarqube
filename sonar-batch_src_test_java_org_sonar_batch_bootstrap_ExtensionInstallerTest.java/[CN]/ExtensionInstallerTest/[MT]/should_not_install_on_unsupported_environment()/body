@@ -1,0 +1,11 @@
+{
+  BatchPluginRepository pluginRepository=mock(BatchPluginRepository.class);
+  when(pluginRepository.getPluginsByMetadata()).thenReturn(newPlugin(Foo.class,MavenExtension.class,AntExtension.class,new BarProvider()));
+  ComponentContainer container=new ComponentContainer();
+  ExtensionInstaller installer=new ExtensionInstaller(pluginRepository,new EnvironmentInformation("ant","1.7"),new Settings());
+  installer.install(container,new TrueMatcher());
+  assertThat(container.get(MavenExtension.class)).isNull();
+  assertThat(container.get(AntExtension.class)).isNotNull();
+  assertThat(container.get(Foo.class)).isNotNull();
+  assertThat(container.get(Bar.class)).isNotNull();
+}

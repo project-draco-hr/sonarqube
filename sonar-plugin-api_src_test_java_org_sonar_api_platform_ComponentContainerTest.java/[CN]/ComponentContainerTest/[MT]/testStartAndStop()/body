@@ -1,9 +1,11 @@
 {
-  ComponentContainer container=new ComponentContainer();
+  ComponentContainer container=spy(new ComponentContainer());
   container.addSingleton(StartableComponent.class);
   container.startComponents();
   assertThat(container.getComponentByType(StartableComponent.class).started).isTrue();
   assertThat(container.getComponentByType(StartableComponent.class).stopped).isFalse();
+  verify(container).doBeforeStart();
+  verify(container).doAfterStart();
   container.stopComponents();
   assertThat(container.getComponentByType(StartableComponent.class).stopped).isTrue();
 }
