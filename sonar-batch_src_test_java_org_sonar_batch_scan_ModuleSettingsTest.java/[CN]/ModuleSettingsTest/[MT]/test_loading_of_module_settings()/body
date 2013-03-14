@@ -1,0 +1,15 @@
+{
+  BatchSettings batchSettings=mock(BatchSettings.class);
+  when(batchSettings.getDefinitions()).thenReturn(new PropertyDefinitions());
+  when(batchSettings.getProperties()).thenReturn(ImmutableMap.of("overridding","batch","on-batch","true"));
+  when(batchSettings.getModuleProperties("struts-core")).thenReturn(ImmutableMap.of("on-module","true","overridding","module"));
+  ProjectDefinition module=ProjectDefinition.create().setKey("struts-core");
+  Configuration deprecatedConf=new PropertiesConfiguration();
+  ModuleSettings moduleSettings=new ModuleSettings(batchSettings,module,deprecatedConf);
+  assertThat(moduleSettings.getString("overridding")).isEqualTo("module");
+  assertThat(moduleSettings.getString("on-batch")).isEqualTo("true");
+  assertThat(moduleSettings.getString("on-module")).isEqualTo("true");
+  assertThat(deprecatedConf.getString("overridding")).isEqualTo("module");
+  assertThat(deprecatedConf.getString("on-batch")).isEqualTo("true");
+  assertThat(deprecatedConf.getString("on-module")).isEqualTo("true");
+}
