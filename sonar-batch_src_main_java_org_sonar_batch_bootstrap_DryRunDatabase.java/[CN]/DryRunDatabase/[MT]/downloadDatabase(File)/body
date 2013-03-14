@@ -1,0 +1,20 @@
+{
+  String projectKey=null;
+  try {
+    if (reactor == null) {
+      server.download("/batch_bootstrap/db",toFile);
+    }
+ else {
+      projectKey=StringUtils.defaultString(reactor.getRoot().getKey());
+      server.download("/batch_bootstrap/db?project=" + projectKey,toFile);
+    }
+    LOG.debug("Dry Run database size: {}",FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(toFile)));
+  }
+ catch (  SonarException e) {
+    Throwable rootCause=Throwables.getRootCause(e);
+    if (projectKey != null && (rootCause instanceof HttpException) && (((HttpException)rootCause).getResponseCode() == 401)) {
+      throw new SonarException(String.format("You don't have access rights to project [%s]",projectKey),e);
+    }
+    throw e;
+  }
+}

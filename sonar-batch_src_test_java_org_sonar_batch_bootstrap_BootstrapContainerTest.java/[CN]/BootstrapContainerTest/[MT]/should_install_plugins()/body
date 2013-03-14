@@ -1,0 +1,9 @@
+{
+  PluginMetadata metadata=mock(PluginMetadata.class);
+  FakePlugin plugin=new FakePlugin();
+  BatchPluginRepository pluginRepository=mock(BatchPluginRepository.class);
+  when(pluginRepository.getPluginsByMetadata()).thenReturn(ImmutableMap.<PluginMetadata,Plugin>of(metadata,plugin));
+  BootstrapContainer container=BootstrapContainer.create(Lists.newArrayList(pluginRepository));
+  container.doAfterStart();
+  assertThat(container.getComponentsByType(Plugin.class)).containsOnly(plugin);
+}
