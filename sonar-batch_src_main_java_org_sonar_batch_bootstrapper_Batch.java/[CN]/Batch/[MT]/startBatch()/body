@@ -1,28 +1,9 @@
 {
-  BootstrapContainer bootstrapContainer=null;
-  try {
-    List all=Lists.newArrayList(components);
-    all.add(new BootstrapProperties(bootstrapProperties));
-    if (projectReactor != null) {
-      all.add(projectReactor);
-    }
-    bootstrapContainer=BootstrapContainer.create(all);
-    bootstrapContainer.startComponents();
-    TaskContainer taskContainer=new TaskContainer(bootstrapContainer);
-    taskContainer.add(ScanTask.DEFINITION,ScanTask.class,ListTask.DEFINITION,ListTask.class);
-    taskContainer.execute();
+  List all=Lists.newArrayList(components);
+  all.add(new BootstrapProperties(bootstrapProperties));
+  if (projectReactor != null) {
+    all.add(projectReactor);
   }
- catch (  RuntimeException e) {
-    PicoUtils.propagateStartupException(e);
-  }
- finally {
-    try {
-      if (bootstrapContainer != null) {
-        bootstrapContainer.stopComponents();
-      }
-    }
- catch (    Exception e) {
-      LoggerFactory.getLogger(Batch.class).error("Error while stopping batch",e);
-    }
-  }
+  BootstrapContainer bootstrapContainer=BootstrapContainer.create(all);
+  bootstrapContainer.execute();
 }
