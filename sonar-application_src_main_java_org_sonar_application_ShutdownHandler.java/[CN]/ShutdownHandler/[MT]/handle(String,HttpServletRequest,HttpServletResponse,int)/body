@@ -1,0 +1,33 @@
+{
+  if (!target.equals("/shutdown")) {
+    return;
+  }
+  if (!request.getMethod().equals("POST")) {
+    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+    return;
+  }
+  if (!hasCorrectSecurityToken(request)) {
+    System.err.println("Unauthorized shutdown attempt from " + getRemoteAddr(request));
+    response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+    return;
+  }
+  if (!requestFromLocalhost(request)) {
+    System.err.println("Unauthorized shutdown attempt from " + getRemoteAddr(request));
+    response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+    return;
+  }
+  System.out.println("Shutting down by request from " + getRemoteAddr(request));
+  new Thread(){
+    public void run(){
+      try {
+        shutdownServer();
+      }
+ catch (      InterruptedException e) {
+      }
+catch (      Exception e) {
+        throw new RuntimeException("Shutting down server",e);
+      }
+    }
+  }
+.start();
+}

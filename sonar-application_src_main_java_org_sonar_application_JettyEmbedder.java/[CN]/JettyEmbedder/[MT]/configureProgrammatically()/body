@@ -1,6 +1,17 @@
 {
   configureServer();
   WebAppContext context=new WebAppContext(getPath("/war/sonar-server"),contextPath);
-  server.addHandler(context);
+  String shutdownCookie=System.getProperty("sonar.shutdownToken");
+  if (shutdownCookie != null && !"".equals(shutdownCookie)) {
+    System.out.println("Registering shutdown handler");
+    ShutdownHandler shutdownHandler=new ShutdownHandler(server,shutdownCookie);
+    shutdownHandler.setExitJvm(true);
+    HandlerList handlers=new HandlerList();
+    handlers.setHandlers(new Handler[]{shutdownHandler,context});
+    server.setHandler(handlers);
+  }
+ else {
+    server.addHandler(context);
+  }
   return server;
 }
