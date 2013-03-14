@@ -1,21 +1,5 @@
 {
-  if (StringUtils.isBlank(rule.getName()) && StringUtils.isBlank(ruleI18nManager.getName(repositoryKey,rule.getKey(),Locale.ENGLISH))) {
-    throw new SonarException("The following rule (repository: " + repositoryKey + ") must have a name: "+ rule);
-  }
-  if (StringUtils.isBlank(rule.getDescription()) && StringUtils.isBlank(ruleI18nManager.getDescription(repositoryKey,rule.getKey(),Locale.ENGLISH))) {
-    if (StringUtils.isNotBlank(rule.getName()) && StringUtils.isBlank(ruleI18nManager.getName(repositoryKey,rule.getKey(),Locale.ENGLISH))) {
-      throw new SonarException("No description found for the rule '" + rule.getName() + "' (repository: "+ repositoryKey+ ") because the entry 'rule."+ repositoryKey+ "."+ rule.getKey()+ ".name' is missing from the bundle.");
-    }
- else {
-      throw new SonarException("The following rule (repository: " + repositoryKey + ") must have a description: "+ rule);
-    }
-  }
-  if (!Strings.isNullOrEmpty(rule.getStatus())) {
-    try {
-      Status.valueOf(rule.getStatus());
-    }
- catch (    IllegalArgumentException e) {
-      throw new SonarException("The status of a rule can only contains : " + Joiner.on(", ").join(Status.values()),e);
-    }
-  }
+  validateRuleRepositoryName(rule,repositoryKey);
+  validateRuleDescription(rule,repositoryKey);
+  validateStatus(rule);
 }
