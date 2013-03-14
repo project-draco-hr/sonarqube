@@ -1,0 +1,9 @@
+{
+  Tasks tasks=mock(Tasks.class);
+  when(tasks.definitions()).thenReturn(Arrays.asList(TaskDefinition.builder().key("foo").description("Foo").taskClass(FooTask.class).build(),TaskDefinition.builder().key("purge").description("Purge database").taskClass(FakePurgeTask.class).build()));
+  ListTask task=spy(new ListTask(tasks));
+  task.execute();
+  verify(task,times(1)).log("Available tasks:");
+  verify(task,times(1)).log("  - foo: Foo");
+  verify(task,times(1)).log("  - purge: Purge database");
+}

@@ -1,22 +1,24 @@
 {
-  BootstrapContainer bootstrapModule=null;
+  BootstrapContainer bootstrapContainer=null;
   try {
     List all=Lists.newArrayList(components);
-    all.add(new BootstrapProperties(globalProperties));
-    all.add(projectReactor);
-    bootstrapModule=BootstrapContainer.create(all);
-    bootstrapModule.startComponents();
-    TaskContainer taskContainer=new TaskContainer(bootstrapModule);
-    taskContainer.add(ScanTask.DEFINITION,ScanTask.class,ListTasksTask.DEFINITION,ListTasksTask.class);
-    taskContainer.executeTask(taskCommand);
+    all.add(new BootstrapProperties(bootstrapProperties));
+    if (projectReactor != null) {
+      all.add(projectReactor);
+    }
+    bootstrapContainer=BootstrapContainer.create(all);
+    bootstrapContainer.startComponents();
+    TaskContainer taskContainer=new TaskContainer(bootstrapContainer);
+    taskContainer.add(ScanTask.DEFINITION,ScanTask.class,ListTask.DEFINITION,ListTask.class);
+    taskContainer.execute();
   }
  catch (  RuntimeException e) {
     PicoUtils.propagateStartupException(e);
   }
  finally {
     try {
-      if (bootstrapModule != null) {
-        bootstrapModule.stopComponents();
+      if (bootstrapContainer != null) {
+        bootstrapContainer.stopComponents();
       }
     }
  catch (    Exception e) {
