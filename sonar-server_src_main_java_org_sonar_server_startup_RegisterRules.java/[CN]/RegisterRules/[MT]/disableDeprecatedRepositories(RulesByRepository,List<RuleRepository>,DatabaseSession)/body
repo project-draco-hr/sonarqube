@@ -1,0 +1,15 @@
+{
+  for (  final String repositoryKey : existingRules.repositories()) {
+    if (!Iterables.any(repositories,new Predicate<RuleRepository>(){
+      public boolean apply(      RuleRepository input){
+        return input.getKey().equals(repositoryKey);
+      }
+    }
+)) {
+      for (      Rule rule : existingRules.get(repositoryKey)) {
+        disable(rule);
+        session.saveWithoutFlush(rule);
+      }
+    }
+  }
+}

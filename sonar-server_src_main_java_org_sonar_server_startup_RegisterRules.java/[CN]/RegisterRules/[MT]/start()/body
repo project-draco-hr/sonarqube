@@ -1,14 +1,9 @@
 {
   TimeProfiler profiler=new TimeProfiler();
   DatabaseSession session=sessionFactory.getSession();
-  disableAllRules(session);
-  for (  RuleRepository repository : repositories) {
-    profiler.start("Register rules [" + repository.getKey() + "/"+ StringUtils.defaultString(repository.getLanguage(),"-")+ "]");
-    registerRepository(repository,session);
-    profiler.stop();
-  }
-  profiler.start("Disable deprecated user rules");
-  disableDeprecatedUserRules(session);
-  profiler.stop();
+  RulesByRepository existingRules=new RulesByRepository(findAllRules(session));
+  registerRules(existingRules,profiler,session);
+  disableDeprecatedRepositories(existingRules,repositories,session);
+  disableDeprecatedUserRules(profiler,session);
   session.commit();
 }
