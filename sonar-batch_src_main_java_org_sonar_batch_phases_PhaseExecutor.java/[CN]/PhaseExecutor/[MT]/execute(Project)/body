@@ -1,0 +1,32 @@
+{
+  pi.execute(module);
+  eventBus.fireEvent(new ProjectAnalysisEvent(module,true));
+  if (phases.isEnabled(Phases.Phase.MAVEN)) {
+    mavenPluginsConfigurator.execute(module);
+    mavenPhaseExecutor.execute(module);
+  }
+  if (phases.isEnabled(Phases.Phase.INIT)) {
+    initializersExecutor.execute();
+    fsLogger.log();
+  }
+  persistenceManager.setDelayedMode(true);
+  if (phases.isEnabled(Phases.Phase.SENSOR)) {
+    sensorsExecutor.execute(sensorContext);
+  }
+  if (phases.isEnabled(Phases.Phase.DECORATOR)) {
+    decoratorsExecutor.execute();
+  }
+  persistenceManager.dump();
+  persistenceManager.setDelayedMode(false);
+  if (module.isRoot()) {
+    graphStorage.save();
+    if (updateStatusJob != null) {
+      updateStatusJob.execute();
+    }
+    if (phases.isEnabled(Phases.Phase.POSTJOB)) {
+      postJobsExecutor.execute(sensorContext);
+    }
+  }
+  cleanMemory();
+  eventBus.fireEvent(new ProjectAnalysisEvent(module,false));
+}
