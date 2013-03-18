@@ -1,0 +1,18 @@
+{
+  StartableComponent parentComponent=new StartableComponent();
+  final StartableComponent childComponent=new StartableComponent();
+  ComponentContainer parentContainer=new ComponentContainer(){
+    @Override public void doAfterStart(){
+      ComponentContainer childContainer=new ComponentContainer(this);
+      childContainer.add(childComponent);
+      childContainer.execute();
+    }
+  }
+;
+  parentContainer.add(parentComponent);
+  parentContainer.execute();
+  assertThat(parentComponent.started).isTrue();
+  assertThat(parentComponent.stopped).isTrue();
+  assertThat(childComponent.started).isTrue();
+  assertThat(childComponent.stopped).isTrue();
+}

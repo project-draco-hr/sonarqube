@@ -1,0 +1,25 @@
+{
+  StartableComponent parentComponent=new StartableComponent();
+  final StartableComponent childComponent1=new StartableComponent();
+  final UnstartableComponent childComponent2=new UnstartableComponent();
+  ComponentContainer parentContainer=new ComponentContainer(){
+    @Override public void doAfterStart(){
+      ComponentContainer childContainer=new ComponentContainer(this);
+      childContainer.add(childComponent1);
+      childContainer.add(childComponent2);
+      childContainer.execute();
+    }
+  }
+;
+  parentContainer.add(parentComponent);
+  try {
+    parentContainer.execute();
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(parentComponent.started).isTrue();
+    assertThat(parentComponent.stopped).isTrue();
+    assertThat(childComponent1.started).isTrue();
+    assertThat(childComponent1.stopped).isTrue();
+  }
+}
