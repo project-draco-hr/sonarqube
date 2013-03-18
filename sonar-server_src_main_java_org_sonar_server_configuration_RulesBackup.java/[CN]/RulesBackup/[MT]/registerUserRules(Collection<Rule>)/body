@@ -16,6 +16,7 @@
       }
     }
     rule.setParent(matchingParentRuleInDb);
+    rule.setLanguage(matchingParentRuleInDb.getLanguage());
     Rule matchingRuleInDb=session.getSingleResult(Rule.class,"pluginName",rule.getRepositoryKey(),"key",rule.getKey());
     if (matchingRuleInDb != null) {
       matchingRuleInDb.setParent(matchingParentRuleInDb);
@@ -25,10 +26,13 @@
       matchingRuleInDb.setSeverity(rule.getSeverity());
       matchingRuleInDb.setParams(rule.getParams());
       matchingRuleInDb.setStatus(Status.READY.name());
+      matchingRuleInDb.setLanguage(rule.getLanguage());
+      matchingRuleInDb.setUpdatedAt(new Date());
       session.save(matchingRuleInDb);
     }
  else {
       rule.setStatus(Status.READY.name());
+      rule.setCreatedAt(new Date());
       session.save(rule);
     }
   }
