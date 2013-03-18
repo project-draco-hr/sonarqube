@@ -5,8 +5,7 @@
   deprecatedUserRuleIds.addAll(session.createQuery("SELECT r.id FROM " + Rule.class.getSimpleName() + " r WHERE r.parent IS NOT NULL AND EXISTS(FROM "+ Rule.class.getSimpleName()+ " p WHERE r.parent=p and p.status=:status)").setParameter("status",RuleStatus.REMOVED.name()).getResultList());
   for (  Integer deprecatedUserRuleId : deprecatedUserRuleIds) {
     Rule rule=session.getSingleResult(Rule.class,"id",deprecatedUserRuleId);
-    disable(rule);
-    session.saveWithoutFlush(rule);
+    disable(rule,existingRules,session);
   }
   profiler.stop();
 }

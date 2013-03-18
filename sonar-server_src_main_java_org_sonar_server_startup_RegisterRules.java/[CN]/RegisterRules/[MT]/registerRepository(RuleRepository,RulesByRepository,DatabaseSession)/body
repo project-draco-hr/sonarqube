@@ -1,4 +1,5 @@
 {
+  List<Rule> registeredRules=newArrayList();
   Map<String,Rule> ruleByKey=newHashMap();
   for (  Rule rule : repository.createRules()) {
     rule.setRepositoryKey(repository.getKey());
@@ -6,18 +7,17 @@
     rule.setStatus(!Strings.isNullOrEmpty(rule.getStatus()) ? rule.getStatus() : RuleStatus.defaultValue().name());
     validateRule(rule,repository.getKey());
     ruleByKey.put(rule.getKey(),rule);
+    registeredRules.add(rule);
   }
   LOG.debug(ruleByKey.size() + " rules");
   for (  Rule persistedRule : existingRules.get(repository.getKey())) {
     Rule rule=ruleByKey.get(persistedRule.getKey());
     if (rule != null) {
       updateRule(persistedRule,rule,session);
+      session.saveWithoutFlush(persistedRule);
       ruleByKey.remove(rule.getKey());
     }
- else {
-      disable(persistedRule);
-    }
-    session.saveWithoutFlush(persistedRule);
   }
   saveNewRules(ruleByKey.values(),session);
+  return registeredRules;
 }

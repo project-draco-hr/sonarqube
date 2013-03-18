@@ -2,8 +2,9 @@
   TimeProfiler profiler=new TimeProfiler();
   DatabaseSession session=sessionFactory.getSession();
   RulesByRepository existingRules=new RulesByRepository(findAllRules(session));
-  registerRules(existingRules,profiler,session);
-  disableDeprecatedRepositories(existingRules,repositories,session);
-  disableDeprecatedUserRules(profiler,session);
+  List<Rule> registeredRules=registerRules(existingRules,profiler,session);
+  disableDeprecatedRules(existingRules,registeredRules,session);
+  disableDeprecatedRepositories(existingRules,session);
+  disableDeprecatedUserRules(profiler,existingRules,session);
   session.commit();
 }

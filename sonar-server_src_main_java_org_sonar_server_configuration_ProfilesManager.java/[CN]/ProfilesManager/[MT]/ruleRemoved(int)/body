@@ -1,0 +1,17 @@
+{
+  Rule rule=getSession().getEntity(Rule.class,ruleId);
+  List<RulesProfile> profiles=getSession().createQuery("FROM " + RulesProfile.class.getSimpleName()).getResultList();
+  String user="admin";
+  for (  RulesProfile profile : profiles) {
+    for (    ActiveRule activeRule : profile.getActiveRules()) {
+      if (activeRule.getRule().equals(rule)) {
+        incrementProfileVersionIfNeeded(profile);
+        deactivate(profile,activeRule.getRule(),user);
+        ActiveRuleChange rc=new ActiveRuleChange(user,profile,rule);
+        rc.setEnabled(false);
+        getSession().saveWithoutFlush(rc);
+      }
+    }
+  }
+  getSession().commit();
+}
