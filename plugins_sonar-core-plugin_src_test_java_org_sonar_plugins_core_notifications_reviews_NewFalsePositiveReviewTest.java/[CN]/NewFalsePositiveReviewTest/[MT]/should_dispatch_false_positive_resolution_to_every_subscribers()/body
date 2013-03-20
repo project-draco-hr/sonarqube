@@ -1,0 +1,10 @@
+{
+  Multimap<String,NotificationChannel> recipients=HashMultimap.create();
+  recipients.put("user1",emailChannel);
+  recipients.put("user2",twitterChannel);
+  when(notificationManager.findSubscribedRecipientsForDispatcher(dispatcher,42)).thenReturn(recipients);
+  dispatcher.performDispatch(new Notification("review-changed").setFieldValue("projectId","42").setFieldValue("author","user3").setFieldValue("new.resolution","FALSE-POSITIVE"),context);
+  verify(context).addUser("user1",emailChannel);
+  verify(context).addUser("user2",twitterChannel);
+  verifyNoMoreInteractions(context);
+}
