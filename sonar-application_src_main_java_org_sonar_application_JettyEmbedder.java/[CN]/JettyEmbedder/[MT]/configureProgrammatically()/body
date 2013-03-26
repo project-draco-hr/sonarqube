@@ -1,17 +1,19 @@
 {
   configureServer();
+  HandlerCollection handlers=new HandlerCollection();
   WebAppContext context=new WebAppContext(getPath("/war/sonar-server"),contextPath);
+  String filenamePattern=configuration.getProperty("sonar.web.jettyRequestLogs");
+  RequestLogHandler requestLogHandler=configureRequestLogHandler(filenamePattern);
   String shutdownCookie=System.getProperty("sonar.shutdownToken");
   if (shutdownCookie != null && !"".equals(shutdownCookie)) {
     System.out.println("Registering shutdown handler");
     ShutdownHandler shutdownHandler=new ShutdownHandler(server,shutdownCookie);
     shutdownHandler.setExitJvm(true);
-    HandlerList handlers=new HandlerList();
-    handlers.setHandlers(new Handler[]{shutdownHandler,context});
-    server.setHandler(handlers);
+    handlers.setHandlers(new Handler[]{shutdownHandler,context,requestLogHandler});
   }
  else {
-    server.addHandler(context);
+    handlers.setHandlers(new Handler[]{context,requestLogHandler});
   }
+  server.setHandler(handlers);
   return server;
 }
