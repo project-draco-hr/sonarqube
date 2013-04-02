@@ -1,0 +1,18 @@
+{
+  Configuration conf=new BaseConfiguration();
+  conf.addProperty("sonar.timemachine.period1","1.2");
+  conf.addProperty("sonar.timemachine.period2","1.2");
+  conf.addProperty("sonar.timemachine.period3","1.2");
+  conf.addProperty("sonar.timemachine.period4","1.2");
+  conf.addProperty("sonar.timemachine.period5","1.2");
+  when(finderByVersion.findByVersion(null,"1.2")).thenReturn(new PastSnapshot("version",new Date(),new Snapshot()));
+  PastSnapshot variationSnapshot=finder.find(null,conf,1);
+  verify(finderByVersion).findByVersion(null,"1.2");
+  assertThat(variationSnapshot.getIndex(),is(1));
+  assertThat(variationSnapshot.getMode(),is("version"));
+  assertThat(variationSnapshot.getProjectSnapshot(),not(nullValue()));
+  assertThat(finder.find(null,conf,2).getIndex(),is(2));
+  assertThat(finder.find(null,conf,3).getIndex(),is(3));
+  assertThat(finder.find(null,conf,4).getIndex(),is(4));
+  assertThat(finder.find(null,conf,5).getIndex(),is(5));
+}
