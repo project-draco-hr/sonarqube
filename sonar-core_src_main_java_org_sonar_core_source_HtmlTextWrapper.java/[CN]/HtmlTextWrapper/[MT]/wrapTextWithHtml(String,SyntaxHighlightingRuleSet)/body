@@ -1,0 +1,44 @@
+{
+  List<SyntaxHighlightingRule> highlightingRules=syntaxHighlighting.getSyntaxHighlightingRuleSet();
+  StringBuilder decoratedText=new StringBuilder();
+  BufferedReader textReader=null;
+  try {
+    textReader=new BufferedReader(new InputStreamReader(IOUtils.toInputStream(text)));
+    int currentCharValue=textReader.read();
+    int currentCharIndex=0;
+    boolean isNewLine=true;
+    while (currentCharValue != END_OF_STREAM) {
+      if (isNewLine) {
+        decoratedText.append("<tr><td>");
+        reopenCurrentSyntaxTags(decoratedText);
+        isNewLine=false;
+      }
+      if (currentCharValue == END_OF_LINE) {
+        closeCurrentSyntaxTags(decoratedText);
+        decoratedText.append("</tr></td>");
+        isNewLine=true;
+      }
+      Collection<SyntaxHighlightingRule> endingRules=Collections2.filter(highlightingRules,new RuleIsMatchingIndex(currentCharIndex,false));
+      if (!endingRules.isEmpty()) {
+        for (        SyntaxHighlightingRule rule : endingRules) {
+          injectClosingHtmlForRule(rule,decoratedText);
+        }
+      }
+      Collection<SyntaxHighlightingRule> startingRules=Collections2.filter(highlightingRules,new RuleIsMatchingIndex(currentCharIndex,true));
+      if (!startingRules.isEmpty()) {
+        for (        SyntaxHighlightingRule rule : startingRules) {
+          injectOpeningHtmlForRule(rule,decoratedText);
+        }
+      }
+      decoratedText.append((char)currentCharValue);
+      currentCharValue=textReader.read();
+      currentCharIndex++;
+    }
+  }
+ catch (  Exception Ex) {
+  }
+ finally {
+    closeReaderSilently(textReader);
+  }
+  return decoratedText.toString();
+}
