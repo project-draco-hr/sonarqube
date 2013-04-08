@@ -4,32 +4,27 @@
   BufferedReader stringBuffer=null;
   try {
     stringBuffer=new BufferedReader(new StringReader(text));
-    int currentCharValue=stringBuffer.read();
-    int currentCharIndex=0;
-    boolean isNewLine=true;
-    while (currentCharValue != END_OF_STREAM) {
-      if (isNewLine) {
+    CharactersReader context=new CharactersReader(stringBuffer);
+    while (context.readNextChar()) {
+      if (shouldStartNewLine(context)) {
         decoratedText.append(OPEN_TABLE_LINE);
-        reopenCurrentSyntaxTags(decoratedText);
-        isNewLine=false;
-      }
-      if (currentCharValue == END_OF_LINE) {
-        closeCurrentSyntaxTags(decoratedText);
-        decoratedText.append(CLOSE_TABLE_LINE);
-        isNewLine=true;
-      }
- else {
-        Collection<SyntaxHighlightingRule> rulesMatchingCurrentIndex=Collections2.filter(highlightingRules,new IndexRuleFilter(currentCharIndex));
-        if (rulesMatchingCurrentIndex.size() > 0) {
-          injectHtml(currentCharIndex,rulesMatchingCurrentIndex,decoratedText);
+        if (shouldReopenPendingTags(context)) {
+          reopenCurrentSyntaxTags(context,decoratedText);
         }
       }
-      decoratedText.append((char)currentCharValue);
-      currentCharValue=stringBuffer.read();
-      currentCharIndex++;
+      Collection<SyntaxHighlightingRule> tagsToClose=Collections2.filter(highlightingRules,new IndexRuleFilter(context.getCurrentIndex(),false));
+      closeCompletedTags(context,tagsToClose,decoratedText);
+      if (shouldClosePendingTags(context)) {
+        closeCurrentSyntaxTags(context,decoratedText);
+        decoratedText.append(CLOSE_TABLE_LINE);
+      }
+      Collection<SyntaxHighlightingRule> tagsToOpen=Collections2.filter(highlightingRules,new IndexRuleFilter(context.getCurrentIndex(),true));
+      openNewTags(context,tagsToOpen,decoratedText);
+      decoratedText.append((char)context.getCurrentValue());
     }
   }
- catch (  Exception Ex) {
+ catch (  IOException exception) {
+    LoggerFactory.getLogger(HtmlTextWrapper.class).error("");
   }
  finally {
     closeReaderSilently(stringBuffer);
