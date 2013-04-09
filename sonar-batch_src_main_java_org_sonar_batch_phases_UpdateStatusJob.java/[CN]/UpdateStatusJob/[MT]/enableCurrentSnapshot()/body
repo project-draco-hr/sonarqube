@@ -3,6 +3,11 @@
   boolean isLast=(previousLastSnapshot == null || previousLastSnapshot.getCreatedAt().before(snapshot.getCreatedAt()));
   setFlags(snapshot,isLast,Snapshot.STATUS_PROCESSED);
   if (!settings.getBoolean(CoreProperties.DRY_RUN)) {
-    LoggerFactory.getLogger(getClass()).info("ANALYSIS SUCCESSFUL, you can browse {}",server.getURL());
+    String baseUrl=StringUtils.defaultIfBlank(settings.getString(CoreProperties.SERVER_BASE_URL),server.getURL());
+    if (!baseUrl.endsWith("/")) {
+      baseUrl+="/";
+    }
+    String url=baseUrl + "dashboard/index/" + project.getKey();
+    LoggerFactory.getLogger(getClass()).info("ANALYSIS SUCCESSFUL, you can browse {}",url);
   }
 }
