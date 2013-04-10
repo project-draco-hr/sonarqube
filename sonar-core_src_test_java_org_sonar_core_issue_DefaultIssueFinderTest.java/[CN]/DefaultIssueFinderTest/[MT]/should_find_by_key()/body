@@ -1,0 +1,11 @@
+{
+  IssueDto issueDto=new IssueDto().setId(1L).setRuleId(1).setResourceId(1);
+  when(issueDao.findByUuid("key")).thenReturn(issueDto);
+  when(ruleFinder.findById(anyInt())).thenReturn(Rule.create("repo","key"));
+  when(resourceDao.getResource(anyInt())).thenReturn(new ResourceDto().setKey("componentKey"));
+  Issue issue=finder.findByKey("key");
+  assertThat(issue).isNotNull();
+  assertThat(issue.componentKey()).isEqualTo("componentKey");
+  assertThat(issue.ruleKey()).isEqualTo("key");
+  assertThat(issue.ruleRepositoryKey()).isEqualTo("repo");
+}
