@@ -3,8 +3,8 @@
   String secondCommentLine=" * Test";
   String thirdCommentLine=" */";
   String blockComment=firstCommentLine + LF_END_OF_LINE + secondCommentLine+ LF_END_OF_LINE+ thirdCommentLine+ LF_END_OF_LINE;
-  SyntaxHighlightingRuleSet syntaxHighlighting=SyntaxHighlightingRuleSet.builder().registerHighlightingRule(0,14,"cppd").build();
+  HighlightingContext context=HighlightingContext.buildFrom("0,14,cppd;");
   HtmlTextWrapper htmlTextWrapper=new HtmlTextWrapper();
-  String htmlOutput=htmlTextWrapper.wrapTextWithHtml(blockComment,syntaxHighlighting);
-  assertThat(htmlOutput).isEqualTo("<tr><td><span class=\"cppd\">" + firstCommentLine + "</span></td></tr>"+ LF_END_OF_LINE+ "<tr><td><span class=\"cppd\">"+ secondCommentLine+ "</span></td></tr>"+ LF_END_OF_LINE+ "<tr><td><span class=\"cppd\">"+ thirdCommentLine+ "</span></td></tr>"+ LF_END_OF_LINE);
+  List<String> htmlOutput=htmlTextWrapper.wrapTextWithHtml(blockComment,context);
+  assertThat(htmlOutput).containsExactly("<span class=\"cppd\">" + firstCommentLine + "</span>","<span class=\"cppd\">" + secondCommentLine + "</span>","<span class=\"cppd\">" + thirdCommentLine + "</span>");
 }
