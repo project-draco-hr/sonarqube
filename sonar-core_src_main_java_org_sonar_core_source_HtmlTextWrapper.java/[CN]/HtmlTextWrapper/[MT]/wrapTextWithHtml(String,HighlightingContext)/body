@@ -1,0 +1,34 @@
+{
+  StringBuilder decoratedText=new StringBuilder();
+  BufferedReader stringBuffer=null;
+  try {
+    stringBuffer=new BufferedReader(new StringReader(text));
+    CharactersReader charsReader=new CharactersReader(stringBuffer);
+    while (charsReader.readNextChar()) {
+      if (shouldStartNewLine(charsReader)) {
+        decoratedText.append(OPEN_TABLE_LINE);
+        if (shouldReopenPendingTags(charsReader)) {
+          reopenCurrentSyntaxTags(charsReader,decoratedText);
+        }
+      }
+      int numberOfTagsToClose=getNumberOfTagsToClose(charsReader.getCurrentIndex(),context);
+      closeCompletedTags(charsReader,numberOfTagsToClose,decoratedText);
+      if (shouldClosePendingTags(charsReader)) {
+        closeCurrentSyntaxTags(charsReader,decoratedText);
+        decoratedText.append(CLOSE_TABLE_LINE);
+      }
+      Collection<String> tagsToOpen=getTagsToOpen(charsReader.getCurrentIndex(),context);
+      openNewTags(charsReader,tagsToOpen,decoratedText);
+      decoratedText.append((char)charsReader.getCurrentValue());
+    }
+  }
+ catch (  IOException exception) {
+    String errorMsg="An exception occurred while highlighting the syntax of one of the project's files";
+    LoggerFactory.getLogger(HtmlTextWrapper.class).error(errorMsg);
+    throw new IllegalStateException(errorMsg,exception);
+  }
+ finally {
+    Closeables.closeQuietly(stringBuffer);
+  }
+  return decoratedText.toString();
+}
