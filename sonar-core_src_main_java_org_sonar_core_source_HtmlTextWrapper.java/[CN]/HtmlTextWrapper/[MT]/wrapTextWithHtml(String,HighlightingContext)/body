@@ -1,29 +1,32 @@
 {
-  StringBuilder decoratedText=new StringBuilder();
+  StringBuilder currentHtmlLine=new StringBuilder();
+  List<String> decoratedHtmlLines=Lists.newArrayList();
   BufferedReader stringBuffer=null;
   try {
     stringBuffer=new BufferedReader(new StringReader(text));
     CharactersReader charsReader=new CharactersReader(stringBuffer);
     while (charsReader.readNextChar()) {
       if (shouldStartNewLine(charsReader)) {
-        decoratedText.append(OPEN_TABLE_LINE);
+        decoratedHtmlLines.add(currentHtmlLine.toString());
+        currentHtmlLine=new StringBuilder();
         if (shouldReopenPendingTags(charsReader)) {
-          reopenCurrentSyntaxTags(charsReader,decoratedText);
+          reopenCurrentSyntaxTags(charsReader,currentHtmlLine);
         }
       }
       int numberOfTagsToClose=getNumberOfTagsToClose(charsReader.getCurrentIndex(),context);
-      closeCompletedTags(charsReader,numberOfTagsToClose,decoratedText);
+      closeCompletedTags(charsReader,numberOfTagsToClose,currentHtmlLine);
       if (shouldClosePendingTags(charsReader)) {
-        closeCurrentSyntaxTags(charsReader,decoratedText);
-        decoratedText.append(CLOSE_TABLE_LINE);
+        closeCurrentSyntaxTags(charsReader,currentHtmlLine);
       }
       Collection<String> tagsToOpen=getTagsToOpen(charsReader.getCurrentIndex(),context);
-      openNewTags(charsReader,tagsToOpen,decoratedText);
-      decoratedText.append((char)charsReader.getCurrentValue());
+      openNewTags(charsReader,tagsToOpen,currentHtmlLine);
+      if (shouldAppendCharToHtmlOutput(charsReader)) {
+        currentHtmlLine.append((char)charsReader.getCurrentValue());
+      }
     }
-    if (shouldClosePendingTags(charsReader)) {
-      closeCurrentSyntaxTags(charsReader,decoratedText);
-      decoratedText.append(CLOSE_TABLE_LINE);
+    closeCurrentSyntaxTags(charsReader,currentHtmlLine);
+    if (currentHtmlLine.length() > 0) {
+      decoratedHtmlLines.add(currentHtmlLine.toString());
     }
   }
  catch (  IOException exception) {
@@ -34,5 +37,5 @@
  finally {
     Closeables.closeQuietly(stringBuffer);
   }
-  return decoratedText.toString();
+  return decoratedHtmlLines;
 }
