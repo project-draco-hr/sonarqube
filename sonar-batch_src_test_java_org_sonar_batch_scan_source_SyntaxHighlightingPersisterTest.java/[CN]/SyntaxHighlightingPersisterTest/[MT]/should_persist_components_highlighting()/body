@@ -1,0 +1,29 @@
+{
+  Snapshot snapshotComponent1=mock(Snapshot.class);
+  when(snapshotComponent1.getId()).thenReturn(1);
+  when(snapshotComponent1.getResourceId()).thenReturn(1);
+  Snapshot snapshotComponent2=mock(Snapshot.class);
+  when(snapshotComponent2.getId()).thenReturn(2);
+  when(snapshotComponent2.getResourceId()).thenReturn(2);
+  Map<String,String> highlightingRules=Maps.newHashMap();
+  highlightingRules.put("component1","0,10,k;2,4,k;15,25,cppd;");
+  highlightingRules.put("component2","0,5,cppd;15,25,k;");
+  when(highlightingCache.getHighlightingRulesByComponent()).thenReturn(highlightingRules);
+  when(snapshots.get("component1")).thenReturn(snapshotComponent1);
+  when(snapshots.get("component2")).thenReturn(snapshotComponent2);
+  SyntaxHighlightingPersister persister=new SyntaxHighlightingPersister(snapshotDataDao,highlightingCache,snapshots);
+  persister.persist();
+  InOrder orderedMock=inOrder(snapshotDataDao);
+  orderedMock.verify(snapshotDataDao).insert(argThat(new ArgumentMatcher<SnapshotDataDto>(){
+    @Override public boolean matches(    Object o){
+      return ((SnapshotDataDto)o).getSnapshotId() == 1;
+    }
+  }
+));
+  orderedMock.verify(snapshotDataDao).insert(argThat(new ArgumentMatcher<SnapshotDataDto>(){
+    @Override public boolean matches(    Object o){
+      return ((SnapshotDataDto)o).getSnapshotId() == 2;
+    }
+  }
+));
+}
