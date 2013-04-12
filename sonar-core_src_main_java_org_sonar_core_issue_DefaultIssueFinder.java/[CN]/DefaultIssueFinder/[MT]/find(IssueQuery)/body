@@ -1,10 +1,33 @@
 {
-  LOG.debug("IssueQuery : {}",issueQuery);
-  Collection<IssueDto> dtoList=issueDao.select(issueQuery);
-  return newArrayList(Iterables.transform(dtoList,new Function<IssueDto,Issue>(){
-    @Override public Issue apply(    IssueDto input){
-      return toIssue(input);
+  LOG.debug("IssueQuery : {}",query);
+  List<IssueDto> dtoList=issueDao.select(query);
+  final Set<Integer> componentIds=Sets.newLinkedHashSet();
+  final Set<Integer> ruleIds=Sets.newLinkedHashSet();
+  for (  IssueDto dto : dtoList) {
+    componentIds.add(dto.getResourceId());
+    ruleIds.add(dto.getRuleId());
+  }
+  final Map<Integer,Rule> rules=Maps.newHashMap();
+  for (  Integer ruleId : ruleIds) {
+    Rule rule=ruleFinder.findById(ruleId);
+    if (rule != null) {
+      rules.put(rule.getId(),rule);
+    }
+  }
+  final Map<Integer,ResourceDto> resources=Maps.newHashMap();
+  for (  Integer componentId : componentIds) {
+    ResourceDto resource=resourceDao.getResource(componentId);
+    if (resource != null) {
+      resources.put(resource.getId().intValue(),resource);
+    }
+  }
+  List<Issue> issues=ImmutableList.copyOf(Iterables.transform(dtoList,new Function<IssueDto,Issue>(){
+    @Override public Issue apply(    IssueDto dto){
+      Rule rule=rules.get(dto.getRuleId());
+      ResourceDto resource=resources.get(dto.getResourceId());
+      return toIssue(dto,rule,resource);
     }
   }
 ));
+  return new DefaultResults(issues);
 }

@@ -1,4 +1,10 @@
 {
-  IssueDto issueDto=issueDao.findByUuid(key);
-  return issueDto != null ? toIssue(issueDto) : null;
+  IssueDto dto=issueDao.selectByKey(key);
+  Issue issue=null;
+  if (dto != null) {
+    Rule rule=ruleFinder.findById(dto.getRuleId());
+    ResourceDto resource=resourceDao.getResource(dto.getResourceId());
+    issue=toIssue(dto,rule,resource);
+  }
+  return issue;
 }
