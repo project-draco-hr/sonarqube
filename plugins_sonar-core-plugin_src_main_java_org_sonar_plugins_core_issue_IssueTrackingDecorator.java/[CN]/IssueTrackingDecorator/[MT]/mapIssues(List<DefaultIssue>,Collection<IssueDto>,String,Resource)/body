@@ -3,18 +3,7 @@
   Multimap<Integer,IssueDto> lastIssuesByRule=LinkedHashMultimap.create();
   if (lastIssues != null) {
     hasLastScan=true;
-    unmappedLastIssues.addAll(lastIssues);
-    for (    IssueDto lastIssue : lastIssues) {
-      lastIssuesByRule.put(getRule(lastIssue),lastIssue);
-    }
-    for (    DefaultIssue newIssue : newIssues) {
-      mapIssue(newIssue,findLastIssueWithSameKey(newIssue,lastIssuesByRule.get(getRule(newIssue))),lastIssuesByRule,referenceIssuesMap);
-    }
-    for (    DefaultIssue newIssue : newIssues) {
-      if (isNotAlreadyMapped(newIssue)) {
-        mapIssue(newIssue,findLastIssueWithSameLineAndChecksum(newIssue,lastIssuesByRule.get(getRule(newIssue))),lastIssuesByRule,referenceIssuesMap);
-      }
-    }
+    mapLastIssues(newIssues,lastIssues,lastIssuesByRule);
   }
   if (referenceIssuesMap.size() != newIssues.size()) {
     if (source != null && resource != null && hasLastScan) {
