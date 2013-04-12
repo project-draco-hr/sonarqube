@@ -1,5 +1,19 @@
 {
   for (  Issue issue : cache.issues()) {
-    System.out.println("Persist issue " + issue.key() + " on "+ issue.componentKey());
+    Snapshot snapshot=snapshotCache.get(issue.componentKey());
+    if (snapshot == null) {
+      throw new IllegalStateException("Snapshot should not be null");
+    }
+    Rule rule=ruleFinder.findByKey(issue.ruleRepositoryKey(),issue.ruleKey());
+    if (rule == null) {
+      throw new IllegalStateException("Rule should not be null");
+    }
+    IssueDto issueDto=toIssueDto((DefaultIssue)issue,snapshot.getResourceId(),rule.getId());
+    if (issue.isNew()) {
+      dao.insert(issueDto);
+    }
+ else {
+      dao.update(newArrayList(issueDto));
+    }
   }
 }
