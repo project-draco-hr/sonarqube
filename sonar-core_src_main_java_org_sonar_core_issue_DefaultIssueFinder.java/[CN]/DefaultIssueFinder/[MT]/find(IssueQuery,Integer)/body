@@ -1,0 +1,40 @@
+{
+  LOG.debug("IssueQuery : {}",query);
+  SqlSession sqlSession=myBatis.openSession();
+  try {
+    List<IssueDto> issueDtos=issueDao.select(query,sqlSession);
+    Set<Integer> componentIds=Sets.newLinkedHashSet();
+    Set<Integer> ruleIds=Sets.newLinkedHashSet();
+    for (    IssueDto issueDto : issueDtos) {
+      componentIds.add(issueDto.getResourceId());
+      ruleIds.add(issueDto.getRuleId());
+    }
+    componentIds=authorizationDao.keepAuthorizedComponentIds(componentIds,currentUserId,ROLE,sqlSession);
+    final Map<Integer,Rule> rules=Maps.newHashMap();
+    for (    Integer ruleId : ruleIds) {
+      Rule rule=ruleFinder.findById(ruleId);
+      if (rule != null) {
+        rules.put(rule.getId(),rule);
+      }
+    }
+    final Map<Integer,ResourceDto> resources=Maps.newHashMap();
+    for (    Integer componentId : componentIds) {
+      ResourceDto resource=resourceDao.getResource(componentId);
+      if (resource != null) {
+        resources.put(resource.getId().intValue(),resource);
+      }
+    }
+    List<Issue> issues=ImmutableList.copyOf(Iterables.transform(issueDtos,new Function<IssueDto,Issue>(){
+      @Override public Issue apply(      IssueDto dto){
+        Rule rule=rules.get(dto.getRuleId());
+        ResourceDto resource=resources.get(dto.getResourceId());
+        return toIssue(dto,rule,resource);
+      }
+    }
+));
+    return new DefaultResults(issues);
+  }
+  finally {
+    MyBatis.closeQuietly(sqlSession);
+  }
+}

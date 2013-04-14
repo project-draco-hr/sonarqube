@@ -1,14 +1,15 @@
 {
+  grantAccessRights();
   IssueQuery issueQuery=mock(IssueQuery.class);
   IssueDto issue1=new IssueDto().setId(1L).setRuleId(50).setResourceId(123);
   IssueDto issue2=new IssueDto().setId(2L).setRuleId(50).setResourceId(123);
   List<IssueDto> dtoList=newArrayList(issue1,issue2);
-  when(issueDao.select(issueQuery)).thenReturn(dtoList);
+  when(issueDao.select(eq(issueQuery),any(SqlSession.class))).thenReturn(dtoList);
   Rule rule=Rule.create("repo","key");
   rule.setId(50);
   when(ruleFinder.findById(anyInt())).thenReturn(rule);
   when(resourceDao.getResource(anyInt())).thenReturn(new ResourceDto().setKey("componentKey").setId(123L));
-  IssueFinder.Results results=finder.find(issueQuery);
+  IssueFinder.Results results=finder.find(issueQuery,null);
   assertThat(results.issues()).hasSize(2);
   Issue issue=results.issues().iterator().next();
   assertThat(issue.componentKey()).isEqualTo("componentKey");
