@@ -1,0 +1,11 @@
+{
+  List<Issue> issues=newArrayList();
+  issues.add(new DefaultIssue().setRuleRepositoryKey(ruleA1.getRepositoryKey()).setRuleKey(ruleA1.getKey()).setSeverity(RulePriority.CRITICAL.name()));
+  issues.add(new DefaultIssue().setRuleRepositoryKey(ruleA1.getRepositoryKey()).setRuleKey(ruleA1.getKey()).setSeverity(RulePriority.CRITICAL.name()));
+  issues.add(new DefaultIssue().setRuleRepositoryKey(ruleA2.getRepositoryKey()).setRuleKey(ruleA2.getKey()).setSeverity(RulePriority.MAJOR.name()));
+  when(issuable.issues()).thenReturn(issues);
+  decorator.decorate(resource,context);
+  verify(context).saveMeasure(argThat(new IsRuleMeasure(CoreMetrics.CRITICAL_ISSUES,ruleA1,2.0)));
+  verify(context,never()).saveMeasure(argThat(new IsRuleMeasure(CoreMetrics.MAJOR_ISSUES,ruleA1,0.0)));
+  verify(context).saveMeasure(argThat(new IsRuleMeasure(CoreMetrics.MAJOR_ISSUES,ruleA2,1.0)));
+}
