@@ -1,0 +1,13 @@
+{
+  Project project=new Project("key").setName("LongName");
+  project.setId(45);
+  Calendar pastDate=new GregorianCalendar(2011,10,25);
+  PastSnapshot pastSnapshot=new PastSnapshot("",pastDate.getTime());
+  when(timeMachineConfiguration.getProjectPastSnapshots()).thenReturn(Lists.newArrayList(pastSnapshot,pastSnapshot));
+  Measure m=new Measure(CoreMetrics.NEW_ISSUES).setVariation1(32.0);
+  when(context.getMeasure(CoreMetrics.NEW_ISSUES)).thenReturn(m);
+  decorator.decorate(project,context);
+  DateFormat dateformat=new SimpleDateFormat("yyyy-MM-dd");
+  Notification notification=new Notification("new-issues").setDefaultMessage("32 new issues on LongName.").setFieldValue("count","32").setFieldValue("projectName","LongName").setFieldValue("projectKey","key").setFieldValue("projectId","45").setFieldValue("fromDate",dateformat.format(pastDate.getTime()));
+  verify(notificationManager,times(1)).scheduleForSending(eq(notification));
+}
