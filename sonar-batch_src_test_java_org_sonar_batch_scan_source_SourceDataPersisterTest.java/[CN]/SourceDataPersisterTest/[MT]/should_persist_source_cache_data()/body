@@ -1,0 +1,19 @@
+{
+  Snapshot snapshotComponent1=mock(Snapshot.class);
+  when(snapshotComponent1.getId()).thenReturn(1);
+  when(snapshotComponent1.getResourceId()).thenReturn(1);
+  Map<String,String> sourceData=Maps.newHashMap();
+  sourceData.put("component1","source data for component 1");
+  when(sourceDataCache.getSourceDataByComponent()).thenReturn(sourceData);
+  when(sourceDataCache.getDataType()).thenReturn("myDataType");
+  when(snapshots.get("component1")).thenReturn(snapshotComponent1);
+  SourceDataPersister persister=new SourceDataPersister(snapshotDataDao,new SourceDataCache[]{sourceDataCache},snapshots);
+  persister.persist();
+  verify(snapshotDataDao).insert(argThat(new ArgumentMatcher<SnapshotDataDto>(){
+    @Override public boolean matches(    Object o){
+      SnapshotDataDto insertedData=(SnapshotDataDto)o;
+      return insertedData.getSnapshotId() == 1 && insertedData.getDataType() == "myDataType";
+    }
+  }
+));
+}
