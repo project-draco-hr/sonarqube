@@ -1,0 +1,12 @@
+{
+  Component component=mock(Component.class);
+  when(component.key()).thenReturn("myComponent");
+  SymbolDataCache cache=mock(SymbolDataCache.class);
+  DefaultSymbolPerspective symbolPerspective=new DefaultSymbolPerspective(cache,component,new SymbolDataRepository());
+  Symbol firstSymbol=symbolPerspective.newSymbol().setDeclaration(4,8).build();
+  symbolPerspective.declareReferences(firstSymbol).addReference(12).addReference(70);
+  Symbol otherSymbol=symbolPerspective.newSymbol().setDeclaration(25,33).build();
+  symbolPerspective.declareReferences(otherSymbol).addReference(44).addReference(60).addReference(108);
+  symbolPerspective.end();
+  verify(cache).registerSymbolData("myComponent","4,8,4,12,70;25,33,25,44,60,108;");
+}
