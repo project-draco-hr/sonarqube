@@ -1,0 +1,18 @@
+{
+  PhasesSumUpTimeProfiler profiler=new PhasesSumUpTimeProfiler();
+  final Project project=mockProject("project root",true);
+  final Project moduleA=mockProject("moduleA",false);
+  final Project moduleB=mockProject("moduleB",false);
+  when(project.getModules()).thenReturn(Arrays.asList(moduleA,moduleB));
+  fakeAnalysis(profiler,moduleA);
+  fakeAnalysis(profiler,moduleB);
+  fakeAnalysis(profiler,project);
+  assertThat(profiler.currentModuleProfiling.getProfilingPerPhase(Phase.SENSOR).getProfilingPerItem(new FakeSensor()).totalTime()).isIn(delta(10L,5));
+  assertThat(profiler.currentModuleProfiling.getProfilingPerPhase(Phase.DECORATOR).getProfilingPerItem(new FakeDecorator1()).totalTime()).isIn(delta(20L,5));
+  assertThat(profiler.currentModuleProfiling.getProfilingPerPhase(Phase.DECORATOR).getProfilingPerItem(new FakeDecorator2()).totalTime()).isIn(delta(10L,5));
+  assertThat(profiler.currentModuleProfiling.getProfilingPerPhase(Phase.POSTJOB).getProfilingPerItem(new FakePostJob()).totalTime()).isIn(delta(30L,5));
+  assertThat(profiler.totalProfiling.getProfilingPerPhase(Phase.SENSOR).getProfilingPerItem(new FakeSensor()).totalTime()).isIn(delta(30L,5));
+  assertThat(profiler.totalProfiling.getProfilingPerPhase(Phase.DECORATOR).getProfilingPerItem(new FakeDecorator1()).totalTime()).isIn(delta(60L,10));
+  assertThat(profiler.totalProfiling.getProfilingPerPhase(Phase.DECORATOR).getProfilingPerItem(new FakeDecorator2()).totalTime()).isIn(delta(30L,5));
+  assertThat(profiler.totalProfiling.getProfilingPerPhase(Phase.POSTJOB).getProfilingPerItem(new FakePostJob()).totalTime()).isIn(delta(90L,10));
+}

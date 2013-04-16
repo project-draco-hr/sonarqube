@@ -1,0 +1,14 @@
+{
+  ComponentContainer parentContainer=new ComponentContainer();
+  Settings settings=new Settings();
+  parentContainer.add(settings);
+  ProjectScanContainer container=new ProjectScanContainer(parentContainer);
+  container.add(mock(ExtensionInstaller.class));
+  container.doBeforeStart();
+  assertThat(container.getComponentsByType(PhasesSumUpTimeProfiler.class)).hasSize(0);
+  settings.setProperty(CoreProperties.PROFILING_LOG_PROPERTY,"true");
+  container=new ProjectScanContainer(parentContainer);
+  container.add(mock(ExtensionInstaller.class));
+  container.doBeforeStart();
+  assertThat(container.getComponentsByType(PhasesSumUpTimeProfiler.class)).hasSize(1);
+}

@@ -1,0 +1,20 @@
+{
+  Project module=event.getProject();
+  if (event.isStart()) {
+    decoratorsProfiler=new DecoratorsProfiler();
+    currentModuleProfiling=new ModuleProfiling();
+  }
+ else {
+    currentModuleProfiling.stop();
+    System.out.println("\n -------- Profiling for module " + module.getName() + " --------\n");
+    currentModuleProfiling.dump();
+    System.out.println("\n -------- End of profiling for module " + module.getName() + " --------\n");
+    totalProfiling.merge(currentModuleProfiling);
+    if (module.isRoot() && !module.getModules().isEmpty()) {
+      totalProfiling.stop();
+      System.out.println("\n ======== Profiling for total execution ========\n");
+      totalProfiling.dump();
+      System.out.println("\n ======== End of profiling for total execution ========\n");
+    }
+  }
+}
