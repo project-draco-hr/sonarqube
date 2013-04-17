@@ -1,0 +1,15 @@
+{
+  setupData("should_persist_component_data");
+  Snapshot snapshot=new Snapshot();
+  snapshot.setId(100);
+  snapshot.setResourceId(200);
+  snapshots.put("org/struts/Action.java",snapshot);
+  data=new ComponentDataCache(caches);
+  data.setStringData("org/struts/Action.java","SYMBOL","content of symbol");
+  data.setStringData("org/struts/Action.java","SYNTAX","content of syntax");
+  data.setStringData("org/struts/Other.java","SYMBOL","unregistered component, should not be persisted");
+  SnapshotDataDao dataDao=new SnapshotDataDao(getMyBatis());
+  ComponentDataPersister persister=new ComponentDataPersister(data,snapshots,dataDao);
+  persister.persist();
+  checkTables("should_persist_component_data",new String[]{"id","created_at","updated_at"},"snapshot_data");
+}
