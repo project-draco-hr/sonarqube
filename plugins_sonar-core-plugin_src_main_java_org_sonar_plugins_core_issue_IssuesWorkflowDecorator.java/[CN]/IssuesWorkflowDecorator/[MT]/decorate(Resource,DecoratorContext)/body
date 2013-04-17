@@ -1,9 +1,10 @@
 {
-  Collection<Issue> newIssues=moduleIssues.issues(resource.getEffectiveKey());
-  Collection<IssueDto> openIssues=initialOpenIssuesStack.selectAndRemove(resource.getId());
-  if (!openIssues.isEmpty()) {
-    issueTracking.track(resource,openIssues,(List)newIssues);
-    updateIssues(newIssues);
+  if (isComponentSupported(resource)) {
+    Collection<Issue> newIssues=moduleIssues.issues(resource.getEffectiveKey());
+    Collection<IssueDto> openIssues=initialOpenIssuesStack.selectAndRemove(resource.getId());
+    Collection<DefaultIssue> newDefaultIssues=toDefaultIssues(newIssues);
+    issueTracking.track(resource,openIssues,newDefaultIssues);
+    updateIssues(newDefaultIssues);
     addManualIssuesAndCloseResolvedOnes(openIssues,resource);
     closeResolvedStandardIssues(openIssues,newIssues,resource);
     keepFalsePositiveIssues(openIssues,resource);
