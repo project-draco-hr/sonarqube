@@ -1,0 +1,12 @@
+{
+  when(moduleIssues.issues(anyString())).thenReturn(Lists.<Issue>newArrayList(new DefaultIssue().setKey("100")));
+  when(initialOpenIssuesStack.selectAndRemove(anyInt())).thenReturn(newArrayList(new IssueDto().setUuid("100").setRuleId(1).setStatus(Issue.STATUS_RESOLVED).setResolution(Issue.RESOLUTION_FIXED)));
+  decorator.decorate(mock(Resource.class),null);
+  ArgumentCaptor<DefaultIssue> argument=ArgumentCaptor.forClass(DefaultIssue.class);
+  verify(moduleIssues,times(2)).addOrUpdate(argument.capture());
+  List<DefaultIssue> capturedDefaultIssues=argument.getAllValues();
+  DefaultIssue defaultIssue=capturedDefaultIssues.get(1);
+  assertThat(defaultIssue.status()).isEqualTo(Issue.STATUS_REOPENED);
+  assertThat(defaultIssue.resolution()).isNull();
+  assertThat(defaultIssue.updatedAt()).isNotNull();
+}
