@@ -1,28 +1,11 @@
 {
-  for (  Long snapshotId : snapshotIds) {
-    purgeMapper.deleteSnapshotDependencies(snapshotId);
-  }
-  session.commit();
-  for (  Long snapshotId : snapshotIds) {
-    purgeMapper.deleteSnapshotDuplications(snapshotId);
-  }
-  session.commit();
-  for (  Long snapshotId : snapshotIds) {
-    purgeMapper.deleteSnapshotSource(snapshotId);
-  }
-  session.commit();
-  for (  Long snapshotId : snapshotIds) {
-    purgeMapper.deleteSnapshotViolations(snapshotId);
-  }
-  session.commit();
-  for (  Long snapshotId : snapshotIds) {
-    purgeMapper.deleteSnapshotGraphs(snapshotId);
-  }
-  session.commit();
-  for (  Long snapshotId : snapshotIds) {
-    purgeMapper.deleteSnapshotData(snapshotId);
-  }
-  session.commit();
+  deleteSnapshotDependencies(snapshotIds);
+  deleteSnapshotDuplications(snapshotIds);
+  deleteSnapshotSources(snapshotIds);
+  deleteSnapshotViolations(snapshotIds);
+  deleteSnapshotGraphs(snapshotIds);
+  deleteSnapshotData(snapshotIds);
+  profiler.start("deleteSnapshotWastedMeasures (project_measures)");
   List<Long> metricIdsWithoutHistoricalData=purgeMapper.selectMetricIdsWithoutHistoricalData();
   if (!metricIdsWithoutHistoricalData.isEmpty()) {
     for (    Long snapshotId : snapshotIds) {
@@ -30,6 +13,8 @@
     }
     session.commit();
   }
+  profiler.stop();
+  profiler.start("deleteSnapshotMeasuresOnCharacteristics (project_measures)");
   List<Long> characteristicIds=purgeMapper.selectCharacteristicIdsToPurge();
   if (!characteristicIds.isEmpty()) {
     for (    Long snapshotId : snapshotIds) {
@@ -39,8 +24,11 @@
     }
     session.commit();
   }
+  profiler.stop();
+  profiler.start("updatePurgeStatusToOne (snapshots)");
   for (  Long snapshotId : snapshotIds) {
     purgeMapper.updatePurgeStatusToOne(snapshotId);
   }
   session.commit();
+  profiler.stop();
 }

@@ -1,42 +1,32 @@
 {
-  for (  Long snapshotId : snapshotIds) {
-    purgeMapper.deleteSnapshotDependencies(snapshotId);
-  }
-  session.commit();
-  for (  Long snapshotId : snapshotIds) {
-    purgeMapper.deleteSnapshotDuplications(snapshotId);
-  }
-  session.commit();
+  deleteSnapshotDependencies(snapshotIds);
+  deleteSnapshotDuplications(snapshotIds);
+  profiler.start("deleteSnapshotEvents (events)");
   for (  Long snapshotId : snapshotIds) {
     purgeMapper.deleteSnapshotEvents(snapshotId);
   }
   session.commit();
+  profiler.stop();
+  profiler.start("deleteSnapshotMeasureData (measure_data)");
   for (  Long snapshotId : snapshotIds) {
     purgeMapper.deleteSnapshotMeasureData(snapshotId);
   }
   session.commit();
+  profiler.stop();
+  profiler.start("deleteSnapshotMeasures (project_measures)");
   for (  Long snapshotId : snapshotIds) {
     purgeMapper.deleteSnapshotMeasures(snapshotId);
   }
   session.commit();
-  for (  Long snapshotId : snapshotIds) {
-    purgeMapper.deleteSnapshotSource(snapshotId);
-  }
-  session.commit();
-  for (  Long snapshotId : snapshotIds) {
-    purgeMapper.deleteSnapshotViolations(snapshotId);
-  }
-  session.commit();
-  for (  Long snapshotId : snapshotIds) {
-    purgeMapper.deleteSnapshotGraphs(snapshotId);
-  }
-  session.commit();
-  for (  Long snapshotId : snapshotIds) {
-    purgeMapper.deleteSnapshotData(snapshotId);
-  }
-  session.commit();
+  profiler.stop();
+  deleteSnapshotSources(snapshotIds);
+  deleteSnapshotViolations(snapshotIds);
+  deleteSnapshotGraphs(snapshotIds);
+  deleteSnapshotData(snapshotIds);
+  profiler.start("deleteSnapshot (snapshots)");
   for (  Long snapshotId : snapshotIds) {
     purgeMapper.deleteSnapshot(snapshotId);
   }
   session.commit();
+  profiler.stop();
 }
