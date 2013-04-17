@@ -1,0 +1,16 @@
+{
+  for (  Map.Entry<String,Snapshot> componentEntry : snapshots.snapshots()) {
+    String componentKey=componentEntry.getKey();
+    Snapshot snapshot=componentEntry.getValue();
+    for (    Cache.Entry<Data> dataEntry : data.entries(componentKey)) {
+      if (dataEntry.value() != null) {
+        SnapshotDataDto dto=new SnapshotDataDto();
+        dto.setSnapshotId(snapshot.getId());
+        dto.setResourceId(snapshot.getResourceId());
+        dto.setDataType(dataEntry.key());
+        dto.setData(dataEntry.value().writeString());
+        dao.insert(dto);
+      }
+    }
+  }
+}
