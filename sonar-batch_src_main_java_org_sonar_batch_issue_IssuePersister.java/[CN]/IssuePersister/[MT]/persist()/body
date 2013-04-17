@@ -1,19 +1,20 @@
 {
-  for (  Issue issue : issueCache.issues()) {
-    Snapshot snapshot=snapshotCache.get(issue.componentKey());
-    if (snapshot == null) {
-      throw new IllegalStateException("Snapshot should not be null");
-    }
-    Rule rule=ruleFinder.findByKey(issue.ruleRepositoryKey(),issue.ruleKey());
-    if (rule == null) {
-      throw new IllegalStateException("Rule should not be null");
-    }
-    IssueDto issueDto=toIssueDto((DefaultIssue)issue,snapshot.getResourceId(),rule.getId());
-    if (issue.isNew()) {
-      dao.insert(issueDto);
-    }
+  for (  Map.Entry<String,Snapshot> componentEntry : snapshotCache.snapshots()) {
+    String componentKey=componentEntry.getKey();
+    Snapshot snapshot=componentEntry.getValue();
+    Collection<Issue> issues=issueCache.componentIssues(componentKey);
+    for (    Issue issue : issues) {
+      Rule rule=ruleFinder.findByKey(issue.ruleRepositoryKey(),issue.ruleKey());
+      if (rule == null) {
+        throw new IllegalStateException("Rule not found: " + issue.ruleRepositoryKey() + ":"+ issue.ruleKey());
+      }
+      IssueDto dto=toIssueDto((DefaultIssue)issue,snapshot.getResourceId(),rule.getId());
+      if (issue.isNew()) {
+        dao.insert(dto);
+      }
  else {
-      dao.update(newArrayList(issueDto));
+        dao.update(newArrayList(dto));
+      }
     }
   }
 }
