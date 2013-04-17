@@ -1,0 +1,15 @@
+{
+  Collection<Issue> newIssues=moduleIssues.issues(resource.getEffectiveKey());
+  Collection<IssueDto> openIssues=initialOpenIssuesStack.selectAndRemove(resource.getId());
+  if (!openIssues.isEmpty()) {
+    issueTracking.track(resource,openIssues,(List)newIssues);
+    updateIssues(newIssues);
+    addManualIssues(openIssues);
+    closeResolvedStandardIssues(openIssues,newIssues,resource);
+    closeResolvedManualIssues(openIssues,resource);
+    reopenUnresolvedIssues(openIssues,resource);
+  }
+  if (ResourceUtils.isRootProject(resource)) {
+    closeIssuesOnDeletedResources(openIssues,resource);
+  }
+}
