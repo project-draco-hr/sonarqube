@@ -6,12 +6,12 @@
   when(qProfile.getActiveRule(anyString(),anyString())).thenReturn(activeRule);
   Date analysisDate=new Date();
   when(project.getAnalysisDate()).thenReturn(analysisDate);
-  DefaultIssue issue=new DefaultIssue().setRuleRepositoryKey("repoKey").setRuleKey("ruleKey").setSeverity(Issue.SEVERITY_CRITICAL);
+  DefaultIssue issue=new DefaultIssue().setRuleKey(RuleKey.of("squid","AvoidCycle")).setSeverity(Severity.CRITICAL);
   moduleIssues.onIssueCreation(issue);
   ArgumentCaptor<Issue> argument=ArgumentCaptor.forClass(Issue.class);
   verify(cache).addOrUpdate(argument.capture());
   assertThat(argument.getValue().key()).isNotNull();
   assertThat(argument.getValue().status()).isEqualTo(Issue.STATUS_OPEN);
-  assertThat(argument.getValue().severity()).isEqualTo(Issue.SEVERITY_CRITICAL);
+  assertThat(argument.getValue().severity()).isEqualTo(Severity.CRITICAL);
   assertThat(argument.getValue().createdAt()).isEqualTo(analysisDate);
 }
