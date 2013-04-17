@@ -1,13 +1,15 @@
 {
-  String snapshotSource=snapshotSourceDao.selectSnapshotSource(snapshotId);
   Collection<SnapshotDataDto> snapshotDataEntries=snapshotDataDao.selectSnapshotData(snapshotId);
-  if (snapshotSource != null && snapshotDataEntries != null) {
-    DecorationDataHolder decorationDataHolder=new DecorationDataHolder();
-    for (    SnapshotDataDto snapshotDataEntry : snapshotDataEntries) {
-      loadSnapshotData(decorationDataHolder,snapshotDataEntry);
+  if (!snapshotDataEntries.isEmpty()) {
+    String snapshotSource=snapshotSourceDao.selectSnapshotSource(snapshotId);
+    if (snapshotSource != null) {
+      DecorationDataHolder decorationDataHolder=new DecorationDataHolder();
+      for (      SnapshotDataDto snapshotDataEntry : snapshotDataEntries) {
+        loadSnapshotData(decorationDataHolder,snapshotDataEntry);
+      }
+      HtmlTextDecorator textDecorator=new HtmlTextDecorator();
+      return textDecorator.decorateTextWithHtml(snapshotSource,decorationDataHolder);
     }
-    HtmlTextDecorator textDecorator=new HtmlTextDecorator();
-    return textDecorator.decorateTextWithHtml(snapshotSource,decorationDataHolder);
   }
   return null;
 }
