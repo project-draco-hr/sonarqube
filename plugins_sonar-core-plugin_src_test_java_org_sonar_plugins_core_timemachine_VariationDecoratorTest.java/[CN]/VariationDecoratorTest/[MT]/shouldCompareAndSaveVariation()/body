@@ -9,13 +9,13 @@
   Measure currentNcloc=newMeasure(NCLOC,200.0);
   Measure currentCoverage=newMeasure(COVERAGE,80.0);
   when(context.getMeasures(Matchers.<MeasuresFilter>anyObject())).thenReturn(Arrays.asList(currentNcloc,currentCoverage));
-  VariationDecorator decorator=new VariationDecorator(pastMeasuresLoader,mock(MetricFinder.class),Arrays.asList(pastSnapshot1,pastSnapshot3),false);
+  VariationDecorator decorator=new VariationDecorator(pastMeasuresLoader,mock(MetricFinder.class),Arrays.asList(pastSnapshot1,pastSnapshot3));
   decorator.decorate(javaPackage,context);
   verify(context,times(3)).saveMeasure(Matchers.<Measure>anyObject());
-  assertThat(currentNcloc.getVariation1(),is(20.0));
-  assertThat(currentNcloc.getVariation2(),nullValue());
-  assertThat(currentNcloc.getVariation3(),is(-40.0));
-  assertThat(currentCoverage.getVariation1(),is(5.0));
-  assertThat(currentCoverage.getVariation2(),nullValue());
-  assertThat(currentCoverage.getVariation3(),nullValue());
+  assertThat(currentNcloc.getVariation1()).isEqualTo(20.0);
+  assertThat(currentNcloc.getVariation2()).isNull();
+  assertThat(currentNcloc.getVariation3()).isEqualTo(-40.0);
+  assertThat(currentCoverage.getVariation1()).isEqualTo(5.0);
+  assertThat(currentCoverage.getVariation2()).isNull();
+  assertThat(currentCoverage.getVariation3()).isNull();
 }
