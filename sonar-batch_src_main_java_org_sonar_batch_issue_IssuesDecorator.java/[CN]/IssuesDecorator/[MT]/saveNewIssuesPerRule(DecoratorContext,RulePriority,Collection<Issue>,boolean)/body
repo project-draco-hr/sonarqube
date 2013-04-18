@@ -1,0 +1,35 @@
+{
+  if (shouldSaveNewMetrics) {
+    Metric metric=SeverityUtils.severityToNewMetricIssue(severity);
+    ListMultimap<Rule,Measure> childMeasuresPerRule=ArrayListMultimap.create();
+    ListMultimap<Rule,Issue> issuesPerRule=ArrayListMultimap.create();
+    Set<Rule> rules=Sets.newHashSet();
+    Collection<Measure> children=context.getChildrenMeasures(MeasuresFilters.rules(metric));
+    for (    Measure child : children) {
+      RuleMeasure childRuleMeasure=(RuleMeasure)child;
+      Rule rule=childRuleMeasure.getRule();
+      if (rule != null) {
+        childMeasuresPerRule.put(rule,childRuleMeasure);
+        rules.add(rule);
+      }
+    }
+    for (    Issue issue : issues) {
+      if (RulePriority.valueOf(issue.severity()).equals(severity)) {
+        Rule rule=rulefinder.findByKey(issue.ruleKey().repository(),issue.ruleKey().rule());
+        rules.add(rule);
+        issuesPerRule.put(rule,issue);
+      }
+    }
+    for (    Rule rule : rules) {
+      RuleMeasure measure=RuleMeasure.createForRule(metric,rule,null);
+      measure.setSeverity(severity);
+      for (      PastSnapshot pastSnapshot : timeMachineConfiguration.getProjectPastSnapshots()) {
+        int variationIndex=pastSnapshot.getIndex();
+        int count=countIssuesAfterDate(issuesPerRule.get(rule),pastSnapshot.getTargetDate());
+        double sum=MeasureUtils.sumOnVariation(true,variationIndex,childMeasuresPerRule.get(rule)) + count;
+        measure.setVariation(variationIndex,sum);
+      }
+      context.saveMeasure(measure);
+    }
+  }
+}

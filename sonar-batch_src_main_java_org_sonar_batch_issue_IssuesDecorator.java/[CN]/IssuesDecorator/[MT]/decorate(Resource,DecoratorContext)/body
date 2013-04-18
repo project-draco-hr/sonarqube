@@ -1,9 +1,34 @@
 {
   Issuable issuable=perspectives.as(Issuable.class,resource);
   if (issuable != null) {
-    Collection<Issue> issues=issuable.issues();
-    computeTotalIssues(context,issues);
-    computeIssuesPerSeverities(context,issues);
-    computeIssuesPerRules(context,issues);
+    Collection<Issue> issues=getOpenIssues(issuable.issues());
+    boolean shouldSaveNewMetrics=shouldSaveNewMetrics(context);
+    Multiset<RulePriority> severitiesBag=HashMultiset.create();
+    Map<RulePriority,Multiset<Rule>> rulesPerSeverity=Maps.newHashMap();
+    ListMultimap<RulePriority,Issue> issuesPerSeverities=ArrayListMultimap.create();
+    int countUnassigned=0;
+    int falsePositives=0;
+    for (    Issue issue : issues) {
+      severitiesBag.add(RulePriority.valueOf(issue.severity()));
+      Multiset<Rule> rulesBag=initRules(rulesPerSeverity,RulePriority.valueOf(issue.severity()));
+      rulesBag.add(rulefinder.findByKey(issue.ruleKey().repository(),issue.ruleKey().rule()));
+      issuesPerSeverities.put(RulePriority.valueOf(issue.severity()),issue);
+      if (issue.assigneeLogin() == null) {
+        countUnassigned++;
+      }
+      if (Issue.RESOLUTION_FALSE_POSITIVE.equals(issue.resolution())) {
+        falsePositives++;
+      }
+    }
+    for (    RulePriority ruleSeverity : RulePriority.values()) {
+      saveIssuesForSeverity(context,ruleSeverity,severitiesBag);
+      saveIssuesPerRules(context,ruleSeverity,rulesPerSeverity);
+      saveNewIssuesForSeverity(context,ruleSeverity,issuesPerSeverities,shouldSaveNewMetrics);
+      saveNewIssuesPerRule(context,ruleSeverity,issues,shouldSaveNewMetrics);
+    }
+    saveTotalIssues(context,issues);
+    saveNewIssues(context,issues,shouldSaveNewMetrics);
+    saveUnassignedIssues(context,countUnassigned);
+    saveFalsePositiveIssues(context,falsePositives);
   }
 }
