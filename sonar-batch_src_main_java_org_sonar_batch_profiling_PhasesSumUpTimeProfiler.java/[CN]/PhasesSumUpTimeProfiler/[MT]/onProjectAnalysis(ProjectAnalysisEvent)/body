@@ -2,21 +2,18 @@
   Project module=event.getProject();
   if (event.isStart()) {
     decoratorsProfiler=new DecoratorsProfiler();
-    currentModuleProfiling=new ModuleProfiling(clock);
+    currentModuleProfiling=new ModuleProfiling(module,clock);
   }
  else {
     currentModuleProfiling.stop();
+    modulesProfilings.add(currentModuleProfiling);
     long moduleTotalTime=currentModuleProfiling.totalTime();
     System.out.println("\n -------- Profiling of module " + module.getName() + ": "+ TimeUtils.formatDuration(moduleTotalTime)+ " --------\n");
     currentModuleProfiling.dump();
     System.out.println("\n -------- End of profiling of module " + module.getName() + " --------\n");
     totalProfiling.merge(currentModuleProfiling);
     if (module.isRoot() && !module.getModules().isEmpty()) {
-      totalProfiling.stop();
-      long totalTime=totalProfiling.totalTime();
-      System.out.println("\n ======== Profiling of total execution: " + TimeUtils.formatDuration(totalTime) + " ========\n");
-      totalProfiling.dump();
-      System.out.println("\n ======== End of profiling of total execution ========\n");
+      dumpTotalExecutionSummary();
     }
   }
 }
