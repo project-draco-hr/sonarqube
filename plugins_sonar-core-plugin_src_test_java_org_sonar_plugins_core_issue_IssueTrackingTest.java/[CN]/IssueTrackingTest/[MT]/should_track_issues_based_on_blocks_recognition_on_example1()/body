@@ -1,0 +1,17 @@
+{
+  when(lastSnapshots.getSource(project)).thenReturn(load("example1-v1"));
+  String source=load("example1-v2");
+  IssueDto referenceIssue1=newReferenceIssue("Indentation",7,1,null);
+  IssueDto referenceIssue2=newReferenceIssue("Indentation",11,1,null);
+  DefaultIssue newIssue1=newDefaultIssue("Indentation",9,RuleKey.of("squid","AvoidCycle"),null);
+  DefaultIssue newIssue2=newDefaultIssue("Indentation",13,RuleKey.of("squid","AvoidCycle"),null);
+  DefaultIssue newIssue3=newDefaultIssue("Indentation",17,RuleKey.of("squid","AvoidCycle"),null);
+  DefaultIssue newIssue4=newDefaultIssue("Indentation",21,RuleKey.of("squid","AvoidCycle"),null);
+  Map<DefaultIssue,IssueDto> mapping=decorator.mapIssues(Arrays.asList(newIssue1,newIssue2,newIssue3,newIssue4),Arrays.asList(referenceIssue1,referenceIssue2),source,project);
+  assertThat(newIssue1.isNew()).isTrue();
+  assertThat(newIssue2.isNew()).isTrue();
+  assertThat(newIssue3.isNew()).isFalse();
+  assertThat(mapping.get(newIssue3)).isEqualTo(referenceIssue1);
+  assertThat(newIssue4.isNew()).isFalse();
+  assertThat(mapping.get(newIssue4)).isEqualTo(referenceIssue2);
+}
