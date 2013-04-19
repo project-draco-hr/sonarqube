@@ -1,10 +1,8 @@
 {
-  IssueDto issueDto=new IssueDto().setId(1L).setRuleId(1).setResourceId(1);
+  IssueDto issueDto=new IssueDto().setId(1L).setRuleId(1).setResourceId(1).setComponentKey_unit_test_only("Action.java").setRuleRepo_unit_test_only("squid").setRule_unit_test_only("AvoidCycle");
   when(issueDao.selectByKey("ABCDE")).thenReturn(issueDto);
-  when(ruleFinder.findById(anyInt())).thenReturn(Rule.create("squid","NullDeref"));
-  when(resourceDao.getResource(anyInt())).thenReturn(new ResourceDto().setKey("org/struts/Action.java"));
   Issue issue=finder.findByKey("ABCDE");
   assertThat(issue).isNotNull();
-  assertThat(issue.componentKey()).isEqualTo("org/struts/Action.java");
-  assertThat(issue.ruleKey().toString()).isEqualTo("squid:NullDeref");
+  assertThat(issue.componentKey()).isEqualTo("Action.java");
+  assertThat(issue.ruleKey().toString()).isEqualTo("squid:AvoidCycle");
 }
