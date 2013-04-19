@@ -1,0 +1,22 @@
+{
+  LOG.debug("IssueQuery : {}",query);
+  SqlSession sqlSession=myBatis.openSession();
+  try {
+    List<IssueDto> dtos=issueDao.select(query,sqlSession);
+    Set<Integer> componentIds=Sets.newLinkedHashSet();
+    for (    IssueDto issueDto : dtos) {
+      componentIds.add(issueDto.getResourceId());
+    }
+    Set<Integer> authorizedComponentIds=authorizationDao.keepAuthorizedComponentIds(componentIds,currentUserId,role,sqlSession);
+    List<Issue> issues=Lists.newArrayList();
+    for (    IssueDto dto : dtos) {
+      if (authorizedComponentIds.contains(dto.getResourceId())) {
+        issues.add(dto.toDefaultIssue());
+      }
+    }
+    return new DefaultResults(issues);
+  }
+  finally {
+    MyBatis.closeQuietly(sqlSession);
+  }
+}
