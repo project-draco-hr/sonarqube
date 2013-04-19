@@ -53,6 +53,7 @@
         }
         for (        HashOccurrence hashOccurrence : map.values()) {
           if (hashOccurrence.countA == 1 && hashOccurrence.countB == 1) {
+            LOG.debug("*** Guaranteed that lineA has been moved to lineB, so we can map all issues on lineA to all issues on lineB");
             map(newViolationsByLines.get(hashOccurrence.lineB),lastViolationsByLines.get(hashOccurrence.lineA),lastViolationsByRule);
             lastViolationsByLines.removeAll(hashOccurrence.lineA);
             newViolationsByLines.removeAll(hashOccurrence.lineB);
@@ -68,6 +69,7 @@
           }
           Collections.sort(possibleLinePairs,LINE_PAIR_COMPARATOR);
           for (          LinePair linePair : possibleLinePairs) {
+            LOG.debug("*** High probability that lineA has been moved to lineB, so we can map all Issues on lineA to all Issues on lineB");
             map(newViolationsByLines.get(linePair.lineB),lastViolationsByLines.get(linePair.lineA),lastViolationsByRule);
           }
         }
@@ -75,16 +77,19 @@
     }
     for (    Violation newViolation : newViolations) {
       if (isNotAlreadyMapped(newViolation)) {
+        LOG.debug("*** Try then to match issues on same rule with same message and with same checksum");
         mapViolation(newViolation,findLastViolationWithSameChecksumAndMessage(newViolation,lastViolationsByRule.get(newViolation.getRule().getId())),lastViolationsByRule,referenceViolationsMap);
       }
     }
     for (    Violation newViolation : newViolations) {
       if (isNotAlreadyMapped(newViolation)) {
+        LOG.debug("*** Try then to match issues on same rule with same line and with same message");
         mapViolation(newViolation,findLastViolationWithSameLineAndMessage(newViolation,lastViolationsByRule.get(newViolation.getRule().getId())),lastViolationsByRule,referenceViolationsMap);
       }
     }
     for (    Violation newViolation : newViolations) {
       if (isNotAlreadyMapped(newViolation)) {
+        LOG.debug("*** Last check: match issue if same rule and same checksum but different line and different message");
         mapViolation(newViolation,findLastViolationWithSameChecksum(newViolation,lastViolationsByRule.get(newViolation.getRule().getId())),lastViolationsByRule,referenceViolationsMap);
       }
     }
