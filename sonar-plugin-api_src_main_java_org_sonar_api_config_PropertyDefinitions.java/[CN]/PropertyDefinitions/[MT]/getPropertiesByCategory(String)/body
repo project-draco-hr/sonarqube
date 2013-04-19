@@ -1,9 +1,17 @@
 {
-  Multimap<String,PropertyDefinition> byCategory=ArrayListMultimap.create();
+  Map<String,Map<String,Collection<PropertyDefinition>>> byCategory=new HashMap<String,Map<String,Collection<PropertyDefinition>>>();
   for (  PropertyDefinition definition : getAll()) {
     if (qualifier == null ? definition.global() : definition.qualifiers().contains(qualifier)) {
-      byCategory.put(getCategory(definition.key()),definition);
+      String category=getCategory(definition.key());
+      if (!byCategory.containsKey(category)) {
+        byCategory.put(category,new HashMap<String,Collection<PropertyDefinition>>());
+      }
+      String subCategory=getSubCategory(definition.key());
+      if (!byCategory.get(category).containsKey(subCategory)) {
+        byCategory.get(category).put(subCategory,new ArrayList<PropertyDefinition>());
+      }
+      byCategory.get(category).get(subCategory).add(definition);
     }
   }
-  return byCategory.asMap();
+  return byCategory;
 }
