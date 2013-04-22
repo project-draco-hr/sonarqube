@@ -1,0 +1,31 @@
+{
+  ruleA1=Rule.create().setRepositoryKey("ruleA1").setKey("ruleA1").setName("nameA1");
+  ruleA2=Rule.create().setRepositoryKey("ruleA2").setKey("ruleA2").setName("nameA2");
+  ruleB1=Rule.create().setRepositoryKey("ruleB1").setKey("ruleB1").setName("nameB1");
+  rulefinder=mock(RuleFinder.class);
+  when(rulefinder.findByKey(ruleA1.getRepositoryKey(),ruleA1.getKey())).thenReturn(ruleA1);
+  when(rulefinder.findByKey(ruleA2.getRepositoryKey(),ruleA2.getKey())).thenReturn(ruleA2);
+  when(rulefinder.findByKey(ruleB1.getRepositoryKey(),ruleB1.getKey())).thenReturn(ruleB1);
+  rightNow=new Date();
+  tenDaysAgo=DateUtils.addDays(rightNow,-10);
+  fiveDaysAgo=DateUtils.addDays(rightNow,-5);
+  PastSnapshot pastSnapshot=mock(PastSnapshot.class);
+  when(pastSnapshot.getIndex()).thenReturn(1);
+  when(pastSnapshot.getTargetDate()).thenReturn(fiveDaysAgo);
+  PastSnapshot pastSnapshot2=mock(PastSnapshot.class);
+  when(pastSnapshot2.getIndex()).thenReturn(2);
+  when(pastSnapshot2.getTargetDate()).thenReturn(tenDaysAgo);
+  timeMachineConfiguration=mock(TimeMachineConfiguration.class);
+  when(timeMachineConfiguration.getProjectPastSnapshots()).thenReturn(Arrays.asList(pastSnapshot,pastSnapshot2));
+  project=mock(Project.class);
+  when(project.isLatestAnalysis()).thenReturn(true);
+  resource=mock(Resource.class);
+  context=mock(DecoratorContext.class);
+  when(context.getResource()).thenReturn(resource);
+  when(context.getProject()).thenReturn(project);
+  when(context.getMeasure(CoreMetrics.NEW_ISSUES)).thenReturn(null);
+  issuable=mock(Issuable.class);
+  ResourcePerspectives perspectives=mock(ResourcePerspectives.class);
+  when(perspectives.as(Issuable.class,resource)).thenReturn(issuable);
+  decorator=new IssueCountersDecorator(perspectives,rulefinder,timeMachineConfiguration);
+}
