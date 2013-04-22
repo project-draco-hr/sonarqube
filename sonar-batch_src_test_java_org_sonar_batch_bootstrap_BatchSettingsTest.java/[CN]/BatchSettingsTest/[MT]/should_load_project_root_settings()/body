@@ -1,5 +1,7 @@
 {
-  when(client.request("/batch_bootstrap/properties?project=struts")).thenReturn(JSON_RESPONSE);
-  BatchSettings batchSettings=new BatchSettings(bootstrapSettings,new PropertyDefinitions(),client,deprecatedConf,new BootstrapProperties(Collections.<String,String>emptyMap()),reactor);
+  when(client.request("/batch_bootstrap/properties")).thenReturn(JSON_RESPONSE);
+  when(client.request("/batch_bootstrap/properties?project=struts")).thenReturn(REACTOR_JSON_RESPONSE);
+  BatchSettings batchSettings=new BatchSettings(bootstrapSettings,new PropertyDefinitions(),client,deprecatedConf);
+  batchSettings.init(project);
   assertThat(batchSettings.getString("sonar.java.coveragePlugin")).isEqualTo("jacoco");
 }

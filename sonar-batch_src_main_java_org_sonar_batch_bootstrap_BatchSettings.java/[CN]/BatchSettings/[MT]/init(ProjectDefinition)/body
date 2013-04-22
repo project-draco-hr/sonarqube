@@ -1,0 +1,22 @@
+{
+  clear();
+  if (rootProject != null) {
+    LoggerFactory.getLogger(BatchSettings.class).info("Load project settings");
+    String branch=bootstrapSettings.property(CoreProperties.PROJECT_BRANCH_PROPERTY);
+    String projectKey=rootProject.getKey();
+    if (StringUtils.isNotBlank(branch)) {
+      projectKey=String.format("%s:%s",projectKey,branch);
+    }
+    downloadSettings(client,projectKey);
+  }
+ else {
+    LoggerFactory.getLogger(BatchSettings.class).info("Load batch settings");
+    downloadSettings(client,null);
+  }
+  addProperties(bootstrapSettings.properties());
+  if (rootProject != null) {
+    addProperties(rootProject.getProperties());
+  }
+  properties.putAll(System.getenv());
+  addProperties(System.getProperties());
+}
