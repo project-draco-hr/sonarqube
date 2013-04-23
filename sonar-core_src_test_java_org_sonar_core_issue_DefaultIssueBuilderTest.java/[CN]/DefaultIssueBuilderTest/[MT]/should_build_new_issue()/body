@@ -1,6 +1,6 @@
 {
   String componentKey="org.apache.struts:struts-core:Action.java";
-  DefaultIssue issue=(DefaultIssue)new DefaultIssueBuilder(callback,componentKey).description("the desc").line(123).cost(10000.0).ruleKey(RuleKey.of("squid","NullDereference")).severity(Severity.CRITICAL).done();
+  DefaultIssue issue=(DefaultIssue)new DefaultIssueBuilder(componentKey).description("the desc").line(123).cost(10000.0).ruleKey(RuleKey.of("squid","NullDereference")).severity(Severity.CRITICAL).attribute("JIRA","FOO-123").attribute("YOUTRACK","YT-123").build();
   assertThat(issue).isNotNull();
   assertThat(issue.key()).isNull();
   assertThat(issue.cost()).isEqualTo(10000.0);
@@ -14,5 +14,9 @@
   assertThat(issue.closedAt()).isNull();
   assertThat(issue.assignee()).isNull();
   assertThat(issue.isNew()).isTrue();
-  verify(callback).onIssueCreation(issue);
+  assertThat(issue.resolution()).isEqualTo(Issue.RESOLUTION_OPEN);
+  assertThat(issue.status()).isEqualTo(Issue.STATUS_OPEN);
+  assertThat(issue.attribute("JIRA")).isEqualTo("FOO-123");
+  assertThat(issue.attribute("YOUTRACK")).isEqualTo("YT-123");
+  assertThat(issue.attributes()).hasSize(2);
 }
