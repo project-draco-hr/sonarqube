@@ -1,0 +1,15 @@
+{
+  Component component=new ComponentDto().setKey("Action.java");
+  when(resourceDao.findByIds(anyCollection())).thenReturn(newArrayList(component));
+  grantAccessRights();
+  IssueQuery issueQuery=mock(IssueQuery.class);
+  IssueDto issue1=new IssueDto().setId(1L).setRuleId(50).setResourceId(123).setComponentKey_unit_test_only("Action.java").setRuleKey_unit_test_only("squid","AvoidCycle");
+  IssueDto issue2=new IssueDto().setId(2L).setRuleId(50).setResourceId(123).setComponentKey_unit_test_only("Action.java").setRuleKey_unit_test_only("squid","AvoidCycle");
+  List<IssueDto> dtoList=newArrayList(issue1,issue2);
+  when(issueDao.select(eq(issueQuery),any(SqlSession.class))).thenReturn(dtoList);
+  IssueFinder.Results results=finder.find(issueQuery,null,UserRole.USER);
+  Issue issue=results.issues().iterator().next();
+  assertThat(results.issues()).hasSize(2);
+  assertThat(results.component(issue)).isEqualTo(component);
+  assertThat(results.components()).hasSize(1);
+}

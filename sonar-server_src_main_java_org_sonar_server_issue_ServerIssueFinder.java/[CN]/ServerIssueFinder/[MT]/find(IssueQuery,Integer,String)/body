@@ -8,13 +8,15 @@
       componentIds.add(issueDto.getResourceId());
     }
     Set<Integer> authorizedComponentIds=authorizationDao.keepAuthorizedComponentIds(componentIds,currentUserId,role,sqlSession);
+    Set<Integer> ruleIds=Sets.newLinkedHashSet();
     List<Issue> issues=Lists.newArrayList();
     for (    IssueDto dto : dtos) {
       if (authorizedComponentIds.contains(dto.getResourceId())) {
         issues.add(dto.toDefaultIssue());
+        ruleIds.add(dto.getRuleId());
       }
     }
-    return new DefaultResults(issues);
+    return new DefaultResults(issues,getRulesByIssue(issues,ruleIds),getComponentsByIssue(issues,componentIds));
   }
   finally {
     MyBatis.closeQuietly(sqlSession);
