@@ -1,0 +1,21 @@
+{
+  try {
+    tempDir=Files.createTempDir();
+    persistit=new Persistit();
+    persistit.setPersistitLogger(new Slf4jAdapter(LoggerFactory.getLogger("PERSISTIT")));
+    Properties props=new Properties();
+    props.setProperty("datapath",tempDir.getAbsolutePath());
+    props.setProperty("logpath","${datapath}/log");
+    props.setProperty("logfile","${logpath}/persistit_${timestamp}.log");
+    props.setProperty("buffer.count.8192","10");
+    props.setProperty("journalpath","${datapath}/journal");
+    props.setProperty("tmpvoldir","${datapath}");
+    props.setProperty("volume.1","${datapath}/persistit,create,pageSize:8192,initialPages:10,extensionPages:100,maximumPages:25000");
+    persistit.setProperties(props);
+    persistit.initialize();
+    volume=persistit.createTemporaryVolume();
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Fail to start caches",e);
+  }
+}
