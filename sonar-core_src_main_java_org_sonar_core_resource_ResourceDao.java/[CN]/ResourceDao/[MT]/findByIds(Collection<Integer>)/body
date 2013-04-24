@@ -1,7 +1,11 @@
 {
+  if (ids.isEmpty()) {
+    return Collections.emptyList();
+  }
   SqlSession session=mybatis.openSession();
   try {
-    Collection<ResourceDto> resources=session.getMapper(ResourceMapper.class).selectResourcesById(ids);
+    List<List<Integer>> idsPartition=Lists.partition(newArrayList(ids),1000);
+    Collection<ResourceDto> resources=session.getMapper(ResourceMapper.class).selectResourcesById(idsPartition);
     Collection<Component> components=newArrayList();
     for (    ResourceDto resourceDto : resources) {
       components.add(toComponent(resourceDto));

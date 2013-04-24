@@ -3,27 +3,21 @@
   SqlSession sqlSession=myBatis.openSession();
   try {
     List<IssueDto> allIssuesDto=issueDao.selectIssueIdsAndComponentsId(query,sqlSession);
-    Set<Integer> componentIds=Sets.newLinkedHashSet();
-    for (    IssueDto issueDto : allIssuesDto) {
-      componentIds.add(issueDto.getResourceId());
-    }
+    Set<Integer> componentIds=getResourceIds(allIssuesDto);
     Set<Integer> authorizedComponentIds=authorizationDao.keepAuthorizedComponentIds(componentIds,currentUserId,role,sqlSession);
-    Set<Long> issueIds=getAutorizedIssueIds(allIssuesDto,authorizedComponentIds,query);
-    Collection<IssueDto> dtos=issueDao.selectByIds(issueIds,sqlSession);
+    List<IssueDto> authorizedIssues=getAuthorizedIssues(allIssuesDto,authorizedComponentIds);
+    Pagination pagination=new Pagination(query.limit(),query.page(),authorizedIssues.size());
+    Set<Long> paginatedAuthorizedIssueIds=getPaginatedAuthorizedIssueIds(authorizedIssues,pagination);
+    Collection<IssueDto> dtos=issueDao.selectByIds(paginatedAuthorizedIssueIds,sqlSession);
     Set<Integer> ruleIds=Sets.newLinkedHashSet();
-    List<Issue> issues=Lists.newArrayList();
+    List<Issue> issues=newArrayList();
     for (    IssueDto dto : dtos) {
       if (authorizedComponentIds.contains(dto.getResourceId())) {
         issues.add(dto.toDefaultIssue());
         ruleIds.add(dto.getRuleId());
       }
     }
-    if (!issues.isEmpty()) {
-      return new DefaultResults(issues,getRulesByIssue(issues,ruleIds),getComponentsByIssue(issues,componentIds));
-    }
- else {
-      return new DefaultResults(issues);
-    }
+    return new DefaultResults(issues,getRulesByIssue(issues,ruleIds),getComponentsByIssue(issues,componentIds),pagination);
   }
   finally {
     MyBatis.closeQuietly(sqlSession);
