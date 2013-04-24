@@ -2,12 +2,14 @@
   LOG.debug("IssueQuery : {}",query);
   SqlSession sqlSession=myBatis.openSession();
   try {
-    List<IssueDto> dtos=issueDao.select(query,sqlSession);
+    List<IssueDto> allIssuesDto=issueDao.selectIssueIdsAndComponentsId(query,sqlSession);
     Set<Integer> componentIds=Sets.newLinkedHashSet();
-    for (    IssueDto issueDto : dtos) {
+    for (    IssueDto issueDto : allIssuesDto) {
       componentIds.add(issueDto.getResourceId());
     }
     Set<Integer> authorizedComponentIds=authorizationDao.keepAuthorizedComponentIds(componentIds,currentUserId,role,sqlSession);
+    Set<Long> issueIds=getAutorizedIssueIds(allIssuesDto,authorizedComponentIds,query);
+    Collection<IssueDto> dtos=issueDao.selectByIds(issueIds,sqlSession);
     Set<Integer> ruleIds=Sets.newLinkedHashSet();
     List<Issue> issues=Lists.newArrayList();
     for (    IssueDto dto : dtos) {
