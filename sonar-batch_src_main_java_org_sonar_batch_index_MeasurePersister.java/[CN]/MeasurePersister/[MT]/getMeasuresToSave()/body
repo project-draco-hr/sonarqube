@@ -1,12 +1,12 @@
 {
-  List<MeasureModel> measures=Lists.newArrayList();
+  List<MeasureModelAndDetails> measures=Lists.newArrayList();
   Map<Resource,Collection<Measure>> map=unsavedMeasuresByResource.asMap();
   for (  Map.Entry<Resource,Collection<Measure>> entry : map.entrySet()) {
     Resource resource=entry.getKey();
     Snapshot snapshot=resourcePersister.getSnapshot(entry.getKey());
     for (    Measure measure : entry.getValue()) {
       if (shouldPersistMeasure(resource,measure)) {
-        measures.add(model(measure).setSnapshotId(snapshot.getId()));
+        measures.add(new MeasureModelAndDetails(model(measure).setSnapshotId(snapshot.getId()),resource.getKey(),measure.getMetricKey()));
       }
     }
   }

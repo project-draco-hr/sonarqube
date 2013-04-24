@@ -3,7 +3,13 @@
     unsavedMeasuresByResource.put(resource,measure);
     return;
   }
-  MeasureModel model=insertOrUpdate(resource,measure);
+  MeasureModel model;
+  try {
+    model=insertOrUpdate(resource,measure);
+  }
+ catch (  Exception e) {
+    throw new SonarException(String.format("Unable to save measure for metric [%s] on resource [%s]",measure.getMetricKey(),resource.getKey()),e);
+  }
   if (model != null) {
     memoryOptimizer.evictDataMeasure(measure,model);
   }
