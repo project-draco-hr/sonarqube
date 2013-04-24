@@ -6,8 +6,8 @@
     Set<Integer> componentIds=getResourceIds(allIssuesDto);
     Set<Integer> authorizedComponentIds=authorizationDao.keepAuthorizedComponentIds(componentIds,currentUserId,role,sqlSession);
     List<IssueDto> authorizedIssues=getAuthorizedIssues(allIssuesDto,authorizedComponentIds);
-    Pagination pagination=new Pagination(query.limit(),query.page(),authorizedIssues.size());
-    Set<Long> paginatedAuthorizedIssueIds=getPaginatedAuthorizedIssueIds(authorizedIssues,pagination);
+    Paging paging=new Paging(query.pageSize(),query.pageIndex(),authorizedIssues.size());
+    Set<Long> paginatedAuthorizedIssueIds=getPaginatedAuthorizedIssueIds(authorizedIssues,paging);
     Collection<IssueDto> dtos=issueDao.selectByIds(paginatedAuthorizedIssueIds,sqlSession);
     Set<Integer> ruleIds=Sets.newLinkedHashSet();
     List<Issue> issues=newArrayList();
@@ -17,7 +17,7 @@
         ruleIds.add(dto.getRuleId());
       }
     }
-    return new DefaultResults(issues,getRulesByIssue(issues,ruleIds),getComponentsByIssue(issues,componentIds),pagination);
+    return new DefaultResults(issues,getRulesByIssue(issues,ruleIds),getComponentsByIssue(issues,componentIds),paging);
   }
   finally {
     MyBatis.closeQuietly(sqlSession);
