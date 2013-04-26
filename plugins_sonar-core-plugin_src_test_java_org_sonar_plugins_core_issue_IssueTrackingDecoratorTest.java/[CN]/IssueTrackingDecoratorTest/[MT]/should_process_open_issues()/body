@@ -1,0 +1,20 @@
+{
+  Resource file=new File("Action.java").setEffectiveKey("struts:Action.java").setId(123);
+  final DefaultIssue issue=new DefaultIssue();
+  when(scanIssues.issues("struts:Action.java")).thenReturn(Arrays.asList(issue));
+  when(filters.accept(issue)).thenReturn(true);
+  List<IssueDto> dbIssues=Collections.emptyList();
+  when(initialOpenIssues.selectAndRemove(123)).thenReturn(dbIssues);
+  decorator.decorate(file,mock(DecoratorContext.class));
+  verify(filters).accept(issue);
+  verify(tracking).track(eq(file),eq(dbIssues),argThat(new ArgumentMatcher<Collection<DefaultIssue>>(){
+    @Override public boolean matches(    Object o){
+      List<DefaultIssue> issues=(List<DefaultIssue>)o;
+      return issues.size() == 1 && issues.get(0) == issue;
+    }
+  }
+));
+  verify(workflow).doAutomaticTransition(issue);
+  verify(handlers).execute(issue);
+  verify(scanIssues).addOrUpdate(issue);
+}

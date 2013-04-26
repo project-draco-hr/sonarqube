@@ -1,18 +1,24 @@
 {
-  if (isComponentSupported(resource)) {
-    Collection<DefaultIssue> newIssues=new ArrayList(scanIssues.issues(resource.getEffectiveKey()));
-    Collection<IssueDto> openIssues=initialOpenIssuesStack.selectAndRemove(resource.getId());
-    tracking.track(resource,openIssues,newIssues);
-    updateIssues(newIssues);
-    Set<String> issueKeys=Sets.newHashSet(Collections2.transform(newIssues,new IssueToKeyFunction()));
-    for (    IssueDto openIssue : openIssues) {
-      addManualIssuesAndCloseResolvedOnes(openIssue);
-      closeResolvedStandardIssues(openIssue,issueKeys);
-      keepFalsePositiveIssues(openIssue);
-      reopenUnresolvedIssues(openIssue);
+  if (canHaveIssues(resource)) {
+    Collection<DefaultIssue> issues=Lists.newArrayList();
+    for (    Issue issue : scanIssues.issues(resource.getEffectiveKey())) {
+      if (filters.accept(issue)) {
+        issues.add((DefaultIssue)issue);
+      }
+ else {
+        scanIssues.remove(issue);
+      }
     }
-    if (ResourceUtils.isRootProject(resource)) {
-      closeIssuesOnDeletedResources(initialOpenIssuesStack.getAllIssues());
+    Collection<IssueDto> dbOpenIssues=initialOpenIssues.selectAndRemove(resource.getId());
+    Set<IssueDto> unmatchedDbIssues=tracking.track(resource,dbOpenIssues,issues);
+    addUnmatched(unmatchedDbIssues,issues);
+    if (ResourceUtils.isProject(resource)) {
+      addDead(issues);
+    }
+    for (    DefaultIssue issue : issues) {
+      workflow.doAutomaticTransition(issue);
+      handlers.execute(issue);
+      scanIssues.addOrUpdate(issue);
     }
   }
 }
