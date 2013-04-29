@@ -3,7 +3,10 @@
   boolean isLast=(previousLastSnapshot == null || previousLastSnapshot.getCreatedAt().before(snapshot.getCreatedAt()));
   setFlags(snapshot,isLast,Snapshot.STATUS_PROCESSED);
   if (!settings.getBoolean(CoreProperties.DRY_RUN)) {
-    String baseUrl=StringUtils.defaultIfBlank(settings.getString(CoreProperties.SERVER_BASE_URL),server.getURL());
+    String baseUrl=settings.getString(CoreProperties.SERVER_BASE_URL);
+    if (baseUrl.equals(settings.getDefaultValue(CoreProperties.SERVER_BASE_URL))) {
+      baseUrl=server.getURL();
+    }
     if (!baseUrl.endsWith("/")) {
       baseUrl+="/";
     }
