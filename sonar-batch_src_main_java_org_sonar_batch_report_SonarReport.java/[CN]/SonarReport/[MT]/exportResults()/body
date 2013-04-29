@@ -1,0 +1,15 @@
+{
+  File exportFile=new File(fileSystem.workingDir(),settings.getString("sonar.report.export.path"));
+  LOG.info("Exporting report results to " + exportFile.getAbsolutePath());
+  Writer output=null;
+  try {
+    output=new BufferedWriter(new FileWriter(exportFile));
+    createJson().writeJSONString(output);
+  }
+ catch (  IOException e) {
+    throw new SonarException("Unable to write report results in file " + exportFile.getAbsolutePath(),e);
+  }
+ finally {
+    Closeables.closeQuietly(output);
+  }
+}
