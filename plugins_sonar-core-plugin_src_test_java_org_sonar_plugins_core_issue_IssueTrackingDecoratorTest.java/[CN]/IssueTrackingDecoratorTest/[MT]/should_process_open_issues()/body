@@ -5,7 +5,7 @@
   when(filters.accept(issue)).thenReturn(true);
   List<IssueDto> dbIssues=Collections.emptyList();
   when(initialOpenIssues.selectAndRemove(123)).thenReturn(dbIssues);
-  decorator.decorate(file,mock(DecoratorContext.class));
+  decorator.decorate(file,mock(DecoratorContext.class,Mockito.RETURNS_MOCKS));
   verify(filters).accept(issue);
   verify(tracking).track(eq(file),eq(dbIssues),argThat(new ArgumentMatcher<Collection<DefaultIssue>>(){
     @Override public boolean matches(    Object o){
@@ -14,7 +14,7 @@
     }
   }
 ));
-  verify(workflow).doAutomaticTransition(issue);
-  verify(handlers).execute(issue);
+  verify(workflow).doAutomaticTransition(eq(issue),any(IssueChangeContext.class));
+  verify(handlers).execute(eq(issue));
   verify(scanIssues).addOrUpdate(issue);
 }

@@ -5,8 +5,8 @@
   when(filters.accept(openIssue)).thenReturn(true);
   IssueDto deadIssue=new IssueDto().setKey("ABCDE").setResolution("OPEN").setStatus("OPEN").setRuleKey_unit_test_only("squid","AvoidCycle");
   when(initialOpenIssues.getAllIssues()).thenReturn(Arrays.asList(deadIssue));
-  decorator.decorate(project,mock(DecoratorContext.class));
-  verify(workflow,times(2)).doAutomaticTransition(any(DefaultIssue.class));
+  decorator.decorate(project,mock(DecoratorContext.class,Mockito.RETURNS_MOCKS));
+  verify(workflow,times(2)).doAutomaticTransition(any(DefaultIssue.class),any(IssueChangeContext.class));
   verify(handlers,times(2)).execute(any(DefaultIssue.class));
   verify(scanIssues,times(2)).addOrUpdate(any(DefaultIssue.class));
   verify(scanIssues).addOrUpdate(argThat(new ArgumentMatcher<DefaultIssue>(){

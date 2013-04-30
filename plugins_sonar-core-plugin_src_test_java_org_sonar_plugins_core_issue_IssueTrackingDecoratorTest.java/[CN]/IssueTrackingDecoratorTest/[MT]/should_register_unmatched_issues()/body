@@ -6,8 +6,8 @@
   IssueDto unmatchedIssue=new IssueDto().setKey("ABCDE").setResolution("OPEN").setStatus("OPEN").setRuleKey_unit_test_only("squid","AvoidCycle");
   List<IssueDto> unmatchedIssues=Arrays.asList(unmatchedIssue);
   when(tracking.track(eq(file),anyCollection(),anyCollection())).thenReturn(Sets.newHashSet(unmatchedIssues));
-  decorator.decorate(file,mock(DecoratorContext.class));
-  verify(workflow,times(2)).doAutomaticTransition(any(DefaultIssue.class));
+  decorator.decorate(file,mock(DecoratorContext.class,Mockito.RETURNS_MOCKS));
+  verify(workflow,times(2)).doAutomaticTransition(any(DefaultIssue.class),any(IssueChangeContext.class));
   verify(handlers,times(2)).execute(any(DefaultIssue.class));
   verify(scanIssues,times(2)).addOrUpdate(any(DefaultIssue.class));
   verify(scanIssues).addOrUpdate(argThat(new ArgumentMatcher<DefaultIssue>(){
