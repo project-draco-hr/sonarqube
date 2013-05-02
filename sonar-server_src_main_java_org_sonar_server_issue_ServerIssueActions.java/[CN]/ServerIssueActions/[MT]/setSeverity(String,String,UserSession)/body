@@ -1,8 +1,8 @@
 {
-  IssueDto dto=loadDto(issueKey,userSession);
-  DefaultIssue issue=dto.toDefaultIssue();
-  if (issueUpdater.setManualSeverity(issue,severity)) {
-    issueDao.update(Arrays.asList(IssueDto.toDto(issue,dto.getResourceId(),dto.getRuleId())));
+  DefaultIssue issue=loadIssue(issueKey,userSession);
+  IssueChangeContext context=IssueChangeContext.createUser(new Date(),userSession.login());
+  if (issueUpdater.setManualSeverity(issue,severity,context)) {
+    issueStorage.save(issue);
   }
   return issue;
 }

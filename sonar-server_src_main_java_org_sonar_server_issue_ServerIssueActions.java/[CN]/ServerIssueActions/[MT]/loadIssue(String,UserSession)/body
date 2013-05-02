@@ -1,0 +1,14 @@
+{
+  if (!userSession.isLoggedIn()) {
+    throw new IllegalStateException("User is not logged in");
+  }
+  IssueDto dto=issueDao.selectByKey(issueKey);
+  if (dto == null) {
+    throw new IllegalStateException("Unknown issue: " + issueKey);
+  }
+  String requiredRole=UserRole.USER;
+  if (!authorizationDao.isAuthorizedComponentId(dto.getResourceId(),userSession.userId(),requiredRole)) {
+    throw new IllegalStateException("User does not have the role " + requiredRole + " required to change the issue: "+ issueKey);
+  }
+  return dto.toDefaultIssue();
+}

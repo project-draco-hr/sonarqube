@@ -1,0 +1,18 @@
+{
+  FakeSaver saver=new FakeSaver(getMyBatis(),new FakeRuleFinder());
+  IssueChangeContext context=IssueChangeContext.createUser(new Date(),"emmerik");
+  IssueComment comment=IssueComment.create("emmerik","the comment");
+  comment.setKey("FGHIJ");
+  DefaultIssue issue=new DefaultIssue();
+  issue.setKey("ABCDE");
+  issue.setRuleKey(RuleKey.of("squid","AvoidCycle"));
+  issue.setLine(5000);
+  issue.setNew(true);
+  issue.setFieldDiff(context,"severity","INFO","BLOCKER");
+  issue.setUserLogin("emmerik");
+  issue.setResolution("OPEN").setStatus("OPEN").setSeverity("BLOCKER");
+  issue.setAttribute("foo","bar");
+  issue.addComment(comment);
+  saver.save(issue);
+  checkTables("should_insert_new_issues",new String[]{"id","created_at","updated_at","closed_at"},"issues","issue_changes");
+}

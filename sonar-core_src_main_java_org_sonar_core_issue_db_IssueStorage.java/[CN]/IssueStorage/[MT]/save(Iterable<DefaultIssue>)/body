@@ -1,0 +1,27 @@
+{
+  SqlSession session=mybatis.openSession();
+  try {
+    List<DefaultIssue> conflicts=Lists.newArrayList();
+    for (    DefaultIssue issue : issues) {
+      int ruleId=ruleId(issue);
+      int componentId=componentId(issue);
+      IssueDto dto=IssueDto.toDto(issue,componentId,ruleId);
+      if (issue.isNew()) {
+        session.insert(MYBATIS_INSERT_ISSUE,dto);
+      }
+ else {
+        int count=session.update(MYBATIS_UPDATE_ISSUE,dto);
+        if (count < 1) {
+          conflicts.add(issue);
+        }
+      }
+      for (      IssueChangeDto changeDto : ChangeDtoConverter.toChangeDtos(issue)) {
+        session.insert(MYBATIS_INSERT_CHANGE,changeDto);
+      }
+    }
+    session.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}
