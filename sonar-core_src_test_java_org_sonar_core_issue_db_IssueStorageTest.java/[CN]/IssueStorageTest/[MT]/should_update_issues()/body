@@ -1,2 +1,25 @@
 {
+  setupData("should_update_issues");
+  FakeSaver saver=new FakeSaver(getMyBatis(),new FakeRuleFinder());
+  IssueComment comment=IssueComment.create("emmerik","the comment");
+  comment.setKey("FGHIJ");
+  Date date=DateUtils.parseDate("2013-05-18");
+  DefaultIssue issue=new DefaultIssue();
+  issue.setKey("ABCDE");
+  issue.setRuleKey(RuleKey.of("squid","AvoidCycle"));
+  issue.setLine(5000);
+  issue.setNew(false);
+  issue.setChecksum("FFFFF");
+  issue.setAuthorLogin("simon");
+  issue.setAssignee("loic");
+  issue.setFieldDiff(context,"severity","INFO","BLOCKER");
+  issue.setUserLogin("emmerik");
+  issue.setResolution("FIXED").setStatus("RESOLVED").setSeverity("BLOCKER");
+  issue.setAttribute("foo","bar");
+  issue.addComment(comment);
+  issue.setCreationDate(date);
+  issue.setUpdateDate(date);
+  issue.setCloseDate(date);
+  saver.save(issue);
+  checkTables("should_update_issues",new String[]{"id","created_at","updated_at"},"issues","issue_changes");
 }
