@@ -1,0 +1,17 @@
+{
+  Component component=mock(Component.class);
+  when(component.key()).thenReturn("myComponent");
+  ComponentDataCache cache=mock(ComponentDataCache.class);
+  DefaultSymbolizable symbolPerspective=new DefaultSymbolizable(cache,component);
+  Symbolizable.SymbolTableBuilder symbolTableBuilder=symbolPerspective.newSymbolTableBuilder();
+  Symbol firstSymbol=symbolTableBuilder.newSymbol(4,8);
+  symbolTableBuilder.newReference(firstSymbol,12);
+  symbolTableBuilder.newReference(firstSymbol,70);
+  Symbol otherSymbol=symbolTableBuilder.newSymbol(25,33);
+  symbolTableBuilder.newReference(otherSymbol,44);
+  symbolTableBuilder.newReference(otherSymbol,60);
+  symbolTableBuilder.newReference(otherSymbol,108);
+  Symbolizable.SymbolTable symbolTable=symbolTableBuilder.build();
+  symbolPerspective.setSymbolTable(symbolTable);
+  verify(cache).setStringData("myComponent",SnapshotDataType.SYMBOL_HIGHLIGHTING.getValue(),"4,8,4,12,70;25,33,25,44,60,108;");
+}
