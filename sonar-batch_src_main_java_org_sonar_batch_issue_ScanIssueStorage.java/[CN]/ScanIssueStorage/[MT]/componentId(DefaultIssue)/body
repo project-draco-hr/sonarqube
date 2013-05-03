@@ -1,7 +1,11 @@
 {
   Snapshot snapshot=snapshotCache.get(issue.componentKey());
-  if (snapshot == null) {
-    throw new IllegalStateException("Component does not exist: " + issue.componentKey());
+  if (snapshot != null) {
+    return snapshot.getResourceId();
   }
-  return snapshot.getResourceId();
+  ResourceDto resourceDto=resourceDao.getResource(ResourceQuery.create().setKey(issue.componentKey()));
+  if (resourceDto == null) {
+    throw new IllegalStateException("Unknown component: " + issue.componentKey());
+  }
+  return resourceDto.getId().intValue();
 }
