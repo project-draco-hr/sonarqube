@@ -3,13 +3,13 @@
   SqlSession sqlSession=myBatis.openSession();
   try {
     List<IssueDto> allIssuesDto=issueDao.selectIssueIdsAndComponentsId(query,sqlSession);
-    Set<Integer> componentIds=getResourceIds(allIssuesDto);
+    Set<Integer> componentIds=extractResourceIds(allIssuesDto);
     Set<Integer> authorizedComponentIds=authorizationDao.keepAuthorizedComponentIds(componentIds,currentUserId,role,sqlSession);
-    List<IssueDto> authorizedIssues=getAuthorizedIssues(allIssuesDto,authorizedComponentIds);
-    Paging paging=new Paging(query.pageSize(),query.pageIndex(),authorizedIssues.size());
-    Set<Long> paginatedAuthorizedIssueIds=getPaginatedAuthorizedIssueIds(authorizedIssues,paging);
-    Collection<IssueDto> dtos=issueDao.selectByIds(paginatedAuthorizedIssueIds,sqlSession);
-    Set<Integer> ruleIds=Sets.newLinkedHashSet();
+    List<IssueDto> authorizedIssues=authorized(allIssuesDto,authorizedComponentIds);
+    Paging paging=Paging.create(query.pageSize(),query.pageIndex(),authorizedIssues.size());
+    Set<Long> pagedAuthorizedIssueIds=pagedAuthorizedIssueIds(authorizedIssues,paging);
+    Collection<IssueDto> dtos=issueDao.selectByIds(pagedAuthorizedIssueIds,sqlSession);
+    Set<Integer> ruleIds=Sets.newHashSet();
     List<Issue> issues=newArrayList();
     List<Long> issueIds=newArrayList();
     Map<Long,Issue> issuesById=newHashMap();
@@ -25,7 +25,7 @@
     Collection<ActionPlanIssueDto> actionPlanIssueDtos=actionPlanIssueDao.findByIssueIds(issueIds,sqlSession);
     ListMultimap<Issue,ActionPlan> actionPlansByIssueKey=createActionPlansByIssue(actionPlanIssueDtos,issuesById);
     setActionPlans(issues,actionPlansByIssueKey);
-    return new DefaultResults(issues,getRulesByIssue(issues,ruleIds),getComponentsByIssue(issues,componentIds),actionPlansByIssueKey,paging,authorizedIssues.size() != allIssuesDto.size());
+    return new DefaultResults(issues,findRules(ruleIds),findComponents(componentIds),actionPlansByIssueKey,paging,authorizedIssues.size() != allIssuesDto.size());
   }
   finally {
     MyBatis.closeQuietly(sqlSession);

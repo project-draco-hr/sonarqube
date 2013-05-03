@@ -1,13 +1,12 @@
 {
-  IssueQuery issueQuery=mock(IssueQuery.class);
-  when(issueQuery.pageSize()).thenReturn(100);
+  IssueQuery query=IssueQuery.builder().pageSize(100).build();
   IssueDto issue1=new IssueDto().setId(1L).setRuleId(50).setResourceId(123).setComponentKey_unit_test_only("Action.java").setRuleKey_unit_test_only("squid","AvoidCycle").setStatus("OPEN").setResolution("OPEN");
   IssueDto issue2=new IssueDto().setId(2L).setRuleId(50).setResourceId(135).setComponentKey_unit_test_only("Phases.java").setRuleKey_unit_test_only("squid","AvoidCycle").setStatus("OPEN").setResolution("OPEN");
   List<IssueDto> dtoList=newArrayList(issue1,issue2);
-  when(issueDao.selectIssueIdsAndComponentsId(eq(issueQuery),any(SqlSession.class))).thenReturn(dtoList);
+  when(issueDao.selectIssueIdsAndComponentsId(eq(query),any(SqlSession.class))).thenReturn(dtoList);
   when(authorizationDao.keepAuthorizedComponentIds(anySet(),anyInt(),anyString(),any(SqlSession.class))).thenReturn(newHashSet(123));
   when(issueDao.selectByIds(anyCollection(),any(SqlSession.class))).thenReturn(newArrayList(issue1));
-  IssueFinder.Results results=finder.find(issueQuery,null,UserRole.USER);
+  IssueFinder.Results results=finder.find(query,null,UserRole.USER);
   verify(issueDao).selectByIds(eq(newHashSet(1L)),any(SqlSession.class));
   assertThat(results.securityExclusions()).isTrue();
 }
