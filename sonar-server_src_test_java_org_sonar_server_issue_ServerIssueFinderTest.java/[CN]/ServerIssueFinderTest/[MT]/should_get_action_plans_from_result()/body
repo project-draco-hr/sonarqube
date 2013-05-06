@@ -1,17 +1,16 @@
 {
-  ActionPlanIssueDto actionPlanIssueDto1=new ActionPlanIssueDto().setIssueId(1L).setKee("A").setName("Short term");
-  ActionPlanIssueDto actionPlanIssueDto2=new ActionPlanIssueDto().setIssueId(2L).setKee("B").setName("Long term");
+  ActionPlan actionPlan1=DefaultActionPlan.create("Short term").setKey("A");
+  ActionPlan actionPlan2=DefaultActionPlan.create("Long term").setKey("B");
   grantAccessRights();
   IssueQuery query=IssueQuery.builder().build();
-  IssueDto issue1=new IssueDto().setId(1L).setRuleId(50).setResourceId(123).setKey("ABC").setComponentKey_unit_test_only("Action.java").setRuleKey_unit_test_only("squid","AvoidCycle").setStatus("OPEN").setResolution("OPEN");
-  IssueDto issue2=new IssueDto().setId(2L).setRuleId(50).setResourceId(123).setKey("DEF").setComponentKey_unit_test_only("Action.java").setRuleKey_unit_test_only("squid","AvoidCycle").setStatus("OPEN").setResolution("OPEN");
+  IssueDto issue1=new IssueDto().setId(1L).setRuleId(50).setResourceId(123).setKey("ABC").setActionPlanKey("A").setComponentKey_unit_test_only("Action.java").setRuleKey_unit_test_only("squid","AvoidCycle").setStatus("OPEN").setResolution("OPEN");
+  IssueDto issue2=new IssueDto().setId(2L).setRuleId(50).setResourceId(123).setKey("DEF").setActionPlanKey("B").setComponentKey_unit_test_only("Action.java").setRuleKey_unit_test_only("squid","AvoidCycle").setStatus("OPEN").setResolution("OPEN");
   List<IssueDto> dtoList=newArrayList(issue1,issue2);
   when(issueDao.selectIssueIdsAndComponentsId(eq(query),any(SqlSession.class))).thenReturn(dtoList);
   when(issueDao.selectByIds(anyCollection(),any(SqlSession.class))).thenReturn(dtoList);
-  when(actionPlanIssueDao.findByIssueIds(anyCollection(),any(SqlSession.class))).thenReturn(newArrayList(actionPlanIssueDto1,actionPlanIssueDto2));
+  when(actionPlanFinder.findByKeys(anyCollection())).thenReturn(newArrayList(actionPlan1,actionPlan2));
   IssueFinder.Results results=finder.find(query,null,UserRole.USER);
   assertThat(results.issues()).hasSize(2);
   Issue issue=results.issues().iterator().next();
-  assertThat(results.issues()).hasSize(2);
-  assertThat(results.actionPlans(issue)).hasSize(1);
+  assertThat(results.actionPlan(issue)).isNotNull();
 }

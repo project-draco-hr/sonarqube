@@ -3,16 +3,17 @@
   SqlSession sqlSession=myBatis.openSession();
   try {
     List<IssueDto> allIssuesDto=issueDao.selectIssueIdsAndComponentsId(query,sqlSession);
-    Set<Integer> componentIds=extractResourceIds(allIssuesDto);
-    Set<Integer> authorizedComponentIds=authorizationDao.keepAuthorizedComponentIds(componentIds,currentUserId,role,sqlSession);
+    Set<Integer> authorizedComponentIds=authorizationDao.keepAuthorizedComponentIds(extractResourceIds(allIssuesDto),currentUserId,role,sqlSession);
     List<IssueDto> authorizedIssues=authorized(allIssuesDto,authorizedComponentIds);
     Paging paging=Paging.create(query.pageSize(),query.pageIndex(),authorizedIssues.size());
     Set<Long> pagedAuthorizedIssueIds=pagedAuthorizedIssueIds(authorizedIssues,paging);
     Collection<IssueDto> dtos=issueDao.selectByIds(pagedAuthorizedIssueIds,sqlSession);
-    Set<Integer> ruleIds=Sets.newHashSet();
+    Map<Long,Issue> issuesById=newHashMap();
     List<Issue> issues=newArrayList();
     List<Long> issueIds=newArrayList();
-    Map<Long,Issue> issuesById=newHashMap();
+    Set<Integer> ruleIds=Sets.newHashSet();
+    Set<Integer> componentIds=Sets.newHashSet();
+    Set<String> actionPlanKeys=Sets.newHashSet();
     for (    IssueDto dto : dtos) {
       if (authorizedComponentIds.contains(dto.getResourceId())) {
         DefaultIssue defaultIssue=dto.toDefaultIssue();
@@ -20,12 +21,10 @@
         issueIds.add(dto.getId());
         issues.add(defaultIssue);
         ruleIds.add(dto.getRuleId());
+        componentIds.add(dto.getResourceId());
       }
     }
-    Collection<ActionPlanIssueDto> actionPlanIssueDtos=actionPlanIssueDao.findByIssueIds(issueIds,sqlSession);
-    ListMultimap<Issue,ActionPlan> actionPlansByIssueKey=createActionPlansByIssue(actionPlanIssueDtos,issuesById);
-    setActionPlans(issues,actionPlansByIssueKey);
-    return new DefaultResults(issues,findRules(ruleIds),findComponents(componentIds),actionPlansByIssueKey,paging,authorizedIssues.size() != allIssuesDto.size());
+    return new DefaultResults(issues,findRules(ruleIds),findComponents(componentIds),findActionPlans(actionPlanKeys),paging,authorizedIssues.size() != allIssuesDto.size());
   }
   finally {
     MyBatis.closeQuietly(sqlSession);
