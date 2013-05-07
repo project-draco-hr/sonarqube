@@ -1,5 +1,7 @@
 {
-  SqlSession session=mybatis.openSession();
+  SqlSession session=mybatis.openBatchSession();
+  IssueMapper issueMapper=session.getMapper(IssueMapper.class);
+  IssueChangeMapper issueChangeMapper=session.getMapper(IssueChangeMapper.class);
   try {
     List<DefaultIssue> conflicts=Lists.newArrayList();
     for (    DefaultIssue issue : issues) {
@@ -7,15 +9,15 @@
       int componentId=componentId(issue);
       IssueDto dto=IssueDto.toDto(issue,componentId,ruleId);
       if (issue.isNew()) {
-        session.insert(MYBATIS_INSERT_ISSUE,dto);
+        issueMapper.insert(dto);
       }
  else {
-        int count=session.update(MYBATIS_UPDATE_ISSUE,dto);
+        int count=issueMapper.update(dto);
         if (count < 1) {
           conflicts.add(issue);
         }
       }
-      insertChanges(session,issue);
+      insertChanges(issueChangeMapper,issue);
     }
     session.commit();
   }
