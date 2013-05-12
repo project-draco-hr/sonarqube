@@ -1,0 +1,12 @@
+{
+  Preconditions.checkArgument(issueKeys.size() < 1000,"Number of issue keys is greater than or equal 1000");
+  List<DefaultIssueComment> result=Lists.newArrayList();
+  if (!issueKeys.isEmpty()) {
+    IssueChangeMapper mapper=session.getMapper(IssueChangeMapper.class);
+    List<IssueChangeDto> dtos=mapper.selectByIssuesAndType(issueKeys,changeType);
+    for (    IssueChangeDto dto : dtos) {
+      result.add(ChangeDtoConverter.dtoToComment(dto));
+    }
+  }
+  return result;
+}
