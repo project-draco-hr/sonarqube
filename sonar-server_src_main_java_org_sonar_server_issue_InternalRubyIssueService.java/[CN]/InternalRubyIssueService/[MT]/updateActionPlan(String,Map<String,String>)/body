@@ -1,12 +1,12 @@
 {
-  Result<ActionPlan> result=createActionPlanResult(parameters);
+  DefaultActionPlan existingActionPlan=(DefaultActionPlan)actionPlanService.findByKey(key);
+  Result<ActionPlan> result=createActionPlanResult(parameters,existingActionPlan.name());
   if (result.ok()) {
     String projectKey=parameters.get("projectKey");
-    DefaultActionPlan defaultActionPlan=(DefaultActionPlan)actionPlanService.findByKey(key);
-    defaultActionPlan.setName(parameters.get("name"));
-    defaultActionPlan.setDescription(parameters.get("description"));
-    defaultActionPlan.setDeadLine(toDate(parameters.get("deadLine")));
-    result.setObject(actionPlanService.update(defaultActionPlan,projectKey));
+    DefaultActionPlan actionPlan=(DefaultActionPlan)result.get();
+    actionPlan.setKey(existingActionPlan.key());
+    actionPlan.setUserLogin(existingActionPlan.userLogin());
+    result.setObject(actionPlanService.update(actionPlan,projectKey));
   }
   return result;
 }
