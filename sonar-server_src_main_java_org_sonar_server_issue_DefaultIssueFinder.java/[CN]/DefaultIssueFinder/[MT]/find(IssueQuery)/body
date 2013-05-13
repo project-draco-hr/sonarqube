@@ -1,0 +1,39 @@
+{
+  LOG.debug("IssueQuery : {}",query);
+  SqlSession sqlSession=myBatis.openSession();
+  try {
+    List<IssueDto> allIssues=issueDao.selectIssueAndComponentIds(query,sqlSession);
+    List<IssueDto> authorizedIssues;
+    if (query.requiredRole() != null) {
+      authorizedIssues=keepAuthorized(allIssues,query.requiredRole(),sqlSession);
+    }
+ else {
+      authorizedIssues=allIssues;
+    }
+    Paging paging=Paging.create(query.pageSize(),query.pageIndex(),authorizedIssues.size());
+    Set<Long> pagedIssueIds=pagedIssueIds(authorizedIssues,paging);
+    Collection<IssueDto> pagedIssues=issueDao.selectByIds(pagedIssueIds,sqlSession);
+    Map<String,DefaultIssue> issuesByKey=newHashMap();
+    List<Issue> issues=newArrayList();
+    Set<Integer> ruleIds=Sets.newHashSet();
+    Set<Integer> componentIds=Sets.newHashSet();
+    Set<String> actionPlanKeys=Sets.newHashSet();
+    for (    IssueDto dto : pagedIssues) {
+      DefaultIssue defaultIssue=dto.toDefaultIssue();
+      issuesByKey.put(dto.getKee(),defaultIssue);
+      issues.add(defaultIssue);
+      ruleIds.add(dto.getRuleId());
+      componentIds.add(dto.getResourceId());
+      actionPlanKeys.add(dto.getActionPlanKey());
+    }
+    List<DefaultIssueComment> comments=issueChangeDao.selectCommentsByIssues(sqlSession,issuesByKey.keySet());
+    for (    DefaultIssueComment comment : comments) {
+      DefaultIssue issue=issuesByKey.get(comment.issueKey());
+      issue.addComment(comment);
+    }
+    return new DefaultResults(issues,findRules(ruleIds),findComponents(componentIds),findActionPlans(actionPlanKeys),paging,authorizedIssues.size() != allIssues.size());
+  }
+  finally {
+    MyBatis.closeQuietly(sqlSession);
+  }
+}

@@ -1,0 +1,12 @@
+{
+  if (!Strings.isNullOrEmpty(actionPlanKey) && actionPlanManager.findByKey(actionPlanKey) == null) {
+    throw new IllegalStateException("Unknown action plan: " + actionPlanKey);
+  }
+  verifyLoggedIn(userSession);
+  DefaultIssue issue=loadIssue(issueKey);
+  IssueChangeContext context=IssueChangeContext.createUser(new Date(),userSession.login());
+  if (issueUpdater.plan(issue,actionPlanKey,context)) {
+    issueStorage.save(issue);
+  }
+  return issue;
+}
