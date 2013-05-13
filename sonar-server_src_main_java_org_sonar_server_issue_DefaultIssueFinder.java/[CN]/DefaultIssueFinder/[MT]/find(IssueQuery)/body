@@ -18,6 +18,7 @@
     Set<Integer> ruleIds=Sets.newHashSet();
     Set<Integer> componentIds=Sets.newHashSet();
     Set<String> actionPlanKeys=Sets.newHashSet();
+    Set<String> users=Sets.newHashSet();
     for (    IssueDto dto : pagedIssues) {
       DefaultIssue defaultIssue=dto.toDefaultIssue();
       issuesByKey.put(dto.getKee(),defaultIssue);
@@ -25,13 +26,16 @@
       ruleIds.add(dto.getRuleId());
       componentIds.add(dto.getResourceId());
       actionPlanKeys.add(dto.getActionPlanKey());
+      users.add(dto.getUserLogin());
+      users.add(dto.getAssignee());
     }
     List<DefaultIssueComment> comments=issueChangeDao.selectCommentsByIssues(sqlSession,issuesByKey.keySet());
     for (    DefaultIssueComment comment : comments) {
       DefaultIssue issue=issuesByKey.get(comment.issueKey());
       issue.addComment(comment);
+      users.add(comment.userLogin());
     }
-    return new DefaultResults(issues,findRules(ruleIds),findComponents(componentIds),findActionPlans(actionPlanKeys),paging,authorizedIssues.size() != allIssues.size());
+    return new DefaultResults(issues,findRules(ruleIds),findComponents(componentIds),findActionPlans(actionPlanKeys),findUsers(users),paging,authorizedIssues.size() != allIssues.size());
   }
   finally {
     MyBatis.closeQuietly(sqlSession);
