@@ -1,0 +1,17 @@
+{
+  Date deadLine=new Date();
+  Map<String,String> parameters=newHashMap();
+  parameters.put("name","Long term");
+  parameters.put("description","Long term issues");
+  parameters.put("projectId","1");
+  parameters.put("deadLine",DateUtils.formatDateTime(deadLine));
+  ArgumentCaptor<ActionPlan> actionPlanCaptor=ArgumentCaptor.forClass(ActionPlan.class);
+  internalRubyIssueService.createActionPlan(parameters);
+  verify(actionPlanService).create(actionPlanCaptor.capture(),eq(1));
+  ActionPlan actionPlan=actionPlanCaptor.getValue();
+  assertThat(actionPlan).isNotNull();
+  assertThat(actionPlan.key()).isNotNull();
+  assertThat(actionPlan.name()).isEqualTo("Long term");
+  assertThat(actionPlan.description()).isEqualTo("Long term issues");
+  assertThat(actionPlan.deadLine()).isNotNull();
+}
