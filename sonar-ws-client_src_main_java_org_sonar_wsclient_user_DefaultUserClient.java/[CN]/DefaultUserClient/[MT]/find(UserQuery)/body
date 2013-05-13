@@ -1,0 +1,16 @@
+{
+  HttpRequest request=requestFactory.get(UserQuery.BASE_URL,query.urlParams());
+  if (!request.ok()) {
+    throw new IllegalStateException("Fail to search for users. Bad HTTP response status: " + request.code());
+  }
+  List<User> result=new ArrayList<User>();
+  String json=request.body("UTF-8");
+  Map jsonRoot=(Map)JSONValue.parse(json);
+  List<Map> jsonUsers=(List)jsonRoot.get("users");
+  if (jsonUsers != null) {
+    for (    Map jsonUser : jsonUsers) {
+      result.add(new User(jsonUser));
+    }
+  }
+  return result;
+}
