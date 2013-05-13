@@ -1,12 +1,18 @@
 {
   DefaultActionPlan existingActionPlan=(DefaultActionPlan)actionPlanService.findByKey(key);
-  Result<ActionPlan> result=createActionPlanResult(parameters,existingActionPlan.name());
-  if (result.ok()) {
-    String projectKey=parameters.get("projectKey");
-    DefaultActionPlan actionPlan=(DefaultActionPlan)result.get();
-    actionPlan.setKey(existingActionPlan.key());
-    actionPlan.setUserLogin(existingActionPlan.userLogin());
-    result.setObject(actionPlanService.update(actionPlan,projectKey));
+  if (existingActionPlan == null) {
+    Result<ActionPlan> result=new Result<ActionPlan>();
+    result.addError("issues_action_plans.errors.action_plan_does_not_exists",key);
+    return result;
   }
-  return result;
+ else {
+    Result<ActionPlan> result=createActionPlanResult(parameters,existingActionPlan.name());
+    if (result.ok()) {
+      DefaultActionPlan actionPlan=(DefaultActionPlan)result.get();
+      actionPlan.setKey(existingActionPlan.key());
+      actionPlan.setUserLogin(existingActionPlan.userLogin());
+      result.setObject(actionPlanService.update(actionPlan));
+    }
+    return result;
+  }
 }
