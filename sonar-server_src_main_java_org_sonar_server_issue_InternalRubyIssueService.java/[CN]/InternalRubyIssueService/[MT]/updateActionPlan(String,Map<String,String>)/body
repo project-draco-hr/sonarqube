@@ -1,8 +1,12 @@
 {
-  Integer projectId=toInteger(parameters.get("projectId"));
-  DefaultActionPlan defaultActionPlan=(DefaultActionPlan)actionPlanService.findByKey(key);
-  defaultActionPlan.setName(parameters.get("name"));
-  defaultActionPlan.setDescription(parameters.get("description"));
-  defaultActionPlan.setDeadLine(toDate(parameters.get("deadLine")));
-  return actionPlanService.update(defaultActionPlan,projectId);
+  Result<ActionPlan> result=createActionPlanResult(parameters);
+  if (result.ok()) {
+    String projectKey=parameters.get("projectKey");
+    DefaultActionPlan defaultActionPlan=(DefaultActionPlan)actionPlanService.findByKey(key);
+    defaultActionPlan.setName(parameters.get("name"));
+    defaultActionPlan.setDescription(parameters.get("description"));
+    defaultActionPlan.setDeadLine(toDate(parameters.get("deadLine")));
+    result.setObject(actionPlanService.update(defaultActionPlan,projectKey));
+  }
+  return result;
 }

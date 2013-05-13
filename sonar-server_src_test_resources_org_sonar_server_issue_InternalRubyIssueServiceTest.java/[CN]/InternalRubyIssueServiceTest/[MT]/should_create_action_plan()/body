@@ -1,13 +1,13 @@
 {
-  Date deadLine=new Date();
   Map<String,String> parameters=newHashMap();
   parameters.put("name","Long term");
   parameters.put("description","Long term issues");
-  parameters.put("projectId","1");
-  parameters.put("deadLine",DateUtils.formatDateTime(deadLine));
+  parameters.put("projectKey","org.sonar.Sample");
+  parameters.put("deadLine","13/05/2113");
   ArgumentCaptor<ActionPlan> actionPlanCaptor=ArgumentCaptor.forClass(ActionPlan.class);
-  internalRubyIssueService.createActionPlan(parameters);
-  verify(actionPlanService).create(actionPlanCaptor.capture(),eq(1));
+  Result result=internalRubyIssueService.createActionPlan(parameters);
+  assertThat(result.ok()).isTrue();
+  verify(actionPlanService).create(actionPlanCaptor.capture(),eq("org.sonar.Sample"));
   ActionPlan actionPlan=actionPlanCaptor.getValue();
   assertThat(actionPlan).isNotNull();
   assertThat(actionPlan.key()).isNotNull();
