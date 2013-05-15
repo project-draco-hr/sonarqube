@@ -1,3 +1,11 @@
 {
-  return null;
+  DefaultIssueComment comment=changeDao.selectCommentByKey(commentKey);
+  if (comment == null) {
+    throw new IllegalStateException();
+  }
+  if (Strings.isNullOrEmpty(comment.userLogin()) || !Objects.equal(comment.userLogin(),userSession.login())) {
+    throw new IllegalStateException();
+  }
+  finder.findByKey(comment.issueKey(),UserRole.USER);
+  return comment;
 }
