@@ -4,6 +4,6 @@
   if (projectId != null) {
     String projectsConditionForIssues="SELECT id from projects where id=" + projectId + " or root_id="+ projectId;
     String snapshotCondition="islast=" + database.getDialect().getTrueSqlValue() + " and (project_id="+ projectId+ " or root_project_id="+ projectId+ ")";
-    template.copyTable(source,dest,"projects","(id=" + projectId + " or root_id="+ projectId+ ")").copyTable(source,dest,"reviews","project_id=" + projectId,"status<>'" + ReviewDto.STATUS_CLOSED + "'").copyTable(source,dest,"rule_failures","snapshot_id in (select id from snapshots where " + snapshotCondition + ")").copyTable(source,dest,"issues","resource_id in (" + projectsConditionForIssues + ")","resolution is null").copyTable(source,dest,"snapshots",snapshotCondition);
+    template.copyTable(source,dest,"projects","(id=" + projectId + " or root_id="+ projectId+ ")").copyTable(source,dest,"reviews","project_id=" + projectId,"status<>'" + ReviewDto.STATUS_CLOSED + "'").copyTable(source,dest,"rule_failures","snapshot_id in (select id from snapshots where " + snapshotCondition + ")").copyTable(source,dest,"issues","resource_id in (" + projectsConditionForIssues + ")","status<>'" + Issue.STATUS_CLOSED + "'").copyTable(source,dest,"snapshots",snapshotCondition);
   }
 }
