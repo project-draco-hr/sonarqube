@@ -1,0 +1,11 @@
+{
+  Measure measure=new Measure(CoreMetrics.NEW_UNPLANNED_ISSUES);
+  for (  PastSnapshot pastSnapshot : timeMachineConfiguration.getProjectPastSnapshots()) {
+    int newUnplannedIssues=countNewUnplannedIssuesForSnapshot(pastSnapshot,issues);
+    int variationIndex=pastSnapshot.getIndex();
+    Collection<Measure> children=context.getChildrenMeasures(CoreMetrics.NEW_UNPLANNED_ISSUES);
+    double sumNewUnplannedIssues=MeasureUtils.sumOnVariation(true,variationIndex,children) + newUnplannedIssues;
+    measure.setVariation(variationIndex,sumNewUnplannedIssues);
+  }
+  context.saveMeasure(measure);
+}

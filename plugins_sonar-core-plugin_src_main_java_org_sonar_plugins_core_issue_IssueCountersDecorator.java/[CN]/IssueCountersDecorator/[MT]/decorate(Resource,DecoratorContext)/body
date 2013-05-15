@@ -8,6 +8,7 @@
     ListMultimap<RulePriority,Issue> issuesPerSeverities=ArrayListMultimap.create();
     int countUnassigned=0;
     int falsePositives=0;
+    int unplanned=0;
     for (    Issue issue : issues) {
       severitiesBag.add(RulePriority.valueOf(issue.severity()));
       Multiset<Rule> rulesBag=initRules(rulesPerSeverity,RulePriority.valueOf(issue.severity()));
@@ -19,6 +20,9 @@
       if (Issue.RESOLUTION_FALSE_POSITIVE.equals(issue.resolution())) {
         falsePositives++;
       }
+      if (issue.actionPlanKey() == null) {
+        unplanned++;
+      }
     }
     for (    RulePriority ruleSeverity : RulePriority.values()) {
       saveIssuesForSeverity(context,ruleSeverity,severitiesBag);
@@ -28,7 +32,9 @@
     }
     saveTotalIssues(context,issues);
     saveNewIssues(context,issues,shouldSaveNewMetrics);
-    saveUnassignedIssues(context,countUnassigned);
-    saveFalsePositiveIssues(context,falsePositives);
+    saveNewUnplannedIssues(context,issues);
+    saveMeasure(context,CoreMetrics.UNASSIGNED_ISSUES,countUnassigned);
+    saveMeasure(context,CoreMetrics.FALSE_POSITIVE_ISSUES,falsePositives);
+    saveMeasure(context,CoreMetrics.UNPLANNED_ISSUES,unplanned);
   }
 }

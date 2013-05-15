@@ -1,0 +1,11 @@
+{
+  List<Issue> issues=newArrayList();
+  issues.add(new DefaultIssue().setRuleKey(ruleA1.ruleKey()).setActionPlanKey("ABCD").setSeverity(RulePriority.CRITICAL.name()).setCreationDate(rightNow));
+  issues.add(new DefaultIssue().setRuleKey(ruleA2.ruleKey()).setSeverity(RulePriority.CRITICAL.name()).setCreationDate(rightNow));
+  issues.add(new DefaultIssue().setRuleKey(ruleA1.ruleKey()).setActionPlanKey("ABCD").setSeverity(RulePriority.CRITICAL.name()).setCreationDate(fiveDaysAgo));
+  issues.add(new DefaultIssue().setRuleKey(ruleA2.ruleKey()).setSeverity(RulePriority.CRITICAL.name()).setCreationDate(fiveDaysAgo));
+  issues.add(new DefaultIssue().setRuleKey(ruleB1.ruleKey()).setSeverity(RulePriority.CRITICAL.name()).setCreationDate(tenDaysAgo));
+  when(issuable.issues()).thenReturn(issues);
+  decorator.decorate(resource,context);
+  verify(context).saveMeasure(argThat(new IsVariationMeasure(CoreMetrics.NEW_UNPLANNED_ISSUES,1.0,2.0)));
+}
