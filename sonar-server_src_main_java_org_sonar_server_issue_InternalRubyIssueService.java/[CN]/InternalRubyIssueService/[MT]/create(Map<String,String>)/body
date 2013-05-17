@@ -1,11 +1,26 @@
 {
-  String componentKey=parameters.get("component");
-  DefaultIssueBuilder builder=new DefaultIssueBuilder().componentKey(componentKey);
-  builder.line(RubyUtils.toInteger(parameters.get("line")));
-  builder.message(parameters.get("message"));
-  builder.severity(parameters.get("severity"));
-  builder.effortToFix(RubyUtils.toDouble(parameters.get("effortToFix")));
-  builder.ruleKey(RuleKey.parse(parameters.get("rule")));
-  Issue issue=builder.build();
-  return issueService.create((DefaultIssue)issue,UserSession.get());
+  Result<DefaultIssue> result=Result.of();
+  try {
+    String componentKey=params.get("component");
+    if (StringUtils.isBlank(componentKey)) {
+      result.addError("Component is not set");
+    }
+    RuleKey ruleKey=null;
+    String rule=params.get("rule");
+    if (StringUtils.isBlank(rule)) {
+      result.addError(Result.Message.ofL10n("issue.manual.missing_rule"));
+    }
+ else {
+      ruleKey=RuleKey.parse(rule);
+    }
+    if (result.ok()) {
+      DefaultIssue issue=(DefaultIssue)new DefaultIssueBuilder().componentKey(componentKey).line(RubyUtils.toInteger(params.get("line"))).message(params.get("message")).severity(params.get("severity")).effortToFix(RubyUtils.toDouble(params.get("effortToFix"))).ruleKey(ruleKey).reporter(UserSession.get().login()).build();
+      issue=issueService.createManualIssue(issue,UserSession.get());
+      result.set(issue);
+    }
+  }
+ catch (  Exception e) {
+    result.addError(e.getMessage());
+  }
+  return result;
 }
