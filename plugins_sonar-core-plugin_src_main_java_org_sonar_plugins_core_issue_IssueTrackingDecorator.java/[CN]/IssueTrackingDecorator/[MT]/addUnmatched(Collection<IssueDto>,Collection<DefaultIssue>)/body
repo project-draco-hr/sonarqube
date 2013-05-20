@@ -1,0 +1,11 @@
+{
+  for (  IssueDto unmatchedDto : unmatchedIssues) {
+    DefaultIssue unmatched=unmatchedDto.toDefaultIssue();
+    unmatched.setNew(false);
+    Rule rule=ruleFinder.findByKey(unmatched.ruleKey());
+    boolean manualIssue=!Strings.isNullOrEmpty(unmatched.reporter());
+    boolean onExistingRule=rule != null && !Rule.STATUS_REMOVED.equals(rule.getStatus());
+    unmatched.setAlive(manualIssue && onExistingRule);
+    issues.add(unmatched);
+  }
+}

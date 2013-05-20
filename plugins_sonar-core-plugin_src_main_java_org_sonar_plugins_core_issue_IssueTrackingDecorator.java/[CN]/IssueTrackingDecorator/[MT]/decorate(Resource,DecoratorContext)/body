@@ -1,22 +1,6 @@
 {
-  if (canHaveIssues(resource)) {
-    Collection<DefaultIssue> issues=Lists.newArrayList();
-    for (    Issue issue : scanIssues.issues(resource.getEffectiveKey())) {
-      scanIssues.remove(issue);
-      if (filters.accept(issue)) {
-        issues.add((DefaultIssue)issue);
-      }
-    }
-    Collection<IssueDto> dbOpenIssues=initialOpenIssues.selectAndRemove(resource.getId());
-    Set<IssueDto> unmatchedDbIssues=tracking.track(resource,dbOpenIssues,issues);
-    addUnmatched(unmatchedDbIssues,issues);
-    if (ResourceUtils.isProject(resource)) {
-      addDead(issues);
-    }
-    for (    DefaultIssue issue : issues) {
-      workflow.doAutomaticTransition(issue,changeContext);
-      handlers.execute(issue,changeContext);
-      scanIssues.addOrUpdate(issue);
-    }
+  Issuable issuable=perspectives.as(Issuable.class,resource);
+  if (issuable != null) {
+    doDecorate(resource);
   }
 }

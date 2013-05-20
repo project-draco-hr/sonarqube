@@ -1,16 +1,17 @@
 {
   Resource file=new File("Action.java").setEffectiveKey("struts:Action.java").setId(123);
   DefaultIssue openIssue=new DefaultIssue();
-  when(scanIssues.issues("struts:Action.java")).thenReturn(Arrays.asList(openIssue));
+  when(issueCache.byComponent("struts:Action.java")).thenReturn(Arrays.asList(openIssue));
   when(filters.accept(openIssue)).thenReturn(true);
   IssueDto unmatchedIssue=new IssueDto().setKee("ABCDE").setResolution("OPEN").setStatus("OPEN").setRuleKey_unit_test_only("squid","AvoidCycle");
-  List<IssueDto> unmatchedIssues=Arrays.asList(unmatchedIssue);
-  when(tracking.track(eq(file),anyCollection(),anyCollection())).thenReturn(Sets.newHashSet(unmatchedIssues));
-  decorator.decorate(file,mock(DecoratorContext.class,Mockito.RETURNS_MOCKS));
+  IssueTrackingResult trackingResult=new IssueTrackingResult();
+  trackingResult.addUnmatched(unmatchedIssue);
+  when(tracking.track(eq(file),anyCollection(),anyCollection())).thenReturn(trackingResult);
+  decorator.doDecorate(file);
   verify(workflow,times(2)).doAutomaticTransition(any(DefaultIssue.class),any(IssueChangeContext.class));
   verify(handlers,times(2)).execute(any(DefaultIssue.class),any(IssueChangeContext.class));
-  verify(scanIssues,times(2)).addOrUpdate(any(DefaultIssue.class));
-  verify(scanIssues).addOrUpdate(argThat(new ArgumentMatcher<DefaultIssue>(){
+  verify(issueCache,times(2)).put(any(DefaultIssue.class));
+  verify(issueCache).put(argThat(new ArgumentMatcher<DefaultIssue>(){
     @Override public boolean matches(    Object o){
       DefaultIssue issue=(DefaultIssue)o;
       return "ABCDE".equals(issue.key());

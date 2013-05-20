@@ -1,15 +1,15 @@
 {
   Project project=new Project("struts");
   DefaultIssue openIssue=new DefaultIssue();
-  when(scanIssues.issues("struts")).thenReturn(Arrays.asList(openIssue));
+  when(issueCache.byComponent("struts")).thenReturn(Arrays.asList(openIssue));
   when(filters.accept(openIssue)).thenReturn(true);
   IssueDto deadIssue=new IssueDto().setKee("ABCDE").setResolution("OPEN").setStatus("OPEN").setRuleKey_unit_test_only("squid","AvoidCycle");
   when(initialOpenIssues.getAllIssues()).thenReturn(Arrays.asList(deadIssue));
-  decorator.decorate(project,mock(DecoratorContext.class,Mockito.RETURNS_MOCKS));
+  decorator.doDecorate(project);
   verify(workflow,times(2)).doAutomaticTransition(any(DefaultIssue.class),any(IssueChangeContext.class));
   verify(handlers,times(2)).execute(any(DefaultIssue.class),any(IssueChangeContext.class));
-  verify(scanIssues,times(2)).addOrUpdate(any(DefaultIssue.class));
-  verify(scanIssues).addOrUpdate(argThat(new ArgumentMatcher<DefaultIssue>(){
+  verify(issueCache,times(2)).put(any(DefaultIssue.class));
+  verify(issueCache).put(argThat(new ArgumentMatcher<DefaultIssue>(){
     @Override public boolean matches(    Object o){
       DefaultIssue dead=(DefaultIssue)o;
       return "ABCDE".equals(dead.key()) && !dead.isNew() && !dead.isAlive();

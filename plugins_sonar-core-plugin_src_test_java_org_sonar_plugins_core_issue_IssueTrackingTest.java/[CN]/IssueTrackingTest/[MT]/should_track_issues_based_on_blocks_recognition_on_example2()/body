@@ -1,13 +1,13 @@
 {
   when(lastSnapshots.getSource(project)).thenReturn(load("example2-v1"));
   String source=load("example2-v2");
-  IssueDto referenceIssue1=newReferenceIssue("SystemPrintln",5,1,null);
+  IssueDto referenceIssue1=newReferenceIssue("SystemPrintln",5,"squid","AvoidCycle",null);
   DefaultIssue newIssue1=newDefaultIssue("SystemPrintln",6,RuleKey.of("squid","AvoidCycle"),null);
   DefaultIssue newIssue2=newDefaultIssue("SystemPrintln",10,RuleKey.of("squid","AvoidCycle"),null);
   DefaultIssue newIssue3=newDefaultIssue("SystemPrintln",14,RuleKey.of("squid","AvoidCycle"),null);
-  Map<DefaultIssue,IssueDto> mapping=tracking.mapIssues(Arrays.asList(newIssue1,newIssue2,newIssue3),Arrays.asList(referenceIssue1),source,project);
-  assertThat(newIssue1.isNew()).isTrue();
-  assertThat(newIssue2.isNew()).isFalse();
-  assertThat(mapping.get(newIssue2)).isEqualTo(referenceIssue1);
-  assertThat(newIssue3.isNew()).isTrue();
+  IssueTrackingResult result=new IssueTrackingResult();
+  tracking.mapIssues(Arrays.asList(newIssue1,newIssue2,newIssue3),Arrays.asList(referenceIssue1),source,project,result);
+  assertThat(result.matching(newIssue1)).isNull();
+  assertThat(result.matching(newIssue2)).isSameAs(referenceIssue1);
+  assertThat(result.matching(newIssue3)).isNull();
 }
