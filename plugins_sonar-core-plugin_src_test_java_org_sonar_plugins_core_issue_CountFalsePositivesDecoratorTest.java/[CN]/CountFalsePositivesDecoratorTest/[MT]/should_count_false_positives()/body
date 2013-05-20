@@ -1,0 +1,11 @@
+{
+  DefaultIssue falsePositive=new DefaultIssue().setRuleKey(RuleKey.parse("squid:AvoidCycles")).setResolution(Issue.RESOLUTION_FALSE_POSITIVE).setStatus(Issue.STATUS_OPEN);
+  DefaultIssue open=new DefaultIssue().setRuleKey(RuleKey.parse("squid:AvoidCycles")).setResolution(null).setStatus(Issue.STATUS_OPEN);
+  File file=new File("foo.c");
+  Issuable issuable=mock(Issuable.class);
+  when(perspectives.as(Issuable.class,file)).thenReturn(issuable);
+  when(issuable.issues()).thenReturn(Arrays.<Issue>asList(falsePositive,open));
+  DecoratorContext context=mock(DecoratorContext.class);
+  decorator.decorate(file,context);
+  verify(context).saveMeasure(CoreMetrics.FALSE_POSITIVE_ISSUES,1.0);
+}
