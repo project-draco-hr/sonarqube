@@ -2,12 +2,6 @@
   for (  DefaultIssue issue : result.matched()) {
     IssueDto ref=result.matching(issue);
     issue.setKey(ref.getKee());
-    if (ref.isManualSeverity()) {
-      issue.setManualSeverity(true);
-      issue.setSeverity(ref.getSeverity());
-    }
- else     if (!Objects.equal(ref.getSeverity(),issue.severity())) {
-    }
     issue.setResolution(ref.getResolution());
     issue.setStatus(ref.getStatus());
     issue.setNew(false);
@@ -18,9 +12,17 @@
     if (ref.getAttributes() != null) {
       issue.setAttributes(KeyValueFormat.parse(ref.getAttributes()));
     }
-    issue.setTechnicalCreationDate(ref.getCreatedAt());
-    issue.setTechnicalUpdateDate(ref.getUpdatedAt());
     issue.setCreationDate(ref.getIssueCreationDate());
+    issue.setUpdateDate(ref.getIssueUpdateDate());
     issue.setCloseDate(ref.getIssueCloseDate());
+    if (ref.isManualSeverity()) {
+      issue.setManualSeverity(true);
+      issue.setSeverity(ref.getSeverity());
+    }
+ else {
+      String severity=issue.severity();
+      issue.setSeverity(ref.getSeverity());
+      updater.setSeverity(issue,severity,changeContext);
+    }
   }
 }
