@@ -2,19 +2,19 @@
   for (  DefaultIssue issue : result.matched()) {
     IssueDto ref=result.matching(issue);
     issue.setKey(ref.getKee());
-    issue.setResolution(ref.getResolution());
-    issue.setStatus(ref.getStatus());
-    issue.setNew(false);
-    issue.setAlive(true);
-    issue.setAssignee(ref.getAssignee());
-    issue.setAuthorLogin(ref.getAuthorLogin());
-    issue.setAssignee(ref.getAssignee());
-    if (ref.getAttributes() != null) {
-      issue.setAttributes(KeyValueFormat.parse(ref.getAttributes()));
-    }
     issue.setCreationDate(ref.getIssueCreationDate());
     issue.setUpdateDate(ref.getIssueUpdateDate());
     issue.setCloseDate(ref.getIssueCloseDate());
+    issue.setNew(false);
+    issue.setAlive(true);
+    issue.setActionPlanKey(ref.getActionPlanKey());
+    issue.setResolution(ref.getResolution());
+    issue.setStatus(ref.getStatus());
+    issue.setAssignee(ref.getAssignee());
+    issue.setAuthorLogin(ref.getAuthorLogin());
+    if (ref.getAttributes() != null) {
+      issue.setAttributes(KeyValueFormat.parse(ref.getAttributes()));
+    }
     if (ref.isManualSeverity()) {
       issue.setManualSeverity(true);
       issue.setSeverity(ref.getSeverity());
@@ -24,5 +24,8 @@
       issue.setSeverity(ref.getSeverity());
       updater.setSeverity(issue,severity,changeContext);
     }
+    Integer line=issue.line();
+    issue.setLine(ref.getLine());
+    updater.setLine(issue,line);
   }
 }
