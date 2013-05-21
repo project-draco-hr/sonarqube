@@ -5,8 +5,8 @@
   List<IssueDto> dtoList=newArrayList(issue1,issue2);
   when(issueDao.selectIssueAndComponentIds(eq(query),any(SqlSession.class))).thenReturn(dtoList);
   when(authorizationDao.keepAuthorizedComponentIds(anySet(),anyInt(),anyString(),any(SqlSession.class))).thenReturn(newHashSet(123));
-  when(issueDao.selectByIds(anyCollection(),any(SqlSession.class))).thenReturn(newArrayList(issue1));
+  when(issueDao.selectByIds(anyCollection(),any(IssueQuery.Sort.class),anyBoolean(),any(SqlSession.class))).thenReturn(newArrayList(issue1));
   IssueQueryResult results=finder.find(query);
-  verify(issueDao).selectByIds(eq(newHashSet(1L)),any(SqlSession.class));
+  verify(issueDao).selectByIds(eq(newHashSet(1L)),any(IssueQuery.Sort.class),anyBoolean(),any(SqlSession.class));
   assertThat(results.securityExclusions()).isTrue();
 }

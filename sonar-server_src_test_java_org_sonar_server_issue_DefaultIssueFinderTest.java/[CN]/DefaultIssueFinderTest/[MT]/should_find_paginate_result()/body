@@ -5,10 +5,10 @@
   IssueDto issue2=new IssueDto().setId(2L).setRuleId(50).setResourceId(135).setComponentKey_unit_test_only("Phases.java").setRuleKey_unit_test_only("squid","AvoidCycle").setStatus("OPEN").setResolution("OPEN");
   List<IssueDto> dtoList=newArrayList(issue1,issue2);
   when(issueDao.selectIssueAndComponentIds(eq(query),any(SqlSession.class))).thenReturn(dtoList);
-  when(issueDao.selectByIds(anyCollection(),any(SqlSession.class))).thenReturn(dtoList);
+  when(issueDao.selectByIds(anyCollection(),any(IssueQuery.Sort.class),anyBoolean(),any(SqlSession.class))).thenReturn(dtoList);
   IssueQueryResult results=finder.find(query);
   assertThat(results.paging().offset()).isEqualTo(0);
   assertThat(results.paging().total()).isEqualTo(2);
   assertThat(results.paging().pages()).isEqualTo(2);
-  verify(issueDao).selectByIds(eq(newHashSet(1L)),any(SqlSession.class));
+  verify(issueDao).selectByIds(eq(newHashSet(1L)),any(IssueQuery.Sort.class),anyBoolean(),any(SqlSession.class));
 }
