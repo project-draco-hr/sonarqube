@@ -4,11 +4,11 @@
   try {
     Collection<Integer> rootProjectIds=authorizationDao.selectAuthorizedRootProjectsIds(UserSession.get().userId(),query.requiredRole(),sqlSession);
     List<IssueDto> authorizedIssues=issueDao.selectIssueAndProjectIds(query,rootProjectIds,sqlSession);
-    Collection<IssueDto> authorizedSortedIssues=new IssuesFinderSort(authorizedIssues,query).sort();
+    List<IssueDto> authorizedSortedIssues=sort(authorizedIssues,query,authorizedIssues.size());
     Paging paging=Paging.create(query.pageSize(),query.pageIndex(),authorizedSortedIssues.size());
     Set<Long> pagedIssueIds=pagedIssueIds(authorizedSortedIssues,paging);
-    Collection<IssueDto> pagedIssues=issueDao.selectByIds(pagedIssueIds,sqlSession);
-    Collection<IssueDto> pagedSortedIssues=new IssuesFinderSort(pagedIssues,query).sort();
+    List<IssueDto> pagedIssues=issueDao.selectByIds(pagedIssueIds,sqlSession);
+    List<IssueDto> pagedSortedIssues=sort(pagedIssues,query,authorizedIssues.size());
     Map<String,DefaultIssue> issuesByKey=newHashMap();
     List<Issue> issues=newArrayList();
     Set<Integer> ruleIds=Sets.newHashSet();
