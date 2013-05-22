@@ -1,10 +1,10 @@
 {
-  grantAccessRights();
+  when(authorizationDao.selectAuthorizedRootProjectsIds(anyInt(),anyString(),any(SqlSession.class))).thenReturn(newHashSet(100));
   IssueQuery query=IssueQuery.builder().pageSize(1).pageIndex(1).build();
-  IssueDto issue1=new IssueDto().setId(1L).setRuleId(50).setResourceId(123).setComponentKey_unit_test_only("Action.java").setRuleKey_unit_test_only("squid","AvoidCycle").setStatus("OPEN").setResolution("OPEN");
-  IssueDto issue2=new IssueDto().setId(2L).setRuleId(50).setResourceId(135).setComponentKey_unit_test_only("Phases.java").setRuleKey_unit_test_only("squid","AvoidCycle").setStatus("OPEN").setResolution("OPEN");
+  IssueDto issue1=new IssueDto().setId(1L).setRuleId(50).setResourceId(123).setProjectId(100).setComponentKey_unit_test_only("Action.java").setProjectKey_unit_test_only("struts").setRuleKey_unit_test_only("squid","AvoidCycle").setStatus("OPEN").setResolution("OPEN");
+  IssueDto issue2=new IssueDto().setId(2L).setRuleId(50).setResourceId(135).setProjectId(100).setComponentKey_unit_test_only("Phases.java").setProjectKey_unit_test_only("struts").setRuleKey_unit_test_only("squid","AvoidCycle").setStatus("OPEN").setResolution("OPEN");
   List<IssueDto> dtoList=newArrayList(issue1,issue2);
-  when(issueDao.selectIssueAndComponentIds(eq(query),any(SqlSession.class))).thenReturn(dtoList);
+  when(issueDao.selectIssueAndProjectIds(eq(query),eq(newHashSet(100)),any(SqlSession.class))).thenReturn(dtoList);
   when(issueDao.selectByIds(anyCollection(),any(IssueQuery.Sort.class),anyBoolean(),any(SqlSession.class))).thenReturn(dtoList);
   IssueQueryResult results=finder.find(query);
   assertThat(results.paging().offset()).isEqualTo(0);

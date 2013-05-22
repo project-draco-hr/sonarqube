@@ -1,15 +1,12 @@
 {
   Component component=new ComponentDto().setKey("Action.java");
   when(resourceDao.findByIds(anyCollection())).thenReturn(newArrayList(component));
-  grantAccessRights();
   IssueQuery query=IssueQuery.builder().build();
-  IssueDto issue1=new IssueDto().setId(1L).setRuleId(50).setResourceId(123).setComponentKey_unit_test_only("Action.java").setRuleKey_unit_test_only("squid","AvoidCycle").setStatus("OPEN").setResolution("OPEN");
-  IssueDto issue2=new IssueDto().setId(2L).setRuleId(50).setResourceId(123).setComponentKey_unit_test_only("Action.java").setRuleKey_unit_test_only("squid","AvoidCycle").setStatus("OPEN").setResolution("OPEN");
+  IssueDto issue1=new IssueDto().setId(1L).setRuleId(50).setResourceId(123).setProjectId(100).setComponentKey_unit_test_only("Action.java").setProjectKey_unit_test_only("struts").setRuleKey_unit_test_only("squid","AvoidCycle").setStatus("OPEN").setResolution("OPEN");
+  IssueDto issue2=new IssueDto().setId(2L).setRuleId(50).setResourceId(123).setProjectId(100).setComponentKey_unit_test_only("Action.java").setProjectKey_unit_test_only("struts").setRuleKey_unit_test_only("squid","AvoidCycle").setStatus("OPEN").setResolution("OPEN");
   List<IssueDto> dtoList=newArrayList(issue1,issue2);
-  when(issueDao.selectIssueAndComponentIds(eq(query),any(SqlSession.class))).thenReturn(dtoList);
   when(issueDao.selectByIds(anyCollection(),any(IssueQuery.Sort.class),anyBoolean(),any(SqlSession.class))).thenReturn(dtoList);
   IssueQueryResult results=finder.find(query);
-  assertThat(results.issues()).hasSize(2);
   assertThat(results.issues()).hasSize(2);
   assertThat(results.components()).hasSize(1);
   Issue issue=results.issues().iterator().next();

@@ -2,7 +2,10 @@
   final List<IssueDto> issues=newArrayList();
   ResultHandler resultHandler=new ResultHandler(){
     @Override public void handleResult(    ResultContext context){
-      issues.add((IssueDto)context.getResultObject());
+      IssueDto issueDto=(IssueDto)context.getResultObject();
+      if (authorizedRootProjectIds.contains(issueDto.getProjectId())) {
+        issues.add(issueDto);
+      }
       if (issues.size() >= maxResults) {
         context.stop();
       }

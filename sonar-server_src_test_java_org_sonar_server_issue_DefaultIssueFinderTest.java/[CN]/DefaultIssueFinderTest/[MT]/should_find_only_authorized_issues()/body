@@ -1,12 +1,8 @@
 {
+  when(authorizationDao.selectAuthorizedRootProjectsIds(anyInt(),anyString(),any(SqlSession.class))).thenReturn(Collections.<Integer>emptySet());
   IssueQuery query=IssueQuery.builder().pageSize(100).requiredRole(UserRole.USER).build();
-  IssueDto issue1=new IssueDto().setId(1L).setRuleId(50).setResourceId(123).setComponentKey_unit_test_only("Action.java").setRuleKey_unit_test_only("squid","AvoidCycle").setStatus("OPEN").setResolution("OPEN");
-  IssueDto issue2=new IssueDto().setId(2L).setRuleId(50).setResourceId(135).setComponentKey_unit_test_only("Phases.java").setRuleKey_unit_test_only("squid","AvoidCycle").setStatus("OPEN").setResolution("OPEN");
-  List<IssueDto> dtoList=newArrayList(issue1,issue2);
-  when(issueDao.selectIssueAndComponentIds(eq(query),any(SqlSession.class))).thenReturn(dtoList);
-  when(authorizationDao.keepAuthorizedComponentIds(anySet(),anyInt(),anyString(),any(SqlSession.class))).thenReturn(newHashSet(123));
+  IssueDto issue1=new IssueDto().setId(1L).setRuleId(50).setResourceId(123).setProjectId(100).setComponentKey_unit_test_only("Action.java").setProjectKey_unit_test_only("struts").setRuleKey_unit_test_only("squid","AvoidCycle").setStatus("OPEN").setResolution("OPEN");
   when(issueDao.selectByIds(anyCollection(),any(IssueQuery.Sort.class),anyBoolean(),any(SqlSession.class))).thenReturn(newArrayList(issue1));
-  IssueQueryResult results=finder.find(query);
-  verify(issueDao).selectByIds(eq(newHashSet(1L)),any(IssueQuery.Sort.class),anyBoolean(),any(SqlSession.class));
-  assertThat(results.securityExclusions()).isTrue();
+  finder.find(query);
+  verify(issueDao).selectIssueAndProjectIds(eq(query),eq(Collections.<Integer>emptySet()),any(SqlSession.class));
 }
