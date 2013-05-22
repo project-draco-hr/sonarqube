@@ -1,0 +1,12 @@
+{
+  SnapshotCache snapshotCache=mock(SnapshotCache.class);
+  when(snapshotCache.get("struts:Action.java")).thenReturn(null);
+  ScanIssueStorage storage=new ScanIssueStorage(getMyBatis(),new FakeRuleFinder(),snapshotCache,new ResourceDao(getMyBatis()));
+  try {
+    storage.projectId(new DefaultIssue().setComponentKey("struts:Action.java"));
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).hasMessage("Unknown component: struts:Action.java");
+  }
+}
