@@ -1,13 +1,22 @@
 {
   setupData("shared","should_select_issue_and_project_ids");
-  IssueQuery query=IssueQuery.builder().build();
-  List<IssueDto> results=dao.selectIssueAndProjectIds(query,newArrayList(399),1000);
+  DefaultIssueQueryResult defaultIssueQueryResult=new DefaultIssueQueryResult();
+  IssueQuery query=mock(IssueQuery.class);
+  when(query.maxResults()).thenReturn(1000);
+  List<IssueDto> results=dao.selectIssueAndProjectIds(query,defaultIssueQueryResult,newArrayList(399));
   assertThat(results).hasSize(3);
+  assertThat(defaultIssueQueryResult.maxResultsReached()).isFalse();
+  assertThat(defaultIssueQueryResult.securityExclusions()).isFalse();
   IssueDto issueDto=results.get(0);
   assertThat(issueDto.getId()).isNotNull();
   assertThat(issueDto.getProjectId()).isNotNull();
-  results=dao.selectIssueAndProjectIds(query,newArrayList(399),2);
-  assertThat(results).hasSize(2);
-  results=dao.selectIssueAndProjectIds(query,Collections.<Integer>emptyList(),1000);
+  results=dao.selectIssueAndProjectIds(query,defaultIssueQueryResult,Collections.<Integer>emptyList());
   assertThat(results).isEmpty();
+  assertThat(defaultIssueQueryResult.maxResultsReached()).isFalse();
+  assertThat(defaultIssueQueryResult.securityExclusions()).isTrue();
+  when(query.maxResults()).thenReturn(2);
+  results=dao.selectIssueAndProjectIds(query,defaultIssueQueryResult,newArrayList(399));
+  assertThat(results).hasSize(2);
+  assertThat(defaultIssueQueryResult.maxResultsReached()).isTrue();
+  assertThat(defaultIssueQueryResult.securityExclusions()).isTrue();
 }
