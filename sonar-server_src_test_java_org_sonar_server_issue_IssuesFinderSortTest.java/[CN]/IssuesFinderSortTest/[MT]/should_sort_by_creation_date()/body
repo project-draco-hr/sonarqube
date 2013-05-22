@@ -1,0 +1,17 @@
+{
+  Date date=new Date();
+  Date date1=DateUtils.addDays(date,-3);
+  Date date2=DateUtils.addDays(date,-2);
+  Date date3=DateUtils.addDays(date,-1);
+  IssueDto issue1=new IssueDto().setId(1L).setIssueCreationDate(date1);
+  IssueDto issue2=new IssueDto().setId(2L).setIssueCreationDate(date3);
+  IssueDto issue3=new IssueDto().setId(3L).setIssueCreationDate(date2);
+  List<IssueDto> dtoList=newArrayList(issue1,issue2,issue3);
+  IssueQuery query=IssueQuery.builder().sort(IssueQuery.Sort.CREATION_DATE).asc(false).build();
+  IssuesFinderSort issuesFinderSort=new IssuesFinderSort(dtoList,query);
+  List<IssueDto> result=newArrayList(issuesFinderSort.sort());
+  assertThat(result).hasSize(3);
+  assertThat(result.get(0).getIssueCreationDate()).isEqualTo(date3);
+  assertThat(result.get(1).getIssueCreationDate()).isEqualTo(date2);
+  assertThat(result.get(2).getIssueCreationDate()).isEqualTo(date1);
+}

@@ -1,0 +1,13 @@
+{
+  IssueDto issue1=new IssueDto().setId(1L).setSeverity("INFO");
+  IssueDto issue2=new IssueDto().setId(2L).setSeverity("BLOCKER");
+  IssueDto issue3=new IssueDto().setId(3L).setSeverity("MAJOR");
+  List<IssueDto> dtoList=newArrayList(issue1,issue2,issue3);
+  IssueQuery query=IssueQuery.builder().sort(IssueQuery.Sort.SEVERITY).asc(true).build();
+  IssuesFinderSort issuesFinderSort=new IssuesFinderSort(dtoList,query);
+  List<IssueDto> result=newArrayList(issuesFinderSort.sort());
+  assertThat(result).hasSize(3);
+  assertThat(result.get(0).getSeverity()).isEqualTo("INFO");
+  assertThat(result.get(1).getSeverity()).isEqualTo("MAJOR");
+  assertThat(result.get(2).getSeverity()).isEqualTo("BLOCKER");
+}

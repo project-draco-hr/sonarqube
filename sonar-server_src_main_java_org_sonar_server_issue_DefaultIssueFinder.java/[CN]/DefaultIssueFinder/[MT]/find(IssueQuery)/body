@@ -4,9 +4,11 @@
   try {
     Collection<Integer> rootProjectIds=authorizationDao.selectAuthorizedRootProjectsIds(UserSession.get().userId(),query.requiredRole(),sqlSession);
     List<IssueDto> authorizedIssues=issueDao.selectIssueAndProjectIds(query,rootProjectIds,sqlSession);
-    Paging paging=Paging.create(query.pageSize(),query.pageIndex(),authorizedIssues.size());
-    Set<Long> pagedIssueIds=pagedIssueIds(authorizedIssues,paging);
-    Collection<IssueDto> pagedIssues=issueDao.selectByIds(pagedIssueIds,query.sort(),query.asc(),sqlSession);
+    Collection<IssueDto> authorizedSortedIssues=new IssuesFinderSort(authorizedIssues,query).sort();
+    Paging paging=Paging.create(query.pageSize(),query.pageIndex(),authorizedSortedIssues.size());
+    Set<Long> pagedIssueIds=pagedIssueIds(authorizedSortedIssues,paging);
+    Collection<IssueDto> pagedIssues=issueDao.selectByIds(pagedIssueIds,sqlSession);
+    Collection<IssueDto> pagedSortedIssues=new IssuesFinderSort(pagedIssues,query).sort();
     Map<String,DefaultIssue> issuesByKey=newHashMap();
     List<Issue> issues=newArrayList();
     Set<Integer> ruleIds=Sets.newHashSet();
@@ -14,7 +16,7 @@
     Set<Integer> projectIds=Sets.newHashSet();
     Set<String> actionPlanKeys=Sets.newHashSet();
     Set<String> users=Sets.newHashSet();
-    for (    IssueDto dto : pagedIssues) {
+    for (    IssueDto dto : pagedSortedIssues) {
       DefaultIssue defaultIssue=dto.toDefaultIssue();
       issuesByKey.put(dto.getKee(),defaultIssue);
       issues.add(defaultIssue);
