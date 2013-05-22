@@ -22,15 +22,16 @@
  else {
     ResourceDto project=resourceDao.getResource(ResourceQuery.create().setKey(projectParam));
     if (project == null) {
-      result.addError(Result.Message.ofL10n("issues_action_plans.errors.project_does_not_exists",projectParam));
+      result.addError(Result.Message.ofL10n("action_plans.errors.project_does_not_exist",projectParam));
     }
   }
   if (!Strings.isNullOrEmpty(deadLineParam)) {
     try {
       SimpleDateFormat dateFormat=new SimpleDateFormat("dd/MM/yyyy");
       deadLine=dateFormat.parse(deadLineParam);
-      if (deadLine.before(new Date())) {
-        result.addError(Result.Message.ofL10n("issues_action_plans.date_cant_be_in_past"));
+      Date today=new Date();
+      if (deadLine.before(today) && !DateUtils.isSameDay(deadLine,today)) {
+        result.addError(Result.Message.ofL10n("action_plans.date_cant_be_in_past"));
       }
     }
  catch (    Exception e) {
@@ -38,7 +39,7 @@
     }
   }
   if (!Strings.isNullOrEmpty(projectParam) && !Strings.isNullOrEmpty(name) && !name.equals(oldName)&& actionPlanService.isNameAlreadyUsedForProject(name,projectParam)) {
-    result.addError(Result.Message.ofL10n("issues_action_plans.same_name_in_same_project"));
+    result.addError(Result.Message.ofL10n("action_plans.same_name_in_same_project"));
   }
   if (result.ok()) {
     DefaultActionPlan actionPlan=DefaultActionPlan.create(name).setProjectKey(projectParam).setDescription(description).setUserLogin(UserSession.get().login()).setDeadLine(deadLine);
