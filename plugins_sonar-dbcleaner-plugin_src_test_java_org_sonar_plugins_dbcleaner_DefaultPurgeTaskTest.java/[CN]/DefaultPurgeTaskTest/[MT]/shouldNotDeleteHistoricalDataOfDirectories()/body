@@ -1,8 +1,14 @@
 {
   PurgeDao purgeDao=mock(PurgeDao.class);
-  Settings settings=new Settings(new PropertyDefinitions(DefaultPurgeTask.class));
+  Settings settings=new Settings(new PropertyDefinitions(DbCleanerPlugin.class));
   settings.setProperty(DbCleanerConstants.PROPERTY_CLEAN_DIRECTORY,"false");
   DefaultPurgeTask task=new DefaultPurgeTask(purgeDao,settings,mock(DefaultPeriodCleaner.class),mock(PurgeProfiler.class));
   task.purge(1L);
-  verify(purgeDao).purge(1L,new String[]{Scopes.FILE});
+  verify(purgeDao).purge(argThat(new ArgumentMatcher<PurgeConfiguration>(){
+    @Override public boolean matches(    Object o){
+      PurgeConfiguration conf=(PurgeConfiguration)o;
+      return conf.rootProjectId() == 1L && conf.scopesWithoutHistoricalData().length == 1 && conf.scopesWithoutHistoricalData()[0].equals(Scopes.FILE);
+    }
+  }
+));
 }

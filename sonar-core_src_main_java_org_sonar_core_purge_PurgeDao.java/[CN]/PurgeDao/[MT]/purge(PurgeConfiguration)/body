@@ -1,0 +1,22 @@
+{
+  SqlSession session=mybatis.openBatchSession();
+  PurgeMapper mapper=session.getMapper(PurgeMapper.class);
+  PurgeCommands commands=new PurgeCommands(session,mapper,profiler);
+  try {
+    List<ResourceDto> projects=getProjects(conf.rootProjectId(),session);
+    for (    ResourceDto project : projects) {
+      LOG.info("-> Clean " + project.getLongName() + " [id="+ project.getId()+ "]");
+      deleteAbortedBuilds(project,commands);
+      purge(project,conf.scopesWithoutHistoricalData(),commands);
+    }
+    for (    ResourceDto project : projects) {
+      disableOrphanResources(project,session,mapper);
+    }
+    deleteOldClosedIssues(conf,mapper);
+    session.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+  return this;
+}
