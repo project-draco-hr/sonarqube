@@ -2,9 +2,8 @@
   LOG.debug("IssueQuery : {}",query);
   SqlSession sqlSession=myBatis.openSession();
   try {
-    DefaultIssueQueryResult defaultIssueQueryResult=new DefaultIssueQueryResult();
     Collection<Integer> rootProjectIds=authorizationDao.selectAuthorizedRootProjectsIds(UserSession.get().userId(),query.requiredRole(),sqlSession);
-    List<IssueDto> authorizedIssues=issueDao.selectIssueAndProjectIds(query,defaultIssueQueryResult,rootProjectIds,sqlSession);
+    List<IssueDto> authorizedIssues=issueDao.selectIssueAndProjectIds(query,rootProjectIds,sqlSession);
     List<IssueDto> authorizedSortedIssues=sort(authorizedIssues,query,authorizedIssues.size());
     Paging paging=Paging.create(query.pageSize(),query.pageIndex(),authorizedSortedIssues.size());
     Set<Long> pagedIssueIds=pagedIssueIds(authorizedSortedIssues,paging);
@@ -40,6 +39,8 @@
         users.add(comment.userLogin());
       }
     }
+    DefaultIssueQueryResult defaultIssueQueryResult=new DefaultIssueQueryResult();
+    defaultIssueQueryResult.setMaxResultsReached(authorizedIssues.size() == query.maxResults());
     defaultIssueQueryResult.setIssues(issues).addRules(findRules(ruleIds)).addComponents(findComponents(componentIds)).addProjects(findProjects(projectIds)).addActionPlans(findActionPlans(actionPlanKeys)).addUsers(findUsers(users)).setPaging(paging);
     return defaultIssueQueryResult;
   }
