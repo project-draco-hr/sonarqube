@@ -1,0 +1,13 @@
+{
+  when(project.isLatestAnalysis()).thenReturn(true);
+  when(issueCache.all()).thenReturn(Arrays.asList(new DefaultIssue().setNew(true),new DefaultIssue().setNew(false)));
+  NewIssuesNotificationPostJob job=new NewIssuesNotificationPostJob(issueCache,notifications);
+  job.executeOn(project,sensorContext);
+  verify(notifications).scheduleForSending(argThat(new ArgumentMatcher<Notification>(){
+    @Override public boolean matches(    Object o){
+      Notification n=(Notification)o;
+      return n.getType().equals("new-issues") && n.getFieldValue("count").equals("1");
+    }
+  }
+));
+}
