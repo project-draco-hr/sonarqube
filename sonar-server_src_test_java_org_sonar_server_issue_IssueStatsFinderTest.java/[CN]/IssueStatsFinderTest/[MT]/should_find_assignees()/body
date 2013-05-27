@@ -1,0 +1,8 @@
+{
+  when(issuestatsDao.selectIssuesColumn(any(IssueQuery.class),anyString(),anyInt())).thenReturn(Lists.<Object>newArrayList("perceval","perceval","arthur",null));
+  when(userFinder.findByLogins(anyListOf(String.class))).thenReturn(Lists.<User>newArrayList(new DefaultUser().setLogin("perceval").setName("Perceval"),new DefaultUser().setLogin("arthur").setName("Roi Arthur")));
+  IssueStatsFinder issueStatsFinder=new IssueStatsFinder(issuestatsDao,userFinder);
+  IssueStatsFinder.IssueStatsResult issueStatsResult=issueStatsFinder.findIssueAssignees(IssueQuery.builder().build());
+  assertThat(issueStatsResult.results()).hasSize(4);
+  assertThat(issueStatsResult.user("arthur").name()).isEqualTo("Roi Arthur");
+}
