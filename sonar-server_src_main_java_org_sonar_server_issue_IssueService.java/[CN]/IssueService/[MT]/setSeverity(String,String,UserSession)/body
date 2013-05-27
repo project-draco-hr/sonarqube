@@ -1,9 +1,11 @@
 {
   verifyLoggedIn(userSession);
-  DefaultIssue issue=loadIssue(issueKey);
+  IssueQueryResult queryResult=loadIssue(issueKey);
+  DefaultIssue issue=(DefaultIssue)queryResult.first();
   IssueChangeContext context=IssueChangeContext.createUser(new Date(),userSession.login());
   if (issueUpdater.setManualSeverity(issue,severity,context)) {
     issueStorage.save(issue);
+    issueNotifications.sendChanges(issue,context,queryResult);
   }
   return issue;
 }

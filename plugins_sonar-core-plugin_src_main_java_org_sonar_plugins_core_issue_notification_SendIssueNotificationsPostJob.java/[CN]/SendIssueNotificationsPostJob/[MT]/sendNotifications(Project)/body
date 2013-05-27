@@ -1,0 +1,16 @@
+{
+  int newIssues=0;
+  IssueChangeContext context=IssueChangeContext.createScan(project.getAnalysisDate());
+  for (  DefaultIssue issue : issueCache.all()) {
+    if (issue.isNew() && issue.resolution() == null) {
+      newIssues++;
+    }
+    if (issue.isChanged() && issue.diffs() != null) {
+      Rule rule=ruleFinder.findByKey(issue.ruleKey());
+      notifications.sendChanges(issue,context,rule,project,null);
+    }
+  }
+  if (newIssues > 0) {
+    notifications.sendNewIssues(project,newIssues);
+  }
+}

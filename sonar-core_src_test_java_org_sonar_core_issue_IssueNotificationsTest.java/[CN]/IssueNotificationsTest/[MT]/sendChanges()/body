@@ -1,0 +1,15 @@
+{
+  IssueChangeContext context=IssueChangeContext.createScan(new Date());
+  DefaultIssue issue=new DefaultIssue().setMessage("the message").setKey("ABCDE").setAssignee("freddy").setFieldDiff(context,"resolution",null,"FIXED").setFieldDiff(context,"status","OPEN","RESOLVED").setComponentKey("struts:Action").setProjectKey("struts");
+  DefaultIssueQueryResult queryResult=new DefaultIssueQueryResult();
+  queryResult.setIssues(Arrays.<Issue>asList(issue));
+  queryResult.addProjects(Arrays.<Component>asList(new Project("struts")));
+  Notification notification=issueNotifications.sendChanges(issue,context,queryResult);
+  assertThat(notification.getFieldValue("message")).isEqualTo("the message");
+  assertThat(notification.getFieldValue("key")).isEqualTo("ABCDE");
+  assertThat(notification.getFieldValue("old.resolution")).isNull();
+  assertThat(notification.getFieldValue("new.resolution")).isEqualTo("FIXED");
+  assertThat(notification.getFieldValue("old.status")).isEqualTo("OPEN");
+  assertThat(notification.getFieldValue("new.status")).isEqualTo("RESOLVED");
+  Mockito.verify(manager).scheduleForSending(notification);
+}
