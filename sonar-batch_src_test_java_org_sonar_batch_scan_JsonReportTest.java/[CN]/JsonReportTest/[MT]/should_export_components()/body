@@ -1,0 +1,12 @@
+{
+  DefaultIssue issue=new DefaultIssue().setKey("200").setComponentKey("Action.java").setRuleKey(RuleKey.of("squid","AvoidCycle")).setNew(false);
+  when(jsonReport.getIssues()).thenReturn(Lists.<DefaultIssue>newArrayList(issue));
+  JSONObject json=jsonReport.createJson();
+  assertThat(json.get("version")).isEqualTo("3.6");
+  assertThat(json.get("components")).isNotNull();
+  JSONArray components=(JSONArray)json.get("components");
+  assertThat(components).hasSize(1);
+  JSONObject jsonComponent=(JSONObject)components.get(0);
+  assertThat(jsonComponent.values()).hasSize(1);
+  assertThat(jsonComponent.get("key")).isEqualTo("Action.java");
+}
