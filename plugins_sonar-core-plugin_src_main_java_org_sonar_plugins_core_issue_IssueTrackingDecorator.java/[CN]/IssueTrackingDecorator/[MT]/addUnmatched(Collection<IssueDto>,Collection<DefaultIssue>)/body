@@ -1,11 +1,18 @@
 {
   for (  IssueDto unmatchedDto : unmatchedIssues) {
     DefaultIssue unmatched=unmatchedDto.toDefaultIssue();
-    ActiveRule activeRule=rulesProfile.getActiveRule(unmatchedDto.getRuleRepo(),unmatchedDto.getRule());
     boolean manualIssue=!Strings.isNullOrEmpty(unmatched.reporter());
-    boolean onDisabledRule=(activeRule == null);
+    Rule rule=ruleFinder.findByKey(RuleKey.of(unmatchedDto.getRuleRepo(),unmatchedDto.getRule()));
+    boolean onDisabledRule=(rule == null || Rule.STATUS_REMOVED.equals(rule.getStatus()));
+    if (manualIssue) {
+      unmatched.setEndOfLife(onDisabledRule);
+    }
+ else {
+      ActiveRule activeRule=rulesProfile.getActiveRule(unmatchedDto.getRuleRepo(),unmatchedDto.getRule());
+      onDisabledRule&=(activeRule == null);
+      unmatched.setEndOfLife(true);
+    }
     unmatched.setNew(false);
-    unmatched.setEndOfLife(!manualIssue);
     unmatched.setOnDisabledRule(onDisabledRule);
     issues.add(unmatched);
   }
