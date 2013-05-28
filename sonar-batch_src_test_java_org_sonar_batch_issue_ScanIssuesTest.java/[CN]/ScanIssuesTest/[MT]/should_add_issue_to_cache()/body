@@ -1,12 +1,13 @@
 {
-  Rule rule=Rule.create("repoKey","ruleKey");
+  Rule rule=Rule.create("squid","AvoidCycle");
   ActiveRule activeRule=mock(ActiveRule.class);
   when(activeRule.getRule()).thenReturn(rule);
   when(activeRule.getSeverity()).thenReturn(RulePriority.INFO);
-  when(qProfile.getActiveRule(anyString(),anyString())).thenReturn(activeRule);
+  when(qProfile.getActiveRule("squid","AvoidCycle")).thenReturn(activeRule);
   Date analysisDate=new Date();
   when(project.getAnalysisDate()).thenReturn(analysisDate);
   DefaultIssue issue=new DefaultIssue().setKey("ABCDE").setRuleKey(RuleKey.of("squid","AvoidCycle")).setSeverity(Severity.CRITICAL);
+  when(filters.accept(issue,null)).thenReturn(true);
   boolean added=scanIssues.initAndAddIssue(issue);
   assertThat(added).isTrue();
   ArgumentCaptor<DefaultIssue> argument=ArgumentCaptor.forClass(DefaultIssue.class);

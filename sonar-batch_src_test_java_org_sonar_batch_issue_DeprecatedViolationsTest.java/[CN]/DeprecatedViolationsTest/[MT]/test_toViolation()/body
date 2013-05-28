@@ -1,0 +1,13 @@
+{
+  RuleKey ruleKey=RuleKey.of("squid","AvoidCycles");
+  when(ruleFinder.findByKey(ruleKey)).thenReturn(new Rule("squid","AvoidCycles"));
+  when(resourceCache.get("org.apache:struts")).thenReturn(new Project("org.apache:struts"));
+  DefaultIssue issue=newIssue(ruleKey);
+  Violation violation=deprecatedViolations.toViolation(issue);
+  assertThat(violation.getLineId()).isEqualTo(42);
+  assertThat(violation.getSeverity()).isEqualTo(RulePriority.BLOCKER);
+  assertThat(violation.isManual()).isTrue();
+  assertThat(violation.getRule().getRepositoryKey()).isEqualTo("squid");
+  assertThat(violation.getRule().getKey()).isEqualTo("AvoidCycles");
+  assertThat(violation.getResource()).isNotNull();
+}

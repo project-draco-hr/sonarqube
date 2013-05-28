@@ -1,0 +1,24 @@
+{
+  Rule rule=Rule.create("squid","AvoidCycle");
+  Resource resource=new JavaFile("org.struts.Action").setEffectiveKey("struts:org.struts.Action");
+  Violation violation=new Violation(rule,resource);
+  violation.setLineId(42);
+  violation.setSeverity(RulePriority.CRITICAL);
+  violation.setMessage("the message");
+  ActiveRule activeRule=mock(ActiveRule.class);
+  when(activeRule.getRule()).thenReturn(rule);
+  when(activeRule.getSeverity()).thenReturn(RulePriority.INFO);
+  when(qProfile.getActiveRule("squid","AvoidCycle")).thenReturn(activeRule);
+  when(filters.accept(any(DefaultIssue.class),eq(violation))).thenReturn(true);
+  boolean added=scanIssues.initAndAddViolation(violation);
+  assertThat(added).isTrue();
+  ArgumentCaptor<DefaultIssue> argument=ArgumentCaptor.forClass(DefaultIssue.class);
+  verify(cache).put(argument.capture());
+  DefaultIssue issue=argument.getValue();
+  assertThat(issue.severity()).isEqualTo(Severity.CRITICAL);
+  assertThat(issue.line()).isEqualTo(42);
+  assertThat(issue.message()).isEqualTo("the message");
+  assertThat(issue.key()).isNotEmpty();
+  assertThat(issue.ruleKey().toString()).isEqualTo("squid:AvoidCycle");
+  assertThat(issue.componentKey().toString()).isEqualTo("struts:org.struts.Action");
+}

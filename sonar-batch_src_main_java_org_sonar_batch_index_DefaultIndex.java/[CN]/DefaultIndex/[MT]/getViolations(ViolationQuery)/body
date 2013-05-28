@@ -7,10 +7,13 @@
   if (bucket == null) {
     return Collections.emptyList();
   }
+  List<Violation> violations=deprecatedViolations.get(bucket.getResource().getEffectiveKey());
+  if (violationQuery.getSwitchMode() == ViolationQuery.SwitchMode.BOTH) {
+    return violations;
+  }
   List<Violation> filteredViolations=Lists.newArrayList();
-  ViolationQuery.SwitchMode mode=violationQuery.getSwitchMode();
-  for (  Violation violation : bucket.getViolations()) {
-    if (isFiltered(violation,mode)) {
+  for (  Violation violation : violations) {
+    if (isFiltered(violation,violationQuery.getSwitchMode())) {
       filteredViolations.add(violation);
     }
   }

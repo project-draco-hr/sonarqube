@@ -3,7 +3,7 @@
   MetricFinder metricFinder=mock(MetricFinder.class);
   when(metricFinder.findByKey("ncloc")).thenReturn(CoreMetrics.NCLOC);
   ruleFinder=mock(RuleFinder.class);
-  index=new DefaultIndex(mock(PersistenceManager.class),lock,mock(ProjectTree.class),metricFinder,ruleFinder,mock(ScanGraph.class),mock(DeprecatedViolations.class),mock(SnapshotCache.class));
+  index=new DefaultIndex(mock(PersistenceManager.class),lock,mock(ProjectTree.class),metricFinder,mock(ScanGraph.class),mock(SnapshotCache.class),mock(ResourceCache.class),mock(DeprecatedViolations.class));
   Project project=new Project("project");
   ResourceFilter filter=new ResourceFilter(){
     public boolean isIgnored(    Resource resource){
@@ -15,6 +15,6 @@
   rule=Rule.create("repoKey","ruleKey","Rule");
   rule.setId(1);
   rulesProfile.activateRule(rule,null);
-  index.setCurrentProject(project,new ResourceFilters(new ResourceFilter[]{filter}),new ViolationFilters(),rulesProfile);
+  index.setCurrentProject(project,new ResourceFilters(new ResourceFilter[]{filter}),mock(ScanIssues.class));
   index.doStart(project);
 }

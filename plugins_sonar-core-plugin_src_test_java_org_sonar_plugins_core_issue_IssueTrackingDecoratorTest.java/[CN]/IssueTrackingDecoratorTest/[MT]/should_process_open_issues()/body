@@ -2,11 +2,9 @@
   Resource file=new File("Action.java").setEffectiveKey("struts:Action.java").setId(123);
   final DefaultIssue issue=new DefaultIssue();
   when(issueCache.byComponent("struts:Action.java")).thenReturn(Arrays.asList(issue));
-  when(filters.accept(issue)).thenReturn(true);
   List<IssueDto> dbIssues=Collections.emptyList();
   when(initialOpenIssues.selectAndRemove(123)).thenReturn(dbIssues);
   decorator.doDecorate(file);
-  verify(filters).accept(issue);
   verify(tracking).track(eq(file),eq(dbIssues),argThat(new ArgumentMatcher<Collection<DefaultIssue>>(){
     @Override public boolean matches(    Object o){
       List<DefaultIssue> issues=(List<DefaultIssue>)o;

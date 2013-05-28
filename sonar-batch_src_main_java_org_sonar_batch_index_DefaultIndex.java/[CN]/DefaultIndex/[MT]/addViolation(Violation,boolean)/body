@@ -11,20 +11,10 @@
     LOG.warn("Rule is null. Ignoring violation {}",violation);
     return;
   }
-  if (rule.getId() == null) {
-    Rule persistedRule=ruleFinder.findByKey(rule.getRepositoryKey(),rule.getKey());
-    if (persistedRule == null) {
-      LOG.warn("Rule does not exist. Ignoring violation {}",violation);
-      return;
-    }
-    violation.setRule(persistedRule);
-  }
   Bucket bucket=checkIndexed(resource);
   if (bucket == null || bucket.isExcluded()) {
     return;
   }
   violation.setResource(bucket.getResource());
-  if (addViolation(violation,bucket,force)) {
-    deprecatedViolations.add(violation,currentProject.getAnalysisDate());
-  }
+  scanIssues.initAndAddViolation(violation);
 }

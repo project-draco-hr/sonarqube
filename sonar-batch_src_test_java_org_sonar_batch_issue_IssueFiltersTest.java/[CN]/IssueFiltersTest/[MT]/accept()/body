@@ -1,0 +1,13 @@
+{
+  IssueFilter ok=mock(IssueFilter.class);
+  when(ok.accept(any(Issue.class))).thenReturn(true);
+  IssueFilter ko=mock(IssueFilter.class);
+  when(ko.accept(any(Issue.class))).thenReturn(false);
+  when(deprecatedFilters.isEmpty()).thenReturn(true);
+  IssueFilters filters=new IssueFilters(deprecatedFilters,deprecatedViolations,new IssueFilter[]{ok,ko});
+  assertThat(filters.accept(new DefaultIssue(),null)).isFalse();
+  filters=new IssueFilters(deprecatedFilters,deprecatedViolations,new IssueFilter[]{ok});
+  assertThat(filters.accept(new DefaultIssue(),null)).isTrue();
+  filters=new IssueFilters(deprecatedFilters,deprecatedViolations,new IssueFilter[]{ko});
+  assertThat(filters.accept(new DefaultIssue(),null)).isFalse();
+}
