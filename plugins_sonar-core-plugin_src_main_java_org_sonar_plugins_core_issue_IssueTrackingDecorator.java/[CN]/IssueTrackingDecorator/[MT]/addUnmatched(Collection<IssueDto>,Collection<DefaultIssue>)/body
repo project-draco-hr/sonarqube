@@ -1,11 +1,12 @@
 {
   for (  IssueDto unmatchedDto : unmatchedIssues) {
     DefaultIssue unmatched=unmatchedDto.toDefaultIssue();
-    unmatched.setNew(false);
-    Rule rule=ruleFinder.findByKey(unmatched.ruleKey());
+    ActiveRule activeRule=rulesProfile.getActiveRule(unmatchedDto.getRuleRepo(),unmatchedDto.getRule());
     boolean manualIssue=!Strings.isNullOrEmpty(unmatched.reporter());
-    boolean onExistingRule=(rule != null && !Rule.STATUS_REMOVED.equals(rule.getStatus()));
-    unmatched.setAlive(manualIssue && onExistingRule);
+    boolean onDisabledRule=(activeRule == null);
+    unmatched.setNew(false);
+    unmatched.setEndOfLife(!manualIssue);
+    unmatched.setOnDisabledRule(onDisabledRule);
     issues.add(unmatched);
   }
 }

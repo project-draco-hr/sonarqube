@@ -1,0 +1,12 @@
+{
+  Issue issue=new DefaultIssue().setEndOfLife(false);
+  when(context.issue()).thenReturn(issue);
+  try {
+    function.execute(context);
+    fail();
+  }
+ catch (  IllegalStateException e) {
+    assertThat(e.getMessage()).contains("Issue is still alive");
+    verify(context,never()).setResolution(anyString());
+  }
+}
