@@ -1,0 +1,30 @@
+{
+  JsonWriter json=null;
+  try {
+    json=new JsonWriter(output);
+    json.setSerializeNulls(false);
+    json.beginObject().name("version").value(server.getVersion()).name("violations_per_resource").beginObject();
+    for (    Resource resource : resources) {
+      Collection<DefaultIssue> issues=getIssues(resource);
+      if (issues.isEmpty()) {
+        continue;
+      }
+      json.name(resource.getKey()).beginArray();
+      for (      DefaultIssue issue : issues) {
+        json.beginObject().name("line").value(issue.line()).name("message").value(issue.message()).name("severity").value(issue.severity()).name("rule_key").value(issue.ruleKey().rule()).name("rule_repository").value(issue.ruleKey().repository()).name("rule_name").value(ruleName(issue.ruleKey())).name("switched_off").value(Issue.RESOLUTION_FALSE_POSITIVE.equals(issue.resolution())).name("is_new").value((issue.isNew()));
+        if (issue.creationDate() != null) {
+          json.name("created_at").value(DateUtils.formatDateTime(issue.creationDate()));
+        }
+        json.endObject();
+      }
+      json.endArray();
+    }
+    json.endObject().endObject().flush();
+  }
+ catch (  IOException e) {
+    throw new SonarException("Unable to export results",e);
+  }
+ finally {
+    Closeables.closeQuietly(json);
+  }
+}

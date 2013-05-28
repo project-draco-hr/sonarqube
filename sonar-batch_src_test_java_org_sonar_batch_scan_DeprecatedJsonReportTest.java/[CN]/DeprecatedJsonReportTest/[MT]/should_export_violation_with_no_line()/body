@@ -1,0 +1,18 @@
+{
+  when(server.getVersion()).thenReturn("3.4");
+  DefaultIssue issue=new DefaultIssue();
+  issue.setComponentKey("KEY");
+  issue.setLine(null);
+  issue.setMessage("VIOLATION");
+  issue.setRuleKey(RuleKey.of("squid","AvoidCycles"));
+  issue.setSeverity(Severity.INFO);
+  issue.setResolution(null);
+  issue.setNew(false);
+  issue.setCreationDate(DateUtils.parseDate("2013-01-30"));
+  when(ruleI18nManager.getName("squid","AvoidCycles",Locale.getDefault())).thenReturn("Avoid Cycles");
+  doReturn(Arrays.asList(issue)).when(deprecatedJsonReport).getIssues(resource);
+  StringWriter output=new StringWriter();
+  deprecatedJsonReport.writeJson(ImmutableSet.of(resource),output);
+  String json=output.toString();
+  assertThat(json).startsWith("{\"version\":\"3.4\",\"violations_per_resource\":{\"KEY\":[{\"message\":\"VIOLATION\",\"severity\":\"INFO\",\"rule_key\":\"AvoidCycles\",\"rule_repository\":\"squid\",\"rule_name\":\"Avoid Cycles\",\"switched_off\":false,\"is_new\":false,\"created_at\":\"2013-01-30");
+}
