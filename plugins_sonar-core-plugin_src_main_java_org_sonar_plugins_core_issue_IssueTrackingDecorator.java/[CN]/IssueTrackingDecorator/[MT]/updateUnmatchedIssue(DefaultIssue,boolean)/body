@@ -1,0 +1,15 @@
+{
+  issue.setNew(false);
+  boolean manualIssue=!Strings.isNullOrEmpty(issue.reporter());
+  Rule rule=ruleFinder.findByKey(issue.ruleKey());
+  if (manualIssue) {
+    boolean isRemovedRule=(rule == null || Rule.STATUS_REMOVED.equals(rule.getStatus()));
+    issue.setEndOfLife(forceEndOfLife || isRemovedRule);
+    issue.setOnDisabledRule(isRemovedRule);
+  }
+ else {
+    ActiveRule activeRule=rulesProfile.getActiveRule(issue.ruleKey().repository(),issue.ruleKey().rule());
+    issue.setEndOfLife(true);
+    issue.setOnDisabledRule(activeRule == null || rule == null || Rule.STATUS_REMOVED.equals(rule.getStatus()));
+  }
+}

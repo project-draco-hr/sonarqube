@@ -1,0 +1,12 @@
+{
+  DefaultIssue issue=new DefaultIssue().setKey("ABCDE").setStatus(Issue.STATUS_OPEN).setRuleKey(RuleKey.of("manual","Performance")).setReporter("simon");
+  workflow.start();
+  assertThat(workflow.outTransitions(issue)).containsOnly(Transition.create("confirm","OPEN","CONFIRMED"),Transition.create("resolve","OPEN","RESOLVED"));
+  workflow.doTransition(issue,"resolve",mock(IssueChangeContext.class));
+  assertThat(issue.resolution()).isEqualTo("FIXED");
+  assertThat(issue.status()).isEqualTo("RESOLVED");
+  assertThat(workflow.outTransitions(issue)).containsOnly(Transition.create("reopen","RESOLVED","REOPENED"));
+  workflow.doAutomaticTransition(issue,mock(IssueChangeContext.class));
+  assertThat(issue.resolution()).isEqualTo("FIXED");
+  assertThat(issue.status()).isEqualTo("CLOSED");
+}
