@@ -1,4 +1,5 @@
 {
+  BatchSession session=mybatis.openBatchSession();
   for (  Map.Entry<String,Snapshot> componentEntry : snapshots.snapshots()) {
     String componentKey=componentEntry.getKey();
     Snapshot snapshot=componentEntry.getValue();
@@ -9,8 +10,9 @@
         dto.setResourceId(snapshot.getResourceId());
         dto.setDataType(dataEntry.key());
         dto.setData(dataEntry.value().writeString());
-        dao.insert(dto);
+        dao.insert(session,dto);
       }
     }
   }
+  session.commit();
 }
