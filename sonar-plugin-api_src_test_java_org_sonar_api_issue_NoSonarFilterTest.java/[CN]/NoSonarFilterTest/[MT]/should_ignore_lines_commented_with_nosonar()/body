@@ -1,0 +1,12 @@
+{
+  Issue issue=mock(Issue.class);
+  when(issue.componentKey()).thenReturn("struts:org.apache.Action");
+  when(issue.ruleKey()).thenReturn(RuleKey.of("squid","AvoidCycles"));
+  Set<Integer> noSonarLines=ImmutableSet.of(31,55);
+  filter.addComponent("struts:org.apache.Action",noSonarLines);
+  assertThat(filter.accept(issue)).isTrue();
+  when(issue.line()).thenReturn(31);
+  assertThat(filter.accept(issue)).isFalse();
+  when(issue.line()).thenReturn(222);
+  assertThat(filter.accept(issue)).isTrue();
+}

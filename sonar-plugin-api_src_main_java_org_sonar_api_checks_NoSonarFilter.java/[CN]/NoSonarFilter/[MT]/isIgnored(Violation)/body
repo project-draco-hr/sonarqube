@@ -1,7 +1,11 @@
 {
+  boolean ignored=false;
   if (violation.getResource() != null && violation.getLineId() != null) {
     Set<Integer> noSonarLines=noSonarLinesByResource.get(violation.getResource());
-    return (noSonarLines != null && noSonarLines.contains(violation.getLineId()));
+    ignored=noSonarLines != null && noSonarLines.contains(violation.getLineId());
+    if (ignored && violation.getRule() != null && StringUtils.containsIgnoreCase(violation.getRule().getKey(),"nosonar")) {
+      ignored=false;
+    }
   }
-  return false;
+  return ignored;
 }
