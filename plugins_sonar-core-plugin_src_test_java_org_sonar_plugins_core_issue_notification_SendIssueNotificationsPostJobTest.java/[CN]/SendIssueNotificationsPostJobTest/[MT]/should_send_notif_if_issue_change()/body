@@ -1,0 +1,11 @@
+{
+  when(project.getAnalysisDate()).thenReturn(DateUtils.parseDate("2013-05-18"));
+  RuleKey ruleKey=RuleKey.of("squid","AvoidCycles");
+  Rule rule=new Rule("squid","AvoidCycles");
+  DefaultIssue issue=new DefaultIssue().setChanged(true).setFieldDiff(mock(IssueChangeContext.class),"severity","MINOR","BLOCKER").setRuleKey(ruleKey);
+  when(issueCache.all()).thenReturn(Arrays.asList(issue));
+  when(ruleFinder.findByKey(ruleKey)).thenReturn(rule);
+  SendIssueNotificationsPostJob job=new SendIssueNotificationsPostJob(issueCache,notifications,ruleFinder);
+  job.executeOn(project,sensorContext);
+  verify(notifications).sendChanges(eq(issue),any(IssueChangeContext.class),eq(rule),any(Component.class),(Component)isNull());
+}
