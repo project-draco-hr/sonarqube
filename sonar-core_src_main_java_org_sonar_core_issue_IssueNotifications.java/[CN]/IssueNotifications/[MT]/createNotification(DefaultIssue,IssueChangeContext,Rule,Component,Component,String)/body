@@ -1,0 +1,26 @@
+{
+  Notification notification=newNotification(project,"issue-changes");
+  notification.setFieldValue("key",issue.key());
+  notification.setFieldValue("changeAuthor",context.login());
+  notification.setFieldValue("reporter",issue.reporter());
+  notification.setFieldValue("assignee",issue.assignee());
+  notification.setFieldValue("message",issue.message());
+  notification.setFieldValue("ruleName",ruleName(rule));
+  notification.setFieldValue("componentKey",issue.componentKey());
+  if (component != null) {
+    notification.setFieldValue("componentName",component.name());
+  }
+  if (comment != null) {
+    notification.setFieldValue("comment",comment);
+  }
+  FieldDiffs diffs=issue.diffs();
+  if (diffs != null) {
+    for (    Map.Entry<String,FieldDiffs.Diff> entry : diffs.diffs().entrySet()) {
+      String type=entry.getKey();
+      FieldDiffs.Diff diff=entry.getValue();
+      notification.setFieldValue("old." + type,diff.oldValue() != null ? diff.oldValue().toString() : null);
+      notification.setFieldValue("new." + type,diff.newValue() != null ? diff.newValue().toString() : null);
+    }
+  }
+  return notification;
+}

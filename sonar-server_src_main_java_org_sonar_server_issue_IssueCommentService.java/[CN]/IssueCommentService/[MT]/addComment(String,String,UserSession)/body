@@ -1,8 +1,10 @@
 {
   verifyLoggedIn(userSession);
-  DefaultIssue issue=finder.findByKey(issueKey,UserRole.USER);
+  IssueQueryResult queryResult=loadIssue(issueKey);
+  DefaultIssue issue=(DefaultIssue)queryResult.first();
   IssueChangeContext context=IssueChangeContext.createUser(new Date(),userSession.login());
   updater.addComment(issue,text,context);
   storage.save(issue);
+  issueNotifications.sendChanges(issue,context,queryResult,text);
   return issue.comments().get(issue.comments().size() - 1);
 }
