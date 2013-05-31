@@ -1,5 +1,9 @@
 {
-  Date loadingDate=new Date();
-  List<IssueDto> dtos=issueDao.selectNonClosedIssuesByModule(project.getId());
-  initialOpenIssuesStack.setIssues(dtos,loadingDate);
+  issueDao.selectNonClosedIssuesByModule(project.getId(),new ResultHandler(){
+    @Override public void handleResult(    ResultContext rc){
+      IssueDto dto=(IssueDto)rc.getResultObject();
+      initialOpenIssuesStack.addIssue(dto);
+    }
+  }
+);
 }
