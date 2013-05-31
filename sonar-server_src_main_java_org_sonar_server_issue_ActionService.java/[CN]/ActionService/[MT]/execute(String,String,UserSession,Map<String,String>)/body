@@ -1,0 +1,22 @@
+{
+  Preconditions.checkArgument(!Strings.isNullOrEmpty(actionKey),"Missing action");
+  IssueQueryResult queryResult=loadIssue(issueKey);
+  DefaultIssue issue=(DefaultIssue)queryResult.first();
+  if (issue == null) {
+    throw new IllegalStateException("Issue is not found : " + issueKey);
+  }
+  Action action=actions.getAction(actionKey);
+  if (action == null) {
+    throw new IllegalStateException("Action is not found : " + actionKey);
+  }
+  if (!action.supports(issue)) {
+    throw new IllegalStateException("A condition is not respected.");
+  }
+  IssueChangeContext changeContext=IssueChangeContext.createUser(new Date(),userSession.login());
+  FunctionContext functionContext=new FunctionContext(updater,issue,parameters,changeContext);
+  for (  Function function : action.functions()) {
+    function.execute(functionContext);
+  }
+  issueStorage.save(issue);
+  return issue;
+}
