@@ -3,15 +3,15 @@
   EmailMessage emailMessage=new EmailMessage().setMessageId("reviews/view/1").setFrom("Full Username").setTo("user@nowhere").setSubject("Review #3").setMessage("I'll take care of this violation.");
   channel.deliver(emailMessage);
   List<WiserMessage> messages=server.getMessages();
-  assertThat(messages.size(),is(1));
+  assertThat(messages).hasSize(1);
   MimeMessage email=messages.get(0).getMimeMessage();
-  assertThat(email.getHeader("Content-Type",null),is("text/plain; charset=UTF-8"));
-  assertThat(email.getHeader("In-Reply-To",null),is("<reviews/view/1@nemo.sonarsource.org>"));
-  assertThat(email.getHeader("References",null),is("<reviews/view/1@nemo.sonarsource.org>"));
-  assertThat(email.getHeader("List-ID",null),is("Sonar <sonar.nemo.sonarsource.org>"));
-  assertThat(email.getHeader("List-Archive",null),is("http://nemo.sonarsource.org"));
-  assertThat(email.getHeader("From",","),is("\"Full Username (Sonar)\" <server@nowhere>"));
-  assertThat(email.getHeader("To",null),is("<user@nowhere>"));
-  assertThat(email.getHeader("Subject",null),is("[SONAR] Review #3"));
-  assertThat((String)email.getContent(),startsWith("I'll take care of this violation."));
+  assertThat(email.getHeader("Content-Type",null)).isEqualTo("text/plain; charset=UTF-8");
+  assertThat(email.getHeader("In-Reply-To",null)).isEqualTo("<reviews/view/1@nemo.sonarsource.org>");
+  assertThat(email.getHeader("References",null)).isEqualTo("<reviews/view/1@nemo.sonarsource.org>");
+  assertThat(email.getHeader("List-ID",null)).isEqualTo("SonarQube <sonar.nemo.sonarsource.org>");
+  assertThat(email.getHeader("List-Archive",null)).isEqualTo("http://nemo.sonarsource.org");
+  assertThat(email.getHeader("From",",")).isEqualTo("\"Full Username (SonarQube)\" <server@nowhere>");
+  assertThat(email.getHeader("To",null)).isEqualTo("<user@nowhere>");
+  assertThat(email.getHeader("Subject",null)).isEqualTo("[SONARQUBE] Review #3");
+  assertThat((String)email.getContent()).startsWith("I'll take care of this violation.");
 }

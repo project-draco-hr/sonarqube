@@ -3,15 +3,15 @@
   EmailMessage emailMessage=new EmailMessage().setTo("user@nowhere").setSubject("Foo").setMessage("Bar");
   channel.deliver(emailMessage);
   List<WiserMessage> messages=server.getMessages();
-  assertThat(messages.size(),is(1));
+  assertThat(messages).hasSize(1);
   MimeMessage email=messages.get(0).getMimeMessage();
-  assertThat(email.getHeader("Content-Type",null),is("text/plain; charset=UTF-8"));
-  assertThat(email.getHeader("In-Reply-To",null),nullValue());
-  assertThat(email.getHeader("References",null),nullValue());
-  assertThat(email.getHeader("List-ID",null),is("Sonar <sonar.nemo.sonarsource.org>"));
-  assertThat(email.getHeader("List-Archive",null),is("http://nemo.sonarsource.org"));
-  assertThat(email.getHeader("From",null),is("Sonar <server@nowhere>"));
-  assertThat(email.getHeader("To",null),is("<user@nowhere>"));
-  assertThat(email.getHeader("Subject",null),is("[SONAR] Foo"));
-  assertThat((String)email.getContent(),startsWith("Bar"));
+  assertThat(email.getHeader("Content-Type",null)).isEqualTo("text/plain; charset=UTF-8");
+  assertThat(email.getHeader("In-Reply-To",null)).isNull();
+  assertThat(email.getHeader("References",null)).isNull();
+  assertThat(email.getHeader("List-ID",null)).isEqualTo("SonarQube <sonar.nemo.sonarsource.org>");
+  assertThat(email.getHeader("List-Archive",null)).isEqualTo("http://nemo.sonarsource.org");
+  assertThat(email.getHeader("From",null)).isEqualTo("SonarQube <server@nowhere>");
+  assertThat(email.getHeader("To",null)).isEqualTo("<user@nowhere>");
+  assertThat(email.getHeader("Subject",null)).isEqualTo("[SONARQUBE] Foo");
+  assertThat((String)email.getContent()).startsWith("Bar");
 }
