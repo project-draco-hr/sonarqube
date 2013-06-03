@@ -1,0 +1,14 @@
+{
+  IssueQueryResult issueQueryResult=new DefaultIssueQueryResult(Collections.<Issue>emptyList());
+  when(finder.find(any(IssueQuery.class))).thenReturn(issueQueryResult);
+  Action action1=Action.builder("link-to-jira").conditions(new AlwaysMatch()).build();
+  Action action2=Action.builder("tweet").conditions(new NeverMatch()).build();
+  actionService=new ActionService(finder,issueStorage,updater,newArrayList(action1,action2));
+  try {
+    actionService.listAvailableActions("ABCD");
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("Issue is not found : ABCD");
+  }
+}

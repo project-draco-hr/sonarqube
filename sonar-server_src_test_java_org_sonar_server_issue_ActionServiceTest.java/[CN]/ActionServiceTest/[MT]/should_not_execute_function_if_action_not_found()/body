@@ -1,0 +1,15 @@
+{
+  Function function=mock(Function.class);
+  Issue issue=new DefaultIssue().setKey("ABCD");
+  IssueQueryResult issueQueryResult=new DefaultIssueQueryResult(newArrayList(issue));
+  when(finder.find(any(IssueQuery.class))).thenReturn(issueQueryResult);
+  Action action=Action.builder("link-to-jira").conditions(new AlwaysMatch()).functions(function).build();
+  actionService=new ActionService(finder,issueStorage,updater,newArrayList(action));
+  try {
+    actionService.execute("ABCD","tweet",mock(UserSession.class));
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("Action is not found : tweet");
+  }
+  verifyZeroInteractions(function);
+}

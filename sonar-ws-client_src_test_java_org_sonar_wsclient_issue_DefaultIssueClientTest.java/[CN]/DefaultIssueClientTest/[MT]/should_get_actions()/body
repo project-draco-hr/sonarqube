@@ -1,0 +1,9 @@
+{
+  HttpRequestFactory requestFactory=new HttpRequestFactory(httpServer.url());
+  httpServer.doReturnBody("{\n" + "  \"actions\": [\n" + "    \"link-to-jira\",\n"+ "    \"tweet\"\n"+ "  ]\n"+ "}");
+  IssueClient client=new DefaultIssueClient(requestFactory);
+  List<String> actions=client.actions("ABCDE");
+  assertThat(httpServer.requestedPath()).isEqualTo("/api/issues/actions?issue=ABCDE");
+  assertThat(actions).hasSize(2);
+  assertThat(actions).containsOnly("link-to-jira","tweet");
+}

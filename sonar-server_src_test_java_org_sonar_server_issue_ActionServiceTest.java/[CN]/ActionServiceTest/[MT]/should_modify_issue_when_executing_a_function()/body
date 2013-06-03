@@ -1,0 +1,13 @@
+{
+  Function function=new TweetFunction();
+  UserSession userSession=mock(UserSession.class);
+  when(userSession.login()).thenReturn("arthur");
+  DefaultIssue issue=new DefaultIssue().setKey("ABCD");
+  IssueQueryResult issueQueryResult=new DefaultIssueQueryResult(newArrayList((Issue)issue));
+  when(finder.find(any(IssueQuery.class))).thenReturn(issueQueryResult);
+  Action action=Action.builder("link-to-jira").conditions(new AlwaysMatch()).functions(function).build();
+  actionService=new ActionService(finder,issueStorage,updater,newArrayList(action));
+  assertThat(actionService.execute("ABCD","link-to-jira",userSession)).isNotNull();
+  verify(updater).addComment(eq(issue),eq("New tweet on issue ABCD"),any(IssueChangeContext.class));
+  verify(updater).setAttribute(eq(issue),eq("tweet"),eq("tweet sent"),any(IssueChangeContext.class));
+}
