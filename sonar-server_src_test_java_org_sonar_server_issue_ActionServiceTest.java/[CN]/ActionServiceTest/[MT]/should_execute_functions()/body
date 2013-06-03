@@ -2,10 +2,12 @@
   Function function1=mock(Function.class);
   Function function2=mock(Function.class);
   Issue issue=new DefaultIssue().setKey("ABCD");
-  IssueQueryResult issueQueryResult=new DefaultIssueQueryResult(newArrayList(issue));
+  IssueQueryResult issueQueryResult=mock(DefaultIssueQueryResult.class);
+  when(issueQueryResult.first()).thenReturn(issue);
+  Component project=mock(Component.class);
+  when(issueQueryResult.component(issue)).thenReturn(project);
   when(finder.find(any(IssueQuery.class))).thenReturn(issueQueryResult);
-  Action action=Action.builder("link-to-jira").conditions(new AlwaysMatch()).functions(function1,function2).build();
-  actionService=new ActionService(finder,issueStorage,updater,newArrayList(action));
+  actions.add(Action.builder("link-to-jira").conditions(new AlwaysMatch()).functions(function1,function2).build());
   assertThat(actionService.execute("ABCD","link-to-jira",mock(UserSession.class))).isNotNull();
   verify(function1).execute(any(Function.Context.class));
   verify(function2).execute(any(Function.Context.class));
