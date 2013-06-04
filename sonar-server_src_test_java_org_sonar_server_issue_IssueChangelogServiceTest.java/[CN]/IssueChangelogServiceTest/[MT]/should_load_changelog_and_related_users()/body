@@ -1,0 +1,12 @@
+{
+  FieldDiffs userChange=new FieldDiffs().setUserLogin("arthur").setDiff("severity","MAJOR","BLOCKER");
+  FieldDiffs scanChange=new FieldDiffs().setDiff("status","RESOLVED","CLOSED");
+  when(changeDao.selectChangelogByIssue("ABCDE")).thenReturn(Arrays.asList(userChange,scanChange));
+  User arthur=new DefaultUser().setLogin("arthur").setName("Arthur");
+  when(userFinder.findByLogins(Arrays.asList("arthur"))).thenReturn(Arrays.asList(arthur));
+  IssueChangelog changelog=service.changelog("ABCDE",mock(UserSession.class));
+  assertThat(changelog).isNotNull();
+  assertThat(changelog.changes()).containsOnly(userChange,scanChange);
+  assertThat(changelog.user(scanChange)).isNull();
+  assertThat(changelog.user(userChange)).isSameAs(arthur);
+}
