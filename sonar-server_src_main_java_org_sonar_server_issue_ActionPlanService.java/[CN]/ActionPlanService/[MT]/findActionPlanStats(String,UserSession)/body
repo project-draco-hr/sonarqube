@@ -1,0 +1,13 @@
+{
+  ResourceDto project=findProject(projectKey);
+  checkAuthorization(userSession,project,UserRole.USER);
+  List<ActionPlanStatsDto> actionPlanStatsDtos=actionPlanStatsDao.findByProjectId(project.getId());
+  List<ActionPlanStats> actionPlanStats=newArrayList(Iterables.transform(actionPlanStatsDtos,new Function<ActionPlanStatsDto,ActionPlanStats>(){
+    @Override public ActionPlanStats apply(    ActionPlanStatsDto actionPlanStatsDto){
+      return actionPlanStatsDto.toActionPlanStat();
+    }
+  }
+));
+  Collections.sort(actionPlanStats,new ActionPlanDeadlineComparator());
+  return actionPlanStats;
+}

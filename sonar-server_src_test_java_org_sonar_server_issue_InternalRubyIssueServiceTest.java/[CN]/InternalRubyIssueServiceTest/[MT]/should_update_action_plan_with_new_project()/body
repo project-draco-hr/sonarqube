@@ -1,5 +1,5 @@
 {
-  when(actionPlanService.findByKey("ABCD")).thenReturn(DefaultActionPlan.create("Long term"));
+  when(actionPlanService.findByKey(eq("ABCD"),any(UserSession.class))).thenReturn(DefaultActionPlan.create("Long term"));
   Map<String,String> parameters=newHashMap();
   parameters.put("name","New Long term");
   parameters.put("description","New Long term issues");
@@ -8,7 +8,7 @@
   ArgumentCaptor<ActionPlan> actionPlanCaptor=ArgumentCaptor.forClass(ActionPlan.class);
   Result result=internalRubyIssueService.updateActionPlan("ABCD",parameters);
   assertThat(result.ok()).isTrue();
-  verify(actionPlanService).update(actionPlanCaptor.capture());
+  verify(actionPlanService).update(actionPlanCaptor.capture(),any(UserSession.class));
   ActionPlan actionPlan=actionPlanCaptor.getValue();
   assertThat(actionPlan).isNotNull();
   assertThat(actionPlan.key()).isNotNull();

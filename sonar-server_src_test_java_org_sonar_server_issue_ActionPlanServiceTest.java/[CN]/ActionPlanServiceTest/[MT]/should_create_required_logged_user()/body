@@ -1,0 +1,12 @@
+{
+  when(resourceDao.getResource(any(ResourceQuery.class))).thenReturn(new ResourceDto().setKey("org.sonar.Sample").setId(1l));
+  ActionPlan actionPlan=DefaultActionPlan.create("Long term");
+  when(userSession.isLoggedIn()).thenReturn(false);
+  try {
+    actionPlanService.create(actionPlan,userSession);
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalStateException.class).hasMessage("User is not logged in");
+  }
+  verifyZeroInteractions(actionPlanDao);
+}

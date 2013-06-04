@@ -1,5 +1,5 @@
 {
-  DefaultActionPlan existingActionPlan=(DefaultActionPlan)actionPlanService.findByKey(key);
+  DefaultActionPlan existingActionPlan=(DefaultActionPlan)actionPlanService.findByKey(key,UserSession.get());
   if (existingActionPlan == null) {
     Result<ActionPlan> result=Result.of();
     result.addError(Result.Message.ofL10n("action_plans.errors.action_plan_does_not_exist",key));
@@ -11,7 +11,7 @@
       DefaultActionPlan actionPlan=(DefaultActionPlan)result.get();
       actionPlan.setKey(existingActionPlan.key());
       actionPlan.setUserLogin(existingActionPlan.userLogin());
-      result.set(actionPlanService.update(actionPlan));
+      result.set(actionPlanService.update(actionPlan,UserSession.get()));
     }
     return result;
   }
