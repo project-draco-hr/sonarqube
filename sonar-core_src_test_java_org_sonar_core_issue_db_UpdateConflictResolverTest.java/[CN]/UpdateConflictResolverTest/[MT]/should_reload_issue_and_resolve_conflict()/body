@@ -1,0 +1,11 @@
+{
+  DefaultIssue issue=new DefaultIssue().setKey("ABCDE").setRuleKey(RuleKey.of("squid","AvoidCycles")).setComponentKey("struts:org.apache.struts.Action").setNew(false).setStatus(Issue.STATUS_OPEN);
+  IssueMapper mapper=mock(IssueMapper.class);
+  when(mapper.selectByKey("ABCDE")).thenReturn(new IssueDto().setKee("ABCDE").setRuleId(10).setRuleKey_unit_test_only("squid","AvoidCycles").setComponentId(100L).setComponentKey_unit_test_only("struts:org.apache.struts.Action").setLine(10).setStatus(Issue.STATUS_OPEN).setAssignee("arthur"));
+  new UpdateConflictResolver().resolve(issue,mapper);
+  ArgumentCaptor<IssueDto> argument=ArgumentCaptor.forClass(IssueDto.class);
+  verify(mapper).update(argument.capture());
+  IssueDto updatedIssue=argument.getValue();
+  assertThat(updatedIssue.getKee()).isEqualTo("ABCDE");
+  assertThat(updatedIssue.getAssignee()).isEqualTo("arthur");
+}

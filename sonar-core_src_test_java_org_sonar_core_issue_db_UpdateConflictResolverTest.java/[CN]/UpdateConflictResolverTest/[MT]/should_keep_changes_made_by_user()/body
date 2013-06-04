@@ -1,0 +1,25 @@
+{
+  DefaultIssue issue=new DefaultIssue().setKey("ABCDE").setRuleKey(RuleKey.of("squid","AvoidCycles")).setComponentKey("struts:org.apache.struts.Action").setNew(false);
+  issue.setAssignee(null);
+  issue.setActionPlanKey("PLAN-1");
+  issue.setCreationDate(DateUtils.parseDate("2012-01-01"));
+  issue.setUpdateDate(DateUtils.parseDate("2012-02-02"));
+  issue.setLine(200);
+  issue.setSeverity(Severity.BLOCKER);
+  issue.setManualSeverity(false);
+  issue.setAuthorLogin("simon");
+  issue.setChecksum("CHECKSUM-ABCDE");
+  issue.setResolution(null);
+  issue.setStatus(Issue.STATUS_REOPENED);
+  IssueDto dbIssue=new IssueDto().setKee("ABCDE").setRuleId(10).setRuleKey_unit_test_only("squid","AvoidCycles").setComponentId(100L).setComponentKey_unit_test_only("struts:org.apache.struts.Action").setLine(10).setResolution(Issue.RESOLUTION_FALSE_POSITIVE).setStatus(Issue.STATUS_RESOLVED).setAssignee("arthur").setActionPlanKey("PLAN-2").setSeverity(Severity.MAJOR).setManualSeverity(false);
+  new UpdateConflictResolver().mergeFields(dbIssue,issue);
+  assertThat(issue.key()).isEqualTo("ABCDE");
+  assertThat(issue.componentKey()).isEqualTo("struts:org.apache.struts.Action");
+  assertThat(issue.line()).isEqualTo(200);
+  assertThat(issue.severity()).isEqualTo(Severity.BLOCKER);
+  assertThat(issue.manualSeverity()).isFalse();
+  assertThat(issue.assignee()).isEqualTo("arthur");
+  assertThat(issue.resolution()).isEqualTo(Issue.RESOLUTION_FALSE_POSITIVE);
+  assertThat(issue.status()).isEqualTo(Issue.STATUS_RESOLVED);
+  assertThat(issue.actionPlanKey()).isEqualTo("PLAN-2");
+}

@@ -1,0 +1,30 @@
+{
+  setupData("testUpdate");
+  IssueDto dto=new IssueDto();
+  dto.setComponentId(123l);
+  dto.setRootComponentId(100l);
+  dto.setRuleId(200);
+  dto.setKee("ABCDE");
+  dto.setLine(500);
+  dto.setEffortToFix(3.14);
+  dto.setResolution("FIXED");
+  dto.setStatus("RESOLVED");
+  dto.setSeverity("BLOCKER");
+  dto.setReporter("emmerik");
+  dto.setAuthorLogin("morgan");
+  dto.setAssignee("karadoc");
+  dto.setActionPlanKey("current_sprint");
+  dto.setIssueAttributes("JIRA=FOO-1234");
+  dto.setChecksum("123456789");
+  dto.setMessage("the message");
+  dto.setIssueCreationDate(DateUtils.parseDate("2013-05-18"));
+  dto.setIssueUpdateDate(DateUtils.parseDate("2013-05-19"));
+  dto.setIssueCloseDate(DateUtils.parseDate("2013-05-20"));
+  dto.setCreatedAt(DateUtils.parseDate("2013-05-21"));
+  dto.setUpdatedAt(DateUtils.parseDate("2013-05-22"));
+  dto.setSelectedAt(DateUtils.parseDate("2015-01-01"));
+  int count=mapper.updateIfBeforeSelectedDate(dto);
+  assertThat(count).isEqualTo(1);
+  session.commit();
+  checkTables("testUpdate",new String[]{"id"},"issues");
+}
