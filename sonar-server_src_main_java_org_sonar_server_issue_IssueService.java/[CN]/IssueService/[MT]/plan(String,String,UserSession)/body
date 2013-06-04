@@ -1,10 +1,10 @@
 {
   if (!Strings.isNullOrEmpty(actionPlanKey) && actionPlanService.findByKey(actionPlanKey,userSession) == null) {
-    throw new IllegalStateException("Unknown action plan: " + actionPlanKey);
+    throw new IllegalArgumentException("Unknown action plan: " + actionPlanKey);
   }
-  verifyLoggedIn(userSession);
   IssueQueryResult queryResult=loadIssue(issueKey);
   DefaultIssue issue=(DefaultIssue)queryResult.first();
+  checkAuthorization(userSession,issue,UserRole.USER);
   IssueChangeContext context=IssueChangeContext.createUser(new Date(),userSession.login());
   if (issueUpdater.plan(issue,actionPlanKey,context)) {
     issueStorage.save(issue);

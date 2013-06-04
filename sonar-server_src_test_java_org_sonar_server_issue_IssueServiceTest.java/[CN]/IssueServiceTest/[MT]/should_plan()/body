@@ -1,0 +1,16 @@
+{
+  grantAccess();
+  String actionPlanKey="EFGH";
+  when(actionPlanService.findByKey(actionPlanKey,userSession)).thenReturn(new DefaultActionPlan());
+  when(issueUpdater.plan(eq(issue),eq(actionPlanKey),any(IssueChangeContext.class))).thenReturn(true);
+  Issue result=issueService.plan("ABCD",actionPlanKey,userSession);
+  assertThat(result).isNotNull();
+  ArgumentCaptor<IssueChangeContext> measureCaptor=ArgumentCaptor.forClass(IssueChangeContext.class);
+  verify(issueUpdater).plan(eq(issue),eq(actionPlanKey),measureCaptor.capture());
+  verify(issueStorage).save(issue);
+  IssueChangeContext issueChangeContext=measureCaptor.getValue();
+  assertThat(issueChangeContext.login()).isEqualTo("arthur");
+  assertThat(issueChangeContext.date()).isNotNull();
+  verify(issueNotifications).sendChanges(eq(issue),eq(issueChangeContext),eq(issueQueryResult));
+  verify(authorizationDao).isAuthorizedComponentId(anyLong(),anyInt(),eq(UserRole.USER));
+}

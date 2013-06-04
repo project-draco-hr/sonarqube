@@ -1,0 +1,14 @@
+{
+  grantAccess();
+  when(workflow.doTransition(eq(issue),eq(transition.key()),any(IssueChangeContext.class))).thenReturn(true);
+  Issue result=issueService.doTransition("ABCD",transition.key(),userSession);
+  assertThat(result).isNotNull();
+  ArgumentCaptor<IssueChangeContext> measureCaptor=ArgumentCaptor.forClass(IssueChangeContext.class);
+  verify(workflow).doTransition(eq(issue),eq(transition.key()),measureCaptor.capture());
+  verify(issueStorage).save(issue);
+  IssueChangeContext issueChangeContext=measureCaptor.getValue();
+  assertThat(issueChangeContext.login()).isEqualTo("arthur");
+  assertThat(issueChangeContext.date()).isNotNull();
+  verify(issueNotifications).sendChanges(eq(issue),eq(issueChangeContext),eq(issueQueryResult));
+  verify(authorizationDao).isAuthorizedComponentId(anyLong(),anyInt(),eq(UserRole.USER));
+}

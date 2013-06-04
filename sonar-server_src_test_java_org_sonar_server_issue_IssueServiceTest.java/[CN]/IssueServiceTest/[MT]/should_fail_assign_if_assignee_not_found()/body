@@ -1,0 +1,15 @@
+{
+  grantAccess();
+  String assignee="perceval";
+  when(userFinder.findByLogin(assignee)).thenReturn(null);
+  try {
+    issueService.assign("ABCD",assignee,userSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("Unknown user: perceval");
+  }
+  verifyZeroInteractions(issueUpdater);
+  verifyZeroInteractions(issueStorage);
+  verifyZeroInteractions(issueNotifications);
+}

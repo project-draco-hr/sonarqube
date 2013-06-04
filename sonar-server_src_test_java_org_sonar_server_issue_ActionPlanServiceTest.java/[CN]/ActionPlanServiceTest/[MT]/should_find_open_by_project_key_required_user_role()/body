@@ -4,9 +4,10 @@
   when(authorizationDao.isAuthorizedComponentId(anyLong(),eq(10),anyString())).thenReturn(false);
   try {
     actionPlanService.findOpenByProjectKey("org.sonar.Sample",userSession);
+    fail();
   }
  catch (  Exception e) {
-    assertThat(e).isInstanceOf(IllegalStateException.class).hasMessage("User does not have the required role to access the project: org.sonar.Sample");
+    assertThat(e).isInstanceOf(IllegalStateException.class).hasMessage("User does not have the required role on the project: org.sonar.Sample");
   }
   verify(authorizationDao).isAuthorizedComponentId(eq(1l),eq(10),eq(UserRole.USER));
   verifyZeroInteractions(actionPlanDao);

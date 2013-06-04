@@ -1,0 +1,15 @@
+{
+  grantAccess();
+  String actionPlanKey="EFGH";
+  when(actionPlanService.findByKey(actionPlanKey,userSession)).thenReturn(null);
+  try {
+    issueService.plan("ABCD",actionPlanKey,userSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("Unknown action plan: EFGH");
+  }
+  verifyZeroInteractions(issueUpdater);
+  verifyZeroInteractions(issueStorage);
+  verifyZeroInteractions(issueNotifications);
+}

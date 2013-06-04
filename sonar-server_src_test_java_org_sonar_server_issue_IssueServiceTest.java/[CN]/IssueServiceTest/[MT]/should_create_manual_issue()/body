@@ -1,0 +1,13 @@
+{
+  grantAccess();
+  RuleKey ruleKey=RuleKey.of("manual","manualRuleKey");
+  DefaultIssue manualIssue=new DefaultIssue().setKey("GHIJ").setRuleKey(RuleKey.of("manual","manualRuleKey")).setComponentKey("org.sonar.Sample");
+  when(ruleFinder.findByKey(ruleKey)).thenReturn(Rule.create("manual","manualRuleKey"));
+  when(resourceDao.findByKey("org.sonar.Sample")).thenReturn(mock(Component.class));
+  Issue result=issueService.createManualIssue(manualIssue,userSession);
+  assertThat(result).isNotNull();
+  assertThat(result.creationDate()).isNotNull();
+  assertThat(result.updateDate()).isNotNull();
+  verify(issueStorage).save(manualIssue);
+  verify(authorizationDao).isAuthorizedComponentId(anyLong(),anyInt(),eq(UserRole.USER));
+}

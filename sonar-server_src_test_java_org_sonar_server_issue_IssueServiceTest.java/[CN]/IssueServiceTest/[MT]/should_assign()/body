@@ -1,0 +1,16 @@
+{
+  grantAccess();
+  String assignee="perceval";
+  when(userFinder.findByLogin(assignee)).thenReturn(new DefaultUser());
+  when(issueUpdater.assign(eq(issue),eq(assignee),any(IssueChangeContext.class))).thenReturn(true);
+  Issue result=issueService.assign("ABCD",assignee,userSession);
+  assertThat(result).isNotNull();
+  ArgumentCaptor<IssueChangeContext> measureCaptor=ArgumentCaptor.forClass(IssueChangeContext.class);
+  verify(issueUpdater).assign(eq(issue),eq(assignee),measureCaptor.capture());
+  verify(issueStorage).save(issue);
+  IssueChangeContext issueChangeContext=measureCaptor.getValue();
+  assertThat(issueChangeContext.login()).isEqualTo("arthur");
+  assertThat(issueChangeContext.date()).isNotNull();
+  verify(issueNotifications).sendChanges(eq(issue),eq(issueChangeContext),eq(issueQueryResult));
+  verify(authorizationDao).isAuthorizedComponentId(anyLong(),anyInt(),eq(UserRole.USER));
+}

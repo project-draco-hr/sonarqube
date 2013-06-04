@@ -1,0 +1,13 @@
+{
+  grantAccess();
+  RuleKey ruleKey=RuleKey.of("squid","s100");
+  DefaultIssue manualIssue=new DefaultIssue().setKey("GHIJ").setRuleKey(ruleKey).setComponentKey("org.sonar.Sample");
+  try {
+    issueService.createManualIssue(manualIssue,userSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("Issues can be created only on rules marked as 'manual': squid:s100");
+  }
+  verifyZeroInteractions(issueStorage);
+}
