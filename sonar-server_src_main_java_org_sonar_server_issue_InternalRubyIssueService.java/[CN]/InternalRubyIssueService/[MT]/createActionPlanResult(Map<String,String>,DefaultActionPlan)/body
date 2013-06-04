@@ -16,13 +16,15 @@
   if (!Strings.isNullOrEmpty(description) && description.length() > 1000) {
     result.addError(Result.Message.ofL10n("errors.is_too_long","description",1000));
   }
-  if (Strings.isNullOrEmpty(projectParam)) {
-    result.addError(Result.Message.ofL10n("errors.cant_be_empty","project"));
-  }
+  if (existingActionPlan == null) {
+    if (Strings.isNullOrEmpty(projectParam)) {
+      result.addError(Result.Message.ofL10n("errors.cant_be_empty","project"));
+    }
  else {
-    ResourceDto project=resourceDao.getResource(ResourceQuery.create().setKey(projectParam));
-    if (project == null) {
-      result.addError(Result.Message.ofL10n("action_plans.errors.project_does_not_exist",projectParam));
+      ResourceDto project=resourceDao.getResource(ResourceQuery.create().setKey(projectParam));
+      if (project == null) {
+        result.addError(Result.Message.ofL10n("action_plans.errors.project_does_not_exist",projectParam));
+      }
     }
   }
   if (!Strings.isNullOrEmpty(deadLineParam)) {
@@ -37,11 +39,17 @@
       result.addError(Result.Message.ofL10n("errors.is_not_valid","date"));
     }
   }
-  if (!Strings.isNullOrEmpty(projectParam) && !Strings.isNullOrEmpty(name) && !name.equals(oldName)&& actionPlanService.isNameAlreadyUsedForProject(name,projectParam)) {
+  if (!Strings.isNullOrEmpty(projectParam) && !Strings.isNullOrEmpty(name) && (existingActionPlan == null || !name.equals(existingActionPlan.name()))&& actionPlanService.isNameAlreadyUsedForProject(name,projectParam)) {
     result.addError(Result.Message.ofL10n("action_plans.same_name_in_same_project"));
   }
   if (result.ok()) {
-    DefaultActionPlan actionPlan=DefaultActionPlan.create(name).setProjectKey(projectParam).setDescription(description).setUserLogin(UserSession.get().login()).setDeadLine(deadLine);
+    DefaultActionPlan actionPlan=DefaultActionPlan.create(name).setDescription(description).setUserLogin(UserSession.get().login()).setDeadLine(deadLine);
+    if (existingActionPlan == null) {
+      actionPlan.setProjectKey(projectParam);
+    }
+ else {
+      actionPlan.setProjectKey(existingActionPlan.projectKey());
+    }
     result.set(actionPlan);
   }
   return result;
