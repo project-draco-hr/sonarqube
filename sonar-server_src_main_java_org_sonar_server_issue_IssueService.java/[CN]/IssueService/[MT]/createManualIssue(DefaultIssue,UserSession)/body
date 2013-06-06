@@ -1,15 +1,18 @@
 {
-  checkAuthorization(userSession,issue,UserRole.USER);
+  verifyLoggedIn(userSession);
+  ResourceDto resourceDto=resourceDao.getResource(ResourceQuery.create().setKey(issue.componentKey()));
+  if (resourceDto == null) {
+    throw new IllegalArgumentException("Unknown component: " + issue.componentKey());
+  }
+  if (!authorizationDao.isAuthorizedComponentId(resourceDto.getId(),userSession.userId(),UserRole.USER)) {
+    throw new IllegalStateException("User does not have the required role");
+  }
   if (!"manual".equals(issue.ruleKey().repository())) {
     throw new IllegalArgumentException("Issues can be created only on rules marked as 'manual': " + issue.ruleKey());
   }
   Rule rule=ruleFinder.findByKey(issue.ruleKey());
   if (rule == null) {
     throw new IllegalArgumentException("Unknown rule: " + issue.ruleKey());
-  }
-  Component component=resourceDao.findByKey(issue.componentKey());
-  if (component == null) {
-    throw new IllegalArgumentException("Unknown component: " + issue.componentKey());
   }
   Date now=new Date();
   issue.setCreationDate(now);
