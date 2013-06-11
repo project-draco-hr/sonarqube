@@ -1,0 +1,25 @@
+{
+  StringBuilder stringBuilder=new StringBuilder();
+  for (  Map.Entry<String,Object> entries : props.entrySet()) {
+    String key=entries.getKey();
+    Object value=entries.getValue();
+    stringBuilder.append(key);
+    stringBuilder.append(DefaultIssueFilter.KEY_VALUE_SEPARATOR);
+    List valuesList=newArrayList();
+    if (value instanceof List) {
+      valuesList=(List)value;
+    }
+ else     if (value instanceof CharSequence) {
+      valuesList=Lists.newArrayList(Splitter.on(',').omitEmptyStrings().split((CharSequence)value));
+    }
+ else {
+      stringBuilder.append(value);
+    }
+    for (    Object valueList : valuesList) {
+      stringBuilder.append(valueList);
+      stringBuilder.append(DefaultIssueFilter.LIST_SEPARATOR);
+    }
+    stringBuilder.append(DefaultIssueFilter.SEPARATOR);
+  }
+  return stringBuilder.toString();
+}
