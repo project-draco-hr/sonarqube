@@ -1,14 +1,15 @@
 {
-  deleteSnapshotDependencies(snapshotIds);
-  deleteSnapshotDuplications(snapshotIds);
-  deleteSnapshotSources(snapshotIds);
-  deleteSnapshotGraphs(snapshotIds);
-  deleteSnapshotData(snapshotIds);
+  List<List<Long>> snapshotIdsPartition=Lists.partition(snapshotIds,MAX_SNAPSHOTS_PER_QUERY);
+  deleteSnapshotDependencies(snapshotIdsPartition);
+  deleteSnapshotDuplications(snapshotIdsPartition);
+  deleteSnapshotSources(snapshotIdsPartition);
+  deleteSnapshotGraphs(snapshotIdsPartition);
+  deleteSnapshotData(snapshotIdsPartition);
   profiler.start("deleteSnapshotWastedMeasures (project_measures)");
   List<Long> metricIdsWithoutHistoricalData=purgeMapper.selectMetricIdsWithoutHistoricalData();
   if (!metricIdsWithoutHistoricalData.isEmpty()) {
-    for (    Long snapshotId : snapshotIds) {
-      purgeMapper.deleteSnapshotWastedMeasures(snapshotId,metricIdsWithoutHistoricalData);
+    for (    List<Long> partSnapshotIds : snapshotIdsPartition) {
+      purgeMapper.deleteSnapshotWastedMeasures(partSnapshotIds,metricIdsWithoutHistoricalData);
     }
     session.commit();
   }
@@ -16,9 +17,9 @@
   profiler.start("deleteSnapshotMeasuresOnCharacteristics (project_measures)");
   List<Long> characteristicIds=purgeMapper.selectCharacteristicIdsToPurge();
   if (!characteristicIds.isEmpty()) {
-    for (    Long snapshotId : snapshotIds) {
+    for (    List<Long> partSnapshotIds : snapshotIdsPartition) {
       for (      List<Long> ids : Iterables.partition(characteristicIds,MAX_CHARACTERISTICS_PER_QUERY)) {
-        purgeMapper.deleteSnapshotMeasuresOnCharacteristics(snapshotId,ids);
+        purgeMapper.deleteSnapshotMeasuresOnCharacteristics(partSnapshotIds,ids);
       }
     }
     session.commit();
