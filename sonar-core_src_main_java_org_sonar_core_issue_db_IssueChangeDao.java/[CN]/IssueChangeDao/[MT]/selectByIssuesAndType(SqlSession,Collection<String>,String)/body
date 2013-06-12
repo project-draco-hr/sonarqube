@@ -1,8 +1,8 @@
 {
-  Preconditions.checkArgument(issueKeys.size() < 1000,"Number of issue keys is greater than or equal 1000");
   if (issueKeys.isEmpty()) {
     return Collections.emptyList();
   }
   IssueChangeMapper mapper=session.getMapper(IssueChangeMapper.class);
-  return mapper.selectByIssuesAndType(issueKeys,changeType);
+  List<List<String>> keysPartition=Lists.partition(newArrayList(issueKeys),1000);
+  return mapper.selectByIssuesAndType(keysPartition,changeType);
 }
