@@ -1,12 +1,16 @@
 {
   Collection<Initializer> initializers=selector.select(Initializer.class,project,true);
+  eventBus.fireEvent(new InitializersPhaseEvent(Lists.newArrayList(initializers),true));
   if (LOG.isDebugEnabled()) {
     LOG.debug("Initializers : {}",StringUtils.join(initializers," -> "));
   }
   for (  Initializer initializer : initializers) {
+    eventBus.fireEvent(new InitializerExecutionEvent(initializer,true));
     executeMavenPlugin(initializer);
     TimeProfiler profiler=new TimeProfiler(LOG).start("Initializer " + initializer);
     initializer.execute(project);
     profiler.stop();
+    eventBus.fireEvent(new InitializerExecutionEvent(initializer,false));
   }
+  eventBus.fireEvent(new InitializersPhaseEvent(Lists.newArrayList(initializers),false));
 }

@@ -2,6 +2,8 @@
   final Project project=mockProject("project",true);
   when(project.getModules()).thenReturn(Collections.<Project>emptyList());
   fakeAnalysis(profiler,project);
+  assertThat(profiler.currentModuleProfiling.getProfilingPerPhase(Phase.MAVEN).totalTime()).isEqualTo(4L);
+  assertThat(profiler.currentModuleProfiling.getProfilingPerPhase(Phase.INIT).getProfilingPerItem(new FakeInitializer()).totalTime()).isEqualTo(7L);
   assertThat(profiler.currentModuleProfiling.getProfilingPerPhase(Phase.SENSOR).getProfilingPerItem(new FakeSensor()).totalTime()).isEqualTo(10L);
   assertThat(profiler.currentModuleProfiling.getProfilingPerPhase(Phase.DECORATOR).getProfilingPerItem(new FakeDecorator1()).totalTime()).isEqualTo(20L);
   assertThat(profiler.currentModuleProfiling.getProfilingPerPhase(Phase.POSTJOB).getProfilingPerItem(new FakePostJob()).totalTime()).isEqualTo(30L);
