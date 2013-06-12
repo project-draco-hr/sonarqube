@@ -1,0 +1,14 @@
+{
+  HttpRequestFactory requestFactory=new HttpRequestFactory(httpServer.url());
+  httpServer.doReturnStatus(500);
+  IssueClient client=new DefaultIssueClient(requestFactory);
+  try {
+    client.find(IssueQuery.create());
+    fail();
+  }
+ catch (  HttpException e) {
+    assertThat(e.status()).isEqualTo(500);
+    assertThat(e.url()).startsWith("http://localhost");
+    assertThat(e.url()).endsWith("/api/issues/search");
+  }
+}

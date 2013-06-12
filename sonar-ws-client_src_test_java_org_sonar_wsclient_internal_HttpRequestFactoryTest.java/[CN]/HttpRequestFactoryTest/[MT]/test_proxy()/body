@@ -1,4 +1,10 @@
 {
-  HttpRequestFactory factory=new HttpRequestFactory(httpServer.url()).setProxyHost("localhost").setProxyPort(5020);
-  HttpRequest request=factory.get("/api/issues",Collections.<String,Object>emptyMap());
+  HttpRequestFactory factory=new HttpRequestFactory(httpServer.url()).setProxyHost("localhost").setProxyPort(1).setProxyLogin("john").setProxyPassword("smith");
+  try {
+    factory.get("/api/issues",Collections.<String,Object>emptyMap());
+    fail();
+  }
+ catch (  IllegalStateException e) {
+    assertThat(e.getCause()).isInstanceOf(ConnectException.class);
+  }
 }

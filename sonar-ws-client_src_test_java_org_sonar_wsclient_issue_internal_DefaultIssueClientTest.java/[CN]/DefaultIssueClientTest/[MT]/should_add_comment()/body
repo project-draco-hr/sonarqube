@@ -1,0 +1,12 @@
+{
+  HttpRequestFactory requestFactory=new HttpRequestFactory(httpServer.url());
+  httpServer.doReturnBody(IOUtils.toString(getClass().getResourceAsStream("/org/sonar/wsclient/issue/internal/DefaultIssueClientTest/add_comment_result.json")));
+  IssueClient client=new DefaultIssueClient(requestFactory);
+  IssueComment comment=client.addComment("ISSUE-1","this is my comment");
+  assertThat(httpServer.requestedPath()).isEqualTo("/api/issues/add_comment?issue=ISSUE-1&text=this%20is%20my%20comment");
+  assertThat(comment).isNotNull();
+  assertThat(comment.key()).isEqualTo("COMMENT-123");
+  assertThat(comment.htmlText()).isEqualTo("this is my comment");
+  assertThat(comment.login()).isEqualTo("admin");
+  assertThat(comment.createdAt().getDate()).isEqualTo(18);
+}
