@@ -5,40 +5,12 @@
   String deadLineParam=parameters.get("deadLine");
   String projectParam=parameters.get("project");
   Date deadLine=null;
-  if (Strings.isNullOrEmpty(name)) {
-    result.addError(Result.Message.ofL10n("errors.cant_be_empty","name"));
-  }
- else {
-    if (name.length() > 200) {
-      result.addError(Result.Message.ofL10n("errors.is_too_long","name",200));
-    }
-  }
-  if (!Strings.isNullOrEmpty(description) && description.length() > 1000) {
-    result.addError(Result.Message.ofL10n("errors.is_too_long","description",1000));
-  }
+  checkMandatorySizeParameter(name,"name",200,result);
+  checkOptionnalSizeParameter(description,"description",1000,result);
   if (existingActionPlan == null) {
-    if (Strings.isNullOrEmpty(projectParam)) {
-      result.addError(Result.Message.ofL10n("errors.cant_be_empty","project"));
-    }
- else {
-      ResourceDto project=resourceDao.getResource(ResourceQuery.create().setKey(projectParam));
-      if (project == null) {
-        result.addError(Result.Message.ofL10n("action_plans.errors.project_does_not_exist",projectParam));
-      }
-    }
+    checkProject(projectParam,result);
   }
-  if (!Strings.isNullOrEmpty(deadLineParam)) {
-    try {
-      deadLine=RubyUtils.toDate(deadLineParam);
-      Date today=new Date();
-      if (deadLine != null && deadLine.before(today) && !org.apache.commons.lang.time.DateUtils.isSameDay(deadLine,today)) {
-        result.addError(Result.Message.ofL10n("action_plans.date_cant_be_in_past"));
-      }
-    }
- catch (    SonarException e) {
-      result.addError(Result.Message.ofL10n("errors.is_not_valid","date"));
-    }
-  }
+  deadLine=checkAndReturnDeadline(deadLineParam,result);
   if (!Strings.isNullOrEmpty(projectParam) && !Strings.isNullOrEmpty(name) && (existingActionPlan == null || !name.equals(existingActionPlan.name()))&& actionPlanService.isNameAlreadyUsedForProject(name,projectParam)) {
     result.addError(Result.Message.ofL10n("action_plans.same_name_in_same_project"));
   }

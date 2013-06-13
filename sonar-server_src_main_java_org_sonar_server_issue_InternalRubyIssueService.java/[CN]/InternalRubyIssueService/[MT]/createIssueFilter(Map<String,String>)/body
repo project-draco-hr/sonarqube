@@ -4,13 +4,15 @@
     String name=params.get("name");
     String description=params.get("description");
     String data=params.get("data");
+    Boolean shared=RubyUtils.toBoolean(params.get("shared"));
     if (result.ok()) {
-      DefaultIssueFilter defaultIssueFilter=new DefaultIssueFilter().setName(name).setDescription(description).setData(data);
-      defaultIssueFilter=issueFilterService.create(defaultIssueFilter,UserSession.get());
+      DefaultIssueFilter defaultIssueFilter=DefaultIssueFilter.create(name).setDescription(description).setShared(shared).setData(data);
+      defaultIssueFilter=issueFilterService.save(defaultIssueFilter,UserSession.get());
       result.set(defaultIssueFilter);
     }
   }
  catch (  Exception e) {
     result.addError(e.getMessage());
   }
+  return result;
 }
