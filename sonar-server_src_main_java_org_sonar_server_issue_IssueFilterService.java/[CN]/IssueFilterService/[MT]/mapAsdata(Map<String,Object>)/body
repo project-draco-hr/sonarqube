@@ -1,6 +1,6 @@
 {
   StringBuilder stringBuilder=new StringBuilder();
-  for (  Map.Entry<String,Object> entries : props.entrySet()) {
+  for (  Map.Entry<String,Object> entries : map.entrySet()) {
     String key=entries.getKey();
     Object value=entries.getValue();
     stringBuilder.append(key);
@@ -15,11 +15,17 @@
  else {
       stringBuilder.append(value);
     }
-    for (    Object valueList : valuesList) {
+    for (Iterator<Object> valueListIter=valuesList.iterator(); valueListIter.hasNext(); ) {
+      Object valueList=valueListIter.next();
       stringBuilder.append(valueList);
-      stringBuilder.append(DefaultIssueFilter.LIST_SEPARATOR);
+      if (valueListIter.hasNext()) {
+        stringBuilder.append(DefaultIssueFilter.LIST_SEPARATOR);
+      }
     }
     stringBuilder.append(DefaultIssueFilter.SEPARATOR);
+  }
+  if (stringBuilder.length() > 0) {
+    stringBuilder.deleteCharAt(stringBuilder.length() - 1);
   }
   return stringBuilder.toString();
 }
