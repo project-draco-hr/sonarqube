@@ -1,0 +1,21 @@
+{
+  Method executeMethod=null;
+  for (  Method m : lifecycleExecutor.getClass().getMethods()) {
+    if (m.getName().equals("execute")) {
+      executeMethod=m;
+      break;
+    }
+  }
+  if (executeMethod == null) {
+    throw new SonarException("Unable to find execute method on Maven LifecycleExecutor. Please check your Maven version.");
+  }
+  if (executeMethod.getParameterTypes().length == 1) {
+    concreteExecuteMaven3(pom,goal);
+  }
+ else   if (executeMethod.getParameterTypes().length == 3) {
+    concreteExecuteMaven2(executeMethod,pom,goal);
+  }
+ else {
+    throw new SonarException("Unexpected parameter count on Maven LifecycleExecutor#execute method. Please check your Maven version.");
+  }
+}
