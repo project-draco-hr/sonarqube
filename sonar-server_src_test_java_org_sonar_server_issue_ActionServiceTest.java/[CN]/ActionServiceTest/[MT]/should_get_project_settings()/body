@@ -1,0 +1,11 @@
+{
+  Component project=mock(Component.class);
+  when(project.key()).thenReturn("struts");
+  settings.appendProperty("sonar.core.version","3.6");
+  List<PropertyDto> projectProperties=newArrayList(new PropertyDto().setKey("sonar.jira.project.key").setValue("STRUTS"));
+  when(propertiesDao.selectProjectProperties("struts")).thenReturn(projectProperties);
+  Settings result=actionService.getProjectSettings(project);
+  assertThat(result).isNotNull();
+  assertThat(result.hasKey("sonar.core.version")).isTrue();
+  assertThat(result.hasKey("sonar.jira.project.key")).isTrue();
+}

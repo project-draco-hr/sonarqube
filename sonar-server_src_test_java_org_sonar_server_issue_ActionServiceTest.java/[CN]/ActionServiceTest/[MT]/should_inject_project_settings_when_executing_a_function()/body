@@ -5,10 +5,11 @@
   DefaultIssue issue=new DefaultIssue().setKey("ABCD");
   IssueQueryResult issueQueryResult=mock(DefaultIssueQueryResult.class);
   when(issueQueryResult.first()).thenReturn(issue);
-  when(issueQueryResult.project(issue)).thenReturn(mock(Component.class));
+  Component project=mock(Component.class);
+  when(project.key()).thenReturn("struts");
+  when(issueQueryResult.project(issue)).thenReturn(project);
   when(finder.find(any(IssueQuery.class))).thenReturn(issueQueryResult);
   actions.add("link-to-jira").setConditions(new AlwaysMatch()).setFunctions(function);
   assertThat(actionService.execute("ABCD","link-to-jira",userSession)).isNotNull();
-  verify(updater).addComment(eq(issue),eq("New tweet on issue ABCD"),any(IssueChangeContext.class));
-  verify(updater).setAttribute(eq(issue),eq("tweet"),eq("tweet sent"),any(IssueChangeContext.class));
+  verify(propertiesDao).selectProjectProperties(eq("struts"));
 }
