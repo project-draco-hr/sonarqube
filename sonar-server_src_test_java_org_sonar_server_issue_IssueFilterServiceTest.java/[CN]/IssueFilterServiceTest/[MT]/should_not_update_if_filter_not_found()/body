@@ -1,0 +1,11 @@
+{
+  when(issueFilterDao.selectById(1L)).thenReturn(null);
+  try {
+    service.update(new DefaultIssueFilter().setId(1L).setName("My New Filter"),userSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("Filter not found: 1");
+  }
+  verify(issueFilterDao,never()).update(any(IssueFilterDto.class));
+}

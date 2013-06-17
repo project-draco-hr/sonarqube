@@ -1,0 +1,12 @@
+{
+  when(issueFilterDao.selectByNameAndUser(eq("My Issue"),eq("john"),eq((Long)null))).thenReturn(new IssueFilterDto());
+  try {
+    DefaultIssueFilter issueFilter=new DefaultIssueFilter().setName("My Issue");
+    service.save(issueFilter,userSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("Name already exists");
+  }
+  verify(issueFilterDao,never()).insert(any(IssueFilterDto.class));
+}

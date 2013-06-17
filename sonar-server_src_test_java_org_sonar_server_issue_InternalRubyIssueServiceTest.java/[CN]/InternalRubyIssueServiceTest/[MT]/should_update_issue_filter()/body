@@ -1,0 +1,14 @@
+{
+  Map<String,String> parameters=newHashMap();
+  parameters.put("id","10");
+  parameters.put("name","Long term");
+  parameters.put("description","Long term issues");
+  Result<DefaultIssueFilter> result=service.updateIssueFilter(parameters);
+  assertThat(result.ok()).isTrue();
+  ArgumentCaptor<DefaultIssueFilter> issueFilterCaptor=ArgumentCaptor.forClass(DefaultIssueFilter.class);
+  verify(issueFilterService).update(issueFilterCaptor.capture(),any(UserSession.class));
+  DefaultIssueFilter issueFilter=issueFilterCaptor.getValue();
+  assertThat(issueFilter.id()).isEqualTo(10L);
+  assertThat(issueFilter.name()).isEqualTo("Long term");
+  assertThat(issueFilter.description()).isEqualTo("Long term issues");
+}

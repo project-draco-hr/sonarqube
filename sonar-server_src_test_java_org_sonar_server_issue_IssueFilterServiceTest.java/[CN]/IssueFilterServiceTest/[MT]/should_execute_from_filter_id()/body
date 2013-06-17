@@ -1,0 +1,8 @@
+{
+  when(issueFilterDao.selectById(1L)).thenReturn(new IssueFilterDto().setId(1L).setName("My Old Filter").setUserLogin("john").setData("componentRoots=struts"));
+  ArgumentCaptor<IssueQuery> issueQueryCaptor=ArgumentCaptor.forClass(IssueQuery.class);
+  service.execute(1L,userSession);
+  verify(issueFinder).find(issueQueryCaptor.capture());
+  IssueQuery issueQuery=issueQueryCaptor.getValue();
+  assertThat(issueQuery.componentRoots()).contains("struts");
+}

@@ -1,18 +1,12 @@
 {
-  Result<DefaultIssueFilter> result=Result.of();
-  try {
-    String name=params.get("name");
-    String description=params.get("description");
-    String data=params.get("data");
-    Boolean shared=RubyUtils.toBoolean(params.get("shared"));
-    if (result.ok()) {
-      DefaultIssueFilter defaultIssueFilter=DefaultIssueFilter.create(name).setDescription(description).setShared(shared).setData(data);
-      defaultIssueFilter=issueFilterService.save(defaultIssueFilter,UserSession.get());
-      result.set(defaultIssueFilter);
+  Result<DefaultIssueFilter> result=createIssueFilterResult(params,false);
+  if (result.ok()) {
+    try {
+      result.set(issueFilterService.save(result.get(),UserSession.get()));
     }
-  }
- catch (  Exception e) {
-    result.addError(e.getMessage());
+ catch (    Exception e) {
+      result.addError(e.getMessage());
+    }
   }
   return result;
 }
