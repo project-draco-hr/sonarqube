@@ -1,18 +1,7 @@
 {
-  EmbeddedRunner runner=EmbeddedRunner.create().setApp("Maven",getMavenVersion());
-  runner.setProperty("sonarRunner.userAgent","Maven");
-  runner.setProperty("sonarRunner.userAgentVersion",getMavenVersion());
-  Set<Entry<Object,Object>> properties=project.getModel().getProperties().entrySet();
-  for (  Entry<Object,Object> entry : properties) {
-    runner.setProperty(ObjectUtils.toString(entry.getKey()),ObjectUtils.toString(entry.getValue()));
-  }
-  String encoding=MavenUtils.getSourceEncoding(project);
-  if (encoding != null) {
-    runner.setProperty(ScanProperties.PROJECT_SOURCE_ENCODING,encoding);
-  }
-  runner.setProperty(ScanProperties.PROJECT_KEY,MavenProjectConverter.getSonarKey(project)).setProperty(RunnerProperties.WORK_DIR,MavenProjectConverter.getSonarWorkDir(project).getAbsolutePath()).setProperty(ScanProperties.PROJECT_BASEDIR,project.getBasedir().getAbsolutePath()).setProperty(ScanProperties.PROJECT_VERSION,StringUtils.defaultString(project.getVersion())).setProperty(ScanProperties.PROJECT_NAME,StringUtils.defaultString(project.getName())).setProperty(ScanProperties.PROJECT_DESCRIPTION,StringUtils.defaultString(project.getDescription())).setProperty(ScanProperties.PROJECT_SOURCE_DIRS,".").setUnmaskedPackages("org.sonar.api.batch.bootstrap").addExtensions(session,getLog(),lifecycleExecutor,artifactFactory,localRepository,artifactMetadataSource,artifactCollector,dependencyTreeBuilder,projectBuilder,Maven3PluginExecutor.class,new SonarMaven3ProjectBuilder(session));
-  if (getLog().isDebugEnabled()) {
-    runner.setProperty("sonar.verbose","true");
-  }
-  runner.execute();
+  ProjectDefinition def=MavenProjectConverter.convert(session.getProjects(),project);
+  ProjectReactor reactor=new ProjectReactor(def);
+  Batch batch=Batch.builder().setEnvironment(getEnvironmentInformation()).setProjectReactor(reactor).addComponents(session,getLog(),lifecycleExecutor,artifactFactory,localRepository,artifactMetadataSource,artifactCollector,dependencyTreeBuilder,projectBuilder,Maven3PluginExecutor.class).build();
+  configureLogging(batch.getLoggingConfiguration());
+  batch.execute();
 }
