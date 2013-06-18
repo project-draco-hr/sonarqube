@@ -1,0 +1,11 @@
+{
+  when(issueFilterDao.selectById(1L)).thenReturn(null);
+  try {
+    service.toggleFavouriteIssueFilter(1L,userSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("Filter not found: 1");
+  }
+  verify(issueFilterFavouriteDao,never()).delete(anyLong());
+}

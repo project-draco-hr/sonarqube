@@ -1,0 +1,10 @@
+{
+  when(issueFilterDao.selectById(1L)).thenReturn(new IssueFilterDto().setId(1L).setName("My Issues").setUserLogin("john").setData("componentRoots=struts"));
+  when(issueFilterFavouriteDao.selectByUserAndIssueFilterId("john",1L)).thenReturn(null);
+  ArgumentCaptor<IssueFilterFavouriteDto> issueFilterFavouriteDtoCaptor=ArgumentCaptor.forClass(IssueFilterFavouriteDto.class);
+  service.toggleFavouriteIssueFilter(1L,userSession);
+  verify(issueFilterFavouriteDao).insert(issueFilterFavouriteDtoCaptor.capture());
+  IssueFilterFavouriteDto issueFilterFavouriteDto=issueFilterFavouriteDtoCaptor.getValue();
+  assertThat(issueFilterFavouriteDto.getIssueFilterId()).isEqualTo(1L);
+  assertThat(issueFilterFavouriteDto.getUserLogin()).isEqualTo("john");
+}
