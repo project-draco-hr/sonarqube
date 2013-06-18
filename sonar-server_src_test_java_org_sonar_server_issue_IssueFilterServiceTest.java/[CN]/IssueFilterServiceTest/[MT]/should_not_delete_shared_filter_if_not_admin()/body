@@ -1,0 +1,12 @@
+{
+  when(authorizationDao.selectGlobalPermissions("john")).thenReturn(newArrayList(UserRole.USER));
+  when(issueFilterDao.selectById(1L)).thenReturn(new IssueFilterDto().setId(1L).setName("My Issues").setUserLogin("arthur").setShared(true));
+  try {
+    service.delete(1L,userSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalStateException.class).hasMessage("User is not authorized to modify this filter");
+  }
+  verify(issueFilterDao,never()).delete(anyLong());
+}
