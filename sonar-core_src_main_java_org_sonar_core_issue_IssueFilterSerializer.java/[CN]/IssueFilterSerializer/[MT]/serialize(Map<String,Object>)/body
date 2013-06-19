@@ -1,0 +1,38 @@
+{
+  StringBuilder stringBuilder=new StringBuilder();
+  for (  Map.Entry<String,Object> entries : map.entrySet()) {
+    String key=entries.getKey();
+    Object value=entries.getValue();
+    if (value != null) {
+      List valuesList=newArrayList();
+      if (value instanceof List) {
+        valuesList=(List)value;
+      }
+ else       if (value instanceof CharSequence) {
+        valuesList=Lists.newArrayList(Splitter.on(',').omitEmptyStrings().split((CharSequence)value));
+      }
+ else {
+        stringBuilder.append(key);
+        stringBuilder.append(IssueFilterSerializer.KEY_VALUE_SEPARATOR);
+        stringBuilder.append(value);
+        stringBuilder.append(IssueFilterSerializer.SEPARATOR);
+      }
+      if (!valuesList.isEmpty()) {
+        stringBuilder.append(key);
+        stringBuilder.append(IssueFilterSerializer.KEY_VALUE_SEPARATOR);
+        for (Iterator<Object> valueListIter=valuesList.iterator(); valueListIter.hasNext(); ) {
+          Object valueList=valueListIter.next();
+          stringBuilder.append(valueList);
+          if (valueListIter.hasNext()) {
+            stringBuilder.append(IssueFilterSerializer.LIST_SEPARATOR);
+          }
+        }
+        stringBuilder.append(IssueFilterSerializer.SEPARATOR);
+      }
+    }
+  }
+  if (stringBuilder.length() > 0) {
+    stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+  }
+  return stringBuilder.toString();
+}

@@ -1,0 +1,13 @@
+{
+  when(issueFilterDao.selectByNameAndUser(eq("My Issue"),eq("john"),eq((Long)null))).thenReturn(null);
+  when(issueFilterDao.selectSharedWithoutUserFiltersByName(eq("My Issue"),eq("john"),eq((Long)null))).thenReturn(new IssueFilterDto());
+  try {
+    DefaultIssueFilter issueFilter=new DefaultIssueFilter().setName("My Issue").setShared(true);
+    service.save(issueFilter,userSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("Other users already share filters with the same name");
+  }
+  verify(issueFilterDao,never()).insert(any(IssueFilterDto.class));
+}
