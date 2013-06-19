@@ -1,0 +1,15 @@
+{
+  List<Rule> templateRules=newArrayList();
+  for (  Rule persistedRule : existingRules.get(repository.getKey())) {
+    Rule parent=persistedRule.getParent();
+    if (parent != null && registeredRules.contains(parent)) {
+      persistedRule.setRepositoryKey(parent.getRepositoryKey());
+      persistedRule.setLanguage(parent.getLanguage());
+      persistedRule.setStatus(parent.getStatus());
+      persistedRule.setUpdatedAt(new Date());
+      session.saveWithoutFlush(persistedRule);
+      templateRules.add(persistedRule);
+    }
+  }
+  return templateRules;
+}
