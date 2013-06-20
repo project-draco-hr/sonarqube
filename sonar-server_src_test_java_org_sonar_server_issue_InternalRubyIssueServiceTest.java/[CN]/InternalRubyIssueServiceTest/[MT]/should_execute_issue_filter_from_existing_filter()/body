@@ -1,4 +1,16 @@
 {
-  service.execute(10L);
-  verify(issueFilterService).execute(eq(10L),any(UserSession.class));
+  Map<String,Object> props=newHashMap();
+  props.put("componentRoots","struts");
+  when(issueFilterService.deserializeIssueFilterQuery(any(DefaultIssueFilter.class))).thenReturn(props);
+  Map<String,Object> overrideProps=newHashMap();
+  overrideProps.put("pageSize",20);
+  overrideProps.put("pageIndex",2);
+  service.execute(10L,overrideProps);
+  ArgumentCaptor<IssueQuery> captor=ArgumentCaptor.forClass(IssueQuery.class);
+  verify(issueFilterService).execute(captor.capture());
+  verify(issueFilterService).find(eq(10L),any(UserSession.class));
+  IssueQuery issueQuery=captor.getValue();
+  assertThat(issueQuery.componentRoots()).contains("struts");
+  assertThat(issueQuery.pageSize()).isEqualTo(20);
+  assertThat(issueQuery.pageIndex()).isEqualTo(2);
 }
