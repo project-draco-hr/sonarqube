@@ -1,0 +1,16 @@
+{
+  MavenSession session=mock(MavenSession.class);
+  MavenProject rootProject=mock(MavenProject.class);
+  when(rootProject.isExecutionRoot()).thenReturn(true);
+  when(session.getSortedProjects()).thenReturn(Arrays.asList(rootProject));
+  MavenProjectConverter mavenProjectConverter=mock(MavenProjectConverter.class);
+  SonarMavenProjectBuilder builder=new SonarMavenProjectBuilder(session,mavenProjectConverter);
+  ProjectBuilderContext context=mock(ProjectBuilderContext.class);
+  ProjectDefinition root=ProjectDefinition.create();
+  ProjectReactor reactor=new ProjectReactor(root);
+  when(context.getProjectReactor()).thenReturn(reactor);
+  builder.build(context);
+  ArgumentCaptor<List> argument=ArgumentCaptor.forClass(List.class);
+  verify(mavenProjectConverter).configure(eq(root),argument.capture(),eq(rootProject));
+  assertThat(argument.getValue()).contains(rootProject);
+}
