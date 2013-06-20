@@ -1,0 +1,14 @@
+{
+  BatchSettings batchSettings=mock(BatchSettings.class);
+  when(batchSettings.getDefinitions()).thenReturn(new PropertyDefinitions());
+  when(batchSettings.getString(CoreProperties.DRY_RUN)).thenReturn("true");
+  when(batchSettings.getProperties()).thenReturn(ImmutableMap.of("sonar.foo.secured","bar"));
+  when(batchSettings.getModuleProperties("struts-core")).thenReturn(ImmutableMap.of("sonar.foo.license.secured","bar2"));
+  ProjectDefinition module=ProjectDefinition.create().setKey("struts-core");
+  Configuration deprecatedConf=new PropertiesConfiguration();
+  ModuleSettings moduleSettings=new ModuleSettings(batchSettings,module,deprecatedConf);
+  assertThat(moduleSettings.getString("sonar.foo.license.secured")).isEqualTo("bar2");
+  thrown.expect(SonarException.class);
+  thrown.expectMessage("Access to the secured property 'sonar.foo.secured' is not possible in local (dry run) SonarQube analysis. The SonarQube plugin accessing to this property must be deactivated in dry run mode.");
+  moduleSettings.getString("sonar.foo.secured");
+}

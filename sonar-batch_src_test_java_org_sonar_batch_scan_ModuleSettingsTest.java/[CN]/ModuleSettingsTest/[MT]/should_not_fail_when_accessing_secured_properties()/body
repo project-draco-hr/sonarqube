@@ -1,0 +1,11 @@
+{
+  BatchSettings batchSettings=mock(BatchSettings.class);
+  when(batchSettings.getDefinitions()).thenReturn(new PropertyDefinitions());
+  when(batchSettings.getProperties()).thenReturn(ImmutableMap.of("sonar.foo.secured","bar"));
+  when(batchSettings.getModuleProperties("struts-core")).thenReturn(ImmutableMap.of("sonar.foo.license.secured","bar2"));
+  ProjectDefinition module=ProjectDefinition.create().setKey("struts-core");
+  Configuration deprecatedConf=new PropertiesConfiguration();
+  ModuleSettings moduleSettings=new ModuleSettings(batchSettings,module,deprecatedConf);
+  assertThat(moduleSettings.getString("sonar.foo.license.secured")).isEqualTo("bar2");
+  assertThat(moduleSettings.getString("sonar.foo.secured")).isEqualTo("bar");
+}

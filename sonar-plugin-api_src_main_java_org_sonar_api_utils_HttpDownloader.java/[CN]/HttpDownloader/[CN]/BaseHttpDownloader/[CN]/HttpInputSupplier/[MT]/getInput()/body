@@ -12,7 +12,20 @@
   connection.setRequestProperty("User-Agent",userAgent);
   int responseCode=connection.getResponseCode();
   if (responseCode >= 400) {
-    throw new HttpException(uri,responseCode);
+    InputStream errorResponse=null;
+    try {
+      errorResponse=connection.getErrorStream();
+      if (errorResponse != null) {
+        String errorResponseContent=IOUtils.toString(errorResponse);
+        throw new HttpException(uri,responseCode,errorResponseContent);
+      }
+ else {
+        throw new HttpException(uri,responseCode);
+      }
+    }
+  finally {
+      IOUtils.closeQuietly(errorResponse);
+    }
   }
   return connection.getInputStream();
 }
