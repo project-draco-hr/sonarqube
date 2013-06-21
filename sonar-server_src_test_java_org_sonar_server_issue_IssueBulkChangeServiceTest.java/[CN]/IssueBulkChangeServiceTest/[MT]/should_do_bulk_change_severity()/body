@@ -1,0 +1,13 @@
+{
+  String severity="MINOR";
+  IssueBulkChangeQuery issueBulkChangeQuery=IssueBulkChangeQuery.builder().issueKeys(newArrayList(issue.key())).severity(severity).build();
+  Result result=service.execute(issueBulkChangeQuery,userSession);
+  assertThat(result.ok()).isTrue();
+  assertThat((List)result.get()).hasSize(1);
+  verify(issueUpdater).setManualSeverity(eq(issue),eq(severity),any(IssueChangeContext.class));
+  verifyNoMoreInteractions(issueUpdater);
+  verify(issueStorage).save(eq(issue));
+  verifyNoMoreInteractions(issueStorage);
+  verify(issueNotifications).sendChanges(eq(issue),any(IssueChangeContext.class),eq(issueQueryResult));
+  verifyNoMoreInteractions(issueNotifications);
+}

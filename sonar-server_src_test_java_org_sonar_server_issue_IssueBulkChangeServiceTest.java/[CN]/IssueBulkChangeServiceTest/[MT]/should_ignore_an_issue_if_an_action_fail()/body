@@ -1,0 +1,15 @@
+{
+  when(issueQueryResult.issues()).thenReturn(newArrayList((Issue)issue,new DefaultIssue().setKey("EFGH")));
+  IssueBulkChangeQuery issueBulkChangeQuery=IssueBulkChangeQuery.builder().issueKeys(newArrayList("ABCD","EFGH")).severity("MAJOR").comment("Bulk change comment").build();
+  when(issueUpdater.setManualSeverity(any(DefaultIssue.class),eq("MAJOR"),any(IssueChangeContext.class))).thenReturn(true).thenThrow(new RuntimeException("Cant change severity"));
+  Result result=service.execute(issueBulkChangeQuery,userSession);
+  assertThat(result.ok()).isFalse();
+  assertThat(((Result.Message)result.errors().get(0)).text()).isEqualTo("Cant change severity");
+  List<Issue> issues=(List)result.get();
+  assertThat(issues).hasSize(1);
+  assertThat(issues.get(0).key()).isEqualTo("ABCD");
+  verify(issueStorage).save(eq(issue));
+  verifyNoMoreInteractions(issueStorage);
+  verify(issueNotifications).sendChanges(eq(issue),any(IssueChangeContext.class),eq(issueQueryResult));
+  verifyNoMoreInteractions(issueNotifications);
+}

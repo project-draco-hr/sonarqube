@@ -1,0 +1,46 @@
+{
+  Result<List<Issue>> result=Result.of();
+  List<Issue> issues=newArrayList();
+  verifyLoggedIn(userSession);
+  IssueQueryResult issueQueryResult=issueFinder.find(IssueQuery.builder().issueKeys(issueBulkChangeQuery.issueKeys()).requiredRole(UserRole.USER).build());
+  String assignee=issueBulkChangeQuery.assignee();
+  if (assignee != null && userFinder.findByLogin(assignee) == null) {
+    throw new IllegalArgumentException("Unknown user: " + assignee);
+  }
+  String actionPlanKey=issueBulkChangeQuery.plan();
+  if (!Strings.isNullOrEmpty(actionPlanKey) && actionPlanService.findByKey(actionPlanKey,userSession) == null) {
+    throw new IllegalArgumentException("Unknown action plan: " + actionPlanKey);
+  }
+  String severity=issueBulkChangeQuery.severity();
+  String transition=issueBulkChangeQuery.transition();
+  String comment=issueBulkChangeQuery.comment();
+  IssueChangeContext context=IssueChangeContext.createUser(new Date(),userSession.login());
+  for (  Issue issue : issueQueryResult.issues()) {
+    DefaultIssue defaultIssue=(DefaultIssue)issue;
+    try {
+      if (issueBulkChangeQuery.isOnAssignee()) {
+        issueUpdater.assign(defaultIssue,assignee,context);
+      }
+      if (issueBulkChangeQuery.isOnActionPlan()) {
+        issueUpdater.plan(defaultIssue,actionPlanKey,context);
+      }
+      if (issueBulkChangeQuery.isOnSeverity()) {
+        issueUpdater.setManualSeverity(defaultIssue,severity,context);
+      }
+      if (issueBulkChangeQuery.isOnTransition()) {
+        workflow.doTransition(defaultIssue,transition,context);
+      }
+      if (issueBulkChangeQuery.isOnComment()) {
+        issueUpdater.addComment(defaultIssue,comment,context);
+      }
+      issueStorage.save(defaultIssue);
+      issueNotifications.sendChanges(defaultIssue,context,issueQueryResult);
+      issues.add(defaultIssue);
+    }
+ catch (    Exception e) {
+      result.addError(e.getMessage());
+    }
+  }
+  result.set(issues);
+  return result;
+}

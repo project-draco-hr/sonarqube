@@ -1,0 +1,14 @@
+{
+  String transition="reopen";
+  when(workflow.doTransition(eq(issue),eq(transition),any(IssueChangeContext.class))).thenReturn(true);
+  IssueBulkChangeQuery issueBulkChangeQuery=IssueBulkChangeQuery.builder().issueKeys(newArrayList(issue.key())).transition(transition).build();
+  Result result=service.execute(issueBulkChangeQuery,userSession);
+  assertThat(result.ok()).isTrue();
+  assertThat((List)result.get()).hasSize(1);
+  verify(workflow).doTransition(eq(issue),eq(transition),any(IssueChangeContext.class));
+  verifyNoMoreInteractions(issueUpdater);
+  verify(issueStorage).save(eq(issue));
+  verifyNoMoreInteractions(issueStorage);
+  verify(issueNotifications).sendChanges(eq(issue),any(IssueChangeContext.class),eq(issueQueryResult));
+  verifyNoMoreInteractions(issueNotifications);
+}
