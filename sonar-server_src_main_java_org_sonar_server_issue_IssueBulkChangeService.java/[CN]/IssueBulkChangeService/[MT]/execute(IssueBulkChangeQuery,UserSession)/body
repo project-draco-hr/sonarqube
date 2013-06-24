@@ -1,42 +1,26 @@
 {
   List<Issue> issues=newArrayList();
   verifyLoggedIn(userSession);
-  IssueQueryResult issueQueryResult=issueFinder.find(IssueQuery.builder().issueKeys(issueBulkChangeQuery.issueKeys()).requiredRole(UserRole.USER).build());
-  String assignee=issueBulkChangeQuery.assignee();
-  if (assignee != null && userFinder.findByLogin(assignee) == null) {
-    throw new IllegalArgumentException("Unknown user: " + assignee);
+  for (  String actionName : issueBulkChangeQuery.actions()) {
+    Action action=getAction(actionName);
+    action.verify(issueBulkChangeQuery.properties(actionName),userSession);
   }
-  String actionPlanKey=issueBulkChangeQuery.plan();
-  if (!Strings.isNullOrEmpty(actionPlanKey) && actionPlanService.findByKey(actionPlanKey,userSession) == null) {
-    throw new IllegalArgumentException("Unknown action plan: " + actionPlanKey);
-  }
-  String severity=issueBulkChangeQuery.severity();
-  String transition=issueBulkChangeQuery.transition();
-  String comment=issueBulkChangeQuery.comment();
-  IssueChangeContext context=IssueChangeContext.createUser(new Date(),userSession.login());
+  IssueQueryResult issueQueryResult=issueFinder.find(IssueQuery.builder().issueKeys(issueBulkChangeQuery.issues()).requiredRole(UserRole.USER).build());
+  IssueChangeContext issueChangeContext=IssueChangeContext.createUser(new Date(),userSession.login());
   for (  Issue issue : issueQueryResult.issues()) {
-    DefaultIssue defaultIssue=(DefaultIssue)issue;
-    try {
-      if (issueBulkChangeQuery.isOnAssignee()) {
-        issueUpdater.assign(defaultIssue,assignee,context);
+    for (    String actionName : issueBulkChangeQuery.actions()) {
+      try {
+        Action action=getAction(actionName);
+        ActionContext actionContext=new ActionContext(issue,issueUpdater,issueChangeContext);
+        if (action.supports(issue) && action.execute(issueBulkChangeQuery.properties(actionName),actionContext)) {
+          issueStorage.save((DefaultIssue)issue);
+          issueNotifications.sendChanges((DefaultIssue)issue,issueChangeContext,issueQueryResult);
+          issues.add(issue);
+        }
       }
-      if (issueBulkChangeQuery.isOnActionPlan()) {
-        issueUpdater.plan(defaultIssue,actionPlanKey,context);
+ catch (      Exception e) {
+        LOG.info("An error occur when trying to apply the action : " + actionName + " on issue : "+ issue.key()+ ". This issue has been ignored.",e);
       }
-      if (issueBulkChangeQuery.isOnSeverity()) {
-        issueUpdater.setManualSeverity(defaultIssue,severity,context);
-      }
-      if (issueBulkChangeQuery.isOnTransition()) {
-        workflow.doTransition(defaultIssue,transition,context);
-      }
-      if (issueBulkChangeQuery.isOnComment()) {
-        issueUpdater.addComment(defaultIssue,comment,context);
-      }
-      issueStorage.save(defaultIssue);
-      issueNotifications.sendChanges(defaultIssue,context,issueQueryResult);
-      issues.add(defaultIssue);
-    }
- catch (    Exception e) {
     }
   }
   return issues;

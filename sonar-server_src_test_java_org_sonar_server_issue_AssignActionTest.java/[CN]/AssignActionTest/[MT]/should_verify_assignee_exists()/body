@@ -1,0 +1,14 @@
+{
+  String assignee="arthur";
+  Map<String,Object> properties=newHashMap();
+  properties.put("assignee",assignee);
+  when(userFinder.findByLogin(assignee)).thenReturn(new DefaultUser());
+  assertThat(action.verify(properties,mock(UserSession.class))).isTrue();
+  when(userFinder.findByLogin(assignee)).thenReturn(null);
+  try {
+    action.verify(properties,mock(UserSession.class));
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("Unknown user: arthur");
+  }
+}

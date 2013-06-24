@@ -1,0 +1,16 @@
+{
+  Map<String,Object> properties=newHashMap();
+  properties.put("issues","ABCD");
+  properties.put("actions","assign");
+  when(action.supports(any(Issue.class))).thenReturn(true);
+  when(action.execute(anyMap(),any(IssueBulkChangeService.ActionContext.class))).thenReturn(true);
+  when(action.execute(eq(properties),any(IssueBulkChangeService.ActionContext.class))).thenReturn(true);
+  IssueBulkChangeQuery issueBulkChangeQuery=new IssueBulkChangeQuery(properties);
+  List<Issue> result=service.execute(issueBulkChangeQuery,userSession);
+  assertThat(result).hasSize(1);
+  verifyNoMoreInteractions(issueUpdater);
+  verify(issueStorage).save(eq(issue));
+  verifyNoMoreInteractions(issueStorage);
+  verify(issueNotifications).sendChanges(eq(issue),any(IssueChangeContext.class),eq(issueQueryResult));
+  verifyNoMoreInteractions(issueNotifications);
+}
