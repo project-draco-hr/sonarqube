@@ -1,0 +1,21 @@
+{
+  File propertyFile=getFileFromPath(moduleProps.getProperty(PROPERTY_PROJECT_CONFIG_FILE),parentProject.getBaseDir());
+  if (propertyFile.isFile()) {
+    Properties propsFromFile=toProperties(propertyFile);
+    for (    Entry<Object,Object> entry : propsFromFile.entrySet()) {
+      moduleProps.put(entry.getKey(),entry.getValue());
+    }
+    File baseDir=null;
+    if (moduleProps.containsKey(PROPERTY_PROJECT_BASEDIR)) {
+      baseDir=getFileFromPath(moduleProps.getProperty(PROPERTY_PROJECT_BASEDIR),propertyFile.getParentFile());
+    }
+ else {
+      baseDir=propertyFile.getParentFile();
+    }
+    setProjectBaseDir(baseDir,moduleProps,moduleId);
+    return baseDir;
+  }
+ else {
+    throw new IllegalStateException("The properties file of the module '" + moduleId + "' does not exist: "+ propertyFile.getAbsolutePath());
+  }
+}

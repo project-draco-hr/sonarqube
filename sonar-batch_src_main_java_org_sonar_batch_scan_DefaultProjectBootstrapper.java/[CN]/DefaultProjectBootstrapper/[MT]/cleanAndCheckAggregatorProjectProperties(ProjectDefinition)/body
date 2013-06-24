@@ -1,0 +1,22 @@
+{
+  Properties properties=project.getProperties();
+  String[] sourceDirs=getListFromProperty(properties,PROPERTY_SOURCES);
+  for (  String path : sourceDirs) {
+    File sourceFolder=getFileFromPath(path,project.getBaseDir());
+    if (sourceFolder.isDirectory()) {
+      LOG.warn("/!\\ A multi-module project can't have source folders, so '{}' won't be used for the analysis. " + "If you want to analyse files of this folder, you should create another sub-module and move them inside it.",sourceFolder.toString());
+    }
+  }
+  properties.remove(PROPERTY_SOURCES);
+  properties.remove(PROPERTY_TESTS);
+  properties.remove(PROPERTY_BINARIES);
+  properties.remove(PROPERTY_LIBRARIES);
+  Properties clone=(Properties)properties.clone();
+  List<String> moduleIds=Lists.newArrayList(getListFromProperty(properties,PROPERTY_MODULES));
+  for (  Entry<Object,Object> entry : clone.entrySet()) {
+    String key=(String)entry.getKey();
+    if (isKeyPrefixedByModuleId(key,moduleIds)) {
+      properties.remove(key);
+    }
+  }
+}

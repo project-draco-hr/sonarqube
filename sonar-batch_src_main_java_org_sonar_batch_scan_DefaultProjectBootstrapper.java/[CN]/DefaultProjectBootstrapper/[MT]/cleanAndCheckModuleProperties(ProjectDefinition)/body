@@ -1,0 +1,13 @@
+{
+  Properties properties=project.getProperties();
+  String[] sourceDirs=getListFromProperty(properties,PROPERTY_SOURCES);
+  checkExistenceOfDirectories(project.getKey(),project.getBaseDir(),sourceDirs,PROPERTY_SOURCES);
+  List<String> libPaths=Lists.newArrayList();
+  for (  String pattern : getListFromProperty(properties,PROPERTY_LIBRARIES)) {
+    for (    File file : getLibraries(project.getBaseDir(),pattern)) {
+      libPaths.add(file.getAbsolutePath());
+    }
+  }
+  properties.remove(PROPERTY_LIBRARIES);
+  properties.put(PROPERTY_LIBRARIES,StringUtils.join(libPaths,","));
+}

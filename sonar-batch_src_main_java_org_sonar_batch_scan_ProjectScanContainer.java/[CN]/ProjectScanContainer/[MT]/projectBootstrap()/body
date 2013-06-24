@@ -1,0 +1,15 @@
+{
+  ProjectReactor reactor=getComponentByType(ProjectReactor.class);
+  if (reactor == null) {
+    ProjectBootstrapper bootstrapper=getComponentByType(ProjectBootstrapper.class);
+    if (bootstrapper == null) {
+      Settings settings=getComponentByType(Settings.class);
+      bootstrapper=new DefaultProjectBootstrapper(settings);
+    }
+    reactor=bootstrapper.bootstrap();
+    if (reactor == null) {
+      throw new SonarException(bootstrapper + " has returned null as ProjectReactor");
+    }
+    add(reactor);
+  }
+}

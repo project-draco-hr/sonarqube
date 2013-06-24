@@ -1,0 +1,15 @@
+{
+  if (!props.containsKey(PROPERTY_MODULES)) {
+    for (    String pattern : getListFromProperty(props,PROPERTY_LIBRARIES)) {
+      File[] files=getLibraries(baseDir,pattern);
+      if (files == null || files.length == 0) {
+        LOG.error("Invalid value of " + PROPERTY_LIBRARIES + " for "+ projectId);
+        throw new IllegalStateException("No files nor directories matching '" + pattern + "' in directory "+ baseDir);
+      }
+    }
+    String[] testDirs=getListFromProperty(props,PROPERTY_TESTS);
+    checkExistenceOfDirectories(projectId,baseDir,testDirs,PROPERTY_TESTS);
+    String[] binDirs=getListFromProperty(props,PROPERTY_BINARIES);
+    checkExistenceOfDirectories(projectId,baseDir,binDirs,PROPERTY_BINARIES);
+  }
+}

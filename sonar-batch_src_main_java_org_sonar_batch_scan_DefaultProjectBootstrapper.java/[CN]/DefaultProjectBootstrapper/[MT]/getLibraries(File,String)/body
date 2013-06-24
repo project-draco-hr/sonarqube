@@ -1,0 +1,23 @@
+{
+  final int i=Math.max(pattern.lastIndexOf('/'),pattern.lastIndexOf('\\'));
+  final String dirPath, filePattern;
+  if (i == -1) {
+    dirPath=".";
+    filePattern=pattern;
+  }
+ else {
+    dirPath=pattern.substring(0,i);
+    filePattern=pattern.substring(i + 1);
+  }
+  List<IOFileFilter> filters=new ArrayList<IOFileFilter>();
+  if (pattern.indexOf('*') >= 0) {
+    filters.add(FileFileFilter.FILE);
+  }
+  filters.add(new WildcardFileFilter(filePattern));
+  File dir=resolvePath(baseDir,dirPath);
+  File[] files=dir.listFiles((FileFilter)new AndFileFilter(filters));
+  if (files == null) {
+    files=new File[0];
+  }
+  return files;
+}
