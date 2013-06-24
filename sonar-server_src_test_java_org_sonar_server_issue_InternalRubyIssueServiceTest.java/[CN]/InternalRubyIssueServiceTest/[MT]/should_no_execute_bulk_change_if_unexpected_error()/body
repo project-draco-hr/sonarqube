@@ -1,6 +1,9 @@
 {
   doThrow(new RuntimeException("Error")).when(issueBulkChangeService).execute(any(IssueBulkChangeQuery.class),any(UserSession.class));
-  Result result=service.executeBulkChange(Maps.<String,Object>newHashMap());
+  Map<String,Object> params=newHashMap();
+  params.put("issues",newArrayList("ABCD","EFGH"));
+  params.put("assignee","arthur");
+  Result result=service.executeBulkChange(params);
   assertThat(result.ok()).isFalse();
   assertThat(((Result.Message)result.errors().get(0)).text()).contains("Error");
 }
