@@ -2,6 +2,9 @@
   String user=getNotNullLogin(userSession);
   IssueFilterDto issueFilterDto=findIssueFilterDto(issueFilter.id(),user);
   verifyCurrentUserCanModifyFilter(issueFilterDto.toIssueFilter(),user);
+  if (issueFilterDto.getUserLogin() != issueFilter.user()) {
+    verifyCurrentUserCanChangeFilterOwnership(user);
+  }
   validateFilter(issueFilter,user);
   issueFilterDao.update(IssueFilterDto.toIssueFilter(issueFilter));
   return issueFilter;
