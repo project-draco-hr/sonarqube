@@ -5,8 +5,9 @@
   when(action.supports(any(Issue.class))).thenReturn(true);
   doThrow(new RuntimeException("Error")).when(action).execute(anyMap(),any(IssueBulkChangeService.ActionContext.class));
   IssueBulkChangeQuery issueBulkChangeQuery=new IssueBulkChangeQuery(properties);
-  List<Issue> result=service.execute(issueBulkChangeQuery,userSession);
-  assertThat(result).isEmpty();
+  IssueBulkChangeResult result=service.execute(issueBulkChangeQuery,userSession);
+  assertThat(result.issuesChanged).isEmpty();
+  assertThat(result.issuesNotChanged).hasSize(1);
   verifyZeroInteractions(issueUpdater);
   verifyZeroInteractions(issueStorage);
   verifyZeroInteractions(issueNotifications);

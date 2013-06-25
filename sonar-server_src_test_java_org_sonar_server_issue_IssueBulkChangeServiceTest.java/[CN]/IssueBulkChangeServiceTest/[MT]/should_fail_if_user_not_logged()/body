@@ -1,12 +1,16 @@
 {
+  when(userSession.isLoggedIn()).thenReturn(false);
   Map<String,Object> properties=newHashMap();
   properties.put("issues","ABCD");
   properties.put("actions","assign");
-  when(action.supports(any(Issue.class))).thenReturn(false);
   IssueBulkChangeQuery issueBulkChangeQuery=new IssueBulkChangeQuery(properties);
-  IssueBulkChangeResult result=service.execute(issueBulkChangeQuery,userSession);
-  assertThat(result.issuesChanged).isEmpty();
-  assertThat(result.issuesNotChanged).hasSize(1);
+  try {
+    service.execute(issueBulkChangeQuery,userSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalStateException.class).hasMessage("User is not logged in");
+  }
   verifyZeroInteractions(issueUpdater);
   verifyZeroInteractions(issueStorage);
   verifyZeroInteractions(issueNotifications);

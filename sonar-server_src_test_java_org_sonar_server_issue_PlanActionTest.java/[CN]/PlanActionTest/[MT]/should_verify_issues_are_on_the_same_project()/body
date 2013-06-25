@@ -1,0 +1,13 @@
+{
+  String planKey="ABCD";
+  Map<String,Object> properties=newHashMap();
+  properties.put("plan",planKey);
+  when(actionPlanService.findByKey(eq(planKey),any(UserSession.class))).thenReturn(new DefaultActionPlan().setProjectKey("struts"));
+  List<Issue> issues=newArrayList(new DefaultIssue().setKey("ABC").setProjectKey("struts"),(Issue)new DefaultIssue().setKey("ABE").setProjectKey("mybatis"));
+  try {
+    action.verify(properties,issues,mock(UserSession.class));
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("Issues are not all related to the action plan project: struts");
+  }
+}
