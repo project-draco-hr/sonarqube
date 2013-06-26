@@ -1,24 +1,23 @@
 {
-  UserMapper userMapper=session.getMapper(UserMapper.class);
-  RoleMapper roleMapper=session.getMapper(RoleMapper.class);
   String[] groupNames=settings.getStringArrayBySeparator("sonar.role." + role + "."+ resource.getQualifier()+ ".defaultGroups",",");
   for (  String groupName : groupNames) {
     GroupRoleDto groupRole=new GroupRoleDto().setRole(role).setResourceId(Long.valueOf(resource.getId()));
     if (DefaultGroups.isAnyone(groupName)) {
-      roleMapper.insertGroupRole(groupRole);
+      roleDao.insertGroupRole(groupRole,session);
     }
  else {
-      GroupDto group=userMapper.selectGroupByName(groupName);
+      GroupDto group=userDao.selectGroupByName(groupName,session);
       if (group != null) {
-        roleMapper.insertGroupRole(groupRole.setGroupId(group.getId()));
+        roleDao.insertGroupRole(groupRole.setGroupId(group.getId()),session);
       }
     }
   }
   String[] logins=settings.getStringArrayBySeparator("sonar.role." + role + "."+ resource.getQualifier()+ ".defaultUsers",",");
   for (  String login : logins) {
-    UserDto user=userMapper.selectUserByLogin(login);
+    UserDto user=userDao.selectActiveUserByLogin(login,session);
     if (user != null) {
-      roleMapper.insertUserRole(new UserRoleDto().setRole(role).setUserId(user.getId()).setResourceId(Long.valueOf(resource.getId())));
+      UserRoleDto userRoleDto=new UserRoleDto().setRole(role).setUserId(user.getId()).setResourceId(Long.valueOf(resource.getId()));
+      roleDao.insertUserRole(userRoleDto,session);
     }
   }
 }
