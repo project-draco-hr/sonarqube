@@ -1,0 +1,25 @@
+{
+  SqlSession session=mybatis.openSession();
+  try {
+    UserMapper mapper=session.getMapper(UserMapper.class);
+    UserDto dto=mapper.selectUserByLogin(login);
+    if (dto == null) {
+      return false;
+    }
+    mapper.removeUserFromGroups(dto.getId());
+    mapper.deleteUserActiveDashboards(dto.getId());
+    mapper.deleteUserDashboards(dto.getId());
+    mapper.deleteUserIssueFilters(dto.getLogin());
+    mapper.deleteUserIssueFilterFavourites(dto.getLogin());
+    mapper.deleteUserMeasureFilters(dto.getId());
+    mapper.deleteUserMeasureFilterFavourites(dto.getId());
+    mapper.deleteUserProperties(dto.getId());
+    mapper.deleteUserRoles(dto.getId());
+    mapper.deactivateUser(dto.getId());
+    session.commit();
+    return true;
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}
