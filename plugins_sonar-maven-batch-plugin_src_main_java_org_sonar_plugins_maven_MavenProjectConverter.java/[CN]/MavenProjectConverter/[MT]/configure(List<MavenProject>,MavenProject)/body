@@ -2,29 +2,8 @@
   Map<String,MavenProject> paths=Maps.newHashMap();
   Map<MavenProject,ProjectDefinition> defs=Maps.newHashMap();
   try {
-    for (    MavenProject pom : poms) {
-      paths.put(pom.getFile().getCanonicalPath(),pom);
-      ProjectDefinition def=ProjectDefinition.create();
-      merge(pom,def);
-      defs.put(pom,def);
-    }
-    for (    Map.Entry<String,MavenProject> entry : paths.entrySet()) {
-      MavenProject pom=entry.getValue();
-      for (      Object m : pom.getModules()) {
-        String moduleId=(String)m;
-        File modulePath=new File(pom.getBasedir(),moduleId);
-        MavenProject module=findMavenProject(modulePath,paths);
-        ProjectDefinition parentProject=defs.get(pom);
-        if (parentProject == null) {
-          throw new IllegalStateException(UNABLE_TO_DETERMINE_PROJECT_STRUCTURE_EXCEPTION_MESSAGE);
-        }
-        ProjectDefinition subProject=defs.get(module);
-        if (subProject == null) {
-          throw new IllegalStateException(UNABLE_TO_DETERMINE_PROJECT_STRUCTURE_EXCEPTION_MESSAGE);
-        }
-        parentProject.addSubProject(subProject);
-      }
-    }
+    configureModules(poms,paths,defs);
+    rebuildModuleHierarchy(paths,defs);
   }
  catch (  IOException e) {
     throw new SonarException(e);

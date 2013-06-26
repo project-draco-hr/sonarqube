@@ -1,0 +1,19 @@
+{
+  for (  Map.Entry<String,MavenProject> entry : paths.entrySet()) {
+    MavenProject pom=entry.getValue();
+    for (    Object m : pom.getModules()) {
+      String moduleId=(String)m;
+      File modulePath=new File(pom.getBasedir(),moduleId);
+      MavenProject module=findMavenProject(modulePath,paths);
+      ProjectDefinition parentProject=defs.get(pom);
+      if (parentProject == null) {
+        throw new IllegalStateException(UNABLE_TO_DETERMINE_PROJECT_STRUCTURE_EXCEPTION_MESSAGE);
+      }
+      ProjectDefinition subProject=defs.get(module);
+      if (subProject == null) {
+        throw new IllegalStateException(UNABLE_TO_DETERMINE_PROJECT_STRUCTURE_EXCEPTION_MESSAGE);
+      }
+      parentProject.addSubProject(subProject);
+    }
+  }
+}
