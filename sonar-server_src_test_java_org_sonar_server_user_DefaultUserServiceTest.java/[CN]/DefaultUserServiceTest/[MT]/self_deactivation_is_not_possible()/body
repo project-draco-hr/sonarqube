@@ -1,0 +1,11 @@
+{
+  try {
+    MockUserSession.set().setLogin("simon").setPermissions(UserRole.ADMIN);
+    service.deactivate("simon");
+    fail();
+  }
+ catch (  BadRequestException e) {
+    assertThat(e).hasMessage("Self-deactivation is not possible");
+    verify(dao,never()).deactivateUserByLogin("simon");
+  }
+}

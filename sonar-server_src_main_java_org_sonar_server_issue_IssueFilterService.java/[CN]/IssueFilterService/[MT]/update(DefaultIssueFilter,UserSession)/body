@@ -1,9 +1,9 @@
 {
   String user=getNotNullLogin(userSession);
   IssueFilterDto issueFilterDto=findIssueFilterDto(issueFilter.id(),user);
-  verifyCurrentUserCanModifyFilter(issueFilterDto.toIssueFilter(),user);
-  if (!issueFilterDto.getUserLogin().equals(issueFilter.user())) {
-    verifyCurrentUserCanChangeFilterOwnership(user);
+  verifyCurrentUserCanModifyFilter(issueFilterDto.toIssueFilter(),user,userSession);
+  if (!issueFilterDto.getUserLogin().equals(issueFilter.user()) && !userSession.hasPermission(UserRole.ADMIN)) {
+    throw new ForbiddenException("User is not authorized to change the owner of this filter");
   }
   validateFilter(issueFilter,user);
   issueFilterDao.update(IssueFilterDto.toIssueFilter(issueFilter));

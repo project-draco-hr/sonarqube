@@ -1,10 +1,9 @@
 {
-  String currentUser="dave.loper";
   IssueFilterDto sharedFilter=new IssueFilterDto().setId(1L).setName("My filter").setUserLogin("former.owner").setShared(true);
   IssueFilterDto expectedDto=new IssueFilterDto().setName("My filter").setUserLogin("new.owner").setShared(true);
-  when(authorizationDao.selectGlobalPermissions(currentUser)).thenReturn(newArrayList(UserRole.ADMIN));
+  MockUserSession admin=MockUserSession.set().setLogin("admin").setPermissions(UserRole.ADMIN);
   when(issueFilterDao.selectById(1L)).thenReturn(sharedFilter);
   DefaultIssueFilter issueFilter=new DefaultIssueFilter().setId(1L).setName("My filter").setShared(true).setUser("new.owner");
-  service.update(issueFilter,new UserSession(1,currentUser,null));
+  service.update(issueFilter,admin);
   verify(issueFilterDao).update(argThat(Matches.filter(expectedDto)));
 }

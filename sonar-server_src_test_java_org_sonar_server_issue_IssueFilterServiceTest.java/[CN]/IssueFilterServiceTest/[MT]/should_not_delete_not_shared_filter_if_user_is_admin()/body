@@ -1,12 +1,12 @@
 {
-  when(authorizationDao.selectGlobalPermissions("john")).thenReturn(newArrayList(UserRole.ADMIN));
+  UserSession userSession=MockUserSession.create().setUserId(1).setLogin("john").setPermissions(UserRole.ADMIN);
   when(issueFilterDao.selectById(1L)).thenReturn(new IssueFilterDto().setId(1L).setName("My Issues").setUserLogin("arthur").setShared(false));
   try {
     service.delete(1L,userSession);
     fail();
   }
- catch (  Exception e) {
-    assertThat(e).isInstanceOf(IllegalStateException.class).hasMessage("User is not authorized to read this filter");
+ catch (  ForbiddenException e) {
+    assertThat(e).hasMessage("User is not authorized to read this filter");
+    verify(issueFilterDao,never()).delete(anyLong());
   }
-  verify(issueFilterDao,never()).delete(anyLong());
 }

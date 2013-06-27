@@ -1,0 +1,11 @@
+{
+  if (Strings.isNullOrEmpty(login)) {
+    throw new BadRequestException("Login is missing");
+  }
+  UserSession userSession=UserSession.get();
+  userSession.checkPermission(UserRole.ADMIN);
+  if (Objects.equal(userSession.login(),login)) {
+    throw new BadRequestException("Self-deactivation is not possible");
+  }
+  dao.deactivateUserByLogin(login);
+}
