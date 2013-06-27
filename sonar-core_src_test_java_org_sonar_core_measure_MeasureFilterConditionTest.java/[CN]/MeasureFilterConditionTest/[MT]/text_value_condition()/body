@@ -1,0 +1,13 @@
+{
+  Metric ncloc=new Metric.Builder("ncloc","NCLOC",Metric.ValueType.INT).create();
+  ncloc.setId(123);
+  MeasureFilterCondition condition=new MeasureFilterCondition(ncloc,MeasureFilterCondition.Operator.EQUALS,"\"foo\"");
+  assertThat(condition.metric()).isEqualTo(ncloc);
+  assertThat(condition.operator()).isEqualTo(MeasureFilterCondition.Operator.EQUALS);
+  assertThat(condition.period()).isNull();
+  assertThat(condition.value()).isEqualTo(0);
+  assertThat(condition.textValue()).isEqualTo("\"foo\"");
+  assertThat(condition.appendSqlColumn(new StringBuilder(),1).toString()).isEqualTo("pmcond1.text_value");
+  assertThat(condition.toString()).isNotEmpty();
+  assertThat(condition.appendSqlCondition(new StringBuilder(),1).toString()).isEqualTo(" pmcond1.metric_id=123 AND pmcond1.text_value = \"foo\" AND pmcond1.rule_id IS NULL AND pmcond1.rule_priority IS NULL AND pmcond1.characteristic_id IS NULL AND pmcond1.person_id IS NULL ");
+}

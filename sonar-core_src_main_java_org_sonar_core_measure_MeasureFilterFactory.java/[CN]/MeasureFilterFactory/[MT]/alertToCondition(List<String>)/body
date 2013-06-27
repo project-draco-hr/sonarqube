@@ -1,0 +1,21 @@
+{
+  if (alertLevels == null || alertLevels.isEmpty()) {
+    return null;
+  }
+  MeasureFilterCondition condition=null;
+  String metricKey=CoreMetrics.ALERT_STATUS_KEY;
+  String op="in";
+  List<String> alertLevelsUppercase=Lists.transform(alertLevels,new Function<String,String>(){
+    @Override public String apply(    String input){
+      return input != null ? input.toUpperCase() : "";
+    }
+  }
+);
+  String val="(\"" + Joiner.on("\", \"").join(alertLevelsUppercase) + "\")";
+  if (!Strings.isNullOrEmpty(metricKey) && !Strings.isNullOrEmpty(op) && !Strings.isNullOrEmpty(val)) {
+    Metric metric=metricFinder.findByKey(metricKey);
+    MeasureFilterCondition.Operator operator=MeasureFilterCondition.Operator.fromCode(op);
+    condition=new MeasureFilterCondition(metric,operator,val);
+  }
+  return condition;
+}
