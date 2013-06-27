@@ -1,0 +1,16 @@
+{
+  List<String> existingPermissions=roleDao.selectUserPermissions(permissionChangeQuery.getUser());
+  if (shouldSkipPermissionChange(operation,existingPermissions,permissionChangeQuery.getRole())) {
+    LOG.info("Skipping permission change '{} {}' for user {} as it matches the current permission scheme",new String[]{operation,permissionChangeQuery.getRole(),permissionChangeQuery.getUser()});
+  }
+ else {
+    Long targetedUser=getTargetedUser(permissionChangeQuery.getUser()).getId();
+    UserRoleDto userRole=new UserRoleDto().setRole(permissionChangeQuery.getRole()).setUserId(targetedUser);
+    if (ADD.equals(operation)) {
+      roleDao.insertUserRole(userRole);
+    }
+ else {
+      roleDao.deleteUserRole(userRole);
+    }
+  }
+}
