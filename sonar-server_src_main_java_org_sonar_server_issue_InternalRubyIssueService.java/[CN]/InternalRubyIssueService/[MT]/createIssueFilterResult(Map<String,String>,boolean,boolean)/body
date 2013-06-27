@@ -7,14 +7,17 @@
   String user=params.get("user");
   Boolean sharedParam=RubyUtils.toBoolean(params.get("shared"));
   boolean shared=sharedParam != null ? sharedParam : false;
-  if (isUpdate) {
+  if (showCheckId) {
     checkMandatoryParameter(id,"id",result);
+  }
+  if (showCheckUser) {
+    checkMandatoryParameter(user,"user",result);
   }
   checkMandatorySizeParameter(name,"name",100,result);
   checkOptionalSizeParameter(description,"description",4000,result);
   if (result.ok()) {
     DefaultIssueFilter defaultIssueFilter=DefaultIssueFilter.create(name).setDescription(description).setShared(shared).setUser(user).setData(data);
-    if (isUpdate) {
+    if (!Strings.isNullOrEmpty(id)) {
       defaultIssueFilter.setId(Long.valueOf(id));
     }
     result.set(defaultIssueFilter);
