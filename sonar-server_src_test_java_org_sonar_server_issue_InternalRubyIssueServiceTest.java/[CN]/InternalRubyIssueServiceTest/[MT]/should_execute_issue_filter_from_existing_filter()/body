@@ -1,8 +1,11 @@
 {
   Map<String,Object> props=newHashMap();
   props.put("componentRoots","struts");
+  props.put("statuses","OPEN");
   when(issueFilterService.deserializeIssueFilterQuery(any(DefaultIssueFilter.class))).thenReturn(props);
   Map<String,Object> overrideProps=newHashMap();
+  overrideProps.put("statuses","CLOSED");
+  overrideProps.put("resolved",true);
   overrideProps.put("pageSize",20);
   overrideProps.put("pageIndex",2);
   service.execute(10L,overrideProps);
@@ -11,6 +14,8 @@
   verify(issueFilterService).find(eq(10L),any(UserSession.class));
   IssueQuery issueQuery=captor.getValue();
   assertThat(issueQuery.componentRoots()).contains("struts");
+  assertThat(issueQuery.statuses()).contains("CLOSED");
+  assertThat(issueQuery.resolved()).isTrue();
   assertThat(issueQuery.pageSize()).isEqualTo(20);
   assertThat(issueQuery.pageIndex()).isEqualTo(2);
 }
