@@ -1,15 +1,15 @@
 {
   String currentUser="dave.loper";
   IssueFilterDto sharedFilter=new IssueFilterDto().setId(1L).setName("My filter").setUserLogin(currentUser).setShared(true);
-  MockUserSession.set().setPermissions(UserRole.USER);
+  when(authorizationDao.selectGlobalPermissions(currentUser)).thenReturn(newArrayList(UserRole.USER));
   when(issueFilterDao.selectById(1L)).thenReturn(sharedFilter);
   try {
     DefaultIssueFilter issueFilter=new DefaultIssueFilter().setId(1L).setName("My filter").setShared(true).setUser("new.owner");
     service.update(issueFilter,MockUserSession.create().setUserId(1).setLogin(currentUser));
     fail();
   }
- catch (  ForbiddenException e) {
-    assertThat(e).hasMessage("User is not authorized to change the owner of this filter");
-    verify(issueFilterDao,never()).update(any(IssueFilterDto.class));
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalStateException.class).hasMessage("User is not authorized to change the owner of this filter");
   }
+  verify(issueFilterDao,never()).update(any(IssueFilterDto.class));
 }

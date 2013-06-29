@@ -1,12 +1,12 @@
 {
-  UserSession userSession=MockUserSession.create().setUserId(1).setLogin("john").setPermissions(UserRole.USER);
+  when(authorizationDao.selectGlobalPermissions("john")).thenReturn(newArrayList(UserRole.USER));
   when(issueFilterDao.selectById(1L)).thenReturn(new IssueFilterDto().setId(1L).setName("My Old Filter").setUserLogin("arthur").setShared(true));
   try {
     service.update(new DefaultIssueFilter().setId(1L).setName("My New Filter"),userSession);
     fail();
   }
- catch (  ForbiddenException e) {
-    assertThat(e).hasMessage("User is not authorized to modify this filter");
-    verify(issueFilterDao,never()).update(any(IssueFilterDto.class));
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalStateException.class).hasMessage("User is not authorized to modify this filter");
   }
+  verify(issueFilterDao,never()).update(any(IssueFilterDto.class));
 }
