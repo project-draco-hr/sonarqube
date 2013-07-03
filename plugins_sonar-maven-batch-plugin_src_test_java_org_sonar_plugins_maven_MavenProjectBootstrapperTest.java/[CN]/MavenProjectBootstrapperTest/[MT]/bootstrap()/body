@@ -1,0 +1,14 @@
+{
+  ProjectDefinition def=mock(ProjectDefinition.class);
+  MavenSession session=mock(MavenSession.class);
+  MavenProject rootProject=new MavenProject();
+  rootProject.setExecutionRoot(true);
+  List<MavenProject> projects=Arrays.asList(rootProject);
+  when(session.getSortedProjects()).thenReturn(projects);
+  MavenProjectConverter pomConverter=mock(MavenProjectConverter.class);
+  when(pomConverter.configure(projects,rootProject)).thenReturn(def);
+  MavenProjectBootstrapper bootstrapper=new MavenProjectBootstrapper(session,pomConverter);
+  ProjectReactor reactor=bootstrapper.bootstrap();
+  assertThat(reactor).isNotNull();
+  verify(pomConverter).configure(projects,rootProject);
+}

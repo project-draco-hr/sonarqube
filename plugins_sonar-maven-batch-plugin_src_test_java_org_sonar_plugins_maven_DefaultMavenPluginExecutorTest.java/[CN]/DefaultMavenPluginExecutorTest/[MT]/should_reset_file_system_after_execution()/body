@@ -1,0 +1,16 @@
+{
+  DefaultMavenPluginExecutor executor=new DefaultMavenPluginExecutor(null,null){
+    @Override public void concreteExecute(    MavenProject pom,    String goal){
+      pom.addCompileSourceRoot("src/java");
+    }
+  }
+;
+  MavenProject pom=new MavenProject();
+  pom.setFile(new File("target/AbstractMavenPluginExecutorTest/pom.xml"));
+  pom.getBuild().setDirectory("target");
+  Project foo=new Project("foo");
+  foo.setPom(pom);
+  DefaultModuleFileSystem fs=mock(DefaultModuleFileSystem.class);
+  executor.execute(foo,fs,new AddSourceMavenPluginHandler());
+  verify(fs).resetDirs(any(File.class),any(File.class),anyList(),anyList(),anyList());
+}
