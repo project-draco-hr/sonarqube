@@ -1,0 +1,18 @@
+{
+  IDatabaseConnection connection=null;
+  try {
+    IDataSet[] dataSets=new IDataSet[dataSetStream.length];
+    for (int i=0; i < dataSetStream.length; i++) {
+      dataSets[i]=dbUnitDataSet(dataSetStream[i]);
+    }
+    tester.setDataSet(new CompositeDataSet(dataSets));
+    connection=dbUnitConnection();
+    new InsertIdentityOperation(DatabaseOperation.INSERT).execute(connection,tester.getDataSet());
+  }
+ catch (  Exception e) {
+    throw translateException("Could not setup DBUnit data",e);
+  }
+ finally {
+    closeQuietly(connection);
+  }
+}

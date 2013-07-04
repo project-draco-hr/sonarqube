@@ -1,0 +1,22 @@
+{
+  InputStream[] streams=new InputStream[testNames.length];
+  try {
+    for (int i=0; i < testNames.length; i++) {
+      String path="/" + testClass.getName().replace('.','/') + "/"+ testNames[i];
+      streams[i]=testClass.getResourceAsStream(path);
+      if (streams[i] == null) {
+        throw new IllegalStateException("DbUnit file not found: " + path);
+      }
+    }
+    prepareDbUnit(streams);
+    commands.resetPrimaryKeys(db.getDataSource());
+  }
+ catch (  SQLException e) {
+    throw translateException("Could not setup DBUnit data",e);
+  }
+ finally {
+    for (    InputStream stream : streams) {
+      IOUtils.closeQuietly(stream);
+    }
+  }
+}

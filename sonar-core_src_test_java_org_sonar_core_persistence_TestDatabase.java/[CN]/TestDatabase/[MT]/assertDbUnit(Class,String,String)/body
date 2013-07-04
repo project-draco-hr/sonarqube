@@ -1,0 +1,29 @@
+{
+  IDatabaseConnection connection=null;
+  try {
+    connection=dbUnitConnection();
+    IDataSet dataSet=connection.createDataSet();
+    String path="/" + testClass.getName().replace('.','/') + "/"+ filename;
+    IDataSet expectedDataSet=dbUnitDataSet(testClass.getResourceAsStream(path));
+    for (    String table : tables) {
+      DiffCollectingFailureHandler diffHandler=new DiffCollectingFailureHandler();
+      Assertion.assertEquals(expectedDataSet.getTable(table),dataSet.getTable(table),diffHandler);
+      List diffList=diffHandler.getDiffList();
+      for (      Object o : diffList) {
+        Difference diff=(Difference)o;
+        if (!"[ignore]".equals(diff.getExpectedValue())) {
+          throw new DatabaseUnitException(diff.toString());
+        }
+      }
+    }
+  }
+ catch (  DatabaseUnitException e) {
+    fail(e.getMessage());
+  }
+catch (  Exception e) {
+    throw translateException("Error while checking results",e);
+  }
+ finally {
+    closeQuietly(connection);
+  }
+}

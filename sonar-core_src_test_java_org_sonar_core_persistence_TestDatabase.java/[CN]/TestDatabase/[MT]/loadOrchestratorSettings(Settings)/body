@@ -1,0 +1,29 @@
+{
+  String url=settings.getString("orchestrator.configUrl");
+  URI uri=new URI(url);
+  InputStream input=null;
+  try {
+    if (url.startsWith("file:")) {
+      File file=new File(uri);
+      input=FileUtils.openInputStream(file);
+    }
+ else {
+      HttpURLConnection connection=(HttpURLConnection)uri.toURL().openConnection();
+      int responseCode=connection.getResponseCode();
+      if (responseCode >= 400) {
+        throw new IllegalStateException("Fail to request: " + uri + ". Status code="+ responseCode);
+      }
+      input=connection.getInputStream();
+    }
+    Properties props=new Properties();
+    props.load(input);
+    settings.addProperties(props);
+    for (    Map.Entry<String,String> entry : settings.getProperties().entrySet()) {
+      String interpolatedValue=StrSubstitutor.replace(entry.getValue(),System.getenv(),"${","}");
+      settings.setProperty(entry.getKey(),interpolatedValue);
+    }
+  }
+  finally {
+    IOUtils.closeQuietly(input);
+  }
+}

@@ -1,0 +1,20 @@
+{
+  List<Object[]> allParams=Lists.newArrayList();
+  for (  Map<String,Object> comment : comments) {
+    String login=login((Long)comment.get("userId"));
+    if (login != null) {
+      Object[] params=new Object[6];
+      params[0]=UUID.randomUUID().toString();
+      params[1]=comment.get("issueKey");
+      params[2]=login;
+      params[3]=comment.get("reviewText");
+      params[4]=comment.get("createdAt");
+      params[5]=comment.get("updatedAt");
+      allParams.add(params);
+    }
+  }
+  if (!allParams.isEmpty()) {
+    runner.batch(writeConnection,"INSERT INTO issue_changes(kee, issue_key, user_login, change_type, change_data, created_at, updated_at) VALUES (?, ?, ?, 'comment', ?, ?, ?)",allParams.toArray(new Object[allParams.size()][]));
+    writeConnection.commit();
+  }
+}

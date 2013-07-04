@@ -1,0 +1,63 @@
+{
+  List<Map<String,Object>> rows=runner.query(readConnection,ViolationHandler.SQL,new ViolationHandler(),violationIds);
+  List<Object[]> allParams=Lists.newArrayList();
+  List<Map<String,Object>> allComments=Lists.newArrayList();
+  for (  Map<String,Object> row : rows) {
+    Long componentId=(Long)row.get("projectId");
+    if (componentId == null) {
+      continue;
+    }
+    String issueKey=UUID.randomUUID().toString();
+    String status, severity, reporter=null;
+    boolean manualSeverity;
+    Date createdAt=Objects.firstNonNull((Date)row.get("createdAt"),oneYearAgo);
+    Date updatedAt;
+    Long reviewId=(Long)row.get("reviewId");
+    if (reviewId == null) {
+      status="OPEN";
+      manualSeverity=false;
+      severity=(String)row.get("severity");
+      updatedAt=createdAt;
+    }
+ else {
+      String reviewStatus=(String)row.get("reviewStatus");
+      status=("OPEN".equals(reviewStatus) ? "CONFIRMED" : reviewStatus);
+      manualSeverity=Objects.firstNonNull((Boolean)row.get("reviewManualSeverity"),false);
+      severity=(String)row.get("reviewSeverity");
+      updatedAt=Objects.firstNonNull((Date)row.get("reviewUpdatedAt"),oneYearAgo);
+      if ((Boolean)row.get("reviewManualViolation")) {
+        reporter=login((Long)row.get("reviewReporterId"));
+      }
+      List<Map<String,Object>> comments=runner.query(readConnection,ReviewCommentsHandler.SQL + reviewId,new ReviewCommentsHandler());
+      for (      Map<String,Object> comment : comments) {
+        comment.put("issueKey",issueKey);
+        allComments.add(comment);
+      }
+    }
+    Object[] params=new Object[20];
+    params[0]=issueKey;
+    params[1]=componentId;
+    params[2]=row.get("rootProjectId");
+    params[3]=row.get("ruleId");
+    params[4]=severity;
+    params[5]=manualSeverity;
+    params[6]=row.get("message");
+    params[7]=row.get("line");
+    params[8]=row.get("cost");
+    params[9]=status;
+    params[10]=row.get("reviewResolution");
+    params[11]=row.get("checksum");
+    params[12]=reporter;
+    params[13]=login((Long)row.get("reviewAssigneeId"));
+    params[14]=plan((Long)row.get("planId"));
+    params[15]=row.get("reviewData");
+    params[16]=createdAt;
+    params[17]=updatedAt;
+    params[18]=createdAt;
+    params[19]=updatedAt;
+    allParams.add(params);
+  }
+  runner.batch(writeConnection,insertSql,allParams.toArray(new Object[allParams.size()][]));
+  writeConnection.commit();
+  insertComments(writeConnection,allComments);
+}

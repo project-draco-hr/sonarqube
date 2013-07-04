@@ -2,9 +2,14 @@
   Connection connection=dataSource.getConnection();
   connection.setAutoCommit(false);
   Statement statement=connection.createStatement();
-  for (  String table : DatabaseUtils.TABLE_NAMES) {
-    statement.executeUpdate("TRUNCATE TABLE " + table);
-    connection.commit();
+  for (  String table : DatabaseVersion.TABLES) {
+    try {
+      statement.executeUpdate("TRUNCATE TABLE " + table);
+      connection.commit();
+    }
+ catch (    Exception e) {
+      connection.rollback();
+    }
   }
   statement.close();
   connection.close();

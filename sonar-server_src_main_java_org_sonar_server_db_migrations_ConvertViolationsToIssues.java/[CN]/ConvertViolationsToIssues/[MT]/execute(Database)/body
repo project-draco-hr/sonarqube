@@ -1,0 +1,17 @@
+{
+  Connection readConnection=null, writeConnection=null;
+  try {
+    readConnection=db.getDataSource().getConnection();
+    writeConnection=db.getDataSource().getConnection();
+    writeConnection.setAutoCommit(false);
+    truncateIssueTables(writeConnection);
+    convertViolations(readConnection,new Converter(db,runner,readConnection,writeConnection));
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Fail to convert violations to issues",e);
+  }
+ finally {
+    DbUtils.closeQuietly(readConnection);
+    DbUtils.closeQuietly(writeConnection);
+  }
+}
