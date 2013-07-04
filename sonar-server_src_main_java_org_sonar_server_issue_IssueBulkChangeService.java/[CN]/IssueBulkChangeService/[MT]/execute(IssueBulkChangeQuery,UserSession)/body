@@ -1,6 +1,6 @@
 {
   LOG.debug("BulkChangeQuery : {}",issueBulkChangeQuery);
-  verifyLoggedIn(userSession);
+  userSession.checkLoggedIn();
   IssueBulkChangeResult result=new IssueBulkChangeResult();
   IssueQueryResult issueQueryResult=issueFinder.find(IssueQuery.builder().issueKeys(issueBulkChangeQuery.issues()).pageSize(-1).requiredRole(UserRole.USER).build());
   List<Issue> issues=issueQueryResult.issues();
@@ -8,7 +8,7 @@
   for (  String actionName : issueBulkChangeQuery.actions()) {
     Action action=getAction(actionName);
     if (action == null) {
-      throw new IllegalArgumentException("The action : '" + actionName + "' is unknown");
+      throw new BadRequestException("The action : '" + actionName + "' is unknown");
     }
     action.verify(issueBulkChangeQuery.properties(actionName),issues,userSession);
     bulkActions.add(action);
