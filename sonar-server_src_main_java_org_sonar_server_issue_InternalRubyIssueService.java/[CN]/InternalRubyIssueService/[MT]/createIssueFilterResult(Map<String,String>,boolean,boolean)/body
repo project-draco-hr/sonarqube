@@ -1,5 +1,4 @@
 {
-  Result<DefaultIssueFilter> result=Result.of();
   String id=params.get("id");
   String name=params.get("name");
   String description=params.get("description");
@@ -8,19 +7,16 @@
   Boolean sharedParam=RubyUtils.toBoolean(params.get("shared"));
   boolean shared=sharedParam != null ? sharedParam : false;
   if (checkId) {
-    checkMandatoryParameter(id,"id",result);
+    checkMandatoryParameter(id,"id");
   }
   if (checkUser) {
-    checkMandatoryParameter(user,"user",result);
+    checkMandatoryParameter(user,"user");
   }
-  checkMandatorySizeParameter(name,"name",100,result);
-  checkOptionalSizeParameter(description,"description",4000,result);
-  if (result.ok()) {
-    DefaultIssueFilter defaultIssueFilter=DefaultIssueFilter.create(name).setDescription(description).setShared(shared).setUser(user).setData(data);
-    if (!Strings.isNullOrEmpty(id)) {
-      defaultIssueFilter.setId(Long.valueOf(id));
-    }
-    result.set(defaultIssueFilter);
+  checkMandatorySizeParameter(name,"name",100);
+  checkOptionalSizeParameter(description,"description",4000);
+  DefaultIssueFilter defaultIssueFilter=DefaultIssueFilter.create(name).setDescription(description).setShared(shared).setUser(user).setData(data);
+  if (!Strings.isNullOrEmpty(id)) {
+    defaultIssueFilter.setId(Long.valueOf(id));
   }
-  return result;
+  return defaultIssueFilter;
 }

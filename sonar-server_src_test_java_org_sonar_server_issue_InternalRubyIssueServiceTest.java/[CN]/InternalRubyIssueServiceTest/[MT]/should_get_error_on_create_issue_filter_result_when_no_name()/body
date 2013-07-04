@@ -1,9 +1,14 @@
 {
   Map<String,String> parameters=newHashMap();
-  parameters.put("name",null);
+  parameters.put("name","");
   parameters.put("description","Long term issues");
   parameters.put("user","John");
-  Result result=service.createIssueFilterResultForNew(parameters);
-  assertThat(result.ok()).isFalse();
-  assertThat(result.errors()).contains(Result.Message.ofL10n("errors.cant_be_empty","name"));
+  try {
+    service.createIssueFilterResultForNew(parameters);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(BadRequestException.class);
+    checkBadRequestException(e,"errors.cant_be_empty","name");
+  }
 }

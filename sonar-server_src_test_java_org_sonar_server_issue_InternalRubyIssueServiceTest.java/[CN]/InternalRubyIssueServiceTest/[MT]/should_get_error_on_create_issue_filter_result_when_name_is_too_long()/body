@@ -3,7 +3,12 @@
   parameters.put("name",createLongString(101));
   parameters.put("description","Long term issues");
   parameters.put("user","John");
-  Result result=service.createIssueFilterResultForNew(parameters);
-  assertThat(result.ok()).isFalse();
-  assertThat(result.errors()).contains(Result.Message.ofL10n("errors.is_too_long","name",100));
+  try {
+    service.createIssueFilterResultForNew(parameters);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(BadRequestException.class);
+    checkBadRequestException(e,"errors.is_too_long","name",100);
+  }
 }
