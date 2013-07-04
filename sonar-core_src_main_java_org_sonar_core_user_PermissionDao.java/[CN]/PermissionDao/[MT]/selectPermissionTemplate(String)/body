@@ -3,7 +3,9 @@
   SqlSession session=myBatis.openSession();
   try {
     PermissionTemplateMapper mapper=session.getMapper(PermissionTemplateMapper.class);
-    permissionTemplate=mapper.selectByName(templateName);
+    permissionTemplate=mapper.selectTemplateUsersPermissions(templateName);
+    PermissionTemplateDto templateWithGroupsPermissions=mapper.selectTemplateGroupsPermissions(templateName);
+    permissionTemplate.setGroupsByPermission(templateWithGroupsPermissions.getGroupsPermissions());
     session.commit();
   }
   finally {
