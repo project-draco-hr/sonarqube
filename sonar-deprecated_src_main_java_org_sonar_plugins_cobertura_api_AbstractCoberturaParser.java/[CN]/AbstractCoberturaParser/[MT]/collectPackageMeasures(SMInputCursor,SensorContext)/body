@@ -1,0 +1,15 @@
+{
+  while (pack.getNext() != null) {
+    Map<String,CoverageMeasuresBuilder> builderByFilename=Maps.newHashMap();
+    collectFileMeasures(pack.descendantElementCursor("class"),builderByFilename);
+    for (    Map.Entry<String,CoverageMeasuresBuilder> entry : builderByFilename.entrySet()) {
+      String filename=sanitizeFilename(entry.getKey());
+      Resource file=getResource(filename);
+      if (fileExists(context,file)) {
+        for (        Measure measure : entry.getValue().createMeasures()) {
+          context.saveMeasure(file,measure);
+        }
+      }
+    }
+  }
+}
