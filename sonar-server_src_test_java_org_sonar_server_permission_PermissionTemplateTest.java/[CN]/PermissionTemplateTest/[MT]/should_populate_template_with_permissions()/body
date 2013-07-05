@@ -1,0 +1,11 @@
+{
+  PermissionTemplateDto permissionTemplateDto=new PermissionTemplateDto().setId(1L).setName("name").setDescription("description").setUsersPermissions(Lists.newArrayList(new PermissionTemplateUserDto().setId(1L).setUserName("user1").setPermission("permission1"),new PermissionTemplateUserDto().setId(2L).setUserName("user1").setPermission("permission2"),new PermissionTemplateUserDto().setId(3L).setUserName("user2").setPermission("permission1"))).setGroupsByPermission(Lists.newArrayList(new PermissionTemplateGroupDto().setId(1L).setGroupName("group1").setPermission("permission3"),new PermissionTemplateGroupDto().setId(2L).setGroupName("group2").setPermission("permission3")));
+  PermissionTemplate permissionTemplate=PermissionTemplate.create(permissionTemplateDto);
+  assertThat(permissionTemplate.getId()).isEqualTo(1L);
+  assertThat(permissionTemplate.getName()).isEqualTo("name");
+  assertThat(permissionTemplate.getDescription()).isEqualTo("description");
+  assertThat(permissionTemplate.getUsersForPermission("unmatchedPermission")).isEmpty();
+  assertThat(permissionTemplate.getUsersForPermission("permission1")).containsOnly("user1","user2");
+  assertThat(permissionTemplate.getUsersForPermission("permission2")).containsOnly("user1");
+  assertThat(permissionTemplate.getGroupsForPermission("permission3")).containsOnly("group1","group2");
+}
