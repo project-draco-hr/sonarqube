@@ -1,5 +1,6 @@
 {
   LOG.debug("BulkChangeQuery : {}",issueBulkChangeQuery);
+  long start=System.currentTimeMillis();
   userSession.checkLoggedIn();
   IssueBulkChangeResult result=new IssueBulkChangeResult();
   IssueQueryResult issueQueryResult=issueFinder.find(IssueQuery.builder().issueKeys(issueBulkChangeQuery.issues()).pageSize(-1).requiredRole(UserRole.USER).build());
@@ -35,5 +36,6 @@
       issueNotifications.sendChanges((DefaultIssue)issue,issueChangeContext,issueQueryResult);
     }
   }
+  LOG.debug("BulkChange execution time : {} ms",System.currentTimeMillis() - start);
   return result;
 }
