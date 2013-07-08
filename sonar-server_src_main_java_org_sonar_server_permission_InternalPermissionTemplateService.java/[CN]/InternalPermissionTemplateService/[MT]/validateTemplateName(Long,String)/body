@@ -1,8 +1,13 @@
 {
+  if (templateName == null) {
+    String errorMsg="The name field is mandatory";
+    LOG.error(errorMsg);
+    throw new BadRequestException(errorMsg);
+  }
   List<PermissionTemplateDto> existingTemplates=permissionDao.selectAllPermissionTemplates();
   if (existingTemplates != null) {
     for (    PermissionTemplateDto existingTemplate : existingTemplates) {
-      if (existingTemplate.getName().equals(name)) {
+      if ((templateId == null || templateId != existingTemplate.getId()) && (existingTemplate.getName().equals(templateName))) {
         String errorMsg="A template with that name already exists";
         LOG.error(errorMsg);
         throw new BadRequestException(errorMsg);
