@@ -3,8 +3,9 @@
   FileLinesContext context=mock(FileLinesContext.class);
   when(context.getStringValue("authors_by_line",1)).thenReturn("julien");
   when(fileLineContextFactory.createFor(resource)).thenReturn(context);
-  DefaultIssue newIssue=newDefaultIssue("message",null,RuleKey.of("squid","AvoidCycle"),"checksum1");
+  DefaultIssue newIssue=mock(DefaultIssue.class);
+  when(newIssue.line()).thenReturn(null);
   when(resource.getScope()).thenReturn(Scopes.FILE);
-  tracking.setScmAuthorOnNewIssues(resource,Arrays.asList(newIssue));
-  assertThat(newIssue.authorLogin()).isNull();
+  decorator.setScmAuthorOnNewIssues(resource,Arrays.asList(newIssue));
+  verify(newIssue,never()).setAuthorLogin(anyString());
 }
