@@ -1,5 +1,6 @@
 {
-  String[] groupNames=settings.getStringArrayBySeparator("sonar.role." + role + "."+ resource.getQualifier()+ ".defaultGroups",",");
+  PermissionTemplateDto applicablePermissionTemplate=getPermissionTemplate(resource.getQualifier());
+  List<String> groupNames=getEligibleGroups(role,applicablePermissionTemplate);
   for (  String groupName : groupNames) {
     GroupRoleDto groupRole=new GroupRoleDto().setRole(role).setResourceId(Long.valueOf(resource.getId()));
     if (DefaultGroups.isAnyone(groupName)) {
@@ -12,7 +13,7 @@
       }
     }
   }
-  String[] logins=settings.getStringArrayBySeparator("sonar.role." + role + "."+ resource.getQualifier()+ ".defaultUsers",",");
+  List<String> logins=getEligibleUsers(role,applicablePermissionTemplate);
   for (  String login : logins) {
     UserDto user=userDao.selectActiveUserByLogin(login,session);
     if (user != null) {
