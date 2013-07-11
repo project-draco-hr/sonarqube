@@ -1,0 +1,15 @@
+{
+  SqlSession session=myBatis.openSession();
+  try {
+    UserDto user=session.getMapper(UserMapper.class).selectUserByLogin(userLogin);
+    if (user != null) {
+      UserRoleDto userRole=new UserRoleDto().setRole(permission).setUserId(user.getId()).setResourceId(Long.valueOf(resourceId));
+      roleDao.deleteUserRole(userRole,session);
+      roleDao.insertUserRole(userRole,session);
+      session.commit();
+    }
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

@@ -1,0 +1,22 @@
+{
+  SqlSession session=myBatis.openSession();
+  try {
+    PermissionTemplateDto permissionTemplate=getPermissionTemplate(templateId);
+    List<PermissionTemplateUserDto> usersPermissions=permissionTemplate.getUsersPermissions();
+    if (usersPermissions != null) {
+      for (      PermissionTemplateUserDto userPermission : usersPermissions) {
+        addUserPermission(resourceId,userPermission.getUserLogin(),userPermission.getPermission(),session);
+      }
+    }
+    List<PermissionTemplateGroupDto> groupsPermissions=permissionTemplate.getGroupsPermissions();
+    if (groupsPermissions != null) {
+      for (      PermissionTemplateGroupDto groupPermission : groupsPermissions) {
+        addGroupPermission(resourceId,groupPermission.getGroupName(),groupPermission.getPermission(),session);
+      }
+    }
+    session.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

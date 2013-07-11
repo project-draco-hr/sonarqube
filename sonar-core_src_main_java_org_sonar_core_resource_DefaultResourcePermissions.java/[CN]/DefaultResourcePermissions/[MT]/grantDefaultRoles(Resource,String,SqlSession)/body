@@ -2,23 +2,12 @@
   PermissionTemplateDto applicablePermissionTemplate=getPermissionTemplate(resource.getQualifier());
   List<String> groupNames=getEligibleGroups(role,applicablePermissionTemplate);
   for (  String groupName : groupNames) {
-    GroupRoleDto groupRole=new GroupRoleDto().setRole(role).setResourceId(Long.valueOf(resource.getId()));
-    if (DefaultGroups.isAnyone(groupName)) {
-      roleDao.insertGroupRole(groupRole,session);
-    }
- else {
-      GroupDto group=userDao.selectGroupByName(groupName,session);
-      if (group != null) {
-        roleDao.insertGroupRole(groupRole.setGroupId(group.getId()),session);
-      }
-    }
+    Long resourceId=Long.valueOf(resource.getId());
+    permissionFacade.addGroupPermission(resourceId,groupName,role,session);
   }
   List<String> logins=getEligibleUsers(role,applicablePermissionTemplate);
   for (  String login : logins) {
-    UserDto user=userDao.selectActiveUserByLogin(login,session);
-    if (user != null) {
-      UserRoleDto userRoleDto=new UserRoleDto().setRole(role).setUserId(user.getId()).setResourceId(Long.valueOf(resource.getId()));
-      roleDao.insertUserRole(userRoleDto,session);
-    }
+    Long resourceId=Long.valueOf(resource.getId());
+    permissionFacade.addUserPermission(resourceId,login,role,session);
   }
 }
