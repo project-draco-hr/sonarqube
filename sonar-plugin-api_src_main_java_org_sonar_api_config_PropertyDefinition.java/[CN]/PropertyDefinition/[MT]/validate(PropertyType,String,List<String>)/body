@@ -1,27 +1,16 @@
 {
   if (StringUtils.isNotBlank(value)) {
     if (type == PropertyType.BOOLEAN) {
-      if (!StringUtils.equalsIgnoreCase(value,"true") && !StringUtils.equalsIgnoreCase(value,"false")) {
-        return Result.newError("notBoolean");
-      }
+      return validateBoolean(value);
     }
  else     if (type == PropertyType.INTEGER) {
-      if (!NumberUtils.isDigits(value)) {
-        return Result.newError("notInteger");
-      }
+      return validateInteger(value);
     }
  else     if (type == PropertyType.FLOAT) {
-      try {
-        Double.parseDouble(value);
-      }
- catch (      NumberFormatException e) {
-        return Result.newError("notFloat");
-      }
+      return validateFloat(value);
     }
- else     if (type == PropertyType.SINGLE_SELECT_LIST) {
-      if (!options.contains(value)) {
-        return Result.newError("notInOptions");
-      }
+ else     if (type == PropertyType.SINGLE_SELECT_LIST && !options.contains(value)) {
+      return Result.newError("notInOptions");
     }
   }
   return Result.SUCCESS;
