@@ -7,17 +7,20 @@
       projectKey=String.format("%s:%s",projectKey,branch);
     }
     if (StringUtils.isBlank(projectKey)) {
-      server.download("/batch_bootstrap/db",toFile);
+      server.download("/batch_bootstrap/db",toFile,readTimeout);
     }
  else {
-      server.download("/batch_bootstrap/db?project=" + projectKey,toFile);
+      server.download("/batch_bootstrap/db?project=" + projectKey,toFile,readTimeout);
     }
     LOG.debug("Dry Run database size: {}",FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(toFile)));
   }
  catch (  SonarException e) {
     Throwable rootCause=Throwables.getRootCause(e);
+    if (rootCause instanceof SocketTimeoutException) {
+      throw new SonarException(new SonarException(String.format("DryRun database read timed out after %s ms. You can try to increase read timeout with property -D" + CoreProperties.DRY_RUN_READ_TIMEOUT,readTimeout),e));
+    }
     if (projectKey != null && (rootCause instanceof HttpException) && (((HttpException)rootCause).getResponseCode() == 401)) {
-      throw new SonarException(String.format("You don't have access rights to project [%s]",projectKey),e);
+      throw new SonarException(new SonarException(String.format("You don't have access rights to project [%s]",projectKey),e));
     }
     throw e;
   }

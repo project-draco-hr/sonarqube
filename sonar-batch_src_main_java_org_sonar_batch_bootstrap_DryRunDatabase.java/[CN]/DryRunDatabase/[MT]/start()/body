@@ -2,7 +2,9 @@
   if (settings.getBoolean(CoreProperties.DRY_RUN)) {
     LOG.info("Dry run");
     File databaseFile=tempDirectories.getFile("","dryrun.h2.db");
-    downloadDatabase(databaseFile);
+    int readTimeout=settings.getInt(CoreProperties.DRY_RUN_READ_TIMEOUT);
+    readTimeout=(readTimeout == 0) ? DEFAULT_DRY_RUN_READ_TIMEOUT : readTimeout;
+    downloadDatabase(databaseFile,readTimeout);
     String databasePath=StringUtils.removeEnd(databaseFile.getAbsolutePath(),".h2.db");
     replaceSettings(databasePath);
   }

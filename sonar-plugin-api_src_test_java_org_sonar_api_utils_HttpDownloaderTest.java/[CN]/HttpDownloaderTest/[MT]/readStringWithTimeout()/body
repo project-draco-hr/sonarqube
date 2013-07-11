@@ -1,0 +1,13 @@
+{
+  String text=new HttpDownloader(new Settings(),2000).readString(new URI(baseUrl + "/timeout/"),Charsets.UTF_8);
+  assertThat(text.length()).isGreaterThan(10);
+  thrown.expect(new BaseMatcher<Exception>(){
+    @Override public boolean matches(    Object ex){
+      return ex instanceof SonarException && ((SonarException)ex).getCause() instanceof SocketTimeoutException;
+    }
+    @Override public void describeTo(    Description arg0){
+    }
+  }
+);
+  new HttpDownloader(new Settings(),100).readString(new URI(baseUrl + "/timeout/"),Charsets.UTF_8);
+}
