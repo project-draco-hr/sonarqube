@@ -1,20 +1,8 @@
 {
-  try {
-    StaxParser parser=new StaxParser(new StaxParser.XmlStreamHandler(){
-      public void stream(      SMHierarchicCursor rootCursor) throws XMLStreamException {
-        try {
-          rootCursor.advance();
-          collectPackageMeasures(rootCursor.descendantElementCursor("package"),context);
-        }
- catch (        ParseException e) {
-          throw new XMLStreamException(e);
-        }
-      }
+  CoberturaReportParserUtils.parseReport(xmlFile,context,new FileResolver(){
+    @Override public Resource<?> resolve(    String filename){
+      return getResource(filename);
     }
+  }
 );
-    parser.parse(xmlFile);
-  }
- catch (  XMLStreamException e) {
-    throw new XmlParserException(e);
-  }
 }
