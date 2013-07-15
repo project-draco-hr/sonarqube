@@ -1,5 +1,9 @@
 {
-  EmbeddedRunner runner=EmbeddedRunner.create().setApp("Maven",getMavenVersion()).addProperties(session.getExecutionProperties()).addProperties(project.getModel().getProperties()).addProperties(session.getUserProperties());
+  ArtifactVersion mavenVersion=getMavenVersion();
+  if (mavenVersion.getMajorVersion() == 2 && mavenVersion.getMinorVersion() < 2) {
+    throw new MojoExecutionException("Please use at least Maven 2.2.x to perform SonarQube analysis (current version is " + mavenVersion.toString() + ")");
+  }
+  EmbeddedRunner runner=EmbeddedRunner.create().setApp("Maven",mavenVersion.toString()).addProperties(session.getExecutionProperties()).addProperties(project.getModel().getProperties()).addProperties(session.getUserProperties());
   String encoding=getSourceEncoding(project);
   if (encoding != null) {
     runner.setProperty(ScanProperties.PROJECT_SOURCE_ENCODING,encoding);
