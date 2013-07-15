@@ -4,7 +4,13 @@
     groupId=null;
   }
  else {
-    groupId=userDao.selectGroupByName(groupName).getId();
+    GroupDto groupDto=userDao.selectGroupByName(groupName);
+    if (groupDto != null) {
+      groupId=userDao.selectGroupByName(groupName).getId();
+    }
+ else {
+      throw new IllegalArgumentException("Cannot setup default permission for group: " + groupName);
+    }
   }
   permissionDao.addGroupPermission(template.getId(),groupId,permission);
 }
