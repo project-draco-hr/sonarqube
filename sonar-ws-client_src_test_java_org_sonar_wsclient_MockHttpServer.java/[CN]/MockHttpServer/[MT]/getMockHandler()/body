@@ -2,12 +2,17 @@
   Handler handler=new AbstractHandler(){
     @Override public void handle(    String target,    Request baseRequest,    HttpServletRequest httpServletRequest,    HttpServletResponse response) throws IOException, ServletException {
       requestPath=baseRequest.getUri().toString();
-      requestBody=IOUtils.toString(baseRequest.getInputStream());
       requestHeaders.clear();
-      Enumeration headerNames=baseRequest.getHeaderNames();
-      while (headerNames.hasMoreElements()) {
-        String headerName=(String)headerNames.nextElement();
+      Enumeration names=baseRequest.getHeaderNames();
+      while (names.hasMoreElements()) {
+        String headerName=(String)names.nextElement();
         requestHeaders.put(headerName,baseRequest.getHeader(headerName));
+      }
+      requestParams.clear();
+      names=baseRequest.getParameterNames();
+      while (names.hasMoreElements()) {
+        String headerName=(String)names.nextElement();
+        requestParams.put(headerName,baseRequest.getParameter(headerName));
       }
       response.setStatus(responseStatus);
       response.setContentType("application/json;charset=utf-8");

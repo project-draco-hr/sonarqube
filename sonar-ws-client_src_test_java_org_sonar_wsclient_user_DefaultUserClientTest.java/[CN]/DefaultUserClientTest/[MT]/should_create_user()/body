@@ -2,7 +2,8 @@
   httpServer.stubResponseBody("{\"user\":{\"login\":\"daveloper\",\"name\":\"daveloper\",\"email\":null}}");
   UserParameters params=UserParameters.create().login("daveloper").password("pass1").passwordConfirmation("pass1");
   User createdUser=client.create(params);
-  assertThatRequestUrlContains("/api/users/create?","login=daveloper","password=pass1","password_confirmation=pass1");
+  assertThat(httpServer.requestedPath()).isEqualTo("/api/users/create");
+  assertThat(httpServer.requestParams()).includes(entry("login","daveloper"),entry("password","pass1"),entry("password_confirmation","pass1"));
   assertThat(createdUser).isNotNull();
   assertThat(createdUser.login()).isEqualTo("daveloper");
   assertThat(createdUser.name()).isEqualTo("daveloper");
