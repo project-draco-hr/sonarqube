@@ -1,0 +1,24 @@
+{
+  Map<Category,Map<SubCategory,Collection<PropertyDefinition>>> byCategory=new HashMap<Category,Map<SubCategory,Collection<PropertyDefinition>>>();
+  if (qualifier == null) {
+    byCategory.put(new Category("email",true),new HashMap<SubCategory,Collection<PropertyDefinition>>());
+    byCategory.put(new Category("encryption",true),new HashMap<SubCategory,Collection<PropertyDefinition>>());
+    HashMap<SubCategory,Collection<PropertyDefinition>> licenseSubCategories=new HashMap<SubCategory,Collection<PropertyDefinition>>();
+    licenseSubCategories.put(new SubCategory("server_id",true),new ArrayList<PropertyDefinition>());
+    byCategory.put(new Category(CoreProperties.CATEGORY_LICENSES,false),licenseSubCategories);
+  }
+  for (  PropertyDefinition definition : getAll()) {
+    if (qualifier == null ? definition.global() : definition.qualifiers().contains(qualifier)) {
+      Category category=categories.get(definition.key());
+      if (!byCategory.containsKey(category)) {
+        byCategory.put(category,new HashMap<SubCategory,Collection<PropertyDefinition>>());
+      }
+      SubCategory subCategory=subcategories.get(definition.key());
+      if (!byCategory.get(category).containsKey(subCategory)) {
+        byCategory.get(category).put(subCategory,new ArrayList<PropertyDefinition>());
+      }
+      byCategory.get(category).get(subCategory).add(definition);
+    }
+  }
+  return byCategory;
+}
