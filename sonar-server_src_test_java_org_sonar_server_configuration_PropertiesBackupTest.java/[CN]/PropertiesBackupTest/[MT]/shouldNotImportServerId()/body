@@ -1,8 +1,10 @@
 {
-  when(persistentSettings.getString(CoreProperties.SERVER_ID)).thenReturn("111");
+  when(persistentSettings.getGlobalProperties()).thenReturn(Lists.newArrayList(new PropertyDto().setKey(CoreProperties.SERVER_ID).setValue("111")));
   Collection<Property> newProperties=Arrays.asList(new Property(CoreProperties.SERVER_ID,"999"));
   SonarConfig config=new SonarConfig();
   config.setProperties(newProperties);
   backup.importXml(config);
-  verify(persistentSettings).saveProperties(argThat(IsMapContaining.hasEntry(CoreProperties.SERVER_ID,"111")));
+  Map<String,String> expectedProperties=new HashMap<String,String>();
+  expectedProperties.put(CoreProperties.SERVER_ID,"111");
+  verify(persistentSettings).saveProperties(argThat(IsMap.containing(expectedProperties)));
 }

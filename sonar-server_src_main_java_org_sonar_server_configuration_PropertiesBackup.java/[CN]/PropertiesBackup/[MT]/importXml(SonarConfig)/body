@@ -1,15 +1,16 @@
 {
   LoggerFactory.getLogger(getClass()).info("Restore properties");
-  String serverId=persistentSettings.getString(CoreProperties.SERVER_ID);
-  String serverStartTime=persistentSettings.getString(CoreProperties.SERVER_STARTTIME);
   Map<String,String> properties=Maps.newHashMap();
   if (sonarConfig.getProperties() != null && !sonarConfig.getProperties().isEmpty()) {
     for (    Property xmlProperty : sonarConfig.getProperties()) {
       properties.put(xmlProperty.getKey(),xmlProperty.getValue());
     }
   }
-  properties.put(CoreProperties.SERVER_ID,serverId);
-  properties.put(CoreProperties.SERVER_STARTTIME,serverStartTime);
+  for (  PropertyDto property : persistentSettings.getGlobalProperties()) {
+    if (shouldNotBeErased(property.getKey())) {
+      properties.put(property.getKey(),property.getValue());
+    }
+  }
   persistentSettings.deleteProperties();
   persistentSettings.saveProperties(properties);
 }
