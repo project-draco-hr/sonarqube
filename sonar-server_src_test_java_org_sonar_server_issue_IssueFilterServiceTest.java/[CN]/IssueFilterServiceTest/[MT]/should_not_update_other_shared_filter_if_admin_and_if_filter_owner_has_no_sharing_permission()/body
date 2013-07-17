@@ -1,0 +1,13 @@
+{
+  when(authorizationDao.selectGlobalPermissions("john")).thenReturn(newArrayList(Permission.SYSTEM_ADMIN.key()));
+  when(authorizationDao.selectGlobalPermissions("arthur")).thenReturn(Collections.<String>emptyList());
+  when(issueFilterDao.selectById(1L)).thenReturn(new IssueFilterDto().setId(1L).setName("My Old Filter").setDescription("Old description").setUserLogin("arthur").setShared(true));
+  try {
+    service.update(new DefaultIssueFilter().setId(1L).setName("My New Filter").setDescription("New description").setShared(true).setUser("arthur"),userSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(ForbiddenException.class).hasMessage("User cannot own this filter because of insufficient rights");
+  }
+  verify(issueFilterDao,never()).update(any(IssueFilterDto.class));
+}

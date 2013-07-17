@@ -1,12 +1,12 @@
 {
-  UserSession userSession=MockUserSession.create().setLogin("john").setPermissions();
+  when(authorizationDao.selectGlobalPermissions("john")).thenReturn(Collections.<String>emptyList());
   when(issueFilterDao.selectById(1L)).thenReturn(new IssueFilterDto().setId(1L).setName("My Filter").setShared(false).setUserLogin("john"));
   try {
     service.update(new DefaultIssueFilter().setId(1L).setName("My Filter").setShared(true).setUser("john"),userSession);
     fail();
   }
  catch (  Exception e) {
-    assertThat(e).isInstanceOf(ForbiddenException.class).hasMessage("User is not authorized to share this filter");
+    assertThat(e).isInstanceOf(ForbiddenException.class).hasMessage("User cannot own this filter because of insufficient rights");
   }
   verify(issueFilterDao,never()).update(any(IssueFilterDto.class));
 }

@@ -1,8 +1,8 @@
 {
-  String currentUser="dave.loper";
   IssueFilterDto sharedFilter=new IssueFilterDto().setId(1L).setName("My filter").setUserLogin("former.owner").setShared(true);
   IssueFilterDto expectedDto=new IssueFilterDto().setName("My filter").setUserLogin("new.owner").setShared(true);
-  UserSession userSession=MockUserSession.create().setLogin(currentUser).setPermissions(Permission.SYSTEM_ADMIN,Permission.DASHBOARD_SHARING);
+  when(authorizationDao.selectGlobalPermissions("new.owner")).thenReturn(newArrayList(Permission.DASHBOARD_SHARING.key()));
+  when(authorizationDao.selectGlobalPermissions("john")).thenReturn(newArrayList(Permission.SYSTEM_ADMIN.key()));
   when(issueFilterDao.selectById(1L)).thenReturn(sharedFilter);
   when(issueFilterDao.selectSharedFilters()).thenReturn(Lists.newArrayList(sharedFilter));
   DefaultIssueFilter issueFilter=new DefaultIssueFilter().setId(1L).setName("My filter").setShared(true).setUser("new.owner");
