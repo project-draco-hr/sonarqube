@@ -2,9 +2,8 @@
   LOG.debug("ComponentQuery : {}",query);
   long start=System.currentTimeMillis();
   try {
-    ResourceQuery resourceQuery=ResourceQuery.create().setQualifiers(query.qualifiers().toArray(new String[]{}));
-    List<ComponentDto> dtos=ResourceDao.toComponents(resourceDao.getResources(resourceQuery));
-    Collection<Component> foundComponents=search(query,dtos);
+    List<Component> components=resourceDao.selectComponentsByQualifiers(query.qualifiers());
+    Collection<Component> foundComponents=search(query,components);
     Collection<? extends Component> sortedComponents=new ComponentsFinderSort(foundComponents,query).sort();
     Paging paging=Paging.create(query.pageSize(),query.pageIndex(),foundComponents.size());
     Collection<? extends Component> pagedComponents=pagedComponents(sortedComponents,paging);
