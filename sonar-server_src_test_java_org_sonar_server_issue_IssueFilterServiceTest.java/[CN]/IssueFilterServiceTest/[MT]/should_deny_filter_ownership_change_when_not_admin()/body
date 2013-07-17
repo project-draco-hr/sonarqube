@@ -1,11 +1,11 @@
 {
   String currentUser="dave.loper";
   IssueFilterDto sharedFilter=new IssueFilterDto().setId(1L).setName("My filter").setUserLogin(currentUser).setShared(true);
-  when(authorizationDao.selectGlobalPermissions(currentUser)).thenReturn(newArrayList(Permission.DRY_RUN_EXECUTION.key()));
+  UserSession userSession=MockUserSession.create().setLogin(currentUser).setUserId(1).setPermissions();
   when(issueFilterDao.selectById(1L)).thenReturn(sharedFilter);
   try {
     DefaultIssueFilter issueFilter=new DefaultIssueFilter().setId(1L).setName("My filter").setShared(true).setUser("new.owner");
-    service.update(issueFilter,MockUserSession.create().setUserId(1).setLogin(currentUser));
+    service.update(issueFilter,userSession);
     fail();
   }
  catch (  Exception e) {
