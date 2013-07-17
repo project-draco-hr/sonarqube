@@ -1,12 +1,12 @@
 {
   String login=getLoggedLogin(userSession);
   IssueFilterDto existingFilterDto=findIssueFilterDto(issueFilter.id(),login);
-  verifyCurrentUserCanModifyFilter(existingFilterDto.toIssueFilter(),login);
+  verifyCurrentUserCanModifyFilter(existingFilterDto.toIssueFilter(),userSession);
   verifyCurrentUserCanChangeFilterSharingFilter(issueFilter,existingFilterDto,login);
   if (!existingFilterDto.getUserLogin().equals(issueFilter.user())) {
-    verifyCurrentUserCanChangeFilterOwnership(login);
+    verifyCurrentUserCanChangeFilterOwnership(userSession);
   }
-  validateFilter(issueFilter);
+  validateFilter(issueFilter,userSession);
   deleteOtherFavoriteFiltersIfFilterBecomeUnshared(existingFilterDto,issueFilter);
   filterDao.update(IssueFilterDto.toIssueFilter(issueFilter));
   return issueFilter;
