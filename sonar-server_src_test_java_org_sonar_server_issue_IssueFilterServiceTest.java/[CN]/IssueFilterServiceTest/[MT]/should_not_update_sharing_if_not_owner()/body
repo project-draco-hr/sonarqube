@@ -1,0 +1,12 @@
+{
+  when(issueFilterDao.selectById(1L)).thenReturn(new IssueFilterDto().setId(1L).setName("Arthur Filter").setShared(true).setUserLogin("arthur"));
+  when(authorizationDao.selectGlobalPermissions("john")).thenReturn(newArrayList(Permission.SYSTEM_ADMIN.key()));
+  try {
+    service.update(new DefaultIssueFilter().setId(1L).setName("Arthur Filter").setShared(false).setUser("john"),userSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(ForbiddenException.class).hasMessage("Only owner of a filter can change sharing");
+  }
+  verify(issueFilterDao,never()).update(any(IssueFilterDto.class));
+}
