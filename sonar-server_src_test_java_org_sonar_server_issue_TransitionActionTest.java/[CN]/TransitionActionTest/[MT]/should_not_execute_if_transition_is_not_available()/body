@@ -1,0 +1,11 @@
+{
+  String transition="reopen";
+  Map<String,Object> properties=newHashMap();
+  properties.put("transition",transition);
+  DefaultIssue issue=mock(DefaultIssue.class);
+  Action.Context context=mock(Action.Context.class);
+  when(context.issue()).thenReturn(issue);
+  when(workflow.outTransitions(context.issue())).thenReturn(newArrayList(Transition.create("resolve","OPEN","RESOLVED")));
+  assertThat(action.execute(properties,context)).isFalse();
+  verify(workflow,never()).doTransition(eq(issue),eq(transition),any(IssueChangeContext.class));
+}
