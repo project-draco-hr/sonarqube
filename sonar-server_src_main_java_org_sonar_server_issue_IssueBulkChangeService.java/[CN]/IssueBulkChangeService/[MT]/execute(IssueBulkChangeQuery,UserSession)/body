@@ -20,7 +20,7 @@
     ActionContext actionContext=new ActionContext(issue,issueChangeContext);
     for (    Action action : bulkActions) {
       try {
-        if (action.supports(issue) && action.execute(issueBulkChangeQuery.properties(action.key()),actionContext)) {
+        if (applyAction(action,actionContext,issueBulkChangeQuery)) {
           result.addIssueChanged(issue);
         }
  else {
@@ -33,6 +33,9 @@
       }
     }
     if (result.issuesChanged().contains(issue)) {
+      if (issueBulkChangeQuery.hasComment()) {
+        applyAction(getAction(CommentAction.KEY),actionContext,issueBulkChangeQuery);
+      }
       issueStorage.save((DefaultIssue)issue);
       issueNotifications.sendChanges((DefaultIssue)issue,issueChangeContext,issueQueryResult);
     }

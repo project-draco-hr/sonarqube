@@ -1,0 +1,25 @@
+{
+  when(issueQueryResult.issues()).thenReturn(newArrayList((Issue)new DefaultIssue().setKey("ABCD"),new DefaultIssue().setKey("EFGH")));
+  Map<String,Object> properties=newHashMap();
+  properties.put("issues","ABCD,EFGH");
+  properties.put("actions","assign");
+  properties.put("assign.assignee","fred");
+  Action commentAction=mock(Action.class);
+  when(commentAction.key()).thenReturn("comment");
+  when(commentAction.supports(any(Issue.class))).thenReturn(true);
+  when(commentAction.verify(anyMap(),anyListOf(Issue.class),any(UserSession.class))).thenReturn(true);
+  when(commentAction.execute(anyMap(),any(IssueBulkChangeService.ActionContext.class))).thenReturn(true);
+  actions.add(commentAction);
+  Action assignAction=mock(Action.class);
+  when(assignAction.key()).thenReturn("assign");
+  when(assignAction.supports(any(Issue.class))).thenReturn(true).thenReturn(false);
+  when(assignAction.verify(anyMap(),anyListOf(Issue.class),any(UserSession.class))).thenReturn(true);
+  when(assignAction.execute(anyMap(),any(IssueBulkChangeService.ActionContext.class))).thenReturn(true).thenReturn(false);
+  actions.add(assignAction);
+  IssueBulkChangeQuery issueBulkChangeQuery=new IssueBulkChangeQuery(properties,"my comment");
+  IssueBulkChangeResult result=service.execute(issueBulkChangeQuery,userSession);
+  assertThat(result.issuesChanged()).hasSize(1);
+  assertThat(result.issuesNotChanged()).hasSize(1);
+  verify(assignAction,times(1)).execute(anyMap(),any(IssueBulkChangeService.ActionContext.class));
+  verify(issueStorage).save(eq(issue));
+}
