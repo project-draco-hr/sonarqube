@@ -5,36 +5,16 @@
   IssueBulkChangeResult result=new IssueBulkChangeResult();
   IssueQueryResult issueQueryResult=issueFinder.find(IssueQuery.builder().issueKeys(issueBulkChangeQuery.issues()).pageSize(-1).requiredRole(UserRole.USER).build());
   List<Issue> issues=issueQueryResult.issues();
-  List<Action> bulkActions=newArrayList();
-  for (  String actionName : issueBulkChangeQuery.actions()) {
-    Action action=getAction(actionName);
-    if (action == null) {
-      throw new BadRequestException("The action : '" + actionName + "' is unknown");
-    }
-    if (action.verify(issueBulkChangeQuery.properties(actionName),issues,userSession)) {
-      bulkActions.add(action);
-    }
-  }
+  List<Action> bulkActions=getActionsToApply(issueBulkChangeQuery,issues,userSession);
   IssueChangeContext issueChangeContext=IssueChangeContext.createUser(new Date(),userSession.login());
   for (  Issue issue : issues) {
     ActionContext actionContext=new ActionContext(issue,issueChangeContext);
     for (    Action action : bulkActions) {
-      try {
-        if (applyAction(action,actionContext,issueBulkChangeQuery)) {
-          result.addIssueChanged(issue);
-        }
- else {
-          result.addIssueNotChanged(issue);
-        }
-      }
- catch (      Exception e) {
-        result.addIssueNotChanged(issue);
-        LOG.info("An error occur when trying to apply the action : " + action.key() + " on issue : "+ issue.key()+ ". This issue has been ignored.",e);
-      }
+      applyAction(action,actionContext,issueBulkChangeQuery,result);
     }
     if (result.issuesChanged().contains(issue)) {
       if (issueBulkChangeQuery.hasComment()) {
-        applyAction(getAction(CommentAction.KEY),actionContext,issueBulkChangeQuery);
+        applyAction(getAction(CommentAction.KEY),actionContext,issueBulkChangeQuery,result);
       }
       issueStorage.save((DefaultIssue)issue);
       issueNotifications.sendChanges((DefaultIssue)issue,issueChangeContext,issueQueryResult);
