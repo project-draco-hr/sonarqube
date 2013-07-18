@@ -2,7 +2,8 @@
   when(issueFilterDao.selectById(1L)).thenReturn(new IssueFilterDto().setId(1L).setName("My Issues").setUserLogin("arthur").setShared(true));
   when(issueFilterFavouriteDao.selectByFilterId(1L)).thenReturn(Collections.<IssueFilterFavouriteDto>emptyList());
   ArgumentCaptor<IssueFilterFavouriteDto> issueFilterFavouriteDtoCaptor=ArgumentCaptor.forClass(IssueFilterFavouriteDto.class);
-  service.toggleFavouriteIssueFilter(1L,userSession);
+  boolean result=service.toggleFavouriteIssueFilter(1L,userSession);
+  assertThat(result).isTrue();
   verify(issueFilterFavouriteDao).insert(issueFilterFavouriteDtoCaptor.capture());
   IssueFilterFavouriteDto issueFilterFavouriteDto=issueFilterFavouriteDtoCaptor.getValue();
   assertThat(issueFilterFavouriteDto.getIssueFilterId()).isEqualTo(1L);
