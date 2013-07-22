@@ -1,0 +1,14 @@
+{
+  Dialect supportedDialect=new H2();
+  when(database.getDialect()).thenReturn(supportedDialect);
+  Connection connection=mock(Connection.class);
+  SqlSession session=mock(SqlSession.class);
+  when(session.getConnection()).thenReturn(connection);
+  when(mybatis.openSession()).thenReturn(session);
+  DatabaseMigrator databaseMigrator=new DatabaseMigrator(mybatis,database){
+    @Override protected void createSchema(    Connection connection,    String dialectId){
+    }
+  }
+;
+  assertThat(databaseMigrator.createDatabase()).isTrue();
+}
