@@ -1,9 +1,15 @@
 {
   TimeProfiler profiler=new TimeProfiler(LOG).start("Register permission templates");
   if (shouldRegister()) {
-    insertDefaultTemplate(PermissionTemplateDto.DEFAULT.getName());
+    if (hasExistingPermissionsConfig()) {
+      String projectsPermissionsKey=settings.getString(DEFAULT_PROJECTS_TEMPLATE_PROPERTY);
+      setDefaultProperty(projectsPermissionsKey);
+    }
+ else {
+      insertDefaultTemplate(PermissionTemplateDto.DEFAULT.getName());
+      setDefaultProperty(PermissionTemplateDto.DEFAULT.getKee());
+    }
     registerInitialization();
-    setDefaultProperty(PermissionTemplateDto.DEFAULT.getKee());
   }
   profiler.stop();
 }
