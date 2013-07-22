@@ -1,10 +1,9 @@
 {
-  TimeProfiler profiler=new TimeProfiler();
   DatabaseSession session=sessionFactory.getSession();
   RulesByRepository existingRules=new RulesByRepository(findAllRules(session));
-  List<Rule> registeredRules=registerRules(existingRules,profiler,session);
+  List<Rule> registeredRules=registerRules(existingRules,session);
+  LOG.info("Removing deprecated rules");
   disableDeprecatedRules(existingRules,registeredRules,session);
   disableDeprecatedRepositories(existingRules,session);
   session.commit();
-  notifyForRemovedRules(existingRules);
 }
