@@ -1,5 +1,6 @@
 {
   LOG.debug("Copy table {}",table);
+  long startup=System.currentTimeMillis();
   String selectQuery=selectQuery(table,whereClauses);
   truncate(dest,table);
   Connection sourceConnection=null;
@@ -8,6 +9,7 @@
   Connection destConnection=null;
   ResultSet destResultSet=null;
   PreparedStatement destStatement=null;
+  int count=0;
   try {
     sourceConnection=source.getConnection();
     sourceStatement=sourceConnection.createStatement();
@@ -19,7 +21,6 @@
       destConnection.setAutoCommit(false);
       String insertSql=new StringBuilder().append("INSERT INTO ").append(table).append("(").append(Joiner.on(",").join(columnNames)).append(") VALUES(").append(StringUtils.repeat("?",",",columnNames.length)).append(")").toString();
       destStatement=destConnection.prepareStatement(insertSql);
-      int count=0;
       do {
         copyColumns(sourceResultSet,destStatement,columnNames,columnTypes);
         count++;
@@ -32,6 +33,9 @@
  while (sourceResultSet.next());
       destStatement.executeBatch();
       destConnection.commit();
+    }
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("  " + count + " rows of "+ table+ " copied in "+ (System.currentTimeMillis() - startup)+ " ms");
     }
   }
  catch (  SQLException e) {
