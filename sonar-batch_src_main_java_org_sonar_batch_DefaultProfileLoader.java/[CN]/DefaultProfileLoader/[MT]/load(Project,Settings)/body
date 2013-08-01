@@ -1,9 +1,8 @@
 {
-  if (!languages.allKey().contains(project.getLanguageKey())) {
-    String languageList=Joiner.on(", ").join(languages.allKey());
-    throw new SonarException("You must install a plugin that supports the language '" + project.getLanguageKey() + "'. Supported language keys are: "+ languageList);
-  }
   String profileName=StringUtils.defaultIfBlank(settings.getString("sonar.profile"),settings.getString("sonar.profile." + project.getLanguageKey()));
+  if (StringUtils.isBlank(profileName)) {
+    throw new SonarException("You must install a plugin that supports the language '" + project.getLanguageKey() + "'");
+  }
   RulesProfile profile=dao.getProfile(project.getLanguageKey(),profileName);
   if (profile == null) {
     throw new SonarException("Quality profile not found : " + profileName + ", language "+ project.getLanguageKey());

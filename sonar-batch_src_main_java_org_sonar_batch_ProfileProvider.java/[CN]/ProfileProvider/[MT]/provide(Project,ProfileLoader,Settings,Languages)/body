@@ -1,6 +1,10 @@
 {
   if (profile == null) {
-    profile=profileLoader.load(project,settings,languages);
+    if (!languages.allKey().contains(project.getLanguageKey())) {
+      String languageList=Joiner.on(", ").join(languages.allKey());
+      throw new SonarException("You must install a plugin that supports the language '" + project.getLanguageKey() + "'. Supported language keys are: "+ languageList);
+    }
+    profile=profileLoader.load(project,settings);
     LOG.info("Quality profile : {}",profile);
   }
   return profile;
