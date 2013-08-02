@@ -1,0 +1,11 @@
+{
+  setUpMocks(CREATOR_SIMON,ASSIGNEE_SIMON);
+  when(queueElement.getNotification()).thenThrow(new RuntimeException("Unexpected exception")).thenReturn(notification);
+  when(manager.getFromQueue()).thenReturn(queueElement).thenReturn(queueElement).thenReturn(null);
+  doAnswer(addUser(ASSIGNEE_SIMON,emailChannel)).when(commentOnReviewAssignedToMe).dispatch(same(notification),any(NotificationDispatcher.Context.class));
+  doAnswer(addUser(CREATOR_SIMON,emailChannel)).when(commentOnReviewCreatedByMe).dispatch(same(notification),any(NotificationDispatcher.Context.class));
+  service.start();
+  verify(emailChannel,timeout(2000)).deliver(notification,ASSIGNEE_SIMON);
+  service.stop();
+  verify(gtalkChannel,never()).deliver(notification,ASSIGNEE_SIMON);
+}
