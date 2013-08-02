@@ -1,7 +1,14 @@
 {
   String profileName=StringUtils.defaultIfBlank(settings.getString("sonar.profile"),settings.getString("sonar.profile." + project.getLanguageKey()));
   if (StringUtils.isBlank(profileName)) {
-    throw new SonarException("You must install a plugin that supports the language '" + project.getLanguageKey() + "'");
+    String msg="You must install a plugin that supports the language key '" + project.getLanguageKey() + "'.";
+    if (!LOG.isDebugEnabled()) {
+      msg+=" Run analysis in verbose mode to see list of available language keys.";
+    }
+ else {
+      msg+=" See analysis log for a list of available language keys.";
+    }
+    throw new SonarException(msg);
   }
   RulesProfile profile=dao.getProfile(project.getLanguageKey(),profileName);
   if (profile == null) {
