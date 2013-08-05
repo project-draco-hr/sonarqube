@@ -1,0 +1,18 @@
+{
+  String lastCommitDatesByLine="1=2008-08-02T13:56:37+0200;" + "2=2008-08-02T13:56:37+0200;" + "3=2008-08-02T13:56:37+0200;"+ "4=2008-08-02T13:56:37+0200";
+  DecoratorContext context=mock(DecoratorContext.class);
+  when(context.getMeasure(CoreMetrics.COVERAGE_LINE_HITS_DATA)).thenReturn(new Measure(CoreMetrics.COVERAGE_LINE_HITS_DATA,"2=1;3=1"));
+  when(context.getMeasure(CoreMetrics.CONDITIONS_BY_LINE)).thenReturn(new Measure(CoreMetrics.CONDITIONS_BY_LINE,"2=1"));
+  when(context.getMeasure(CoreMetrics.COVERED_CONDITIONS_BY_LINE)).thenReturn(new Measure(CoreMetrics.COVERED_CONDITIONS_BY_LINE,"2=1"));
+  when(context.getMeasure(CoreMetrics.SCM_LAST_COMMIT_DATETIMES_BY_LINE)).thenReturn(new Measure(CoreMetrics.SCM_LAST_COMMIT_DATETIMES_BY_LINE,lastCommitDatesByLine));
+  NewCoverageFileAnalyzer decorator=newDecorator();
+  decorator.doDecorate(context);
+  verify(context).saveMeasure(argThat(new VariationMatcher(CoreMetrics.NEW_LINES_TO_COVER,1,null)));
+  verify(context).saveMeasure(argThat(new VariationMatcher(CoreMetrics.NEW_UNCOVERED_LINES,1,null)));
+  verify(context).saveMeasure(argThat(new VariationMatcher(CoreMetrics.NEW_CONDITIONS_TO_COVER,1,null)));
+  verify(context).saveMeasure(argThat(new VariationMatcher(CoreMetrics.NEW_UNCOVERED_CONDITIONS,1,null)));
+  verify(context).saveMeasure(argThat(new VariationMatcher(CoreMetrics.NEW_LINES_TO_COVER,3,null)));
+  verify(context).saveMeasure(argThat(new VariationMatcher(CoreMetrics.NEW_UNCOVERED_LINES,3,null)));
+  verify(context).saveMeasure(argThat(new VariationMatcher(CoreMetrics.NEW_CONDITIONS_TO_COVER,3,null)));
+  verify(context).saveMeasure(argThat(new VariationMatcher(CoreMetrics.NEW_UNCOVERED_CONDITIONS,3,null)));
+}

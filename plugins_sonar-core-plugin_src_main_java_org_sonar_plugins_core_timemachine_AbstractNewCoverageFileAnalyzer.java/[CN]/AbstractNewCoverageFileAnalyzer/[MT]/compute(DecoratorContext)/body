@@ -4,10 +4,18 @@
   Measure newConditions=new Measure(getNewConditionsToCoverMetric());
   Measure newUncoveredConditions=new Measure(getNewUncoveredConditionsMetric());
   for (  PeriodStruct struct : structs) {
-    newLines.setVariation(struct.index,(double)struct.newLines);
-    newUncoveredLines.setVariation(struct.index,(double)(struct.newLines - struct.newCoveredLines));
-    newConditions.setVariation(struct.index,(double)struct.newConditions);
-    newUncoveredConditions.setVariation(struct.index,(double)struct.newConditions - struct.newCoveredConditions);
+    if (struct.hasNewCode()) {
+      newLines.setVariation(struct.index,(double)struct.getNewLines());
+      newUncoveredLines.setVariation(struct.index,(double)(struct.getNewLines() - struct.getNewCoveredLines()));
+      newConditions.setVariation(struct.index,(double)struct.getNewConditions());
+      newUncoveredConditions.setVariation(struct.index,(double)struct.getNewConditions() - struct.getNewCoveredConditions());
+    }
+ else {
+      newLines.setVariation(struct.index,null);
+      newUncoveredLines.setVariation(struct.index,null);
+      newConditions.setVariation(struct.index,null);
+      newUncoveredConditions.setVariation(struct.index,null);
+    }
   }
   context.saveMeasure(newLines);
   context.saveMeasure(newUncoveredLines);
