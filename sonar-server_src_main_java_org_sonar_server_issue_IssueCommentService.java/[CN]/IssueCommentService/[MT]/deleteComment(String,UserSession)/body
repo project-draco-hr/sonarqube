@@ -1,10 +1,10 @@
 {
   DefaultIssueComment comment=changeDao.selectCommentByKey(commentKey);
   if (comment == null) {
-    throw new IllegalStateException();
+    throw new NotFoundException("Comment not found: " + commentKey);
   }
   if (Strings.isNullOrEmpty(comment.userLogin()) || !Objects.equal(comment.userLogin(),userSession.login())) {
-    throw new IllegalStateException();
+    throw new ForbiddenException("You can only delete your own comments");
   }
   finder.findByKey(comment.issueKey(),UserRole.USER);
   changeDao.delete(commentKey);

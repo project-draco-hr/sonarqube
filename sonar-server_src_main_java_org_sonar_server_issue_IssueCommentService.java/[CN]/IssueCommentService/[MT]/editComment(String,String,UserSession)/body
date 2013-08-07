@@ -1,10 +1,13 @@
 {
   DefaultIssueComment comment=changeDao.selectCommentByKey(commentKey);
+  if (StringUtils.isBlank(text)) {
+    throw new BadRequestException("Cannot add empty comments to an issue");
+  }
   if (comment == null) {
-    throw new IllegalStateException();
+    throw new NotFoundException("Comment not found: " + commentKey);
   }
   if (Strings.isNullOrEmpty(comment.userLogin()) || !Objects.equal(comment.userLogin(),userSession.login())) {
-    throw new IllegalStateException();
+    throw new ForbiddenException("You can only edit your own comments");
   }
   finder.findByKey(comment.issueKey(),UserRole.USER);
   IssueChangeDto dto=IssueChangeDto.of(comment);
