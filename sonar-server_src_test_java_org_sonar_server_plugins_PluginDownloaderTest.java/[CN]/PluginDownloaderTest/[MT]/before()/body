@@ -3,6 +3,14 @@
   updateCenter=mock(UpdateCenter.class);
   when(updateCenterMatrixFactory.getUpdateCenter(anyBoolean())).thenReturn(updateCenter);
   httpDownloader=mock(HttpDownloader.class);
+  doAnswer(new Answer(){
+    @Override public Object answer(    InvocationOnMock inv) throws Throwable {
+      File toFile=(File)inv.getArguments()[1];
+      FileUtils.touch(toFile);
+      return null;
+    }
+  }
+).when(httpDownloader).download(any(URI.class),any(File.class));
   DefaultServerFileSystem defaultServerFileSystem=mock(DefaultServerFileSystem.class);
   downloadDir=testFolder.newFolder("downloads");
   when(defaultServerFileSystem.getDownloadedPluginsDir()).thenReturn(downloadDir);
