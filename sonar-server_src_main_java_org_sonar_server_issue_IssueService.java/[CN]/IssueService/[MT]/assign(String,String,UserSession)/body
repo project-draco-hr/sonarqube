@@ -2,11 +2,15 @@
   verifyLoggedIn(userSession);
   IssueQueryResult queryResult=loadIssue(issueKey);
   DefaultIssue issue=(DefaultIssue)queryResult.first();
-  if (assignee != null && userFinder.findByLogin(assignee) == null) {
-    throw new IllegalArgumentException("Unknown user: " + assignee);
+  User user=null;
+  if (!Strings.isNullOrEmpty(assignee)) {
+    user=userFinder.findByLogin(assignee);
+    if (user == null) {
+      throw new IllegalArgumentException("Unknown user: " + assignee);
+    }
   }
   IssueChangeContext context=IssueChangeContext.createUser(new Date(),userSession.login());
-  if (issueUpdater.assign(issue,assignee,context)) {
+  if (issueUpdater.assign(issue,user,context)) {
     issueStorage.save(issue);
     issueNotifications.sendChanges(issue,context,queryResult);
   }

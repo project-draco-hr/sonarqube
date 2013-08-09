@@ -1,7 +1,11 @@
 {
-  String sanitizedAssignee=StringUtils.defaultIfBlank(assignee,null);
+  String sanitizedAssignee=null;
+  if (user != null) {
+    sanitizedAssignee=StringUtils.defaultIfBlank(user.login(),null);
+  }
   if (!Objects.equal(sanitizedAssignee,issue.assignee())) {
-    issue.setFieldChange(context,"assignee",issue.assignee(),sanitizedAssignee);
+    String newAssignee=user != null ? user.name() : null;
+    issue.setFieldChange(context,ASSIGNEE,UNUSED,newAssignee);
     issue.setAssignee(sanitizedAssignee);
     issue.setUpdateDate(context.date());
     issue.setChanged(true);

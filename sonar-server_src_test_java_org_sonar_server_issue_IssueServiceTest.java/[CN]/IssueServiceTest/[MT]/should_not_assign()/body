@@ -1,10 +1,11 @@
 {
   String assignee="perceval";
-  when(userFinder.findByLogin(assignee)).thenReturn(new DefaultUser());
-  when(issueUpdater.assign(eq(issue),eq(assignee),any(IssueChangeContext.class))).thenReturn(false);
+  User user=new DefaultUser();
+  when(userFinder.findByLogin(assignee)).thenReturn(user);
+  when(issueUpdater.assign(eq(issue),eq(user),any(IssueChangeContext.class))).thenReturn(false);
   Issue result=issueService.assign("ABCD",assignee,userSession);
   assertThat(result).isNotNull();
-  verify(issueUpdater).assign(eq(issue),eq(assignee),any(IssueChangeContext.class));
+  verify(issueUpdater).assign(eq(issue),eq(user),any(IssueChangeContext.class));
   verifyZeroInteractions(issueStorage);
   verifyZeroInteractions(issueNotifications);
 }
