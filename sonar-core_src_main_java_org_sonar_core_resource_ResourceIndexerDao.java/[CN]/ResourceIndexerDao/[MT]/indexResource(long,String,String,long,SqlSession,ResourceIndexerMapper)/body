@@ -1,16 +1,11 @@
 {
   boolean indexed=false;
   String key=nameToKey(name);
-  if (key.length() >= MINIMUM_KEY_SIZE) {
+  if (key.length() >= MINIMUM_KEY_SIZE || key.length() == SINGLE_INDEX_SIZE) {
     indexed=true;
     boolean toBeIndexed=sanitizeIndex(id,key,mapper);
     if (toBeIndexed) {
-      ResourceIndexDto dto=new ResourceIndexDto().setResourceId(id).setQualifier(qualifier).setRootProjectId(rootId).setNameSize(name.length());
-      for (int position=0; position <= key.length() - MINIMUM_KEY_SIZE; position++) {
-        dto.setPosition(position);
-        dto.setKey(StringUtils.substring(key,position));
-        mapper.insert(dto);
-      }
+      insertIndexEntries(key,id,qualifier,rootId,name.length(),mapper);
       session.commit();
     }
   }
