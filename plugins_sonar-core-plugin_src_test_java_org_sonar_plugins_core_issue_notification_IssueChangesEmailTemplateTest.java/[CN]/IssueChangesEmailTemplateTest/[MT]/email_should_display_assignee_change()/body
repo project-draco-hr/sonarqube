@@ -1,0 +1,11 @@
+{
+  Notification notification=generateNotification().setFieldValue("old.assignee","simon").setFieldValue("new.assignee","louis");
+  EmailMessage email=template.format(notification);
+  assertThat(email.getMessageId()).isEqualTo("issue-changes/ABCDE");
+  assertThat(email.getSubject()).isEqualTo("Struts, change on issue #ABCDE");
+  String message=email.getMessage();
+  String expectedMessage=TestUtils.getResourceContent("/org/sonar/plugins/core/issue/notification/IssueChangesEmailTemplateTest/email_with_assignee_change.txt");
+  expectedMessage=StringUtils.remove(expectedMessage,'\r');
+  assertThat(message).isEqualTo(expectedMessage);
+  assertThat(email.getFrom()).isNull();
+}
