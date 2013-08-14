@@ -1,7 +1,14 @@
 {
   String assignee=assigneeValue(properties);
-  if (!Strings.isNullOrEmpty(assignee) && getOrSelectUser(assignee) == null) {
-    throw new IllegalArgumentException("Unknown user: " + assignee);
+  if (!Strings.isNullOrEmpty(assignee)) {
+    User user=selectUser(assignee);
+    if (user == null) {
+      throw new IllegalArgumentException("Unknown user: " + assignee);
+    }
+    properties.put(VERIFIED_ASSIGNEE,user);
+  }
+ else {
+    properties.put(VERIFIED_ASSIGNEE,null);
   }
   return true;
 }

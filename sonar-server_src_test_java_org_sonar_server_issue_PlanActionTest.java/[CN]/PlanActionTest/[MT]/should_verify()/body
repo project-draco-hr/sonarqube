@@ -2,7 +2,9 @@
   String planKey="ABCD";
   Map<String,Object> properties=newHashMap();
   properties.put("plan",planKey);
+  ActionPlan actionPlan=new DefaultActionPlan().setProjectKey("struts");
   List<Issue> issues=newArrayList((Issue)new DefaultIssue().setKey("ABC").setProjectKey("struts"));
-  when(actionPlanService.findByKey(eq(planKey),any(UserSession.class))).thenReturn(new DefaultActionPlan().setProjectKey("struts"));
+  when(actionPlanService.findByKey(eq(planKey),any(UserSession.class))).thenReturn(actionPlan);
   assertThat(action.verify(properties,issues,mock(UserSession.class))).isTrue();
+  assertThat(properties.get(PlanAction.VERIFIED_ACTION_PLAN)).isEqualTo(actionPlan);
 }
