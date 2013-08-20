@@ -1,15 +1,17 @@
 {
-  incrementProfileVersionIfNeeded(profile);
-  ActiveRuleChange rc=new ActiveRuleChange(userName,profile,disabledRule.getRule());
-  rc.setEnabled(false);
-  rc.setOldSeverity(disabledRule.getSeverity());
-  if (disabledRule.getRule().getParams() != null) {
-    for (    RuleParam p : disabledRule.getRule().getParams()) {
-      String oldParam=disabledRule.getParameter(p.getKey());
-      if (oldParam != null) {
-        rc.setParameterChange(p.getKey(),oldParam,null);
+  if (shouldTrackChanges(profile)) {
+    incrementProfileVersionIfNeeded(profile);
+    ActiveRuleChange rc=new ActiveRuleChange(userName,profile,disabledRule.getRule());
+    rc.setEnabled(false);
+    rc.setOldSeverity(disabledRule.getSeverity());
+    if (disabledRule.getRule().getParams() != null) {
+      for (      RuleParam p : disabledRule.getRule().getParams()) {
+        String oldParam=disabledRule.getParameter(p.getKey());
+        if (oldParam != null) {
+          rc.setParameterChange(p.getKey(),oldParam,null);
+        }
       }
     }
+    getSession().saveWithoutFlush(rc);
   }
-  getSession().saveWithoutFlush(rc);
 }
