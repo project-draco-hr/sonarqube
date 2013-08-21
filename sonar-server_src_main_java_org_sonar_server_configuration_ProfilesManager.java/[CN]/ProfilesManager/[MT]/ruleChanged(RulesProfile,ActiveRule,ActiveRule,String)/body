@@ -1,20 +1,18 @@
 {
-  if (shouldTrackChanges(profile)) {
-    incrementProfileVersionIfNeeded(profile);
-    ActiveRuleChange rc=new ActiveRuleChange(userName,profile,newActiveRule.getRule());
-    if (oldActiveRule.getSeverity() != newActiveRule.getSeverity()) {
-      rc.setOldSeverity(oldActiveRule.getSeverity());
-      rc.setNewSeverity(newActiveRule.getSeverity());
-    }
-    if (oldActiveRule.getRule().getParams() != null) {
-      for (      RuleParam p : oldActiveRule.getRule().getParams()) {
-        String oldParam=oldActiveRule.getParameter(p.getKey());
-        String newParam=newActiveRule.getParameter(p.getKey());
-        if (!StringUtils.equals(oldParam,newParam)) {
-          rc.setParameterChange(p.getKey(),oldParam,newParam);
-        }
+  incrementProfileVersionIfNeeded(profile);
+  ActiveRuleChange rc=new ActiveRuleChange(userName,profile,newActiveRule.getRule());
+  if (oldActiveRule.getSeverity() != newActiveRule.getSeverity()) {
+    rc.setOldSeverity(oldActiveRule.getSeverity());
+    rc.setNewSeverity(newActiveRule.getSeverity());
+  }
+  if (oldActiveRule.getRule().getParams() != null) {
+    for (    RuleParam p : oldActiveRule.getRule().getParams()) {
+      String oldParam=oldActiveRule.getParameter(p.getKey());
+      String newParam=newActiveRule.getParameter(p.getKey());
+      if (!StringUtils.equals(oldParam,newParam)) {
+        rc.setParameterChange(p.getKey(),oldParam,newParam);
       }
     }
-    getSession().saveWithoutFlush(rc);
   }
+  getSession().saveWithoutFlush(rc);
 }
