@@ -1,0 +1,10 @@
+{
+  db.prepareDbUnit(getClass(),"sort_by_alert.xml");
+  Metric alert=new Metric.Builder(CoreMetrics.ALERT_STATUS_KEY,"Alert",Metric.ValueType.LEVEL).create().setId(5);
+  MeasureFilter filter=new MeasureFilter().setResourceQualifiers(Arrays.asList("TRK")).setSortOnMetric(alert);
+  List<MeasureFilterRow> rows=executor.execute(filter,new MeasureFilterContext());
+  assertThat(rows).hasSize(3);
+  verifyPhpProject(rows.get(0));
+  verifyJavaProject(rows.get(1));
+  verifyProject(rows.get(2),120L,20L,20L);
+}
