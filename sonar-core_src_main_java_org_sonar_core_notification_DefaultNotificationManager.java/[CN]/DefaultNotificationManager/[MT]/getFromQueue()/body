@@ -1,13 +1,9 @@
 {
-  DatabaseSession session=sessionFactory.getSession();
-  String hql="FROM " + NotificationQueueElement.class.getSimpleName() + " ORDER BY createdAt ASC";
-  List<NotificationQueueElement> notifications=session.createQuery(hql).setMaxResults(1).getResultList();
+  int batchSize=1;
+  List<NotificationQueueDto> notifications=notificationQueueDao.findOldest(batchSize);
   if (notifications.isEmpty()) {
-    sessionFactory.clear();
     return null;
   }
-  NotificationQueueElement notification=notifications.get(0);
-  session.removeWithoutFlush(notification);
-  session.commit();
-  return notification;
+  notificationQueueDao.delete(notifications);
+  return notifications.get(0).toNotification();
 }

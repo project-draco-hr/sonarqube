@@ -1,0 +1,10 @@
+{
+  Notification notification=new Notification("test");
+  NotificationQueueDto dto=NotificationQueueDto.toNotificationQueueDto(notification);
+  List<NotificationQueueDto> dtos=Arrays.asList(dto);
+  when(notificationQueueDao.findOldest(1)).thenReturn(dtos);
+  assertThat(manager.getFromQueue()).isNotNull();
+  InOrder inOrder=inOrder(notificationQueueDao);
+  inOrder.verify(notificationQueueDao).findOldest(1);
+  inOrder.verify(notificationQueueDao).delete(dtos);
+}
