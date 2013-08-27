@@ -4,12 +4,12 @@
   DefaultIssueQueryResult queryResult=new DefaultIssueQueryResult(Arrays.<Issue>asList(issue));
   queryResult.addProjects(Arrays.<Component>asList(new Project("struts")));
   queryResult.addComponents(Arrays.<Component>asList(new ResourceComponent(new File("struts:Action").setEffectiveKey("struts:Action"))));
-  Notification notification=issueNotifications.sendChanges(issue,context,queryResult);
+  Notification notification=issueNotifications.sendChanges(issue,context,queryResult).get(0);
   assertThat(notification.getFieldValue("message")).isEqualTo("the message");
   assertThat(notification.getFieldValue("key")).isEqualTo("ABCDE");
   assertThat(notification.getFieldValue("componentKey")).isEqualTo("struts:Action");
   assertThat(notification.getFieldValue("componentName")).isEqualTo("struts:Action");
   assertThat(notification.getFieldValue("old.resolution")).isNull();
   assertThat(notification.getFieldValue("new.resolution")).isEqualTo("FIXED");
-  Mockito.verify(manager).scheduleForSending(notification);
+  Mockito.verify(manager).scheduleForSending(eq(Arrays.asList(notification)));
 }

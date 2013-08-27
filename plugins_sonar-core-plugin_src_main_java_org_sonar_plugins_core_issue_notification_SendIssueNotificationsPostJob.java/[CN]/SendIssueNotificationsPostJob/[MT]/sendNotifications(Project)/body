@@ -1,6 +1,7 @@
 {
   int newIssues=0;
   IssueChangeContext context=IssueChangeContext.createScan(project.getAnalysisDate());
+  Map<DefaultIssue,Rule> shouldSentNotification=new LinkedHashMap<DefaultIssue,Rule>();
   for (  DefaultIssue issue : issueCache.all()) {
     if (issue.isNew() && issue.resolution() == null) {
       newIssues++;
@@ -8,9 +9,12 @@
     if (!issue.isNew() && issue.isChanged() && issue.mustSendNotifications()) {
       Rule rule=ruleFinder.findByKey(issue.ruleKey());
       if (rule != null) {
-        notifications.sendChanges(issue,context,rule,project,null);
+        shouldSentNotification.put(issue,rule);
       }
     }
+  }
+  if (!shouldSentNotification.isEmpty()) {
+    notifications.sendChanges(shouldSentNotification,context,project,null);
   }
   if (newIssues > 0) {
     notifications.sendNewIssues(project,newIssues);
