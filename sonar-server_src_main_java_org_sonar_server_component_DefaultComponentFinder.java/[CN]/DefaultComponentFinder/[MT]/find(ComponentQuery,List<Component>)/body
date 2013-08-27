@@ -1,0 +1,13 @@
+{
+  LOG.debug("ComponentQuery : {}",query);
+  Collection<Component> foundComponents=search(query,allComponents);
+  Collection<? extends Component> sortedComponents=new ComponentsFinderSort(foundComponents,query).sort();
+  if (ComponentQuery.NO_PAGINATION == query.pageSize()) {
+    return new DefaultComponentQueryResult(sortedComponents).setQuery(query);
+  }
+ else {
+    Paging paging=Paging.create(query.pageSize(),query.pageIndex(),foundComponents.size());
+    Collection<? extends Component> pagedComponents=pagedComponents(sortedComponents,paging);
+    return new DefaultComponentQueryResult(pagedComponents).setPaging(paging).setQuery(query);
+  }
+}
