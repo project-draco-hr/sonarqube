@@ -2,11 +2,17 @@
   DbTemplate template=new DbTemplate();
   template.copyTable(source,dest,"active_rules").copyTable(source,dest,"active_rule_parameters").copyTable(source,dest,"characteristics").copyTable(source,dest,"characteristic_edges").copyTable(source,dest,"characteristic_properties").copyTable(source,dest,"metrics").copyTable(source,dest,"permission_templates").copyTable(source,dest,"perm_templates_users").copyTable(source,dest,"perm_templates_groups").copyTable(source,dest,"quality_models").copyTable(source,dest,"rules").copyTable(source,dest,"rules_parameters").copyTable(source,dest,"rules_profiles").copyTable(source,dest,"alerts");
   if (projectId != null) {
-    String snapshotCondition="islast=" + database.getDialect().getTrueSqlValue() + " and (project_id="+ projectId+ " or root_project_id="+ projectId+ ")";
-    template.copyTable(source,dest,"projects","id in (select project_id from snapshots where " + snapshotCondition + ") or (id="+ projectId+ " or root_id="+ projectId+ ")");
-    template.copyTable(source,dest,"snapshots",snapshotCondition);
-    String forRootModule="(root_component_id in (select id from projects where id=" + projectId + " and qualifier='TRK'))";
-    String forSubModule="(component_id in (select id from projects where id=" + projectId + " or root_id="+ projectId+ "))";
-    template.copyTable(source,dest,"issues","(" + forRootModule + ") or( "+ forSubModule+ ")","status<>'" + Issue.STATUS_CLOSED + "'");
+    StringBuilder projectQuery=new StringBuilder();
+    projectQuery.append("SELECT p.* FROM projects p INNER JOIN snapshots s ON p.id = s.project_id");
+    projectQuery.append(" WHERE s.islast=").append(database.getDialect().getTrueSqlValue());
+    projectQuery.append(" AND (");
+    projectQuery.append("   s.root_project_id=").append(projectId);
+    projectQuery.append("   OR p.id=").append(projectId);
+    projectQuery.append("   OR p.root_id=").append(projectId);
+    projectQuery.append(" )");
+    template.copyTable(source,dest,"projects",projectQuery.toString());
+    String forRootModule="root_component_id in (select id from projects where id=" + projectId + " and qualifier='TRK')";
+    String forSubModule="component_id in (select id from projects where id=" + projectId + " or root_id="+ projectId+ ")";
+    template.copyTable(source,dest,"issues","SELECT * FROM issues WHERE ((" + forRootModule + ") OR ( "+ forSubModule+ ")) AND status <> '"+ Issue.STATUS_CLOSED+ "'");
   }
 }
