@@ -1,10 +1,21 @@
 {
   TIME_PROFILER.start("Processing notifications queue");
+  long start=now();
+  long lastLog=start;
+  long notifSentCount=0;
   Notification notifToSend=manager.getFromQueue();
   while (notifToSend != null) {
     deliver(notifToSend);
+    notifSentCount++;
     if (stopping) {
       break;
+    }
+    long now=now();
+    if (now - lastLog > 10 * 60 * 1000) {
+      long remainingNotifCount=manager.count();
+      lastLog=now;
+      long spentTimeInMinutes=(now - start) / (60 * 1000);
+      log(notifSentCount,remainingNotifCount,spentTimeInMinutes);
     }
     notifToSend=manager.getFromQueue();
   }
