@@ -3,54 +3,54 @@
   List<Object[]> allParams=Lists.newArrayList();
   List<Map<String,Object>> allComments=Lists.newArrayList();
   for (  Map<String,Object> row : rows) {
-    Long componentId=(Long)row.get("projectId");
+    Long componentId=(Long)row.get(PROJECT_ID);
     if (componentId == null) {
       continue;
     }
     String issueKey=UUID.randomUUID().toString();
     String status, severity, reporter=null;
     boolean manualSeverity;
-    Object createdAt=Objects.firstNonNull(row.get("createdAt"),oneYearAgo);
+    Object createdAt=Objects.firstNonNull(row.get(CREATED_AT),oneYearAgo);
     Object updatedAt;
-    Long reviewId=(Long)row.get("reviewId");
+    Long reviewId=(Long)row.get(REVIEW_ID);
     if (reviewId == null) {
-      status="OPEN";
+      status=STATUS_OPEN;
       manualSeverity=false;
-      severity=(String)row.get("severity");
+      severity=(String)row.get(SEVERITY);
       updatedAt=createdAt;
     }
  else {
-      String reviewStatus=(String)row.get("reviewStatus");
-      status=("OPEN".equals(reviewStatus) ? "CONFIRMED" : reviewStatus);
-      manualSeverity=Objects.firstNonNull((Boolean)row.get("reviewManualSeverity"),false);
-      severity=(String)row.get("reviewSeverity");
-      updatedAt=Objects.firstNonNull(row.get("reviewUpdatedAt"),oneYearAgo);
-      if ((Boolean)row.get("reviewManualViolation")) {
-        reporter=login((Long)row.get("reviewReporterId"));
+      String reviewStatus=(String)row.get(REVIEW_STATUS);
+      status=(STATUS_OPEN.equals(reviewStatus) ? STATUS_CONFIRMED : reviewStatus);
+      manualSeverity=Objects.firstNonNull((Boolean)row.get(REVIEW_MANUAL_SEVERITY),false);
+      severity=(String)row.get(REVIEW_SEVERITY);
+      updatedAt=Objects.firstNonNull(row.get(REVIEW_UPDATED_AT),oneYearAgo);
+      if ((Boolean)row.get(REVIEW_MANUAL_VIOLATION)) {
+        reporter=login((Long)row.get(REVIEW_REPORTER_ID));
       }
       List<Map<String,Object>> comments=runner.query(readConnection,ReviewCommentsHandler.SQL + reviewId,new ReviewCommentsHandler());
       for (      Map<String,Object> comment : comments) {
-        comment.put("issueKey",issueKey);
+        comment.put(ISSUE_KEY,issueKey);
         allComments.add(comment);
       }
     }
     Object[] params=new Object[20];
     params[0]=issueKey;
     params[1]=componentId;
-    params[2]=row.get("rootProjectId");
-    params[3]=row.get("ruleId");
+    params[2]=row.get(ROOT_PROJECT_ID);
+    params[3]=row.get(RULE_ID);
     params[4]=severity;
     params[5]=manualSeverity;
-    params[6]=row.get("message");
-    params[7]=row.get("line");
-    params[8]=row.get("cost");
+    params[6]=row.get(MESSAGE);
+    params[7]=row.get(LINE);
+    params[8]=row.get(COST);
     params[9]=status;
-    params[10]=row.get("reviewResolution");
-    params[11]=row.get("checksum");
+    params[10]=row.get(REVIEW_RESOLUTION);
+    params[11]=row.get(CHECKSUM);
     params[12]=reporter;
-    params[13]=login((Long)row.get("reviewAssigneeId"));
-    params[14]=plan((Long)row.get("planId"));
-    params[15]=row.get("reviewData");
+    params[13]=login((Long)row.get(REVIEW_ASSIGNEE_ID));
+    params[14]=plan((Long)row.get(PLAN_ID));
+    params[15]=row.get(REVIEW_DATA);
     params[16]=createdAt;
     params[17]=updatedAt;
     params[18]=createdAt;
