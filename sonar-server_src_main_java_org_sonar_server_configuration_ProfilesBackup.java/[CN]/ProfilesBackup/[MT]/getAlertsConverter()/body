@@ -2,18 +2,18 @@
   return new Converter(){
     public void marshal(    Object source,    HierarchicalStreamWriter writer,    MarshallingContext context){
       Alert alert=(Alert)source;
-      writeNode(writer,"operator",alert.getOperator());
-      writeNode(writer,"value-error",alert.getValueError());
-      writeNode(writer,"value-warning",alert.getValueWarning());
+      writeNode(writer,OPERATOR,alert.getOperator());
+      writeNode(writer,VALUE_ERROR,alert.getValueError());
+      writeNode(writer,VALUE_WARNING,alert.getValueWarning());
       if (alert.getPeriod() != null) {
-        writeNode(writer,"period",Integer.toString(alert.getPeriod()));
+        writeNode(writer,PERIOD,Integer.toString(alert.getPeriod()));
       }
-      writeNode(writer,"metric-key",alert.getMetric().getKey());
+      writeNode(writer,METRIC_KEY,alert.getMetric().getKey());
     }
     public Object unmarshal(    HierarchicalStreamReader reader,    UnmarshallingContext context){
       Map<String,String> values=readNode(reader);
-      Alert alert=new Alert(null,new Metric(values.get("metric-key")),values.get("operator"),values.get("value-error"),values.get("value-warning"));
-      String periodText=values.get("period");
+      Alert alert=new Alert(null,new Metric(values.get(METRIC_KEY)),values.get(OPERATOR),values.get(VALUE_ERROR),values.get(VALUE_WARNING));
+      String periodText=values.get(PERIOD);
       if (StringUtils.isNotEmpty(periodText)) {
         alert.setPeriod(Integer.parseInt(periodText));
       }
