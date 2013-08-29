@@ -15,7 +15,15 @@
               e.printStackTrace();
             }
           }
-          resp.getPrintStream().append("agent=" + req.getValues("User-Agent").get(0));
+          if (req.getPath().getPath().contains("/gzip/")) {
+            resp.set("Content-Encoding","gzip");
+            GZIPOutputStream gzipOutputStream=new GZIPOutputStream(resp.getOutputStream());
+            gzipOutputStream.write("GZIP response".getBytes());
+            gzipOutputStream.close();
+          }
+ else {
+            resp.getPrintStream().append("agent=" + req.getValues("User-Agent").get(0));
+          }
         }
       }
  catch (      IOException e) {
