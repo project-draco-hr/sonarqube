@@ -1,0 +1,25 @@
+{
+  File cacheLocation=getCacheLocation(projectId);
+  if (!cacheLocation.exists()) {
+    return null;
+  }
+  Collection<File> dbInCache=FileUtils.listFiles(cacheLocation,FileFileFilter.FILE,null);
+  if (dbInCache.isEmpty()) {
+    return null;
+  }
+  SortedSet<Long> timestamps=new TreeSet<Long>();
+  for (  File file : dbInCache) {
+    if (file.getName().endsWith(H2_FILE_SUFFIX)) {
+      try {
+        timestamps.add(Long.valueOf(StringUtils.removeEnd(file.getName(),H2_FILE_SUFFIX)));
+      }
+ catch (      NumberFormatException e) {
+        LOG.warn("Unexpected file in dryrun cache folder " + file.getAbsolutePath(),e);
+      }
+    }
+  }
+  if (timestamps.isEmpty()) {
+    return null;
+  }
+  return timestamps.last();
+}

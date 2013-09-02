@@ -1,0 +1,14 @@
+{
+  long globalTimestamp=settings.getLong(SONAR_DRY_RUN_CACHE_LAST_UPDATE);
+  if (globalTimestamp > lastTimestampInCache) {
+    return false;
+  }
+  if (projectId != null) {
+    Long rootId=resourceDao.getRootProjectByComponentId(projectId).getId();
+    long projectTimestamp=settings.getLong("sonar.dryRun.cache." + rootId + ".lastUpdate");
+    if (projectTimestamp > lastTimestampInCache) {
+      return false;
+    }
+  }
+  return true;
+}

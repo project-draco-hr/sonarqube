@@ -1,0 +1,17 @@
+{
+  File cacheLocation=getCacheLocation(projectId);
+  try {
+    FileUtils.forceMkdir(cacheLocation);
+  }
+ catch (  IOException e) {
+    throw new SonarException("Unable to create cache directory " + cacheLocation,e);
+  }
+  String name=getH2DBName(cacheLocation,timestamp);
+  try {
+    File dbFile=new File(name + H2_FILE_SUFFIX);
+    return Files.toByteArray(dbFile);
+  }
+ catch (  IOException e) {
+    throw new SonarException("Unable to read h2 database file",e);
+  }
+}
