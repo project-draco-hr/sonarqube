@@ -1,11 +1,11 @@
 {
-  SettingsChangeHandler handler=mock(SettingsChangeHandler.class);
-  SettingsChangeNotifier notifier=new SettingsChangeNotifier(mock(ResourceDao.class),mock(UserDao.class),new SettingsChangeHandler[]{handler});
-  notifier.onPropertyChange("foo","bar",null,null);
-  verify(handler).onChange(argThat(new ArgumentMatcher<SettingsChangeHandler.SettingsChange>(){
+  GlobalPropertyChangeHandler handler=mock(GlobalPropertyChangeHandler.class);
+  SettingsChangeNotifier notifier=new SettingsChangeNotifier(new GlobalPropertyChangeHandler[]{handler});
+  notifier.onGlobalPropertyChange("foo","bar");
+  verify(handler).onChange(argThat(new ArgumentMatcher<GlobalPropertyChangeHandler.PropertyChange>(){
     @Override public boolean matches(    Object o){
-      SettingsChangeHandler.SettingsChange change=(SettingsChangeHandler.SettingsChange)o;
-      return change.key().equals("foo") && change.newValue().equals("bar") && change.componentKey() == null && change.userLogin() == null;
+      GlobalPropertyChangeHandler.PropertyChange change=(GlobalPropertyChangeHandler.PropertyChange)o;
+      return change.getKey().equals("foo") && change.getNewValue().equals("bar");
     }
   }
 ));

@@ -1,8 +1,10 @@
 {
   long startup=System.currentTimeMillis();
   Long lastTimestampInCache=getLastTimestampInCache(projectId);
-  lastTimestampInCache=System.nanoTime();
-  cleanCache(projectId);
-  createNewDatabaseForDryRun(projectId,startup,lastTimestampInCache);
+  if (lastTimestampInCache == null || !isValid(projectId,lastTimestampInCache)) {
+    lastTimestampInCache=System.nanoTime();
+    cleanCache(projectId);
+    createNewDatabaseForDryRun(projectId,startup,lastTimestampInCache);
+  }
   return dbFileContent(projectId,lastTimestampInCache);
 }
