@@ -7,6 +7,7 @@
   List<Issue> issues=issueQueryResult.issues();
   List<Action> bulkActions=getActionsToApply(issueBulkChangeQuery,issues,userSession);
   IssueChangeContext issueChangeContext=IssueChangeContext.createUser(new Date(),userSession.login());
+  Set<String> concernedProjects=new HashSet<String>();
   for (  Issue issue : issues) {
     ActionContext actionContext=new ActionContext(issue,issueChangeContext);
     for (    Action action : bulkActions) {
@@ -18,7 +19,11 @@
       }
       issueStorage.save((DefaultIssue)issue);
       issueNotifications.sendChanges((DefaultIssue)issue,issueChangeContext,issueQueryResult);
+      concernedProjects.add(((DefaultIssue)issue).projectKey());
     }
+  }
+  for (  String projectKey : concernedProjects) {
+    dryRunCache.reportResourceModification(projectKey);
   }
   LOG.debug("BulkChange execution time : {} ms",System.currentTimeMillis() - start);
   return result;
