@@ -1,12 +1,12 @@
 {
   setupData("should_create_database");
-  File existingDb=new File(new File(dryRunCache,"default"),"123456.h2.db");
+  File existingDb=new File(dryRunCacheFolder,"123456.h2.db");
   FileUtils.write(existingDb,"fakeDbContent");
-  settings.setProperty("sonar.dryRun.cache.lastUpdate","123457");
+  when(dryRunCache.getModificationTimestamp(null)).thenReturn(123457L);
   byte[] database=localDatabaseFactory.createDatabaseForDryRun(null);
   dataSource=createDatabase(database);
   assertThat(rowCount("metrics")).isEqualTo(2);
   assertThat(rowCount("projects")).isZero();
   assertThat(rowCount("alerts")).isEqualTo(1);
-  assertThat(existingDb).doesNotExist();
+  verify(dryRunCache).clean(null);
 }

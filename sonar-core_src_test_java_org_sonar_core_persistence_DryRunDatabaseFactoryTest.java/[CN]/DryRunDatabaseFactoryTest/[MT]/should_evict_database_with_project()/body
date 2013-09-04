@@ -1,14 +1,13 @@
 {
   setupData("should_create_database");
-  when(resourceDao.getRootProjectByComponentId(123L)).thenReturn(new ResourceDto().setId(123L));
-  File existingDb=new File(new File(dryRunCache,"123"),"123456.h2.db");
+  File existingDb=new File(dryRunCacheFolder,"123456.h2.db");
   FileUtils.write(existingDb,"fakeDbContent");
-  settings.setProperty("sonar.dryRun.cache.123.lastUpdate","123457");
+  when(dryRunCache.getModificationTimestamp(123L)).thenReturn(123457L);
   byte[] database=localDatabaseFactory.createDatabaseForDryRun(123L);
   dataSource=createDatabase(database);
   assertThat(rowCount("metrics")).isEqualTo(2);
   assertThat(rowCount("projects")).isEqualTo(1);
   assertThat(rowCount("snapshots")).isEqualTo(1);
   assertThat(rowCount("project_measures")).isEqualTo(1);
-  assertThat(existingDb).doesNotExist();
+  verify(dryRunCache).clean(123L);
 }

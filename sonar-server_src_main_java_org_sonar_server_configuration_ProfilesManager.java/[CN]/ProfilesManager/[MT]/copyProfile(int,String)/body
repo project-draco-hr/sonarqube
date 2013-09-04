@@ -2,7 +2,8 @@
   RulesProfile profile=getSession().getSingleResult(RulesProfile.class,"id",profileId);
   RulesProfile toImport=(RulesProfile)profile.clone();
   toImport.setName(newProfileName);
-  ProfilesBackup pb=new ProfilesBackup(getSession());
+  ProfilesBackup pb=new ProfilesBackup(getSession(),dryRunCache);
   pb.importProfile(rulesDao,toImport);
   getSession().commit();
+  dryRunCache.reportGlobalModification();
 }

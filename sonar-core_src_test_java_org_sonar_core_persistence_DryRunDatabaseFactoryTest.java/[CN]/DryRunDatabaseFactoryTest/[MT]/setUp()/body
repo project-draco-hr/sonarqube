@@ -1,8 +1,9 @@
 {
   File tempFolder=temporaryFolder.newFolder();
-  dryRunCache=new File(tempFolder,"dryRun");
-  when(serverFileSystem.getTempDir()).thenReturn(tempFolder);
-  resourceDao=mock(ResourceDao.class);
-  settings=new Settings();
-  localDatabaseFactory=new DryRunDatabaseFactory(getDatabase(),serverFileSystem,settings,resourceDao);
+  dryRunCacheFolder=new File(tempFolder,"dryRun");
+  dryRunCache=mock(DryRunCache.class);
+  when(dryRunCache.getCacheLocation(anyLong())).thenReturn(dryRunCacheFolder);
+  when(dryRunCache.getModificationTimestamp(null)).thenReturn(0L);
+  when(dryRunCache.getModificationTimestamp(anyLong())).thenReturn(0L);
+  localDatabaseFactory=new DryRunDatabaseFactory(getDatabase(),dryRunCache);
 }
