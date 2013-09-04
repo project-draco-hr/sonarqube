@@ -6,8 +6,11 @@
     }
     return Long.valueOf(dto.getValue());
   }
-  Long rootId=resourceDao.getRootProjectByComponentId(projectId).getId();
-  PropertyDto dto=propertiesDao.selectProjectProperty(rootId,SONAR_DRY_RUN_CACHE_LAST_UPDATE_KEY);
+  ResourceDto rootProject=resourceDao.getRootProjectByComponentId(projectId);
+  if (rootProject == null) {
+    throw new SonarException("Unable to find root project for project with [id=" + projectId + "]");
+  }
+  PropertyDto dto=propertiesDao.selectProjectProperty(rootProject.getId(),SONAR_DRY_RUN_CACHE_LAST_UPDATE_KEY);
   if (dto == null) {
     return 0;
   }
