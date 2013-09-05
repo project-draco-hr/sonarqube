@@ -1,0 +1,26 @@
+{
+  LOG.debug("Scanning {}",resource);
+  init();
+  List<String> lines=FileUtils.readLines(file,sourcesEncoding.name());
+  int lineIndex=0;
+  for (  String line : lines) {
+    lineIndex++;
+    if (line.trim().length() == 0) {
+      continue;
+    }
+    for (    java.util.regex.Pattern pattern : allFilePatterns) {
+      if (pattern.matcher(line).find()) {
+        patternsInitializer.addPatternToExcludeResource(resource);
+        LOG.debug("- Exclusion pattern '{}': every violation in this file will be ignored.",pattern);
+        return;
+      }
+    }
+    checkDoubleRegexps(line,lineIndex);
+  }
+  fileLength=lineIndex;
+  if (!lineExclusions.isEmpty()) {
+    Set<LineRange> lineRanges=convertLineExclusionsToLineRanges();
+    LOG.debug("- Line exclusions found: {}",lineRanges);
+    patternsInitializer.addPatternToExcludeLines(resource,lineRanges);
+  }
+}

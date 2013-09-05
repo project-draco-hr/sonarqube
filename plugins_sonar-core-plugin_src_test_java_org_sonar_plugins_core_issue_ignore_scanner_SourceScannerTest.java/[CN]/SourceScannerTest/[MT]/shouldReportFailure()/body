@@ -1,0 +1,9 @@
+{
+  File sourceFile=new File("Foo.php");
+  when(project.getLanguageKey()).thenReturn("php");
+  when(fileSystem.files(Mockito.isA(FileQuery.class))).thenReturn(Arrays.asList(sourceFile));
+  doThrow(new IOException("BUG")).when(regexpScanner).scan("Foo.php",sourceFile,UTF_8);
+  thrown.expect(SonarException.class);
+  thrown.expectMessage("Unable to read the source file");
+  scanner.analyse(project,null);
+}

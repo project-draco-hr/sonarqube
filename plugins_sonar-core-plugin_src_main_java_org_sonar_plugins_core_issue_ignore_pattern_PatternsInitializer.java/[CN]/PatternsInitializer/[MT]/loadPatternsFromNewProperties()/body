@@ -1,0 +1,27 @@
+{
+  String patternConf=StringUtils.defaultIfBlank(settings.getString(Constants.PATTERNS_MULTICRITERIA_KEY),"");
+  for (  String id : StringUtils.split(patternConf,',')) {
+    String propPrefix=Constants.PATTERNS_MULTICRITERIA_KEY + "." + id+ ".";
+    String resourceKeyPattern=settings.getString(propPrefix + Constants.RESOURCE_KEY);
+    String ruleKeyPattern=settings.getString(propPrefix + Constants.RULE_KEY);
+    Pattern pattern=new Pattern(firstNonNull(resourceKeyPattern,"*"),firstNonNull(ruleKeyPattern,"*"));
+    String lineRange=settings.getString(propPrefix + Constants.LINE_RANGE_KEY);
+    PatternDecoder.decodeRangeOfLines(pattern,firstNonNull(lineRange,"*"));
+    multicriteriaPatterns.add(pattern);
+  }
+  patternConf=StringUtils.defaultIfBlank(settings.getString(Constants.PATTERNS_BLOCK_KEY),"");
+  for (  String id : StringUtils.split(patternConf,',')) {
+    String propPrefix=Constants.PATTERNS_BLOCK_KEY + "." + id+ ".";
+    String beginBlockRegexp=settings.getString(propPrefix + Constants.BEGIN_BLOCK_REGEXP);
+    String endBlockRegexp=settings.getString(propPrefix + Constants.END_BLOCK_REGEXP);
+    Pattern pattern=new Pattern().setBeginBlockRegexp(nullToEmpty(beginBlockRegexp)).setEndBlockRegexp(nullToEmpty(endBlockRegexp));
+    blockPatterns.add(pattern);
+  }
+  patternConf=StringUtils.defaultIfBlank(settings.getString(Constants.PATTERNS_ALLFILE_KEY),"");
+  for (  String id : StringUtils.split(patternConf,',')) {
+    String propPrefix=Constants.PATTERNS_ALLFILE_KEY + "." + id+ ".";
+    String allFileRegexp=settings.getString(propPrefix + Constants.FILE_REGEXP);
+    Pattern pattern=new Pattern().setAllFileRegexp(nullToEmpty(allFileRegexp));
+    allFilePatterns.add(pattern);
+  }
+}

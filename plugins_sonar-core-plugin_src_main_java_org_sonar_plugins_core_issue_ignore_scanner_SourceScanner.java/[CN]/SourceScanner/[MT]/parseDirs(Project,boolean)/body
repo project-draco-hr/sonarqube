@@ -1,0 +1,21 @@
+{
+  Charset sourcesEncoding=fileSystem.sourceCharset();
+  List<File> files;
+  if (isTest) {
+    files=fileSystem.files(FileQuery.onTest().onLanguage(project.getLanguageKey()));
+  }
+ else {
+    files=fileSystem.files(FileQuery.onSource().onLanguage(project.getLanguageKey()));
+  }
+  for (  File inputFile : files) {
+    try {
+      String resource=defineResource(inputFile,fileSystem,project,isTest);
+      if (resource != null) {
+        regexpScanner.scan(resource,inputFile,sourcesEncoding);
+      }
+    }
+ catch (    Exception e) {
+      throw new SonarException("Unable to read the source file : '" + inputFile.getAbsolutePath() + "' with the charset : '"+ sourcesEncoding.name()+ "'.",e);
+    }
+  }
+}

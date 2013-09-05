@@ -1,0 +1,11 @@
+{
+  File sourceFile=new File("src/main/java/Foo.java");
+  File otherFile=new File("other.js");
+  when(project.getLanguageKey()).thenReturn("java");
+  List<File> empty=Collections.emptyList();
+  when(fileSystem.files(Mockito.isA(FileQuery.class))).thenReturn(Arrays.asList(sourceFile,otherFile)).thenReturn(empty);
+  when(fileSystem.sourceDirs()).thenReturn(Arrays.asList(new File("src/main/java")));
+  when(fileSystem.testDirs()).thenReturn(Arrays.asList(new File("src/test/java")));
+  scanner.analyse(project,null);
+  verify(regexpScanner,never()).scan("other.js",sourceFile,UTF_8);
+}
