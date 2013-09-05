@@ -3,6 +3,7 @@
   template.copyTable(source,dest,"active_rules").copyTable(source,dest,"active_rule_parameters").copyTable(source,dest,"characteristics").copyTable(source,dest,"characteristic_edges").copyTable(source,dest,"characteristic_properties").copyTable(source,dest,"metrics").copyTable(source,dest,"permission_templates").copyTable(source,dest,"perm_templates_users").copyTable(source,dest,"perm_templates_groups").copyTable(source,dest,"quality_models").copyTable(source,dest,"rules").copyTable(source,dest,"rules_parameters").copyTable(source,dest,"rules_profiles").copyTable(source,dest,"alerts");
   if (projectId != null) {
     template.copyTable(source,dest,"projects",projectQuery(projectId,false));
+    template.copyTable(source,dest,"events","SELECT * FROM events WHERE resource_id=" + projectId);
     template.copyTable(source,dest,"snapshots","SELECT * FROM snapshots WHERE project_id=" + projectId);
     template.copyTable(source,dest,"project_measures","SELECT m.* FROM project_measures m INNER JOIN snapshots s on m.snapshot_id=s.id WHERE s.project_id=" + projectId);
     StringBuilder issueQuery=new StringBuilder().append("SELECT issues.* FROM issues").append(" INNER JOIN (").append(projectQuery(projectId,true)).append(") resources").append(" ON issues.component_id=resources.id").append(" AND status <> '").append(Issue.STATUS_CLOSED).append("'");
