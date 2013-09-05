@@ -1,7 +1,11 @@
 {
-  Settings settings=new Settings();
-  settings.addProperties(DefaultProjectBootstrapper.toProperties(TestUtils.getResource(this.getClass(),projectFolder + "/sonar-project.properties")));
-  settings.setProperty("sonar.projectBaseDir",TestUtils.getResource(this.getClass(),projectFolder).getAbsolutePath());
-  ProjectReactor projectReactor=new DefaultProjectBootstrapper(settings).bootstrap();
+  Map<String,String> props=Maps.<String,String>newHashMap();
+  Properties runnerProps=DefaultProjectBootstrapper.toProperties(TestUtils.getResource(this.getClass(),projectFolder + "/sonar-project.properties"));
+  for (  final String name : runnerProps.stringPropertyNames()) {
+    props.put(name,runnerProps.getProperty(name));
+  }
+  props.put("sonar.projectBaseDir",TestUtils.getResource(this.getClass(),projectFolder).getAbsolutePath());
+  BootstrapProperties bootstrapProps=new BootstrapProperties(props);
+  ProjectReactor projectReactor=new DefaultProjectBootstrapper(new BootstrapSettings(bootstrapProps)).bootstrap();
   return projectReactor.getRoot();
 }
