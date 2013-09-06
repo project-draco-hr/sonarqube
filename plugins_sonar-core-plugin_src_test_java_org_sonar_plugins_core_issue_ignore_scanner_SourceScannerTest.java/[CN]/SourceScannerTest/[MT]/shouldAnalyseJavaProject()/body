@@ -5,7 +5,10 @@
   when(fileSystem.files(Mockito.isA(FileQuery.class))).thenReturn(Arrays.asList(sourceFile)).thenReturn(Arrays.asList(testFile));
   when(fileSystem.sourceDirs()).thenReturn(Arrays.asList(new File("src/main/java")));
   when(fileSystem.testDirs()).thenReturn(Arrays.asList(new File("src/test/java")));
+  when(patternsInitializer.hasFileContentPattern()).thenReturn(true);
   scanner.analyse(project,null);
-  verify(regexpScanner).scan("[default].Foo",sourceFile,UTF_8);
-  verify(regexpScanner).scan("[default].FooTest",testFile,UTF_8);
+  verify(patternsInitializer).configurePatternsForComponent("polop:[default].Foo","Foo.java");
+  verify(patternsInitializer).configurePatternsForComponent("polop:[default].FooTest","FooTest.java");
+  verify(regexpScanner).scan("polop:[default].Foo",sourceFile,UTF_8);
+  verify(regexpScanner).scan("polop:[default].FooTest",testFile,UTF_8);
 }

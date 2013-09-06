@@ -1,17 +1,24 @@
 {
   Charset sourcesEncoding=fileSystem.sourceCharset();
   List<File> files;
+  List<File> dirs;
   if (isTest) {
     files=fileSystem.files(FileQuery.onTest().onLanguage(project.getLanguageKey()));
+    dirs=fileSystem.testDirs();
   }
  else {
     files=fileSystem.files(FileQuery.onSource().onLanguage(project.getLanguageKey()));
+    dirs=fileSystem.sourceDirs();
   }
   for (  File inputFile : files) {
     try {
-      String resource=defineResource(inputFile,fileSystem,project,isTest);
-      if (resource != null) {
-        regexpScanner.scan(resource,inputFile,sourcesEncoding);
+      String componentKey=resolveComponent(inputFile,fileSystem,project,isTest);
+      if (componentKey != null) {
+        String relativePath=pathResolver.relativePath(dirs,inputFile).path();
+        patternsInitializer.configurePatternsForComponent(componentKey,relativePath);
+        if (patternsInitializer.hasFileContentPattern()) {
+          regexpScanner.scan(componentKey,inputFile,sourcesEncoding);
+        }
       }
     }
  catch (    Exception e) {
