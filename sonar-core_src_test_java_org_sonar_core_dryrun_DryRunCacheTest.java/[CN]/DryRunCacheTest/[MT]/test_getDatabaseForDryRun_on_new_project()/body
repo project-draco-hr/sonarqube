@@ -1,0 +1,16 @@
+{
+  when(dryRunDatabaseFactory.createNewDatabaseForDryRun(isNull(Long.class),any(File.class),anyString())).thenAnswer(new Answer<File>(){
+    public File answer(    InvocationOnMock invocation) throws IOException {
+      Object[] args=invocation.getArguments();
+      File dbFile=new File(new File(dryRunCacheLocation,"default"),(String)args[2] + ".h2.db");
+      FileUtils.write(dbFile,"fake db content");
+      return dbFile;
+    }
+  }
+);
+  byte[] dbContent=dryRunCache.getDatabaseForDryRun(null);
+  assertThat(new String(dbContent)).isEqualTo("fake db content");
+  dbContent=dryRunCache.getDatabaseForDryRun(null);
+  assertThat(new String(dbContent)).isEqualTo("fake db content");
+  verify(dryRunDatabaseFactory,times(1)).createNewDatabaseForDryRun(anyLong(),any(File.class),anyString());
+}

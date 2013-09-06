@@ -1,0 +1,25 @@
+{
+  long startup=System.currentTimeMillis();
+  String h2Name=destFolder.getAbsolutePath() + File.separator + dbFileName;
+  try {
+    DataSource source=database.getDataSource();
+    BasicDataSource destination=create(DIALECT,DRIVER,USER,PASSWORD,URL + h2Name);
+    copy(source,destination,projectId);
+    close(destination);
+    File dbFile=new File(h2Name + H2_FILE_SUFFIX);
+    if (LOG.isDebugEnabled()) {
+      long size=dbFile.length();
+      long duration=System.currentTimeMillis() - startup;
+      if (projectId == null) {
+        LOG.debug("Dry Run Database created in " + duration + " ms, size is "+ size+ " bytes");
+      }
+ else {
+        LOG.debug("Dry Run Database for project " + projectId + " created in "+ duration+ " ms, size is "+ size+ " bytes");
+      }
+    }
+    return dbFile;
+  }
+ catch (  SQLException e) {
+    throw new SonarException("Unable to create database for DryRun",e);
+  }
+}

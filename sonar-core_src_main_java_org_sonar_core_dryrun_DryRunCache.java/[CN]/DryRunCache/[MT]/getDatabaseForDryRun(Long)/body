@@ -1,0 +1,21 @@
+{
+  long notNullProjectId=projectId != null ? projectId.longValue() : 0L;
+  ReadWriteLock rwl=getLock(notNullProjectId);
+  try {
+    rwl.readLock().lock();
+    if (!isCacheValid(projectId)) {
+      rwl.readLock().unlock();
+      rwl.writeLock().lock();
+      if (!isCacheValid(projectId)) {
+        generateNewDB(projectId);
+      }
+      rwl.readLock().lock();
+      rwl.writeLock().unlock();
+    }
+    File dbFile=new File(getCacheLocation(projectId),lastTimestampPerProject.get(notNullProjectId) + DryRunDatabaseFactory.H2_FILE_SUFFIX);
+    return fileToByte(dbFile);
+  }
+  finally {
+    rwl.readLock().unlock();
+  }
+}

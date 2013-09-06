@@ -1,0 +1,14 @@
+{
+  long notNullProjectId=projectId != null ? projectId.longValue() : 0L;
+  Long lastTimestampInCache=lastTimestampPerProject.get(notNullProjectId);
+  LOG.debug("Timestamp of last cached DB is {}",lastTimestampInCache);
+  if (lastTimestampInCache != null && isValid(projectId,lastTimestampInCache.longValue())) {
+    File dbFile=new File(getCacheLocation(projectId),lastTimestampInCache + DryRunDatabaseFactory.H2_FILE_SUFFIX);
+    LOG.debug("Look for existence of cached DB at {}",dbFile);
+    if (dbFile.exists()) {
+      LOG.debug("Found cached DB at {}",dbFile);
+      return true;
+    }
+  }
+  return false;
+}
