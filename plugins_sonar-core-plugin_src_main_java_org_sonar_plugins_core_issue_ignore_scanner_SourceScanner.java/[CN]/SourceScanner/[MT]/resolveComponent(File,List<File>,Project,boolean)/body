@@ -1,17 +1,10 @@
 {
   Resource<?> resource=null;
   if (Java.KEY.equals(project.getLanguageKey()) && Java.isJavaFile(inputFile)) {
-    List<File> sourceDirs=null;
-    if (isTest) {
-      sourceDirs=fileSystem.testDirs();
-    }
- else {
-      sourceDirs=fileSystem.sourceDirs();
-    }
     resource=JavaFile.fromIOFile(inputFile,sourceDirs,isTest);
   }
  else {
-    resource=new org.sonar.api.resources.File(inputFile.getPath());
+    resource=new org.sonar.api.resources.File(pathResolver.relativePath(sourceDirs,inputFile).path());
   }
   if (resource == null) {
     return null;
