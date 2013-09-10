@@ -1,0 +1,23 @@
+{
+  if (isBlankOrComment(line)) {
+    return null;
+  }
+  String[] fields=StringUtils.splitPreserveAllTokens(line,';');
+  if (fields.length > THREE_FIELDS_PER_LINE) {
+    throw new SonarException("Invalid format. The following line has more than 3 fields separated by comma: " + line);
+  }
+  Pattern pattern;
+  if (fields.length == THREE_FIELDS_PER_LINE) {
+    checkRegularLineConstraints(line,fields);
+    pattern=new Pattern(StringUtils.trim(fields[0]),StringUtils.trim(fields[1]));
+    decodeRangeOfLines(pattern,fields[2]);
+  }
+ else   if (fields.length == 2) {
+    checkDoubleRegexpLineConstraints(line,fields);
+    pattern=new Pattern().setBeginBlockRegexp(fields[0]).setEndBlockRegexp(fields[1]);
+  }
+ else {
+    pattern=new Pattern().setAllFileRegexp(fields[0]);
+  }
+  return pattern;
+}
