@@ -1,0 +1,16 @@
+{
+  String url;
+  if (StringUtils.isNotBlank(projectKey)) {
+    url=BATCH_BOOTSTRAP_PROPERTIES_URL + "?project=" + projectKey+ "&dryRun="+ dryRun;
+  }
+ else {
+    url=BATCH_BOOTSTRAP_PROPERTIES_URL + "?dryRun=" + dryRun;
+  }
+  String jsonText=client.request(url);
+  List<Map<String,String>> json=(List<Map<String,String>>)JSONValue.parse(jsonText);
+  for (  Map<String,String> jsonProperty : json) {
+    String key=jsonProperty.get("k");
+    String value=jsonProperty.get("v");
+    setProperty(key,value);
+  }
+}
