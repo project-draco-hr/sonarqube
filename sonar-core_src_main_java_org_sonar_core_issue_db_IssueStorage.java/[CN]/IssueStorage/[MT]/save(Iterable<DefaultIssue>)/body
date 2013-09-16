@@ -1,25 +1,5 @@
 {
-  SqlSession session=mybatis.openSession();
-  int count=0;
-  IssueMapper issueMapper=session.getMapper(IssueMapper.class);
-  IssueChangeMapper issueChangeMapper=session.getMapper(IssueChangeMapper.class);
   Date now=new Date();
-  try {
-    for (    DefaultIssue issue : issues) {
-      if (issue.isNew()) {
-        insert(issueMapper,now,issue);
-      }
- else       if (issue.isChanged()) {
-        update(issueMapper,now,issue);
-      }
-      insertChanges(issueChangeMapper,issue);
-      if (count++ > BatchSession.MAX_BATCH_SIZE) {
-        session.commit();
-      }
-    }
-    session.commit();
-  }
-  finally {
-    MyBatis.closeQuietly(session);
-  }
+  List<DefaultIssue> toBeUpdated=batchInsert(issues,now);
+  update(toBeUpdated,now);
 }

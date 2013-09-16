@@ -1,0 +1,26 @@
+{
+  List<DefaultIssue> toBeUpdated=Lists.newArrayList();
+  SqlSession batchSession=mybatis.openBatchSession();
+  int count=0;
+  IssueMapper issueMapper=batchSession.getMapper(IssueMapper.class);
+  IssueChangeMapper issueChangeMapper=batchSession.getMapper(IssueChangeMapper.class);
+  try {
+    for (    DefaultIssue issue : issues) {
+      if (issue.isNew()) {
+        insert(issueMapper,now,issue);
+        insertChanges(issueChangeMapper,issue);
+        if (count++ > BatchSession.MAX_BATCH_SIZE) {
+          batchSession.commit();
+        }
+      }
+ else       if (issue.isChanged()) {
+        toBeUpdated.add(issue);
+      }
+    }
+    batchSession.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(batchSession);
+  }
+  return toBeUpdated;
+}

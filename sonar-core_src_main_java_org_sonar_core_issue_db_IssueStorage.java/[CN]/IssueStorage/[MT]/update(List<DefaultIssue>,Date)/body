@@ -1,0 +1,17 @@
+{
+  if (!toBeUpdated.isEmpty()) {
+    SqlSession session=mybatis.openSession();
+    try {
+      IssueMapper issueMapper=session.getMapper(IssueMapper.class);
+      IssueChangeMapper issueChangeMapper=session.getMapper(IssueChangeMapper.class);
+      for (      DefaultIssue issue : toBeUpdated) {
+        update(issueMapper,now,issue);
+        insertChanges(issueChangeMapper,issue);
+      }
+      session.commit();
+    }
+  finally {
+      MyBatis.closeQuietly(session);
+    }
+  }
+}
