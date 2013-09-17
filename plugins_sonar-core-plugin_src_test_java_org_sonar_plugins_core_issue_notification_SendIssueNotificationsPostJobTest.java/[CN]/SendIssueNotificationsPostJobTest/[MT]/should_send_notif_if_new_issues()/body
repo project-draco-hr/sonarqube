@@ -1,7 +1,9 @@
 {
   when(project.getAnalysisDate()).thenReturn(DateUtils.parseDate("2013-05-18"));
-  when(issueCache.all()).thenReturn(Arrays.asList(new DefaultIssue().setNew(true),new DefaultIssue().setNew(false)));
+  when(issueCache.all()).thenReturn(Arrays.asList(new DefaultIssue().setNew(true).setSeverity("MAJOR"),new DefaultIssue().setNew(false).setSeverity("MINOR")));
   SendIssueNotificationsPostJob job=new SendIssueNotificationsPostJob(issueCache,notifications,ruleFinder);
   job.executeOn(project,sensorContext);
-  verify(notifications).sendNewIssues(project,1);
+  ArgumentCaptor<IssuesBySeverity> argument=ArgumentCaptor.forClass(IssuesBySeverity.class);
+  verify(notifications).sendNewIssues(eq(project),argument.capture());
+  assertThat(argument.getValue().size()).isEqualTo(1);
 }

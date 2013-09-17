@@ -3,10 +3,19 @@
     return null;
   }
   String projectName=notification.getFieldValue("projectName");
-  String violationsCount=notification.getFieldValue("count");
   StringBuilder sb=new StringBuilder();
-  sb.append("Project: ").append(projectName).append('\n');
-  sb.append(violationsCount).append(" new issues").append('\n');
+  sb.append("Project: ").append(projectName).append("\n\n");
+  sb.append(notification.getFieldValue("count")).append(" new issues").append("\n\n");
+  sb.append("   ");
+  for (Iterator<String> severityIterator=Lists.reverse(Severity.ALL).iterator(); severityIterator.hasNext(); ) {
+    String severity=severityIterator.next();
+    String severityLabel=i18n.message(getLocale(),"severity." + severity,severity);
+    sb.append(severityLabel).append(": ").append(notification.getFieldValue("count-" + severity));
+    if (severityIterator.hasNext()) {
+      sb.append("   ");
+    }
+  }
+  sb.append('\n');
   appendFooter(sb,notification);
   EmailMessage message=new EmailMessage().setMessageId("new-issues/" + notification.getFieldValue("projectKey")).setSubject(projectName + ": new issues").setMessage(sb.toString());
   return message;

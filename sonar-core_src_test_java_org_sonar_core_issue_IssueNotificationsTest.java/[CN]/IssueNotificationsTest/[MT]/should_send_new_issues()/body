@@ -1,8 +1,12 @@
 {
   Date date=DateUtils.parseDateTime("2013-05-18T13:00:03+0200");
   Project project=new Project("struts").setAnalysisDate(date);
-  Notification notification=issueNotifications.sendNewIssues(project,42);
+  IssuesBySeverity issuesBySeverity=mock(IssuesBySeverity.class);
+  when(issuesBySeverity.size()).thenReturn(42);
+  when(issuesBySeverity.issues("MINOR")).thenReturn(10);
+  Notification notification=issueNotifications.sendNewIssues(project,issuesBySeverity);
   assertThat(notification.getFieldValue("count")).isEqualTo("42");
+  assertThat(notification.getFieldValue("count-MINOR")).isEqualTo("10");
   assertThat(DateUtils.parseDateTime(notification.getFieldValue("projectDate"))).isEqualTo(date);
   Mockito.verify(manager).scheduleForSending(notification);
 }
