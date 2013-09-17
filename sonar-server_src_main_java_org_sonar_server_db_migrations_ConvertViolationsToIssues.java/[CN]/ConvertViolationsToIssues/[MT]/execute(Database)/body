@@ -7,8 +7,14 @@
     truncateIssueTables(writeConnection);
     convertViolations(readConnection,new Converter(db,runner,readConnection,writeConnection));
   }
- catch (  Exception e) {
-    throw new IllegalStateException("Fail to convert violations to issues",e);
+ catch (  SQLException e) {
+    logger.error("Fail to convert violations to issues",e);
+    SQLException next=e.getNextException();
+    while (next != null) {
+      logger.error("SQL error: {}. Message: {}",next.getSQLState(),next.getMessage());
+      next=next.getNextException();
+    }
+    throw MessageException.of("Fail to convert violations to issues");
   }
  finally {
     DbUtils.closeQuietly(readConnection);
