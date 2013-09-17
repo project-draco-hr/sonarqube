@@ -1,9 +1,10 @@
 {
   when(lastSnapshots.getSource(project)).thenReturn(load("example2-v1"));
-  String source=load("example2-v2");
+  when(index.getSource(project)).thenReturn(load("example2-v2"));
+  sourceHashHolder=new SourceHashHolder(index,lastSnapshots,project);
   DefaultIssue newIssue=newDefaultIssue("1 branch need to be covered",null,RuleKey.of("squid","AvoidCycle"),"foo");
   IssueDto referenceIssue=newReferenceIssue("Indentationd",7,"squid","AvoidCycle",null);
   IssueTrackingResult result=new IssueTrackingResult();
-  tracking.mapIssues(newArrayList(newIssue),newArrayList(referenceIssue),source,project,result);
+  tracking.mapIssues(newArrayList(newIssue),newArrayList(referenceIssue),sourceHashHolder,result);
   assertThat(result.matched()).isEmpty();
 }

@@ -5,7 +5,8 @@
     issues.add((DefaultIssue)issue);
   }
   Collection<IssueDto> dbOpenIssues=initialOpenIssues.selectAndRemove(resource.getEffectiveKey());
-  IssueTrackingResult trackingResult=tracking.track(resource,dbOpenIssues,issues);
+  SourceHashHolder sourceHashHolder=new SourceHashHolder(index,lastSnapshots,resource);
+  IssueTrackingResult trackingResult=tracking.track(sourceHashHolder,dbOpenIssues,issues);
   addUnmatched(trackingResult.unmatched(),issues);
   mergeMatched(trackingResult);
   if (ResourceUtils.isProject(resource)) {
