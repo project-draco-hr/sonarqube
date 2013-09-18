@@ -1,0 +1,17 @@
+{
+  Rule rule=Rule.create("squid","AvoidCycle");
+  ActiveRule activeRule=mock(ActiveRule.class);
+  when(activeRule.getRule()).thenReturn(rule);
+  when(activeRule.getSeverity()).thenReturn(RulePriority.INFO);
+  when(qProfile.getActiveRule("squid","AvoidCycle")).thenReturn(activeRule);
+  Date analysisDate=new Date();
+  when(project.getAnalysisDate()).thenReturn(analysisDate);
+  DefaultIssue issue=new DefaultIssue().setKey("ABCDE").setRuleKey(SQUID_RULE_KEY).setSeverity(Severity.CRITICAL);
+  when(filters.accept(issue,null)).thenReturn(true);
+  boolean added=moduleIssues.initAndAddIssue(issue);
+  assertThat(added).isTrue();
+  ArgumentCaptor<DefaultIssue> argument=ArgumentCaptor.forClass(DefaultIssue.class);
+  verify(cache).put(argument.capture());
+  assertThat(argument.getValue().severity()).isEqualTo(Severity.CRITICAL);
+  assertThat(argument.getValue().creationDate()).isEqualTo(DateUtils.truncate(analysisDate,Calendar.SECOND));
+}

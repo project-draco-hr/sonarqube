@@ -1,0 +1,12 @@
+{
+  Rule rule=Rule.create("squid","AvoidCycle");
+  ActiveRule activeRule=mock(ActiveRule.class);
+  when(activeRule.getRule()).thenReturn(rule);
+  when(activeRule.getSeverity()).thenReturn(RulePriority.INFO);
+  when(qProfile.getActiveRule("squid","AvoidCycle")).thenReturn(activeRule);
+  DefaultIssue issue=new DefaultIssue().setKey("ABCDE").setRuleKey(SQUID_RULE_KEY).setSeverity(Severity.CRITICAL);
+  when(filters.accept(issue,null)).thenReturn(false);
+  boolean added=moduleIssues.initAndAddIssue(issue);
+  assertThat(added).isFalse();
+  verifyZeroInteractions(cache);
+}
