@@ -1,0 +1,14 @@
+{
+  Logger logger=LoggerFactory.getLogger(IssueTrackingDecorator.class);
+  logger.debug("Trying to relocate manual issue {}",oldIssue.getKee());
+  Collection<Integer> newLinesWithSameHash=sourceHashHolder.getNewLinesMatching(oldIssue.getLine());
+  logger.debug("Found the following lines with same hash: {}",newLinesWithSameHash);
+  if (newLinesWithSameHash.size() == 1) {
+    Integer newLine=newLinesWithSameHash.iterator().next();
+    logger.debug("Relocating issue to line {}",newLine);
+    newIssue.setLine(newLine);
+    updater.setPastLine(newIssue,oldIssue.getLine());
+    updater.setPastMessage(newIssue,oldIssue.getMessage(),changeContext);
+    updater.setPastEffortToFix(newIssue,oldIssue.getEffortToFix(),changeContext);
+  }
+}

@@ -1,9 +1,12 @@
 {
   Resource file=new File("Action.java").setEffectiveKey("struts:Action.java").setId(123);
-  IssueDto unmatchedIssue=new IssueDto().setKee("ABCDE").setReporter("freddy").setStatus("OPEN").setRuleKey_unit_test_only("manual","Performance");
+  IssueDto unmatchedIssue=new IssueDto().setKee("ABCDE").setReporter("freddy").setLine(1).setStatus("OPEN").setRuleKey_unit_test_only("manual","Performance");
   when(ruleFinder.findByKey(RuleKey.of("manual","Performance"))).thenReturn(null);
   IssueTrackingResult trackingResult=new IssueTrackingResult();
   trackingResult.addUnmatched(unmatchedIssue);
+  String source="public interface Action {}";
+  when(index.getSource(file)).thenReturn(source);
+  when(lastSnapshots.getSource(file)).thenReturn(source);
   when(tracking.track(isA(SourceHashHolder.class),anyCollection(),anyCollection())).thenReturn(trackingResult);
   decorator.doDecorate(file);
   verify(workflow,times(1)).doAutomaticTransition(any(DefaultIssue.class),any(IssueChangeContext.class));
