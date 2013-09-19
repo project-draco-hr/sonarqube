@@ -2,16 +2,16 @@
   LoadedTemplateDto expectedTemplate=new LoadedTemplateDto().setKey(PermissionTemplateDto.DEFAULT.getKee()).setType(LoadedTemplateDto.PERMISSION_TEMPLATE_TYPE);
   PermissionTemplateDto permissionTemplate=PermissionTemplateDto.DEFAULT.setId(1L);
   when(loadedTemplateDao.countByTypeAndKey(LoadedTemplateDto.PERMISSION_TEMPLATE_TYPE,PermissionTemplateDto.DEFAULT.getKee())).thenReturn(0);
-  when(permissionDao.createPermissionTemplate(PermissionTemplateDto.DEFAULT.getName(),PermissionTemplateDto.DEFAULT.getDescription())).thenReturn(permissionTemplate);
+  when(permissionTemplateDao.createPermissionTemplate(PermissionTemplateDto.DEFAULT.getName(),PermissionTemplateDto.DEFAULT.getDescription())).thenReturn(permissionTemplate);
   when(userDao.selectGroupByName(DefaultGroups.ADMINISTRATORS)).thenReturn(new GroupDto().setId(1L));
   when(userDao.selectGroupByName(DefaultGroups.USERS)).thenReturn(new GroupDto().setId(2L));
-  RegisterPermissionTemplates initializer=new RegisterPermissionTemplates(loadedTemplateDao,permissionDao,userDao,settings);
+  RegisterPermissionTemplates initializer=new RegisterPermissionTemplates(loadedTemplateDao,permissionTemplateDao,userDao,settings);
   initializer.start();
   verify(loadedTemplateDao).insert(argThat(Matches.template(expectedTemplate)));
-  verify(permissionDao).createPermissionTemplate(PermissionTemplateDto.DEFAULT.getName(),PermissionTemplateDto.DEFAULT.getDescription());
-  verify(permissionDao).addGroupPermission(1L,1L,UserRole.ADMIN);
-  verify(permissionDao).addGroupPermission(1L,null,UserRole.USER);
-  verify(permissionDao).addGroupPermission(1L,null,UserRole.CODEVIEWER);
-  verifyNoMoreInteractions(permissionDao);
+  verify(permissionTemplateDao).createPermissionTemplate(PermissionTemplateDto.DEFAULT.getName(),PermissionTemplateDto.DEFAULT.getDescription());
+  verify(permissionTemplateDao).addGroupPermission(1L,1L,UserRole.ADMIN);
+  verify(permissionTemplateDao).addGroupPermission(1L,null,UserRole.USER);
+  verify(permissionTemplateDao).addGroupPermission(1L,null,UserRole.CODEVIEWER);
+  verifyNoMoreInteractions(permissionTemplateDao);
   verify(settings).saveProperty(RegisterPermissionTemplates.DEFAULT_TEMPLATE_PROPERTY,PermissionTemplateDto.DEFAULT.getKee());
 }

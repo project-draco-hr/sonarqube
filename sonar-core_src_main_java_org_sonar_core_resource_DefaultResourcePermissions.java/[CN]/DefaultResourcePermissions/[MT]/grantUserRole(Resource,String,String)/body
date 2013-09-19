@@ -1,5 +1,16 @@
 {
   if (resource.getId() != null) {
-    permissionFacade.setUserPermission(Long.valueOf(resource.getId()),login,role);
+    SqlSession session=myBatis.openSession();
+    try {
+      UserDto user=session.getMapper(UserMapper.class).selectUserByLogin(login);
+      if (user != null) {
+        permissionFacade.deleteUserPermission(Long.valueOf(resource.getId()),user.getId(),role,session);
+        permissionFacade.insertUserPermission(Long.valueOf(resource.getId()),user.getId(),role,session);
+        session.commit();
+      }
+    }
+  finally {
+      MyBatis.closeQuietly(session);
+    }
   }
 }

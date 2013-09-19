@@ -1,16 +1,15 @@
 {
-  List<String> existingPermissions=roleDao.selectUserPermissions(permissionChangeQuery.getUser());
-  if (shouldSkipPermissionChange(operation,existingPermissions,permissionChangeQuery.getRole())) {
-    LOG.info("Skipping permission change '{} {}' for user {} as it matches the current permission scheme",new String[]{operation,permissionChangeQuery.getRole(),permissionChangeQuery.getUser()});
+  List<String> existingPermissions=roleDao.selectUserPermissions(permissionChangeQuery.user());
+  if (shouldSkipPermissionChange(operation,existingPermissions,permissionChangeQuery.permission())) {
+    LOG.info("Skipping permission change '{} {}' for user {} as it matches the current permission scheme",new String[]{operation,permissionChangeQuery.permission(),permissionChangeQuery.user()});
   }
  else {
-    Long targetedUser=getTargetedUser(permissionChangeQuery.getUser());
-    UserRoleDto userRole=new UserRoleDto().setRole(permissionChangeQuery.getRole()).setUserId(targetedUser);
+    Long targetedUser=getTargetedUser(permissionChangeQuery.user());
     if (ADD.equals(operation)) {
-      roleDao.insertUserRole(userRole);
+      permissionFacade.insertUserPermission(getComponentId(permissionChangeQuery.component()),targetedUser,permissionChangeQuery.permission());
     }
  else {
-      roleDao.deleteUserRole(userRole);
+      permissionFacade.deleteUserPermission(getComponentId(permissionChangeQuery.component()),targetedUser,permissionChangeQuery.permission());
     }
   }
 }

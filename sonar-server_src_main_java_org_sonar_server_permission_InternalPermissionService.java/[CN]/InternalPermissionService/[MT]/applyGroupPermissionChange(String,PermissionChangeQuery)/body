@@ -1,16 +1,15 @@
 {
-  List<String> existingPermissions=roleDao.selectGroupPermissions(permissionChangeQuery.getGroup());
-  if (shouldSkipPermissionChange(operation,existingPermissions,permissionChangeQuery.getRole())) {
-    LOG.info("Skipping permission change '{} {}' for group {} as it matches the current permission scheme",new String[]{operation,permissionChangeQuery.getRole(),permissionChangeQuery.getGroup()});
+  List<String> existingPermissions=roleDao.selectGroupPermissions(permissionChangeQuery.group());
+  if (shouldSkipPermissionChange(operation,existingPermissions,permissionChangeQuery.permission())) {
+    LOG.info("Skipping permission change '{} {}' for group {} as it matches the current permission scheme",new String[]{operation,permissionChangeQuery.permission(),permissionChangeQuery.group()});
   }
  else {
-    Long targetedGroup=getTargetedGroup(permissionChangeQuery.getGroup());
-    GroupRoleDto groupRole=new GroupRoleDto().setRole(permissionChangeQuery.getRole()).setGroupId(targetedGroup);
+    Long targetedGroup=getTargetedGroup(permissionChangeQuery.group());
     if (ADD.equals(operation)) {
-      roleDao.insertGroupRole(groupRole);
+      permissionFacade.insertGroupPermission(getComponentId(permissionChangeQuery.component()),targetedGroup,permissionChangeQuery.permission());
     }
  else {
-      roleDao.deleteGroupRole(groupRole);
+      permissionFacade.deleteGroupPermission(getComponentId(permissionChangeQuery.component()),targetedGroup,permissionChangeQuery.permission());
     }
   }
 }

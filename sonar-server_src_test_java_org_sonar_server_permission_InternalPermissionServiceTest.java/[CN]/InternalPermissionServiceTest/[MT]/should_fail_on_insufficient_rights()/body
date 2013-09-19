@@ -1,6 +1,10 @@
 {
-  throwable.expect(ForbiddenException.class);
-  params=buildPermissionChangeParams("user",null,Permission.QUALITY_PROFILE_ADMIN);
-  MockUserSession.set().setLogin("unauthorized").setPermissions(Permission.QUALITY_PROFILE_ADMIN);
-  service.addPermission(params);
+  try {
+    params=buildPermissionChangeParams("user",null,GlobalPermission.QUALITY_PROFILE_ADMIN);
+    MockUserSession.set().setLogin("unauthorized").setPermissions(GlobalPermission.QUALITY_PROFILE_ADMIN);
+    service.addPermission(params);
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(ForbiddenException.class).hasMessage("Insufficient privileges");
+  }
 }

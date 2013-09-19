@@ -1,11 +1,10 @@
 {
-  MockUserSession.set().setLogin("admin").setPermissions(Permission.SYSTEM_ADMIN);
-  UserDto targetedUser=new UserDto().setId(2L).setLogin("user").setActive(true);
-  GroupDto targetedGroup=new GroupDto().setId(2L).setName("group");
+  MockUserSession.set().setLogin("admin").setPermissions(GlobalPermission.SYSTEM_ADMIN);
   roleDao=mock(RoleDao.class);
   userDao=mock(UserDao.class);
-  when(userDao.selectActiveUserByLogin("user")).thenReturn(targetedUser);
-  when(userDao.selectGroupByName("group")).thenReturn(targetedGroup);
-  permissionFacade=mock(ComponentPermissionFacade.class);
-  service=new InternalPermissionService(roleDao,userDao,permissionFacade);
+  when(userDao.selectActiveUserByLogin("user")).thenReturn(new UserDto().setId(2L).setLogin("user").setActive(true));
+  when(userDao.selectGroupByName("group")).thenReturn(new GroupDto().setId(2L).setName("group"));
+  resourceDao=mock(ResourceDao.class);
+  permissionFacade=mock(PermissionFacade.class);
+  service=new InternalPermissionService(roleDao,userDao,resourceDao,permissionFacade);
 }

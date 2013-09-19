@@ -1,5 +1,13 @@
 {
   if (resource.getId() != null) {
-    permissionFacade.setGroupPermission(Long.valueOf(resource.getId()),groupName,role);
+    SqlSession session=myBatis.openSession();
+    try {
+      permissionFacade.deleteGroupPermission(Long.valueOf(resource.getId()),groupName,role,session);
+      permissionFacade.insertGroupPermission(Long.valueOf(resource.getId()),groupName,role,session);
+      session.commit();
+    }
+  finally {
+      MyBatis.closeQuietly(session);
+    }
   }
 }
