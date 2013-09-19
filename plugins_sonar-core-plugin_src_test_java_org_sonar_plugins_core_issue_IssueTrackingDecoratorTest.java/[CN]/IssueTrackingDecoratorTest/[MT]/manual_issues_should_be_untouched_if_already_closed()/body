@@ -1,0 +1,23 @@
+{
+  Resource file=new File("Action.java").setEffectiveKey("struts:Action.java").setId(123);
+  IssueDto unmatchedIssue=new IssueDto().setKee("ABCDE").setReporter("freddy").setLine(1).setStatus("CLOSED").setRuleKey_unit_test_only("manual","Performance");
+  when(ruleFinder.findByKey(RuleKey.of("manual","Performance"))).thenReturn(new Rule("manual","Performance"));
+  IssueTrackingResult trackingResult=new IssueTrackingResult();
+  trackingResult.addUnmatched(unmatchedIssue);
+  String originalSource="public interface Action {}";
+  when(index.getSource(file)).thenReturn(originalSource);
+  when(lastSnapshots.getSource(file)).thenReturn(originalSource);
+  when(tracking.track(isA(SourceHashHolder.class),anyCollection(),anyCollection())).thenReturn(trackingResult);
+  decorator.doDecorate(file);
+  verify(workflow,times(1)).doAutomaticTransition(any(DefaultIssue.class),any(IssueChangeContext.class));
+  verify(handlers,times(1)).execute(any(DefaultIssue.class),any(IssueChangeContext.class));
+  ArgumentCaptor<DefaultIssue> argument=ArgumentCaptor.forClass(DefaultIssue.class);
+  verify(issueCache).put(argument.capture());
+  DefaultIssue issue=argument.getValue();
+  assertThat(issue.line()).isEqualTo(1);
+  assertThat(issue.key()).isEqualTo("ABCDE");
+  assertThat(issue.isNew()).isFalse();
+  assertThat(issue.isEndOfLife()).isFalse();
+  assertThat(issue.isOnDisabledRule()).isFalse();
+  assertThat(issue.status()).isEqualTo("CLOSED");
+}
