@@ -1,0 +1,13 @@
+{
+  Referentials referentials=new Referentials(db);
+  ViolationConverters converters=new ViolationConverters(db,referentials);
+  Connection readConnection=db.getDataSource().getConnection();
+  try {
+    readConnection.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+    new QueryRunner().query(readConnection,"select id from rule_failures",new ViolationIdHandler(converters));
+  }
+  finally {
+    DbUtils.closeQuietly(readConnection);
+  }
+  converters.waitForFinished();
+}

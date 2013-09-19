@@ -1,0 +1,20 @@
+{
+  List<Object[]> allParams=Lists.newArrayList();
+  for (  Map<String,Object> comment : comments) {
+    String login=referentials.userLogin((Long)comment.get(USER_ID));
+    if (login != null) {
+      Object[] params=new Object[6];
+      params[0]=UUID.randomUUID().toString();
+      params[1]=comment.get(ISSUE_KEY);
+      params[2]=login;
+      params[3]=comment.get(REVIEW_TEXT);
+      params[4]=comment.get(CREATED_AT);
+      params[5]=comment.get(UPDATED_AT);
+      allParams.add(params);
+    }
+  }
+  if (!allParams.isEmpty()) {
+    new QueryRunner().batch(writeConnection,SQL_INSERT_ISSUE_CHANGE,allParams.toArray(new Object[allParams.size()][]));
+    writeConnection.commit();
+  }
+}

@@ -1,0 +1,18 @@
+{
+  Connection connection=database.getDataSource().getConnection();
+  try {
+    return new QueryRunner().query(connection,sql,new ResultSetHandler<Map<Long,String>>(){
+      @Override public Map<Long,String> handle(      ResultSet rs) throws SQLException {
+        Map<Long,String> map=Maps.newHashMap();
+        while (rs.next()) {
+          map.put(rs.getLong(1),rs.getString(2));
+        }
+        return map;
+      }
+    }
+);
+  }
+  finally {
+    DbUtils.closeQuietly(connection);
+  }
+}
