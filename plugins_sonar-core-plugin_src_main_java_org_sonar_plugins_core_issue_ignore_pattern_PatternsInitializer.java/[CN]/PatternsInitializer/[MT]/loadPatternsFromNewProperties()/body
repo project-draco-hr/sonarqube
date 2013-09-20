@@ -7,7 +7,7 @@
     String lineRange=settings.getString(propPrefix + IgnoreIssuesConfiguration.LINE_RANGE_KEY);
     String[] fields=new String[]{resourceKeyPattern,ruleKeyPattern,lineRange};
     PatternDecoder.checkRegularLineConstraints(StringUtils.join(fields,","),fields);
-    Pattern pattern=new Pattern(firstNonNull(resourceKeyPattern,"*"),firstNonNull(ruleKeyPattern,"*"));
+    IssuePattern pattern=new IssuePattern(firstNonNull(resourceKeyPattern,"*"),firstNonNull(ruleKeyPattern,"*"));
     PatternDecoder.decodeRangeOfLines(pattern,firstNonNull(lineRange,"*"));
     multicriteriaPatterns.add(pattern);
   }
@@ -18,7 +18,7 @@
     String endBlockRegexp=settings.getString(propPrefix + IgnoreIssuesConfiguration.END_BLOCK_REGEXP);
     String[] fields=new String[]{beginBlockRegexp,endBlockRegexp};
     PatternDecoder.checkDoubleRegexpLineConstraints(StringUtils.join(fields,","),fields);
-    Pattern pattern=new Pattern().setBeginBlockRegexp(nullToEmpty(beginBlockRegexp)).setEndBlockRegexp(nullToEmpty(endBlockRegexp));
+    IssuePattern pattern=new IssuePattern().setBeginBlockRegexp(nullToEmpty(beginBlockRegexp)).setEndBlockRegexp(nullToEmpty(endBlockRegexp));
     blockPatterns.add(pattern);
   }
   patternConf=StringUtils.defaultIfBlank(settings.getString(IgnoreIssuesConfiguration.PATTERNS_ALLFILE_KEY),"");
@@ -26,7 +26,7 @@
     String propPrefix=IgnoreIssuesConfiguration.PATTERNS_ALLFILE_KEY + "." + id+ ".";
     String allFileRegexp=settings.getString(propPrefix + IgnoreIssuesConfiguration.FILE_REGEXP);
     PatternDecoder.checkWholeFileRegexp(allFileRegexp);
-    Pattern pattern=new Pattern().setAllFileRegexp(nullToEmpty(allFileRegexp));
+    IssuePattern pattern=new IssuePattern().setAllFileRegexp(nullToEmpty(allFileRegexp));
     allFilePatterns.add(pattern);
   }
 }
