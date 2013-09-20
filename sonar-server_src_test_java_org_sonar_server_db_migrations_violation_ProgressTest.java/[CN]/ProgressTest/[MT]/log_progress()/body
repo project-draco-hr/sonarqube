@@ -1,0 +1,15 @@
+{
+  Logger logger=mock(Logger.class);
+  ArgumentCaptor<String> argument=ArgumentCaptor.forClass(String.class);
+  Progress progress=new Progress(5000,logger);
+  progress.run();
+  progress.increment(200);
+  progress.increment(130);
+  progress.run();
+  progress.increment(1670);
+  progress.run();
+  verify(logger,times(3)).info(argument.capture());
+  assertThat(argument.getAllValues().get(0)).matches("0% \\[0/5000 violations, 0 violations/minute, \\d+ minutes remaining\\]");
+  assertThat(argument.getAllValues().get(1)).matches("6% \\[330/5000 violations, \\d+ violations/minute, \\d+ minutes remaining\\]");
+  assertThat(argument.getAllValues().get(2)).matches("40% \\[2000/5000 violations, \\d+ violations/minute, \\d+ minutes remaining\\]");
+}

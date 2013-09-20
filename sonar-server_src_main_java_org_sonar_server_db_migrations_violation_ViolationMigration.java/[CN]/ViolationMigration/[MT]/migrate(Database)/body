@@ -1,12 +1,14 @@
 {
   Referentials referentials=new Referentials(db);
-  ViolationConverters converters=new ViolationConverters(db,referentials);
-  Connection readConnection=db.getDataSource().getConnection();
-  try {
-    new QueryRunner().query(readConnection,"select id from rule_failures",new ViolationIdHandler(converters));
-  }
+  if (referentials.totalViolations() > 0) {
+    ViolationConverters converters=new ViolationConverters(db,referentials);
+    Connection readConnection=db.getDataSource().getConnection();
+    try {
+      new QueryRunner().query(readConnection,"select id from rule_failures",new ViolationIdHandler(converters));
+    }
   finally {
-    DbUtils.closeQuietly(readConnection);
+      DbUtils.closeQuietly(readConnection);
+    }
+    converters.waitForFinished();
   }
-  converters.waitForFinished();
 }
