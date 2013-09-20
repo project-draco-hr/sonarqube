@@ -1,10 +1,13 @@
 {
   int totalIssues=counter.get();
   long durationMinutes=(System.currentTimeMillis() - start) / 60000L;
-  int remaining=0;
-  if (durationMinutes > 0) {
+  int percents=(100 * totalIssues) / totalViolations;
+  if (totalIssues > 0 && durationMinutes > 0) {
     int frequency=(int)(totalIssues / durationMinutes);
-    remaining=(totalViolations - totalIssues) / frequency;
+    int remaining=(totalViolations - totalIssues) / frequency;
+    logger.info(String.format("%d%% [%d/%d violations, %d minutes remaining]",percents,totalIssues,totalViolations,remaining));
   }
-  logger.info(String.format("%d%% [%d/%d violations, %d minutes remaining]",(100 * totalIssues) / totalViolations,totalIssues,totalViolations,remaining));
+ else {
+    logger.info(String.format("%d%% [%d/%d violations]",percents,totalIssues,totalViolations));
+  }
 }

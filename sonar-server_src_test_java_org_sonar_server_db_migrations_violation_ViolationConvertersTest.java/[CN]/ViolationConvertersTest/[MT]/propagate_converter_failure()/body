@@ -1,0 +1,12 @@
+{
+  Callable<Object> callable=mock(Callable.class);
+  when(callable.call()).thenThrow(new IllegalStateException("Need to cry"));
+  List<Callable<Object>> callables=Lists.newArrayList(callable);
+  try {
+    new ViolationConverters(new Settings()).doExecute(new FakeTimerTask(),callables);
+    fail();
+  }
+ catch (  ExecutionException e) {
+    assertThat(e.getCause().getMessage()).isEqualTo("Need to cry");
+  }
+}

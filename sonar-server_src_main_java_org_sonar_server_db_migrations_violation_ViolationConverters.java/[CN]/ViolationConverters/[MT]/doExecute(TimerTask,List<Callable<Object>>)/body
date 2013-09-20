@@ -1,0 +1,15 @@
+{
+  Timer timer=new Timer(Progress.THREAD_NAME);
+  timer.schedule(progress,Progress.DELAY_MS,Progress.DELAY_MS);
+  try {
+    ExecutorService executor=Executors.newFixedThreadPool(converters.size());
+    List<Future<Object>> results=executor.invokeAll(converters);
+    executor.shutdown();
+    for (    Future result : results) {
+      result.get();
+    }
+  }
+  finally {
+    timer.cancel();
+  }
+}

@@ -2,9 +2,5 @@
   db.prepareDbUnit(getClass(),"migrate_violations.xml");
   new ViolationMigration(db.database(),new Settings()).execute();
   db.assertDbUnit(getClass(),"migrate_violations_result.xml","issues","issue_changes");
-  assertThat(db.count("select count(id) from rule_failures")).isEqualTo(0);
-  Set<Thread> threads=Thread.getAllStackTraces().keySet();
-  for (  Thread thread : threads) {
-    assertThat(thread.getName()).isNotEqualTo(Progress.THREAD_NAME);
-  }
+  assertMigrationEnded();
 }
