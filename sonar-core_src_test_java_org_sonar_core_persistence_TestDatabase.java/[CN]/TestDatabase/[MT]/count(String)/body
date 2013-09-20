@@ -1,0 +1,20 @@
+{
+  Connection connection=null;
+  PreparedStatement stmt=null;
+  ResultSet rs=null;
+  try {
+    connection=openConnection();
+    stmt=connection.prepareStatement(sql);
+    rs=stmt.executeQuery();
+    if (rs.next()) {
+      return rs.getInt(1);
+    }
+    throw new IllegalStateException("No results for " + sql);
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Fail to execute sql: " + sql);
+  }
+ finally {
+    DbUtils.closeQuietly(connection,stmt,rs);
+  }
+}
