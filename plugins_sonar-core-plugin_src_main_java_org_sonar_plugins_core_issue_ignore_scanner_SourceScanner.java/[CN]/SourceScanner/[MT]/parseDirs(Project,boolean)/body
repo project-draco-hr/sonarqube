@@ -15,12 +15,9 @@
       String componentKey=resolveComponent(inputFile,dirs,project,isTest);
       if (componentKey != null) {
         String relativePath=pathResolver.relativePath(dirs,inputFile).path();
-        for (        IssuePattern pattern : patternsInitializer.getMulticriteriaPatterns()) {
-          if (pattern.matchResource(relativePath)) {
-            patternMatcher.addPatternForComponent(componentKey,pattern);
-          }
-        }
-        if (patternsInitializer.hasFileContentPattern()) {
+        inclusionPatternInitializer.initializePatternsForPath(relativePath,componentKey);
+        exclusionPatternInitializer.initializePatternsForPath(relativePath,componentKey);
+        if (exclusionPatternInitializer.hasFileContentPattern()) {
           regexpScanner.scan(componentKey,inputFile,sourcesEncoding);
         }
       }

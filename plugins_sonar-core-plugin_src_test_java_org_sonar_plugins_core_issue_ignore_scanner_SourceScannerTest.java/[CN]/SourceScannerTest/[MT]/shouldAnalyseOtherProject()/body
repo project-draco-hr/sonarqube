@@ -5,8 +5,12 @@
   when(fileSystem.files(Mockito.isA(FileQuery.class))).thenReturn(Arrays.asList(sourceFile)).thenReturn(Arrays.asList(testFile));
   when(fileSystem.sourceDirs()).thenReturn(ImmutableList.of(new File("")));
   when(fileSystem.testDirs()).thenReturn(ImmutableList.of(new File("")));
-  when(patternsInitializer.hasFileContentPattern()).thenReturn(true);
+  when(exclusionPatternInitializer.hasFileContentPattern()).thenReturn(true);
   scanner.analyse(project,null);
+  verify(inclusionPatternInitializer).initializePatternsForPath("Foo.php","polop:Foo.php");
+  verify(inclusionPatternInitializer).initializePatternsForPath("FooTest.php","polop:FooTest.php");
+  verify(exclusionPatternInitializer).initializePatternsForPath("Foo.php","polop:Foo.php");
+  verify(exclusionPatternInitializer).initializePatternsForPath("FooTest.php","polop:FooTest.php");
   verify(regexpScanner).scan("polop:Foo.php",sourceFile,UTF_8);
   verify(regexpScanner).scan("polop:FooTest.php",testFile,UTF_8);
 }
