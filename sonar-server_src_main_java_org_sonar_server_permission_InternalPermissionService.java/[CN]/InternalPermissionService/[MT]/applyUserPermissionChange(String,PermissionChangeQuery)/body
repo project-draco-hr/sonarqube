@@ -1,15 +1,16 @@
 {
-  List<String> existingPermissions=roleDao.selectUserPermissions(permissionChangeQuery.user());
-  if (shouldSkipPermissionChange(operation,existingPermissions,permissionChangeQuery.permission())) {
+  Long componentId=getComponentId(permissionChangeQuery.component());
+  List<String> existingPermissions=roleDao.selectUserPermissions(permissionChangeQuery.user(),componentId);
+  if (shouldSkipPermissionChange(operation,existingPermissions,permissionChangeQuery)) {
     LOG.info("Skipping permission change '{} {}' for user {} as it matches the current permission scheme",new String[]{operation,permissionChangeQuery.permission(),permissionChangeQuery.user()});
   }
  else {
     Long targetedUser=getTargetedUser(permissionChangeQuery.user());
     if (ADD.equals(operation)) {
-      permissionFacade.insertUserPermission(getComponentId(permissionChangeQuery.component()),targetedUser,permissionChangeQuery.permission());
+      permissionFacade.insertUserPermission(componentId,targetedUser,permissionChangeQuery.permission());
     }
  else {
-      permissionFacade.deleteUserPermission(getComponentId(permissionChangeQuery.component()),targetedUser,permissionChangeQuery.permission());
+      permissionFacade.deleteUserPermission(componentId,targetedUser,permissionChangeQuery.permission());
     }
   }
 }
