@@ -1,0 +1,36 @@
+{
+  Characteristic characteristic=Characteristic.create();
+  SMInputCursor cursor=chcCursor.childElementCursor();
+  String ruleRepositoryKey=null, ruleKey=null;
+  List<Characteristic> children=Lists.newArrayList();
+  while (cursor.getNext() != null) {
+    String node=cursor.getLocalName();
+    if (StringUtils.equals(node,XMLConstants.CHARACTERISTIC_KEY)) {
+      characteristic.setKey(cursor.collectDescendantText().trim());
+    }
+ else     if (StringUtils.equals(node,XMLConstants.CHARACTERISTIC_NAME)) {
+      characteristic.setName(cursor.collectDescendantText().trim(),false);
+    }
+ else     if (StringUtils.equals(node,XMLConstants.CHARACTERISTIC_DESCRIPTION)) {
+      characteristic.setDescription(cursor.collectDescendantText().trim());
+    }
+ else     if (StringUtils.equals(node,XMLConstants.PROPERTY)) {
+      processProperty(characteristic,cursor,messages);
+    }
+ else     if (StringUtils.equals(node,XMLConstants.CHARACTERISTIC)) {
+      children.add(processCharacteristic(sqale,cursor,messages,ruleCache));
+    }
+ else     if (StringUtils.equals(node,"rule-repo")) {
+      ruleRepositoryKey=cursor.collectDescendantText().trim();
+    }
+ else     if (StringUtils.equals(node,"rule-key")) {
+      ruleKey=cursor.collectDescendantText().trim();
+    }
+  }
+  fillRule(characteristic,ruleRepositoryKey,ruleKey,messages,ruleCache);
+  if (StringUtils.isNotBlank(characteristic.getKey()) || characteristic.getRule() != null) {
+    addCharacteristicToModel(sqale,characteristic,children);
+    return characteristic;
+  }
+  return null;
+}

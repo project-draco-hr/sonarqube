@@ -1,0 +1,13 @@
+{
+  if (contributingPluginKeyToClassLoader == null) {
+    contributingPluginKeyToClassLoader=Maps.newTreeMap();
+    for (    PluginMetadata metadata : pluginRepository.getMetadata()) {
+      String pluginKey=metadata.getKey();
+      ClassLoader classLoader=pluginRepository.getPlugin(pluginKey).getClass().getClassLoader();
+      if (classLoader.getResource(getXMLFilePathForPlugin(pluginKey)) != null) {
+        contributingPluginKeyToClassLoader.put(pluginKey,classLoader);
+      }
+    }
+  }
+  contributingPluginKeyToClassLoader=Collections.unmodifiableMap(contributingPluginKeyToClassLoader);
+}

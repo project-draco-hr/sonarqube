@@ -1,0 +1,16 @@
+{
+  setupData("reset_model");
+  Model model=manager.resetModel(ValidationMessages.create(),defaultRuleCache());
+  assertThat(model.getCharacteristics().size()).isGreaterThan(3);
+  assertThat(model.getCharacteristics().size()).isGreaterThan(model.getRootCharacteristics().size());
+  for (  Characteristic portabilityCharacteristic : model.getCharacteristicByKey("PORTABILITY").getChildren()) {
+    assertThat(portabilityCharacteristic.getName()).contains("portability");
+    Characteristic requirement=portabilityCharacteristic.getChildren().get(0);
+    assertThat(requirement).isNotNull();
+    Rule rule=requirement.getRule();
+    assertThat(rule).isNotNull();
+    assertThat(rule.getName()).isEqualTo("Regular exp");
+  }
+  assertThat(model.getCharacteristicByKey("testability")).isNull();
+  assertThat(model.getCharacteristicByKey("unit_testability")).isNull();
+}

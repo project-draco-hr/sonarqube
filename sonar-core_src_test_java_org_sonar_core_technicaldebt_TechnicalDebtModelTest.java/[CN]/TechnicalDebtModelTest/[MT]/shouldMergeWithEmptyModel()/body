@@ -1,0 +1,12 @@
+{
+  Model with=Model.createByName(TechnicalDebtModelDefinition.TECHNICAL_DEBT_MODEL);
+  Characteristic efficiency=with.createCharacteristicByKey("efficiency","Efficiency");
+  efficiency.addChild(with.createCharacteristicByKey("ram-efficiency","RAM Efficiency"));
+  with.createCharacteristicByKey("usability","Usability");
+  ValidationMessages messages=ValidationMessages.create();
+  technicalDebtModel.mergeWith(with,messages,mockRuleCache());
+  assertThat(model.getCharacteristics()).hasSize(3);
+  assertThat(model.getRootCharacteristics()).hasSize(2);
+  assertThat(model.getCharacteristicByKey("ram-efficiency").getDepth()).isEqualTo(Characteristic.ROOT_DEPTH + 1);
+  assertThat(messages.getErrors()).isEmpty();
+}

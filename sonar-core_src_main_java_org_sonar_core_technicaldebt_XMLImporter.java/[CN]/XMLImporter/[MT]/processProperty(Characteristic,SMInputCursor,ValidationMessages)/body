@@ -1,0 +1,29 @@
+{
+  SMInputCursor c=cursor.childElementCursor();
+  String key=null;
+  Double value=null;
+  String textValue=null;
+  while (c.getNext() != null) {
+    String node=c.getLocalName();
+    if (StringUtils.equals(node,XMLConstants.PROPERTY_KEY)) {
+      key=c.collectDescendantText().trim();
+    }
+ else     if (StringUtils.equals(node,XMLConstants.PROPERTY_VALUE)) {
+      String s=c.collectDescendantText().trim();
+      try {
+        value=NumberUtils.createDouble(s);
+      }
+ catch (      NumberFormatException ex) {
+        String message=String.format("Cannot import value '%s' for field %s - Expected a numeric value instead",s,key);
+        LOG.error(message,ex);
+        messages.addErrorText(message);
+      }
+    }
+ else     if (StringUtils.equals(node,XMLConstants.PROPERTY_TEXT_VALUE)) {
+      textValue=c.collectDescendantText().trim();
+    }
+  }
+  if (StringUtils.isNotBlank(key)) {
+    characteristic.setProperty(key,textValue).setValue(value);
+  }
+}

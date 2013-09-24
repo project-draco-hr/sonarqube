@@ -1,0 +1,11 @@
+{
+  RuleCache ruleCache=mockRuleCache();
+  String xml=getFileContent("shouldLogWarningIfRuleNotFound.xml");
+  ValidationMessages messages=ValidationMessages.create();
+  Model sqale=new XMLImporter().importXML(xml,messages,ruleCache);
+  assertThat(messages.getWarnings()).hasSize(1);
+  assertThat(sqale.getRootCharacteristics()).hasSize(1);
+  Characteristic efficiency=sqale.getCharacteristicByKey("EFFICIENCY");
+  assertThat(efficiency.getChildren()).isEmpty();
+  assertThat(messages.getWarnings().get(0)).contains("findbugs");
+}
