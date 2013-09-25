@@ -1,0 +1,13 @@
+{
+  setupData("reset_model");
+  RuleFinder ruleFinder=mock(RuleFinder.class);
+  when(ruleFinder.findByKey(anyString(),anyString())).thenReturn(null);
+  manager=new TechnicalDebtManager(getSessionFactory(),new DefaultModelFinder(getSessionFactory()),technicalDebtModelFinder,new XMLImporter());
+  ValidationMessages messages=ValidationMessages.create();
+  Model model=manager.reset(messages,new RuleCache(ruleFinder));
+  assertThat(model.getCharacteristics().size()).isGreaterThanOrEqualTo(3);
+  assertThat(model.getCharacteristics().size()).isGreaterThan(model.getRootCharacteristics().size());
+  List<Characteristic> hardwareControls=model.getCharacteristicByKey("HARDWARE_RELATED_PORTABILITY").getChildren();
+  assertThat(hardwareControls.isEmpty()).isTrue();
+  assertThat(messages.getWarnings()).hasSize(3);
+}
