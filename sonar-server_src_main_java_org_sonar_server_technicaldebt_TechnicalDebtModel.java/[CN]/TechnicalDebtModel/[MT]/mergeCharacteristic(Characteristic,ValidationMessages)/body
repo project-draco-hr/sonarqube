@@ -1,0 +1,16 @@
+{
+  Characteristic existingCharacteristic=model.getCharacteristicByKey(characteristic.getKey());
+  if (existingCharacteristic == null) {
+    if (defaultCharacteristics.contains(characteristic)) {
+      existingCharacteristic=model.addCharacteristic(clone(characteristic));
+      if (!characteristic.getParents().isEmpty()) {
+        Characteristic parentTargetCharacteristic=mergeCharacteristic(characteristic.getParents().get(0),messages);
+        parentTargetCharacteristic.addChild(existingCharacteristic);
+      }
+    }
+ else {
+      throw new IllegalArgumentException("The characteristic : " + characteristic.getKey() + " cannot be used as it's not available in default ones.");
+    }
+  }
+  return existingCharacteristic;
+}
