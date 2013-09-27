@@ -2,8 +2,6 @@
   UserSession.get().checkLoggedIn();
   UserSession.get().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
   ComponentDto component=(ComponentDto)resourceDao.findByKey(componentKey);
-  if (component == null) {
-    throw new BadRequestException("Component " + componentKey + " does not exists.");
-  }
+  badRequestIfNullResult(component,OBJECT_TYPE_COMPONENT,componentKey);
   permissionFacade.grantDefaultRoles(component.getId(),component.qualifier());
 }
