@@ -1,0 +1,21 @@
+{
+  String componentKey="new-project";
+  String componentName="New Project";
+  String scope=Scopes.PROJECT;
+  String qualifier=Qualifiers.PROJECT;
+  long componentId=Long.MAX_VALUE;
+  ComponentDto component=mock(ComponentDto.class);
+  when(component.getId()).thenReturn(componentId);
+  when(resourceDao.findByKey(componentKey)).thenReturn(component);
+  componentService.createComponent(componentKey,componentName,scope,qualifier);
+  ArgumentCaptor<ResourceDto> resourceCaptor=ArgumentCaptor.forClass(ResourceDto.class);
+  verify(resourceDao).insertOrUpdate(resourceCaptor.capture());
+  ResourceDto created=resourceCaptor.getValue();
+  assertThat(created.getKey()).isEqualTo(componentKey);
+  assertThat(created.getName()).isEqualTo(componentName);
+  assertThat(created.getLongName()).isEqualTo(componentName);
+  assertThat(created.getScope()).isEqualTo(scope);
+  assertThat(created.getQualifier()).isEqualTo(qualifier);
+  verify(resourceDao).findByKey(componentKey);
+  verify(resourceIndexerDao).indexResource(componentId);
+}
