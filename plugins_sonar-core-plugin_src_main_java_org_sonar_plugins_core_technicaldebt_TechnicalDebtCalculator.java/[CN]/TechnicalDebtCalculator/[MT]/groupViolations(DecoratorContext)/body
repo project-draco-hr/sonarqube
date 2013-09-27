@@ -1,0 +1,15 @@
+{
+  ListMultimap<Requirement,Violation> violationsByRequirement=ArrayListMultimap.create();
+  for (  Violation violation : context.getViolations()) {
+    String repositoryKey=violation.getRule().getRepositoryKey();
+    String key=violation.getRule().getKey();
+    Requirement requirement=technicalDebtModel.getRequirementByRule(repositoryKey,key);
+    if (requirement == null) {
+      LoggerFactory.getLogger(getClass()).debug("No technical debt requirement for: " + repositoryKey + "/"+ key);
+    }
+ else {
+      violationsByRequirement.put(requirement,violation);
+    }
+  }
+  return violationsByRequirement;
+}

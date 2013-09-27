@@ -1,0 +1,11 @@
+{
+  double requirementCost=1.0;
+  Characteristic parentCharacteristic=new Characteristic(org.sonar.api.qualitymodel.Characteristic.create());
+  Characteristic characteristic=new Characteristic(org.sonar.api.qualitymodel.Characteristic.create(),parentCharacteristic);
+  Requirement requirement=mock(Requirement.class);
+  when(requirement.getParent()).thenReturn(characteristic);
+  remediationCostCalculator.updateRequirementCosts(requirement,requirementCost);
+  assertThat(remediationCostCalculator.getRequirementCosts().get(requirement)).isEqualTo(requirementCost);
+  assertThat(remediationCostCalculator.getCharacteristicCosts().get(characteristic)).isEqualTo(requirementCost);
+  assertThat(remediationCostCalculator.getCharacteristicCosts().get(parentCharacteristic)).isEqualTo(requirementCost);
+}

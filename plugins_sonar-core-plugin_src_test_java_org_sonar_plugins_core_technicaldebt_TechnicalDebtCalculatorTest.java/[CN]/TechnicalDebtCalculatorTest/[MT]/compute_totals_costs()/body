@@ -1,0 +1,18 @@
+{
+  Requirement requirement1=mock(Requirement.class);
+  Requirement requirement2=mock(Requirement.class);
+  Violation violation1=buildViolation("rule1","repo1",NOW);
+  Violation violation2=buildViolation("rule1","repo1",NOW);
+  Violation violation3=buildViolation("rule2","repo2",YESTERDAY);
+  Violation violation4=buildViolation("rule2","repo2",LAST_MONTH);
+  List<Violation> violations=Lists.newArrayList(violation1,violation2,violation3,violation4);
+  stub(technicalDebtModel.getRequirementByRule("repo1","rule1")).toReturn(requirement1);
+  stub(technicalDebtModel.getRequirementByRule("repo2","rule2")).toReturn(requirement2);
+  stub(technicalDebtModel.getAllRequirements()).toReturn(Lists.newArrayList(requirement1,requirement2));
+  stub(functions.calculateCost(any(Requirement.class),any(Collection.class))).toReturn(1.0);
+  DecoratorContext context=mock(DecoratorContext.class);
+  stub(context.getViolations()).toReturn(violations);
+  stub(context.getChildrenMeasures(any(MeasuresFilter.class))).toReturn(Collections.EMPTY_LIST);
+  remediationCostCalculator.compute(context);
+  assertThat(remediationCostCalculator.getTotal()).isEqualTo(2.0);
+}
