@@ -1,0 +1,8 @@
+{
+  Metric metric=new Metric.Builder("rating","Rating",Metric.ValueType.INT).create();
+  when(i18n.message(any(Locale.class),eq("metric.rating.name"),anyString())).thenReturn("THE RATING");
+  when(context.getMeasure(metric)).thenReturn(new Measure(metric,4d));
+  when(profile.getAlerts()).thenReturn(Arrays.<Alert>asList(new Alert(null,metric,Alert.OPERATOR_SMALLER,"10",null)));
+  decorator.decorate(project,context);
+  verify(context).saveMeasure(argThat(matchesMetric(CoreMetrics.ALERT_STATUS,Metric.Level.ERROR,"THE RATING < 10")));
+}
