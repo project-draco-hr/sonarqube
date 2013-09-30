@@ -1,4 +1,12 @@
 {
+  ComponentDto component=(ComponentDto)resourceDao.findByKey(kee);
+  if (component != null) {
+    throw new BadRequestException("Could not create resource, key already exists: " + kee);
+  }
   resourceDao.insertOrUpdate(new ResourceDto().setKey(kee).setName(name).setLongName(name).setScope(scope).setQualifier(qualifier).setCreatedAt(new Date()));
-  resourceIndexerDao.indexResource(((ComponentDto)resourceDao.findByKey(kee)).getId());
+  component=(ComponentDto)resourceDao.findByKey(kee);
+  if (component == null) {
+    throw new BadRequestException("Resource not created: " + kee);
+  }
+  resourceIndexerDao.indexResource(component.getId());
 }
