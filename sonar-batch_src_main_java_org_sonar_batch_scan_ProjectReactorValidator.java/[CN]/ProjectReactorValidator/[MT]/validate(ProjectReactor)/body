@@ -1,4 +1,10 @@
 {
+  if (settings.getBoolean(CoreProperties.CORE_PREVENT_AUTOMATIC_PROJECT_CREATION)) {
+    String projectKey=reactor.getRoot().getKey();
+    if (resourceDao.findByKey(projectKey) == null) {
+      throw new SonarException("Unable to scan non-existing project " + projectKey);
+    }
+  }
   List<String> validationMessages=new ArrayList<String>();
   for (  ProjectDefinition moduleDef : reactor.getProjects()) {
     validateModule(moduleDef,validationMessages);
