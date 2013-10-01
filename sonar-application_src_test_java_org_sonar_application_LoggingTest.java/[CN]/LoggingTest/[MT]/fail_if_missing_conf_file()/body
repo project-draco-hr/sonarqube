@@ -1,0 +1,13 @@
+{
+  Tomcat tomcat=mock(Tomcat.class,Mockito.RETURNS_DEEP_STUBS);
+  Env env=mock(Env.class);
+  final File confFile=new File("target/does_not_exist/logback-access.xml");
+  when(env.file(Logging.CONF_PATH)).thenReturn(confFile);
+  try {
+    Logging.configure(tomcat,env);
+    fail();
+  }
+ catch (  IllegalStateException e) {
+    assertThat(e).hasMessage("File is missing: " + confFile.getAbsolutePath());
+  }
+}

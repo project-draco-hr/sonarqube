@@ -1,0 +1,25 @@
+{
+  BackgroundThread background=new BackgroundThread(starter);
+  try {
+    background.start();
+    boolean started=false;
+    for (int i=0; i < 100; i++) {
+      Thread.sleep(500L);
+      if (starter.port() > 0) {
+        try {
+          starter.start();
+          fail();
+        }
+ catch (        IllegalStateException e) {
+          assertThat(e.getMessage()).isEqualTo("Tomcat is already started");
+          started=true;
+          break;
+        }
+      }
+    }
+    assertThat(started).isTrue();
+  }
+  finally {
+    starter.stop();
+  }
+}

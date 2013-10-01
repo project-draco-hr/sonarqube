@@ -1,0 +1,20 @@
+{
+  if (tomcat != null || hook != null) {
+    throw new IllegalStateException("Tomcat is already started");
+  }
+  tomcat=new Tomcat();
+  String basedir=env.freshDir(TEMP_RELATIVE_PATH).getCanonicalPath();
+  tomcat.setBaseDir(basedir);
+  tomcat.getHost().setAppBase(basedir);
+  tomcat.getHost().setAutoDeploy(false);
+  tomcat.getHost().setCreateDirs(false);
+  tomcat.getHost().setDeployOnStartup(true);
+  Props props=Props.create(env);
+  Logging.configure(tomcat,env);
+  Connectors.configure(tomcat,props);
+  Webapp.configure(tomcat,env,props);
+  tomcat.start();
+  addShutdownHook();
+  tomcat.getServer().await();
+  stop();
+}

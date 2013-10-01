@@ -1,0 +1,14 @@
+{
+  Tomcat tomcat=mock(Tomcat.class,Mockito.RETURNS_DEEP_STUBS);
+  Env env=mock(Env.class);
+  final File propsFile=new File(getClass().getResource("/org/sonar/application/LoggingTest/logback-access.xml").toURI());
+  when(env.file(Logging.CONF_PATH)).thenReturn(propsFile);
+  Logging.configure(tomcat,env);
+  verify(tomcat.getHost().getPipeline()).addValve(argThat(new ArgumentMatcher<Valve>(){
+    @Override public boolean matches(    Object o){
+      LogbackValve v=(LogbackValve)o;
+      return v.getFilename().equals(propsFile.getAbsolutePath());
+    }
+  }
+));
+}
