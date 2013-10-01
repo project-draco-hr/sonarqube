@@ -4,8 +4,11 @@
   if (projectId != null) {
     template.copyTable(source,dest,"projects",projectQuery(projectId,false));
     template.copyTable(source,dest,"events","SELECT * FROM events WHERE resource_id=" + projectId);
-    template.copyTable(source,dest,"snapshots","SELECT * FROM snapshots WHERE project_id=" + projectId);
-    template.copyTable(source,dest,"project_measures","SELECT m.* FROM project_measures m INNER JOIN snapshots s on m.snapshot_id=s.id WHERE s.project_id=" + projectId);
+    StringBuilder snapshotQuery=new StringBuilder().append("SELECT * FROM snapshots WHERE project_id=").append(projectId).append(" UNION SELECT snap.* FROM snapshots snap").append(" INNER JOIN (").append(projectQuery(projectId,true)).append(") res").append(" ON snap.project_id=res.id").append(" INNER JOIN snapshot_data data").append(" ON snap.id=data.snapshot_id").append(" AND data.data_type='").append(SnapshotDataType.FILE_HASH.getValue()).append("'").append(" AND snap.islast=").append(database.getDialect().getTrueSqlValue());
+    template.copyTable(source,dest,"snapshots",snapshotQuery.toString());
+    StringBuilder snapshotDataQuery=new StringBuilder().append("SELECT data.* FROM snapshot_data data").append(" INNER JOIN snapshots s").append(" ON s.id=data.snapshot_id").append(" AND s.islast=").append(database.getDialect().getTrueSqlValue()).append(" INNER JOIN (").append(projectQuery(projectId,true)).append(") res").append(" ON data.resource_id=res.id").append(" AND data.data_type='").append(SnapshotDataType.FILE_HASH.getValue()).append("'");
+    template.copyTable(source,dest,"snapshot_data",snapshotDataQuery.toString());
+    template.copyTable(source,dest,"project_measures","SELECT m.* FROM project_measures m INNER JOIN snapshots s on m.snapshot_id=s.id " + "WHERE s.project_id=" + projectId);
     StringBuilder issueQuery=new StringBuilder().append("SELECT issues.* FROM issues").append(" INNER JOIN (").append(projectQuery(projectId,true)).append(") resources").append(" ON issues.component_id=resources.id").append(" AND status <> '").append(Issue.STATUS_CLOSED).append("'");
     template.copyTable(source,dest,"issues",issueQuery.toString());
   }

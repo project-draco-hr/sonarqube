@@ -1,0 +1,15 @@
+{
+  settings.setProperty(CoreProperties.PARTIAL_ANALYSIS,true);
+  settings.setProperty(CoreProperties.DRY_RUN,true);
+  Snapshot previousSnapshot=mock(Snapshot.class);
+  when(previousSnapshot.getId()).thenReturn(123);
+  PastSnapshot pastSnapshot=new PastSnapshot("foo",new Date(),previousSnapshot);
+  when(pastSnapshotFinder.findPreviousAnalysis(snapshot)).thenReturn(pastSnapshot);
+  SnapshotDataDto snapshotDataDto=new SnapshotDataDto();
+  snapshotDataDto.setData("src/main/java/foo/Bar.java=acbd18db4cc2f85cedef654fccc4a4d8\n");
+  when(snapshotDataDao.selectSnapshotData(123,Arrays.asList(SnapshotDataType.FILE_HASH.getValue()))).thenReturn(Arrays.asList(snapshotDataDto));
+  filter.start();
+  File file=new File(baseDir,"src/main/java/foo/Bar.java");
+  FileUtils.write(file,"foo");
+  assertThat(filter.accept(file,mock(FileSystemFilter.Context.class))).isFalse();
+}
