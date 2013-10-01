@@ -1,0 +1,17 @@
+{
+  TechnicalDebtRequirement requirement1=mock(TechnicalDebtRequirement.class);
+  TechnicalDebtRequirement requirement2=mock(TechnicalDebtRequirement.class);
+  Violation violation1=buildViolation("rule1","repo1",NOW);
+  Violation violation2=buildViolation("rule1","repo1",NOW);
+  Violation violation3=buildViolation("rule2","repo2",NOW);
+  Violation violation4=buildViolation("unmatchable","repo2",NOW);
+  List<Violation> violations=Lists.newArrayList(violation1,violation2,violation3,violation4);
+  when(technicalDebtModel.getRequirementByRule("repo1","rule1")).thenReturn(requirement1);
+  when(technicalDebtModel.getRequirementByRule("repo2","rule2")).thenReturn(requirement2);
+  DecoratorContext context=mock(DecoratorContext.class);
+  when(context.getViolations()).thenReturn(violations);
+  ListMultimap<TechnicalDebtRequirement,Violation> groupedViolations=remediationCostCalculator.groupViolations(context);
+  assertThat(groupedViolations.keySet().size()).isEqualTo(2);
+  assertThat(groupedViolations.get(requirement1)).containsExactly(violation1,violation2);
+  assertThat(groupedViolations.get(requirement2)).containsExactly(violation3);
+}

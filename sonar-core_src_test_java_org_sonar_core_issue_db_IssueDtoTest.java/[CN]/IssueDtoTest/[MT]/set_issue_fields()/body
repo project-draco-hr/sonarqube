@@ -1,0 +1,27 @@
+{
+  Date createdAt=DateUtils.addDays(new Date(),-5);
+  Date updatedAt=DateUtils.addDays(new Date(),-3);
+  Date closedAt=DateUtils.addDays(new Date(),-1);
+  IssueDto dto=new IssueDto().setKee("100").setRuleId(1).setRuleKey_unit_test_only("squid","AvoidCycle").setComponentKey_unit_test_only("org.sonar.sample:Sample").setRootComponentKey_unit_test_only("org.sonar.sample").setComponentId(1l).setRootComponentId(1l).setStatus(Issue.STATUS_CLOSED).setResolution(Issue.RESOLUTION_FALSE_POSITIVE).setEffortToFix(15.0).setRemediationCost(500L).setLine(6).setSeverity("BLOCKER").setMessage("message").setManualSeverity(true).setReporter("arthur").setAssignee("perceval").setIssueAttributes("key=value").setAuthorLogin("pierre").setIssueCreationDate(createdAt).setIssueUpdateDate(updatedAt).setIssueCloseDate(closedAt);
+  DefaultIssue issue=dto.toDefaultIssue();
+  assertThat(issue.key()).isEqualTo("100");
+  assertThat(issue.ruleKey().toString()).isEqualTo("squid:AvoidCycle");
+  assertThat(issue.componentKey()).isEqualTo("org.sonar.sample:Sample");
+  assertThat(issue.projectKey()).isEqualTo("org.sonar.sample");
+  assertThat(issue.status()).isEqualTo(Issue.STATUS_CLOSED);
+  assertThat(issue.resolution()).isEqualTo(Issue.RESOLUTION_FALSE_POSITIVE);
+  assertThat(issue.effortToFix()).isEqualTo(15.0);
+  assertThat(issue.remediationCost()).isEqualTo(500L);
+  assertThat(issue.line()).isEqualTo(6);
+  assertThat(issue.severity()).isEqualTo("BLOCKER");
+  assertThat(issue.message()).isEqualTo("message");
+  assertThat(issue.manualSeverity()).isTrue();
+  assertThat(issue.reporter()).isEqualTo("arthur");
+  assertThat(issue.assignee()).isEqualTo("perceval");
+  assertThat(issue.attribute("key")).isEqualTo("value");
+  assertThat(issue.authorLogin()).isEqualTo("pierre");
+  assertThat(issue.creationDate()).isEqualTo(DateUtils.truncate(createdAt,Calendar.SECOND));
+  assertThat(issue.updateDate()).isEqualTo(DateUtils.truncate(updatedAt,Calendar.SECOND));
+  assertThat(issue.closeDate()).isEqualTo(DateUtils.truncate(closedAt,Calendar.SECOND));
+  assertThat(issue.isNew()).isFalse();
+}
