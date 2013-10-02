@@ -1,0 +1,34 @@
+{
+  List<FileSystemFilter> filters=Lists.newArrayList(fsFilters);
+  if (changedFilesOnly) {
+    filters.add(new ChangedFileFilter(fileHashCache));
+  }
+  for (  FileFilter fileFilter : query.filters()) {
+    filters.add(new FileFilterWrapper(fileFilter));
+  }
+  for (  String language : query.languages()) {
+    filters.add(new FileFilterWrapper(languageFilters.forLang(language)));
+  }
+  for (  String inclusion : query.inclusions()) {
+    filters.add(new InclusionFilter(inclusion));
+  }
+  for (  String exclusion : query.exclusions()) {
+    filters.add(new ExclusionFilter(exclusion));
+  }
+  List<File> result=Lists.newLinkedList();
+  FileFilterContext context=new FileFilterContext(this);
+  for (  FileType type : query.types()) {
+    context.setType(type);
+switch (type) {
+case SOURCE:
+      applyFilters(result,context,filters,sourceDirs);
+    break;
+case TEST:
+  applyFilters(result,context,filters,testDirs);
+break;
+default :
+throw new IllegalArgumentException("Unknown file type: " + type);
+}
+}
+return result;
+}

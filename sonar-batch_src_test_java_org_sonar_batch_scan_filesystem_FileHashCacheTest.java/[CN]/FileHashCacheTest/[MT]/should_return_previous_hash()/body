@@ -1,0 +1,13 @@
+{
+  Snapshot previousSnapshot=mock(Snapshot.class);
+  when(previousSnapshot.getId()).thenReturn(123);
+  PastSnapshot pastSnapshot=new PastSnapshot("foo",new Date(),previousSnapshot);
+  when(pastSnapshotFinder.findPreviousAnalysis(snapshot)).thenReturn(pastSnapshot);
+  SnapshotDataDto snapshotDataDto=new SnapshotDataDto();
+  snapshotDataDto.setData("src/main/java/foo/Bar.java=abcd1234\n");
+  when(snapshotDataDao.selectSnapshotData(123,Arrays.asList(SnapshotDataType.FILE_HASH.getValue()))).thenReturn(Arrays.asList(snapshotDataDto));
+  File file=new File(baseDir,"src/main/java/foo/Bar.java");
+  FileUtils.write(file,"foo");
+  cache.start();
+  assertThat(cache.getPreviousHash(file)).isEqualTo("abcd1234");
+}
