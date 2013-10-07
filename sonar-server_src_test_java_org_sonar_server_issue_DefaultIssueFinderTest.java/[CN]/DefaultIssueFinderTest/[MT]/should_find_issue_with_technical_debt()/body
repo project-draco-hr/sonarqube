@@ -1,0 +1,11 @@
+{
+  IssueQuery query=IssueQuery.builder().build();
+  IssueDto issue=new IssueDto().setId(1L).setRuleId(50).setComponentId(123l).setRootComponentId(100l).setComponentKey_unit_test_only("Action.java").setRootComponentKey_unit_test_only("struts").setRuleKey_unit_test_only("squid","AvoidCycle").setStatus("OPEN").setResolution("OPEN").setTechnicalDebt(10L);
+  List<IssueDto> dtoList=newArrayList(issue);
+  when(issueDao.selectByIds(anyCollection(),any(SqlSession.class))).thenReturn(dtoList);
+  IssueQueryResult results=finder.find(query);
+  verify(issueDao).selectIssueIds(eq(query),anyInt(),any(SqlSession.class));
+  assertThat(results.issues()).hasSize(1);
+  DefaultIssue result=(DefaultIssue)results.issues().iterator().next();
+  assertThat(result.technicalDebt()).isEqualTo(TechnicalDebt.of(10,0,0));
+}
