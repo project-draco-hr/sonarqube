@@ -4,9 +4,11 @@
   when(issue.ruleKey()).thenReturn(RuleKey.of("squid","AvoidCycles"));
   Set<Integer> noSonarLines=ImmutableSet.of(31,55);
   filter.addComponent("struts:org.apache.Action",noSonarLines);
-  assertThat(filter.accept(issue)).isTrue();
+  when(issue.line()).thenReturn(null);
+  assertThat(filter.accept(issue,chain)).isTrue();
   when(issue.line()).thenReturn(31);
-  assertThat(filter.accept(issue)).isFalse();
+  assertThat(filter.accept(issue,chain)).isFalse();
   when(issue.line()).thenReturn(222);
-  assertThat(filter.accept(issue)).isTrue();
+  assertThat(filter.accept(issue,chain)).isTrue();
+  verify(chain,times(2)).accept(issue);
 }
