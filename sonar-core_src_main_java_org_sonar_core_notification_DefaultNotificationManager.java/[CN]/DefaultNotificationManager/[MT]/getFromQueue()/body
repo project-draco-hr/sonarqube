@@ -5,5 +5,20 @@
     return null;
   }
   notificationQueueDao.delete(notifications);
-  return notifications.get(0).toNotification();
+  try {
+    return notifications.get(0).toNotification();
+  }
+ catch (  InvalidClassException e) {
+    if (!alreadyLoggedDeserializationIssue) {
+      logDeserializationIssue();
+      alreadyLoggedDeserializationIssue=true;
+    }
+    return null;
+  }
+catch (  IOException e) {
+    throw new SonarException(UNABLE_TO_READ_NOTIFICATION,e);
+  }
+catch (  ClassNotFoundException e) {
+    throw new SonarException(UNABLE_TO_READ_NOTIFICATION,e);
+  }
 }
