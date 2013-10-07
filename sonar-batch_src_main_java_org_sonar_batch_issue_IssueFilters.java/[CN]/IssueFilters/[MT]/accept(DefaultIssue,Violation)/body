@@ -1,12 +1,17 @@
 {
-  for (  IssueFilter filter : filters) {
-    if (!filter.accept(issue)) {
-      return false;
+  if (new DefaultIssueFilterChain(filters).accept(issue)) {
+    for (    org.sonar.api.issue.IssueFilter filter : exclusionFilters) {
+      if (!filter.accept(issue)) {
+        return false;
+      }
     }
+    if (!deprecatedFilters.isEmpty()) {
+      Violation v=violation != null ? violation : deprecatedViolations.toViolation(issue);
+      return !deprecatedFilters.isIgnored(v);
+    }
+    return true;
   }
-  if (!deprecatedFilters.isEmpty()) {
-    Violation v=violation != null ? violation : deprecatedViolations.toViolation(issue);
-    return !deprecatedFilters.isIgnored(v);
+ else {
+    return false;
   }
-  return true;
 }
