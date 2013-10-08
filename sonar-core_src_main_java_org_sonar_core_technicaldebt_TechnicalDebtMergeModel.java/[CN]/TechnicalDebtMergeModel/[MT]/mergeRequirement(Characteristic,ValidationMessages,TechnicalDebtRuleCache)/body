@@ -1,0 +1,15 @@
+{
+  Characteristic targetRequirement=model.getCharacteristicByRule(requirement.getRule());
+  if (targetRequirement == null && !requirement.getParents().isEmpty()) {
+    Rule rule=technicalDebtRuleCache.getRule(requirement.getRule().getRepositoryKey(),requirement.getRule().getKey());
+    if (rule == null) {
+      messages.addWarningText("The rule " + requirement.getRule() + " does not exist.");
+    }
+ else {
+      Characteristic parent=mergeCharacteristic(requirement.getParents().get(0),messages);
+      requirement=model.addCharacteristic(clone(requirement));
+      requirement.setRule(rule);
+      parent.addChild(requirement);
+    }
+  }
+}
