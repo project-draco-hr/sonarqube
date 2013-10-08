@@ -1,0 +1,20 @@
+{
+  String rule="rule";
+  String path="org/sonar/api/Issue.java";
+  String componentKey="org.sonar.api.Issue";
+  RuleKey ruleKey=mock(RuleKey.class);
+  when(ruleKey.toString()).thenReturn(rule);
+  when(issue.ruleKey()).thenReturn(ruleKey);
+  when(issue.componentKey()).thenReturn(componentKey);
+  IssuePattern matching=mock(IssuePattern.class);
+  WildcardPattern rulePattern=mock(WildcardPattern.class);
+  when(matching.getRulePattern()).thenReturn(rulePattern);
+  when(rulePattern.match(rule)).thenReturn(true);
+  WildcardPattern pathPattern=mock(WildcardPattern.class);
+  when(matching.getResourcePattern()).thenReturn(pathPattern);
+  when(pathPattern.match(path)).thenReturn(false);
+  when(exclusionPatternInitializer.getMulticriteriaPatterns()).thenReturn(ImmutableList.of(matching));
+  when(exclusionPatternInitializer.getPathForComponent(componentKey)).thenReturn(null);
+  assertThat(ignoreFilter.accept(issue,chain)).isFalse();
+  verifyZeroInteractions(chain);
+}

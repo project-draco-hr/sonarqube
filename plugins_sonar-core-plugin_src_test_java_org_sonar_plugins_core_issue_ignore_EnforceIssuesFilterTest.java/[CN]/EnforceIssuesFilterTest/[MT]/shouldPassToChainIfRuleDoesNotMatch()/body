@@ -1,0 +1,13 @@
+{
+  String rule="rule";
+  RuleKey ruleKey=mock(RuleKey.class);
+  when(ruleKey.toString()).thenReturn(rule);
+  when(issue.ruleKey()).thenReturn(ruleKey);
+  IssuePattern matching=mock(IssuePattern.class);
+  WildcardPattern rulePattern=mock(WildcardPattern.class);
+  when(matching.getRulePattern()).thenReturn(rulePattern);
+  when(rulePattern.match(rule)).thenReturn(false);
+  when(exclusionPatternInitializer.getMulticriteriaPatterns()).thenReturn(ImmutableList.of(matching));
+  assertThat(ignoreFilter.accept(issue,chain)).isTrue();
+  verify(chain).accept(issue);
+}

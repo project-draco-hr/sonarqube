@@ -1,0 +1,24 @@
+{
+  boolean atLeastOneRuleMatched=false;
+  boolean atLeastOnePatternFullyMatched=false;
+  IssuePattern matchingPattern=null;
+  for (  IssuePattern pattern : patternInitializer.getMulticriteriaPatterns()) {
+    if (pattern.getRulePattern().match(issue.ruleKey().toString())) {
+      atLeastOneRuleMatched=true;
+      String pathForComponent=patternInitializer.getPathForComponent(issue.componentKey());
+      if (pathForComponent != null && pattern.getResourcePattern().match(pathForComponent)) {
+        atLeastOnePatternFullyMatched=true;
+        matchingPattern=pattern;
+      }
+    }
+  }
+  if (atLeastOneRuleMatched) {
+    if (atLeastOnePatternFullyMatched) {
+      LOG.debug("Issue {} enforced by pattern {}",issue,matchingPattern);
+    }
+    return atLeastOnePatternFullyMatched;
+  }
+ else {
+    return chain.accept(issue);
+  }
+}
