@@ -1,3 +1,15 @@
 {
-  loadPatternsFromNewProperties();
+  multicriteriaPatterns=Lists.newArrayList();
+  String patternConf=StringUtils.defaultIfBlank(settings.getString(getMulticriteriaConfigurationKey()),"");
+  for (  String id : StringUtils.split(patternConf,',')) {
+    String propPrefix=getMulticriteriaConfigurationKey() + "." + id+ ".";
+    String resourceKeyPattern=settings.getString(propPrefix + IgnoreIssuesConfiguration.RESOURCE_KEY);
+    String ruleKeyPattern=settings.getString(propPrefix + IgnoreIssuesConfiguration.RULE_KEY);
+    String lineRange="*";
+    String[] fields=new String[]{resourceKeyPattern,ruleKeyPattern,lineRange};
+    PatternDecoder.checkRegularLineConstraints(StringUtils.join(fields,","),fields);
+    IssuePattern pattern=new IssuePattern(firstNonNull(resourceKeyPattern,"*"),firstNonNull(ruleKeyPattern,"*"));
+    PatternDecoder.decodeRangeOfLines(pattern,firstNonNull(lineRange,"*"));
+    multicriteriaPatterns.add(pattern);
+  }
 }
