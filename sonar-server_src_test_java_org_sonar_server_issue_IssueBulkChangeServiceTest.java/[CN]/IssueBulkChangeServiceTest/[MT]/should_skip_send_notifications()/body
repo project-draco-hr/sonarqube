@@ -1,17 +1,15 @@
 {
   Map<String,Object> properties=newHashMap();
   properties.put("issues","ABCD");
-  properties.put("actions","assign,set_severity");
+  properties.put("actions","assign");
   properties.put("assign.assignee","fred");
-  properties.put("set_severity.severity","MINOR");
-  actions.add(new MockAction("set_severity"));
   actions.add(new MockAction("assign"));
-  IssueBulkChangeQuery issueBulkChangeQuery=new IssueBulkChangeQuery(properties,true);
+  IssueBulkChangeQuery issueBulkChangeQuery=new IssueBulkChangeQuery(properties,false);
   IssueBulkChangeResult result=service.execute(issueBulkChangeQuery,userSession);
   assertThat(result.issuesChanged()).hasSize(1);
   assertThat(result.issuesNotChanged()).isEmpty();
-  verify(issueStorage,times(1)).save(eq(issue));
+  verify(issueStorage).save(eq(issue));
   verifyNoMoreInteractions(issueStorage);
-  verify(issueNotifications,times(1)).sendChanges(eq(issue),any(IssueChangeContext.class),eq(issueQueryResult));
+  verify(issueNotifications,never()).sendChanges(eq(issue),any(IssueChangeContext.class),eq(issueQueryResult));
   verifyNoMoreInteractions(issueNotifications);
 }
