@@ -1,0 +1,19 @@
+{
+  File basedir=temp.newFolder("base");
+  File buildDir=temp.newFolder("build");
+  File workingDir=temp.newFolder("work");
+  DefaultModuleFileSystem fs=new DefaultModuleFileSystem("foo",settings,fileCache,fileIndexer);
+  fs.setBaseDir(basedir);
+  fs.setBuildDir(buildDir);
+  fs.setWorkingDir(workingDir);
+  fs.addBinaryDir(new File(basedir,"target/classes"));
+  fs.addSourceDir(new File(basedir,"src/main/java"));
+  fs.addSourceDir(new File(basedir,"src/main/groovy"));
+  fs.addTestDir(new File(basedir,"src/test/java"));
+  assertThat(fs.baseDir().getCanonicalPath()).isEqualTo(basedir.getCanonicalPath());
+  assertThat(fs.workingDir().getCanonicalPath()).isEqualTo(workingDir.getCanonicalPath());
+  assertThat(fs.buildDir().getCanonicalPath()).isEqualTo(buildDir.getCanonicalPath());
+  assertThat(fs.sourceDirs()).hasSize(2);
+  assertThat(fs.testDirs()).hasSize(1);
+  assertThat(fs.binaryDirs()).hasSize(1);
+}

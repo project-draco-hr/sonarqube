@@ -1,0 +1,33 @@
+{
+  Reader reader=null;
+  try {
+    MessageDigest md5Digest=DigestUtils.getMd5Digest();
+    md5Digest.reset();
+    reader=new BufferedReader(new InputStreamReader(new FileInputStream(file),charset));
+    int i=reader.read();
+    boolean afterCR=true;
+    while (i != -1) {
+      char c=(char)i;
+      if (afterCR) {
+        afterCR=false;
+        if (c == '\n') {
+          i=reader.read();
+          continue;
+        }
+      }
+      if (c == '\r') {
+        afterCR=true;
+        c='\n';
+      }
+      md5Digest.update(charToBytesUTF(c));
+      i=reader.read();
+    }
+    return Hex.encodeHexString(md5Digest.digest());
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException(String.format("Fail to compute hash of file %s with charset %s",file.getAbsolutePath(),charset),e);
+  }
+ finally {
+    IOUtils.closeQuietly(reader);
+  }
+}

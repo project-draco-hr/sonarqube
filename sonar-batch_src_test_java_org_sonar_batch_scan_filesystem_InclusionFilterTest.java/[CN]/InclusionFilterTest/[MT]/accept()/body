@@ -1,11 +1,11 @@
 {
-  InclusionFilter filter=new InclusionFilter("**/*Foo.java");
+  InclusionFilter sourceRelativeFilter=new InclusionFilter("**/*Foo.java");
+  InclusionFilter absoluteFilter=new InclusionFilter("file:**/src/main/**Foo.java");
   File file=temp.newFile();
-  FileFilterContext context=new FileFilterContext(mock(ModuleFileSystem.class));
-  context.setCanonicalPath("/absolute/path/to/MyFoo.java");
-  context.setRelativePath("relative/path/to/MyFoo.java");
-  assertThat(filter.accept(file,context)).isTrue();
-  context.setCanonicalPath("/absolute/path/to/Other.java");
-  context.setRelativePath("relative/path/to/Other.java");
-  assertThat(filter.accept(file,context)).isFalse();
+  InputFile inputFile=InputFile.create(file,"src/main/java/org/MyFoo.java",ImmutableMap.of(InputFile.ATTRIBUTE_CANONICAL_PATH,"/absolute/path/to/src/main/java/org/MyFoo.java",InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"org/MyFoo.java"));
+  assertThat(sourceRelativeFilter.accept(inputFile)).isTrue();
+  assertThat(absoluteFilter.accept(inputFile)).isTrue();
+  inputFile=InputFile.create(file,"src/main/java/org/Other.java",ImmutableMap.of(InputFile.ATTRIBUTE_CANONICAL_PATH,"/absolute/path/to/src/main/java/org/Other.java",InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"org/Other.java"));
+  assertThat(sourceRelativeFilter.accept(inputFile)).isFalse();
+  assertThat(absoluteFilter.accept(inputFile)).isFalse();
 }

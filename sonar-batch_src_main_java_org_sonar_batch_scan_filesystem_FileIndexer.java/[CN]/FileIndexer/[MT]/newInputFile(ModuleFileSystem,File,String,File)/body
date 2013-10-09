@@ -1,0 +1,18 @@
+{
+  try {
+    Map<String,String> attributes=Maps.newHashMap();
+    String baseRelativePath=pathResolver.relativePath(fileSystem.baseDir(),file);
+    set(attributes,InputFile.ATTRIBUTE_SOURCEDIR_PATH,FilenameUtils.normalize(sourceDir.getCanonicalPath(),true));
+    set(attributes,InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,pathResolver.relativePath(sourceDir,file));
+    set(attributes,InputFile.ATTRIBUTE_CANONICAL_PATH,FilenameUtils.normalize(file.getCanonicalPath(),true));
+    set(attributes,InputFile.ATTRIBUTE_TYPE,type);
+    String extension=FilenameUtils.getExtension(file.getName());
+    set(attributes,InputFile.ATTRIBUTE_EXTENSION,extension);
+    set(attributes,InputFile.ATTRIBUTE_LANGUAGE,languageRecognizer.ofExtension(extension));
+    initStatus(file,fileSystem.sourceCharset(),baseRelativePath,attributes);
+    return InputFile.create(file,baseRelativePath,attributes);
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Fail to read file: " + file.getAbsolutePath(),e);
+  }
+}
