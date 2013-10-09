@@ -1,24 +1,9 @@
 {
   int batchSize=1;
-  List<NotificationQueueDto> notifications=notificationQueueDao.findOldest(batchSize);
-  if (notifications.isEmpty()) {
+  List<NotificationQueueDto> notificationDtos=notificationQueueDao.findOldest(batchSize);
+  if (notificationDtos.isEmpty()) {
     return null;
   }
-  notificationQueueDao.delete(notifications);
-  try {
-    return notifications.get(0).toNotification();
-  }
- catch (  InvalidClassException e) {
-    if (!alreadyLoggedDeserializationIssue) {
-      logDeserializationIssue();
-      alreadyLoggedDeserializationIssue=true;
-    }
-    return null;
-  }
-catch (  IOException e) {
-    throw new SonarException(UNABLE_TO_READ_NOTIFICATION,e);
-  }
-catch (  ClassNotFoundException e) {
-    throw new SonarException(UNABLE_TO_READ_NOTIFICATION,e);
-  }
+  notificationQueueDao.delete(notificationDtos);
+  return convertToNotification(notificationDtos);
 }
