@@ -1,9 +1,9 @@
 {
   File basedir=temp.newFolder();
-  DefaultModuleFileSystem fs=new DefaultModuleFileSystem("foo",settings,fileCache,fileIndexer);
-  fs.setBaseDir(basedir);
-  fs.setWorkingDir(basedir);
-  fs.addSourceDir(new File(basedir,"src/main/java"));
+  when(initializer.baseDir()).thenReturn(basedir);
+  when(initializer.workingDir()).thenReturn(basedir);
+  when(initializer.sourceDirs()).thenReturn(Arrays.asList(new File(basedir,"src/main/java")));
+  DefaultModuleFileSystem fs=new DefaultModuleFileSystem("foo",settings,fileIndex,initializer);
   File existingDir=temp.newFolder("new_folder");
   File notExistingDir=new File(existingDir,"not_exist");
   fs.resetDirs(existingDir,existingDir,Lists.newArrayList(existingDir,notExistingDir),Lists.newArrayList(existingDir,notExistingDir),Lists.newArrayList(existingDir,notExistingDir));
@@ -15,5 +15,5 @@
   assertThat(fs.testDirs().get(0).getCanonicalPath()).isEqualTo(existingDir.getCanonicalPath());
   assertThat(fs.binaryDirs()).hasSize(1);
   assertThat(fs.binaryDirs().get(0).getCanonicalPath()).isEqualTo(existingDir.getCanonicalPath());
-  verify(fileIndexer).index(fs);
+  verify(fileIndex).index(fs);
 }

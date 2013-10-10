@@ -1,0 +1,15 @@
+{
+  Logger logger=LoggerFactory.getLogger(FileIndex.class);
+  logger.info("Index files");
+  IndexStatus status=new IndexStatus(cache.filePathsOfModule(fileSystem.moduleKey()));
+  for (  File sourceDir : fileSystem.sourceDirs()) {
+    indexDirectory(fileSystem,status,sourceDir,InputFile.TYPE_SOURCE);
+  }
+  for (  File testDir : fileSystem.testDirs()) {
+    indexDirectory(fileSystem,status,testDir,InputFile.TYPE_TEST);
+  }
+  for (  String relativePath : status.orphans) {
+    cache.remove(fileSystem.moduleKey(),relativePath);
+  }
+  logger.info(String.format("%d files indexed",status.count));
+}
