@@ -1,13 +1,16 @@
 {
+  String extension=FilenameUtils.getExtension(file.getName());
+  String lang=languageRecognizer.ofExtension(extension);
+  if (lang == null) {
+    return null;
+  }
   try {
     Map<String,String> attributes=Maps.newHashMap();
+    set(attributes,InputFile.ATTRIBUTE_EXTENSION,extension);
     set(attributes,InputFile.ATTRIBUTE_TYPE,type);
-    String baseRelativePath=pathResolver.relativePath(fileSystem.baseDir(),file);
+    set(attributes,InputFile.ATTRIBUTE_LANGUAGE,lang);
     set(attributes,InputFile.ATTRIBUTE_SOURCEDIR_PATH,FilenameUtils.normalize(sourceDir.getCanonicalPath(),true));
     set(attributes,InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,pathResolver.relativePath(sourceDir,file));
-    String extension=FilenameUtils.getExtension(file.getName());
-    set(attributes,InputFile.ATTRIBUTE_EXTENSION,extension);
-    set(attributes,InputFile.ATTRIBUTE_LANGUAGE,languageRecognizer.ofExtension(extension));
     initStatus(file,fileSystem.sourceCharset(),baseRelativePath,attributes);
     return DefaultInputFile.create(file,baseRelativePath,attributes);
   }
