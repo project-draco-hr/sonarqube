@@ -1,0 +1,9 @@
+{
+  HttpRequestFactory requestFactory=new HttpRequestFactory(httpServer.url());
+  httpServer.stubResponseBody("{\"id\":\"1\",\"k\":\"polop\",\"nm\":\"Polop\",\"sc\":\"PRJ\",\"qu\":\"TRK\"}");
+  ProjectClient client=new DefaultProjectClient(requestFactory);
+  Project result=client.create(NewProject.create().key("polop").name("Polop"));
+  assertThat(httpServer.requestedPath()).isEqualTo("/api/projects/create");
+  assertThat(httpServer.requestParams()).includes(entry("key","polop"),entry("name","Polop"));
+  assertThat(result).isNotNull();
+}
