@@ -1,12 +1,19 @@
 {
   for (  Language language : languages) {
-    for (    String suffix : language.getFileSuffixes()) {
-      String extension=sanitizeExtension(suffix);
-      String s=byExtensions.get(extension);
-      if (s != null && !StringUtils.equals(s,language.getKey())) {
-        throw new IllegalStateException(String.format("File extension '%s' is declared by two languages: %s and %s",extension,s,language.getKey()));
+    if (language.getFileSuffixes().length == 0) {
+      langsByExtension.put(NO_EXTENSION,language.getKey());
+    }
+ else {
+      for (      String suffix : language.getFileSuffixes()) {
+        String extension=sanitizeExtension(suffix);
+        langsByExtension.put(extension,language.getKey());
       }
-      byExtensions.put(extension,language.getKey());
+    }
+  }
+  for (  String extension : langsByExtension.keySet()) {
+    Set<String> langs=langsByExtension.get(extension);
+    if (langs.size() > 1) {
+      warnConflict(extension,langs);
     }
   }
 }

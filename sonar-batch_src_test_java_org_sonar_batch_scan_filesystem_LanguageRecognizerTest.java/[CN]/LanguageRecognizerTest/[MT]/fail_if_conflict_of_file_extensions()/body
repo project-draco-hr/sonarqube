@@ -1,21 +1,12 @@
 {
-  Language[] languages=new Language[]{Java.INSTANCE,new Language(){
-    @Override public String getKey(){
-      return "java2";
-    }
-    @Override public String getName(){
-      return "Java2";
-    }
-    @Override public String[] getFileSuffixes(){
-      return new String[]{"java2","java"};
+  Language[] languages=new Language[]{new MockLanguage("java","java"),new MockLanguage("java2","java","java2")};
+  LanguageRecognizer recognizer=spy(new LanguageRecognizer(newProject("java"),languages));
+  recognizer.start();
+  verify(recognizer).warnConflict(eq("java"),argThat(new ArgumentMatcher<Set<String>>(){
+    @Override public boolean matches(    Object o){
+      Set<String> set=(Set<String>)o;
+      return set.contains("java") && set.contains("java2") && set.size() == 2;
     }
   }
-};
-  try {
-    new LanguageRecognizer(languages).start();
-    fail();
-  }
- catch (  IllegalStateException e) {
-    assertThat(e.getMessage()).isEqualTo("File extension 'java' is declared by two languages: java and java2");
-  }
+));
 }
