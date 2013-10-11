@@ -1,10 +1,11 @@
 {
-  File sourceFile=new File("Foo.php");
-  File testFile=new File("FooTest.php");
+  File rootDir=temp.newFolder();
+  File sourceFile=new File(rootDir,"Foo.php");
+  File testFile=new File(rootDir,"FooTest.php");
   when(project.getLanguageKey()).thenReturn("php");
   when(fileSystem.files(Mockito.isA(FileQuery.class))).thenReturn(Arrays.asList(sourceFile)).thenReturn(Arrays.asList(testFile));
-  when(fileSystem.sourceDirs()).thenReturn(ImmutableList.of(new File("")));
-  when(fileSystem.testDirs()).thenReturn(ImmutableList.of(new File("")));
+  when(fileSystem.sourceDirs()).thenReturn(ImmutableList.of(rootDir));
+  when(fileSystem.testDirs()).thenReturn(ImmutableList.of(rootDir));
   when(exclusionPatternInitializer.hasFileContentPattern()).thenReturn(true);
   scanner.analyse(project,null);
   verify(inclusionPatternInitializer).initializePatternsForPath("Foo.php","polop:Foo.php");
