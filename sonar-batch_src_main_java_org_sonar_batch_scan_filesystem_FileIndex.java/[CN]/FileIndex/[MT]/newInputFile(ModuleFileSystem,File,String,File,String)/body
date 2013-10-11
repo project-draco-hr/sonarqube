@@ -7,7 +7,14 @@
   set(attributes,InputFile.ATTRIBUTE_TYPE,type);
   set(attributes,InputFile.ATTRIBUTE_LANGUAGE,lang);
   set(attributes,InputFile.ATTRIBUTE_SOURCEDIR_PATH,PathUtils.canonicalPath(sourceDir));
-  set(attributes,InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,pathResolver.relativePath(sourceDir,file));
+  String sourceRelativePath=pathResolver.relativePath(sourceDir,file);
+  set(attributes,InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,sourceRelativePath);
+  if (Java.KEY.equals(lang)) {
+    set(attributes,DefaultInputFile.ATTRIBUTE_COMPONENT_KEY,project.getEffectiveKey() + ":" + JavaFile.fromRelativePath(sourceRelativePath,false).getKey());
+  }
+ else {
+    set(attributes,DefaultInputFile.ATTRIBUTE_COMPONENT_KEY,project.getEffectiveKey() + ":" + sourceRelativePath);
+  }
   initStatus(file,fileSystem.sourceCharset(),path,attributes);
   return DefaultInputFile.create(file,path,attributes);
 }

@@ -1,0 +1,21 @@
+{
+  JsonWriter json=null;
+  try {
+    json=new JsonWriter(writer);
+    json.setSerializeNulls(false);
+    json.beginObject();
+    json.name("version").value(server.getVersion());
+    Set<RuleKey> ruleKeys=newHashSet();
+    componentSelector.init();
+    writeJsonIssues(json,ruleKeys);
+    writeJsonComponents(json);
+    writeJsonRules(json,ruleKeys);
+    json.endObject().flush();
+  }
+ catch (  IOException e) {
+    throw new SonarException("Unable to write JSON report",e);
+  }
+ finally {
+    Closeables.closeQuietly(json);
+  }
+}
