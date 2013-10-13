@@ -1,12 +1,5 @@
 {
   Props props=new Props(new Properties());
-  Tomcat tomcat=mock(Tomcat.class,Mockito.RETURNS_DEEP_STUBS);
   Connectors.configure(tomcat,props);
-  verify(tomcat).setConnector(argThat(new ArgumentMatcher<Connector>(){
-    @Override public boolean matches(    Object o){
-      Connector c=(Connector)o;
-      return (Integer)c.getProperty("minSpareThreads") == 5 && (Integer)c.getProperty("maxThreads") == 50 && (Integer)c.getProperty("acceptCount") == 25;
-    }
-  }
-));
+  verify(tomcat).setConnector(argThat(new PropertiesMatcher(ImmutableMap.<String,Object>of("minSpareThreads",5,"maxThreads",50,"acceptCount",25))));
 }

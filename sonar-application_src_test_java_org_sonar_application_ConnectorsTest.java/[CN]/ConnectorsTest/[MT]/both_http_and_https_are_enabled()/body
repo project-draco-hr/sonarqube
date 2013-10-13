@@ -1,0 +1,21 @@
+{
+  Properties p=new Properties();
+  p.setProperty("sonar.web.http.enable","true");
+  p.setProperty("sonar.web.https.enable","true");
+  Props props=new Props(p);
+  Connectors.configure(tomcat,props);
+  verify(tomcat.getService()).addConnector(argThat(new ArgumentMatcher<Connector>(){
+    @Override public boolean matches(    Object o){
+      Connector c=(Connector)o;
+      return c.getScheme().equals("http") && c.getPort() == 9000;
+    }
+  }
+));
+  verify(tomcat.getService()).addConnector(argThat(new ArgumentMatcher<Connector>(){
+    @Override public boolean matches(    Object o){
+      Connector c=(Connector)o;
+      return c.getScheme().equals("https") && c.getPort() == 9443;
+    }
+  }
+));
+}

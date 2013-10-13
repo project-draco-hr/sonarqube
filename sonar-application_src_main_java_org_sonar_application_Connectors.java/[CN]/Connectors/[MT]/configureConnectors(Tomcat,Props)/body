@@ -1,0 +1,18 @@
+{
+  Connector http=newHttpConnector(props);
+  Connector https=newHttpsConnector(props);
+  if (http == null) {
+    if (https == null) {
+      throw new IllegalStateException("Both HTTP and HTTPS connectors are disabled");
+    }
+    tomcat.setConnector(https);
+    tomcat.getService().addConnector(https);
+  }
+ else {
+    tomcat.setConnector(http);
+    tomcat.getService().addConnector(http);
+    if (https != null) {
+      tomcat.getService().addConnector(https);
+    }
+  }
+}

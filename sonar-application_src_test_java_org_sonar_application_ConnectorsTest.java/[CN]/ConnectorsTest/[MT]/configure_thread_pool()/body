@@ -1,16 +1,9 @@
 {
   Properties p=new Properties();
-  p.setProperty(Connectors.PROPERTY_MIN_THREADS,"2");
-  p.setProperty(Connectors.PROPERTY_MAX_THREADS,"30");
-  p.setProperty(Connectors.PROPERTY_ACCEPT_COUNT,"20");
+  p.setProperty("sonar.web.http.minThreads","2");
+  p.setProperty("sonar.web.http.maxThreads","30");
+  p.setProperty("sonar.web.http.acceptCount","20");
   Props props=new Props(p);
-  Tomcat tomcat=mock(Tomcat.class,Mockito.RETURNS_DEEP_STUBS);
   Connectors.configure(tomcat,props);
-  verify(tomcat).setConnector(argThat(new ArgumentMatcher<Connector>(){
-    @Override public boolean matches(    Object o){
-      Connector c=(Connector)o;
-      return (Integer)c.getProperty("minSpareThreads") == 2 && (Integer)c.getProperty("maxThreads") == 30 && (Integer)c.getProperty("acceptCount") == 20;
-    }
-  }
-));
+  verify(tomcat).setConnector(argThat(new PropertiesMatcher(ImmutableMap.<String,Object>of("minSpareThreads",2,"maxThreads",30,"acceptCount",20))));
 }

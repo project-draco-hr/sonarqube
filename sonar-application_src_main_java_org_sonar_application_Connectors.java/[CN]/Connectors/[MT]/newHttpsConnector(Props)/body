@@ -1,0 +1,22 @@
+{
+  Connector connector=null;
+  if (props.booleanOf("sonar.web.https.enable")) {
+    connector=newConnector(props,"https");
+    int port=props.intOf("sonar.web.https.port",9443);
+    connector.setPort(port);
+    connector.setSecure(true);
+    connector.setScheme("https");
+    setConnectorAttribute(connector,"keyAlias",props.of("sonar.web.https.keyAlias"));
+    String keyPassword=props.of("sonar.web.https.keyPass","changeit");
+    setConnectorAttribute(connector,"keyPass",keyPassword);
+    setConnectorAttribute(connector,"keystorePass",props.of("sonar.web.https.keystorePass",keyPassword));
+    setConnectorAttribute(connector,"keystoreFile",props.of("sonar.web.https.keystoreFile"));
+    setConnectorAttribute(connector,"keystoreType",props.of("sonar.web.https.keystoreType","JKS"));
+    setConnectorAttribute(connector,"keystoreProvider",props.of("sonar.web.https.keystoreProvider"));
+    setConnectorAttribute(connector,"clientAuth",false);
+    setConnectorAttribute(connector,"sslProtocol","TLS");
+    setConnectorAttribute(connector,"SSLEnabled",true);
+    info("HTTPS connector is enabled on port " + port);
+  }
+  return connector;
+}
