@@ -1,18 +1,12 @@
 {
-  Connector http=newHttpConnector(props);
-  Connector https=newHttpsConnector(props);
-  if (http == null) {
-    if (https == null) {
-      throw new IllegalStateException("Both HTTP and HTTPS connectors are disabled");
-    }
-    tomcat.setConnector(https);
-    tomcat.getService().addConnector(https);
+  List<Connector> connectors=new ArrayList<Connector>();
+  connectors.addAll(Arrays.asList(newHttpConnector(props),newAjpConnector(props),newHttpsConnector(props)));
+  connectors.removeAll(Collections.singleton(null));
+  if (connectors.isEmpty()) {
+    throw new IllegalStateException("HTTP connectors are disabled");
   }
- else {
-    tomcat.setConnector(http);
-    tomcat.getService().addConnector(http);
-    if (https != null) {
-      tomcat.getService().addConnector(https);
-    }
+  tomcat.setConnector(connectors.get(0));
+  for (  Connector connector : connectors) {
+    tomcat.getService().addConnector(connector);
   }
 }
