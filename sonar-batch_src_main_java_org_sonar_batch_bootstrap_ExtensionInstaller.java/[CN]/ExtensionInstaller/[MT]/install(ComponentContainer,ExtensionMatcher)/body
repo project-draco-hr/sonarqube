@@ -1,10 +1,10 @@
 {
-  boolean dryRun=isDryRun();
+  boolean preview=analysisMode.isPreview();
   for (  Map.Entry<PluginMetadata,Plugin> entry : pluginRepository.getPluginsByMetadata().entrySet()) {
     PluginMetadata metadata=entry.getKey();
     Plugin plugin=entry.getValue();
     for (    Object extension : plugin.getExtensions()) {
-      doInstall(container,matcher,metadata,dryRun,extension);
+      doInstall(container,matcher,metadata,preview,extension);
     }
   }
   List<ExtensionProvider> providers=container.getComponentsByType(ExtensionProvider.class);
@@ -12,11 +12,11 @@
     Object object=provider.provide();
     if (object instanceof Iterable) {
       for (      Object extension : (Iterable)object) {
-        doInstall(container,matcher,null,dryRun,extension);
+        doInstall(container,matcher,null,preview,extension);
       }
     }
  else {
-      doInstall(container,matcher,null,dryRun,object);
+      doInstall(container,matcher,null,preview,object);
     }
   }
   return this;

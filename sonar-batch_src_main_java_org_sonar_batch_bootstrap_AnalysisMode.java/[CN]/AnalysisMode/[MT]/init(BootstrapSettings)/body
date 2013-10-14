@@ -1,0 +1,21 @@
+{
+  if (bootstrapSettings.properties().containsKey(CoreProperties.DRY_RUN)) {
+    LOG.warn(MessageFormat.format("Property {0} is deprecated. Please use {1} instead",CoreProperties.DRY_RUN,CoreProperties.ANALYSIS_MODE));
+    preview="true".equals(bootstrapSettings.property(CoreProperties.DRY_RUN));
+    incremental=false;
+  }
+ else {
+    String mode=bootstrapSettings.property(CoreProperties.ANALYSIS_MODE);
+    preview=CoreProperties.ANALYSIS_MODE_PREVIEW.equals(mode);
+    incremental=CoreProperties.ANALYSIS_MODE_INCREMENTAL.equals(mode);
+  }
+  if (incremental) {
+    LOG.info("Incremental mode");
+  }
+ else   if (preview) {
+    LOG.info("Preview mode");
+  }
+  if (incremental || preview) {
+    bootstrapSettings.properties().put(CoreProperties.DRY_RUN,"true");
+  }
+}

@@ -1,0 +1,15 @@
+{
+  if (projectId != null) {
+    LOG.debug("Generate new preview database for project [id={}]",projectId);
+  }
+ else {
+    LOG.debug("Generate new preview database for new project");
+  }
+  long notNullProjectId=projectId != null ? projectId.longValue() : 0L;
+  long newTimestamp=System.currentTimeMillis();
+  File cacheLocation=getCacheLocation(projectId);
+  FileUtils.deleteQuietly(cacheLocation);
+  File dbFile=previewDatabaseFactory.createNewDatabaseForDryRun(projectId,cacheLocation,String.valueOf(newTimestamp));
+  LOG.debug("Cached DB at {}",dbFile);
+  lastTimestampPerProject.put(notNullProjectId,newTimestamp);
+}

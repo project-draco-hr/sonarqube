@@ -1,0 +1,9 @@
+{
+  Throwable rootCause=Throwables.getRootCause(e);
+  if (rootCause instanceof SocketTimeoutException) {
+    throw new SonarException(new SonarException(String.format("Preview database read timed out after %s ms. You can try to increase read timeout with property -D" + CoreProperties.PREVIEW_READ_TIMEOUT_SEC + " (in seconds)",readTimeout),e));
+  }
+  if (projectKey != null && (rootCause instanceof HttpException) && (((HttpException)rootCause).getResponseCode() == 401)) {
+    throw new SonarException(new SonarException(String.format("You don't have access rights to project [%s]",projectKey),e));
+  }
+}
