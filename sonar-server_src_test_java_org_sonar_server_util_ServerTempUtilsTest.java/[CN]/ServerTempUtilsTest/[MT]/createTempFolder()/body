@@ -1,0 +1,12 @@
+{
+  ServerFileSystem fs=mock(ServerFileSystem.class);
+  File serverTempFolder=temp.newFolder();
+  when(fs.getTempDir()).thenReturn(serverTempFolder);
+  ServerTempUtils tempUtils=new ServerTempUtils(fs);
+  tempUtils.createTempDirectory();
+  tempUtils.createTempFile();
+  assertThat(new File(serverTempFolder,"tmp")).exists();
+  assertThat(new File(serverTempFolder,"tmp").list()).hasSize(2);
+  tempUtils.stop();
+  assertThat(new File(serverTempFolder,"tmp")).doesNotExist();
+}
