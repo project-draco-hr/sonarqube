@@ -1,0 +1,20 @@
+{
+  TechnicalDebtCharacteristic parentCharacteristic=new TechnicalDebtCharacteristic(Characteristic.create());
+  TechnicalDebtRequirement requirement1=new TechnicalDebtRequirement(Characteristic.create(),parentCharacteristic);
+  ;
+  Violation violation1=buildViolation("rule1","repo1",NOW);
+  Violation violation2=buildViolation("rule1","repo1",NOW);
+  Violation violation3=buildViolation("rule2","repo2",YESTERDAY);
+  Violation violation4=buildViolation("rule2","repo2",LAST_MONTH);
+  List<Violation> violations=newArrayList(violation1,violation2,violation3,violation4);
+  when(technicalDebtModel.getRequirementByRule("repo1","rule1")).thenReturn(requirement1);
+  when(technicalDebtModel.getAllRequirements()).thenReturn(newArrayList(requirement1));
+  when(functions.costInHours(any(TechnicalDebtRequirement.class),any(Collection.class))).thenReturn(1.0);
+  DecoratorContext context=mock(DecoratorContext.class);
+  when(context.getViolations()).thenReturn(violations);
+  Measure measure=new Measure().setCharacteristic(requirement1.toCharacteristic()).setValue(5.0);
+  when(context.getChildrenMeasures(any(MeasuresFilter.class))).thenReturn(newArrayList(measure));
+  remediationCostCalculator.compute(context);
+  assertThat(remediationCostCalculator.getTotal()).isEqualTo(6.0);
+  assertThat(remediationCostCalculator.getRequirementCosts().get(requirement1)).isEqualTo(6.0);
+}
