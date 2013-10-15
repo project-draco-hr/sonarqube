@@ -1,0 +1,10 @@
+{
+  HttpRequestFactory requestFactory=new HttpRequestFactory(httpServer.url());
+  httpServer.stubResponseBody(RUNNING_JSON);
+  DefaultSystemClient client=new DefaultSystemClient(requestFactory);
+  Migration migration=client.migrate();
+  assertThat(httpServer.requestedPath()).isEqualTo("/api/server/setup");
+  assertThat(migration.status()).isEqualTo(Migration.Status.MIGRATION_RUNNING);
+  assertThat(migration.operationalWebapp()).isFalse();
+  assertThat(migration.startedAt().getYear()).isEqualTo(113);
+}
