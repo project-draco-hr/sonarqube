@@ -1,10 +1,13 @@
 {
   Logger logger=mock(Logger.class);
-  Logging.StartupLogger listener=new Logging.StartupLogger(logger);
+  Logging.LifecycleLogger listener=new Logging.LifecycleLogger(logger);
   LifecycleEvent event=new LifecycleEvent(mock(Lifecycle.class),"before_init",null);
   listener.lifecycleEvent(event);
   verifyZeroInteractions(logger);
   event=new LifecycleEvent(mock(Lifecycle.class),"after_start",null);
   listener.lifecycleEvent(event);
-  verify(logger).info("Web server is up");
+  verify(logger).info("Web server is started");
+  event=new LifecycleEvent(mock(Lifecycle.class),"after_destroy",null);
+  listener.lifecycleEvent(event);
+  verify(logger).info("Web server is stopped");
 }
