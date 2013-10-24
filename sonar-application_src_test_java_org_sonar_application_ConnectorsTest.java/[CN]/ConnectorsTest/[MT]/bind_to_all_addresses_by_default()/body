@@ -1,0 +1,20 @@
+{
+  Properties p=new Properties();
+  p.setProperty("sonar.web.port","9000");
+  p.setProperty("sonar.web.https.port","9443");
+  Connectors.configure(tomcat,new Props(p));
+  verify(tomcat.getService()).addConnector(argThat(new ArgumentMatcher<Connector>(){
+    @Override public boolean matches(    Object o){
+      Connector c=(Connector)o;
+      return c.getScheme().equals("http") && c.getPort() == 9000 && ((InetAddress)c.getProperty("address")).getHostAddress().equals("0.0.0.0");
+    }
+  }
+));
+  verify(tomcat.getService()).addConnector(argThat(new ArgumentMatcher<Connector>(){
+    @Override public boolean matches(    Object o){
+      Connector c=(Connector)o;
+      return c.getScheme().equals("https") && c.getPort() == 9443 && ((InetAddress)c.getProperty("address")).getHostAddress().equals("0.0.0.0");
+    }
+  }
+));
+}
