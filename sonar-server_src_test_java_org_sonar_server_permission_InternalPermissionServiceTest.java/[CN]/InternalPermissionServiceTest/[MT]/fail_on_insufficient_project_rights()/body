@@ -1,0 +1,11 @@
+{
+  try {
+    when(resourceDao.getResource(any(ResourceQuery.class))).thenReturn(new ResourceDto().setId(10L).setKey("org.sample.Sample"));
+    params=buildPermissionChangeParams(null,DefaultGroups.ANYONE,"org.sample.Sample","user");
+    MockUserSession.set().setLogin("admin").addProjectPermissions(UserRole.ADMIN);
+    service.addPermission(params);
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(ForbiddenException.class).hasMessage("Insufficient privileges");
+  }
+}
