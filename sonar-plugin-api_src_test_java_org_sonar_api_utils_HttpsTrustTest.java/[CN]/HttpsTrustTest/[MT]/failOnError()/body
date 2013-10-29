@@ -1,0 +1,13 @@
+{
+  HttpsTrust.SslContext context=mock(HttpsTrust.SslContext.class);
+  KeyManagementException cause=new KeyManagementException("foo");
+  when(context.newFactory(any(TrustManager.class))).thenThrow(cause);
+  try {
+    new HttpsTrust(context);
+    fail();
+  }
+ catch (  IllegalStateException e) {
+    assertThat(e.getMessage()).isEqualTo("Fail to build SSL factory");
+    assertThat(e.getCause()).isSameAs(cause);
+  }
+}
