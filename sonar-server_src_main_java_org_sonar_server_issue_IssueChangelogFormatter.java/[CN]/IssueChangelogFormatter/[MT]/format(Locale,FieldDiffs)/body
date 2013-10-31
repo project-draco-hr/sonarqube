@@ -1,0 +1,21 @@
+{
+  List<String> result=newArrayList();
+  for (  Map.Entry<String,FieldDiffs.Diff> entry : diffs.diffs().entrySet()) {
+    StringBuilder message=new StringBuilder();
+    String key=entry.getKey();
+    FieldDiffs.Diff diff=entry.getValue();
+    if (diff.newValue() != null && !diff.newValue().equals("")) {
+      message.append(i18nManager.message(locale,"issue.changelog.changed_to",null,i18nManager.message(locale,"issue.changelog.field." + key,null),diff.newValue()));
+    }
+ else {
+      message.append(i18nManager.message(locale,"issue.changelog.removed",null,i18nManager.message(locale,"issue.changelog.field." + key,null)));
+    }
+    if (diff.oldValue() != null && !diff.oldValue().equals("")) {
+      message.append(" (");
+      message.append(i18nManager.message(locale,"issue.changelog.was",null,diff.oldValue()));
+      message.append(")");
+    }
+    result.add(message.toString());
+  }
+  return result;
+}
