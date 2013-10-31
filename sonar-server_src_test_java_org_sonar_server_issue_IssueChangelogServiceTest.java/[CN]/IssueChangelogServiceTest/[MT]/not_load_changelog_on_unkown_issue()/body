@@ -1,0 +1,13 @@
+{
+  try {
+    IssueQueryResult issueQueryResult=new DefaultIssueQueryResult(Collections.emptyList());
+    when(issueFinder.find(any(IssueQuery.class))).thenReturn(issueQueryResult);
+    service.changelog("ABCDE");
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(NotFoundException.class);
+    verifyNoMoreInteractions(changeDao);
+    verifyNoMoreInteractions(userFinder);
+  }
+}

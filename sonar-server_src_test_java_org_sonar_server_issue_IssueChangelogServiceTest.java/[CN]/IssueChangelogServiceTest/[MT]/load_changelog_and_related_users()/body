@@ -4,7 +4,9 @@
   when(changeDao.selectChangelogByIssue("ABCDE")).thenReturn(Arrays.asList(userChange,scanChange));
   User arthur=new DefaultUser().setLogin("arthur").setName("Arthur");
   when(userFinder.findByLogins(Arrays.asList("arthur"))).thenReturn(Arrays.asList(arthur));
-  IssueChangelog changelog=service.changelog("ABCDE",mock(UserSession.class));
+  IssueQueryResult issueQueryResult=new DefaultIssueQueryResult(newArrayList((Issue)new DefaultIssue().setKey("ABCDE")));
+  when(issueFinder.find(any(IssueQuery.class))).thenReturn(issueQueryResult);
+  IssueChangelog changelog=service.changelog("ABCDE");
   assertThat(changelog).isNotNull();
   assertThat(changelog.changes()).containsOnly(userChange,scanChange);
   assertThat(changelog.user(scanChange)).isNull();
