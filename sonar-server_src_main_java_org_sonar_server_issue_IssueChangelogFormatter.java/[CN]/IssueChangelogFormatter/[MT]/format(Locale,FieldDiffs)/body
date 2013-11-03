@@ -3,16 +3,16 @@
   for (  Map.Entry<String,FieldDiffs.Diff> entry : diffs.diffs().entrySet()) {
     StringBuilder message=new StringBuilder();
     String key=entry.getKey();
-    FieldDiffs.Diff diff=entry.getValue();
-    if (diff.newValue() != null && !diff.newValue().equals("")) {
-      message.append(i18nManager.message(locale,"issue.changelog.changed_to",null,i18nManager.message(locale,"issue.changelog.field." + key,null),diff.newValue()));
+    IssueChangelogDiffFormat diffFormat=format(locale,key,entry.getValue());
+    if (diffFormat.newValue() != null) {
+      message.append(i18nManager.message(locale,"issue.changelog.changed_to",null,i18nManager.message(locale,"issue.changelog.field." + key,null),diffFormat.newValue()));
     }
  else {
       message.append(i18nManager.message(locale,"issue.changelog.removed",null,i18nManager.message(locale,"issue.changelog.field." + key,null)));
     }
-    if (diff.oldValue() != null && !diff.oldValue().equals("")) {
+    if (diffFormat.oldValue() != null) {
       message.append(" (");
-      message.append(i18nManager.message(locale,"issue.changelog.was",null,diff.oldValue()));
+      message.append(i18nManager.message(locale,"issue.changelog.was",null,diffFormat.oldValue()));
       message.append(")");
     }
     result.add(message.toString());
