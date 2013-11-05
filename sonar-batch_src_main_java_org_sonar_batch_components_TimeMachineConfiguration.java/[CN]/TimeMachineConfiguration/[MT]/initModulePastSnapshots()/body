@@ -1,14 +1,13 @@
 {
   periods=newLinkedList();
   modulePastSnapshots=newLinkedList();
-  for (  PastSnapshot projectPastSnapshot : periodsDefinition.projectPastSnapshots()) {
-    Date snapshotDate=getSnapshotDate(projectPastSnapshot.getProjectSnapshot());
+  for (  PastSnapshot projectPastSnapshot : periodsDefinition.getRootProjectPastSnapshots()) {
+    Snapshot snapshot=findSnapshot(projectPastSnapshot.getProjectSnapshot());
     PastSnapshot pastSnapshot=new PastSnapshot(projectPastSnapshot.getMode(),projectPastSnapshot.getTargetDate(),projectPastSnapshot.getProjectSnapshot());
     pastSnapshot.setIndex(projectPastSnapshot.getIndex());
-    pastSnapshot.setMode(projectPastSnapshot.getMode());
     pastSnapshot.setModeParameter(projectPastSnapshot.getModeParameter());
     modulePastSnapshots.add(pastSnapshot);
-    periods.add(new Period(projectPastSnapshot.getIndex(),projectPastSnapshot.getTargetDate(),snapshotDate));
+    periods.add(new Period(pastSnapshot.getIndex(),pastSnapshot.getTargetDate(),snapshot != null ? snapshot.getCreatedAt() : null));
     log(pastSnapshot);
   }
 }
