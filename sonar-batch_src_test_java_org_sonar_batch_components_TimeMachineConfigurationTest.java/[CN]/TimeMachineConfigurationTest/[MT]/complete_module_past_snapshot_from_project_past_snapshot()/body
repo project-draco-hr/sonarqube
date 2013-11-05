@@ -1,0 +1,16 @@
+{
+  Integer projectId=1;
+  Date targetDate=new Date();
+  PastSnapshot projectPastSnapshot=new PastSnapshot("mode",targetDate);
+  projectPastSnapshot.setIndex(1);
+  projectPastSnapshot.setMode("mode");
+  projectPastSnapshot.setModeParameter("modeParam");
+  PastSnapshot modulePastSnapshot=new PastSnapshot("mode",targetDate);
+  when(periodsDefinition.projectPastSnapshots()).thenReturn(newArrayList(projectPastSnapshot));
+  when(pastSnapshotFinderByDate.findByDate(anyInt(),any(Date.class))).thenReturn(modulePastSnapshot);
+  TimeMachineConfiguration timeMachineConfiguration=new TimeMachineConfiguration((Project)new Project("my:project").setId(projectId),periodsDefinition,pastSnapshotFinderByDate);
+  assertThat(timeMachineConfiguration.modulePastSnapshots()).hasSize(1);
+  assertThat(timeMachineConfiguration.modulePastSnapshots().get(0).getIndex()).isEqualTo(1);
+  assertThat(timeMachineConfiguration.modulePastSnapshots().get(0).getMode()).isEqualTo("mode");
+  assertThat(timeMachineConfiguration.modulePastSnapshots().get(0).getModeParameter()).isEqualTo("modeParam");
+}

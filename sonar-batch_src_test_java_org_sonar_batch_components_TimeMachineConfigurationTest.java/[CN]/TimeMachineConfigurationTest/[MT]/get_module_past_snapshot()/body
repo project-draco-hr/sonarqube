@@ -1,0 +1,11 @@
+{
+  Integer projectId=1;
+  Date targetDate=new Date();
+  PastSnapshot projectPastSnapshot=new PastSnapshot("mode",targetDate);
+  PastSnapshot modulePastSnapshot=new PastSnapshot("mode",targetDate);
+  when(periodsDefinition.projectPastSnapshots()).thenReturn(newArrayList(projectPastSnapshot));
+  when(pastSnapshotFinderByDate.findByDate(anyInt(),any(Date.class))).thenReturn(modulePastSnapshot);
+  TimeMachineConfiguration timeMachineConfiguration=new TimeMachineConfiguration((Project)new Project("my:project").setId(projectId),periodsDefinition,pastSnapshotFinderByDate);
+  assertThat(timeMachineConfiguration.periods()).hasSize(1);
+  assertThat(timeMachineConfiguration.modulePastSnapshots()).hasSize(1);
+}
