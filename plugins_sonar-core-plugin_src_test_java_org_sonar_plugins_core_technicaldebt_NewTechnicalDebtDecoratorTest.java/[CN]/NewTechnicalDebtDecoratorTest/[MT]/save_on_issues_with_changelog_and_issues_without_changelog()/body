@@ -1,0 +1,13 @@
+{
+  Issue issue1=new DefaultIssue().setKey("A").setCreationDate(fiveDaysAgo).setTechnicalDebt(fiveDaysDebt);
+  Issue issue2=new DefaultIssue().setKey("B").setCreationDate(fiveDaysAgo).setTechnicalDebt(twoDaysDebt);
+  Issue issue3=new DefaultIssue().setKey("C").setCreationDate(nineDaysAgo).setTechnicalDebt(fiveDaysDebt);
+  Issue issue4=new DefaultIssue().setKey("D").setCreationDate(fiveDaysAgo).setTechnicalDebt(twoDaysDebt);
+  when(issuable.issues()).thenReturn(newArrayList(issue1,issue2,issue3,issue4));
+  Multimap<Issue,FieldDiffs> changelogList=ArrayListMultimap.create();
+  changelogList.putAll(issue1,newArrayList(new FieldDiffs().setDiff("technicalDebt",twoDaysDebt,fiveDaysDebt).setCreatedAt(rightNow),new FieldDiffs().setDiff("technicalDebt",oneDaysDebt,twoDaysDebt).setCreatedAt(fourDaysAgo),new FieldDiffs().setDiff("technicalDebt",null,oneDaysDebt).setCreatedAt(nineDaysAgo)));
+  changelogList.putAll(issue2,newArrayList(new FieldDiffs().setDiff("technicalDebt",oneDaysDebt,twoDaysDebt).setCreatedAt(rightNow),new FieldDiffs().setDiff("technicalDebt",null,oneDaysDebt).setCreatedAt(nineDaysAgo)));
+  when(changelogFinder.findByIssues(anyCollection())).thenReturn(changelogList);
+  decorator.decorate(resource,context);
+  verify(context).saveMeasure(argThat(new IsVariationMeasure(CoreMetrics.NEW_TECHNICAL_DEBT,3.0,12.0)));
+}
