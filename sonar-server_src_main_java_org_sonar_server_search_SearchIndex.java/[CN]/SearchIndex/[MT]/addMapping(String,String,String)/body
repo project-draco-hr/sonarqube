@@ -2,11 +2,11 @@
   IndicesAdminClient indices=client.admin().indices();
   try {
     if (!indices.exists(new IndicesExistsRequest(index)).get().isExists()) {
-      indices.prepareCreate(index).get();
+      indices.prepareCreate(index).execute().actionGet();
     }
   }
  catch (  Exception e) {
     LOG.error("While checking for index existence",e);
   }
-  indices.preparePutMapping(index).setType(type).setSource(mapping).execute();
+  indices.putMapping(Requests.putMappingRequest(index).type(type).source(mapping)).actionGet();
 }
