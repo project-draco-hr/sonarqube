@@ -1,0 +1,20 @@
+{
+  LOG.info("Starting {} in {}",this.getClass().getSimpleName(),nodeDir);
+  nodeSettingsBuilder.put("node.path.conf",nodeDir).put("node.path.data",nodeDir).put("node.path.work",nodeDir).put("node.path.logs",nodeDir).put("gateway.type","none").put("index.store.type","ram").put("index.number_of_shards",1).put("index.number_of_replicas",0);
+  String httpHost=settings.getString("sonar.es.http.host");
+  String httpPort=settings.getString("sonar.es.http.port");
+  if (httpPort == null) {
+    LOG.info("HTTP access to search cache disabled");
+    nodeSettingsBuilder.put("http.enabled",false);
+  }
+ else {
+    if (httpHost == null) {
+      httpHost="127.0.0.1";
+    }
+    LOG.info("Enabling HTTP access to search cache on ports {}",httpPort);
+    nodeSettingsBuilder.put("http.enabled",true);
+    nodeSettingsBuilder.put("http.host",httpHost);
+    nodeSettingsBuilder.put("http.port",httpPort);
+  }
+  node=nodeBuilder.local(true).clusterName("sonarqube").settings(nodeSettingsBuilder).node();
+}

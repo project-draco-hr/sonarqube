@@ -1,0 +1,23 @@
+{
+  BulkRequestBuilder builder=new BulkRequestBuilder(client);
+  for (int i=0; i < ids.length; i++) {
+    builder.add(client.prepareIndex(index,type,ids[i]).setSource(sources[i].bytes()));
+  }
+  try {
+    BulkResponse bulkResponse=client.bulk(builder.setRefresh(true).request()).get();
+    if (bulkResponse.hasFailures()) {
+      for (      BulkItemResponse bulkItemResponse : bulkResponse.getItems()) {
+        if (bulkItemResponse.isFailed()) {
+          int itemId=bulkItemResponse.getItemId();
+          put(index,type,ids[itemId],sources[itemId]);
+        }
+      }
+    }
+  }
+ catch (  InterruptedException e) {
+    LOG.error("Interrupted during bulk operation",e);
+  }
+catch (  ExecutionException e) {
+    LOG.error("Execution of bulk operation failed",e);
+  }
+}
