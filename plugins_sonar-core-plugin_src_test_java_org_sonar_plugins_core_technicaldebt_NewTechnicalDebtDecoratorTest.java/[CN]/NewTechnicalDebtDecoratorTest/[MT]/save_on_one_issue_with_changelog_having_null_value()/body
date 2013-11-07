@@ -1,0 +1,9 @@
+{
+  Issue issue=new DefaultIssue().setKey("A").setCreationDate(fiveDaysAgo).setTechnicalDebt(fiveDaysDebt);
+  when(issuable.issues()).thenReturn(newArrayList(issue));
+  Multimap<Issue,FieldDiffs> changelogList=ArrayListMultimap.create();
+  changelogList.putAll(issue,newArrayList(new FieldDiffs().setDiff("technicalDebt",null,fiveDaysDebt).setCreatedAt(rightNow),new FieldDiffs().setDiff("technicalDebt",oneDaysDebt,null).setCreatedAt(fourDaysAgo),new FieldDiffs().setDiff("technicalDebt",null,oneDaysDebt).setCreatedAt(nineDaysAgo)));
+  when(changelogFinder.findByIssues(anyCollection())).thenReturn(changelogList);
+  decorator.decorate(resource,context);
+  verify(context).saveMeasure(argThat(new IsVariationMeasure(CoreMetrics.NEW_TECHNICAL_DEBT,5.0,4.0)));
+}
