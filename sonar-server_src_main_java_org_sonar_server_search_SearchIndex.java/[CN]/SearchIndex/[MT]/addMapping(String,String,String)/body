@@ -8,5 +8,10 @@
  catch (  Exception e) {
     LOG.error("While checking for index existence",e);
   }
-  indices.putMapping(Requests.putMappingRequest(index).type(type).source(mapping)).actionGet();
+  try {
+    indices.putMapping(Requests.putMappingRequest(index).type(type).source(mapping)).actionGet();
+  }
+ catch (  ElasticSearchParseException parseException) {
+    throw new IllegalArgumentException("Invalid mapping file",parseException);
+  }
 }
