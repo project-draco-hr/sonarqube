@@ -1,0 +1,15 @@
+{
+  List<String> result=Lists.newArrayList();
+  final int scrollTime=100;
+  SearchResponse scrollResp=searchQuery.toBuilder(client).addField("_id").setSearchType(SearchType.SCAN).setScroll(new TimeValue(scrollTime)).setSize(searchQuery.scrollSize()).execute().actionGet();
+  while (true) {
+    scrollResp=client.prepareSearchScroll(scrollResp.getScrollId()).setScroll(new TimeValue(scrollTime)).execute().actionGet();
+    for (    SearchHit hit : scrollResp.getHits()) {
+      result.add(hit.getId());
+    }
+    if (scrollResp.getHits().getHits().length == 0) {
+      break;
+    }
+  }
+  return result;
+}

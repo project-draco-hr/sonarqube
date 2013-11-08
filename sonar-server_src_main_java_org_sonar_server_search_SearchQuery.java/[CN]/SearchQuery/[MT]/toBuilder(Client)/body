@@ -1,11 +1,20 @@
 {
   SearchRequestBuilder builder=client.prepareSearch(indices.toArray(new String[0])).setTypes(types.toArray(new String[0]));
-  String queryString=getQueryString();
-  if (StringUtils.isBlank(queryString)) {
-    builder.setQuery(QueryBuilders.matchAllQuery());
+  List<FilterBuilder> filters=Lists.newArrayList();
+  if (StringUtils.isNotBlank(searchString)) {
+    filters.add(queryFilter(QueryBuilders.queryString(searchString)));
+  }
+  for (  String field : fieldCriteria.keySet()) {
+    filters.add(termFilter(field,fieldCriteria.get(field)));
+  }
+  if (filters.isEmpty()) {
+    builder.setFilter(matchAllFilter());
+  }
+ else   if (filters.size() == 1) {
+    builder.setFilter(filters.get(0));
   }
  else {
-    builder.setQuery(queryString);
+    builder.setFilter(FilterBuilders.andFilter(filters.toArray(new FilterBuilder[0])));
   }
   return addFacets(builder);
 }
