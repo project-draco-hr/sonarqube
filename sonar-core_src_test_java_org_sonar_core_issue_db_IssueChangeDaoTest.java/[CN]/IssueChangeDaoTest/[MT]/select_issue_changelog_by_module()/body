@@ -1,0 +1,22 @@
+{
+  setupData("select_issue_changelog_by_module");
+  DefaultResultHandler handler=new DefaultResultHandler();
+  dao.selectChangelogOnNonClosedIssuesByModuleAndType(400,handler);
+  assertThat(handler.getResultList()).hasSize(4);
+  IssueChangeDto issueChangeDto=(IssueChangeDto)handler.getResultList().get(0);
+  assertThat(issueChangeDto.getId()).isNotNull();
+  assertThat(issueChangeDto.getKey()).isNotNull();
+  assertThat(issueChangeDto.getIssueKey()).isNotNull();
+  assertThat(issueChangeDto.getUserLogin()).isNotNull();
+  assertThat(issueChangeDto.getChangeType()).isNotNull();
+  assertThat(issueChangeDto.getChangeData()).isNotNull();
+  assertThat(issueChangeDto.getCreatedAt()).isNotNull();
+  assertThat(issueChangeDto.getUpdatedAt()).isNotNull();
+  for (  Object changeDtoObject : handler.getResultList()) {
+    IssueChangeDto changeDto=(IssueChangeDto)changeDtoObject;
+    assertThat(changeDto.getChangeType()).isEqualTo(IssueChangeDto.TYPE_FIELD_CHANGE);
+  }
+  handler=new DefaultResultHandler();
+  dao.selectChangelogOnNonClosedIssuesByModuleAndType(399,handler);
+  assertThat(handler.getResultList()).hasSize(1);
+}

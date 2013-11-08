@@ -1,10 +1,7 @@
 {
   when(timeMachineConfiguration.periods()).thenReturn(newArrayList(new Period(1,null,null),new Period(2,null,null)));
-  Issue issue=new DefaultIssue().setKey("A").setCreationDate(fiveDaysAgo).setTechnicalDebt(fiveDaysDebt);
+  Issue issue=new DefaultIssue().setKey("A").setCreationDate(fiveDaysAgo).setTechnicalDebt(fiveDaysDebt).setChanges(newArrayList(new FieldDiffs().setDiff("technicalDebt",null,fiveDaysDebt).setCreatedAt(rightNow),new FieldDiffs().setDiff("technicalDebt",oneDaysDebt,null).setCreatedAt(fourDaysAgo),new FieldDiffs().setDiff("technicalDebt",null,oneDaysDebt).setCreatedAt(nineDaysAgo)));
   when(issuable.issues()).thenReturn(newArrayList(issue));
-  Multimap<Issue,FieldDiffs> changelogList=ArrayListMultimap.create();
-  changelogList.putAll(issue,newArrayList(new FieldDiffs().setDiff("technicalDebt",null,fiveDaysDebt).setCreatedAt(rightNow),new FieldDiffs().setDiff("technicalDebt",oneDaysDebt,null).setCreatedAt(fourDaysAgo),new FieldDiffs().setDiff("technicalDebt",null,oneDaysDebt).setCreatedAt(nineDaysAgo)));
-  when(changelogFinder.findByIssues(anyCollection())).thenReturn(changelogList);
   decorator.decorate(resource,context);
   verify(context).saveMeasure(argThat(new IsVariationMeasure(CoreMetrics.NEW_TECHNICAL_DEBT,4.0,4.0)));
 }

@@ -17,6 +17,10 @@
     if (ref.getIssueAttributes() != null) {
       issue.setAttributes(KeyValueFormat.parse(ref.getIssueAttributes()));
     }
+    Collection<IssueChangeDto> issueChangeDtos=initialOpenIssues.selectChangelog(issue.key());
+    for (    IssueChangeDto issueChangeDto : issueChangeDtos) {
+      issue.addChange(issueChangeDto.toFieldDiffs());
+    }
     if (ref.isManualSeverity()) {
       issue.setManualSeverity(true);
       issue.setSeverity(ref.getSeverity());
