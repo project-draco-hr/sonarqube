@@ -1,0 +1,17 @@
+{
+  Map<String,String> options=Maps.newHashMap();
+  String status=" ";
+  String repositories="repo1|repo2";
+  String searchText="search text";
+  options.put("status",status);
+  options.put("repositories",repositories);
+  options.put("searchtext",searchText);
+  facade.findIds(options);
+  ArgumentCaptor<Map> captor=ArgumentCaptor.forClass(Map.class);
+  verify(ruleRegistry).findIds(captor.capture());
+  Map<String,String> params=(Map<String,String>)captor.getValue();
+  assertThat(params.get("status")).isNull();
+  assertThat(params.get("repositoryKey")).isEqualTo(repositories);
+  assertThat(params.get("language")).isNull();
+  assertThat(params.get("nameOrKey")).isEqualTo(searchText);
+}

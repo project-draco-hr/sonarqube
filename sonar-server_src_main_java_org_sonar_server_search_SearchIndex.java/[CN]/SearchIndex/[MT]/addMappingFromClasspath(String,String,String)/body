@@ -1,11 +1,12 @@
 {
   try {
-    addMapping(index,type,IOUtils.toString(getClass().getResource(resourcePath)));
+    URL resource=getClass().getResource(resourcePath);
+    if (resource == null) {
+      throw new IllegalArgumentException("Could not load unexisting file at " + resourcePath);
+    }
+    addMapping(index,type,IOUtils.toString(resource));
   }
- catch (  NullPointerException nonExisting) {
-    throw new IllegalArgumentException("Could not load unexisting file at " + resourcePath,nonExisting);
-  }
-catch (  IOException ioException) {
+ catch (  IOException ioException) {
     throw new IllegalArgumentException("Problem loading file at " + resourcePath,ioException);
   }
 }

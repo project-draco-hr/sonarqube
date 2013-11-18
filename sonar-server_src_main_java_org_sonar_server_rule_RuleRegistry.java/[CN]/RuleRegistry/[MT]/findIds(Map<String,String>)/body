@@ -2,12 +2,11 @@
   Map<String,String> params=Maps.newHashMap(query);
   SearchQuery searchQuery=SearchQuery.create();
   searchQuery.index(INDEX_RULES).type(TYPE_RULE).scrollSize(500);
-  if (params.containsKey("nameOrKey")) {
-    searchQuery.searchString(query.get("nameOrKey"));
-    params.remove("nameOrKey");
+  if (params.containsKey(PARAM_NAMEORKEY)) {
+    searchQuery.searchString(params.remove(PARAM_NAMEORKEY));
   }
-  for (  String key : params.keySet()) {
-    searchQuery.field(key,params.get(key));
+  for (  Map.Entry<String,String> param : params.entrySet()) {
+    searchQuery.field(param.getKey(),param.getValue().split("\\|"));
   }
   List<Integer> result=Lists.newArrayList();
   for (  String docId : searchIndex.findDocumentIds(searchQuery)) {

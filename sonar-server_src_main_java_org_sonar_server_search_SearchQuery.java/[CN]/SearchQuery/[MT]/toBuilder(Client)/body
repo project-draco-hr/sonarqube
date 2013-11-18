@@ -5,7 +5,12 @@
     filters.add(queryFilter(QueryBuilders.queryString(searchString)));
   }
   for (  String field : fieldCriteria.keySet()) {
-    filters.add(termFilter(field,fieldCriteria.get(field)));
+    if (fieldCriteria.get(field).size() > 1) {
+      filters.add(termsFilter(field,fieldCriteria.get(field)));
+    }
+ else {
+      filters.add(termFilter(field,fieldCriteria.get(field)));
+    }
   }
   if (filters.isEmpty()) {
     builder.setFilter(matchAllFilter());
@@ -14,7 +19,7 @@
     builder.setFilter(filters.get(0));
   }
  else {
-    builder.setFilter(FilterBuilders.andFilter(filters.toArray(new FilterBuilder[0])));
+    builder.setFilter(andFilter(filters.toArray(new FilterBuilder[0])));
   }
   return addFacets(builder);
 }
