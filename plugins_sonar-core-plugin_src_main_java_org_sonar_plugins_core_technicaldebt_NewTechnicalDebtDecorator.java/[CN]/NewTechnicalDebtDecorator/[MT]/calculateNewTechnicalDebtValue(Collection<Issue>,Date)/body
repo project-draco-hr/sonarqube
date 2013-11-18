@@ -2,14 +2,12 @@
   double value=0;
   for (  Issue issue : issues) {
     WorkDayDuration currentTechnicalDebt=((DefaultIssue)issue).technicalDebt();
-    List<FieldDiffs> technicalDebtChangelog=changesOnField(IssueUpdater.TECHNICAL_DEBT,((DefaultIssue)issue).changes());
-    if (technicalDebtChangelog.isEmpty()) {
-      if (isAfter(issue.creationDate(),periodDate)) {
-        value+=technicalDebtConverter.toDays(currentTechnicalDebt);
-      }
+    Date periodDatePlusOneSecond=periodDate != null ? DateUtils.addSeconds(periodDate,1) : null;
+    if (isAfter(issue.creationDate(),periodDatePlusOneSecond)) {
+      value+=technicalDebtConverter.toDays(currentTechnicalDebt);
     }
  else {
-      value+=calculateNewTechnicalDebtValueFromChangelog(currentTechnicalDebt,technicalDebtChangelog,periodDate);
+      value+=calculateNewTechnicalDebtValueFromChangelog(currentTechnicalDebt,issue,periodDate);
     }
   }
   return value;

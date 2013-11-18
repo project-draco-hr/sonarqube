@@ -1,0 +1,18 @@
+{
+  Map<Date,WorkDayDuration> technicalDebtHistory=newLinkedHashMap();
+  List<FieldDiffs> technicalDebtChangelog=changesOnField(((DefaultIssue)issue).changes());
+  if (!technicalDebtChangelog.isEmpty()) {
+    Ordering<FieldDiffs> ordering=Ordering.natural().nullsLast().onResultOf(new Function<FieldDiffs,Date>(){
+      public Date apply(      FieldDiffs diff){
+        return diff.createdAt();
+      }
+    }
+);
+    List<FieldDiffs> technicalDebtChangelogSorted=ordering.immutableSortedCopy(technicalDebtChangelog);
+    technicalDebtHistory.put(issue.creationDate(),oldValue(technicalDebtChangelogSorted.iterator().next()));
+    for (    FieldDiffs fieldDiffs : technicalDebtChangelogSorted) {
+      technicalDebtHistory.put(fieldDiffs.createdAt(),newValue(fieldDiffs));
+    }
+  }
+  return technicalDebtHistory;
+}
