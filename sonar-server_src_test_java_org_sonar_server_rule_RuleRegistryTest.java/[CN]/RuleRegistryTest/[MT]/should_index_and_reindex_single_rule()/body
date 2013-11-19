@@ -1,0 +1,13 @@
+{
+  DatabaseSession session=mock(DatabaseSession.class);
+  when(sessionFactory.getSession()).thenReturn(session);
+  Rule rule=Rule.create("repo","key");
+  int id=3;
+  rule.setId(id);
+  when(session.getEntity(Rule.class,id)).thenReturn(rule);
+  registry.saveOrUpdate(id);
+  assertThat(registry.findIds(ImmutableMap.of("repositoryKey","repo"))).hasSize(1);
+  rule.setName("polop");
+  registry.saveOrUpdate(id);
+  assertThat(registry.findIds(ImmutableMap.of("repositoryKey","repo"))).hasSize(1);
+}

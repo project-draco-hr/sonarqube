@@ -1,0 +1,14 @@
+{
+  DatabaseSession session=mock(DatabaseSession.class);
+  when(sessionFactory.getSession()).thenReturn(session);
+  Rule rule1=Rule.create("repo","key1");
+  rule1.setId(3);
+  Rule rule2=Rule.create("repo","key2");
+  rule2.createParameter("param");
+  rule2.setId(4);
+  rule2.setParent(rule1);
+  List<Rule> rules=ImmutableList.of(rule1,rule2);
+  when(session.getResults(Rule.class)).thenReturn(rules);
+  registry.bulkRegisterRules();
+  assertThat(registry.findIds(ImmutableMap.of("repositoryKey","repo"))).hasSize(2);
+}
