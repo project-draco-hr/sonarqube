@@ -1,0 +1,20 @@
+{
+  CharacteristicProperty function=characteristic.getProperty(TechnicalDebtRequirement.PROPERTY_REMEDIATION_FUNCTION);
+  if (function != null) {
+    if ("linear_threshold".equals(function.getTextValue())) {
+      function.setTextValue(TechnicalDebtRequirement.FUNCTION_LINEAR);
+      CharacteristicProperty offset=characteristic.getProperty(TechnicalDebtRequirement.PROPERTY_OFFSET);
+      offset.setValue(0d);
+      String message=String.format("Linear with threshold function is no more used, the function of the requirement '%s' is replaced by linear.",characteristic.getRule());
+      LOG.warn(message);
+      messages.addWarningText(message);
+    }
+ else     if ("constant_resource".equals(function.getTextValue())) {
+      String message=String.format("Constant / file function is no more used, requirement '%s' is ignore.",characteristic.getRule());
+      LOG.warn(message);
+      messages.addWarningText(message);
+      return null;
+    }
+  }
+  return characteristic;
+}

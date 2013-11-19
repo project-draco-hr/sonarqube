@@ -1,0 +1,15 @@
+{
+  ListMultimap<TechnicalDebtRequirement,Issue> issuesByRequirement=ArrayListMultimap.create();
+  for (  Issue issue : issues) {
+    String repositoryKey=issue.ruleKey().repository();
+    String key=issue.ruleKey().rule();
+    TechnicalDebtRequirement requirement=technicalDebtModel.getRequirementByRule(repositoryKey,key);
+    if (requirement == null) {
+      LoggerFactory.getLogger(getClass()).debug("No technical debt requirement for: " + repositoryKey + "/"+ key);
+    }
+ else {
+      issuesByRequirement.put(requirement,issue);
+    }
+  }
+  return issuesByRequirement;
+}

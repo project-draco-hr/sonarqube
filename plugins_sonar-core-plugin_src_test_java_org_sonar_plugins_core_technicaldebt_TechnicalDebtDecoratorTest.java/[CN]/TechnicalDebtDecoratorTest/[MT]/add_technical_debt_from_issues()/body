@@ -1,0 +1,24 @@
+{
+  WorkDayDuration technicalDebt1=mock(WorkDayDuration.class);
+  when(converter.toDays(technicalDebt1)).thenReturn(1.0);
+  WorkDayDuration technicalDebt2=mock(WorkDayDuration.class);
+  when(converter.toDays(technicalDebt2)).thenReturn(2.0);
+  Issue issue1=createIssue("rule1","repo1").setTechnicalDebt(technicalDebt1);
+  Issue issue2=createIssue("rule1","repo1").setTechnicalDebt(technicalDebt1);
+  Issue issue3=createIssue("rule2","repo2").setTechnicalDebt(technicalDebt2);
+  Issue issue4=createIssue("rule2","repo2").setTechnicalDebt(technicalDebt2);
+  when(issuable.issues()).thenReturn(newArrayList(issue1,issue2,issue3,issue4));
+  Characteristic requirement1=Characteristic.createByName("requirement1");
+  Characteristic requirement2=Characteristic.createByName("requirement2");
+  TechnicalDebtRequirement technicalDebtRequirement1=mock(TechnicalDebtRequirement.class);
+  when(technicalDebtRequirement1.toCharacteristic()).thenReturn(requirement1);
+  TechnicalDebtRequirement technicalDebtRequirement2=mock(TechnicalDebtRequirement.class);
+  when(technicalDebtRequirement2.toCharacteristic()).thenReturn(requirement2);
+  when(technicalDebtModel.getRequirementByRule("repo1","rule1")).thenReturn(technicalDebtRequirement1);
+  when(technicalDebtModel.getRequirementByRule("repo2","rule2")).thenReturn(technicalDebtRequirement2);
+  when(technicalDebtModel.getAllRequirements()).thenReturn(newArrayList(technicalDebtRequirement1,technicalDebtRequirement2));
+  decorator.decorate(resource,context);
+  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,null,6.0)));
+  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,requirement1,2.0)));
+  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,requirement2,4.0)));
+}

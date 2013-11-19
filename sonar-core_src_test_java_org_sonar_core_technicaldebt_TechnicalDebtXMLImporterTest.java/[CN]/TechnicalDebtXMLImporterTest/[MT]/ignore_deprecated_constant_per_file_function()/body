@@ -1,0 +1,10 @@
+{
+  TechnicalDebtRuleCache technicalDebtRuleCache=mockRuleCache();
+  String xml=getFileContent("shouldImportXML_with_deprecated_constant_per_file.xml");
+  ValidationMessages messages=ValidationMessages.create();
+  Model sqale=new TechnicalDebtXMLImporter().importXML(xml,messages,technicalDebtRuleCache);
+  assertThat(messages.getWarnings()).hasSize(1);
+  assertThat(sqale.getRootCharacteristics()).hasSize(1);
+  Characteristic efficiency=sqale.getCharacteristicByKey("EFFICIENCY");
+  assertThat(efficiency.getChildren()).isEmpty();
+}

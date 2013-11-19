@@ -1,0 +1,21 @@
+{
+  WorkDayDuration technicalDebt=mock(WorkDayDuration.class);
+  when(converter.toDays(technicalDebt)).thenReturn(1.0);
+  Issue issue=createIssue("rule1","repo1").setTechnicalDebt(technicalDebt);
+  when(issuable.issues()).thenReturn(newArrayList(issue));
+  Characteristic requirement=Characteristic.createByName("requirement");
+  Characteristic characteristic=Characteristic.createByName("characteristic");
+  Characteristic parentCharacteristic=Characteristic.createByName("parentCharacteristic");
+  TechnicalDebtCharacteristic parentTechDebtCharacteristic=new TechnicalDebtCharacteristic(parentCharacteristic);
+  TechnicalDebtCharacteristic techDebtCharacteristic=new TechnicalDebtCharacteristic(characteristic,parentTechDebtCharacteristic);
+  TechnicalDebtRequirement technicalDebtRequirement=mock(TechnicalDebtRequirement.class);
+  when(technicalDebtRequirement.toCharacteristic()).thenReturn(requirement);
+  when(technicalDebtRequirement.getParent()).thenReturn(techDebtCharacteristic);
+  when(technicalDebtModel.getRequirementByRule("repo1","rule1")).thenReturn(technicalDebtRequirement);
+  when(technicalDebtModel.getAllRequirements()).thenReturn(newArrayList(technicalDebtRequirement));
+  decorator.decorate(resource,context);
+  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,null,1.0)));
+  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,parentCharacteristic,1.0)));
+  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,characteristic,1.0)));
+  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,requirement,1.0)));
+}
