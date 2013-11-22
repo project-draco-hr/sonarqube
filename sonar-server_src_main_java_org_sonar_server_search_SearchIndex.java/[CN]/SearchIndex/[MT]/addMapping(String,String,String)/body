@@ -1,17 +1,26 @@
 {
   IndicesAdminClient indices=client.admin().indices();
+  TimeProfiler profiler=newDebugProfiler();
   try {
     if (!indices.exists(new IndicesExistsRequest(index)).get().isExists()) {
+      profiler.start(format("create index '%s'",index));
       indices.prepareCreate(index).execute().actionGet();
     }
   }
  catch (  Exception e) {
     LOG.error("While checking for index existence",e);
   }
+ finally {
+    profiler.stop();
+  }
+  profiler.start(format("put mapping on index '%s' for type '%s'",index,type));
   try {
     indices.putMapping(Requests.putMappingRequest(index).type(type).source(mapping)).actionGet();
   }
  catch (  ElasticSearchParseException parseException) {
     throw new IllegalArgumentException("Invalid mapping file",parseException);
+  }
+ finally {
+    profiler.stop();
   }
 }

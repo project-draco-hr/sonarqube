@@ -1,7 +1,11 @@
 {
   List<String> result=Lists.newArrayList();
   final int scrollTime=100;
-  SearchResponse scrollResp=searchQuery.toBuilder(client).addField("_id").setSearchType(SearchType.SCAN).setScroll(new TimeValue(scrollTime)).setSize(searchQuery.scrollSize()).execute().actionGet();
+  SearchRequestBuilder builder=searchQuery.toBuilder(client);
+  LOG.debug("findDocumentIds" + builder.internalBuilder().toString());
+  TimeProfiler profiler=newDebugProfiler();
+  profiler.start("findDocumentIds");
+  SearchResponse scrollResp=builder.addField("_id").setSearchType(SearchType.SCAN).setScroll(new TimeValue(scrollTime)).setSize(searchQuery.scrollSize()).execute().actionGet();
   while (true) {
     scrollResp=client.prepareSearchScroll(scrollResp.getScrollId()).setScroll(new TimeValue(scrollTime)).execute().actionGet();
     for (    SearchHit hit : scrollResp.getHits()) {
@@ -11,5 +15,6 @@
       break;
     }
   }
+  profiler.stop();
   return result;
 }

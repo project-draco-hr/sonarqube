@@ -1,3 +1,7 @@
 {
-  client.prepareIndex(index,type,id).setSource(source.bytes()).setRefresh(refresh).execute().actionGet();
+  IndexRequestBuilder builder=client.prepareIndex(index,type,id).setSource(source.bytes()).setRefresh(refresh);
+  TimeProfiler profiler=newDebugProfiler();
+  profiler.start(format("put document with id '%s' with type '%s' into index '%s'",id,type,index));
+  builder.execute().actionGet();
+  profiler.stop();
 }
