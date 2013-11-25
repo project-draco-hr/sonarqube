@@ -1,10 +1,10 @@
 {
-  DatabaseSession session=mock(DatabaseSession.class);
-  when(sessionFactory.getSession()).thenReturn(session);
-  Rule rule=Rule.create("repo","key");
+  RuleDto rule=new RuleDto();
+  rule.setRepositoryKey("repo");
+  rule.setRuleKey("key");
   int id=3;
-  rule.setId(id);
-  when(session.getEntity(Rule.class,id)).thenReturn(rule);
+  rule.setId((long)id);
+  when(ruleDao.selectById((long)id)).thenReturn(rule);
   registry.saveOrUpdate(id);
   assertThat(registry.findIds(ImmutableMap.of("repositoryKey","repo"))).hasSize(1);
   rule.setName("polop");

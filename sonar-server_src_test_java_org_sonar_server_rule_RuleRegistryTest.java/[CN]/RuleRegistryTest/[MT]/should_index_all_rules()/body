@@ -1,14 +1,22 @@
 {
-  DatabaseSession session=mock(DatabaseSession.class);
-  when(sessionFactory.getSession()).thenReturn(session);
-  Rule rule1=Rule.create("repo","key1");
-  rule1.setId(3);
-  Rule rule2=Rule.create("repo","key2");
-  rule2.createParameter("param");
-  rule2.setId(4);
-  rule2.setParent(rule1);
-  List<Rule> rules=ImmutableList.of(rule1,rule2);
-  when(session.getResults(Rule.class)).thenReturn(rules);
+  long ruleId1=3L;
+  RuleDto rule1=new RuleDto();
+  rule1.setRepositoryKey("repo");
+  rule1.setRuleKey("key1");
+  rule1.setId(ruleId1);
+  long ruleId2=4L;
+  RuleDto rule2=new RuleDto();
+  rule2.setRepositoryKey("repo");
+  rule2.setRuleKey("key2");
+  rule2.setId(ruleId2);
+  rule2.setParentId(ruleId1);
+  List<RuleDto> rules=ImmutableList.of(rule1,rule2);
+  RuleParamDto paramRule2=new RuleParamDto();
+  paramRule2.setName("name");
+  paramRule2.setRuleId(ruleId2);
+  List<RuleParamDto> params=ImmutableList.of(paramRule2);
+  when(ruleDao.selectNonManual()).thenReturn(rules);
+  when(ruleDao.selectParameters()).thenReturn(params);
   registry.bulkRegisterRules();
   assertThat(registry.findIds(ImmutableMap.of("repositoryKey","repo"))).hasSize(2);
 }

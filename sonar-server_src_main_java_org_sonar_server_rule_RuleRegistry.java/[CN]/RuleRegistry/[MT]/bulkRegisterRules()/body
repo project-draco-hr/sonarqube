@@ -1,11 +1,15 @@
 {
   TimeProfiler profiler=new TimeProfiler();
-  DatabaseSession session=sessionFactory.getSession();
   profiler.start("Rebuilding rules index - query");
-  List<Rule> rules=session.getResults(Rule.class);
+  List<RuleDto> rules=ruleDao.selectNonManual();
+  List<RuleParamDto> flatParams=ruleDao.selectParameters();
   profiler.stop();
+  Multimap<Long,RuleParamDto> paramsByRule=ArrayListMultimap.create();
+  for (  RuleParamDto param : flatParams) {
+    paramsByRule.put(param.getRuleId(),param);
+  }
   try {
-    bulkIndex(rules);
+    bulkIndex(rules,paramsByRule);
   }
  catch (  IOException ioe) {
     throw new IllegalStateException("Unable to index rules",ioe);

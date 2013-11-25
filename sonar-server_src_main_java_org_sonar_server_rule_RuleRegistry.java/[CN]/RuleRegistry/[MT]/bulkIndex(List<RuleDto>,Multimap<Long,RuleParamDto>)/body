@@ -1,0 +1,16 @@
+{
+  String[] ids=new String[rules.size()];
+  BytesStream[] docs=new BytesStream[rules.size()];
+  int index=0;
+  TimeProfiler profiler=new TimeProfiler();
+  profiler.start("Build rules documents");
+  for (  RuleDto rule : rules) {
+    ids[index]=rule.getId().toString();
+    docs[index]=ruleDocument(rule,paramsByRule.get(rule.getId()));
+    index++;
+  }
+  profiler.stop();
+  profiler.start("Index rules");
+  searchIndex.bulkIndex(INDEX_RULES,TYPE_RULE,ids,docs);
+  profiler.stop();
+}
