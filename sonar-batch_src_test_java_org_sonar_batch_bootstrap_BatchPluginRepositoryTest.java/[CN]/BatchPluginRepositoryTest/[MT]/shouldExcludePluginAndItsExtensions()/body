@@ -1,17 +1,12 @@
 {
-  TempFolder tempDirs=mock(TempFolder.class);
-  File toDir1=temp.newFolder();
-  File toDir2=temp.newFolder();
-  when(tempDirs.newDir("plugins/checkstyle")).thenReturn(toDir1);
-  when(tempDirs.newDir("plugins/checkstyleextensions")).thenReturn(toDir2);
   RemotePlugin checkstyle=new RemotePlugin("checkstyle",true);
   RemotePlugin checkstyleExt=new RemotePlugin("checkstyleextensions",false);
   PluginDownloader downloader=mock(PluginDownloader.class);
-  when(downloader.downloadPlugin(checkstyle)).thenReturn(copyFile("sonar-checkstyle-plugin-2.8.jar"));
-  when(downloader.downloadPlugin(checkstyleExt)).thenReturn(copyFile("sonar-checkstyle-extensions-plugin-0.1-SNAPSHOT.jar"));
+  when(downloader.downloadPlugin(checkstyle)).thenReturn(fileFromCache("sonar-checkstyle-plugin-2.8.jar"));
+  when(downloader.downloadPlugin(checkstyleExt)).thenReturn(fileFromCache("sonar-checkstyle-extensions-plugin-0.1-SNAPSHOT.jar"));
   Settings settings=new Settings();
   settings.setProperty(CoreProperties.BATCH_EXCLUDE_PLUGINS,"checkstyle");
-  repository=new BatchPluginRepository(downloader,tempDirs,settings,mode);
+  repository=new BatchPluginRepository(downloader,settings,mode,new BatchPluginInstaller(cache));
   repository.doStart(Arrays.asList(checkstyle,checkstyleExt));
   assertThat(repository.getMetadata()).isEmpty();
 }
