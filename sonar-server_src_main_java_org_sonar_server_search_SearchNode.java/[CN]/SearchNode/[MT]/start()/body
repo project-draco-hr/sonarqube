@@ -1,20 +1,10 @@
 {
-  LOG.info("Starting {} in {}",this.getClass().getSimpleName(),nodeDir);
-  nodeSettingsBuilder.put("node.name","sonarqube").put("path.home",nodeDir);
-  String httpHost=settings.getString("sonar.es.http.host");
-  String httpPort=settings.getString("sonar.es.http.port");
-  if (httpPort == null) {
-    LOG.info("HTTP access to search cache disabled");
-    nodeSettingsBuilder.put("http.enabled",false);
-  }
- else {
-    if (httpHost == null) {
-      httpHost="127.0.0.1";
-    }
-    LOG.info("Enabling HTTP access to search cache on ports {}",httpPort);
-    nodeSettingsBuilder.put("http.enabled",true);
-    nodeSettingsBuilder.put("http.host",httpHost);
-    nodeSettingsBuilder.put("http.port",httpPort);
-  }
-  node=nodeBuilder.local(true).clusterName("sonarqube").data(true).settings(nodeSettingsBuilder).node();
+  LOG.info("Starting Elasticsearch...");
+  initLogging();
+  ImmutableSettings.Builder esSettings=ImmutableSettings.builder().put("node.name",INSTANCE_NAME);
+  initDirs(esSettings);
+  initRestConsole(esSettings);
+  node=NodeBuilder.nodeBuilder().clusterName(INSTANCE_NAME).local(true).data(true).settings(esSettings).node();
+  node.start();
+  LOG.info("Elasticsearch started");
 }
