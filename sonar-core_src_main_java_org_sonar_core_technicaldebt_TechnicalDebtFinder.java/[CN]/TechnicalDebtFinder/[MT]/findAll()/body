@@ -2,35 +2,8 @@
   TechnicalDebtModel model=new TechnicalDebtModel();
   List<CharacteristicDto> dtos=dao.selectEnabledCharacteristics();
   Map<Integer,Characteristic> characteristicsById=newHashMap();
-  List<Integer> ruleIds=newArrayList();
-  for (  CharacteristicDto dto : dtos) {
-    if (dto.getParentId() == null) {
-      Characteristic rootCharacteristic=dto.toCharacteristic(null);
-      model.addRootCharacteristic(rootCharacteristic);
-      characteristicsById.put(dto.getId(),rootCharacteristic);
-    }
-  }
-  for (  CharacteristicDto dto : dtos) {
-    if (dto.getParentId() != null && dto.getRuleId() == null) {
-      Characteristic parent=characteristicsById.get(dto.getParentId());
-      Characteristic characteristic=dto.toCharacteristic(parent);
-      characteristicsById.put(dto.getId(),characteristic);
-    }
-  }
-  for (  CharacteristicDto dto : dtos) {
-    if (dto.getRuleId() != null) {
-      ruleIds.add(dto.getRuleId());
-    }
-  }
-  Map<Integer,Rule> rulesById=findRules(ruleIds);
-  for (  CharacteristicDto dto : dtos) {
-    Integer ruleId=dto.getRuleId();
-    if (ruleId != null) {
-      Characteristic characteristic=characteristicsById.get(dto.getParentId());
-      Rule rule=rulesById.get(ruleId);
-      RuleKey ruleKey=RuleKey.of(rule.getRepositoryKey(),rule.getKey());
-      dto.toRequirement(ruleKey,characteristic);
-    }
-  }
+  addRootCharacteristics(model,dtos,characteristicsById);
+  addCharacteristics(model,dtos,characteristicsById);
+  addRequirements(model,dtos,characteristicsById);
   return model;
 }
