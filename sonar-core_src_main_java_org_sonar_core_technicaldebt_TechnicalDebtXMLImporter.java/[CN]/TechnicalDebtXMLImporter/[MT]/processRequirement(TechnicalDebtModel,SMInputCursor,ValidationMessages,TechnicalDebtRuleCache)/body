@@ -1,0 +1,17 @@
+{
+  Requirement requirement=new Requirement();
+  String ruleRepositoryKey=cursor.collectDescendantText().trim();
+  String ruleKey=null;
+  Properties properties=new Properties();
+  while (cursor.getNext() != null) {
+    String node=cursor.getLocalName();
+    if (StringUtils.equals(node,PROPERTY)) {
+      properties.add(processProperty(requirement,cursor,messages));
+    }
+ else     if (StringUtils.equals(node,RULE_KEY)) {
+      ruleKey=cursor.collectDescendantText().trim();
+    }
+  }
+  fillRule(requirement,ruleRepositoryKey,ruleKey,messages,technicalDebtRuleCache);
+  return processFunctionsOnRequirement(requirement,properties,messages);
+}

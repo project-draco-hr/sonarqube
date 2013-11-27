@@ -3,13 +3,10 @@
   when(converter.toDays(technicalDebt)).thenReturn(1.0);
   Issue issue=createIssue("rule1","repo1").setTechnicalDebt(technicalDebt);
   when(issuable.issues()).thenReturn(newArrayList(issue));
-  Characteristic requirement=Characteristic.create();
-  TechnicalDebtRequirement technicalDebtRequirement=mock(TechnicalDebtRequirement.class);
-  when(technicalDebtRequirement.toCharacteristic()).thenReturn(requirement);
-  when(technicalDebtRequirement.getParent()).thenReturn(null);
-  when(technicalDebtModel.getRequirementByRule("repo1","rule1")).thenReturn(technicalDebtRequirement);
-  when(technicalDebtModel.getAllRequirements()).thenReturn(newArrayList(technicalDebtRequirement));
+  Requirement requirement=mock(Requirement.class);
+  when(technicalDebtModel.requirementsByRule(RuleKey.of("repo1","rule1"))).thenReturn(requirement);
+  when(technicalDebtModel.requirements()).thenReturn(newArrayList(requirement));
   decorator.decorate(resource,context);
-  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,null,1.0)));
-  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,requirement,1.0)));
+  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,1.0)));
+  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,null,requirement,1.0)));
 }

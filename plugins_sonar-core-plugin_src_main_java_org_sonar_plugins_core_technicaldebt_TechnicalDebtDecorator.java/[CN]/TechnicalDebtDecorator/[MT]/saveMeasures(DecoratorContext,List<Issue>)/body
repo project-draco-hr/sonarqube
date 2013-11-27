@@ -1,14 +1,14 @@
 {
-  ListMultimap<TechnicalDebtRequirement,Issue> issuesByRequirement=issuesByRequirement(issues);
+  ListMultimap<Requirement,Issue> issuesByRequirement=issuesByRequirement(issues);
   double total=0.0;
-  Map<TechnicalDebtCharacteristic,Double> characteristicCosts=newHashMap();
-  Map<TechnicalDebtRequirement,Double> requirementCosts=newHashMap();
-  for (  TechnicalDebtRequirement requirement : technicalDebtModel.getAllRequirements()) {
+  Map<Characteristic,Double> characteristicCosts=newHashMap();
+  Map<Requirement,Double> requirementCosts=newHashMap();
+  for (  Requirement requirement : technicalDebtModel.requirements()) {
     List<Issue> requirementIssues=issuesByRequirement.get(requirement);
     double value=computeTechnicalDebt(CoreMetrics.TECHNICAL_DEBT,context,requirement,requirementIssues);
     requirementCosts.put(requirement,value);
     total+=value;
-    propagateTechnicalDebtInParents(requirement.getParent(),value,characteristicCosts);
+    propagateTechnicalDebtInParents(requirement.characteristic(),value,characteristicCosts);
   }
   context.saveMeasure(new Measure(CoreMetrics.TECHNICAL_DEBT,total,DECIMALS_PRECISION));
   saveOnCharacteristic(context,characteristicCosts);

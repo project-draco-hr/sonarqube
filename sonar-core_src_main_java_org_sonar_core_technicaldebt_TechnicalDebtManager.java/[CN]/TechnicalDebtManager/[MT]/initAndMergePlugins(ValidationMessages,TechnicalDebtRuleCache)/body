@@ -1,6 +1,12 @@
 {
-  DatabaseSession session=sessionFactory.getSession();
-  Model model=initAndMergePlugins(messages,rulesCache,session);
-  session.commit();
+  SqlSession session=mybatis.openSession();
+  TechnicalDebtModel model=null;
+  try {
+    model=initAndMergePlugins(messages,rulesCache,session);
+    session.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
   return model;
 }

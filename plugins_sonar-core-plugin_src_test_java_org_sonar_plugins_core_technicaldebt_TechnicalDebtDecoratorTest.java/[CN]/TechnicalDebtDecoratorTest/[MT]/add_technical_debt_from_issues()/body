@@ -8,17 +8,17 @@
   Issue issue3=createIssue("rule2","repo2").setTechnicalDebt(technicalDebt2);
   Issue issue4=createIssue("rule2","repo2").setTechnicalDebt(technicalDebt2);
   when(issuable.issues()).thenReturn(newArrayList(issue1,issue2,issue3,issue4));
-  Characteristic requirement1=Characteristic.createByName("requirement1");
-  Characteristic requirement2=Characteristic.createByName("requirement2");
-  TechnicalDebtRequirement technicalDebtRequirement1=mock(TechnicalDebtRequirement.class);
-  when(technicalDebtRequirement1.toCharacteristic()).thenReturn(requirement1);
-  TechnicalDebtRequirement technicalDebtRequirement2=mock(TechnicalDebtRequirement.class);
-  when(technicalDebtRequirement2.toCharacteristic()).thenReturn(requirement2);
-  when(technicalDebtModel.getRequirementByRule("repo1","rule1")).thenReturn(technicalDebtRequirement1);
-  when(technicalDebtModel.getRequirementByRule("repo2","rule2")).thenReturn(technicalDebtRequirement2);
-  when(technicalDebtModel.getAllRequirements()).thenReturn(newArrayList(technicalDebtRequirement1,technicalDebtRequirement2));
+  Characteristic rootCharacteristic=new Characteristic().setKey("rootCharacteristic");
+  Characteristic characteristic=new Characteristic().setKey("characteristic").setParent(rootCharacteristic);
+  RuleKey ruleKey1=RuleKey.of("repo1","rule1");
+  Requirement requirement1=new Requirement().setRuleKey(ruleKey1).setCharacteristic(characteristic);
+  RuleKey ruleKey2=RuleKey.of("repo2","rule2");
+  Requirement requirement2=new Requirement().setRuleKey(ruleKey2).setCharacteristic(characteristic);
+  when(technicalDebtModel.requirementsByRule(ruleKey1)).thenReturn(requirement1);
+  when(technicalDebtModel.requirementsByRule(ruleKey2)).thenReturn(requirement2);
+  when(technicalDebtModel.requirements()).thenReturn(newArrayList(requirement1,requirement2));
   decorator.decorate(resource,context);
-  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,null,6.0)));
+  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,6.0)));
   verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,requirement1,2.0)));
   verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,requirement2,4.0)));
 }

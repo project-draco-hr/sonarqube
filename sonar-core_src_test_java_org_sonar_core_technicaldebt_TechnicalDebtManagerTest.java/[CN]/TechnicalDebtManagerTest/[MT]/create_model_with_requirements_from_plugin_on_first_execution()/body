@@ -1,14 +1,22 @@
 {
-  setupData("empty");
-  addPluginModel("java","fake-java-model.xml");
-  TechnicalDebtRuleCache technicalDebtRuleCache=mock(TechnicalDebtRuleCache.class);
-  Rule rule1=Rule.create("checkstyle","import","Regular expression");
-  rule1.setId(1);
-  when(technicalDebtRuleCache.getRule("checkstyle","import")).thenReturn(rule1);
-  Rule rule2=Rule.create("checkstyle","export","Regular expression");
-  rule2.setId(2);
-  when(technicalDebtRuleCache.getRule("checkstyle","export")).thenReturn(rule2);
-  manager.initAndMergePlugins(ValidationMessages.create(),technicalDebtRuleCache);
-  getSession().commit();
-  checkTables("create_model_with_requirements_from_plugin_on_first_execution",EXCLUDED_COLUMNS,"quality_models","characteristics","characteristic_edges","characteristic_properties");
+  Characteristic defaultRootCharacteristic=new Characteristic().setKey("PORTABILITY");
+  Characteristic characteristic=new Characteristic().setKey("COMPILER_RELATED_PORTABILITY").setParent(defaultRootCharacteristic);
+  defaultModel.addRootCharacteristic(defaultRootCharacteristic);
+  when(sqaleModelFinder.findAll()).thenReturn(new TechnicalDebtModel());
+  TechnicalDebtModel javaModel=new TechnicalDebtModel();
+  Characteristic javaRootCharacteristic=new Characteristic().setKey("PORTABILITY");
+  Characteristic javaCharacteristic=new Characteristic().setKey("COMPILER_RELATED_PORTABILITY").setParent(javaRootCharacteristic);
+  javaModel.addRootCharacteristic(javaRootCharacteristic);
+  RuleKey ruleKey=RuleKey.of("checkstyle","import");
+  when(ruleCache.exists(ruleKey)).thenReturn(true);
+  Requirement javaRequirement=new Requirement().setRuleKey(ruleKey).setFunction("linear").setFactor(WorkUnit.create(30.0,WorkUnit.MINUTES)).setCharacteristic(javaCharacteristic);
+  Reader javaModelReader=mock(Reader.class);
+  when(technicalDebtModelRepository.createReaderForXMLFile("java")).thenReturn(javaModelReader);
+  when(xmlImporter.importXML(eq(javaModelReader),any(ValidationMessages.class),eq(ruleCache))).thenReturn(javaModel);
+  when(technicalDebtModelRepository.getContributingPluginList()).thenReturn(newArrayList("java"));
+  manager.initAndMergePlugins(ValidationMessages.create(),ruleCache);
+  verify(service).create(eq(defaultRootCharacteristic),eq(session));
+  verify(service).create(eq(characteristic),eq(session));
+  verify(service).create(eq(javaRequirement),eq(javaCharacteristic),eq(ruleCache),eq(session));
+  verifyNoMoreInteractions(service);
 }
