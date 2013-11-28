@@ -1,10 +1,10 @@
 {
-  Characteristic rootCharacteristic=new Characteristic().setKey("PORTABILITY");
-  new Characteristic().setKey("COMPILER_RELATED_PORTABILITY").setParent(rootCharacteristic);
+  DefaultCharacteristic rootCharacteristic=new DefaultCharacteristic().setKey("PORTABILITY");
+  new DefaultCharacteristic().setKey("COMPILER_RELATED_PORTABILITY").setParent(rootCharacteristic);
   defaultModel.addRootCharacteristic(rootCharacteristic);
   when(technicalDebtModelRepository.getContributingPluginList()).thenReturn(Collections.<String>emptyList());
   when(dao.selectEnabledCharacteristics()).thenReturn(Lists.<CharacteristicDto>newArrayList());
-  manager.initAndMergePlugins(ValidationMessages.create(),ruleCache);
+  manager.synchronize(ValidationMessages.create(),ruleCache);
   verify(dao).selectEnabledCharacteristics();
   ArgumentCaptor<CharacteristicDto> characteristicCaptor=ArgumentCaptor.forClass(CharacteristicDto.class);
   verify(dao,times(2)).insert(characteristicCaptor.capture(),eq(session));

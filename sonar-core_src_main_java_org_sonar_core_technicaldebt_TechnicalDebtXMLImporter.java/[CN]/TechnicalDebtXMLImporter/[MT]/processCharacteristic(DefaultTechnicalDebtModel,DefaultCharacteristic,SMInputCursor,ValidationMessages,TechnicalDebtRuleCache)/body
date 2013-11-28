@@ -1,0 +1,29 @@
+{
+  DefaultCharacteristic characteristic=new DefaultCharacteristic();
+  characteristic.setParent(parent);
+  SMInputCursor cursor=chcCursor.childElementCursor();
+  while (cursor.getNext() != null) {
+    String node=cursor.getLocalName();
+    if (StringUtils.equals(node,CHARACTERISTIC_KEY)) {
+      characteristic.setKey(cursor.collectDescendantText().trim());
+    }
+ else     if (StringUtils.equals(node,CHARACTERISTIC_NAME)) {
+      characteristic.setName(cursor.collectDescendantText().trim(),false);
+    }
+ else     if (StringUtils.equals(node,CHARACTERISTIC)) {
+      processCharacteristic(model,characteristic,cursor,messages,technicalDebtRuleCache);
+    }
+ else     if (StringUtils.equals(node,REPOSITORY_KEY)) {
+      DefaultRequirement requirement=processRequirement(model,cursor,messages,technicalDebtRuleCache);
+      if (requirement != null) {
+        requirement.setCharacteristic(parent);
+      }
+    }
+  }
+  if (StringUtils.isNotBlank(characteristic.key()) && characteristic.isRoot()) {
+    characteristic.setOrder(model.rootCharacteristics().size() + 1);
+    model.addRootCharacteristic(characteristic);
+    return characteristic;
+  }
+  return null;
+}

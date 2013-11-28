@@ -1,6 +1,6 @@
 {
-  Characteristic defaultRootCharacteristic=new Characteristic().setKey("PORTABILITY");
-  new Characteristic().setKey("COMPILER_RELATED_PORTABILITY").setParent(defaultRootCharacteristic);
+  DefaultCharacteristic defaultRootCharacteristic=new DefaultCharacteristic().setKey("PORTABILITY");
+  new DefaultCharacteristic().setKey("COMPILER_RELATED_PORTABILITY").setParent(defaultRootCharacteristic);
   defaultModel.addRootCharacteristic(defaultRootCharacteristic);
   CharacteristicDto dbRootCharacteristic=new CharacteristicDto().setId(1).setKey("PORTABILITY");
   CharacteristicDto dbCharacteristic=new CharacteristicDto().setId(2).setKey("COMPILER_RELATED_PORTABILITY").setParentId(1);
@@ -11,20 +11,20 @@
   when(ruleCache.getByRuleKey(ruleKey1)).thenReturn(rule1);
   when(ruleCache.exists(10)).thenReturn(true);
   when(dao.selectEnabledCharacteristics()).thenReturn(newArrayList(requirement,dbCharacteristic,dbRootCharacteristic));
-  TechnicalDebtModel javaModel=new TechnicalDebtModel();
-  Characteristic javaRootCharacteristic=new Characteristic().setKey("PORTABILITY");
-  Characteristic javaCharacteristic=new Characteristic().setKey("COMPILER_RELATED_PORTABILITY").setParent(javaRootCharacteristic);
+  DefaultTechnicalDebtModel javaModel=new DefaultTechnicalDebtModel();
+  DefaultCharacteristic javaRootCharacteristic=new DefaultCharacteristic().setKey("PORTABILITY");
+  DefaultCharacteristic javaCharacteristic=new DefaultCharacteristic().setKey("COMPILER_RELATED_PORTABILITY").setParent(javaRootCharacteristic);
   javaModel.addRootCharacteristic(javaRootCharacteristic);
   RuleKey ruleKey2=RuleKey.of("checkstyle","export");
   Rule rule2=Rule.create();
   rule2.setId(11);
   when(ruleCache.getByRuleKey(ruleKey2)).thenReturn(rule2);
-  new Requirement().setRuleKey(ruleKey2).setFunction("linear").setFactor(WorkUnit.create(1.0,WorkUnit.HOURS)).setCharacteristic(javaCharacteristic);
+  new DefaultRequirement().setRuleKey(ruleKey2).setFunction("linear").setFactor(WorkUnit.create(1.0,WorkUnit.HOURS)).setCharacteristic(javaCharacteristic);
   Reader javaModelReader=mock(Reader.class);
   when(technicalDebtModelRepository.createReaderForXMLFile("java")).thenReturn(javaModelReader);
   when(xmlImporter.importXML(eq(javaModelReader),any(ValidationMessages.class),eq(ruleCache))).thenReturn(javaModel);
   when(technicalDebtModelRepository.getContributingPluginList()).thenReturn(newArrayList("java"));
-  manager.initAndMergePlugins(ValidationMessages.create(),ruleCache);
+  manager.synchronize(ValidationMessages.create(),ruleCache);
   verify(dao).selectEnabledCharacteristics();
   ArgumentCaptor<CharacteristicDto> characteristicCaptor=ArgumentCaptor.forClass(CharacteristicDto.class);
   verify(dao).insert(characteristicCaptor.capture(),eq(session));

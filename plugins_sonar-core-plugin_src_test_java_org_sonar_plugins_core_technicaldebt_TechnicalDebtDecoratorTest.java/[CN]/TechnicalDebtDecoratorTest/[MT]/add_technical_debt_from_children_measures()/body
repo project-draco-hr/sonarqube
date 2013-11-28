@@ -4,12 +4,12 @@
   Issue issue1=createIssue("rule1","repo1").setTechnicalDebt(technicalDebt1);
   Issue issue2=createIssue("rule1","repo1").setTechnicalDebt(technicalDebt1);
   when(issuable.issues()).thenReturn(newArrayList(issue1,issue2));
-  Characteristic rootCharacteristic=new Characteristic().setKey("rootCharacteristic");
-  Characteristic characteristic=new Characteristic().setKey("characteristic").setParent(rootCharacteristic);
+  DefaultCharacteristic rootCharacteristic=new DefaultCharacteristic().setKey("rootCharacteristic");
+  DefaultCharacteristic characteristic=new DefaultCharacteristic().setKey("characteristic").setParent(rootCharacteristic);
   RuleKey ruleKey1=RuleKey.of("repo1","rule1");
-  Requirement requirement=new Requirement().setRuleKey(ruleKey1).setCharacteristic(characteristic);
-  when(technicalDebtModel.requirementsByRule(ruleKey1)).thenReturn(requirement);
-  when(technicalDebtModel.requirements()).thenReturn(newArrayList(requirement));
+  DefaultRequirement requirement=new DefaultRequirement().setRuleKey(ruleKey1).setCharacteristic(characteristic);
+  when(defaultTechnicalDebtModel.requirementsByRule(ruleKey1)).thenReturn(requirement);
+  doReturn(newArrayList(requirement)).when(defaultTechnicalDebtModel).requirements();
   Measure measure=new Measure().setRequirement(requirement).setValue(5.0);
   when(context.getChildrenMeasures(any(MeasuresFilter.class))).thenReturn(newArrayList(measure));
   decorator.decorate(resource,context);

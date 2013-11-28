@@ -1,0 +1,12 @@
+{
+  if (!messages.hasErrors()) {
+    for (    DefaultRequirement pluginRequirement : pluginModel.requirements()) {
+      Rule rule=rulesCache.getByRuleKey(pluginRequirement.ruleKey());
+      if (!isRequirementExists(existingModel,rule)) {
+        CharacteristicDto characteristicDto=findCharacteristic(existingModel,pluginRequirement.characteristic().key());
+        CharacteristicDto requirementDto=CharacteristicDto.toDto(pluginRequirement,characteristicDto.getId(),characteristicDto.getRootId(),rule.getId());
+        dao.insert(requirementDto,session);
+      }
+    }
+  }
+}
