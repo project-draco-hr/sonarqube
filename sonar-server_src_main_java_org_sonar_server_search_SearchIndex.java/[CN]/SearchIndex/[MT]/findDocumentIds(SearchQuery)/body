@@ -1,11 +1,8 @@
 {
   List<String> result=Lists.newArrayList();
   final int scrollTime=100;
-  final String methodName="findDocumentIds";
   SearchRequestBuilder builder=searchQuery.toBuilder(client);
-  LOG.debug(methodName + builder.internalBuilder().toString());
-  TimeProfiler profiler=newDebugProfiler();
-  profiler.start(methodName);
+  StopWatch watch=createWatch();
   SearchResponse scrollResp=builder.addField("_id").setSearchType(SearchType.SCAN).setScroll(new TimeValue(scrollTime)).setSize(searchQuery.scrollSize()).execute().actionGet();
   while (true) {
     scrollResp=client.prepareSearchScroll(scrollResp.getScrollId()).setScroll(new TimeValue(scrollTime)).execute().actionGet();
@@ -16,6 +13,6 @@
       break;
     }
   }
-  profiler.stop();
+  watch.stop("findDocumentIds with request: %s",builderToString(builder));
   return result;
 }

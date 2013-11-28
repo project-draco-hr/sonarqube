@@ -1,9 +1,8 @@
 {
   IndicesAdminClient indices=client.admin().indices();
-  TimeProfiler profiler=newDebugProfiler();
+  StopWatch watch=createWatch();
   try {
     if (!indices.exists(new IndicesExistsRequest(index)).get().isExists()) {
-      profiler.start(format("create index '%s'",index));
       indices.prepareCreate(index).setSettings(INDEX_DEFAULT_SETTINGS).addMapping("_default_",INDEX_DEFAULT_MAPPING).execute().actionGet();
     }
   }
@@ -11,9 +10,9 @@
     LOG.error("While checking for index existence",e);
   }
  finally {
-    profiler.stop();
+    watch.stop("create index '%s'",index);
   }
-  profiler.start(format("put mapping on index '%s' for type '%s'",index,type));
+  watch=createWatch();
   try {
     indices.putMapping(Requests.putMappingRequest(index).type(type).source(mapping)).actionGet();
   }
@@ -21,6 +20,6 @@
     throw new IllegalArgumentException("Invalid mapping file",parseException);
   }
  finally {
-    profiler.stop();
+    watch.stop("put mapping on index '%s' for type '%s'",index,type);
   }
 }

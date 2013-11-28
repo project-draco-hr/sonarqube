@@ -3,9 +3,8 @@
   for (int i=0; i < ids.length; i++) {
     builder.add(client.prepareIndex(index,type,ids[i]).setSource(sources[i].bytes()));
   }
-  TimeProfiler profiler=newDebugProfiler();
+  StopWatch watch=createWatch();
   try {
-    profiler.start(format("bulk index of %d documents with type '%s' into index '%s'",ids.length,type,index));
     BulkResponse bulkResponse=client.bulk(builder.setRefresh(true).request()).get();
     if (bulkResponse.hasFailures()) {
       for (      BulkItemResponse bulkItemResponse : bulkResponse.getItems()) {
@@ -23,6 +22,6 @@ catch (  ExecutionException e) {
     LOG.error("Execution of bulk operation failed",e);
   }
  finally {
-    profiler.stop();
+    watch.stop("bulk index of %d documents with type '%s' into index '%s'",ids.length,type,index);
   }
 }

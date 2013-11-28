@@ -3,9 +3,8 @@
   for (int i=0; i < ids.length; i++) {
     builder.add(client.prepareDelete(index,type,ids[i]));
   }
-  TimeProfiler profiler=newDebugProfiler();
+  StopWatch watch=createWatch();
   try {
-    profiler.start(format("bulk delete of %d documents with type '%s' from index '%s'",ids.length,type,index));
     BulkResponse bulkResponse=client.bulk(builder.setRefresh(true).request()).get();
     if (bulkResponse.hasFailures()) {
       for (      BulkItemResponse bulkItemResponse : bulkResponse.getItems()) {
@@ -23,6 +22,6 @@ catch (  ExecutionException e) {
     LOG.error("Execution of bulk operation failed",e);
   }
  finally {
-    profiler.stop();
+    watch.stop("bulk delete of %d documents with type '%s' from index '%s'",ids.length,type,index);
   }
 }

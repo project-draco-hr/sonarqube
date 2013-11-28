@@ -5,7 +5,10 @@
   esSetup.execute(EsSetup.deleteAll());
   SearchNode node=mock(SearchNode.class);
   when(node.client()).thenReturn(esSetup.client());
-  searchIndex=new SearchIndex(node);
+  Settings settings=new Settings();
+  settings.setProperty("sonar.log.profilingLevel","FULL");
+  Profiling profiling=new Profiling(settings);
+  searchIndex=new SearchIndex(node,profiling);
   searchIndex.start();
   registry=new RuleRegistry(searchIndex,ruleDao,ruleI18nManager);
   registry.start();
