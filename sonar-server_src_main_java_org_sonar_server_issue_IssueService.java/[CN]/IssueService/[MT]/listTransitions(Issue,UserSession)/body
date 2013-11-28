@@ -1,0 +1,14 @@
+{
+  if (issue == null) {
+    return Collections.emptyList();
+  }
+  List<Transition> outTransitions=workflow.outTransitions(issue);
+  List<Transition> allowedTransitions=new ArrayList<Transition>();
+  for (  Transition transition : outTransitions) {
+    DefaultIssue defaultIssue=(DefaultIssue)issue;
+    if (StringUtils.isBlank(transition.requiredProjectPermission()) || userSession.hasProjectPermission(UserRole.ISSUE_ADMIN,defaultIssue.projectKey())) {
+      allowedTransitions.add(transition);
+    }
+  }
+  return allowedTransitions;
+}

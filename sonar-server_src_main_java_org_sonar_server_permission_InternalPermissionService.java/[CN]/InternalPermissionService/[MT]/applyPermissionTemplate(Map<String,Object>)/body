@@ -3,13 +3,14 @@
   ApplyPermissionTemplateQuery query=ApplyPermissionTemplateQuery.buildFromParams(params);
   query.validate();
   if (query.getSelectedComponents().size() == 1) {
-    checkProjectAdminPermission(Long.parseLong(query.getSelectedComponents().get(0)));
+    checkProjectAdminPermission(query.getSelectedComponents().get(0));
   }
  else {
     checkProjectAdminPermission(null);
     UserSession.get().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
   }
-  for (  String component : query.getSelectedComponents()) {
-    permissionFacade.applyPermissionTemplate(query.getTemplateKey(),Long.parseLong(component));
+  for (  String componentKey : query.getSelectedComponents()) {
+    ComponentDto component=(ComponentDto)resourceDao.findByKey(componentKey);
+    permissionFacade.applyPermissionTemplate(query.getTemplateKey(),component.getId());
   }
 }

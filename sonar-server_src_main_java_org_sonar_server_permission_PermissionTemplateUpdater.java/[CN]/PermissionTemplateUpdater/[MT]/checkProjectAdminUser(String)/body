@@ -1,0 +1,12 @@
+{
+  UserSession currentSession=UserSession.get();
+  currentSession.checkLoggedIn();
+  if (componentKey == null) {
+    currentSession.checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+  }
+ else {
+    if (!currentSession.hasGlobalPermission(GlobalPermissions.SYSTEM_ADMIN) && !currentSession.hasProjectPermission(UserRole.ADMIN,componentKey)) {
+      throw new ForbiddenException("Insufficient privileges");
+    }
+  }
+}

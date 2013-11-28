@@ -1,8 +1,11 @@
 {
-  MockUserSession.set().setLogin("admin").addProjectPermissions(UserRole.ADMIN,1L);
+  MockUserSession.set().setLogin("admin").addProjectPermissions(UserRole.ADMIN,"org.sample.Sample");
   params=Maps.newHashMap();
   params.put("template_key","my_template_key");
-  params.put("components","1");
+  params.put("components","org.sample.Sample");
+  ComponentDto c=mock(ComponentDto.class);
+  when(c.getId()).thenReturn(1L);
+  when(resourceDao.findByKey("org.sample.Sample")).thenReturn(c);
   service.applyPermissionTemplate(params);
   verify(permissionFacade).applyPermissionTemplate("my_template_key",1L);
 }

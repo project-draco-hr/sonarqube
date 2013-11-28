@@ -1,7 +1,7 @@
 {
   when(resourceDao.getResource(any(ResourceQuery.class))).thenReturn(new ResourceDto().setKey("org.sonar.Sample").setId(1l));
   ActionPlan actionPlan=DefaultActionPlan.create("Long term");
-  when(authorizationDao.isAuthorizedComponentId(anyLong(),eq(10),anyString())).thenReturn(false);
+  when(authorizationDao.isAuthorizedComponentKey(anyString(),eq(10),anyString())).thenReturn(false);
   try {
     actionPlanService.create(actionPlan,userSession);
     fail();
@@ -9,6 +9,6 @@
  catch (  Exception e) {
     assertThat(e).isInstanceOf(IllegalStateException.class).hasMessage("User does not have the required role on the project: org.sonar.Sample");
   }
-  verify(authorizationDao).isAuthorizedComponentId(eq(1l),eq(10),eq(UserRole.ADMIN));
+  verify(authorizationDao).isAuthorizedComponentKey(eq("org.sonar.Sample"),eq(10),eq(UserRole.ADMIN));
   verifyZeroInteractions(actionPlanDao);
 }
