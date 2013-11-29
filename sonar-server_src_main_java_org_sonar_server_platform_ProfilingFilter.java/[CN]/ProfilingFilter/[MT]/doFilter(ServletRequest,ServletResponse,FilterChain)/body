@@ -1,0 +1,23 @@
+{
+  if (request instanceof HttpServletRequest) {
+    HttpServletRequest httpRequest=(HttpServletRequest)request;
+    String requestUri=httpRequest.getRequestURI();
+    String rootDir=getRootDir(requestUri);
+    if (staticResourceDirs.contains(rootDir)) {
+      chain.doFilter(request,response);
+    }
+ else {
+      StopWatch watch=getProfiling().start("http",Level.BASIC);
+      try {
+        chain.doFilter(request,response);
+      }
+  finally {
+        String queryString=httpRequest.getQueryString();
+        watch.stop(queryString == null ? MESSAGE_WITHOUT_QUERY : MESSAGE_WITH_QUERY,httpRequest.getMethod(),requestUri,queryString);
+      }
+    }
+  }
+ else {
+    chain.doFilter(request,response);
+  }
+}

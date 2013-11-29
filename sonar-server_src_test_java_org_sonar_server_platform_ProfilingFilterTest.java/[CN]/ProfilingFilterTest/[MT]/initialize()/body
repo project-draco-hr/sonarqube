@@ -1,0 +1,14 @@
+{
+  FilterConfig filterConfig=mock(FilterConfig.class);
+  when(filterConfig.getInitParameter("staticDirs")).thenReturn("/static,/assets");
+  ServletContext context=mock(ServletContext.class);
+  when(context.getContextPath()).thenReturn("/context");
+  when(filterConfig.getServletContext()).thenReturn(context);
+  chain=mock(FilterChain.class);
+  Settings settings=new Settings();
+  settings.setProperty("sonar.log.profilingLevel","BASIC");
+  Profiling profiling=new Profiling(settings);
+  filter=spy(new ProfilingFilter());
+  when(filter.getProfiling()).thenReturn(profiling);
+  filter.init(filterConfig);
+}
