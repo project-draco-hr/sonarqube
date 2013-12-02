@@ -1,0 +1,17 @@
+{
+  setupData("updadeRuleFields");
+  String i18nName="The One";
+  String i18nDescription="The Description of One";
+  when(ruleI18nManager.getName("fake","rule1")).thenReturn(i18nName);
+  when(ruleI18nManager.getDescription("fake","rule1")).thenReturn(i18nDescription);
+  task.start();
+  Rule rule1=getSession().getSingleResult(Rule.class,"id",1);
+  assertThat(rule1.getName(),is(i18nName));
+  assertThat(rule1.getDescription(),is(i18nDescription));
+  assertThat(rule1.getSeverity(),is(RulePriority.BLOCKER));
+  assertThat(rule1.getConfigKey(),is("config1"));
+  assertThat(rule1.getUpdatedAt(),notNullValue());
+  Rule rule2=getSession().getSingleResult(Rule.class,"id",2);
+  assertThat(rule2.getStatus(),is(Rule.STATUS_DEPRECATED));
+  assertThat(rule2.getUpdatedAt(),notNullValue());
+}
