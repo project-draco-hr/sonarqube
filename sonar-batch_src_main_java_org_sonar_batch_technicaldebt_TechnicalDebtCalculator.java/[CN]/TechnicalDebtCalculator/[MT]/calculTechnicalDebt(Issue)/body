@@ -1,6 +1,9 @@
 {
   Requirement requirement=model.requirementsByRule(issue.ruleKey());
   if (requirement != null) {
+    if (requirement.function().equals(DefaultRequirement.CONSTANT_ISSUE) && issue.effortToFix() != null) {
+      throw new IllegalArgumentException("The implementation of rule '" + issue.ruleKey() + "' defines an effort to fix whereas its requirement is set to 'constant/issue' - which is not compatible.");
+    }
     return converter.fromMinutes(calculTechnicalDebt(requirement,issue));
   }
   return null;

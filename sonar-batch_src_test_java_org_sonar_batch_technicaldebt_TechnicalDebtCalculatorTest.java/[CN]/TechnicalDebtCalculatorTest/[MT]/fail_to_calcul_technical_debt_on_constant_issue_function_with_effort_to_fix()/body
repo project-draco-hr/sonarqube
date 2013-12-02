@@ -1,0 +1,17 @@
+{
+  RuleKey ruleKey=RuleKey.of("squid","AvoidCycle");
+  DefaultIssue issue=new DefaultIssue().setKey("ABCDE").setRuleKey(ruleKey).setEffortToFix(2d);
+  DefaultRequirement requirement=mock(DefaultRequirement.class);
+  Mockito.when(requirement.function()).thenReturn("constant_issue");
+  Mockito.when(requirement.factor()).thenReturn(null);
+  Mockito.when(requirement.offset()).thenReturn(fiveMinutes);
+  when(model.requirementsByRule(ruleKey)).thenReturn(requirement);
+  try {
+    remediationCostCalculator.calculTechnicalDebt(issue);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("The implementation of rule 'squid:AvoidCycle' defines an effort to fix whereas its requirement is set to 'constant/issue' - which is not compatible.");
+  }
+  verifyZeroInteractions(converter);
+}
