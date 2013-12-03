@@ -1,0 +1,13 @@
+{
+  List<GroupMembership> groupMemberships=newArrayList();
+  String user=user(params);
+  UserDto userDto=userDao.selectActiveUserByLogin(user);
+  if (userDto == null) {
+    throw new NotFoundException("User '" + user + "' does not exists.");
+  }
+  List<GroupMembershipDto> dtos=groupMembershipDao.selectGroups(parseQuery(params,userDto.getId()));
+  for (  GroupMembershipDto dto : dtos) {
+    groupMemberships.add(dto.toDefaultGroupMembership());
+  }
+  return groupMemberships;
+}
