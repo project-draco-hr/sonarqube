@@ -1,6 +1,6 @@
 {
   LOG.debug("Copy table {}",table);
-  long startup=System.currentTimeMillis();
+  StopWatch watch=profiling.start("previewdb",Level.BASIC);
   truncate(dest,table);
   Connection sourceConnection=null;
   Statement sourceStatement=null;
@@ -35,15 +35,13 @@
       destStatement.executeBatch();
       destConnection.commit();
     }
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("  " + count + " rows of "+ table+ " copied in "+ (System.currentTimeMillis() - startup)+ " ms");
-    }
   }
  catch (  SQLException e) {
     LOG.error("Fail to copy table " + table,e);
     throw new IllegalStateException("Fail to copy table " + table,e);
   }
  finally {
+    watch.stop("  " + count + " rows of "+ table+ " copied");
     DbUtils.closeQuietly(destStatement);
     DbUtils.closeQuietly(destResultSet);
     DbUtils.closeQuietly(destConnection);
