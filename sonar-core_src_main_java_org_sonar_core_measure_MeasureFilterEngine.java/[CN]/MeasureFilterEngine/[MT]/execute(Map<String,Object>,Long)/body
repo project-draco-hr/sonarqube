@@ -1,3 +1,25 @@
 {
-  return execute(filterMap,userId,LoggerFactory.getLogger("org.sonar.MEASURE_FILTER"));
+  StopWatch watch=profiling.start("measures",Level.BASIC);
+  StopWatch sqlWatch=null;
+  MeasureFilterResult result=new MeasureFilterResult();
+  MeasureFilterContext context=new MeasureFilterContext();
+  context.setUserId(userId);
+  context.setData(String.format("{%s}",Joiner.on('|').withKeyValueSeparator("=").join(filterMap)));
+  try {
+    MeasureFilter filter=factory.create(filterMap);
+    sqlWatch=profiling.start("sql",Level.FULL);
+    List<MeasureFilterRow> rows=executor.execute(filter,context);
+    result.setRows(rows);
+  }
+ catch (  Exception e) {
+    result.setError(MeasureFilterResult.Error.UNKNOWN);
+    LOG.error("Fail to execute measure filter: " + context,e);
+  }
+ finally {
+    if (sqlWatch != null) {
+      sqlWatch.stop(context.getSql());
+    }
+    watch.stop(log(context,result));
+  }
+  return result;
 }
