@@ -1,0 +1,19 @@
+{
+  Connection connection=null;
+  Statement statement=null;
+  ResultSet resultSet=null;
+  try {
+    connection=dataSource.getConnection();
+    statement=connection.createStatement();
+    resultSet=statement.executeQuery("SELECT crypted_password FROM users WHERE id=" + userId);
+    return resultSet.next() ? resultSet.getString(1) : null;
+  }
+ catch (  SQLException e) {
+    throw new IllegalStateException(e);
+  }
+ finally {
+    DbUtils.closeQuietly(resultSet);
+    DbUtils.closeQuietly(statement);
+    DbUtils.closeQuietly(connection);
+  }
+}

@@ -6,10 +6,13 @@
     json.beginObject();
     json.name("version").value(server.getVersion());
     Set<RuleKey> ruleKeys=newHashSet();
+    Set<String> userLogins=newHashSet();
     componentSelector.init();
-    writeJsonIssues(json,ruleKeys);
+    writeJsonIssues(json,ruleKeys,userLogins);
     writeJsonComponents(json);
     writeJsonRules(json,ruleKeys);
+    List<User> users=userFinder.findByLogins(new ArrayList<String>(userLogins));
+    writeUsers(json,users);
     json.endObject().flush();
   }
  catch (  IOException e) {
