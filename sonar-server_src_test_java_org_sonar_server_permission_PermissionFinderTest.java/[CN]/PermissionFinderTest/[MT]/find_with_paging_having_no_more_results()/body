@@ -1,0 +1,11 @@
+{
+  WithPermissionQuery query=WithPermissionQuery.builder().permission("user").pageIndex(1).pageSize(10).build();
+  when(dao.selectUsers(eq(query),anyLong(),anyInt(),anyInt())).thenReturn(newArrayList(new UserWithPermissionDto().setName("user1"),new UserWithPermissionDto().setName("user2"),new UserWithPermissionDto().setName("user4"),new UserWithPermissionDto().setName("user3")));
+  UserWithPermissionQueryResult result=finder.find(query);
+  ArgumentCaptor<Integer> argumentOffset=ArgumentCaptor.forClass(Integer.class);
+  ArgumentCaptor<Integer> argumentLimit=ArgumentCaptor.forClass(Integer.class);
+  verify(dao).selectUsers(eq(query),anyLong(),argumentOffset.capture(),argumentLimit.capture());
+  assertThat(argumentOffset.getValue()).isEqualTo(0);
+  assertThat(argumentLimit.getValue()).isEqualTo(11);
+  assertThat(result.hasMoreResults()).isFalse();
+}
