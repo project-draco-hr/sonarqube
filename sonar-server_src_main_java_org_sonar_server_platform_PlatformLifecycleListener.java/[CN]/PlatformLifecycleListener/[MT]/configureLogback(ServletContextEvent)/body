@@ -1,5 +1,6 @@
 {
   Profiling.Level profilingLevel=Profiling.Level.fromConfigString(event.getServletContext().getInitParameter(Profiling.CONFIG_PROFILING_LEVEL));
-  Map<String,String> variables=ImmutableMap.of("RAILS_LOGGER_LEVEL",profilingLevel == Profiling.Level.FULL ? "DEBUG" : "WARN");
+  String consoleEnabled=defaultIfEmpty(defaultIfEmpty(event.getServletContext().getInitParameter("sonar.log.console"),System.getProperty("sonar.log.console")),"false");
+  Map<String,String> variables=ImmutableMap.of("RAILS_LOGGER_LEVEL",profilingLevel == Profiling.Level.FULL ? "DEBUG" : "WARN","CONSOLE_ENABLED",consoleEnabled);
   Logback.configure("/org/sonar/server/platform/logback.xml",variables);
 }
