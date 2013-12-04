@@ -1,0 +1,11 @@
+{
+  GroupMembershipQuery query=GroupMembershipQuery.builder().login("arthur").pageIndex(1).pageSize(10).build();
+  when(groupMembershipDao.selectGroups(eq(query),anyLong(),anyInt(),anyInt())).thenReturn(newArrayList(new GroupMembershipDto().setId(1L).setName("group1"),new GroupMembershipDto().setId(2L).setName("group2"),new GroupMembershipDto().setId(3L).setName("group3"),new GroupMembershipDto().setId(4L).setName("group4")));
+  GroupMembershipQueryResult result=finder.find(query);
+  ArgumentCaptor<Integer> argumentOffset=ArgumentCaptor.forClass(Integer.class);
+  ArgumentCaptor<Integer> argumentLimit=ArgumentCaptor.forClass(Integer.class);
+  verify(groupMembershipDao).selectGroups(eq(query),anyLong(),argumentOffset.capture(),argumentLimit.capture());
+  assertThat(argumentOffset.getValue()).isEqualTo(0);
+  assertThat(argumentLimit.getValue()).isEqualTo(11);
+  assertThat(result.hasMoreResults()).isFalse();
+}

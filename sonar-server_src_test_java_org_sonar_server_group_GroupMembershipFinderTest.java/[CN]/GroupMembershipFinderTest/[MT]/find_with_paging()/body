@@ -1,0 +1,9 @@
+{
+  GroupMembershipQuery query=GroupMembershipQuery.builder().login("arthur").pageIndex(3).pageSize(10).build();
+  finder.find(query);
+  ArgumentCaptor<Integer> argumentOffset=ArgumentCaptor.forClass(Integer.class);
+  ArgumentCaptor<Integer> argumentLimit=ArgumentCaptor.forClass(Integer.class);
+  verify(groupMembershipDao).selectGroups(eq(query),anyLong(),argumentOffset.capture(),argumentLimit.capture());
+  assertThat(argumentOffset.getValue()).isEqualTo(20);
+  assertThat(argumentLimit.getValue()).isEqualTo(11);
+}
