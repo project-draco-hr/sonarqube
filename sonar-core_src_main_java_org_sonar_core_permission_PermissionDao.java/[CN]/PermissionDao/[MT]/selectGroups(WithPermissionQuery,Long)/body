@@ -1,3 +1,13 @@
 {
-  return selectGroups(query,componentId,0,Integer.MAX_VALUE);
+  SqlSession session=mybatis.openSession();
+  try {
+    Map<String,Object> params=newHashMap();
+    params.put("query",query);
+    params.put("componentId",componentId);
+    params.put("anyoneGroup",DefaultGroups.ANYONE);
+    return session.selectList("org.sonar.core.permission.PermissionMapper.selectGroups",params);
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
 }
