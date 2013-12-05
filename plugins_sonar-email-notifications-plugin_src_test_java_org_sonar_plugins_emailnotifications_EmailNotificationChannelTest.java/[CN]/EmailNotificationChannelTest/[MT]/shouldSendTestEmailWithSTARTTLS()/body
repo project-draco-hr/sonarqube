@@ -1,0 +1,13 @@
+{
+  server.getServer().setEnableTLS(true);
+  server.getServer().setRequireTLS(true);
+  configure();
+  when(configuration.getSecureConnection()).thenReturn("STARTTLS");
+  try {
+    channel.sendTestEmail("user@nowhere","Test Message from SonarQube","This is a test message from SonarQube.");
+    fail("An SSL exception was expected a a proof that STARTTLS is enabled");
+  }
+ catch (  EmailException e) {
+    assertThat(e.getCause().getMessage()).isEqualTo("Could not convert socket to TLS");
+  }
+}
