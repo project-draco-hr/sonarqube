@@ -1,10 +1,9 @@
 {
-  WithPermissionQuery query=WithPermissionQuery.builder().permission("user").pageIndex(1).pageSize(2).build();
-  when(dao.selectUsers(eq(query),anyLong(),anyInt(),anyInt())).thenReturn(newArrayList(new UserWithPermissionDto().setName("user1").setPermission("user"),new UserWithPermissionDto().setName("user2").setPermission("user"),new UserWithPermissionDto().setName("user3").setPermission("user")));
-  UserWithPermissionQueryResult result=finder.findUsersWithPermission(query);
+  when(permissionDao.selectUsers(any(WithPermissionQuery.class),anyLong(),anyInt(),anyInt())).thenReturn(newArrayList(new UserWithPermissionDto().setName("user1").setPermission("user"),new UserWithPermissionDto().setName("user2").setPermission("user"),new UserWithPermissionDto().setName("user3").setPermission("user")));
+  UserWithPermissionQueryResult result=finder.findUsersWithPermission(WithPermissionQuery.builder().permission("user").pageIndex(1).pageSize(2).build());
   ArgumentCaptor<Integer> argumentOffset=ArgumentCaptor.forClass(Integer.class);
   ArgumentCaptor<Integer> argumentLimit=ArgumentCaptor.forClass(Integer.class);
-  verify(dao).selectUsers(eq(query),anyLong(),argumentOffset.capture(),argumentLimit.capture());
+  verify(permissionDao).selectUsers(any(WithPermissionQuery.class),anyLong(),argumentOffset.capture(),argumentLimit.capture());
   assertThat(argumentOffset.getValue()).isEqualTo(0);
   assertThat(argumentLimit.getValue()).isEqualTo(3);
   assertThat(result.hasMoreResults()).isTrue();

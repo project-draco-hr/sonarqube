@@ -1,14 +1,5 @@
 {
-  Long componentId=getComponentId(query.component());
-  int pageSize=query.pageSize();
-  int pageIndex=query.pageIndex();
-  int offset=(pageIndex - 1) * pageSize;
-  int limit=pageSize + 1;
-  List<UserWithPermissionDto> dtos=dao.selectUsers(query,componentId,offset,limit);
-  boolean hasMoreResults=false;
-  if (dtos.size() == limit) {
-    hasMoreResults=true;
-    dtos.remove(dtos.size() - 1);
-  }
-  return new UserWithPermissionQueryResult(toUserWithPermissionList(dtos),hasMoreResults);
+  Long componentId=componentId(query.component());
+  int limit=limit(query);
+  return toQueryResult(permissionDao.selectUsers(query,componentId,offset(query),limit),limit);
 }
