@@ -1,0 +1,7 @@
+{
+  when(permissionTemplateDao.selectTemplateByKey(anyString())).thenReturn(new PermissionTemplateDto().setId(1L).setKee("my_template"));
+  when(permissionTemplateDao.selectGroups(any(WithPermissionQuery.class),anyLong())).thenReturn(newArrayList(new GroupWithPermissionDto().setName("users").setPermission("user")));
+  GroupWithPermissionQueryResult result=finder.findGroupsWithPermissionTemplate(WithPermissionQuery.builder().permission("user").template("my_template").membership(WithPermissionQuery.OUT).build());
+  assertThat(result.groups()).hasSize(1);
+  assertThat(result.hasMoreResults()).isFalse();
+}
