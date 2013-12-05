@@ -27,22 +27,7 @@
     email.setSubject(subject);
     email.setMsg(emailMessage.getMessage());
     email.setHostName(configuration.getSmtpHost());
-    if (StringUtils.equalsIgnoreCase(configuration.getSecureConnection(),"ssl")) {
-      email.setSSLOnConnect(true);
-      email.setSslSmtpPort(String.valueOf(configuration.getSmtpPort()));
-      email.setSmtpPort(configuration.getSmtpPort());
-    }
- else     if (StringUtils.equalsIgnoreCase(configuration.getSecureConnection(),"starttls")) {
-      email.setStartTLSEnabled(true);
-      email.setStartTLSRequired(true);
-      email.setSmtpPort(configuration.getSmtpPort());
-    }
- else     if (StringUtils.isBlank(configuration.getSecureConnection())) {
-      email.setSmtpPort(configuration.getSmtpPort());
-    }
- else {
-      throw new SonarException("Unknown type of SMTP secure connection: " + configuration.getSecureConnection());
-    }
+    configureSecureConnection(email);
     if (StringUtils.isNotBlank(configuration.getSmtpUsername()) || StringUtils.isNotBlank(configuration.getSmtpPassword())) {
       email.setAuthentication(configuration.getSmtpUsername(),configuration.getSmtpPassword());
     }
