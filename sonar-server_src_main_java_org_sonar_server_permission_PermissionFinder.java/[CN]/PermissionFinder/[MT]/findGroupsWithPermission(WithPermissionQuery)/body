@@ -1,0 +1,14 @@
+{
+  Long componentId=getComponentId(query.component());
+  int pageSize=query.pageSize();
+  int pageIndex=query.pageIndex();
+  int offset=(pageIndex - 1) * pageSize;
+  int limit=pageSize + 1;
+  List<GroupWithPermissionDto> dtos=dao.selectGroups(query,componentId,offset,limit);
+  boolean hasMoreResults=false;
+  if (dtos.size() == limit) {
+    hasMoreResults=true;
+    dtos.remove(dtos.size() - 1);
+  }
+  return new GroupWithPermissionQueryResult(toGroupWithPermissionList(dtos),hasMoreResults);
+}
