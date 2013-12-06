@@ -1,10 +1,10 @@
 {
-  when(permissionDao.selectGroups(any(WithPermissionQuery.class),anyLong())).thenReturn(newArrayList(new GroupWithPermissionDto().setName("Anyone").setPermission("user"),new GroupWithPermissionDto().setName("Admin").setPermission("user"),new GroupWithPermissionDto().setName("Users").setPermission(null),new GroupWithPermissionDto().setName("Reviewers").setPermission(null),new GroupWithPermissionDto().setName("Other").setPermission(null)));
-  GroupWithPermissionQueryResult result=finder.findGroupsWithPermission(WithPermissionQuery.builder().permission("user").pageSize(2).pageIndex(2).build());
+  when(permissionDao.selectGroups(any(PermissionQuery.class),anyLong())).thenReturn(newArrayList(new GroupWithPermissionDto().setName("Anyone").setPermission("user"),new GroupWithPermissionDto().setName("Admin").setPermission("user"),new GroupWithPermissionDto().setName("Users").setPermission(null),new GroupWithPermissionDto().setName("Reviewers").setPermission(null),new GroupWithPermissionDto().setName("Other").setPermission(null)));
+  GroupWithPermissionQueryResult result=finder.findGroupsWithPermission(PermissionQuery.builder().permission("user").pageSize(2).pageIndex(2).build());
   assertThat(result.hasMoreResults()).isTrue();
   List<GroupWithPermission> groups=result.groups();
   assertThat(groups).hasSize(2);
   assertThat(groups.get(0).name()).isEqualTo("Users");
   assertThat(groups.get(1).name()).isEqualTo("Reviewers");
-  assertThat(finder.findGroupsWithPermission(WithPermissionQuery.builder().permission("user").pageSize(2).pageIndex(3).build()).hasMoreResults()).isFalse();
+  assertThat(finder.findGroupsWithPermission(PermissionQuery.builder().permission("user").pageSize(2).pageIndex(3).build()).hasMoreResults()).isFalse();
 }
