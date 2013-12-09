@@ -1,33 +1,32 @@
 {
   SearchRequestBuilder builder=client.prepareSearch(indices.toArray(new String[0])).setTypes(types.toArray(new String[0]));
-  List<FilterBuilder> filters=Lists.newArrayList();
-  if (StringUtils.isNotBlank(searchString)) {
-    filters.add(queryFilter(QueryBuilders.queryString(searchString).defaultOperator(Operator.AND).allowLeadingWildcard(false)));
-  }
-  for (  String field : fieldCriteria.keySet()) {
-    if (fieldCriteria.get(field).size() > 1) {
-      filters.add(termsFilter(field,fieldCriteria.get(field)));
-    }
- else {
-      filters.add(termFilter(field,fieldCriteria.get(field)));
-    }
-  }
-  for (  String field : notFieldCriteria.keySet()) {
-    if (notFieldCriteria.get(field).size() > 1) {
-      filters.add(notFilter(termsFilter(field,notFieldCriteria.get(field))));
-    }
- else {
-      filters.add(notFilter(termFilter(field,notFieldCriteria.get(field))));
-    }
-  }
-  if (filters.isEmpty()) {
-    builder.setFilter(matchAllFilter());
-  }
- else   if (filters.size() == 1) {
-    builder.setFilter(filters.get(0));
+  if (fieldCriteria.isEmpty() && notFieldCriteria.isEmpty() && StringUtils.isBlank(searchString)) {
+    builder.setFilter(new MatchAllFilterBuilder());
   }
  else {
-    builder.setFilter(andFilter(filters.toArray(new FilterBuilder[0])));
+    BoolFilterBuilder boolFilter=boolFilter();
+    Iterator<String> mustCriteriaIterator=fieldCriteria.keySet().iterator();
+    while (mustCriteriaIterator.hasNext()) {
+      String field=mustCriteriaIterator.next();
+      if (fieldCriteria.get(field).size() > 1) {
+        boolFilter.must(termsFilter(field,fieldCriteria.get(field)));
+      }
+ else {
+        boolFilter.must(termFilter(field,fieldCriteria.get(field)));
+      }
+    }
+    for (    String field : notFieldCriteria.keySet()) {
+      if (notFieldCriteria.get(field).size() > 1) {
+        boolFilter.mustNot(termsFilter(field,notFieldCriteria.get(field)));
+      }
+ else {
+        boolFilter.mustNot(termFilter(field,notFieldCriteria.get(field)));
+      }
+    }
+    if (StringUtils.isNotBlank(searchString)) {
+      boolFilter.must(queryFilter(QueryBuilders.queryString(searchString).defaultOperator(Operator.AND).allowLeadingWildcard(false)));
+    }
+    builder.setFilter(boolFilter);
   }
-  return addFacets(builder);
+  return builder;
 }
