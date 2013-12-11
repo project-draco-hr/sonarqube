@@ -1,0 +1,13 @@
+{
+  BulkRequestBuilder builder=new BulkRequestBuilder(client);
+  for (int i=0; i < ids.length; i++) {
+    builder.add(client.prepareIndex(index,type,ids[i]).setParent(parentIds[i]).setSource(sources[i].bytes()));
+  }
+  StopWatch watch=createWatch();
+  try {
+    doBulkOperation(builder);
+  }
+  finally {
+    watch.stop("bulk index of %d child documents with type '%s' into index '%s'",ids.length,type,index);
+  }
+}

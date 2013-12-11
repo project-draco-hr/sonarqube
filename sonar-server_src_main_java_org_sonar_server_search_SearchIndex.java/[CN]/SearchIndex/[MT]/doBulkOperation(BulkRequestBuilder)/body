@@ -1,0 +1,18 @@
+{
+  try {
+    BulkResponse bulkResponse=client.bulk(builder.setRefresh(true).request()).get();
+    if (bulkResponse.hasFailures()) {
+      for (      BulkItemResponse bulkItemResponse : bulkResponse.getItems()) {
+        if (bulkItemResponse.isFailed()) {
+          throw new IllegalStateException("Bulk operation partially executed");
+        }
+      }
+    }
+  }
+ catch (  InterruptedException e) {
+    throw new IllegalStateException(BULK_INTERRUPTED,e);
+  }
+catch (  ExecutionException e) {
+    throw new IllegalStateException(BULK_EXECUTE_FAILED,e);
+  }
+}

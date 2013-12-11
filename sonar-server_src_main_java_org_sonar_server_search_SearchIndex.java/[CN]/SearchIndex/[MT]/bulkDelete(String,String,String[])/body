@@ -5,23 +5,9 @@
   }
   StopWatch watch=createWatch();
   try {
-    BulkResponse bulkResponse=client.bulk(builder.setRefresh(true).request()).get();
-    if (bulkResponse.hasFailures()) {
-      for (      BulkItemResponse bulkItemResponse : bulkResponse.getItems()) {
-        if (bulkItemResponse.isFailed()) {
-          int itemId=bulkItemResponse.getItemId();
-          client.prepareDelete(index,type,ids[itemId]).execute().actionGet();
-        }
-      }
-    }
+    doBulkOperation(builder);
   }
- catch (  InterruptedException e) {
-    LOG.error(BULK_INTERRUPTED,e);
-  }
-catch (  ExecutionException e) {
-    LOG.error(BULK_EXECUTE_FAILED,e);
-  }
- finally {
+  finally {
     watch.stop("bulk delete of %d documents with type '%s' from index '%s'",ids.length,type,index);
   }
 }
