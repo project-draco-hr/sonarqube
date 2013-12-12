@@ -1,0 +1,12 @@
+{
+  esSetup.client().prepareBulk().add(Requests.indexRequest().index("rules").type("rule").source(testFileAsString("should_find_active_rules/rule25.json"))).add(Requests.indexRequest().index("rules").type("rule").source(testFileAsString("should_find_active_rules/rule759.json"))).add(Requests.indexRequest().index("rules").type("active_rule").parent("25").source(testFileAsString("should_find_active_rules/active_rule25.json"))).add(Requests.indexRequest().index("rules").type("active_rule").parent("759").source(testFileAsString("should_find_active_rules/active_rule391.json"))).add(Requests.indexRequest().index("rules").type("active_rule").parent("759").source(testFileAsString("should_find_active_rules/active_rule523.json"))).setRefresh(true).execute().actionGet();
+  Paging paging=Paging.create(10,1,10);
+  QProfile profile1=mock(QProfile.class);
+  when(profile1.id()).thenReturn(1);
+  List<QProfileRule> result1=profileRules.searchActiveRules(profile1,paging);
+  assertThat(result1).hasSize(2);
+  QProfile profile2=mock(QProfile.class);
+  when(profile2.id()).thenReturn(2);
+  List<QProfileRule> result2=profileRules.searchActiveRules(profile2,paging);
+  assertThat(result2).hasSize(1);
+}
