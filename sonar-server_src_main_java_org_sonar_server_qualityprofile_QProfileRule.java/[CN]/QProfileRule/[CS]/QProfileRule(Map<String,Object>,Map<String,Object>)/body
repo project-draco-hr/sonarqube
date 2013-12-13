@@ -1,0 +1,23 @@
+{
+  this.ruleSource=ruleSource;
+  this.activeRuleSource=activeRuleSource;
+  key=(String)ruleSource.get("key");
+  name=(String)ruleSource.get("name");
+  description=(String)ruleSource.get("description");
+  status=(String)ruleSource.get("status");
+  severity=RulePriority.valueOf((String)activeRuleSource.get("severity"));
+  params=Lists.newArrayList();
+  if (ruleSource.containsKey("params")) {
+    Map<String,Map<String,Object>> ruleParams=Maps.newHashMap();
+    for (    Map<String,Object> ruleParam : (List<Map<String,Object>>)ruleSource.get("params")) {
+      ruleParams.put((String)ruleParam.get("key"),ruleParam);
+    }
+    Map<String,Map<String,Object>> activeRuleParams=Maps.newHashMap();
+    for (    Map<String,Object> activeRuleParam : (List<Map<String,Object>>)activeRuleSource.get("params")) {
+      activeRuleParams.put((String)activeRuleParam.get("key"),activeRuleParam);
+    }
+    for (    Map.Entry<String,Map<String,Object>> ruleParam : ruleParams.entrySet()) {
+      params.add(new Param((String)ruleParam.getValue().get("key"),activeRuleParams.containsKey(ruleParam.getKey()) ? (String)activeRuleParams.get(ruleParam.getKey()).get("value") : null,(String)ruleParam.getValue().get("description"),(String)ruleParam.getValue().get("defaultValue"),(String)ruleParam.getValue().get("type")));
+    }
+  }
+}

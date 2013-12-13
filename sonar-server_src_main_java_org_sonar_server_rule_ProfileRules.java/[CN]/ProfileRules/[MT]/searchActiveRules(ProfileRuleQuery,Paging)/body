@@ -3,19 +3,19 @@
   addMustTermOrTerms(filter,"severity",query.severities());
   SearchRequestBuilder builder=index.client().prepareSearch("rules").setTypes("active_rule").setFilter(filter).addFields("_source","_parent").setSize(paging.pageSize()).setFrom(paging.offset());
   SearchHits hits=index.executeRequest(builder);
-  String[] activeRuleSources=new String[hits.getHits().length];
+  List<Map<String,Object>> activeRuleSources=Lists.newArrayList();
   String[] parentIds=new String[hits.getHits().length];
   int hitCounter=0;
   List<QProfileRule> result=Lists.newArrayList();
   for (  SearchHit hit : hits.getHits()) {
-    activeRuleSources[hitCounter]=hit.sourceAsString();
+    activeRuleSources.add(hit.sourceAsMap());
     parentIds[hitCounter]=hit.field("_parent").value();
     hitCounter++;
   }
   if (hitCounter > 0) {
     MultiGetItemResponse[] responses=index.client().prepareMultiGet().add("rules","rule",parentIds).execute().actionGet().getResponses();
     for (int i=0; i < hitCounter; i++) {
-      result.add(new QProfileRule(responses[i].getResponse().getSourceAsString(),activeRuleSources[i]));
+      result.add(new QProfileRule(responses[i].getResponse().getSourceAsMap(),activeRuleSources.get(i)));
     }
   }
   return new QProfileRuleResult(result,PagingResult.create(paging.pageSize(),paging.pageIndex(),hits.getTotalHits()));
