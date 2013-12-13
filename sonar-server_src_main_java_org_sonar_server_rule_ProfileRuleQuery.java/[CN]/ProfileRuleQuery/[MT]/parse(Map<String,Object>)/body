@@ -1,15 +1,13 @@
 {
-  List<String> validationMessages=Lists.newArrayList();
-  validatePresenceOf(params,validationMessages,"profileId");
+  BadRequestException validationException=BadRequestException.of("Incorrect rule search parameters");
+  validatePresenceOf(params,validationException,"profileId");
   ProfileRuleQuery result=new ProfileRuleQuery();
   try {
     result.profileId=Integer.parseInt((String)params.get("profileId"));
   }
  catch (  Exception badProfileId) {
-    validationMessages.add("profileId could not be parsed");
+    validationException.addError("profileId could not be parsed");
   }
-  if (!validationMessages.isEmpty()) {
-    throw new ValidationException(validationMessages);
-  }
+  validationException.checkMessages();
   return result;
 }
