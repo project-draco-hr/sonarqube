@@ -1,0 +1,22 @@
+{
+  BoolFilterBuilder filter=boolFilter().must(termFilter("profileId",query.profileId()),hasParentFilter("rule",parentRuleFilter(query)));
+  addMustTermOrTerms(filter,"severity",query.severities());
+  SearchRequestBuilder builder=index.client().prepareSearch("rules").setTypes("active_rule").setFilter(filter).addFields("_source","_parent").setSize(paging.pageSize()).setFrom(paging.offset());
+  SearchHits hits=index.executeRequest(builder);
+  String[] activeRuleSources=new String[hits.getHits().length];
+  String[] parentIds=new String[hits.getHits().length];
+  int hitCounter=0;
+  List<QProfileRule> result=Lists.newArrayList();
+  for (  SearchHit hit : hits.getHits()) {
+    activeRuleSources[hitCounter]=hit.sourceAsString();
+    parentIds[hitCounter]=hit.field("_parent").value();
+    hitCounter++;
+  }
+  if (hitCounter > 0) {
+    MultiGetItemResponse[] responses=index.client().prepareMultiGet().add("rules","rule",parentIds).execute().actionGet().getResponses();
+    for (int i=0; i < hitCounter; i++) {
+      result.add(new QProfileRule(responses[i].getResponse().getSourceAsString(),activeRuleSources[i]));
+    }
+  }
+  return result;
+}

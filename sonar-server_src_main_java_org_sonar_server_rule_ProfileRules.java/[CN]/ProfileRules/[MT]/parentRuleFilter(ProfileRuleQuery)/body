@@ -1,0 +1,12 @@
+{
+  if (!query.hasParentRuleCriteria()) {
+    return FilterBuilders.matchAllFilter();
+  }
+  BoolFilterBuilder result=boolFilter();
+  addMustTermOrTerms(result,"repositoryKey",query.repositoryKeys());
+  addMustTermOrTerms(result,"status",query.statuses());
+  if (StringUtils.isNotBlank(query.nameOrKey())) {
+    result.must(queryFilter(multiMatchQuery(query.nameOrKey(),"name","key").operator(Operator.AND)));
+  }
+  return result;
+}
