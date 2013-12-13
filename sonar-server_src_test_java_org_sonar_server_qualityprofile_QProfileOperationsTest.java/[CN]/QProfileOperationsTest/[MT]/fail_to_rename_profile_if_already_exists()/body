@@ -1,0 +1,12 @@
+{
+  try {
+    when(dao.selectByNameAndLanguage(eq("Default"),anyString())).thenReturn(new QualityProfileDto().setName("Default").setLanguage("java"));
+    when(dao.selectByNameAndLanguage(eq("New Default"),anyString())).thenReturn(new QualityProfileDto().setName("New Default").setLanguage("java"));
+    operations.renameProfile("Default","java","New Default",MockUserSession.create().setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN));
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(BadRequestException.class);
+  }
+  verify(session,never()).commit();
+}

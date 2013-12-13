@@ -1,0 +1,12 @@
+{
+  NewProfileResult result=operations.newProfile("Default","java",Maps.<String,String>newHashMap(),MockUserSession.create().setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN));
+  assertThat(result.profile().name()).isEqualTo("Default");
+  assertThat(result.profile().language()).isEqualTo("java");
+  verify(dao).insert(any(QualityProfileDto.class),eq(session));
+  ArgumentCaptor<QualityProfileDto> profileArgument=ArgumentCaptor.forClass(QualityProfileDto.class);
+  verify(dao).insert(profileArgument.capture(),eq(session));
+  assertThat(profileArgument.getValue().getName()).isEqualTo("Default");
+  assertThat(profileArgument.getValue().getLanguage()).isEqualTo("java");
+  assertThat(profileArgument.getValue().getVersion()).isEqualTo(1);
+  assertThat(profileArgument.getValue().isUsed()).isFalse();
+}
