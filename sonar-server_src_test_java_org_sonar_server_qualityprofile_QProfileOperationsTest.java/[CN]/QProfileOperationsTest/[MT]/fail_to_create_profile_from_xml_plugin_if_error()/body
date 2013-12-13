@@ -1,0 +1,24 @@
+{
+  try {
+    Map<String,String> xmlProfilesByPlugin=newHashMap();
+    xmlProfilesByPlugin.put("pmd","<xml/>");
+    ProfileImporter importer=mock(ProfileImporter.class);
+    when(importer.getKey()).thenReturn("pmd");
+    importers.add(importer);
+    doAnswer(new Answer(){
+      public Object answer(      InvocationOnMock invocation){
+        Object[] args=invocation.getArguments();
+        ValidationMessages validationMessages=(ValidationMessages)args[1];
+        validationMessages.addErrorText("error!");
+        return null;
+      }
+    }
+).when(importer).importProfile(any(Reader.class),any(ValidationMessages.class));
+    operations.newProfile("Default","java",xmlProfilesByPlugin,MockUserSession.create().setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN));
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(BadRequestException.class);
+  }
+  verify(session,never()).commit();
+}

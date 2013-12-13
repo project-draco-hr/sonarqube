@@ -1,17 +1,20 @@
 {
   userSession.checkGlobalPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN);
+  validate(name,language);
+  NewProfileResult result=new NewProfileResult();
+  List<RulesProfile> importProfiles=readProfiles(result,xmlProfilesByPlugin);
   SqlSession sqlSession=myBatis.openSession();
-  Result<QProfile> result=Result.of();
   try {
-    QualityProfileDto dto=new QualityProfileDto().setName(name).setLanguage(language);
+    QualityProfileDto dto=new QualityProfileDto().setName(name).setLanguage(language).setVersion(1).setUsed(false);
     dao.insert(dto,sqlSession);
-    for (    Map.Entry<String,String> entry : xmlProfilesByPlugin.entrySet()) {
-      importProfile(dto,entry.getKey(),entry.getValue(),result,sqlSession);
+    for (    RulesProfile rulesProfile : importProfiles) {
+      importProfile(dto,rulesProfile,sqlSession);
     }
-    result.set(QProfile.from(dto));
+    result.setProfile(QProfile.from(dto));
   }
   finally {
     sqlSession.commit();
+    dryRunCache.reportGlobalModification();
     return result;
   }
 }
