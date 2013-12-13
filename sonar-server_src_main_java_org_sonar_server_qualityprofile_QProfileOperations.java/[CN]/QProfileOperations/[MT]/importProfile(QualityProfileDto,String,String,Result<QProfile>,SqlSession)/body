@@ -1,0 +1,15 @@
+{
+  ProfileImporter importer=getProfileImporter(pluginKey);
+  ValidationMessages messages=ValidationMessages.create();
+  RulesProfile profile=importer.importProfile(new StringReader(xmlProfile),messages);
+  completeErrorResult(result,messages);
+  if (result.ok()) {
+    for (    ActiveRule activeRule : profile.getActiveRules()) {
+      ActiveRuleDto activeRuleDto=toActiveRuleDto(activeRule,qualityProfileDto);
+      activeRuleDao.insert(activeRuleDto,sqlSession);
+      for (      ActiveRuleParam activeRuleParam : activeRule.getActiveRuleParams()) {
+        activeRuleDao.insert(toActiveRuleParamDto(activeRuleParam,activeRuleDto),sqlSession);
+      }
+    }
+  }
+}

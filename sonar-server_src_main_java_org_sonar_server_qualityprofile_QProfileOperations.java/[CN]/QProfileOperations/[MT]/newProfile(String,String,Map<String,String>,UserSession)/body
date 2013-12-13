@@ -1,0 +1,17 @@
+{
+  userSession.checkGlobalPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN);
+  SqlSession sqlSession=myBatis.openSession();
+  Result<QProfile> result=Result.of();
+  try {
+    QualityProfileDto dto=new QualityProfileDto().setName(name).setLanguage(language);
+    dao.insert(dto,sqlSession);
+    for (    Map.Entry<String,String> entry : xmlProfilesByPlugin.entrySet()) {
+      importProfile(dto,entry.getKey(),entry.getValue(),result,sqlSession);
+    }
+    result.set(QProfile.from(dto));
+  }
+  finally {
+    sqlSession.commit();
+    return result;
+  }
+}
