@@ -1,11 +1,19 @@
 {
   this.ruleSource=ruleSource;
   this.activeRuleSource=activeRuleSource;
+  id=(Integer)ruleSource.get("id");
   key=(String)ruleSource.get("key");
+  repositoryKey=(String)ruleSource.get("repositoryKey");
   name=(String)ruleSource.get("name");
   description=(String)ruleSource.get("description");
   status=(String)ruleSource.get("status");
-  severity=RulePriority.valueOf((String)activeRuleSource.get("severity"));
+  cardinality=(String)ruleSource.get("cardinality");
+  parentKey=(String)ruleSource.get("parentKey");
+  createdAt=parseOptionalDate("createdAt",ruleSource);
+  updatedAt=parseOptionalDate("updatedAt",ruleSource);
+  activeRuleId=(Integer)activeRuleSource.get("id");
+  severity=(String)activeRuleSource.get("severity");
+  inheritance=(String)activeRuleSource.get("inheritance");
   params=Lists.newArrayList();
   if (ruleSource.containsKey("params")) {
     Map<String,Map<String,Object>> ruleParams=Maps.newHashMap();
@@ -13,8 +21,10 @@
       ruleParams.put((String)ruleParam.get("key"),ruleParam);
     }
     Map<String,Map<String,Object>> activeRuleParams=Maps.newHashMap();
-    for (    Map<String,Object> activeRuleParam : (List<Map<String,Object>>)activeRuleSource.get("params")) {
-      activeRuleParams.put((String)activeRuleParam.get("key"),activeRuleParam);
+    if (activeRuleSource.containsKey("params")) {
+      for (      Map<String,Object> activeRuleParam : (List<Map<String,Object>>)activeRuleSource.get("params")) {
+        activeRuleParams.put((String)activeRuleParam.get("key"),activeRuleParam);
+      }
     }
     for (    Map.Entry<String,Map<String,Object>> ruleParam : ruleParams.entrySet()) {
       params.add(new Param((String)ruleParam.getValue().get("key"),activeRuleParams.containsKey(ruleParam.getKey()) ? (String)activeRuleParams.get(ruleParam.getKey()).get("value") : null,(String)ruleParam.getValue().get("description"),(String)ruleParam.getValue().get("defaultValue"),(String)ruleParam.getValue().get("type")));
