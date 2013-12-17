@@ -1,0 +1,13 @@
+{
+  try {
+    QualityProfileDto qualityProfile=new QualityProfileDto().setId(1).setName("My profile").setLanguage("java");
+    ComponentDto project=new ComponentDto().setId(10L).setKey("org.codehaus.sonar:sonar").setName("SonarQube");
+    service.addProject(qualityProfile,project,MockUserSession.create());
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(ForbiddenException.class);
+  }
+  verifyNoMoreInteractions(qualityProfileDao);
+  verifyNoMoreInteractions(propertiesDao);
+}
