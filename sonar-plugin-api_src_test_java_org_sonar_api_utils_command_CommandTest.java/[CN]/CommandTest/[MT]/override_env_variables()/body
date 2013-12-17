@@ -1,5 +1,7 @@
 {
-  Command command=Command.create("java");
-  command.setEnvironmentVariable("JAVA_HOME","/path/to/java");
-  assertThat(command.getEnvironmentVariables().get("JAVA_HOME")).isEqualTo("/path/to/java");
+  System2 system=mock(System2.class);
+  when(system.envVariables()).thenReturn(ImmutableMap.of("JAVA_HOME","/default/path/to/java"));
+  Command command=new Command("java",system);
+  command.setEnvironmentVariable("JAVA_HOME","/new/path/to/java");
+  assertThat(command.getEnvironmentVariables().get("JAVA_HOME")).isEqualTo("/new/path/to/java");
 }
