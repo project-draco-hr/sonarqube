@@ -1,10 +1,10 @@
 {
-  BadRequestException exception=BadRequestException.of("Fail to create profile");
-  for (  String error : messages.getErrors()) {
-    exception.addError(error);
-  }
-  if (!exception.errors().isEmpty()) {
-    throw exception;
+  if (!messages.getErrors().isEmpty()) {
+    List<BadRequestException.Message> errors=newArrayList();
+    for (    String error : messages.getErrors()) {
+      errors.add(BadRequestException.Message.of(error));
+    }
+    throw BadRequestException.of("Fail to create profile",errors);
   }
   result.setWarnings(messages.getWarnings());
   result.setInfos(messages.getInfos());
