@@ -12,9 +12,11 @@
     index++;
   }
   profiler.stop();
-  profiler.start("Index active rules");
-  searchIndex.bulkIndex(INDEX_RULES,TYPE_ACTIVE_RULE,ids,docs,parentIds);
-  profiler.stop();
+  if (!rules.isEmpty()) {
+    profiler.start("Index active rules");
+    searchIndex.bulkIndex(INDEX_RULES,TYPE_ACTIVE_RULE,ids,docs,parentIds);
+    profiler.stop();
+  }
   List<String> indexIds=searchIndex.findDocumentIds(SearchQuery.create().index(INDEX_RULES).type(TYPE_ACTIVE_RULE));
   indexIds.removeAll(Arrays.asList(ids));
   if (!indexIds.isEmpty()) {

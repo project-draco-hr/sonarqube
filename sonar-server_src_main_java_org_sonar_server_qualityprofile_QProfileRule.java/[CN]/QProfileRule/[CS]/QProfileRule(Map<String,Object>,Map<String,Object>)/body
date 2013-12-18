@@ -9,9 +9,23 @@
   parentKey=(String)ruleSource.get(RuleDocument.FIELD_PARENT_KEY);
   createdAt=parseOptionalDate(RuleDocument.FIELD_CREATED_AT,ruleSource);
   updatedAt=parseOptionalDate(RuleDocument.FIELD_UPDATED_AT,ruleSource);
+  if (ruleSource.containsKey(RuleDocument.FIELD_NOTE)) {
+    Map<String,Object> ruleNoteDocument=(Map<String,Object>)ruleSource.get(RuleDocument.FIELD_NOTE);
+    ruleNote=new QProfileRuleNote((String)ruleNoteDocument.get(RuleDocument.FIELD_NOTE_DATA),(String)ruleNoteDocument.get(RuleDocument.FIELD_NOTE_USER_LOGIN),parseOptionalDate(RuleDocument.FIELD_NOTE_CREATED_AT,ruleNoteDocument),parseOptionalDate(RuleDocument.FIELD_NOTE_UPDATED_AT,ruleNoteDocument));
+  }
+ else {
+    ruleNote=null;
+  }
   activeRuleId=(Integer)activeRuleSource.get(ActiveRuleDocument.FIELD_ID);
   severity=(String)activeRuleSource.get(ActiveRuleDocument.FIELD_SEVERITY);
   inheritance=(String)activeRuleSource.get(ActiveRuleDocument.FIELD_INHERITANCE);
+  if (activeRuleSource.containsKey(ActiveRuleDocument.FIELD_NOTE)) {
+    Map<String,Object> ruleNoteDocument=(Map<String,Object>)activeRuleSource.get(ActiveRuleDocument.FIELD_NOTE);
+    activeRuleNote=new QProfileRuleNote((String)ruleNoteDocument.get(ActiveRuleDocument.FIELD_NOTE_DATA),(String)ruleNoteDocument.get(ActiveRuleDocument.FIELD_NOTE_USER_LOGIN),parseOptionalDate(ActiveRuleDocument.FIELD_NOTE_CREATED_AT,ruleNoteDocument),parseOptionalDate(ActiveRuleDocument.FIELD_NOTE_UPDATED_AT,ruleNoteDocument));
+  }
+ else {
+    activeRuleNote=null;
+  }
   params=Lists.newArrayList();
   if (ruleSource.containsKey(RuleDocument.FIELD_PARAMS)) {
     Map<String,Map<String,Object>> ruleParams=Maps.newHashMap();
@@ -25,7 +39,7 @@
       }
     }
     for (    Map.Entry<String,Map<String,Object>> ruleParam : ruleParams.entrySet()) {
-      params.add(new Param((String)ruleParam.getValue().get(RuleDocument.FIELD_PARAM_KEY),activeRuleParams.containsKey(ruleParam.getKey()) ? (String)activeRuleParams.get(ruleParam.getKey()).get(ActiveRuleDocument.FIELD_PARAM_VALUE) : null,(String)ruleParam.getValue().get(RuleDocument.FIELD_PARAM_DESCRIPTION),(String)ruleParam.getValue().get(RuleDocument.FIELD_PARAM_DEFAULT_VALUE),(String)ruleParam.getValue().get(RuleDocument.FIELD_PARAM_TYPE)));
+      params.add(new QProfileRuleParam((String)ruleParam.getValue().get(RuleDocument.FIELD_PARAM_KEY),activeRuleParams.containsKey(ruleParam.getKey()) ? (String)activeRuleParams.get(ruleParam.getKey()).get(ActiveRuleDocument.FIELD_PARAM_VALUE) : null,(String)ruleParam.getValue().get(RuleDocument.FIELD_PARAM_DESCRIPTION),(String)ruleParam.getValue().get(RuleDocument.FIELD_PARAM_DEFAULT_VALUE),(String)ruleParam.getValue().get(RuleDocument.FIELD_PARAM_TYPE)));
     }
   }
 }
