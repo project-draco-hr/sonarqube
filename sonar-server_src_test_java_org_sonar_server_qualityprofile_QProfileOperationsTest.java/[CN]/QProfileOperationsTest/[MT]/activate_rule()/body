@@ -1,0 +1,17 @@
+{
+  QualityProfileDto qualityProfile=new QualityProfileDto().setId(1).setName("My profile").setLanguage("java");
+  Rule rule=Rule.create().setRepositoryKey("squid").setKey("AvoidCycle");
+  rule.setId(10);
+  when(ruleDao.selectParameters(eq(10L),eq(session))).thenReturn(newArrayList(new RuleParamDto().setId(20).setName("max").setDefaultValue("10")));
+  operations.activateRule(qualityProfile,rule,Severity.CRITICAL,MockUserSession.create().setName("nicolas").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN));
+  ArgumentCaptor<ActiveRuleDto> activeRuleArgument=ArgumentCaptor.forClass(ActiveRuleDto.class);
+  verify(activeRuleDao).insert(activeRuleArgument.capture(),eq(session));
+  assertThat(activeRuleArgument.getValue().getRulId()).isEqualTo(10);
+  assertThat(activeRuleArgument.getValue().getSeverity()).isEqualTo(3);
+  ArgumentCaptor<ActiveRuleParamDto> activeRuleParamArgument=ArgumentCaptor.forClass(ActiveRuleParamDto.class);
+  verify(activeRuleDao).insert(activeRuleParamArgument.capture(),eq(session));
+  assertThat(activeRuleParamArgument.getValue().getKey()).isEqualTo("max");
+  assertThat(activeRuleParamArgument.getValue().getValue()).isEqualTo("10");
+  verify(session).commit();
+  verify(profilesManager).activated(eq(1),anyInt(),eq("nicolas"));
+}

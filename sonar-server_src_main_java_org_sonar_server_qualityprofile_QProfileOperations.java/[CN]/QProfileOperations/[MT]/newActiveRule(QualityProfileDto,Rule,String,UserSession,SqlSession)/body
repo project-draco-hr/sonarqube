@@ -1,0 +1,11 @@
+{
+  ActiveRuleDto activeRuleDto=new ActiveRuleDto().setProfileId(qualityProfile.getId()).setRuleId(rule.getId()).setSeverity(Severity.ordinal(severity));
+  activeRuleDao.insert(activeRuleDto,session);
+  List<RuleParamDto> ruleParams=ruleDao.selectParameters(rule.getId().longValue(),session);
+  for (  RuleParamDto ruleParam : ruleParams) {
+    ActiveRuleParamDto activeRuleParam=new ActiveRuleParamDto().setActiveRuleId(activeRuleDto.getId()).setRulesParameterId(ruleParam.getId()).setKey(ruleParam.getName()).setValue(ruleParam.getDefaultValue());
+    activeRuleDao.insert(activeRuleParam,session);
+  }
+  session.commit();
+  profilesManager.activated(qualityProfile.getId(),activeRuleDto.getId(),userSession.name());
+}

@@ -1,10 +1,10 @@
 {
   RulesProfile profile=RulesProfile.create("Default","java");
   Rule rule=Rule.create("pmd","rule1");
-  rule.createParameter("paramKey");
+  rule.createParameter("max");
   rule.setId(10);
   ActiveRule activeRule=profile.activateRule(rule,RulePriority.BLOCKER);
-  activeRule.setParameter("paramKey","paramValue");
+  activeRule.setParameter("max","10");
   Map<String,String> xmlProfilesByPlugin=newHashMap();
   xmlProfilesByPlugin.put("pmd","<xml/>");
   ProfileImporter importer=mock(ProfileImporter.class);
@@ -23,7 +23,7 @@
   assertThat(activeRuleArgument.getValue().getSeverity()).isEqualTo(4);
   ArgumentCaptor<ActiveRuleParamDto> activeRuleParamArgument=ArgumentCaptor.forClass(ActiveRuleParamDto.class);
   verify(activeRuleDao).insert(activeRuleParamArgument.capture(),eq(session));
-  assertThat(activeRuleParamArgument.getValue().getKey()).isEqualTo("paramKey");
-  assertThat(activeRuleParamArgument.getValue().getValue()).isEqualTo("paramValue");
+  assertThat(activeRuleParamArgument.getValue().getKey()).isEqualTo("max");
+  assertThat(activeRuleParamArgument.getValue().getValue()).isEqualTo("10");
   verify(ruleRegistry).bulkIndexActiveRules(anyListOf(ActiveRuleDto.class),any(Multimap.class));
 }

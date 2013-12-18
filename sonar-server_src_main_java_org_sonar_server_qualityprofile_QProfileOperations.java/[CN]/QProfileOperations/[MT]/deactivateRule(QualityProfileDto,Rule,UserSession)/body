@@ -1,0 +1,14 @@
+{
+  checkPermission(userSession);
+  SqlSession session=myBatis.openSession();
+  try {
+    ActiveRuleDto activeRule=validate(qualityProfile,rule);
+    activeRuleDao.delete(activeRule.getId(),session);
+    activeRuleDao.deleteParameters(activeRule.getId(),session);
+    session.commit();
+    profilesManager.deactivated(activeRule.getProfileId(),activeRule.getId(),userSession.name());
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

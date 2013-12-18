@@ -1,0 +1,9 @@
+{
+  QualityProfileDto qualityProfile=new QualityProfileDto().setId(1).setName("My profile").setLanguage("java");
+  when(qualityProfileDao.selectById(1)).thenReturn(qualityProfile);
+  Rule rule=Rule.create().setRepositoryKey("squid").setKey("AvoidCycle");
+  rule.setId(10);
+  when(ruleFinder.findById(10)).thenReturn(rule);
+  qProfiles.deactivateRule(1,10);
+  verify(service).deactivateRule(eq(qualityProfile),eq(rule),any(UserSession.class));
+}

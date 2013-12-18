@@ -2,19 +2,19 @@
   checkPermission(userSession);
   NewProfileResult result=new NewProfileResult();
   List<RulesProfile> importProfiles=readProfilesFromXml(result,xmlProfilesByPlugin);
-  SqlSession sqlSession=myBatis.openSession();
+  SqlSession session=myBatis.openSession();
   try {
     QualityProfileDto dto=new QualityProfileDto().setName(name).setLanguage(language).setVersion(1).setUsed(false);
-    dao.insert(dto,sqlSession);
+    dao.insert(dto,session);
     for (    RulesProfile rulesProfile : importProfiles) {
-      importProfile(dto,rulesProfile,sqlSession);
+      importProfile(dto,rulesProfile,session);
     }
     result.setProfile(QProfile.from(dto));
-    sqlSession.commit();
+    session.commit();
     dryRunCache.reportGlobalModification();
   }
   finally {
-    MyBatis.closeQuietly(sqlSession);
+    MyBatis.closeQuietly(session);
   }
   return result;
 }

@@ -1,0 +1,12 @@
+{
+  QualityProfileDto qualityProfile=new QualityProfileDto().setId(1).setName("My profile").setLanguage("java");
+  Rule rule=Rule.create().setRepositoryKey("squid").setKey("AvoidCycle");
+  rule.setId(10);
+  ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1);
+  when(activeRuleDao.selectByProfileAndRule(1,10)).thenReturn(activeRule);
+  operations.deactivateRule(qualityProfile,rule,MockUserSession.create().setName("nicolas").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN));
+  verify(activeRuleDao).delete(eq(5),eq(session));
+  verify(activeRuleDao).deleteParameters(eq(5),eq(session));
+  verify(session).commit();
+  verify(profilesManager).deactivated(eq(1),anyInt(),eq("nicolas"));
+}
