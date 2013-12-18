@@ -3,7 +3,10 @@
   Rule rule=Rule.create().setRepositoryKey("squid").setKey("AvoidCycle");
   rule.setId(10);
   when(ruleDao.selectParameters(eq(10L),eq(session))).thenReturn(newArrayList(new RuleParamDto().setId(20).setName("max").setDefaultValue("10")));
-  operations.activateRule(qualityProfile,rule,Severity.CRITICAL,MockUserSession.create().setName("nicolas").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN));
+  RuleActivationResult result=operations.activateRule(qualityProfile,rule,Severity.CRITICAL,MockUserSession.create().setName("nicolas").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN));
+  assertThat(result.profile()).isNotNull();
+  assertThat(result.rule()).isNotNull();
+  assertThat(result.activeRule()).isNotNull();
   ArgumentCaptor<ActiveRuleDto> activeRuleArgument=ArgumentCaptor.forClass(ActiveRuleDto.class);
   verify(activeRuleDao).insert(activeRuleArgument.capture(),eq(session));
   assertThat(activeRuleArgument.getValue().getRulId()).isEqualTo(10);
