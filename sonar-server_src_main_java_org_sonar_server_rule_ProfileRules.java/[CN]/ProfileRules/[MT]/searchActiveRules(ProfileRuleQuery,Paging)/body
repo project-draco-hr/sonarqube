@@ -12,7 +12,8 @@
     hitCounter++;
   }
   if (hitCounter > 0) {
-    MultiGetItemResponse[] responses=index.client().prepareMultiGet().add(INDEX_RULES,TYPE_RULE,parentIds).execute().actionGet().getResponses();
+    MultiGetRequestBuilder getParentRules=index.client().prepareMultiGet().add(INDEX_RULES,TYPE_RULE,parentIds);
+    MultiGetItemResponse[] responses=index.executeMultiGet(getParentRules);
     for (int i=0; i < hitCounter; i++) {
       result.add(new QProfileRule(responses[i].getResponse().getSourceAsMap(),activeRuleSources.get(i)));
     }

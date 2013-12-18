@@ -1,9 +1,12 @@
 {
   StopWatch watch=createWatch();
+  long count=0;
   try {
-    return builder.execute().actionGet().getCount();
+    count=builder.execute().actionGet().getCount();
   }
   finally {
-    watch.stop("Count executed: %s",builder.toString());
+    CountRequest request=builder.request();
+    watch.stop("Counted %d documents on ind(ex|ices) '%s'",count,Arrays.toString(request.indices()));
   }
+  return count;
 }
