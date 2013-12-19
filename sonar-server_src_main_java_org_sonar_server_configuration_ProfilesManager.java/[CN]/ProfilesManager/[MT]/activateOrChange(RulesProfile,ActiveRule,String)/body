@@ -1,13 +1,16 @@
 {
   ActiveRule oldActiveRule=profile.getActiveRule(parentActiveRule.getRule());
+  RuleInheritanceActions actions=new RuleInheritanceActions();
   if (oldActiveRule != null) {
     if (oldActiveRule.isInherited()) {
       removeActiveRule(oldActiveRule);
+      actions.addToDelete(oldActiveRule.getId());
     }
  else {
       oldActiveRule.setInheritance(ActiveRule.OVERRIDES);
       getSession().saveWithoutFlush(oldActiveRule);
-      return;
+      actions.addToIndex(oldActiveRule.getId());
+      return actions;
     }
   }
   ActiveRule newActiveRule=(ActiveRule)parentActiveRule.clone();
@@ -15,6 +18,7 @@
   newActiveRule.setInheritance(ActiveRule.INHERITED);
   profile.addActiveRule(newActiveRule);
   getSession().saveWithoutFlush(newActiveRule);
+  actions.addToIndex(newActiveRule.getId());
   if (oldActiveRule != null) {
     ruleChanged(profile,oldActiveRule,newActiveRule,userName);
   }
@@ -22,6 +26,7 @@
     ruleEnabled(profile,newActiveRule,userName);
   }
   for (  RulesProfile child : getChildren(profile)) {
-    activateOrChange(child,newActiveRule,userName);
+    actions.add(activateOrChange(child,newActiveRule,userName));
   }
+  return actions;
 }

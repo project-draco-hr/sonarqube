@@ -1,17 +1,21 @@
 {
+  RuleInheritanceActions actions=new RuleInheritanceActions();
   ActiveRule activeRule=profile.getActiveRule(rule);
   if (activeRule != null) {
     if (activeRule.isInherited()) {
       ruleDisabled(profile,activeRule,userName);
+      actions.addToDelete(activeRule.getId());
       removeActiveRule(activeRule);
     }
  else {
       activeRule.setInheritance(null);
       getSession().saveWithoutFlush(activeRule);
-      return;
+      actions.addToIndex(activeRule.getId());
+      return actions;
     }
     for (    RulesProfile child : getChildren(profile)) {
-      deactivate(child,rule,userName);
+      actions.add(deactivate(child,rule,userName));
     }
   }
+  return actions;
 }

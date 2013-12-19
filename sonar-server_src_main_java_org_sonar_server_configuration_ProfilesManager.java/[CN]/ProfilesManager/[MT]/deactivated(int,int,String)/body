@@ -1,10 +1,13 @@
 {
+  RuleInheritanceActions actions=new RuleInheritanceActions();
   ActiveRule parentActiveRule=getSession().getEntity(ActiveRule.class,deactivatedRuleId);
   RulesProfile profile=getSession().getEntity(RulesProfile.class,parentProfileId);
   ruleDisabled(profile,parentActiveRule,userName);
+  actions.addToIndex(parentActiveRule.getId());
   for (  RulesProfile child : getChildren(parentProfileId)) {
-    deactivate(child,parentActiveRule.getRule(),userName);
+    actions.add(deactivate(child,parentActiveRule.getRule(),userName));
   }
   getSession().commit();
   dryRunCache.reportGlobalModification();
+  return actions;
 }

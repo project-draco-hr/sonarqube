@@ -1,12 +1,15 @@
 {
+  RuleInheritanceActions actions=new RuleInheritanceActions();
   ActiveRule parentActiveRule=getSession().getEntity(ActiveRule.class,activeRuleId);
   if (parentActiveRule.isInherited()) {
     parentActiveRule.setInheritance(ActiveRule.OVERRIDES);
     getSession().saveWithoutFlush(parentActiveRule);
   }
+  actions.addToIndex(activeRuleId);
   for (  RulesProfile child : getChildren(parentProfileId)) {
-    activateOrChange(child,parentActiveRule,userName);
+    actions.add(activateOrChange(child,parentActiveRule,userName));
   }
   getSession().commit();
   dryRunCache.reportGlobalModification();
+  return actions;
 }
