@@ -4,12 +4,13 @@
   rule.setId(10);
   ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1);
   when(activeRuleDao.selectByProfileAndRule(1,10)).thenReturn(activeRule);
+  when(profileRules.getFromRuleId(anyInt())).thenReturn(mock(QProfileRule.class));
   RuleActivationResult result=operations.deactivateRule(qualityProfile,rule,MockUserSession.create().setName("nicolas").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN));
   assertThat(result.profile()).isNotNull();
   assertThat(result.rule()).isNotNull();
-  assertThat(result.activeRule()).isNull();
   verify(activeRuleDao).delete(eq(5),eq(session));
   verify(activeRuleDao).deleteParameters(eq(5),eq(session));
   verify(session).commit();
+  verify(profileRules).getFromRuleId(anyInt());
   verify(profilesManager).deactivated(eq(1),anyInt(),eq("nicolas"));
 }
