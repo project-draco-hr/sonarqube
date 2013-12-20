@@ -1,0 +1,12 @@
+{
+  ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1).setNoteCreatedAt(null).setNoteData(null);
+  long now=System.currentTimeMillis();
+  doReturn(now).when(system).now();
+  operations.updateActiveRuleNote(activeRule,"My note",MockUserSession.create().setLogin("nicolas").setName("Nicolas").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN));
+  ArgumentCaptor<ActiveRuleDto> argumentCaptor=ArgumentCaptor.forClass(ActiveRuleDto.class);
+  verify(activeRuleDao).update(argumentCaptor.capture());
+  assertThat(argumentCaptor.getValue().getNoteData()).isEqualTo("My note");
+  assertThat(argumentCaptor.getValue().getNoteUserLogin()).isEqualTo("nicolas");
+  assertThat(argumentCaptor.getValue().getNoteCreatedAt().getTime()).isEqualTo(now);
+  assertThat(argumentCaptor.getValue().getNoteUpdatedAt().getTime()).isEqualTo(now);
+}

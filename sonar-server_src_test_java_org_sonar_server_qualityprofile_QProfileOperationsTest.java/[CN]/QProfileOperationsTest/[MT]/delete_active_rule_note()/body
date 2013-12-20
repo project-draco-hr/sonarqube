@@ -1,0 +1,13 @@
+{
+  Date createdAt=DateUtils.parseDate("2013-12-20");
+  ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1).setNoteCreatedAt(createdAt).setNoteData("My note");
+  long now=System.currentTimeMillis();
+  doReturn(now).when(system).now();
+  operations.deleteActiveRuleNote(activeRule,MockUserSession.create().setName("nicolas").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN));
+  ArgumentCaptor<ActiveRuleDto> argumentCaptor=ArgumentCaptor.forClass(ActiveRuleDto.class);
+  verify(activeRuleDao).update(argumentCaptor.capture());
+  assertThat(argumentCaptor.getValue().getNoteData()).isNull();
+  assertThat(argumentCaptor.getValue().getNoteUserLogin()).isNull();
+  assertThat(argumentCaptor.getValue().getNoteCreatedAt()).isNull();
+  assertThat(argumentCaptor.getValue().getNoteUpdatedAt()).isNull();
+}
