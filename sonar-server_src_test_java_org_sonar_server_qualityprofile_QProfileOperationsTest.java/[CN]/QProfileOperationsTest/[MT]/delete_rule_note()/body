@@ -1,0 +1,13 @@
+{
+  Date createdAt=DateUtils.parseDate("2013-12-20");
+  RuleDto rule=new RuleDto().setId(10).setNoteData("My note").setNoteUserLogin("nicolas").setNoteCreatedAt(createdAt).setNoteUpdatedAt(createdAt);
+  long now=System.currentTimeMillis();
+  doReturn(now).when(system).now();
+  operations.deleteRuleNote(rule,MockUserSession.create().setName("nicolas").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN));
+  ArgumentCaptor<RuleDto> argumentCaptor=ArgumentCaptor.forClass(RuleDto.class);
+  verify(ruleDao).update(argumentCaptor.capture());
+  assertThat(argumentCaptor.getValue().getNoteData()).isNull();
+  assertThat(argumentCaptor.getValue().getNoteUserLogin()).isNull();
+  assertThat(argumentCaptor.getValue().getNoteCreatedAt()).isNull();
+  assertThat(argumentCaptor.getValue().getNoteUpdatedAt()).isNull();
+}
