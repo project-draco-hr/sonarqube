@@ -9,7 +9,9 @@
     ActiveRuleParamDto activeRuleParam=new ActiveRuleParamDto().setActiveRuleId(activeRule.getId()).setKey(key).setValue(value).setRulesParameterId(ruleParam.getId());
     activeRuleDao.insert(activeRuleParam,session);
     session.commit();
-    profilesManager.ruleParamChanged(activeRule.getProfileId(),activeRule.getId(),key,null,value,userSession.name());
+    RuleInheritanceActions actions=profilesManager.ruleParamChanged(activeRule.getProfileId(),activeRule.getId(),key,null,value,userSession.name());
+    reindexInheritanceResult(actions,session);
+    return profileRules.getFromActiveRuleId(activeRule.getId());
   }
   finally {
     MyBatis.closeQuietly(session);

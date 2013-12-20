@@ -8,6 +8,8 @@
   final int idActiveRuleToDelete=24;
   RuleInheritanceActions inheritanceActions=new RuleInheritanceActions().addToIndex(idActiveRuleToUpdate).addToDelete(idActiveRuleToDelete);
   when(profilesManager.activated(eq(1),anyInt(),eq("nicolas"))).thenReturn(inheritanceActions);
+  when(activeRuleDao.selectByIds(anyList(),isA(SqlSession.class))).thenReturn(ImmutableList.<ActiveRuleDto>of(mock(ActiveRuleDto.class)));
+  when(activeRuleDao.selectParamsByRuleIds(anyList(),isA(SqlSession.class))).thenReturn(ImmutableList.<ActiveRuleParamDto>of(mock(ActiveRuleParamDto.class)));
   RuleActivationResult result=operations.createActiveRule(qualityProfile,rule,Severity.CRITICAL,MockUserSession.create().setName("nicolas").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN));
   assertThat(result.profile()).isNotNull();
   assertThat(result.rule()).isNotNull();
@@ -23,4 +25,5 @@
   verify(session).commit();
   verify(profileRules).getFromActiveRuleId(anyInt());
   verify(profilesManager).activated(eq(1),anyInt(),eq("nicolas"));
+  verify(ruleRegistry).bulkIndexActiveRules(anyList(),isA(Multimap.class));
 }

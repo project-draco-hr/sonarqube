@@ -6,7 +6,8 @@
     activeRule.setSeverity(Severity.ordinal(newSeverity));
     activeRuleDao.update(activeRule,session);
     session.commit();
-    profilesManager.ruleSeverityChanged(activeRule.getProfileId(),activeRule.getId(),RulePriority.valueOfInt(oldSeverity),RulePriority.valueOf(newSeverity),userSession.name());
+    RuleInheritanceActions actions=profilesManager.ruleSeverityChanged(activeRule.getProfileId(),activeRule.getId(),RulePriority.valueOfInt(oldSeverity),RulePriority.valueOf(newSeverity),userSession.name());
+    reindexInheritanceResult(actions,session);
     return new RuleActivationResult(QProfile.from(qualityProfile),profileRules.getFromActiveRuleId(activeRule.getId()));
   }
   finally {

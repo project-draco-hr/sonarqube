@@ -7,7 +7,9 @@
     activeRuleParam.setValue(sanitizedValue);
     activeRuleDao.update(activeRuleParam,session);
     session.commit();
-    profilesManager.ruleParamChanged(activeRule.getProfileId(),activeRule.getId(),activeRuleParam.getKey(),oldValue,sanitizedValue,userSession.name());
+    RuleInheritanceActions actions=profilesManager.ruleParamChanged(activeRule.getProfileId(),activeRule.getId(),activeRuleParam.getKey(),oldValue,sanitizedValue,userSession.name());
+    reindexInheritanceResult(actions,session);
+    return profileRules.getFromActiveRuleId(activeRule.getId());
   }
   finally {
     MyBatis.closeQuietly(session);
