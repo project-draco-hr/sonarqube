@@ -1,0 +1,15 @@
+{
+  checkPermission(userSession);
+  SqlSession session=myBatis.openSession();
+  try {
+    String sanitizedValue=Strings.emptyToNull(value);
+    String oldValue=activeRuleParam.getValue();
+    activeRuleParam.setValue(sanitizedValue);
+    activeRuleDao.update(activeRuleParam,session);
+    session.commit();
+    profilesManager.ruleParamChanged(activeRule.getProfileId(),activeRule.getId(),activeRuleParam.getKey(),oldValue,sanitizedValue,userSession.name());
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}
