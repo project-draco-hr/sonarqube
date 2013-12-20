@@ -1,0 +1,9 @@
+{
+  ruleRegistry.deleteActiveRules(actions.idsToDelete());
+  List<ActiveRuleDto> activeRules=activeRuleDao.selectByIds(actions.idsToIndex(),session);
+  Multimap<Integer,ActiveRuleParamDto> paramsByActiveRule=ArrayListMultimap.create();
+  for (  ActiveRuleParamDto param : activeRuleDao.selectParamsByRuleIds(actions.idsToIndex(),session)) {
+    paramsByActiveRule.put(param.getActiveRuleId(),param);
+  }
+  ruleRegistry.bulkIndexActiveRules(activeRules,paramsByActiveRule);
+}
