@@ -1,0 +1,15 @@
+{
+  checkPermission(userSession);
+  SqlSession session=myBatis.openSession();
+  try {
+    Integer oldSeverity=activeRule.getSeverity();
+    activeRule.setSeverity(Severity.ordinal(newSeverity));
+    activeRuleDao.update(activeRule,session);
+    session.commit();
+    profilesManager.ruleSeverityChanged(activeRule.getProfileId(),activeRule.getId(),RulePriority.valueOfInt(oldSeverity),RulePriority.valueOf(newSeverity),userSession.name());
+    return new RuleActivationResult(QProfile.from(qualityProfile),profileRules.getFromActiveRuleId(activeRule.getId()));
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

@@ -1,5 +1,11 @@
 {
   QualityProfileDto qualityProfile=findNotNull(profileId);
   Rule rule=findRuleNotNull(ruleId);
-  return operations.activateRule(qualityProfile,rule,severity,UserSession.get());
+  ActiveRuleDto activeRule=findActiveRule(qualityProfile,rule);
+  if (activeRule == null) {
+    return operations.createActiveRule(qualityProfile,rule,severity,UserSession.get());
+  }
+ else {
+    return operations.updateSeverity(qualityProfile,activeRule,severity,UserSession.get());
+  }
 }
