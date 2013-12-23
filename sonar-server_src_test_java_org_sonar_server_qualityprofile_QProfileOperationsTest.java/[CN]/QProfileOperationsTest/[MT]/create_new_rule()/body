@@ -1,9 +1,8 @@
 {
-  QualityProfileDto qualityProfile=new QualityProfileDto().setId(1).setName("My profile").setLanguage("java");
   RuleDto templateRule=new RuleDto().setId(10).setRepositoryKey("squid").setRuleKey("AvoidCycle").setConfigKey("Xpath");
   when(ruleDao.selectParameters(eq(10),eq(session))).thenReturn(newArrayList(new RuleParamDto().setId(20).setName("max").setDefaultValue("10")));
   Map<String,String> paramsByKey=ImmutableMap.of("max","20");
-  RuleDto result=operations.createRule(qualityProfile,templateRule,"My New Rule",Severity.BLOCKER,"Rule Description",paramsByKey,authorizedUserSession);
+  RuleDto result=operations.createRule(templateRule,"My New Rule",Severity.BLOCKER,"Rule Description",paramsByKey,authorizedUserSession);
   assertThat(result).isNotNull();
   ArgumentCaptor<RuleDto> ruleArgument=ArgumentCaptor.forClass(RuleDto.class);
   verify(ruleDao).insert(ruleArgument.capture(),eq(session));

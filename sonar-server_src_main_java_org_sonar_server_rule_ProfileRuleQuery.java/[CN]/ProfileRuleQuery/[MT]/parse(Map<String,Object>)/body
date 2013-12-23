@@ -2,12 +2,6 @@
   List<BadRequestException.Message> errors=newArrayList();
   validatePresenceOf(params,errors,PARAM_PROFILE_ID);
   ProfileRuleQuery result=new ProfileRuleQuery();
-  try {
-    result.profileId=RubyUtils.toInteger(params.get(PARAM_PROFILE_ID));
-  }
- catch (  Exception badProfileId) {
-    errors.add(BadRequestException.Message.of("profileId could not be parsed"));
-  }
   if (params.containsKey(PARAM_LANGUAGE)) {
     result.setLanguage((String)params.get(PARAM_LANGUAGE));
   }
@@ -25,6 +19,9 @@
   }
   if (!errors.isEmpty()) {
     throw BadRequestException.of("Incorrect rule search parameters",errors);
+  }
+ else {
+    result.profileId=RubyUtils.toInteger(params.get(PARAM_PROFILE_ID));
   }
   return result;
 }

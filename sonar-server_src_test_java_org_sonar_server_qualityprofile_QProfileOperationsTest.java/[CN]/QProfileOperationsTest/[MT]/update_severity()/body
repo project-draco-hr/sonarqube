@@ -1,10 +1,9 @@
 {
-  QualityProfileDto qualityProfile=new QualityProfileDto().setId(1).setName("My profile").setLanguage("java");
   Rule rule=Rule.create().setRepositoryKey("squid").setKey("AvoidCycle");
   rule.setId(10);
   ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1);
   when(profilesManager.ruleSeverityChanged(eq(1),eq(5),eq(RulePriority.MINOR),eq(RulePriority.MAJOR),eq("Nicolas"))).thenReturn(new RuleInheritanceActions());
-  operations.updateSeverity(qualityProfile,activeRule,Severity.MAJOR,authorizedUserSession);
+  operations.updateSeverity(activeRule,Severity.MAJOR,authorizedUserSession);
   verify(activeRuleDao).update(eq(activeRule),eq(session));
   verify(session).commit();
   verify(profilesManager).ruleSeverityChanged(eq(1),eq(5),eq(RulePriority.MINOR),eq(RulePriority.MAJOR),eq("Nicolas"));
