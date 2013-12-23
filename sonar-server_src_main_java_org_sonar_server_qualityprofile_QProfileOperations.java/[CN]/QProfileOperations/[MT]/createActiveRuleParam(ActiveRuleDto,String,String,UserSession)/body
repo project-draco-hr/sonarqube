@@ -2,10 +2,8 @@
   checkPermission(userSession);
   SqlSession session=myBatis.openSession();
   try {
-    RuleParamDto ruleParam=ruleDao.selectParamByRuleAndKey(activeRule.getRulId(),key,session);
-    if (ruleParam == null) {
-      throw new IllegalArgumentException("No rule param found");
-    }
+    RuleParamDto ruleParam=findRuleParamNotNull(activeRule.getRulId(),key,session);
+    validateParam(ruleParam.getType(),value);
     ActiveRuleParamDto activeRuleParam=new ActiveRuleParamDto().setActiveRuleId(activeRule.getId()).setKey(key).setValue(value).setRulesParameterId(ruleParam.getId());
     activeRuleDao.insert(activeRuleParam,session);
     session.commit();

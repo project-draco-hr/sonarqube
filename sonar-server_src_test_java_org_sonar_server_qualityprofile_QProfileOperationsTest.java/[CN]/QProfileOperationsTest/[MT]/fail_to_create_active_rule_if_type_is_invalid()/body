@@ -1,0 +1,14 @@
+{
+  RuleParamDto ruleParam=new RuleParamDto().setRuleId(10).setName("max").setDefaultValue("20").setType(PropertyType.INTEGER.name());
+  when(ruleDao.selectParamByRuleAndKey(10,"max",session)).thenReturn(ruleParam);
+  ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1);
+  try {
+    operations.createActiveRuleParam(activeRule,"max","invalid integer",authorizedUserSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(BadRequestException.class);
+  }
+  verify(activeRuleDao,never()).insert(any(ActiveRuleParamDto.class),eq(session));
+  verifyZeroInteractions(profilesManager);
+}

@@ -1,0 +1,15 @@
+{
+  QualityProfileDto qualityProfile=new QualityProfileDto().setId(1).setName("My profile").setLanguage("java");
+  Rule rule=Rule.create().setRepositoryKey("squid").setKey("AvoidCycle");
+  rule.setId(10);
+  ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1);
+  try {
+    operations.updateSeverity(qualityProfile,activeRule,"Unknown",authorizedUserSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(BadRequestException.class);
+  }
+  verify(activeRuleDao,never()).update(eq(activeRule),eq(session));
+  verifyZeroInteractions(profilesManager);
+}
