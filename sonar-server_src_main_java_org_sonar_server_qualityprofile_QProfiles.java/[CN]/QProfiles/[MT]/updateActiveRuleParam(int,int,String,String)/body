@@ -1,0 +1,19 @@
+{
+  String sanitizedValue=Strings.emptyToNull(value);
+  QualityProfileDto qualityProfile=findNotNull(profileId);
+  ActiveRuleParamDto activeRuleParam=findActiveRuleParam(activeRuleId,key);
+  ActiveRuleDto activeRule=findActiveRuleNotNull(activeRuleId);
+  UserSession userSession=UserSession.get();
+  if (activeRuleParam == null && sanitizedValue != null) {
+    operations.createActiveRuleParam(activeRule,key,value,userSession);
+  }
+ else   if (activeRuleParam != null && sanitizedValue == null) {
+    operations.deleteActiveRuleParam(activeRule,activeRuleParam,userSession);
+  }
+ else   if (activeRuleParam != null) {
+    operations.updateActiveRuleParam(activeRule,activeRuleParam,value,userSession);
+  }
+ else {
+  }
+  return activeRuleChanged(qualityProfile,activeRule);
+}

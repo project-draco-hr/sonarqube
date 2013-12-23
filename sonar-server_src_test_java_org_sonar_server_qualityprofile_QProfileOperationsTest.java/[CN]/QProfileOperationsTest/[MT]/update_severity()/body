@@ -4,13 +4,10 @@
   rule.setId(10);
   ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1);
   when(profileRules.getFromActiveRuleId(anyInt())).thenReturn(mock(QProfileRule.class));
-  when(profilesManager.ruleSeverityChanged(eq(1),eq(5),eq(RulePriority.MINOR),eq(RulePriority.MAJOR),eq("nicolas"))).thenReturn(new RuleInheritanceActions());
-  RuleActivationResult result=operations.updateSeverity(qualityProfile,activeRule,Severity.MAJOR,MockUserSession.create().setName("nicolas").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN));
-  assertThat(result.profile()).isNotNull();
-  assertThat(result.rule()).isNotNull();
-  assertThat(result.rule().activeRuleId()).isNotNull();
+  when(profilesManager.ruleSeverityChanged(eq(1),eq(5),eq(RulePriority.MINOR),eq(RulePriority.MAJOR),eq("Nicolas"))).thenReturn(new RuleInheritanceActions());
+  operations.updateSeverity(qualityProfile,activeRule,Severity.MAJOR,authorizedUserSession);
   verify(activeRuleDao).update(eq(activeRule),eq(session));
   verify(session).commit();
-  verify(profileRules).getFromActiveRuleId(anyInt());
-  verify(profilesManager).ruleSeverityChanged(eq(1),eq(5),eq(RulePriority.MINOR),eq(RulePriority.MAJOR),eq("nicolas"));
+  verify(profilesManager).ruleSeverityChanged(eq(1),eq(5),eq(RulePriority.MINOR),eq(RulePriority.MAJOR),eq("Nicolas"));
+  verify(ruleRegistry).bulkIndexActiveRules(anyList(),isA(Multimap.class));
 }

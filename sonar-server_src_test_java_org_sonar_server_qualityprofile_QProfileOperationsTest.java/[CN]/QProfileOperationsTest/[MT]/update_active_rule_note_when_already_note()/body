@@ -5,9 +5,11 @@
   doReturn(now).when(system).now();
   operations.updateActiveRuleNote(activeRule,"My new note",MockUserSession.create().setLogin("guy").setName("Guy").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN));
   ArgumentCaptor<ActiveRuleDto> argumentCaptor=ArgumentCaptor.forClass(ActiveRuleDto.class);
-  verify(activeRuleDao).update(argumentCaptor.capture());
+  verify(activeRuleDao).update(argumentCaptor.capture(),eq(session));
   assertThat(argumentCaptor.getValue().getNoteData()).isEqualTo("My new note");
   assertThat(argumentCaptor.getValue().getNoteUserLogin()).isEqualTo("nicolas");
   assertThat(argumentCaptor.getValue().getNoteCreatedAt()).isEqualTo(createdAt);
   assertThat(argumentCaptor.getValue().getNoteUpdatedAt().getTime()).isEqualTo(now);
+  verify(session).commit();
+  verify(ruleRegistry).bulkIndexActiveRules(anyList(),isA(Multimap.class));
 }

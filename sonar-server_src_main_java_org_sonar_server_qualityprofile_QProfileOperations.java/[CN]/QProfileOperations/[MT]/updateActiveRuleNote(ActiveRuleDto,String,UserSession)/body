@@ -1,11 +1,19 @@
 {
   checkPermission(userSession);
   Date now=new Date(system.now());
-  if (activeRule.getNoteData() == null) {
-    activeRule.setNoteCreatedAt(now);
-    activeRule.setNoteUserLogin(userSession.login());
+  SqlSession session=myBatis.openSession();
+  try {
+    if (activeRule.getNoteData() == null) {
+      activeRule.setNoteCreatedAt(now);
+      activeRule.setNoteUserLogin(userSession.login());
+    }
+    activeRule.setNoteUpdatedAt(now);
+    activeRule.setNoteData(note);
+    activeRuleDao.update(activeRule,session);
+    session.commit();
+    reindexActiveRule(activeRule,session);
   }
-  activeRule.setNoteUpdatedAt(now);
-  activeRule.setNoteData(note);
-  activeRuleDao.update(activeRule);
+  finally {
+    MyBatis.closeQuietly(session);
+  }
 }

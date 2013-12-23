@@ -1,19 +1,16 @@
 {
   QualityProfileDto qualityProfile=new QualityProfileDto().setId(1).setName("My profile").setLanguage("java");
-  Rule rule=Rule.create().setRepositoryKey("squid").setKey("AvoidCycle");
-  rule.setId(10);
+  RuleDto rule=new RuleDto().setId(10).setRepositoryKey("squid").setRuleKey("AvoidCycle");
   when(ruleDao.selectParameters(eq(10),eq(session))).thenReturn(newArrayList(new RuleParamDto().setId(20).setName("max").setDefaultValue("10")));
   when(profileRules.getFromActiveRuleId(anyInt())).thenReturn(mock(QProfileRule.class));
   final int idActiveRuleToUpdate=42;
   final int idActiveRuleToDelete=24;
   RuleInheritanceActions inheritanceActions=new RuleInheritanceActions().addToIndex(idActiveRuleToUpdate).addToDelete(idActiveRuleToDelete);
-  when(profilesManager.activated(eq(1),anyInt(),eq("nicolas"))).thenReturn(inheritanceActions);
+  when(profilesManager.activated(eq(1),anyInt(),eq("Nicolas"))).thenReturn(inheritanceActions);
   when(activeRuleDao.selectByIds(anyList(),isA(SqlSession.class))).thenReturn(ImmutableList.<ActiveRuleDto>of(mock(ActiveRuleDto.class)));
-  when(activeRuleDao.selectParamsByRuleIds(anyList(),isA(SqlSession.class))).thenReturn(ImmutableList.<ActiveRuleParamDto>of(mock(ActiveRuleParamDto.class)));
-  RuleActivationResult result=operations.createActiveRule(qualityProfile,rule,Severity.CRITICAL,MockUserSession.create().setName("nicolas").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN));
-  assertThat(result.profile()).isNotNull();
-  assertThat(result.rule()).isNotNull();
-  assertThat(result.rule().activeRuleId()).isNotNull();
+  when(activeRuleDao.selectParamsByActiveRuleIds(anyList(),isA(SqlSession.class))).thenReturn(ImmutableList.<ActiveRuleParamDto>of(mock(ActiveRuleParamDto.class)));
+  ActiveRuleDto result=operations.createActiveRule(qualityProfile,rule,Severity.CRITICAL,authorizedUserSession);
+  assertThat(result).isNotNull();
   ArgumentCaptor<ActiveRuleDto> activeRuleArgument=ArgumentCaptor.forClass(ActiveRuleDto.class);
   verify(activeRuleDao).insert(activeRuleArgument.capture(),eq(session));
   assertThat(activeRuleArgument.getValue().getRulId()).isEqualTo(10);
@@ -23,7 +20,6 @@
   assertThat(activeRuleParamArgument.getValue().getKey()).isEqualTo("max");
   assertThat(activeRuleParamArgument.getValue().getValue()).isEqualTo("10");
   verify(session).commit();
-  verify(profileRules).getFromActiveRuleId(anyInt());
-  verify(profilesManager).activated(eq(1),anyInt(),eq("nicolas"));
+  verify(profilesManager).activated(eq(1),anyInt(),eq("Nicolas"));
   verify(ruleRegistry).bulkIndexActiveRules(anyList(),isA(Multimap.class));
 }

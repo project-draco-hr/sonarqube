@@ -1,9 +1,9 @@
 {
   QualityProfileDto qualityProfile=new QualityProfileDto().setId(1).setName("My profile").setLanguage("java");
   when(qualityProfileDao.selectById(1)).thenReturn(qualityProfile);
-  Rule rule=Rule.create().setRepositoryKey("squid").setKey("AvoidCycle");
-  rule.setId(10);
-  when(ruleFinder.findById(10)).thenReturn(rule);
+  RuleDto rule=new RuleDto().setId(10).setRepositoryKey("squid").setRuleKey("AvoidCycle");
+  when(ruleDao.selectById(10)).thenReturn(rule);
+  when(service.createActiveRule(eq(qualityProfile),eq(rule),eq(Severity.BLOCKER),any(UserSession.class))).thenReturn(new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1));
   qProfiles.activateRule(1,10,Severity.BLOCKER);
   verify(service).createActiveRule(eq(qualityProfile),eq(rule),eq(Severity.BLOCKER),any(UserSession.class));
 }

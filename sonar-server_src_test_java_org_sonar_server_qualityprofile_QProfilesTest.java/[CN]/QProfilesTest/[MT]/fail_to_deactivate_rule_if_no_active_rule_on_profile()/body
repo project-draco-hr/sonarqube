@@ -1,0 +1,14 @@
+{
+  QualityProfileDto qualityProfile=new QualityProfileDto().setId(1).setName("My profile").setLanguage("java");
+  when(qualityProfileDao.selectById(1)).thenReturn(qualityProfile);
+  RuleDto rule=new RuleDto().setId(10).setRepositoryKey("squid").setRuleKey("AvoidCycle");
+  when(ruleDao.selectById(10)).thenReturn(rule);
+  when(activeRuleDao.selectByProfileAndRule(1,10)).thenReturn(null);
+  try {
+    qProfiles.deactivateRule(1,10);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(BadRequestException.class);
+  }
+}

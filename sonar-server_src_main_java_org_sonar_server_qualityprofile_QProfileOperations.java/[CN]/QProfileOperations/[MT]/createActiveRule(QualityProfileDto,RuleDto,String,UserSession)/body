@@ -1,0 +1,22 @@
+{
+  checkPermission(userSession);
+  SqlSession session=myBatis.openSession();
+  try {
+    ActiveRuleDto activeRule=new ActiveRuleDto().setProfileId(qualityProfile.getId()).setRuleId(rule.getId()).setSeverity(Severity.ordinal(severity));
+    activeRuleDao.insert(activeRule,session);
+    List<RuleParamDto> ruleParams=ruleDao.selectParameters(rule.getId(),session);
+    List<ActiveRuleParamDto> activeRuleParams=Lists.newArrayList();
+    for (    RuleParamDto ruleParam : ruleParams) {
+      ActiveRuleParamDto activeRuleParam=new ActiveRuleParamDto().setActiveRuleId(activeRule.getId()).setRulesParameterId(ruleParam.getId()).setKey(ruleParam.getName()).setValue(ruleParam.getDefaultValue());
+      activeRuleParams.add(activeRuleParam);
+      activeRuleDao.insert(activeRuleParam,session);
+    }
+    session.commit();
+    RuleInheritanceActions actions=profilesManager.activated(qualityProfile.getId(),activeRule.getId(),userSession.name());
+    reindexInheritanceResult(actions,session);
+    return activeRule;
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

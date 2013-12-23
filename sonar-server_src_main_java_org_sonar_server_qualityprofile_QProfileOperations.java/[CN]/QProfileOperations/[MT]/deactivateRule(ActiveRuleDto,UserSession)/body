@@ -1,0 +1,15 @@
+{
+  checkPermission(userSession);
+  SqlSession session=myBatis.openSession();
+  try {
+    RuleInheritanceActions actions=profilesManager.deactivated(activeRule.getProfileId(),activeRule.getId(),userSession.name());
+    activeRuleDao.delete(activeRule.getId(),session);
+    activeRuleDao.deleteParameters(activeRule.getId(),session);
+    actions.addToDelete(activeRule.getId());
+    session.commit();
+    reindexInheritanceResult(actions,session);
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}
