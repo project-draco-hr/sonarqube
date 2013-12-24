@@ -1,5 +1,7 @@
 {
   ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1).setNoteCreatedAt(null).setNoteData(null);
+  List<ActiveRuleParamDto> activeRuleParams=newArrayList(new ActiveRuleParamDto());
+  when(activeRuleDao.selectParamsByActiveRuleId(eq(5),eq(session))).thenReturn(activeRuleParams);
   long now=System.currentTimeMillis();
   doReturn(now).when(system).now();
   operations.updateActiveRuleNote(activeRule,"My note",authorizedUserSession);
@@ -10,5 +12,5 @@
   assertThat(argumentCaptor.getValue().getNoteCreatedAt().getTime()).isEqualTo(now);
   assertThat(argumentCaptor.getValue().getNoteUpdatedAt().getTime()).isEqualTo(now);
   verify(session).commit();
-  verify(ruleRegistry).bulkIndexActiveRules(anyList(),isA(Multimap.class));
+  verify(ruleRegistry).save(eq(activeRule),eq(activeRuleParams));
 }

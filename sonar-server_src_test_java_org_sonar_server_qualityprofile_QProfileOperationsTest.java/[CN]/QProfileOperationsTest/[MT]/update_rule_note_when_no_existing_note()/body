@@ -1,5 +1,7 @@
 {
   RuleDto rule=new RuleDto().setId(10).setNoteCreatedAt(null).setNoteData(null);
+  List<RuleParamDto> ruleParams=newArrayList(new RuleParamDto().setId(20).setName("max").setDefaultValue("10"));
+  when(ruleDao.selectParameters(eq(10),eq(session))).thenReturn(ruleParams);
   long now=System.currentTimeMillis();
   doReturn(now).when(system).now();
   operations.updateRuleNote(rule,"My note",authorizedUserSession);
@@ -10,4 +12,5 @@
   assertThat(argumentCaptor.getValue().getNoteCreatedAt().getTime()).isEqualTo(now);
   assertThat(argumentCaptor.getValue().getNoteUpdatedAt().getTime()).isEqualTo(now);
   verify(session).commit();
+  verify(ruleRegistry).save(eq(rule),eq(ruleParams));
 }
