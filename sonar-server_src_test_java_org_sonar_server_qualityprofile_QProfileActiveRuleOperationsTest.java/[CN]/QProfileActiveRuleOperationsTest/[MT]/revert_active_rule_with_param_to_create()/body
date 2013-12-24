@@ -1,0 +1,19 @@
+{
+  ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1).setInheritance(ActiveRuleDto.OVERRIDES);
+  ActiveRuleDto parent=new ActiveRuleDto().setId(4).setProfileId(1).setRuleId(10).setSeverity(1);
+  when(activeRuleDao.selectParent(5,session)).thenReturn(parent);
+  when(activeRuleDao.selectParamsByActiveRuleId(eq(4),eq(session))).thenReturn(newArrayList(new ActiveRuleParamDto().setId(101).setActiveRuleId(5).setKey("minimum").setValue("2")));
+  when(profilesManager.ruleParamChanged(eq(1),eq(5),eq("minimum"),eq((String)null),eq("2"),eq("Nicolas"))).thenReturn(new RuleInheritanceActions());
+  operations.revertActiveRule(activeRule,authorizedUserSession);
+  ArgumentCaptor<ActiveRuleDto> argumentCaptor=ArgumentCaptor.forClass(ActiveRuleDto.class);
+  verify(activeRuleDao).update(argumentCaptor.capture(),eq(session));
+  assertThat(argumentCaptor.getValue().getInheritance()).isEqualTo(ActiveRuleDto.INHERITED);
+  ArgumentCaptor<ActiveRuleParamDto> paramCaptor=ArgumentCaptor.forClass(ActiveRuleParamDto.class);
+  verify(activeRuleDao).insert(paramCaptor.capture(),eq(session));
+  assertThat(paramCaptor.getValue().getKey()).isEqualTo("minimum");
+  assertThat(paramCaptor.getValue().getValue()).isEqualTo("2");
+  verify(session,times(2)).commit();
+  verify(profilesManager).ruleParamChanged(eq(1),eq(5),eq("minimum"),eq((String)null),eq("2"),eq("Nicolas"));
+  verify(ruleRegistry).bulkIndexActiveRules(anyList(),isA(Multimap.class));
+  verify(ruleRegistry).save(eq(activeRule),anyListOf(ActiveRuleParamDto.class));
+}

@@ -1,0 +1,16 @@
+{
+  ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1).setInheritance(ActiveRuleDto.OVERRIDES);
+  ActiveRuleDto parent=new ActiveRuleDto().setId(4).setProfileId(1).setRuleId(10).setSeverity(2);
+  when(activeRuleDao.selectParent(5,session)).thenReturn(parent);
+  when(profilesManager.ruleSeverityChanged(eq(1),eq(5),eq(RulePriority.MINOR),eq(RulePriority.MAJOR),eq("Nicolas"))).thenReturn(new RuleInheritanceActions());
+  operations.revertActiveRule(activeRule,authorizedUserSession);
+  ArgumentCaptor<ActiveRuleDto> argumentCaptor=ArgumentCaptor.forClass(ActiveRuleDto.class);
+  verify(activeRuleDao,times(2)).update(argumentCaptor.capture(),eq(session));
+  List<ActiveRuleDto> activeRulesChanged=argumentCaptor.getAllValues();
+  assertThat(activeRulesChanged.get(0).getSeverity()).isEqualTo(2);
+  assertThat(activeRulesChanged.get(1).getInheritance()).isEqualTo(ActiveRuleDto.INHERITED);
+  verify(session,times(2)).commit();
+  verify(profilesManager).ruleSeverityChanged(eq(1),eq(5),eq(RulePriority.MINOR),eq(RulePriority.MAJOR),eq("Nicolas"));
+  verify(ruleRegistry).bulkIndexActiveRules(anyList(),isA(Multimap.class));
+  verify(ruleRegistry).save(eq(activeRule),anyListOf(ActiveRuleParamDto.class));
+}

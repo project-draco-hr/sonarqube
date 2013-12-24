@@ -7,8 +7,7 @@
     activeRule.setSeverity(Severity.ordinal(newSeverity));
     activeRuleDao.update(activeRule,session);
     session.commit();
-    RuleInheritanceActions actions=profilesManager.ruleSeverityChanged(activeRule.getProfileId(),activeRule.getId(),RulePriority.valueOfInt(oldSeverity),RulePriority.valueOf(newSeverity),userSession.name());
-    reindexInheritanceResult(actions,session);
+    notifySeverityChanged(activeRule,newSeverity,Severity.get(oldSeverity),session,userSession);
   }
   finally {
     MyBatis.closeQuietly(session);

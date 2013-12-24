@@ -1,0 +1,21 @@
+{
+  ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1).setInheritance(ActiveRuleDto.OVERRIDES);
+  when(activeRuleDao.selectParamsByActiveRuleId(eq(5),eq(session))).thenReturn(newArrayList(new ActiveRuleParamDto().setId(102).setActiveRuleId(5).setKey("max").setValue("20")));
+  ActiveRuleDto parent=new ActiveRuleDto().setId(4).setProfileId(1).setRuleId(10).setSeverity(1);
+  when(activeRuleDao.selectParent(5,session)).thenReturn(parent);
+  when(activeRuleDao.selectParamsByActiveRuleId(eq(4),eq(session))).thenReturn(newArrayList(new ActiveRuleParamDto().setId(100).setActiveRuleId(5).setKey("max").setValue("15")));
+  when(profilesManager.ruleParamChanged(eq(1),eq(5),eq("max"),eq("20"),eq("15"),eq("Nicolas"))).thenReturn(new RuleInheritanceActions());
+  operations.revertActiveRule(activeRule,authorizedUserSession);
+  ArgumentCaptor<ActiveRuleDto> argumentCaptor=ArgumentCaptor.forClass(ActiveRuleDto.class);
+  verify(activeRuleDao).update(argumentCaptor.capture(),eq(session));
+  assertThat(argumentCaptor.getValue().getInheritance()).isEqualTo(ActiveRuleDto.INHERITED);
+  ArgumentCaptor<ActiveRuleParamDto> paramCaptor=ArgumentCaptor.forClass(ActiveRuleParamDto.class);
+  verify(activeRuleDao).update(paramCaptor.capture(),eq(session));
+  assertThat(paramCaptor.getValue().getId()).isEqualTo(102);
+  assertThat(paramCaptor.getValue().getKey()).isEqualTo("max");
+  assertThat(paramCaptor.getValue().getValue()).isEqualTo("15");
+  verify(session,times(2)).commit();
+  verify(profilesManager).ruleParamChanged(eq(1),eq(5),eq("max"),eq("20"),eq("15"),eq("Nicolas"));
+  verify(ruleRegistry).bulkIndexActiveRules(anyList(),isA(Multimap.class));
+  verify(ruleRegistry).save(eq(activeRule),anyListOf(ActiveRuleParamDto.class));
+}
