@@ -1,0 +1,25 @@
+{
+  checkPermission(userSession);
+  SqlSession session=myBatis.openSession();
+  try {
+    rule.setStatus(Rule.STATUS_REMOVED).setUpdatedAt(new Date(system.now()));
+    ruleDao.update(rule,session);
+    session.commit();
+    ruleRegistry.save(rule,ruleDao.selectParameters(rule.getId(),session));
+    List<ActiveRuleDto> activeRules=activeRuleDao.selectByRuleId(rule.getId());
+    for (    ActiveRuleDto activeRule : activeRules) {
+      activeRuleDao.deleteParameters(activeRule.getId(),session);
+    }
+    activeRuleDao.deleteFromRule(rule.getId(),session);
+    session.commit();
+    ruleRegistry.deleteActiveRules(newArrayList(Iterables.transform(activeRules,new Function<ActiveRuleDto,Integer>(){
+      @Override public Integer apply(      ActiveRuleDto input){
+        return input.getId();
+      }
+    }
+)));
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}
