@@ -1,10 +1,14 @@
 {
   double currentTechnicalDebtValue=technicalDebtConverter.toDays(currentTechnicalDebt);
-  for (  Map.Entry<Date,WorkDayDuration> history : technicalDebtHistory(issue).entrySet()) {
-    if (isAfterOrEqual(history.getKey(),periodDate)) {
-      WorkDayDuration pastTechnicalDebt=history.getValue();
-      double pastTechnicalDebtValue=technicalDebtConverter.toDays(pastTechnicalDebt);
-      return currentTechnicalDebtValue - pastTechnicalDebtValue;
+  List<FieldDiffs> changelog=technicalDebtHistory(issue);
+  for (Iterator<FieldDiffs> iterator=changelog.iterator(); iterator.hasNext(); ) {
+    FieldDiffs diff=iterator.next();
+    Date date=diff.creationDate();
+    if (isLesserOrEqual(date,periodDate)) {
+      return currentTechnicalDebtValue - technicalDebtConverter.toDays(newValue(diff));
+    }
+    if (!iterator.hasNext()) {
+      return currentTechnicalDebtValue - technicalDebtConverter.toDays(oldValue(diff));
     }
   }
   return 0d;
