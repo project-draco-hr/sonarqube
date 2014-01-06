@@ -6,5 +6,8 @@
   initRestConsole(esSettings);
   node=NodeBuilder.nodeBuilder().clusterName(INSTANCE_NAME).local(true).data(true).settings(esSettings).node();
   node.start();
+  if (node.client().admin().cluster().prepareHealth().setWaitForYellowStatus().setTimeout(healthTimeout).execute().actionGet().getStatus() == ClusterHealthStatus.RED) {
+    throw new IllegalStateException(String.format("Elasticsearch index is corrupt, please delete directory '${SonarQubeHomeDirectory}/%s' and relaunch the SonarQube server.",DATA_DIR));
+  }
   LOG.info("Elasticsearch started");
 }
