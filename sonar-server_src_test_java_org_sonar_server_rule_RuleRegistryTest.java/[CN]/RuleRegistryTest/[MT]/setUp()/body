@@ -1,5 +1,5 @@
 {
-  ruleDao=mock(RuleDao.class);
+  when(myBatis.openSession()).thenReturn(session);
   esSetup=new EsSetup();
   esSetup.execute(EsSetup.deleteAll());
   SearchNode node=mock(SearchNode.class);
@@ -9,8 +9,8 @@
   Profiling profiling=new Profiling(settings);
   searchIndex=new SearchIndex(node,profiling);
   searchIndex.start();
-  session=mock(DatabaseSession.class);
-  registry=new RuleRegistry(searchIndex,ruleDao,session);
+  myBatis=mock(MyBatis.class);
+  registry=new RuleRegistry(searchIndex,ruleDao,activeRuleDao,myBatis);
   registry.start();
   String source1=IOUtils.toString(TestUtils.getResource(getClass(),"rules/rule1.json").toURI());
   String source2=IOUtils.toString(TestUtils.getResource(getClass(),"rules/rule2.json").toURI());

@@ -1,12 +1,19 @@
 {
-  TimeProfiler profiler=new TimeProfiler();
-  profiler.start("Rebuilding active rules index - query");
-  List<ActiveRule> rules=session.getResults(ActiveRule.class);
-  profiler.stop();
+  SqlSession session=myBatis.openSession();
   try {
-    bulkIndex(rules);
+    TimeProfiler profiler=new TimeProfiler();
+    profiler.start("Rebuilding active rules index - query");
+    List<ActiveRuleDto> activeRules=activeRuleDao.selectAll(session);
+    List<ActiveRuleParamDto> activeRuleParams=activeRuleDao.selectAllParams(session);
+    profiler.stop();
+    Multimap<Integer,ActiveRuleParamDto> paramsByActiveRule=ArrayListMultimap.create();
+    for (    ActiveRuleParamDto param : activeRuleParams) {
+      paramsByActiveRule.put(param.getActiveRuleId(),param);
+    }
+    String[] ids=bulkIndexActiveRules(activeRules,paramsByActiveRule);
+    removeDeletedActiveRules(ids);
   }
- catch (  IOException ioe) {
-    throw new IllegalStateException("Unable to index active rules",ioe);
+  finally {
+    MyBatis.closeQuietly(session);
   }
 }
