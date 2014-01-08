@@ -1,0 +1,17 @@
+{
+  List<String> result=Lists.newArrayList();
+  final int scrollTime=100;
+  StopWatch watch=createWatch();
+  SearchResponse scrollResp=builder.addField("_id").setSearchType(SearchType.SCAN).setScroll(new TimeValue(scrollTime)).setSize(scrollSize).execute().actionGet();
+  while (true) {
+    scrollResp=client.prepareSearchScroll(scrollResp.getScrollId()).setScroll(new TimeValue(scrollTime)).execute().actionGet();
+    for (    SearchHit hit : scrollResp.getHits()) {
+      result.add(hit.getId());
+    }
+    if (scrollResp.getHits().getHits().length == 0) {
+      break;
+    }
+  }
+  watch.stop("findDocumentIds with request: %s",builderToString(builder));
+  return result;
+}
