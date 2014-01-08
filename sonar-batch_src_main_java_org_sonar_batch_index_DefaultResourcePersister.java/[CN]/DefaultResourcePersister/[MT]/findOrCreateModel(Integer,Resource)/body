@@ -1,7 +1,12 @@
 {
   ResourceModel model;
   try {
-    model=session.getSingleResult(ResourceModel.class,"key",resource.getEffectiveKey());
+    if (rootModuleId != null && StringUtils.isNotBlank(resource.getPath())) {
+      model=session.getSingleResult(ResourceModel.class,"rootId",rootModuleId,"path",resource.getPath());
+    }
+ else {
+      model=session.getSingleResult(ResourceModel.class,"key",resource.getEffectiveKey());
+    }
     if (model == null) {
       model=createModel(resource);
     }

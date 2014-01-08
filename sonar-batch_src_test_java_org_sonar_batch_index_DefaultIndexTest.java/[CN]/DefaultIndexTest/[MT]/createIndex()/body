@@ -4,8 +4,17 @@
   MetricFinder metricFinder=mock(MetricFinder.class);
   when(metricFinder.findByKey("ncloc")).thenReturn(CoreMetrics.NCLOC);
   ruleFinder=mock(RuleFinder.class);
-  index=new DefaultIndex(mock(PersistenceManager.class),lock,mock(ProjectTree.class),metricFinder,mock(ScanGraph.class),deprecatedViolations);
-  Project project=new Project("project");
+  ProjectTree projectTree=mock(ProjectTree.class);
+  index=new DefaultIndex(mock(PersistenceManager.class),lock,projectTree,metricFinder,mock(ScanGraph.class),deprecatedViolations);
+  java.io.File baseDir=temp.newFolder();
+  project=new Project("project");
+  when(projectTree.getProjectDefinition(project)).thenReturn(ProjectDefinition.create().setBaseDir(baseDir));
+  moduleA=new Project("moduleA").setParent(project);
+  when(projectTree.getProjectDefinition(moduleA)).thenReturn(ProjectDefinition.create().setBaseDir(new java.io.File(baseDir,"moduleA")));
+  moduleB=new Project("moduleB").setParent(project);
+  when(projectTree.getProjectDefinition(moduleB)).thenReturn(ProjectDefinition.create().setBaseDir(new java.io.File(baseDir,"moduleB")));
+  moduleB1=new Project("moduleB1").setParent(moduleB);
+  when(projectTree.getProjectDefinition(moduleB1)).thenReturn(ProjectDefinition.create().setBaseDir(new java.io.File(baseDir,"moduleB/moduleB1")));
   ResourceFilter filter=new ResourceFilter(){
     public boolean isIgnored(    Resource resource){
       return StringUtils.containsIgnoreCase(resource.getKey(),"excluded");
