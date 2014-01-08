@@ -1,18 +1,20 @@
 {
-  List<Rule> registeredRules=newArrayList();
+  List<RuleDto> registeredRules=newArrayList();
   Map<String,Rule> ruleByKey=newHashMap();
   for (  Rule rule : repository.createRules()) {
     updateRuleFromRepositoryInfo(rule,repository);
     validateRule(rule,repository.getKey());
     ruleByKey.put(rule.getKey(),rule);
-    registeredRules.add(rule);
+    registeredRules.add(dtoFrom(rule));
   }
   LOG.debug(ruleByKey.size() + " rules");
-  for (  Rule persistedRule : existingRules.get(repository.getKey())) {
-    Rule rule=ruleByKey.get(persistedRule.getKey());
+  for (  RuleDto persistedRule : existingRules.get(repository.getKey())) {
+    Rule rule=ruleByKey.get(persistedRule.getRuleKey());
     if (rule != null) {
-      updateExistingRule(persistedRule,rule);
-      session.saveWithoutFlush(persistedRule);
+      registeredRules.remove(dtoFrom(rule));
+      updateExistingRule(persistedRule,existingRules.params(persistedRule.getId()),existingRules.tags(persistedRule.getId()),rule);
+      ruleDao.update(persistedRule,sqlSession);
+      registeredRules.add(persistedRule);
       ruleByKey.remove(rule.getKey());
     }
   }

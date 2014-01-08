@@ -1,0 +1,20 @@
+{
+  Map<String,RuleParamDto> paramsByKey=Maps.newHashMap();
+  for (  RuleParamDto param : ruleParams) {
+    paramsByKey.put(param.getName(),param);
+  }
+  if (rule.getParams() != null) {
+    for (    RuleParam param : rule.getParams()) {
+      RuleParamDto persistedParam=paramsByKey.get(param.getKey());
+      if (persistedParam == null) {
+        persistedParam=new RuleParamDto().setRuleId(persistedRule.getId()).setName(param.getKey()).setType(param.getType());
+        ruleDao.insert(persistedParam,sqlSession);
+      }
+      String desc=StringUtils.defaultIfEmpty(ruleI18nManager.getParamDescription(rule.getRepositoryKey(),rule.getKey(),param.getKey()),param.getDescription());
+      persistedParam.setDescription(desc);
+      persistedParam.setType(param.getType());
+      persistedParam.setDefaultValue(param.getDefaultValue());
+      ruleDao.update(persistedParam,sqlSession);
+    }
+  }
+}

@@ -1,7 +1,6 @@
 {
-  task=new RegisterRules(getSessionFactory(),new RuleRepository[]{new VolumeRepository()},ruleI18nManager,profilesManager,ruleRegistry);
+  task=new RegisterRules(new RuleRepository[]{new VolumeRepository()},ruleI18nManager,profilesManager,ruleRegistry,myBatis,ruleDao,activeRuleDao);
   setupData("shared");
   task.start();
-  List<Rule> result=getSession().getResults(Rule.class,"status",Rule.STATUS_READY);
-  assertThat(result.size()).isEqualTo(VolumeRepository.SIZE);
+  assertThat(ruleDao.selectAll()).hasSize(VolumeRepository.SIZE + 1);
 }

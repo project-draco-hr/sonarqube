@@ -1,7 +1,16 @@
 {
   for (  Rule rule : rules) {
     LOG.debug("Save new rule " + rule);
-    rule.setCreatedAt(new Date());
-    session.saveWithoutFlush(rule);
+    RuleDto newRule=dtoFrom(rule);
+    newRule.setCreatedAt(new Date());
+    ruleDao.insert(newRule,sqlSession);
+    for (    RuleParam param : rule.getParams()) {
+      RuleParamDto newParam=dtoFrom(param,newRule.getId());
+      ruleDao.insert(newParam,sqlSession);
+    }
+    for (    String tag : rule.getTags()) {
+      RuleTagDto newTag=dtoFrom(tag,newRule.getId());
+      ruleDao.insert(newTag,sqlSession);
+    }
   }
 }
