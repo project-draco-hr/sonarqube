@@ -5,7 +5,11 @@
       sonarFile=JavaFile.fromRelativePath(inputFile.attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH),unitTest);
     }
  else {
-      sonarFile=new org.sonar.api.resources.File(languages.get(languageKey),inputFile.attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH));
+      File newFile=new File(languages.get(languageKey),inputFile.attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH));
+      if (newFile != null && unitTest) {
+        newFile.setQualifier(Qualifiers.UNIT_TEST_FILE);
+      }
+      sonarFile=newFile;
     }
     if (sonarFile != null) {
       sonarFile.setPath(inputFile.path());
