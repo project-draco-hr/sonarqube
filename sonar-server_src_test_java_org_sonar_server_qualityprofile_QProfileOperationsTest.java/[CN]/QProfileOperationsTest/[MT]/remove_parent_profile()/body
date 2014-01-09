@@ -1,0 +1,14 @@
+{
+  QualityProfileDto child=new QualityProfileDto().setId(1).setName("Child").setLanguage("java").setParent("Old Parent");
+  QualityProfileDto parent=new QualityProfileDto().setId(2).setName("Old Parent").setLanguage("java");
+  when(qualityProfileDao.selectParent(2,session)).thenReturn(parent);
+  when(profilesManager.profileParentChanged(anyInt(),anyString(),anyString())).thenReturn(new RuleInheritanceActions());
+  operations.updateParentProfile(child,null,authorizedUserSession);
+  ArgumentCaptor<QualityProfileDto> profileArgument=ArgumentCaptor.forClass(QualityProfileDto.class);
+  verify(qualityProfileDao).update(profileArgument.capture(),eq(session));
+  assertThat(profileArgument.getValue().getParent()).isNull();
+  assertThat(profileArgument.getValue().getLanguage()).isEqualTo("java");
+  verify(profilesManager).profileParentChanged(1,null,"Nicolas");
+  verify(ruleRegistry).deleteActiveRules(anyListOf(Integer.class));
+  verify(ruleRegistry).bulkIndexActiveRules(anyListOf(Integer.class),eq(session));
+}

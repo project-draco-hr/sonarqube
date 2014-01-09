@@ -1,0 +1,19 @@
+{
+  checkPermission(userSession);
+  SqlSession session=myBatis.openSession();
+  try {
+    if (isCycle(profile,parentProfile,session)) {
+      throw new BadRequestException("Please do not select a child profile as parent.");
+    }
+    String parentName=parentProfile != null ? parentProfile.getName() : null;
+    RuleInheritanceActions actions=profilesManager.profileParentChanged(profile.getId(),parentName,userSession.name());
+    ruleRegistry.deleteActiveRules(actions.idsToDelete());
+    ruleRegistry.bulkIndexActiveRules(actions.idsToIndex(),session);
+    profile.setParent(parentName);
+    dao.update(profile,session);
+    session.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

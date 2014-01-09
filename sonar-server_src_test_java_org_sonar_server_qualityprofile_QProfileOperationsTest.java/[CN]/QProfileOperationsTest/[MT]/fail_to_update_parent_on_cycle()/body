@@ -1,0 +1,13 @@
+{
+  QualityProfileDto child=new QualityProfileDto().setId(1).setName("Child").setLanguage("java").setParent("parent");
+  QualityProfileDto parent=new QualityProfileDto().setId(2).setName("Parent").setLanguage("java");
+  when(qualityProfileDao.selectParent(1,session)).thenReturn(parent);
+  when(qualityProfileDao.selectParent(2,session)).thenReturn(null);
+  try {
+    operations.updateParentProfile(parent,child,authorizedUserSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(BadRequestException.class).hasMessage("Please do not select a child profile as parent.");
+  }
+}

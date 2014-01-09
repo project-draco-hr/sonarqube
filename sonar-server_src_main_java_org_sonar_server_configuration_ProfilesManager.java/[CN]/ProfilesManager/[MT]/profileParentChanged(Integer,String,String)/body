@@ -1,0 +1,19 @@
+{
+  RulesProfile profile=getSession().getEntity(RulesProfile.class,profileId);
+  RulesProfile oldParent=getParentProfile(profile);
+  RulesProfile newParent=getProfile(profile.getLanguage(),parentName);
+  RuleInheritanceActions actions=new RuleInheritanceActions();
+  if (oldParent != null) {
+    for (    ActiveRule activeRule : oldParent.getActiveRules()) {
+      actions.add(deactivate(profile,activeRule.getRule(),userName));
+    }
+  }
+  if (newParent != null) {
+    for (    ActiveRule activeRule : newParent.getActiveRules()) {
+      actions.add(activateOrChange(profile,activeRule,userName));
+    }
+  }
+  getSession().commit();
+  dryRunCache.reportGlobalModification();
+  return actions;
+}

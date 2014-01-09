@@ -6,8 +6,6 @@
   final int idActiveRuleToDelete=24;
   RuleInheritanceActions inheritanceActions=new RuleInheritanceActions().addToIndex(idActiveRuleToUpdate).addToDelete(idActiveRuleToDelete);
   when(profilesManager.activated(eq(1),anyInt(),eq("Nicolas"))).thenReturn(inheritanceActions);
-  when(activeRuleDao.selectByIds(anyList(),isA(SqlSession.class))).thenReturn(ImmutableList.<ActiveRuleDto>of(mock(ActiveRuleDto.class)));
-  when(activeRuleDao.selectParamsByActiveRuleIds(anyList(),isA(SqlSession.class))).thenReturn(ImmutableList.<ActiveRuleParamDto>of(mock(ActiveRuleParamDto.class)));
   ActiveRuleDto result=operations.createActiveRule(qualityProfile,rule,Severity.CRITICAL,authorizedUserSession);
   assertThat(result).isNotNull();
   ArgumentCaptor<ActiveRuleDto> activeRuleArgument=ArgumentCaptor.forClass(ActiveRuleDto.class);
@@ -20,5 +18,6 @@
   assertThat(activeRuleParamArgument.getValue().getValue()).isEqualTo("10");
   verify(session).commit();
   verify(profilesManager).activated(eq(1),anyInt(),eq("Nicolas"));
-  verify(ruleRegistry).bulkIndexActiveRules(anyList(),isA(Multimap.class));
+  verify(ruleRegistry).deleteActiveRules(eq(newArrayList(idActiveRuleToDelete)));
+  verify(ruleRegistry).bulkIndexActiveRules(eq(newArrayList(idActiveRuleToUpdate)),eq(session));
 }
