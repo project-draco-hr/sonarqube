@@ -1,10 +1,16 @@
 {
   Paging paging=Paging.create(10,1);
-  assertThat(profileRules.searchProfileRules(ProfileRuleQuery.create(1).setInheritance(null),paging).rules()).hasSize(3);
-  assertThat(profileRules.searchProfileRules(ProfileRuleQuery.create(1).setInheritance(QProfileRule.INHERITED),paging).rules()).hasSize(1);
-  assertThat(profileRules.searchProfileRules(ProfileRuleQuery.create(1).setInheritance(QProfileRule.OVERRIDES),paging).rules()).hasSize(1);
-  assertThat(profileRules.searchProfileRules(ProfileRuleQuery.create(1).setInheritance(ProfileRuleQuery.INHERITANCE_NOT),paging).rules()).hasSize(1);
-  List<QProfileRule> rules=profileRules.searchProfileRules(ProfileRuleQuery.create(1).setInheritance(ProfileRuleQuery.INHERITANCE_NOT),paging).rules();
+  List<QProfileRule> rules=profileRules.searchProfileRules(ProfileRuleQuery.create(1),paging).rules();
+  assertThat(rules).hasSize(3);
+  rules=profileRules.searchProfileRules(ProfileRuleQuery.create(1).setAnyInheritance(true),paging).rules();
+  assertThat(rules).hasSize(3);
+  rules=profileRules.searchProfileRules(ProfileRuleQuery.create(1).setInheritance(QProfileRule.INHERITED),paging).rules();
+  assertThat(rules).hasSize(1);
+  assertThat(rules.get(0).activeRuleId()).isEqualTo(391);
+  rules=profileRules.searchProfileRules(ProfileRuleQuery.create(1).setInheritance(QProfileRule.OVERRIDES),paging).rules();
+  assertThat(rules).hasSize(1);
+  assertThat(rules.get(0).activeRuleId()).isEqualTo(25);
+  rules=profileRules.searchProfileRules(ProfileRuleQuery.create(1).setNoInheritance(true),paging).rules();
   assertThat(rules).hasSize(1);
   assertThat(rules.get(0).activeRuleId()).isEqualTo(2702);
 }
