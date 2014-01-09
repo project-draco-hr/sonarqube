@@ -1,17 +1,19 @@
 {
-  File baseDir=temp.newFolder();
-  DefaultModuleFileSystem fs=mock(DefaultModuleFileSystem.class);
   File javaFile1=new File(baseDir,"src/main/java/foo/bar/Foo.java");
   File javaFile2=new File(baseDir,"src/main/java2/foo/bar/Foo.java");
-  when(fs.inputFiles(FileQuery.onSource().onLanguage(Java.KEY))).thenReturn((Iterable)Arrays.asList(new InputFileBuilder(javaFile1,"src/main/java/foo/bar/Foo.java").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"foo/bar/Foo.java").build(),new InputFileBuilder(javaFile2,"src/main/java2/foo/bar/Foo.java").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"foo/bar/Foo.java").build()));
+  when(fs.inputFiles(FileQuery.onSource().onLanguage(Java.KEY))).thenReturn((Iterable)Arrays.asList(new InputFileBuilder(javaFile1,Charsets.UTF_8,"src/main/java/foo/bar/Foo.java").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"foo/bar/Foo.java").build(),new InputFileBuilder(javaFile2,Charsets.UTF_8,"src/main/java2/foo/bar/Foo.java").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"foo/bar/Foo.java").build()));
   File javaTestFile1=new File(baseDir,"src/test/java/foo/bar/FooTest.java");
-  when(fs.inputFiles(FileQuery.onTest().onLanguage(Java.KEY))).thenReturn((Iterable)Arrays.asList(new InputFileBuilder(javaTestFile1,"src/test/java/foo/bar/FooTest.java").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"foo/bar/FooTest.java").build()));
-  Project project=mock(Project.class);
+  when(fs.inputFiles(FileQuery.onTest().onLanguage(Java.KEY))).thenReturn((Iterable)Arrays.asList(new InputFileBuilder(javaTestFile1,Charsets.UTF_8,"src/test/java/foo/bar/FooTest.java").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"foo/bar/FooTest.java").build()));
   when(project.getLanguageKey()).thenReturn(Java.KEY);
-  FileIndexer indexer=new FileIndexer(project,fs,new Languages(Java.INSTANCE));
-  SensorContext sensorContext=mock(SensorContext.class);
-  indexer.execute(sensorContext);
-  verify(sensorContext).index(new JavaFile("foo.bar.Foo",false).setPath("/src/main/java/foo/bar/Foo.java"));
-  verify(sensorContext).index(new JavaFile("foo.bar.Foo",false).setPath("/src/main/java2/foo/bar/Foo.java"));
-  verify(sensorContext).index(new JavaFile("foo.bar.FooTest",true).setPath("/src/test/java/foo/bar/FooTest.java"));
+  FileIndexer indexer=new FileIndexer(project,fs,new Languages(Java.INSTANCE),sonarIndex,settings);
+  indexer.execute();
+  verify(sonarIndex).index(new JavaFile("foo.bar.Foo",false).setPath("/src/main/java/foo/bar/Foo.java"));
+  verify(sonarIndex).index(new JavaFile("foo.bar.Foo",false).setPath("/src/main/java2/foo/bar/Foo.java"));
+  verify(sonarIndex).index(argThat(new ArgumentMatcher<JavaFile>(){
+    @Override public boolean matches(    Object arg0){
+      JavaFile javaFile=(JavaFile)arg0;
+      return javaFile.getKey().equals("foo.bar.FooTest") && javaFile.getPath().equals("/src/test/java/foo/bar/FooTest.java") && javaFile.getQualifier().equals(Qualifiers.UNIT_TEST_FILE);
+    }
+  }
+));
 }

@@ -1,22 +1,13 @@
 {
-  File baseDir=temp.newFolder();
-  DefaultModuleFileSystem fs=mock(DefaultModuleFileSystem.class);
   File cobolFile1=new File(baseDir,"src/foo/bar/Foo.cbl");
   File cobolFile2=new File(baseDir,"src2/foo/bar/Foo.cbl");
-  when(fs.inputFiles(FileQuery.onSource().onLanguage("cobol"))).thenReturn((Iterable)Arrays.asList(new InputFileBuilder(cobolFile1,"src/foo/bar/Foo.cbl").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"foo/bar/Foo.cbl").build(),new InputFileBuilder(cobolFile2,"src2/foo/bar/Foo.cbl").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"foo/bar/Foo.cbl").build()));
+  when(fs.inputFiles(FileQuery.onSource().onLanguage("cobol"))).thenReturn((Iterable)Arrays.asList(new InputFileBuilder(cobolFile1,Charsets.UTF_8,"src/foo/bar/Foo.cbl").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"foo/bar/Foo.cbl").build(),new InputFileBuilder(cobolFile2,Charsets.UTF_8,"src2/foo/bar/Foo.cbl").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"foo/bar/Foo.cbl").build()));
   File cobolTestFile1=new File(baseDir,"src/test/foo/bar/FooTest.cbl");
-  when(fs.inputFiles(FileQuery.onTest().onLanguage("cobol"))).thenReturn((Iterable)Arrays.asList(new InputFileBuilder(cobolTestFile1,"src/test/foo/bar/FooTest.cbl").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"foo/bar/FooTest.cbl").build()));
-  Project project=mock(Project.class);
+  when(fs.inputFiles(FileQuery.onTest().onLanguage("cobol"))).thenReturn((Iterable)Arrays.asList(new InputFileBuilder(cobolTestFile1,Charsets.UTF_8,"src/test/foo/bar/FooTest.cbl").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"foo/bar/FooTest.cbl").build()));
   when(project.getLanguageKey()).thenReturn("cobol");
-  FileIndexer indexer=new FileIndexer(project,fs,new Languages(new AbstractLanguage("cobol"){
-    @Override public String[] getFileSuffixes(){
-      return new String[]{"cbl"};
-    }
-  }
-));
-  SensorContext sensorContext=mock(SensorContext.class);
-  indexer.execute(sensorContext);
-  verify(sensorContext).index(new org.sonar.api.resources.File("foo/bar/Foo.cbl").setPath("/src/foo/bar/Foo.cbl"));
-  verify(sensorContext).index(new org.sonar.api.resources.File("foo/bar/Foo.cbl").setPath("/src2/foo/bar/Foo.cbl"));
-  verify(sensorContext).index(new org.sonar.api.resources.File("foo/bar/FooTest.cbl").setPath("/src/test/foo/bar/FooTest.cbl"));
+  FileIndexer indexer=new FileIndexer(project,fs,new Languages(cobolLanguage),sonarIndex,settings);
+  indexer.execute();
+  verify(sonarIndex).index(new org.sonar.api.resources.File("foo/bar/Foo.cbl").setPath("/src/foo/bar/Foo.cbl"));
+  verify(sonarIndex).index(new org.sonar.api.resources.File("foo/bar/Foo.cbl").setPath("/src2/foo/bar/Foo.cbl"));
+  verify(sonarIndex).index(new org.sonar.api.resources.File("foo/bar/FooTest.cbl").setPath("/src/test/foo/bar/FooTest.cbl"));
 }

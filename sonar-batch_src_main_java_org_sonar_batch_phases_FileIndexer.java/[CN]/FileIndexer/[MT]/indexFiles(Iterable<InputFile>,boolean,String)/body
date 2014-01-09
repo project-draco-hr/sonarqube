@@ -1,0 +1,29 @@
+{
+  for (  InputFile inputFile : files) {
+    Resource sonarFile;
+    if (Java.KEY.equals(languageKey)) {
+      sonarFile=JavaFile.fromRelativePath(inputFile.attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH),unitTest);
+    }
+ else {
+      File newFile=new File(languages.get(languageKey),inputFile.attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH));
+      if (newFile != null && unitTest) {
+        newFile.setQualifier(Qualifiers.UNIT_TEST_FILE);
+      }
+      sonarFile=newFile;
+    }
+    if (sonarFile != null) {
+      sonarFile.setPath(inputFile.path());
+      sonarIndex.index(sonarFile);
+      try {
+        if (importSource) {
+          String source=Files.toString(inputFile.file(),inputFile.encoding());
+          source=CharMatcher.anyOf("\uFEFF").removeFrom(source);
+          sonarIndex.setSource(sonarFile,source);
+        }
+      }
+ catch (      Exception e) {
+        throw new SonarException("Unable to read and import the source file : '" + inputFile.absolutePath() + "' with the charset : '"+ inputFile.encoding()+ "'.",e);
+      }
+    }
+  }
+}
