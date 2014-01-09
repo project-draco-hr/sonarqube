@@ -2,8 +2,10 @@
   BoolFilterBuilder filter=boolFilter().must(termFilter(ActiveRuleDocument.FIELD_PROFILE_ID,query.profileId()),hasParentFilter(TYPE_RULE,parentRuleFilter(query)));
   addMustTermOrTerms(filter,ActiveRuleDocument.FIELD_SEVERITY,query.severities());
   String inheritance=query.inheritance();
-  if (inheritance != null) {
-    addMustTermOrTerms(filter,ActiveRuleDocument.FIELD_INHERITANCE,newArrayList(inheritance));
+  if (inheritance != null && !inheritance.equals(ProfileRuleQuery.INHERITANCE_ANY)) {
+    if (!inheritance.equals(ProfileRuleQuery.INHERITANCE_NOT)) {
+      addMustTermOrTerms(filter,ActiveRuleDocument.FIELD_INHERITANCE,newArrayList(inheritance));
+    }
   }
   return filter;
 }
