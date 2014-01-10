@@ -1,8 +1,9 @@
 {
-  BoolFilterBuilder filter=parentRuleFilter(query);
+  BoolFilterBuilder filter=ruleFilter(query);
   addMustTermOrTerms(filter,RuleDocument.FIELD_SEVERITY,query.severities());
   filter.mustNot(hasChildFilter(TYPE_ACTIVE_RULE,termFilter(ActiveRuleDocument.FIELD_PROFILE_ID,query.profileId())));
   SearchRequestBuilder builder=index.client().prepareSearch(INDEX_RULES).setTypes(TYPE_RULE).setPostFilter(filter).addFields(FIELD_SOURCE,FIELD_PARENT).setSize(paging.pageSize()).setFrom(paging.offset());
+  addOrder(query,builder);
   SearchHits hits=index.executeRequest(builder);
   List<QProfileRule> result=Lists.newArrayList();
   for (  SearchHit hit : hits.getHits()) {

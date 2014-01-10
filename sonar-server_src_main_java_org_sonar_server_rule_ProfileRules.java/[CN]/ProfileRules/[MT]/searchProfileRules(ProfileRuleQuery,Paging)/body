@@ -1,22 +1,22 @@
 {
-  BoolFilterBuilder filter=activeRuleFilter(query);
-  SearchRequestBuilder builder=index.client().prepareSearch(INDEX_RULES).setTypes(TYPE_ACTIVE_RULE).setPostFilter(filter).addFields(FIELD_SOURCE,FIELD_PARENT).setSize(paging.pageSize()).setFrom(paging.offset());
-  SearchHits hits=index.executeRequest(builder);
-  List<Map<String,Object>> activeRuleSources=Lists.newArrayList();
-  String[] parentIds=new String[hits.getHits().length];
-  int hitCounter=0;
-  List<QProfileRule> result=Lists.newArrayList();
-  for (  SearchHit hit : hits.getHits()) {
-    activeRuleSources.add(hit.sourceAsMap());
-    parentIds[hitCounter]=hit.field(FIELD_PARENT).value();
-    hitCounter++;
+  SearchRequestBuilder builder=index.client().prepareSearch(INDEX_RULES).setTypes(TYPE_RULE).setPostFilter(ruleFilter(query).must(hasChildFilter(TYPE_ACTIVE_RULE,childFilter(query)))).setSize(paging.pageSize()).setFrom(paging.offset());
+  addOrder(query,builder);
+  SearchHits ruleHits=index.executeRequest(builder);
+  List<Integer> ruleIds=Lists.newArrayList();
+  for (  SearchHit ruleHit : ruleHits) {
+    ruleIds.add(Integer.valueOf(ruleHit.id()));
   }
-  if (hitCounter > 0) {
-    MultiGetRequestBuilder getParentRules=index.client().prepareMultiGet().add(INDEX_RULES,TYPE_RULE,parentIds);
-    MultiGetItemResponse[] responses=index.executeMultiGet(getParentRules);
-    for (int i=0; i < hitCounter; i++) {
-      result.add(new QProfileRule(responses[i].getResponse().getSourceAsMap(),activeRuleSources.get(i)));
+  List<QProfileRule> result=Lists.newArrayList();
+  if (!ruleIds.isEmpty()) {
+    SearchRequestBuilder activeRuleBuilder=index.client().prepareSearch(INDEX_RULES).setTypes(TYPE_ACTIVE_RULE).setPostFilter(boolFilter().must(termFilter(ActiveRuleDocument.FIELD_PROFILE_ID,query.profileId()),hasParentFilter(TYPE_RULE,termsFilter(RuleDocument.FIELD_ID,ruleIds)))).addFields(FIELD_SOURCE,FIELD_PARENT).setSize(ruleHits.getHits().length);
+    SearchHits activeRuleHits=index.executeRequest(activeRuleBuilder);
+    Map<String,SearchHit> activeRuleByParent=Maps.newHashMap();
+    for (    SearchHit activeRuleHit : activeRuleHits) {
+      activeRuleByParent.put((String)activeRuleHit.field(FIELD_PARENT).getValue(),activeRuleHit);
+    }
+    for (    SearchHit ruleHit : ruleHits) {
+      result.add(new QProfileRule(ruleHit.sourceAsMap(),activeRuleByParent.get(ruleHit.id()).sourceAsMap()));
     }
   }
-  return new QProfileRuleResult(result,PagingResult.create(paging.pageSize(),paging.pageIndex(),hits.getTotalHits()));
+  return new QProfileRuleResult(result,PagingResult.create(paging.pageSize(),paging.pageIndex(),ruleHits.getTotalHits()));
 }
