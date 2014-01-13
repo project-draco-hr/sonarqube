@@ -1,0 +1,21 @@
+{
+  List<RuleDto> registeredRules=newArrayList();
+  for (  Rule rule : rules) {
+    LOG.debug("Save new rule " + rule);
+    RuleDto newRule=dtoFrom(rule);
+    newRule.setCreatedAt(new Date());
+    ruleDao.insert(newRule,sqlSession);
+    registeredRules.add(newRule);
+    for (    RuleParam param : rule.getParams()) {
+      RuleParamDto newParam=dtoFrom(param,newRule.getId());
+      ruleDao.insert(newParam,sqlSession);
+      existingRules.params.put(newRule.getId(),newParam);
+    }
+    for (    String tag : rule.getTags()) {
+      RuleTagDto newTag=dtoFrom(tag,newRule.getId());
+      ruleDao.insert(newTag,sqlSession);
+      existingRules.tags.put(newRule.getId(),newTag);
+    }
+  }
+  return registeredRules;
+}

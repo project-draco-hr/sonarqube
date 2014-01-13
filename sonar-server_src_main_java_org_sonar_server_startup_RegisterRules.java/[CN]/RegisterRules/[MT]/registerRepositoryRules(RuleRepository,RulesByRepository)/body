@@ -5,19 +5,17 @@
     updateRuleFromRepositoryInfo(rule,repository);
     validateRule(rule,repository.getKey());
     ruleByKey.put(rule.getKey(),rule);
-    registeredRules.add(dtoFrom(rule));
   }
   LOG.debug(ruleByKey.size() + " rules");
   for (  RuleDto persistedRule : existingRules.get(repository.getKey())) {
     Rule rule=ruleByKey.get(persistedRule.getRuleKey());
     if (rule != null) {
-      registeredRules.remove(dtoFrom(rule));
-      updateExistingRule(persistedRule,existingRules.params(persistedRule.getId()),existingRules.tags(persistedRule.getId()),rule);
+      updateExistingRule(persistedRule,existingRules,rule);
       ruleDao.update(persistedRule,sqlSession);
       registeredRules.add(persistedRule);
       ruleByKey.remove(rule.getKey());
     }
   }
-  saveNewRules(ruleByKey.values());
+  registeredRules.addAll(saveNewRules(ruleByKey.values(),existingRules));
   return registeredRules;
 }

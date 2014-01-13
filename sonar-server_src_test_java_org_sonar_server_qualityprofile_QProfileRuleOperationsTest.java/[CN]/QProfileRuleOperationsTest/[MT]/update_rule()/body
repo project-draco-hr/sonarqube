@@ -1,6 +1,8 @@
 {
   RuleDto rule=new RuleDto().setId(11).setRepositoryKey("squid").setRuleKey("XPath_1387869254").setConfigKey("Xpath");
   when(ruleDao.selectParameters(eq(11),eq(session))).thenReturn(newArrayList(new RuleParamDto().setId(21).setName("max").setDefaultValue("20")));
+  ArrayList<RuleTagDto> ruleTags=newArrayList(new RuleTagDto().setId(30L).setTag("style").setType(RuleTagType.SYSTEM));
+  when(ruleDao.selectTags(eq(11),eq(session))).thenReturn(ruleTags);
   Map<String,String> paramsByKey=ImmutableMap.of("max","21");
   operations.updateRule(rule,"Updated Rule",Severity.MAJOR,"Updated Description",paramsByKey,authorizedUserSession);
   ArgumentCaptor<RuleDto> ruleArgument=ArgumentCaptor.forClass(RuleDto.class);
@@ -12,5 +14,5 @@
   verify(ruleDao).update(ruleParamArgument.capture(),eq(session));
   assertThat(ruleParamArgument.getValue().getDefaultValue()).isEqualTo("21");
   verify(session).commit();
-  verify(ruleRegistry).save(eq(ruleArgument.getValue()),eq(newArrayList(ruleParamArgument.getValue())));
+  verify(ruleRegistry).save(eq(ruleArgument.getValue()),eq(newArrayList(ruleParamArgument.getValue())),eq(ruleTags));
 }

@@ -1,6 +1,7 @@
 {
   RuleDto templateRule=new RuleDto().setId(10).setRepositoryKey("squid").setRuleKey("AvoidCycle").setConfigKey("Xpath");
   when(ruleDao.selectParameters(eq(10),eq(session))).thenReturn(newArrayList(new RuleParamDto().setId(20).setName("max").setDefaultValue("10")));
+  when(ruleDao.selectTags(eq(10),eq(session))).thenReturn(newArrayList(new RuleTagDto().setId(30L).setTag("style").setType(RuleTagType.SYSTEM)));
   Map<String,String> paramsByKey=ImmutableMap.of("max","20");
   RuleDto result=operations.createRule(templateRule,"My New Rule",Severity.BLOCKER,"Rule Description",paramsByKey,authorizedUserSession);
   assertThat(result).isNotNull();
@@ -19,6 +20,10 @@
   verify(ruleDao).insert(ruleParamArgument.capture(),eq(session));
   assertThat(ruleParamArgument.getValue().getName()).isEqualTo("max");
   assertThat(ruleParamArgument.getValue().getDefaultValue()).isEqualTo("20");
+  ArgumentCaptor<RuleTagDto> ruleTagArgument=ArgumentCaptor.forClass(RuleTagDto.class);
+  verify(ruleDao).insert(ruleTagArgument.capture(),eq(session));
+  assertThat(ruleTagArgument.getValue().getTag()).isEqualTo("style");
+  assertThat(ruleTagArgument.getValue().getType()).isEqualTo(RuleTagType.SYSTEM);
   verify(session).commit();
-  verify(ruleRegistry).save(eq(ruleArgument.getValue()),eq(newArrayList(ruleParamArgument.getValue())));
+  verify(ruleRegistry).save(eq(ruleArgument.getValue()),eq(newArrayList(ruleParamArgument.getValue())),eq(newArrayList(ruleTagArgument.getValue())));
 }

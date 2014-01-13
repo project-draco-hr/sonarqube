@@ -9,7 +9,10 @@
     disabledRules.addAll(disableDeprecatedRepositories(existingRules));
     sqlSession.commit();
     removeActiveRulesOnDisabledRules(disabledRules);
-    ruleRegistry.bulkRegisterRules();
+    Set<RuleDto> allRules=Sets.newHashSet();
+    allRules.addAll(existingRules.rules());
+    allRules.addAll(registeredRules);
+    ruleRegistry.bulkRegisterRules(allRules,existingRules.params,existingRules.tags);
   }
   finally {
     sqlSession.close();

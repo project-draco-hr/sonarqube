@@ -13,8 +13,15 @@
       ruleDao.insert(param,session);
       ruleParams.add(param);
     }
+    List<RuleTagDto> templateRuleTags=ruleDao.selectTags(templateRule.getId(),session);
+    List<RuleTagDto> ruleTags=newArrayList();
+    for (    RuleTagDto tag : templateRuleTags) {
+      RuleTagDto newTag=new RuleTagDto().setRuleId(rule.getId()).setTag(tag.getTag()).setType(tag.getType());
+      ruleDao.insert(newTag,session);
+      ruleTags.add(newTag);
+    }
     session.commit();
-    reindexRule(rule,ruleParams);
+    reindexRule(rule,ruleParams,ruleTags);
     return rule;
   }
   finally {
