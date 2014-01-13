@@ -1,0 +1,13 @@
+{
+  SearchNode node=new SearchNode(fs,new Settings().setProperty("sonar.es.http.port",9200));
+  node.start();
+  node.client().admin().indices().prepareCreate("polop").addMapping("type1","{\"type1\": {\"properties\": {\"value\": {\"type\": \"string\"}}}}").execute().actionGet();
+  node.client().admin().cluster().prepareHealth("polop").setWaitForYellowStatus().execute().actionGet();
+  assertThat(node.client().admin().indices().prepareAnalyze("polop","This Is A Wonderful Text").setAnalyzer("sortable").execute().actionGet().getTokens().get(0).getTerm()).isEqualTo("this is a wonderful text");
+  try {
+    node.client().prepareIndex("polop","type1","666").setSource(XContentFactory.jsonBuilder().startObject().field("unknown","plouf").endObject()).execute().actionGet();
+  }
+  finally {
+    node.stop();
+  }
+}

@@ -1,11 +1,12 @@
 {
   LOG.info("Starting Elasticsearch...");
   initLogging();
-  ImmutableSettings.Builder esSettings=ImmutableSettings.builder().put("node.name",INSTANCE_NAME);
+  ImmutableSettings.Builder esSettings=ImmutableSettings.builder().loadFromUrl(getClass().getResource("config/elasticsearch.json"));
   initDirs(esSettings);
   initRestConsole(esSettings);
-  node=NodeBuilder.nodeBuilder().clusterName(INSTANCE_NAME).local(true).data(true).settings(esSettings).node();
+  node=NodeBuilder.nodeBuilder().settings(esSettings).node();
   node.start();
+  addIndexTemplates();
   if (node.client().admin().cluster().prepareHealth().setWaitForYellowStatus().setTimeout(healthTimeout).execute().actionGet().getStatus() == ClusterHealthStatus.RED) {
     throw new IllegalStateException(String.format("Elasticsearch index is corrupt, please delete directory '%s/%s' and relaunch the SonarQube server.",fileSystem.getHomeDir().getAbsolutePath(),DATA_DIR));
   }
