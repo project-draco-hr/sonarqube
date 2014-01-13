@@ -1,0 +1,15 @@
+{
+  final List<Integer> ruleIds=newArrayList();
+  new Search(PAGE_SIZE){
+    @Override public int search(    int currentPage){
+      Paging paging=Paging.create(pageSize,currentPage);
+      SearchHits hits=searchRules(query,paging,ruleFilterForInactiveRuleSearch(query),RuleDocument.FIELD_ID);
+      for (      SearchHit hit : hits.getHits()) {
+        ruleIds.add((Integer)hit.field(RuleDocument.FIELD_ID).getValue());
+      }
+      return hits.getHits().length;
+    }
+  }
+.execute();
+  return ruleIds;
+}

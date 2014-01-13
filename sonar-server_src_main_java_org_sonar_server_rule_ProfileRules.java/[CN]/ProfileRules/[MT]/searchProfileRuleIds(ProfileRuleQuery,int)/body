@@ -1,0 +1,22 @@
+{
+  final List<Integer> activeRuleIds=newArrayList();
+  new Search(pageSize){
+    @Override public int search(    int currentPage){
+      Paging paging=Paging.create(pageSize,currentPage);
+      SearchHits ruleHits=searchRules(query,paging,ruleFilterForActiveRuleSearch(query).must(hasChildFilter(TYPE_ACTIVE_RULE,activeRuleFilter(query))));
+      List<Integer> ruleIds=Lists.newArrayList();
+      for (      SearchHit ruleHit : ruleHits) {
+        ruleIds.add(Integer.valueOf(ruleHit.id()));
+      }
+      if (!ruleIds.isEmpty()) {
+        SearchHits activeRuleHits=searchActiveRules(query,ruleIds,ActiveRuleDocument.FIELD_ID);
+        for (        SearchHit activeRuleHit : activeRuleHits) {
+          activeRuleIds.add((Integer)activeRuleHit.field(ActiveRuleDocument.FIELD_ID).getValue());
+        }
+      }
+      return ruleHits.getHits().length;
+    }
+  }
+.execute();
+  return activeRuleIds;
+}
