@@ -1,10 +1,11 @@
 {
-  QualityProfileDto child=new QualityProfileDto().setId(1).setName("Child").setLanguage("java").setParent("parent");
+  when(profileLookup.profile(1)).thenReturn(new QProfile().setId(1).setName("Child").setLanguage("java").setParent("parent"));
+  when(profileLookup.profile(2)).thenReturn(new QProfile().setId(2).setName("Parent").setLanguage("java"));
   QualityProfileDto parent=new QualityProfileDto().setId(2).setName("Parent").setLanguage("java");
   when(qualityProfileDao.selectParent(1,session)).thenReturn(parent);
   when(qualityProfileDao.selectParent(2,session)).thenReturn(null);
   try {
-    operations.updateParentProfile(parent,child,authorizedUserSession);
+    operations.updateParentProfile(2,1,authorizedUserSession);
     fail();
   }
  catch (  Exception e) {
