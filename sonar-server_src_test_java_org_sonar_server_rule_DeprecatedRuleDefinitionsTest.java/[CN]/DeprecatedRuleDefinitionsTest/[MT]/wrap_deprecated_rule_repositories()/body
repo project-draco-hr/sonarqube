@@ -1,0 +1,27 @@
+{
+  RuleDefinitions.Context context=new RuleDefinitions.Context();
+  RuleI18nManager i18n=mock(RuleI18nManager.class);
+  new DeprecatedRuleDefinitions(i18n,new RuleRepository[]{new CheckstyleRules()}).define(context);
+  assertThat(context.repositories()).hasSize(1);
+  RuleDefinitions.Repository checkstyle=context.repository("checkstyle");
+  assertThat(checkstyle).isNotNull();
+  assertThat(checkstyle.key()).isEqualTo("checkstyle");
+  assertThat(checkstyle.name()).isEqualTo("Checkstyle");
+  assertThat(checkstyle.language()).isEqualTo("java");
+  assertThat(checkstyle.rules()).hasSize(1);
+  RuleDefinitions.Rule rule=checkstyle.rule("ConstantName");
+  assertThat(rule).isNotNull();
+  assertThat(rule.key()).isEqualTo("ConstantName");
+  assertThat(rule.name()).isEqualTo("Constant Name");
+  assertThat(rule.htmlDescription()).isEqualTo("Checks that constant names conform to the specified format");
+  assertThat(rule.defaultSeverity()).isEqualTo(Severity.BLOCKER);
+  assertThat(rule.metadata()).isEqualTo("Checker/TreeWalker/ConstantName");
+  assertThat(rule.tags()).isEmpty();
+  assertThat(rule.params()).hasSize(1);
+  RuleDefinitions.Param param=rule.param("format");
+  assertThat(param).isNotNull();
+  assertThat(param.key()).isEqualTo("format");
+  assertThat(param.name()).isEqualTo("format");
+  assertThat(param.description()).isEqualTo("Regular expression");
+  assertThat(param.defaultValue()).isEqualTo("A-Z");
+}
