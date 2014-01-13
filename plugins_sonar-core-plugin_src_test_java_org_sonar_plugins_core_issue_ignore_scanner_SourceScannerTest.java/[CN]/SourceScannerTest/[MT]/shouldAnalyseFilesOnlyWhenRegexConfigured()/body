@@ -1,15 +1,14 @@
 {
-  File sourceFile=new File("src/main/java/Foo.java");
-  File testFile=new File("src/test/java/FooTest.java");
-  when(project.getLanguageKey()).thenReturn("java");
-  when(fileSystem.files(Mockito.isA(FileQuery.class))).thenReturn(Arrays.asList(sourceFile)).thenReturn(Arrays.asList(testFile));
-  when(fileSystem.sourceDirs()).thenReturn(Arrays.asList(new File("src/main/java")));
-  when(fileSystem.testDirs()).thenReturn(Arrays.asList(new File("src/test/java")));
+  File javaFile1=new File(baseDir,"src/main/java/Foo.java");
+  when(fs.inputFiles(FileQuery.onSource().onLanguage(Java.KEY))).thenReturn((Iterable)Arrays.asList(new InputFileBuilder(javaFile1,Charsets.UTF_8,"src/main/java/Foo.java").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"Foo.java").attribute(DefaultInputFile.ATTRIBUTE_COMPONENT_KEY,"polop:/src/main/java/Foo.java").build()));
+  File javaTestFile1=new File(baseDir,"src/test/java/FooTest.java");
+  when(fs.inputFiles(FileQuery.onTest().onLanguage(Java.KEY))).thenReturn((Iterable)Arrays.asList(new InputFileBuilder(javaTestFile1,Charsets.UTF_8,"src/test/java/FooTest.java").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"FooTest.java").attribute(DefaultInputFile.ATTRIBUTE_COMPONENT_KEY,"polop:/src/test/java/FooTest.java").build()));
+  when(project.getLanguageKey()).thenReturn(Java.KEY);
   when(exclusionPatternInitializer.hasFileContentPattern()).thenReturn(false);
   scanner.analyse(project,null);
-  verify(inclusionPatternInitializer).initializePatternsForPath("Foo.java","polop:[default].Foo");
-  verify(inclusionPatternInitializer).initializePatternsForPath("FooTest.java","polop:[default].FooTest");
-  verify(exclusionPatternInitializer).initializePatternsForPath("Foo.java","polop:[default].Foo");
-  verify(exclusionPatternInitializer).initializePatternsForPath("FooTest.java","polop:[default].FooTest");
+  verify(inclusionPatternInitializer).initializePatternsForPath("Foo.java","polop:/src/main/java/Foo.java");
+  verify(inclusionPatternInitializer).initializePatternsForPath("FooTest.java","polop:/src/test/java/FooTest.java");
+  verify(exclusionPatternInitializer).initializePatternsForPath("Foo.java","polop:/src/main/java/Foo.java");
+  verify(exclusionPatternInitializer).initializePatternsForPath("FooTest.java","polop:/src/test/java/FooTest.java");
   verifyZeroInteractions(regexpScanner);
 }

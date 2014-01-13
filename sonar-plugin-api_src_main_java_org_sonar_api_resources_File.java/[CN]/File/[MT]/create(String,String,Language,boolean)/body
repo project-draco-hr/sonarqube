@@ -1,0 +1,23 @@
+{
+  File file=new File();
+  String normalizedPath=normalize(relativePathFromBasedir);
+  file.setKey(normalizedPath);
+  file.setPath(normalizedPath);
+  String directoryKey=StringUtils.substringBeforeLast(normalizedPath,Directory.SEPARATOR);
+  file.setLanguage(language);
+  if (relativePathFromSourceDir.contains(Directory.SEPARATOR)) {
+    file.filename=StringUtils.substringAfterLast(relativePathFromSourceDir,Directory.SEPARATOR);
+    file.directoryDeprecatedKey=Directory.parseKey(StringUtils.substringBeforeLast(relativePathFromSourceDir,Directory.SEPARATOR));
+    file.setDeprecatedKey(file.directoryDeprecatedKey + Directory.SEPARATOR + file.filename);
+  }
+ else {
+    file.filename=relativePathFromSourceDir;
+    file.directoryDeprecatedKey=Directory.ROOT;
+    file.setDeprecatedKey(file.filename);
+  }
+  if (unitTest) {
+    file.setQualifier(Qualifiers.UNIT_TEST_FILE);
+  }
+  file.parent=Directory.create(directoryKey,file.directoryDeprecatedKey);
+  return file;
+}

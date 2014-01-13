@@ -1,0 +1,20 @@
+{
+  JavaFile javaFile=JavaFile.create(relativePathFromBasedir);
+  if (relativePathFromSourceDir.contains(Directory.SEPARATOR)) {
+    javaFile.packageFullyQualifiedName=StringUtils.substringBeforeLast(relativePathFromSourceDir,Directory.SEPARATOR);
+    javaFile.packageFullyQualifiedName=StringUtils.replace(javaFile.packageFullyQualifiedName,Directory.SEPARATOR,".");
+    javaFile.className=StringUtils.substringAfterLast(relativePathFromSourceDir,Directory.SEPARATOR);
+    javaFile.className=StringUtils.removeEndIgnoreCase(javaFile.className,JAVA_SUFFIX);
+    javaFile.fullyQualifiedName=javaFile.packageFullyQualifiedName + "." + javaFile.className;
+    javaFile.setDeprecatedKey(javaFile.fullyQualifiedName);
+  }
+ else {
+    javaFile.packageFullyQualifiedName=JavaPackage.DEFAULT_PACKAGE_NAME;
+    javaFile.className=StringUtils.removeEndIgnoreCase(relativePathFromSourceDir,JAVA_SUFFIX);
+    javaFile.fullyQualifiedName=javaFile.className;
+    javaFile.setDeprecatedKey(JavaPackage.DEFAULT_PACKAGE_NAME + "." + javaFile.className);
+  }
+  javaFile.unitTest=unitTest;
+  javaFile.parent.setDeprecatedKey(javaFile.packageFullyQualifiedName);
+  return javaFile;
+}

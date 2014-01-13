@@ -1,13 +1,14 @@
 {
   ResourceModel model;
   try {
-    if (rootModuleId != null && StringUtils.isNotBlank(resource.getPath())) {
-      model=session.getSingleResult(ResourceModel.class,"rootId",rootModuleId,"path",resource.getPath());
-    }
- else {
-      model=session.getSingleResult(ResourceModel.class,"key",resource.getEffectiveKey());
+    model=session.getSingleResult(ResourceModel.class,"key",resource.getEffectiveKey());
+    if (model == null) {
+      model=session.getSingleResult(ResourceModel.class,"key",resource.getDeprecatedEffectiveKey(),"deprecatedKey",null);
     }
     if (model == null) {
+      if (StringUtils.isBlank(resource.getEffectiveKey())) {
+        throw new SonarException("Unable to persist resource " + resource.toString() + ". Resource effective key is blank. This may be caused by an outdated plugin.");
+      }
       model=createModel(resource);
     }
  else {

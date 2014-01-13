@@ -9,11 +9,16 @@
   set(attributes,InputFile.ATTRIBUTE_SOURCEDIR_PATH,PathUtils.canonicalPath(sourceDir));
   String sourceRelativePath=pathResolver.relativePath(sourceDir,file);
   set(attributes,InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,sourceRelativePath);
+  String resourceKey=PathUtils.sanitize(path);
+  if (!StringUtils.startsWith(resourceKey,"/")) {
+    resourceKey="/" + resourceKey;
+  }
+  set(attributes,DefaultInputFile.ATTRIBUTE_COMPONENT_KEY,project.getEffectiveKey() + ":" + resourceKey);
   if (Java.KEY.equals(lang)) {
-    set(attributes,DefaultInputFile.ATTRIBUTE_COMPONENT_KEY,project.getEffectiveKey() + ":" + JavaFile.fromRelativePath(sourceRelativePath,false).getKey());
+    set(attributes,DefaultInputFile.ATTRIBUTE_COMPONENT_DEPRECATED_KEY,project.getEffectiveKey() + ":" + JavaFile.fromRelativePath(sourceRelativePath,false).getKey());
   }
  else {
-    set(attributes,DefaultInputFile.ATTRIBUTE_COMPONENT_KEY,project.getEffectiveKey() + ":" + sourceRelativePath);
+    set(attributes,DefaultInputFile.ATTRIBUTE_COMPONENT_DEPRECATED_KEY,project.getEffectiveKey() + ":" + sourceRelativePath);
   }
   initStatus(file,fileSystem.sourceCharset(),path,attributes);
   return DefaultInputFile.create(file,fileSystem.sourceCharset(),path,attributes);

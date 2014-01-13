@@ -7,12 +7,12 @@
   when(project.getLanguageKey()).thenReturn(Java.KEY);
   FileIndexer indexer=new FileIndexer(project,fs,new Languages(Java.INSTANCE),sonarIndex,settings);
   indexer.execute();
-  verify(sonarIndex).index(new JavaFile("foo.bar.Foo",false).setPath("/src/main/java/foo/bar/Foo.java"));
-  verify(sonarIndex).index(new JavaFile("foo.bar.Foo",false).setPath("/src/main/java2/foo/bar/Foo.java"));
+  verify(sonarIndex).index(JavaFile.create("src/main/java/foo/bar/Foo.java","foo/bar/Foo.java",false));
+  verify(sonarIndex).index(JavaFile.create("src/main/java2/foo/bar/Foo.java","foo/bar/Foo.java",false));
   verify(sonarIndex).index(argThat(new ArgumentMatcher<JavaFile>(){
     @Override public boolean matches(    Object arg0){
       JavaFile javaFile=(JavaFile)arg0;
-      return javaFile.getKey().equals("foo.bar.FooTest") && javaFile.getPath().equals("/src/test/java/foo/bar/FooTest.java") && javaFile.getQualifier().equals(Qualifiers.UNIT_TEST_FILE);
+      return javaFile.getKey().equals("/src/test/java/foo/bar/FooTest.java") && javaFile.getDeprecatedKey().equals("foo.bar.FooTest") && javaFile.getPath().equals("/src/test/java/foo/bar/FooTest.java")&& javaFile.getQualifier().equals(Qualifiers.UNIT_TEST_FILE);
     }
   }
 ));

@@ -1,17 +1,15 @@
 {
-  File rootDir=temp.newFolder();
-  File sourceFile=new File(rootDir,"Foo.php");
-  File testFile=new File(rootDir,"FooTest.php");
+  File phpFile1=new File(baseDir,"src/Foo.php");
+  when(fs.inputFiles(FileQuery.onSource().onLanguage("php"))).thenReturn((Iterable)Arrays.asList(new InputFileBuilder(phpFile1,Charsets.UTF_8,"src/Foo.php").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"Foo.php").attribute(DefaultInputFile.ATTRIBUTE_COMPONENT_KEY,"polop:/src/Foo.php").build()));
+  File phpTestFile1=new File(baseDir,"src/test/FooTest.php");
+  when(fs.inputFiles(FileQuery.onTest().onLanguage("php"))).thenReturn((Iterable)Arrays.asList(new InputFileBuilder(phpTestFile1,Charsets.UTF_8,"src/test/FooTest.php").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"FooTest.php").attribute(DefaultInputFile.ATTRIBUTE_COMPONENT_KEY,"polop:/src/test/FooTest.php").build()));
   when(project.getLanguageKey()).thenReturn("php");
-  when(fileSystem.files(Mockito.isA(FileQuery.class))).thenReturn(Arrays.asList(sourceFile)).thenReturn(Arrays.asList(testFile));
-  when(fileSystem.sourceDirs()).thenReturn(ImmutableList.of(rootDir));
-  when(fileSystem.testDirs()).thenReturn(ImmutableList.of(rootDir));
   when(exclusionPatternInitializer.hasFileContentPattern()).thenReturn(true);
   scanner.analyse(project,null);
-  verify(inclusionPatternInitializer).initializePatternsForPath("Foo.php","polop:Foo.php");
-  verify(inclusionPatternInitializer).initializePatternsForPath("FooTest.php","polop:FooTest.php");
-  verify(exclusionPatternInitializer).initializePatternsForPath("Foo.php","polop:Foo.php");
-  verify(exclusionPatternInitializer).initializePatternsForPath("FooTest.php","polop:FooTest.php");
-  verify(regexpScanner).scan("polop:Foo.php",sourceFile,UTF_8);
-  verify(regexpScanner).scan("polop:FooTest.php",testFile,UTF_8);
+  verify(inclusionPatternInitializer).initializePatternsForPath("Foo.php","polop:/src/Foo.php");
+  verify(inclusionPatternInitializer).initializePatternsForPath("FooTest.php","polop:/src/test/FooTest.php");
+  verify(exclusionPatternInitializer).initializePatternsForPath("Foo.php","polop:/src/Foo.php");
+  verify(exclusionPatternInitializer).initializePatternsForPath("FooTest.php","polop:/src/test/FooTest.php");
+  verify(regexpScanner).scan("polop:/src/Foo.php",phpFile1,UTF_8);
+  verify(regexpScanner).scan("polop:/src/test/FooTest.php",phpTestFile1,UTF_8);
 }
