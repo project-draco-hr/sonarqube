@@ -1,17 +1,20 @@
 {
-  RuleDefinitions.NewRepository findbugs=context.newRepository("findbugs","java");
-  findbugs.newRule("NPE").setName("Detect NPE").setHtmlDescription("Detect <code>java.lang.NullPointerException</code>").setDefaultSeverity(Severity.BLOCKER).setMetadata("/something").setTags("valuable","bug");
-  findbugs.newRule("ABC");
-  assertThat(findbugs.getRules()).hasSize(2);
-  RuleDefinitions.NewRule npeRule=findbugs.getRule("NPE");
+  RuleDefinitions.NewRepository newFindbugs=context.newRepository("findbugs","java");
+  newFindbugs.newRule("NPE").setName("Detect NPE").setHtmlDescription("Detect <code>java.lang.NullPointerException</code>").setDefaultSeverity(Severity.BLOCKER).setMetadata("/something").setTags("one","two").addTags("two","three","four");
+  newFindbugs.newRule("ABC");
+  newFindbugs.done();
+  RuleDefinitions.Repository findbugs=context.repository("findbugs");
+  assertThat(findbugs.rules()).hasSize(2);
+  RuleDefinitions.Rule npeRule=findbugs.rule("NPE");
   assertThat(npeRule.key()).isEqualTo("NPE");
   assertThat(npeRule.name()).isEqualTo("Detect NPE");
   assertThat(npeRule.defaultSeverity()).isEqualTo(Severity.BLOCKER);
   assertThat(npeRule.htmlDescription()).isEqualTo("Detect <code>java.lang.NullPointerException</code>");
-  assertThat(npeRule.tags()).containsOnly("valuable","bug");
-  assertThat(npeRule.getParams()).isEmpty();
+  assertThat(npeRule.tags()).containsOnly("one","two","three","four");
+  assertThat(npeRule.params()).isEmpty();
   assertThat(npeRule.metadata()).isEqualTo("/something");
-  RuleDefinitions.NewRule otherRule=findbugs.getRule("ABC");
+  assertThat(npeRule.toString()).isEqualTo("[repository=findbugs, key=NPE]");
+  RuleDefinitions.Rule otherRule=findbugs.rule("ABC");
   assertThat(npeRule).isEqualTo(npeRule).isNotEqualTo(otherRule).isNotEqualTo("NPE").isNotEqualTo(null);
   assertThat(npeRule.hashCode()).isEqualTo(npeRule.hashCode());
 }

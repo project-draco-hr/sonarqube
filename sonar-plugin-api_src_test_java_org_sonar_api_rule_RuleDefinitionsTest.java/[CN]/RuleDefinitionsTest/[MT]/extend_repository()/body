@@ -1,10 +1,12 @@
 {
-  assertThat(context.getExtendedRepositories()).isEmpty();
-  context.extendRepository("findbugs").newRule("NPE");
-  assertThat(context.getRepositories()).isEmpty();
-  assertThat(context.getExtendedRepositories()).hasSize(1);
-  assertThat(context.getExtendedRepositories("other")).isEmpty();
-  assertThat(context.getExtendedRepositories("findbugs")).hasSize(1);
-  RuleDefinitions.ExtendedRepository findbugs=context.getExtendedRepositories("findbugs").get(0);
-  assertThat(findbugs.getRule("NPE")).isNotNull();
+  assertThat(context.extendedRepositories()).isEmpty();
+  RuleDefinitions.NewExtendedRepository newFindbugs=context.extendRepository("findbugs");
+  newFindbugs.newRule("NPE");
+  newFindbugs.done();
+  assertThat(context.repositories()).isEmpty();
+  assertThat(context.extendedRepositories()).hasSize(1);
+  assertThat(context.extendedRepositories("other")).isEmpty();
+  assertThat(context.extendedRepositories("findbugs")).hasSize(1);
+  RuleDefinitions.ExtendedRepository findbugs=context.extendedRepositories("findbugs").get(0);
+  assertThat(findbugs.rule("NPE")).isNotNull();
 }

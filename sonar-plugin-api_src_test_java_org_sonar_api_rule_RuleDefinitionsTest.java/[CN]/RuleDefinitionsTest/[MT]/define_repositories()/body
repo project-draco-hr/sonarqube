@@ -1,15 +1,21 @@
 {
-  assertThat(context.getRepositories()).isEmpty();
-  RuleDefinitions.NewRepository findbugs=context.newRepository("findbugs","java").setName("Findbugs");
-  RuleDefinitions.NewRepository checkstyle=context.newRepository("checkstyle","java");
+  assertThat(context.repositories()).isEmpty();
+  context.newRepository("findbugs","java").setName("Findbugs").done();
+  context.newRepository("checkstyle","java").done();
+  assertThat(context.repositories()).hasSize(2);
+  RuleDefinitions.Repository findbugs=context.repository("findbugs");
   assertThat(findbugs).isNotNull();
   assertThat(findbugs.key()).isEqualTo("findbugs");
   assertThat(findbugs.language()).isEqualTo("java");
   assertThat(findbugs.name()).isEqualTo("Findbugs");
-  assertThat(findbugs.getRules()).isEmpty();
-  assertThat(context.getRepositories()).hasSize(2);
-  assertThat(context.getRepository("findbugs")).isSameAs(findbugs);
-  assertThat(context.getRepository("unknown")).isNull();
+  assertThat(findbugs.rules()).isEmpty();
+  RuleDefinitions.Repository checkstyle=context.repository("checkstyle");
+  assertThat(checkstyle).isNotNull();
+  assertThat(checkstyle.key()).isEqualTo("checkstyle");
+  assertThat(checkstyle.language()).isEqualTo("java");
+  assertThat(checkstyle.name()).isEqualTo("checkstyle");
+  assertThat(checkstyle.rules()).isEmpty();
+  assertThat(context.repository("unknown")).isNull();
   assertThat(findbugs).isEqualTo(findbugs).isNotEqualTo(checkstyle).isNotEqualTo("findbugs").isNotEqualTo(null);
   assertThat(findbugs.hashCode()).isEqualTo(findbugs.hashCode());
 }
