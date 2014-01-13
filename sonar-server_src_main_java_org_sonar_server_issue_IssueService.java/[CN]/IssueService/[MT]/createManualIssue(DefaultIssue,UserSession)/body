@@ -4,7 +4,8 @@
   if (resourceDto == null) {
     throw new IllegalArgumentException("Unknown component: " + issue.componentKey());
   }
-  if (!authorizationDao.isAuthorizedComponentKey(issue.componentKey(),userSession.userId(),UserRole.USER)) {
+  issue.setComponentKey(resourceDto.getKey());
+  if (!authorizationDao.isAuthorizedComponentKey(resourceDto.getKey(),userSession.userId(),UserRole.USER)) {
     throw new IllegalStateException("User does not have the required role");
   }
   if (!"manual".equals(issue.ruleKey().repository())) {
@@ -18,6 +19,6 @@
   issue.setCreationDate(now);
   issue.setUpdateDate(now);
   issueStorage.save(issue);
-  dryRunCache.reportResourceModification(issue.componentKey());
+  dryRunCache.reportResourceModification(resourceDto.getKey());
   return issue;
 }
