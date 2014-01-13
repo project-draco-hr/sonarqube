@@ -4,9 +4,11 @@
   try {
     List<RuleDto> registeredRules=registerRules(existingRules);
     LOG.info("Removing deprecated rules");
-    disableDeprecatedRules(existingRules,registeredRules);
-    disableDeprecatedRepositories(existingRules);
+    Set<RuleDto> disabledRules=newHashSet();
+    disabledRules.addAll(disableDeprecatedRules(existingRules,registeredRules));
+    disabledRules.addAll(disableDeprecatedRepositories(existingRules));
     sqlSession.commit();
+    removeActiveRulesOnDisabledRules(disabledRules);
     ruleRegistry.bulkRegisterRules();
   }
   finally {
