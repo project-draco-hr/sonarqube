@@ -1,0 +1,13 @@
+{
+  final int numberOfDocuments=3;
+  searchIndex.addMappingFromClasspath("index","type1","/org/sonar/server/es/ESIndexTest/correct_mapping1.json");
+  String[] ids=new String[numberOfDocuments];
+  BytesStream[] sources=new BytesStream[numberOfDocuments];
+  for (int i=0; i < numberOfDocuments; i++) {
+    ids[i]=Integer.toString(i);
+    sources[i]=XContentFactory.jsonBuilder().startObject().field("value",Integer.toString(i)).endObject();
+  }
+  searchIndex.bulkIndex("index","type1",ids,sources);
+  List<String> docIds=searchIndex.findDocumentIds(SearchQuery.create().scrollSize(100));
+  assertThat(docIds).hasSize(numberOfDocuments);
+}

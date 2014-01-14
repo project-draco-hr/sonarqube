@@ -1,11 +1,11 @@
 {
-  esSetup=new EsSetup(ImmutableSettings.builder().loadFromUrl(SearchNode.class.getResource("config/elasticsearch.json")).build());
+  esSetup=new EsSetup(ImmutableSettings.builder().loadFromUrl(ESNode.class.getResource("config/elasticsearch.json")).build());
   esSetup.execute(EsSetup.deleteAll());
-  SearchNode searchNode=mock(SearchNode.class);
+  ESNode searchNode=mock(ESNode.class);
   when(searchNode.client()).thenReturn(esSetup.client());
   Settings settings=new Settings();
   settings.setProperty("sonar.log.profilingLevel","FULL");
-  SearchIndex index=new SearchIndex(searchNode,new Profiling(settings));
+  ESIndex index=new ESIndex(searchNode,new Profiling(settings));
   index.start();
   RuleRegistry registry=new RuleRegistry(index,null,null,null);
   registry.start();

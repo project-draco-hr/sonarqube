@@ -1,13 +1,13 @@
 {
   when(myBatis.openSession()).thenReturn(session);
-  esSetup=new EsSetup(ImmutableSettings.builder().loadFromUrl(SearchNode.class.getResource("config/elasticsearch.json")).build());
+  esSetup=new EsSetup(ImmutableSettings.builder().loadFromUrl(ESNode.class.getResource("config/elasticsearch.json")).build());
   esSetup.execute(EsSetup.deleteAll());
-  SearchNode node=mock(SearchNode.class);
+  ESNode node=mock(ESNode.class);
   when(node.client()).thenReturn(esSetup.client());
   Settings settings=new Settings();
   settings.setProperty("sonar.log.profilingLevel","FULL");
   Profiling profiling=new Profiling(settings);
-  searchIndex=new SearchIndex(node,profiling);
+  searchIndex=new ESIndex(node,profiling);
   searchIndex.start();
   registry=new RuleRegistry(searchIndex,ruleDao,activeRuleDao,myBatis);
   registry.start();

@@ -1,0 +1,13 @@
+{
+  assertThat(dataDir).doesNotExist();
+  ESNode node=new ESNode(fs,new Settings());
+  node.start();
+  ClusterAdminClient cluster=node.client().admin().cluster();
+  ClusterState state=cluster.state(cluster.prepareState().request()).actionGet().getState();
+  assertThat(state.getNodes().size()).isEqualTo(1);
+  assertThat(state.getNodes().getMasterNode().isDataNode()).isTrue();
+  assertThat(dataDir).exists().isDirectory();
+  assertThat(state.getMetaData().settings().get("http.port")).isNull();
+  node.stop();
+  assertThat(dataDir).exists().isDirectory();
+}

@@ -1,0 +1,9 @@
+{
+  ZipUtils.unzip(TestUtils.getResource(ESNodeTest.class,"data-es-clean.zip"),dataDir);
+  ESNode node=new ESNode(fs,new Settings());
+  node.start();
+  AdminClient admin=node.client().admin();
+  assertThat(admin.indices().prepareExists("myindex").execute().actionGet().isExists()).isTrue();
+  assertThat(admin.cluster().prepareHealth("myindex").setWaitForYellowStatus().execute().actionGet().getStatus()).isIn(ClusterHealthStatus.GREEN,ClusterHealthStatus.YELLOW);
+  node.stop();
+}

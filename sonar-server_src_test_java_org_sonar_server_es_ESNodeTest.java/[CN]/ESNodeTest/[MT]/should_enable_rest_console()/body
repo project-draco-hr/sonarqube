@@ -1,0 +1,19 @@
+{
+  Settings settings=new Settings();
+  int httpPort=NetworkUtils.freePort();
+  settings.setProperty("sonar.es.http.port",httpPort);
+  ESNode node=new ESNode(fs,settings);
+  node.start();
+  URL url=URI.create("http://localhost:" + httpPort).toURL();
+  HttpURLConnection connection=(HttpURLConnection)url.openConnection();
+  connection.connect();
+  assertThat(connection.getResponseCode()).isEqualTo(200);
+  node.stop();
+  connection=(HttpURLConnection)url.openConnection();
+  try {
+    connection.connect();
+    fail();
+  }
+ catch (  Exception e) {
+  }
+}
