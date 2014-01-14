@@ -1,0 +1,19 @@
+{
+  int resourceSnapshotId=getSnapshotIdFor(inputFile);
+  List<DuplicationUnitDto> units=dao.selectCandidates(resourceSnapshotId,lastSnapshotId,languageKey);
+  cache.clear();
+  for (  DuplicationUnitDto unit : units) {
+    String hash=unit.getHash();
+    String resourceKey=unit.getResourceKey();
+    int indexInFile=unit.getIndexInFile();
+    int startLine=unit.getStartLine();
+    int endLine=unit.getEndLine();
+    Block block=Block.builder().setResourceId(resourceKey).setBlockHash(new ByteArray(hash)).setIndexInFile(indexInFile).setLines(startLine,endLine).build();
+    Collection<Block> sameHash=cache.get(block.getBlockHash());
+    if (sameHash == null) {
+      sameHash=Lists.newArrayList();
+      cache.put(block.getBlockHash(),sameHash);
+    }
+    sameHash.add(block);
+  }
+}

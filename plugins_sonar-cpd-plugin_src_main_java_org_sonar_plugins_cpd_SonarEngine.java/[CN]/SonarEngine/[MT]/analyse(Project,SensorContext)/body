@@ -1,8 +1,8 @@
 {
   String[] cpdExclusions=settings.getStringArray(CoreProperties.CPD_EXCLUSIONS);
   logExclusions(cpdExclusions,LOG);
-  List<File> sourceFiles=fileSystem.files(FileQuery.onSource().onLanguage(project.getLanguageKey()).withExclusions(cpdExclusions));
-  if (sourceFiles.isEmpty()) {
+  Iterable<InputFile> sourceFiles=fileSystem.inputFiles(FileQuery.onSource().onLanguage(project.getLanguageKey()).withExclusions(cpdExclusions));
+  if (!sourceFiles.iterator().hasNext()) {
     return;
   }
   SonarDuplicationsIndex index=createIndex(project,sourceFiles);
