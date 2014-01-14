@@ -1,5 +1,13 @@
 {
   validatePermission(userSession);
-  ActiveRuleDto activeRule=findActiveRuleNotNull(activeRuleId);
-  revertActiveRule(activeRule,userSession);
+  SqlSession session=myBatis.openSession();
+  try {
+    ActiveRuleDto activeRule=findActiveRuleNotNull(activeRuleId,session);
+    if (activeRule.doesOverride()) {
+      revertActiveRule(activeRule,userSession,session);
+    }
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
 }

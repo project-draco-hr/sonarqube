@@ -1,13 +1,19 @@
 {
   validatePermission(userSession);
   validateSeverity(severity);
-  QProfile profile=findProfileNotNull(profileId);
-  RuleDto rule=findRuleNotNull(ruleId);
-  ActiveRuleDto activeRule=findActiveRule(profileId,ruleId);
-  if (activeRule == null) {
-    createActiveRule(profile.id(),rule.getId(),severity,userSession);
-  }
+  SqlSession session=myBatis.openSession();
+  try {
+    QualityProfileDto profile=findProfileNotNull(profileId,session);
+    RuleDto rule=findRuleNotNull(ruleId,session);
+    ActiveRuleDto activeRule=findActiveRule(profileId,ruleId,session);
+    if (activeRule == null) {
+      createActiveRule(profile.getId(),rule.getId(),severity,userSession,session);
+    }
  else {
-    updateSeverity(activeRule,severity,userSession);
+      updateSeverity(activeRule,severity,userSession,session);
+    }
+  }
+  finally {
+    MyBatis.closeQuietly(session);
   }
 }

@@ -1,8 +1,8 @@
 {
-  when(profileLookup.profile(1)).thenReturn(new QProfile().setId(1).setName("Default").setLanguage("java"));
-  when(ruleDao.selectById(10)).thenReturn(new RuleDto().setId(10));
+  when(profileDao.selectById(1,session)).thenReturn(new QualityProfileDto().setId(1).setName("Default").setLanguage("java"));
+  when(ruleDao.selectById(10,session)).thenReturn(new RuleDto().setId(10));
   ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1);
-  when(activeRuleDao.selectByProfileAndRule(1,10)).thenReturn(activeRule);
+  when(activeRuleDao.selectByProfileAndRule(1,10,session)).thenReturn(activeRule);
   when(profilesManager.ruleSeverityChanged(eq(1),eq(5),eq(RulePriority.MINOR),eq(RulePriority.MAJOR),eq("Nicolas"))).thenReturn(new ProfilesManager.RuleInheritanceActions());
   operations.activateRule(1,10,Severity.MAJOR,authorizedUserSession);
   verify(activeRuleDao).update(eq(activeRule),eq(session));

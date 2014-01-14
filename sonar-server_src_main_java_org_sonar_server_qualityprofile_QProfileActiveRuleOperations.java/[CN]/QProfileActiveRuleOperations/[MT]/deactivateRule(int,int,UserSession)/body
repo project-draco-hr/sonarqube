@@ -1,5 +1,11 @@
 {
   validatePermission(userSession);
-  ActiveRuleDto activeRule=findActiveRule(profileId,ruleId);
-  deactivateRule(activeRule,userSession);
+  SqlSession session=myBatis.openSession();
+  try {
+    ActiveRuleDto activeRule=findActiveRule(profileId,ruleId,session);
+    deactivateRule(activeRule,userSession,session);
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
 }

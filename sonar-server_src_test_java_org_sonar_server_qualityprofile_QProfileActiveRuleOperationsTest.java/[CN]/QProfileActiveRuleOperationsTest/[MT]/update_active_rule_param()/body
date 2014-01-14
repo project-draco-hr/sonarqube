@@ -1,10 +1,10 @@
 {
   ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1);
-  when(activeRuleDao.selectById(5)).thenReturn(activeRule);
+  when(activeRuleDao.selectById(5,session)).thenReturn(activeRule);
   RuleParamDto ruleParam=new RuleParamDto().setRuleId(10).setName("max").setDefaultValue("20").setType(PropertyType.INTEGER.name());
   when(ruleDao.selectParamByRuleAndKey(10,"max",session)).thenReturn(ruleParam);
   ActiveRuleParamDto activeRuleParam=new ActiveRuleParamDto().setId(100).setActiveRuleId(5).setKey("max").setValue("20");
-  when(activeRuleDao.selectParamByActiveRuleAndKey(5,"max")).thenReturn(activeRuleParam);
+  when(activeRuleDao.selectParamByActiveRuleAndKey(5,"max",session)).thenReturn(activeRuleParam);
   when(profilesManager.ruleParamChanged(eq(1),eq(5),eq("max"),eq("20"),eq("30"),eq("Nicolas"))).thenReturn(new ProfilesManager.RuleInheritanceActions());
   operations.updateActiveRuleParam(5,"max","30",authorizedUserSession);
   ArgumentCaptor<ActiveRuleParamDto> argumentCaptor=ArgumentCaptor.forClass(ActiveRuleParamDto.class);

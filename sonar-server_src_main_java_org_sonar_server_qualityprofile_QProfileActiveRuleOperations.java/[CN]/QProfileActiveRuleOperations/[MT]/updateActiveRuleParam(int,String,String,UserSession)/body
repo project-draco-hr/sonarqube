@@ -1,15 +1,21 @@
 {
   validatePermission(userSession);
-  String sanitizedValue=Strings.emptyToNull(value);
-  ActiveRuleParamDto activeRuleParam=findActiveRuleParam(activeRuleId,key);
-  ActiveRuleDto activeRule=findActiveRuleNotNull(activeRuleId);
-  if (activeRuleParam == null && sanitizedValue != null) {
-    createActiveRuleParam(activeRule,key,value,userSession);
+  SqlSession session=myBatis.openSession();
+  try {
+    String sanitizedValue=Strings.emptyToNull(value);
+    ActiveRuleParamDto activeRuleParam=findActiveRuleParam(activeRuleId,key,session);
+    ActiveRuleDto activeRule=findActiveRuleNotNull(activeRuleId,session);
+    if (activeRuleParam == null && sanitizedValue != null) {
+      createActiveRuleParam(activeRule,key,value,userSession,session);
+    }
+ else     if (activeRuleParam != null && sanitizedValue == null) {
+      deleteActiveRuleParam(activeRule,activeRuleParam,userSession,session);
+    }
+ else     if (activeRuleParam != null) {
+      updateActiveRuleParam(activeRule,activeRuleParam,value,userSession,session);
+    }
   }
- else   if (activeRuleParam != null && sanitizedValue == null) {
-    deleteActiveRuleParam(activeRule,activeRuleParam,userSession);
-  }
- else   if (activeRuleParam != null) {
-    updateActiveRuleParam(activeRule,activeRuleParam,value,userSession);
+  finally {
+    MyBatis.closeQuietly(session);
   }
 }
