@@ -1,0 +1,14 @@
+{
+  RuleDefinitions.Context context=defLoader.load();
+  for (  RuleDefinitions.Repository repoDef : context.repositories()) {
+    enableRepository(buffer,sqlSession,repoDef);
+  }
+  for (  RuleDefinitions.ExtendedRepository extendedRepoDef : context.extendedRepositories()) {
+    if (context.repository(extendedRepoDef.key()) == null) {
+      LOG.warn(String.format("Extension is ignored, repository %s does not exist",extendedRepoDef.key()));
+    }
+ else {
+      enableRepository(buffer,sqlSession,extendedRepoDef);
+    }
+  }
+}

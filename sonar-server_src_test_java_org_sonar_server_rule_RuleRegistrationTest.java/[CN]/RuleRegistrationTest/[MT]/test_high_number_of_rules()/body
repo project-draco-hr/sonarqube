@@ -1,0 +1,8 @@
+{
+  task=new RuleRegistration(new RuleDefinitionsLoader(mock(RuleRepositories.class),new RuleDefinitions[]{new BigRepository()}),profilesManager,ruleRegistry,myBatis,ruleDao,activeRuleDao);
+  setupData("shared");
+  task.start();
+  assertThat(ruleDao.selectAll()).hasSize(BigRepository.SIZE + 1);
+  assertThat(ruleDao.selectParameters()).hasSize(BigRepository.SIZE * 20);
+  assertThat(ruleDao.selectTags(getMyBatis().openSession())).hasSize(BigRepository.SIZE * 3);
+}

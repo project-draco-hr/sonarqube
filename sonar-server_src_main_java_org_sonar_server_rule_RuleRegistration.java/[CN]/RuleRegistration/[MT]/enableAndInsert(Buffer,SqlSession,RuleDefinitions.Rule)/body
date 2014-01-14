@@ -1,0 +1,16 @@
+{
+  RuleDto ruleDto=new RuleDto().setCardinality(ruleDef.template() ? Cardinality.MULTIPLE : Cardinality.SINGLE).setConfigKey(ruleDef.metadata()).setDescription(ruleDef.htmlDescription()).setLanguage(ruleDef.repository().language()).setName(ruleDef.name()).setRepositoryKey(ruleDef.repository().key()).setRuleKey(ruleDef.key()).setSeverity(RulePriority.valueOf(ruleDef.defaultSeverity()).ordinal()).setCreatedAt(buffer.now()).setUpdatedAt(buffer.now()).setStatus(ruleDef.status().name());
+  ruleDao.insert(ruleDto,sqlSession);
+  buffer.add(ruleDto);
+  for (  RuleDefinitions.Param param : ruleDef.params()) {
+    RuleParamDto paramDto=new RuleParamDto().setRuleId(ruleDto.getId()).setDefaultValue(param.defaultValue()).setDescription(param.description()).setName(param.name()).setType(param.type().toString());
+    ruleDao.insert(paramDto,sqlSession);
+    buffer.add(paramDto);
+  }
+  for (  String tag : ruleDef.tags()) {
+    RuleTagDto tagDto=new RuleTagDto().setRuleId(ruleDto.getId()).setTag(tag).setType(RuleTagType.SYSTEM);
+    ruleDao.insert(tagDto,sqlSession);
+    buffer.add(tagDto);
+  }
+  return ruleDto;
+}
