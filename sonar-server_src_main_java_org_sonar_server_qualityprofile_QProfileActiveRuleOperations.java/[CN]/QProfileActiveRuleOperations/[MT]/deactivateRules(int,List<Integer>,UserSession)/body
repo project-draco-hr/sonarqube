@@ -1,11 +1,15 @@
 {
   validatePermission(userSession);
   SqlSession session=myBatis.openSession();
+  int numberOfDeactivatedRules=0;
   try {
     for (    int activeRuleId : activeRuleIdsToDeactivate) {
       ActiveRuleDto activeRule=findActiveRuleNotNull(activeRuleId,session);
-      deactivateRule(activeRule,userSession,session);
+      if (deactivateRule(activeRule,userSession,session)) {
+        numberOfDeactivatedRules++;
+      }
     }
+    return numberOfDeactivatedRules;
   }
   finally {
     MyBatis.closeQuietly(session);
