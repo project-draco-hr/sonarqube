@@ -1,9 +1,15 @@
 {
+  QProfile profile=new QProfile().setId(1).setName("Default").setLanguage("java");
+  when(profileLookup.profile(1)).thenReturn(profile);
+  QProfileRule rule=mock(QProfileRule.class);
+  when(rule.id()).thenReturn(10);
+  when(rulesLookup.findByRuleId(10)).thenReturn(rule);
+  ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1);
+  when(activeRuleDao.selectById(5)).thenReturn(activeRule);
   RuleParamDto ruleParam=new RuleParamDto().setRuleId(10).setName("max").setDefaultValue("20").setType(PropertyType.INTEGER.name());
   when(ruleDao.selectParamByRuleAndKey(10,"max",session)).thenReturn(ruleParam);
-  ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1);
   try {
-    operations.createActiveRuleParam(activeRule,"max","invalid integer",authorizedUserSession);
+    operations.updateActiveRuleParam(1,5,"max","invalid integer",authorizedUserSession);
     fail();
   }
  catch (  Exception e) {

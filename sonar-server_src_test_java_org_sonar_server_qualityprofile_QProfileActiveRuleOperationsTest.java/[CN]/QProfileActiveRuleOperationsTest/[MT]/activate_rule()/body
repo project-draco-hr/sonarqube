@@ -1,13 +1,15 @@
 {
-  QualityProfileDto qualityProfile=new QualityProfileDto().setId(1).setName("My profile").setLanguage("java");
-  RuleDto rule=new RuleDto().setId(10).setRepositoryKey("squid").setRuleKey("AvoidCycle");
+  QProfile profile=new QProfile().setId(1).setName("Default").setLanguage("java");
+  when(profileLookup.profile(1)).thenReturn(profile);
+  QProfileRule rule=mock(QProfileRule.class);
+  when(rule.id()).thenReturn(10);
+  when(rulesLookup.findByRuleId(10)).thenReturn(rule);
   when(ruleDao.selectParameters(eq(10),eq(session))).thenReturn(newArrayList(new RuleParamDto().setId(20).setName("max").setDefaultValue("10")));
   final int idActiveRuleToUpdate=42;
   final int idActiveRuleToDelete=24;
   ProfilesManager.RuleInheritanceActions inheritanceActions=new ProfilesManager.RuleInheritanceActions().addToIndex(idActiveRuleToUpdate).addToDelete(idActiveRuleToDelete);
   when(profilesManager.activated(eq(1),anyInt(),eq("Nicolas"))).thenReturn(inheritanceActions);
-  ActiveRuleDto result=operations.createActiveRule(qualityProfile,rule,Severity.CRITICAL,authorizedUserSession);
-  assertThat(result).isNotNull();
+  operations.activateRule(1,10,Severity.CRITICAL,authorizedUserSession);
   ArgumentCaptor<ActiveRuleDto> activeRuleArgument=ArgumentCaptor.forClass(ActiveRuleDto.class);
   verify(activeRuleDao).insert(activeRuleArgument.capture(),eq(session));
   assertThat(activeRuleArgument.getValue().getRulId()).isEqualTo(10);

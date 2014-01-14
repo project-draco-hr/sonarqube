@@ -1,8 +1,13 @@
 {
+  QProfile profile=new QProfile().setId(1).setName("Default").setLanguage("java");
+  when(profileLookup.profile(1)).thenReturn(profile);
+  QProfileRule rule=mock(QProfileRule.class);
+  when(rule.id()).thenReturn(10);
+  when(rulesLookup.findByRuleId(10)).thenReturn(rule);
   ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1);
   when(activeRuleDao.selectByProfileAndRule(1,10)).thenReturn(activeRule);
   when(profilesManager.deactivated(eq(1),anyInt(),eq("Nicolas"))).thenReturn(new ProfilesManager.RuleInheritanceActions());
-  operations.deactivateRule(activeRule,authorizedUserSession);
+  operations.deactivateRule(1,10,authorizedUserSession);
   verify(activeRuleDao).delete(eq(5),eq(session));
   verify(activeRuleDao).deleteParameters(eq(5),eq(session));
   verify(session).commit();

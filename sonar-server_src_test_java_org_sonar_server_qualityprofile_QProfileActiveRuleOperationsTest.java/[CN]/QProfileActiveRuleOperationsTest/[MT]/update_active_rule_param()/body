@@ -1,10 +1,17 @@
 {
+  QProfile profile=new QProfile().setId(1).setName("Default").setLanguage("java");
+  when(profileLookup.profile(1)).thenReturn(profile);
+  QProfileRule rule=mock(QProfileRule.class);
+  when(rule.id()).thenReturn(10);
+  when(rulesLookup.findByRuleId(10)).thenReturn(rule);
   ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1);
-  ActiveRuleParamDto activeRuleParam=new ActiveRuleParamDto().setId(100).setActiveRuleId(5).setKey("max").setValue("20");
+  when(activeRuleDao.selectById(5)).thenReturn(activeRule);
   RuleParamDto ruleParam=new RuleParamDto().setRuleId(10).setName("max").setDefaultValue("20").setType(PropertyType.INTEGER.name());
   when(ruleDao.selectParamByRuleAndKey(10,"max",session)).thenReturn(ruleParam);
+  ActiveRuleParamDto activeRuleParam=new ActiveRuleParamDto().setId(100).setActiveRuleId(5).setKey("max").setValue("20");
+  when(activeRuleDao.selectParamByActiveRuleAndKey(5,"max")).thenReturn(activeRuleParam);
   when(profilesManager.ruleParamChanged(eq(1),eq(5),eq("max"),eq("20"),eq("30"),eq("Nicolas"))).thenReturn(new ProfilesManager.RuleInheritanceActions());
-  operations.updateActiveRuleParam(activeRule,activeRuleParam,"30",authorizedUserSession);
+  operations.updateActiveRuleParam(1,5,"max","30",authorizedUserSession);
   ArgumentCaptor<ActiveRuleParamDto> argumentCaptor=ArgumentCaptor.forClass(ActiveRuleParamDto.class);
   verify(activeRuleDao).update(argumentCaptor.capture(),eq(session));
   assertThat(argumentCaptor.getValue().getId()).isEqualTo(100);
