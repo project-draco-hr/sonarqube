@@ -1,6 +1,4 @@
 {
-  QProfile profile=new QProfile().setId(1).setName("Default").setLanguage("java");
-  when(profileLookup.profile(1)).thenReturn(profile);
   ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1).setInheritance(ActiveRuleDto.OVERRIDES).setParentId(4);
   when(activeRuleDao.selectById(5)).thenReturn(activeRule);
   when(activeRuleDao.selectParamsByActiveRuleId(eq(5),eq(session))).thenReturn(newArrayList(new ActiveRuleParamDto().setId(102).setActiveRuleId(5).setKey("max").setValue("20")));
@@ -8,7 +6,7 @@
   when(activeRuleDao.selectById(4,session)).thenReturn(parent);
   when(activeRuleDao.selectParamsByActiveRuleId(eq(4),eq(session))).thenReturn(newArrayList(new ActiveRuleParamDto().setId(100).setActiveRuleId(5).setKey("max").setValue("15")));
   when(profilesManager.ruleParamChanged(eq(1),eq(5),eq("max"),eq("20"),eq("15"),eq("Nicolas"))).thenReturn(new ProfilesManager.RuleInheritanceActions());
-  operations.revertActiveRule(1,5,authorizedUserSession);
+  operations.revertActiveRule(5,authorizedUserSession);
   ArgumentCaptor<ActiveRuleDto> argumentCaptor=ArgumentCaptor.forClass(ActiveRuleDto.class);
   verify(activeRuleDao).update(argumentCaptor.capture(),eq(session));
   assertThat(argumentCaptor.getValue().getInheritance()).isEqualTo(ActiveRuleDto.INHERITED);
