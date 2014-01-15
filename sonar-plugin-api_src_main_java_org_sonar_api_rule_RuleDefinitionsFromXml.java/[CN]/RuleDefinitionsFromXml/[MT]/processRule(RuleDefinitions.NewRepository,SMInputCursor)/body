@@ -1,0 +1,51 @@
+{
+  String key=null, name=null, description=null, metadata=null, severity=Severity.MAJOR, status=null;
+  Cardinality cardinality=Cardinality.SINGLE;
+  List<ParamStruct> params=new ArrayList<ParamStruct>();
+  String keyAttribute=ruleC.getAttrValue("key");
+  if (StringUtils.isNotBlank(keyAttribute)) {
+    key=StringUtils.trim(keyAttribute);
+  }
+  String priorityAttribute=ruleC.getAttrValue("priority");
+  if (StringUtils.isNotBlank(priorityAttribute)) {
+    severity=StringUtils.trim(priorityAttribute);
+  }
+  SMInputCursor cursor=ruleC.childElementCursor();
+  while (cursor.getNext() != null) {
+    String nodeName=cursor.getLocalName();
+    if (StringUtils.equalsIgnoreCase("name",nodeName)) {
+      name=StringUtils.trim(cursor.collectDescendantText(false));
+    }
+ else     if (StringUtils.equalsIgnoreCase("description",nodeName)) {
+      description=StringUtils.trim(cursor.collectDescendantText(false));
+    }
+ else     if (StringUtils.equalsIgnoreCase("key",nodeName)) {
+      key=StringUtils.trim(cursor.collectDescendantText(false));
+    }
+ else     if (StringUtils.equalsIgnoreCase("configKey",nodeName)) {
+      metadata=StringUtils.trim(cursor.collectDescendantText(false));
+    }
+ else     if (StringUtils.equalsIgnoreCase("priority",nodeName)) {
+      severity=StringUtils.trim(cursor.collectDescendantText(false));
+    }
+ else     if (StringUtils.equalsIgnoreCase("severity",nodeName)) {
+      severity=StringUtils.trim(cursor.collectDescendantText(false));
+    }
+ else     if (StringUtils.equalsIgnoreCase("cardinality",nodeName)) {
+      cardinality=Cardinality.valueOf(StringUtils.trim(cursor.collectDescendantText(false)));
+    }
+ else     if (StringUtils.equalsIgnoreCase("status",nodeName)) {
+      status=StringUtils.trim(cursor.collectDescendantText(false));
+    }
+ else     if (StringUtils.equalsIgnoreCase("param",nodeName)) {
+      params.add(processParameter(cursor));
+    }
+  }
+  RuleDefinitions.NewRule rule=repo.newRule(key).setHtmlDescription(description).setDefaultSeverity(severity).setName(name).setMetadata(metadata).setTemplate(cardinality == Cardinality.MULTIPLE);
+  if (status != null) {
+    rule.setStatus(RuleDefinitions.Status.valueOf(status));
+  }
+  for (  ParamStruct param : params) {
+    rule.newParam(param.key).setDefaultValue(param.defaultValue).setType(param.type).setDescription(param.description);
+  }
+}

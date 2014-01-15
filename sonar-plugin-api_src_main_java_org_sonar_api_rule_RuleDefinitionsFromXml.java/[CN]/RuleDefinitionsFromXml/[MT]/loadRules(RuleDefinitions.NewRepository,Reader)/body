@@ -1,0 +1,19 @@
+{
+  XMLInputFactory xmlFactory=XMLInputFactory.newInstance();
+  xmlFactory.setProperty(XMLInputFactory.IS_COALESCING,Boolean.TRUE);
+  xmlFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE,Boolean.FALSE);
+  xmlFactory.setProperty(XMLInputFactory.SUPPORT_DTD,Boolean.FALSE);
+  xmlFactory.setProperty(XMLInputFactory.IS_VALIDATING,Boolean.FALSE);
+  SMInputFactory inputFactory=new SMInputFactory(xmlFactory);
+  try {
+    SMHierarchicCursor rootC=inputFactory.rootElementCursor(reader);
+    rootC.advance();
+    SMInputCursor rulesC=rootC.childElementCursor("rule");
+    while (rulesC.getNext() != null) {
+      processRule(repo,rulesC);
+    }
+  }
+ catch (  XMLStreamException e) {
+    throw new IllegalStateException("XML is not valid",e);
+  }
+}

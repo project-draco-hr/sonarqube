@@ -1,0 +1,29 @@
+{
+  ParamStruct param=new ParamStruct();
+  String keyAttribute=ruleC.getAttrValue("key");
+  if (StringUtils.isNotBlank(keyAttribute)) {
+    param.key=StringUtils.trim(keyAttribute);
+  }
+  String typeAttribute=ruleC.getAttrValue("type");
+  if (StringUtils.isNotBlank(typeAttribute)) {
+    param.type=RuleParamType.parse(typeAttribute);
+  }
+  SMInputCursor paramC=ruleC.childElementCursor();
+  while (paramC.getNext() != null) {
+    String propNodeName=paramC.getLocalName();
+    String propText=StringUtils.trim(paramC.collectDescendantText(false));
+    if (StringUtils.equalsIgnoreCase("key",propNodeName)) {
+      param.key=propText;
+    }
+ else     if (StringUtils.equalsIgnoreCase("description",propNodeName)) {
+      param.description=propText;
+    }
+ else     if (StringUtils.equalsIgnoreCase("type",propNodeName)) {
+      param.type=RuleParamType.parse(propText);
+    }
+ else     if (StringUtils.equalsIgnoreCase("defaultValue",propNodeName)) {
+      param.defaultValue=propText;
+    }
+  }
+  return param;
+}

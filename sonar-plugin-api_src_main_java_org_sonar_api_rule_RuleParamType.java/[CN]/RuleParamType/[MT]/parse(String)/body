@@ -1,6 +1,19 @@
 {
-  String format=StringUtils.substringBefore(key,FIELD_SEPARATOR);
-  String options=StringUtils.substringAfter(key,FIELD_SEPARATOR);
+  if ("i".equals(s) || "i{}".equals(s)) {
+    return INTEGER;
+  }
+  if ("s".equals(s) || "s{}".equals(s) || "r".equals(s)) {
+    return STRING;
+  }
+  if ("b".equals(s)) {
+    return BOOLEAN;
+  }
+  if (s.startsWith("s[")) {
+    String values=StringUtils.substringBetween(s,"[","]");
+    return ofValues(StringUtils.split(values,','));
+  }
+  String format=StringUtils.substringBefore(s,FIELD_SEPARATOR);
+  String options=StringUtils.substringAfter(s,FIELD_SEPARATOR);
   if (StringUtils.isBlank(options)) {
     return new RuleParamType(format);
   }
