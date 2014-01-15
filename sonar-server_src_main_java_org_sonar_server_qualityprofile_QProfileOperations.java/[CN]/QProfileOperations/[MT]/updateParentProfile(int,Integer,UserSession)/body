@@ -1,12 +1,12 @@
 {
   checkPermission(userSession);
-  QualityProfileDto profile=findNotNull(profileId).toDto();
-  QualityProfileDto parentProfile=null;
-  if (parentId != null) {
-    parentProfile=findNotNull(parentId).toDto();
-  }
   SqlSession session=myBatis.openSession();
   try {
+    QualityProfileDto profile=findNotNull(profileId,session);
+    QualityProfileDto parentProfile=null;
+    if (parentId != null) {
+      parentProfile=findNotNull(parentId,session);
+    }
     if (isCycle(profile,parentProfile,session)) {
       throw new BadRequestException("Please do not select a child profile as parent.");
     }

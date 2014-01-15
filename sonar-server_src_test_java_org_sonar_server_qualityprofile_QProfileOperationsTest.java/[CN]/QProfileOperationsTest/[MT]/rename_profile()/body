@@ -1,8 +1,8 @@
 {
-  when(profileLookup.profile(1)).thenReturn(new QProfile().setId(1).setName("Default").setLanguage("java"));
+  when(qualityProfileDao.selectById(1,session)).thenReturn(new QualityProfileDto().setId(1).setName("Default").setLanguage("java"));
   operations.renameProfile(1,"Default profile",authorizedUserSession);
   ArgumentCaptor<QualityProfileDto> profileArgument=ArgumentCaptor.forClass(QualityProfileDto.class);
-  verify(qualityProfileDao).update(profileArgument.capture());
+  verify(qualityProfileDao).update(profileArgument.capture(),eq(session));
   assertThat(profileArgument.getValue().getName()).isEqualTo("Default profile");
   assertThat(profileArgument.getValue().getLanguage()).isEqualTo("java");
 }

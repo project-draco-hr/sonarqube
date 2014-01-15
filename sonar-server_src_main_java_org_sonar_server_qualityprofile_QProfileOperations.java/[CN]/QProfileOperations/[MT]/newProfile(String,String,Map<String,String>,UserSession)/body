@@ -1,10 +1,10 @@
 {
   checkPermission(userSession);
-  checkNotAlreadyExists(name,language);
-  NewProfileResult result=new NewProfileResult();
-  List<RulesProfile> importProfiles=readProfilesFromXml(result,xmlProfilesByPlugin);
   SqlSession session=myBatis.openSession();
   try {
+    checkNotAlreadyExists(name,language,session);
+    NewProfileResult result=new NewProfileResult();
+    List<RulesProfile> importProfiles=readProfilesFromXml(result,xmlProfilesByPlugin);
     QualityProfileDto dto=new QualityProfileDto().setName(name).setLanguage(language).setVersion(1).setUsed(false);
     dao.insert(dto,session);
     for (    RulesProfile rulesProfile : importProfiles) {
@@ -13,9 +13,9 @@
     result.setProfile(QProfile.from(dto));
     session.commit();
     dryRunCache.reportGlobalModification();
+    return result;
   }
   finally {
     MyBatis.closeQuietly(session);
   }
-  return result;
 }

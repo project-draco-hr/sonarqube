@@ -1,10 +1,15 @@
 {
   checkPermission(userSession);
-  QProfile profile=findNotNull(profileId);
-  if (!profile.name().equals(newName)) {
-    checkNotAlreadyExists(newName,profile.language());
+  SqlSession session=myBatis.openSession();
+  try {
+    QualityProfileDto profile=findNotNull(profileId,session);
+    if (!profile.getName().equals(newName)) {
+      checkNotAlreadyExists(newName,profile.getLanguage(),session);
+    }
+    profile.setName(newName);
+    dao.update(profile,session);
   }
-  QualityProfileDto dto=profile.toDto();
-  dto.setName(newName);
-  dao.update(dto);
+  finally {
+    MyBatis.closeQuietly(session);
+  }
 }
