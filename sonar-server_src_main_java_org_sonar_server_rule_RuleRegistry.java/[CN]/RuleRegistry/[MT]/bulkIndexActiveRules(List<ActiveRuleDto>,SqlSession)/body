@@ -1,0 +1,13 @@
+{
+  Multimap<Integer,ActiveRuleParamDto> paramsByActiveRule=ArrayListMultimap.create();
+  List<Integer> activeRulesIdList=newArrayList(Iterables.transform(activeRules,new Function<ActiveRuleDto,Integer>(){
+    @Override public Integer apply(    ActiveRuleDto input){
+      return input.getId();
+    }
+  }
+));
+  for (  ActiveRuleParamDto param : activeRuleDao.selectParamsByActiveRuleIds(activeRulesIdList,session)) {
+    paramsByActiveRule.put(param.getActiveRuleId(),param);
+  }
+  bulkIndexActiveRules(activeRules,paramsByActiveRule);
+}

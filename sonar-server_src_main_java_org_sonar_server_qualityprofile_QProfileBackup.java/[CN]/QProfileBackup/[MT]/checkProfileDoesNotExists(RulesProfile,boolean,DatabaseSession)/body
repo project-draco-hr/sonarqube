@@ -1,0 +1,10 @@
+{
+  RulesProfile existingProfile=hibernateSession.getSingleResult(RulesProfile.class,"name",importedProfile.getName(),"language",importedProfile.getLanguage());
+  if (existingProfile != null && !deleteExisting) {
+    throw BadRequestException.of("The profile " + existingProfile + " already exists. Please delete it before restoring.");
+  }
+  if (existingProfile != null) {
+    hibernateSession.removeWithoutFlush(existingProfile);
+    hibernateSession.commit();
+  }
+}

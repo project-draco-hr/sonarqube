@@ -1,16 +1,13 @@
 {
-  checkPermission(userSession);
   SqlSession session=myBatis.openSession();
   try {
-    checkNotAlreadyExists(name,language,session);
+    QProfile profile=newProfile(name,language,userSession,session);
     NewProfileResult result=new NewProfileResult();
     List<RulesProfile> importProfiles=readProfilesFromXml(result,xmlProfilesByPlugin);
-    QualityProfileDto dto=new QualityProfileDto().setName(name).setLanguage(language).setVersion(1).setUsed(false);
-    dao.insert(dto,session);
     for (    RulesProfile rulesProfile : importProfiles) {
-      importProfile(dto,rulesProfile,session);
+      importProfile(profile.id(),rulesProfile,session);
     }
-    result.setProfile(QProfile.from(dto));
+    result.setProfile(profile);
     session.commit();
     dryRunCache.reportGlobalModification();
     return result;

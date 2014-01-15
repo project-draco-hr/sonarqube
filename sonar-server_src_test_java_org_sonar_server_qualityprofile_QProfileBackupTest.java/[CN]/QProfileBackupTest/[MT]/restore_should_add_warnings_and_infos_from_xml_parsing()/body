@@ -1,0 +1,22 @@
+{
+  final RulesProfile profile=mock(RulesProfile.class);
+  when(profile.getName()).thenReturn("Default");
+  when(profile.getLanguage()).thenReturn("java");
+  when(profile.getId()).thenReturn(1);
+  doAnswer(new Answer(){
+    public Object answer(    InvocationOnMock invocation){
+      Object[] args=invocation.getArguments();
+      ValidationMessages validationMessages=(ValidationMessages)args[1];
+      validationMessages.addInfoText("an info message");
+      validationMessages.addWarningText("a warning message");
+      return profile;
+    }
+  }
+).when(xmlProfileParser).parse(any(Reader.class),any(ValidationMessages.class));
+  when(hibernateSession.getSingleResult(any(Class.class),eq("name"),eq("Default"),eq("language"),eq("java"))).thenReturn(null);
+  when(qProfileLookup.profile(anyInt())).thenReturn(new QProfile().setId(1));
+  QProfileBackup.Result result=backup.restore("<xml/>",true,userSession);
+  assertThat(result.profile()).isNotNull();
+  assertThat(result.warnings()).isNotEmpty();
+  assertThat(result.infos()).isNotEmpty();
+}

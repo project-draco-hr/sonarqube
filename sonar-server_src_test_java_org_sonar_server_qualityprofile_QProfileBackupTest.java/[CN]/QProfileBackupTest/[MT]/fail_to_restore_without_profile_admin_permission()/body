@@ -1,0 +1,12 @@
+{
+  try {
+    backup.restore("<xml/>",false,MockUserSession.create().setLogin("nicolas").setName("Nicolas"));
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(ForbiddenException.class);
+  }
+  verify(hibernateSession,never()).saveWithoutFlush(any(RulesProfile.class));
+  verifyZeroInteractions(ruleRegistry);
+  verifyZeroInteractions(dryRunCache);
+}
