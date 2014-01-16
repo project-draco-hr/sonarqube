@@ -3,11 +3,10 @@
   try {
     QProfile profile=newProfile(name,language,userSession,session);
     QProfileResult result=new QProfileResult();
-    List<RulesProfile> importProfiles=readProfilesFromXml(result,xmlProfilesByPlugin);
-    for (    RulesProfile rulesProfile : importProfiles) {
-      importProfile(profile.id(),rulesProfile,session);
-    }
     result.setProfile(profile);
+    for (    Map.Entry<String,String> entry : xmlProfilesByPlugin.entrySet()) {
+      result.add(exporter.importXml(profile,entry.getKey(),entry.getValue(),session));
+    }
     session.commit();
     dryRunCache.reportGlobalModification();
     return result;

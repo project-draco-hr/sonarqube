@@ -1,0 +1,15 @@
+{
+  checkPermission(userSession);
+  QualityProfileDto profile=findNotNull(profileId,session);
+  if (!profileLookup.isDeletable(QProfile.from(profile),session)) {
+    throw new BadRequestException("This profile can not be deleted");
+  }
+ else {
+    activeRuleDao.deleteParametersFromProfile(profile.getId(),session);
+    activeRuleDao.deleteFromProfile(profile.getId(),session);
+    dao.delete(profile.getId(),session);
+    propertiesDao.deleteProjectProperties(PROFILE_PROPERTY_PREFIX + profile.getLanguage(),profile.getName(),session);
+    ruleRegistry.deleteActiveRulesFromProfile(profile.getId());
+    dryRunCache.reportGlobalModification();
+  }
+}

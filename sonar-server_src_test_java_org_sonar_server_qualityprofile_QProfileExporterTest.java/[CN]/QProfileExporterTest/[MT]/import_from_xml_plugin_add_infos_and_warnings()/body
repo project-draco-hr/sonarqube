@@ -5,8 +5,6 @@
   rule.setId(10);
   ActiveRule activeRule=profile.activateRule(rule,RulePriority.BLOCKER);
   activeRule.setParameter("max","10");
-  Map<String,String> xmlProfilesByPlugin=newHashMap();
-  xmlProfilesByPlugin.put("pmd","<xml/>");
   ProfileImporter importer=mock(ProfileImporter.class);
   when(importer.getKey()).thenReturn("pmd");
   doAnswer(new Answer(){
@@ -20,7 +18,8 @@
   }
 ).when(importer).importProfile(any(Reader.class),any(ValidationMessages.class));
   importers.add(importer);
-  QProfileResult result=operations.newProfile("Default","java",xmlProfilesByPlugin,authorizedUserSession);
+  QProfileResult result=operations.importXml(new QProfile().setId(1),"pmd","<xml/>",session);
+  ;
   assertThat(result.infos()).hasSize(1);
   assertThat(result.warnings()).hasSize(1);
 }

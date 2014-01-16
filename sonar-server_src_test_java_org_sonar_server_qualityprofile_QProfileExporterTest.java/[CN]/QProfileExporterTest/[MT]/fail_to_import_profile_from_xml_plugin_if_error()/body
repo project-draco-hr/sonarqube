@@ -1,7 +1,11 @@
 {
   try {
-    Map<String,String> xmlProfilesByPlugin=newHashMap();
-    xmlProfilesByPlugin.put("pmd","<xml/>");
+    final RulesProfile profile=RulesProfile.create("Default","java");
+    Rule rule=Rule.create("pmd","rule1");
+    rule.createParameter("max");
+    rule.setId(10);
+    ActiveRule activeRule=profile.activateRule(rule,RulePriority.BLOCKER);
+    activeRule.setParameter("max","10");
     ProfileImporter importer=mock(ProfileImporter.class);
     when(importer.getKey()).thenReturn("pmd");
     importers.add(importer);
@@ -10,15 +14,14 @@
         Object[] args=invocation.getArguments();
         ValidationMessages validationMessages=(ValidationMessages)args[1];
         validationMessages.addErrorText("error!");
-        return null;
+        return profile;
       }
     }
 ).when(importer).importProfile(any(Reader.class),any(ValidationMessages.class));
-    operations.newProfile("Default","java",xmlProfilesByPlugin,authorizedUserSession);
+    operations.importXml(new QProfile().setId(1),"pmd","<xml/>",session);
     fail();
   }
  catch (  Exception e) {
     assertThat(e).isInstanceOf(BadRequestException.class);
   }
-  verify(session,never()).commit();
 }
