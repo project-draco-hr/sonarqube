@@ -1,0 +1,16 @@
+{
+  when(qualityProfileDao.selectById(1,session)).thenReturn(new QualityProfileDto().setId(1).setName("Default").setLanguage("java"));
+  when(profileLookup.isDeletable(any(QProfile.class),eq(session))).thenReturn(false);
+  try {
+    operations.deleteProfile(1,authorizedUserSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(BadRequestException.class);
+  }
+  verify(session,never()).commit();
+  verifyZeroInteractions(activeRuleDao);
+  verify(qualityProfileDao,never()).delete(anyInt(),eq(session));
+  verifyZeroInteractions(propertiesDao);
+  verifyZeroInteractions(ruleRegistry);
+}

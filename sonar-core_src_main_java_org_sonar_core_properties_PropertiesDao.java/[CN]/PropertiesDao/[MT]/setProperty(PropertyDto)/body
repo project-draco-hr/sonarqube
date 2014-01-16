@@ -1,17 +1,8 @@
 {
   SqlSession session=mybatis.openSession();
-  PropertiesMapper mapper=session.getMapper(PropertiesMapper.class);
   try {
-    PropertyDto persistedProperty=mapper.selectByKey(property);
-    if (persistedProperty != null && !StringUtils.equals(persistedProperty.getValue(),property.getValue())) {
-      persistedProperty.setValue(property.getValue());
-      mapper.update(persistedProperty);
-      session.commit();
-    }
- else     if (persistedProperty == null) {
-      mapper.insert(property);
-      session.commit();
-    }
+    setProperty(property,session);
+    session.commit();
   }
   finally {
     MyBatis.closeQuietly(session);

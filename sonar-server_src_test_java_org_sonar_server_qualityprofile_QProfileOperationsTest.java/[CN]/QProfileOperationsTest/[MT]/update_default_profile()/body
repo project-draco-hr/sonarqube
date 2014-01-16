@@ -1,8 +1,8 @@
 {
-  QualityProfileDto qualityProfile=new QualityProfileDto().setId(1).setName("My profile").setLanguage("java");
-  operations.setDefaultProfile(qualityProfile,authorizedUserSession);
+  when(qualityProfileDao.selectById(1,session)).thenReturn(new QualityProfileDto().setId(1).setName("Default").setLanguage("java"));
+  operations.setDefaultProfile(1,authorizedUserSession);
   ArgumentCaptor<PropertyDto> argumentCaptor=ArgumentCaptor.forClass(PropertyDto.class);
   verify(propertiesDao).setProperty(argumentCaptor.capture());
   assertThat(argumentCaptor.getValue().getKey()).isEqualTo("sonar.profile.java");
-  assertThat(argumentCaptor.getValue().getValue()).isEqualTo("My profile");
+  assertThat(argumentCaptor.getValue().getValue()).isEqualTo("Default");
 }
