@@ -2,12 +2,19 @@
   checkPermission(userSession);
   SqlSession session=myBatis.openSession();
   try {
-    QualityProfileDto profile=findNotNull(profileId,session);
-    if (!profile.getName().equals(newName)) {
-      checkNotAlreadyExists(newName,profile.getLanguage(),session);
+    QualityProfileDto profileDto=findNotNull(profileId,session);
+    String oldName=profileDto.getName();
+    QProfile profile=QProfile.from(profileDto);
+    if (!oldName.equals(newName)) {
+      checkNotAlreadyExists(newName,profile.language(),session);
     }
-    profile.setName(newName);
-    dao.update(profile,session);
+    profileDto.setName(newName);
+    dao.update(profileDto,session);
+    List<QProfile> children=profileLookup.children(profile,session);
+    for (    QProfile child : children) {
+      dao.update(child.setParent(newName).toDto(),session);
+    }
+    propertiesDao.updateProperties(PROFILE_PROPERTY_PREFIX + profile.language(),oldName,newName,session);
     session.commit();
   }
   finally {

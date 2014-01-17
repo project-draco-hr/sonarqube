@@ -1,9 +1,12 @@
 {
-  when(qualityProfileDao.selectById(1,session)).thenReturn(new QualityProfileDto().setId(1).setName("Default").setLanguage("java"));
+  when(qualityProfileDao.selectById(1,session)).thenReturn(new QualityProfileDto().setId(1).setName("Old Default").setLanguage("java"));
+  when(profileLookup.children(any(QProfile.class),eq(session))).thenReturn(Collections.<QProfile>emptyList());
   operations.renameProfile(1,"Default profile",authorizedUserSession);
   ArgumentCaptor<QualityProfileDto> profileArgument=ArgumentCaptor.forClass(QualityProfileDto.class);
   verify(qualityProfileDao).update(profileArgument.capture(),eq(session));
+  assertThat(profileArgument.getValue().getId()).isEqualTo(1);
   assertThat(profileArgument.getValue().getName()).isEqualTo("Default profile");
   assertThat(profileArgument.getValue().getLanguage()).isEqualTo("java");
+  verify(propertiesDao).updateProperties("sonar.profile.java","Old Default","Default profile",session);
   verify(session).commit();
 }
