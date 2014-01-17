@@ -1,0 +1,14 @@
+{
+  when(qualityProfileDao.selectById(1,session)).thenReturn(new QualityProfileDto().setId(1).setName("Default").setLanguage("java"));
+  when(qualityProfileDao.selectByNameAndLanguage(anyString(),anyString(),eq(session))).thenReturn(new QualityProfileDto());
+  when(profilesManager.copyProfile(1,"Copy Default")).thenReturn(2);
+  try {
+    operations.copyProfile(1,"Copy Default",authorizedUserSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(BadRequestException.class);
+  }
+  verifyZeroInteractions(profilesManager);
+  verifyZeroInteractions(ruleRegistry);
+}

@@ -1,0 +1,13 @@
+{
+  when(qualityProfileDao.selectById(1,session)).thenReturn(null);
+  when(profilesManager.copyProfile(1,"Copy Default")).thenReturn(2);
+  try {
+    operations.copyProfile(1,"Copy Default",authorizedUserSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(NotFoundException.class);
+  }
+  verifyZeroInteractions(profilesManager);
+  verifyZeroInteractions(ruleRegistry);
+}
