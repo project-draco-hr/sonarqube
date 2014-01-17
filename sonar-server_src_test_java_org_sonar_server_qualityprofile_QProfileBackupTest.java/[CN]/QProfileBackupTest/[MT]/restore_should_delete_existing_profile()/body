@@ -6,7 +6,7 @@
   when(xmlProfileParser.parse(any(Reader.class),any(ValidationMessages.class))).thenReturn(profile);
   RulesProfile existingProfile=RulesProfile.create("Default","java").setId(1);
   when(hibernateSession.getSingleResult(any(Class.class),eq("name"),eq("Default"),eq("language"),eq("java"))).thenReturn(existingProfile);
-  when(qProfileLookup.profile(anyInt())).thenReturn(new QProfile().setId(1));
+  when(qProfileLookup.profile(anyInt(),eq(session))).thenReturn(new QProfile().setId(1));
   QProfileResult result=backup.restore("<xml/>",true,userSession);
   assertThat(result.profile()).isNotNull();
   verify(hibernateSession).removeWithoutFlush(eq(existingProfile));
