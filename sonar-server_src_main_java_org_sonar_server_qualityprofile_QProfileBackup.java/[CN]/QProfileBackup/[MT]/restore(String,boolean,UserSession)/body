@@ -1,24 +1,25 @@
 {
   checkPermission(userSession);
+  SqlSession session=myBatis.openSession();
   QProfileResult result=new QProfileResult();
-  ValidationMessages messages=ValidationMessages.create();
-  RulesProfile importedProfile=xmlProfileParser.parse(new StringReader(xmlBackup),messages);
-  processValidationMessages(messages,result);
-  if (importedProfile != null) {
-    DatabaseSession hibernateSession=sessionFactory.getSession();
-    checkProfileDoesNotExists(importedProfile,deleteExisting,hibernateSession);
-    hibernateSession.saveWithoutFlush(importedProfile);
-    hibernateSession.commit();
-    SqlSession session=myBatis.openSession();
-    try {
+  try {
+    ValidationMessages messages=ValidationMessages.create();
+    RulesProfile importedProfile=xmlProfileParser.parse(new StringReader(xmlBackup),messages);
+    processValidationMessages(messages,result);
+    if (importedProfile != null) {
+      DatabaseSession hibernateSession=sessionFactory.getSession();
+      checkProfileDoesNotExists(importedProfile,deleteExisting,hibernateSession);
+      hibernateSession.saveWithoutFlush(importedProfile);
+      hibernateSession.commit();
       QProfile profile=qProfileLookup.profile(importedProfile.getId());
       ruleRegistry.bulkIndexProfile(profile.id(),session);
+      dryRunCache.reportGlobalModification(session);
+      session.commit();
       result.setProfile(profile);
     }
+  }
   finally {
-      MyBatis.closeQuietly(session);
-    }
-    dryRunCache.reportGlobalModification();
+    MyBatis.closeQuietly(session);
   }
   return result;
 }
