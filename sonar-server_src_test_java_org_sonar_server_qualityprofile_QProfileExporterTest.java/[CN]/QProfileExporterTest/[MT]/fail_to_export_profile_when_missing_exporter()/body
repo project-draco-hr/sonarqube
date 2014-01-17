@@ -1,0 +1,20 @@
+{
+  RulesProfile profile=RulesProfile.create("Default","java").setId(1);
+  Rule rule=Rule.create("pmd","rule1");
+  rule.createParameter("max");
+  rule.setId(10);
+  ActiveRule activeRule=profile.activateRule(rule,RulePriority.BLOCKER);
+  activeRule.setParameter("max","10");
+  when(hibernateSession.getSingleResult(any(Class.class),eq("id"),eq(1))).thenReturn(profile);
+  ProfileExporter exporter=mock(ProfileExporter.class);
+  when(exporter.getKey()).thenReturn("pmd");
+  exporters.add(exporter);
+  try {
+    operations.exportToXml(new QProfile().setId(1),"unknown");
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(BadRequestException.class).hasMessage("No such exporter : unknown");
+  }
+  verify(exporter,never()).exportProfile(any(RulesProfile.class),any(Writer.class));
+}

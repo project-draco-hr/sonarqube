@@ -1,0 +1,20 @@
+{
+  final RulesProfile profile=RulesProfile.create("Default","java");
+  Rule rule=Rule.create("pmd","rule1");
+  rule.createParameter("max");
+  rule.setId(10);
+  ActiveRule activeRule=profile.activateRule(rule,RulePriority.BLOCKER);
+  activeRule.setParameter("max","10");
+  ProfileImporter importer=mock(ProfileImporter.class);
+  when(importer.getKey()).thenReturn("pmd");
+  importers.add(importer);
+  when(importer.importProfile(any(Reader.class),any(ValidationMessages.class))).thenReturn(profile);
+  try {
+    operations.importXml(new QProfile().setId(1),"unknown","<xml/>",session);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(BadRequestException.class).hasMessage("No such importer : unknown");
+  }
+  verify(importer,never()).importProfile(any(Reader.class),any(ValidationMessages.class));
+}

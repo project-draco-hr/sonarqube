@@ -1,23 +1,23 @@
 {
-  try {
-    final RulesProfile profile=RulesProfile.create("Default","java");
-    Rule rule=Rule.create("pmd","rule1");
-    rule.createParameter("max");
-    rule.setId(10);
-    ActiveRule activeRule=profile.activateRule(rule,RulePriority.BLOCKER);
-    activeRule.setParameter("max","10");
-    ProfileImporter importer=mock(ProfileImporter.class);
-    when(importer.getKey()).thenReturn("pmd");
-    importers.add(importer);
-    doAnswer(new Answer(){
-      public Object answer(      InvocationOnMock invocation){
-        Object[] args=invocation.getArguments();
-        ValidationMessages validationMessages=(ValidationMessages)args[1];
-        validationMessages.addErrorText("error!");
-        return profile;
-      }
+  final RulesProfile profile=RulesProfile.create("Default","java");
+  Rule rule=Rule.create("pmd","rule1");
+  rule.createParameter("max");
+  rule.setId(10);
+  ActiveRule activeRule=profile.activateRule(rule,RulePriority.BLOCKER);
+  activeRule.setParameter("max","10");
+  ProfileImporter importer=mock(ProfileImporter.class);
+  when(importer.getKey()).thenReturn("pmd");
+  importers.add(importer);
+  doAnswer(new Answer(){
+    public Object answer(    InvocationOnMock invocation){
+      Object[] args=invocation.getArguments();
+      ValidationMessages validationMessages=(ValidationMessages)args[1];
+      validationMessages.addErrorText("error!");
+      return profile;
     }
+  }
 ).when(importer).importProfile(any(Reader.class),any(ValidationMessages.class));
+  try {
     operations.importXml(new QProfile().setId(1),"pmd","<xml/>",session);
     fail();
   }
