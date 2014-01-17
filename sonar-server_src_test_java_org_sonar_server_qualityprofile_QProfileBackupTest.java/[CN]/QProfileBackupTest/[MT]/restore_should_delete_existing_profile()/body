@@ -4,7 +4,8 @@
   when(profile.getLanguage()).thenReturn("java");
   when(profile.getId()).thenReturn(1);
   when(xmlProfileParser.parse(any(Reader.class),any(ValidationMessages.class))).thenReturn(profile);
-  RulesProfile existingProfile=RulesProfile.create("Default","java").setId(1);
+  RulesProfile existingProfile=mock(RulesProfile.class);
+  when(existingProfile.getId()).thenReturn(1);
   when(hibernateSession.getSingleResult(any(Class.class),eq("name"),eq("Default"),eq("language"),eq("java"))).thenReturn(existingProfile);
   when(qProfileLookup.profile(anyInt(),eq(session))).thenReturn(new QProfile().setId(1));
   QProfileResult result=backup.restore("<xml/>",true,userSession);
