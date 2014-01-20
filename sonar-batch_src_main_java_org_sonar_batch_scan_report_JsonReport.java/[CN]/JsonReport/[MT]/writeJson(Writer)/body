@@ -1,10 +1,8 @@
 {
-  JsonWriter json=null;
   try {
-    json=new JsonWriter(writer);
-    json.setSerializeNulls(false);
+    JsonWriter json=JsonWriter.of(writer);
     json.beginObject();
-    json.name("version").value(server.getVersion());
+    json.prop("version",server.getVersion());
     Set<RuleKey> ruleKeys=newHashSet();
     Set<String> userLogins=newHashSet();
     componentSelector.init();
@@ -13,12 +11,9 @@
     writeJsonRules(json,ruleKeys);
     List<User> users=userFinder.findByLogins(new ArrayList<String>(userLogins));
     writeUsers(json,users);
-    json.endObject().flush();
+    json.endObject().close();
   }
  catch (  IOException e) {
     throw new SonarException("Unable to write JSON report",e);
-  }
- finally {
-    Closeables.closeQuietly(json);
   }
 }
