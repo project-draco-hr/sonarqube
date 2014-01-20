@@ -1,0 +1,15 @@
+{
+  Writer output=mock(Writer.class);
+  IOException cause=new IOException("bad");
+  doThrow(cause).when(output).close();
+  CsvWriter writer=CsvWriter.of(output);
+  writer.values("foo");
+  try {
+    writer.close();
+    fail();
+  }
+ catch (  WriterException e) {
+    assertThat(e).hasMessage("Fail to close CSV output");
+    assertThat(e.getCause()).isSameAs(cause);
+  }
+}

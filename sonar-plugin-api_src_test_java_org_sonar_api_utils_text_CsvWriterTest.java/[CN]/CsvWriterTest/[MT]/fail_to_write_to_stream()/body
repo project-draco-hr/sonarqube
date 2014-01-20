@@ -1,0 +1,14 @@
+{
+  Writer output=mock(Writer.class);
+  IOException cause=new IOException("bad");
+  doThrow(cause).when(output).append(anyString());
+  CsvWriter writer=CsvWriter.of(output);
+  try {
+    writer.values("foo");
+    fail();
+  }
+ catch (  WriterException e) {
+    assertThat(e).hasMessage("Fail to generate CSV with value: foo");
+    assertThat(e.getCause()).isSameAs(cause);
+  }
+}
