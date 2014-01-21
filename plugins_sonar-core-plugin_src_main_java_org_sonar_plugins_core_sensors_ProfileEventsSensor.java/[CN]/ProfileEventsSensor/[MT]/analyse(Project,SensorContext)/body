@@ -1,22 +1,26 @@
 {
-  Measure pastProfileMeasure=getPreviousMeasure(project,CoreMetrics.PROFILE);
-  if (pastProfileMeasure == null) {
-    return;
-  }
-  int pastProfileId=pastProfileMeasure.getIntValue();
-  Measure pastProfileVersionMeasure=getPreviousMeasure(project,CoreMetrics.PROFILE_VERSION);
-  final int pastProfileVersion;
-  if (pastProfileVersionMeasure == null) {
-    pastProfileVersion=1;
-  }
+  RulesProfileWrapper profileWrapper=(RulesProfileWrapper)profile;
+  for (  String languageKey : moduleLanguages.getModuleLanguageKeys()) {
+    RulesProfile realProfile=profileWrapper.getProfileByLanguage(languageKey);
+    Measure pastProfileMeasure=getPreviousMeasure(project,CoreMetrics.PROFILE);
+    if (pastProfileMeasure == null) {
+      return;
+    }
+    int pastProfileId=pastProfileMeasure.getIntValue();
+    Measure pastProfileVersionMeasure=getPreviousMeasure(project,CoreMetrics.PROFILE_VERSION);
+    final int pastProfileVersion;
+    if (pastProfileVersionMeasure == null) {
+      pastProfileVersion=1;
+    }
  else {
-    pastProfileVersion=pastProfileVersionMeasure.getIntValue();
-  }
-  String pastProfile=formatProfileDescription(pastProfileMeasure.getData(),pastProfileVersion);
-  int currentProfileId=profile.getId();
-  int currentProfileVersion=profile.getVersion();
-  String currentProfile=formatProfileDescription(profile.getName(),currentProfileVersion);
-  if ((pastProfileId != currentProfileId) || (pastProfileVersion != currentProfileVersion)) {
-    context.createEvent(project,currentProfile,currentProfile + " is used instead of " + pastProfile,Event.CATEGORY_PROFILE,null);
+      pastProfileVersion=pastProfileVersionMeasure.getIntValue();
+    }
+    String pastProfile=formatProfileDescription(pastProfileMeasure.getData(),pastProfileVersion);
+    int currentProfileId=realProfile.getId();
+    int currentProfileVersion=realProfile.getVersion();
+    String currentProfile=formatProfileDescription(realProfile.getName(),currentProfileVersion);
+    if ((pastProfileId != currentProfileId) || (pastProfileVersion != currentProfileVersion)) {
+      context.createEvent(project,currentProfile,currentProfile + " is used instead of " + pastProfile,Event.CATEGORY_PROFILE,null);
+    }
   }
 }

@@ -1,7 +1,11 @@
 {
   Settings settings=new Settings();
   settings.setProperty("sonar.profile.java","legacy profile");
+  settings.setProperty("sonar.profile.cobol","cobol profile");
   when(dao.getProfile(Java.KEY,"legacy profile")).thenReturn(RulesProfile.create("legacy profile","java"));
-  RulesProfile profile=new DefaultProfileLoader(dao).load(javaProject,settings);
+  when(dao.getProfile("cobol","cobol profile")).thenReturn(RulesProfile.create("cobol profile","cobol"));
+  ModuleLanguages moduleLanguages=new ModuleLanguages(settings,languages);
+  moduleLanguages.addLanguage("java");
+  RulesProfile profile=new DefaultProfileLoader(dao,moduleLanguages,languages).load(javaProject,settings);
   assertThat(profile.getName()).isEqualTo("legacy profile");
 }

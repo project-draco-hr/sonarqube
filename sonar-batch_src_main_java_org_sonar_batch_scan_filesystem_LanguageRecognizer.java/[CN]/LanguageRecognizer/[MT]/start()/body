@@ -1,13 +1,13 @@
 {
-  for (  Language language : languages) {
-    if (language.getFileSuffixes().length == 0 && language.getKey().equals(project.getLanguageKey())) {
-      ignoreFileExtension=true;
+  for (  Language language : languages.all()) {
+    for (    String suffix : language.getFileSuffixes()) {
+      String extension=sanitizeExtension(suffix);
+      langsByExtension.put(extension,language.getKey());
     }
- else {
-      for (      String suffix : language.getFileSuffixes()) {
-        String extension=sanitizeExtension(suffix);
-        langsByExtension.put(extension,language.getKey());
-      }
+    String[] filePatterns=settings.getStringArray(getFilePatternPropKey(language.getKey()));
+    PathPattern[] pathPatterns=PathPattern.create(filePatterns);
+    if (pathPatterns.length > 0) {
+      patternByLanguage.put(language.getKey(),pathPatterns);
     }
   }
 }

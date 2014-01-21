@@ -1,18 +1,17 @@
 {
-  String profileName=StringUtils.defaultIfBlank(settings.getString("sonar.profile"),settings.getString("sonar.profile." + project.getLanguageKey()));
-  if (StringUtils.isBlank(profileName)) {
-    String msg="You must install a plugin that supports the language key '" + project.getLanguageKey() + "'.";
-    if (!LOG.isDebugEnabled()) {
-      msg+=" Run analysis in verbose mode to see list of available language keys.";
+  Map<String,RulesProfile> profilesPerLanguageKey=new HashMap<String,RulesProfile>();
+  for (  Language language : languages.all()) {
+    String languageKey=language.getKey();
+    String profileName=StringUtils.defaultIfBlank(settings.getString("sonar.profile"),settings.getString("sonar.profile." + languageKey));
+    RulesProfile profile=dao.getProfile(languageKey,profileName);
+    if (profile == null) {
+      throw new SonarException("Quality profile not found : " + profileName + ", language "+ languageKey);
     }
- else {
-      msg+=" See analysis log for a list of available language keys.";
-    }
-    throw new SonarException(msg);
+    profilesPerLanguageKey.put(languageKey,hibernateHack(profile));
   }
-  RulesProfile profile=dao.getProfile(project.getLanguageKey(),profileName);
-  if (profile == null) {
-    throw new SonarException("Quality profile not found : " + profileName + ", language "+ project.getLanguageKey());
+  RulesProfile profile=new RulesProfileWrapper(moduleLanguages,profilesPerLanguageKey);
+  for (  Map.Entry<String,RulesProfile> profiles : profilesPerLanguageKey.entrySet()) {
+    LOG.info("Quality profile for {}: {}",profiles.getKey(),profiles.getValue());
   }
-  return hibernateHack(profile);
+  return profile;
 }

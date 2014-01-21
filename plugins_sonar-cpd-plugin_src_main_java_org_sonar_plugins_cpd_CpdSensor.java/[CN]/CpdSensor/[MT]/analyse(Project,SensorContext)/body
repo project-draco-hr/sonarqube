@@ -1,5 +1,15 @@
 {
-  CpdEngine engine=getEngine(project);
-  LOG.info("{} is used",engine);
-  engine.analyse(project,context);
+  for (  Language language : moduleLanguages.getModuleLanguages()) {
+    if (isSkipped(language)) {
+      LOG.info("Detection of duplicated code is skipped for {}.",language);
+      continue;
+    }
+    CpdEngine engine=getEngine(language);
+    if (!engine.isLanguageSupported(language)) {
+      LOG.debug("Detection of duplicated code is not supported for {}.",language);
+      continue;
+    }
+    LOG.info("{} is used for {}",engine,language);
+    engine.analyse(project,context);
+  }
 }

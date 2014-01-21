@@ -1,0 +1,22 @@
+{
+  Settings settings=new Settings();
+  settings.setProperty("sonar.profile.java","java profile");
+  settings.setProperty("sonar.profile.cobol","cobol profile");
+  RulesProfile javaProfile=RulesProfile.create("java profile","java");
+  org.sonar.api.rules.Rule javaRule=new org.sonar.api.rules.Rule("javaplugin","javarule");
+  ActiveRule javaActiveRule=new ActiveRule(javaProfile,javaRule,RulePriority.BLOCKER);
+  javaProfile.addActiveRule(javaActiveRule);
+  when(dao.getProfile(Java.KEY,"java profile")).thenReturn(javaProfile);
+  RulesProfile cobolProfile=RulesProfile.create("cobol profile","cobol");
+  org.sonar.api.rules.Rule cobolRule=new org.sonar.api.rules.Rule("cobolplugin","cobolrule");
+  ActiveRule cobolActiveRule=new ActiveRule(cobolProfile,cobolRule,RulePriority.BLOCKER);
+  cobolProfile.addActiveRule(cobolActiveRule);
+  when(dao.getProfile("cobol","cobol profile")).thenReturn(cobolProfile);
+  ModuleLanguages moduleLanguages=new ModuleLanguages(settings,languages);
+  moduleLanguages.addLanguage("java");
+  moduleLanguages.addLanguage("cobol");
+  RulesProfile profile=new DefaultProfileLoader(dao,moduleLanguages,languages).load(javaProject,settings);
+  thrown.expect(SonarException.class);
+  thrown.expectMessage("Please update your plugin to support multi-language analysis");
+  profile.getId();
+}

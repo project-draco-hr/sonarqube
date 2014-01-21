@@ -1,0 +1,17 @@
+{
+  Languages languages=new Languages(new MockLanguage("xml","xhtml"),new MockLanguage("web","xhtml"));
+  Settings settings=new Settings();
+  LanguageRecognizer recognizer=new LanguageRecognizer(settings,languages);
+  recognizer.start();
+  thrown.expect(SonarException.class);
+  thrown.expectMessage(new BaseMatcher<String>(){
+    @Override public void describeTo(    Description arg0){
+    }
+    @Override public boolean matches(    Object arg0){
+      return arg0.toString().contains("Language of file 'abc.xhtml' can not be decided as the file extension 'xhtml' is declared by several languages: ") && arg0.toString().contains("web") && arg0.toString().contains("xml");
+    }
+  }
+);
+  recognizer.of(newInputFile("abc.xhtml"));
+  recognizer.stop();
+}

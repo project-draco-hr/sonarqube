@@ -1,0 +1,11 @@
+{
+  settings.setProperty(CoreProperties.CORE_IMPORT_SOURCES_PROPERTY,"true");
+  when(fs.inputFiles(FileQuery.all())).thenReturn((Iterable)Arrays.asList(newInputFile("src/main/java/foo/bar/Foo.java","sample code","foo/bar/Foo.java","java",false)));
+  when(project.getLanguageKey()).thenReturn(Java.KEY);
+  Languages languages=new Languages(Java.INSTANCE);
+  ComponentIndexer indexer=new ComponentIndexer(project,languages,sonarIndex,settings,mock(ResourceKeyMigration.class),new ModuleLanguages(settings,languages),mock(ResourceDao.class));
+  indexer.execute(fs);
+  Resource sonarFile=JavaFile.create("src/main/java/foo/bar/Foo.java","foo/bar/Foo.java",false);
+  verify(sonarIndex).index(sonarFile);
+  verify(sonarIndex).setSource(sonarFile,"sample code");
+}

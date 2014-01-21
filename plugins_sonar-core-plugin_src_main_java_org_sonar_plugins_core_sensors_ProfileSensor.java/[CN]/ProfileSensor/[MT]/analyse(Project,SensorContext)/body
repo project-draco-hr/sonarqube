@@ -1,11 +1,15 @@
 {
-  Measure measure=new Measure(CoreMetrics.PROFILE,profile.getName());
-  Measure measureVersion=new Measure(CoreMetrics.PROFILE_VERSION,Integer.valueOf(profile.getVersion()).doubleValue());
-  if (profile.getId() != null) {
-    measure.setValue(profile.getId().doubleValue());
-    profile.setUsed(true);
-    session.merge(profile);
+  RulesProfileWrapper wrapper=(RulesProfileWrapper)profile;
+  for (  String languageKey : languages.getModuleLanguageKeys()) {
+    RulesProfile realProfile=wrapper.getProfileByLanguage(languageKey);
+    Measure measure=new Measure(CoreMetrics.PROFILE,profile.getName());
+    Measure measureVersion=new Measure(CoreMetrics.PROFILE_VERSION,Integer.valueOf(profile.getVersion()).doubleValue());
+    if (realProfile.getId() != null) {
+      measure.setValue(realProfile.getId().doubleValue());
+      realProfile.setUsed(true);
+      session.merge(realProfile);
+    }
+    context.saveMeasure(measure);
+    context.saveMeasure(measureVersion);
   }
-  context.saveMeasure(measure);
-  context.saveMeasure(measureVersion);
 }

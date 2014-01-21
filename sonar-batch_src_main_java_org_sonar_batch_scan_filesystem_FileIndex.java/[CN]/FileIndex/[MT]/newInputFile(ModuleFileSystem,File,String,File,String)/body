@@ -1,22 +1,23 @@
 {
-  String lang=languageRecognizer.of(file);
-  if (lang == null) {
-    return null;
-  }
   Map<String,String> attributes=Maps.newHashMap();
   set(attributes,InputFile.ATTRIBUTE_TYPE,type);
-  set(attributes,InputFile.ATTRIBUTE_LANGUAGE,lang);
   set(attributes,InputFile.ATTRIBUTE_SOURCEDIR_PATH,PathUtils.canonicalPath(sourceDir));
   String sourceRelativePath=pathResolver.relativePath(sourceDir,file);
   set(attributes,InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,sourceRelativePath);
   String resourceKey=PathUtils.sanitize(path);
   set(attributes,DefaultInputFile.ATTRIBUTE_COMPONENT_KEY,project.getEffectiveKey() + ":" + resourceKey);
+  initStatus(file,fileSystem.sourceCharset(),path,attributes);
+  DefaultInputFile inputFile=DefaultInputFile.create(file,fileSystem.sourceCharset(),path,attributes);
+  String lang=languageRecognizer.of(inputFile);
+  if (lang == null) {
+    return null;
+  }
+  set(inputFile.attributes(),InputFile.ATTRIBUTE_LANGUAGE,lang);
   if (Java.KEY.equals(lang)) {
-    set(attributes,DefaultInputFile.ATTRIBUTE_COMPONENT_DEPRECATED_KEY,project.getEffectiveKey() + ":" + JavaFile.fromRelativePath(sourceRelativePath,false).getDeprecatedKey());
+    set(inputFile.attributes(),DefaultInputFile.ATTRIBUTE_COMPONENT_DEPRECATED_KEY,project.getEffectiveKey() + ":" + JavaFile.fromRelativePath(sourceRelativePath,false).getDeprecatedKey());
   }
  else {
-    set(attributes,DefaultInputFile.ATTRIBUTE_COMPONENT_DEPRECATED_KEY,project.getEffectiveKey() + ":" + sourceRelativePath);
+    set(inputFile.attributes(),DefaultInputFile.ATTRIBUTE_COMPONENT_DEPRECATED_KEY,project.getEffectiveKey() + ":" + sourceRelativePath);
   }
-  initStatus(file,fileSystem.sourceCharset(),path,attributes);
-  return DefaultInputFile.create(file,fileSystem.sourceCharset(),path,attributes);
+  return inputFile;
 }

@@ -1,14 +1,14 @@
 {
-  Language[] languages=new Language[]{new MockLanguage("java","java","jav"),new MockLanguage("cobol","cbl","cob")};
-  LanguageRecognizer recognizer=new LanguageRecognizer(newProject("java"),languages);
+  Languages languages=new Languages(new MockLanguage("java","java","jav"),new MockLanguage("cobol","cbl","cob"));
+  LanguageRecognizer recognizer=new LanguageRecognizer(new Settings(),languages);
   recognizer.start();
-  assertThat(recognizer.of(temp.newFile("Foo.java"))).isEqualTo("java");
-  assertThat(recognizer.of(temp.newFile("Foo.JAVA"))).isEqualTo("java");
-  assertThat(recognizer.of(temp.newFile("Foo.jav"))).isEqualTo("java");
-  assertThat(recognizer.of(temp.newFile("Foo.Jav"))).isEqualTo("java");
-  assertThat(recognizer.of(temp.newFile("abc.cbl"))).isNull();
-  assertThat(recognizer.of(temp.newFile("abc.CBL"))).isNull();
-  assertThat(recognizer.of(temp.newFile("abc.php"))).isNull();
-  assertThat(recognizer.of(temp.newFile("abc"))).isNull();
+  assertThat(recognizer.of(newInputFile("Foo.java"))).isEqualTo("java");
+  assertThat(recognizer.of(newInputFile("Foo.JAVA"))).isEqualTo("java");
+  assertThat(recognizer.of(newInputFile("Foo.jav"))).isEqualTo("java");
+  assertThat(recognizer.of(newInputFile("Foo.Jav"))).isEqualTo("java");
+  assertThat(recognizer.of(newInputFile("abc.cbl"))).isEqualTo("cobol");
+  assertThat(recognizer.of(newInputFile("abc.CBL"))).isEqualTo("cobol");
+  assertThat(recognizer.of(newInputFile("abc.php"))).isNull();
+  assertThat(recognizer.of(newInputFile("abc"))).isNull();
   recognizer.stop();
 }

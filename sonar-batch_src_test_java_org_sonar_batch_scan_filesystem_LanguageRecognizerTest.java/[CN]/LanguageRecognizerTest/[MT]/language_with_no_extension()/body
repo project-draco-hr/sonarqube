@@ -1,15 +1,17 @@
 {
-  Language[] languages=new Language[]{new MockLanguage("java","java"),new MockLanguage("abap")};
-  LanguageRecognizer recognizer=new LanguageRecognizer(newProject("java"),languages);
+  Languages languages=new Languages(new MockLanguage("java","java"),new MockLanguage("abap"));
+  LanguageRecognizer recognizer=new LanguageRecognizer(new Settings(),languages);
   recognizer.start();
-  assertThat(recognizer.of(temp.newFile("abc"))).isNull();
-  assertThat(recognizer.of(temp.newFile("abc.abap"))).isNull();
-  assertThat(recognizer.of(temp.newFile("abc.java"))).isEqualTo("java");
+  assertThat(recognizer.of(newInputFile("abc"))).isNull();
+  assertThat(recognizer.of(newInputFile("abc.abap"))).isNull();
+  assertThat(recognizer.of(newInputFile("abc.java"))).isEqualTo("java");
   recognizer.stop();
-  recognizer=new LanguageRecognizer(newProject("abap"),languages);
+  Settings settings=new Settings();
+  settings.setProperty(CoreProperties.PROJECT_LANGUAGE_PROPERTY,"abap");
+  recognizer=new LanguageRecognizer(settings,languages);
   recognizer.start();
-  assertThat(recognizer.of(temp.newFile("abc"))).isEqualTo("abap");
-  assertThat(recognizer.of(temp.newFile("abc.txt"))).isEqualTo("abap");
-  assertThat(recognizer.of(temp.newFile("abc.java"))).isEqualTo("abap");
+  assertThat(recognizer.of(newInputFile("abc"))).isEqualTo("abap");
+  assertThat(recognizer.of(newInputFile("abc.txt"))).isEqualTo("abap");
+  assertThat(recognizer.of(newInputFile("abc.java"))).isEqualTo("abap");
   recognizer.stop();
 }

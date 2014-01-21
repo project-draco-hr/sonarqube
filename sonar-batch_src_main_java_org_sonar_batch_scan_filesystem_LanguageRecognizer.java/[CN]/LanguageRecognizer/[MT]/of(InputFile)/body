@@ -1,0 +1,44 @@
+{
+  String forcedLanguage=null;
+  for (  Map.Entry<String,PathPattern[]> languagePattern : patternByLanguage.entrySet()) {
+    PathPattern[] patterns=languagePattern.getValue();
+    for (    PathPattern pathPattern : patterns) {
+      if (pathPattern.match(inputFile)) {
+        if (forcedLanguage == null) {
+          forcedLanguage=languagePattern.getKey();
+          break;
+        }
+ else {
+          throw new SonarException("Language of file '" + inputFile.path() + "' can not be decided as the file matches patterns of both "+ getFilePatternPropKey(forcedLanguage)+ " and "+ getFilePatternPropKey(languagePattern.getKey()));
+        }
+      }
+    }
+  }
+  if (forcedLanguage != null) {
+    LOG.debug("Language of file '" + inputFile.path() + "' was forced to '"+ forcedLanguage+ "'");
+    return forcedLanguage;
+  }
+  String extension=sanitizeExtension(FilenameUtils.getExtension(inputFile.file().getName()));
+  String languageKey=settings.getString(CoreProperties.PROJECT_LANGUAGE_PROPERTY);
+  if (StringUtils.isNotBlank(languageKey)) {
+    Language language=languages.get(languageKey);
+    if (language == null) {
+      throw new SonarException("No language is installed with key '" + languageKey + "'. Please update property '"+ CoreProperties.PROJECT_LANGUAGE_PROPERTY+ "'");
+    }
+    String[] fileSuffixes=language.getFileSuffixes();
+    if (fileSuffixes.length == 0) {
+      return languageKey;
+    }
+    for (    String fileSuffix : fileSuffixes) {
+      if (sanitizeExtension(fileSuffix).equals(extension)) {
+        return languageKey;
+      }
+    }
+    return null;
+  }
+  Set<String> langs=langsByExtension.get(extension);
+  if (langs.size() > 1) {
+    throw new SonarException("Language of file '" + inputFile.path() + "' can not be decided as the file extension '"+ extension+ "' is declared by several languages: "+ StringUtils.join(langs,", "));
+  }
+  return langs.isEmpty() ? null : langs.iterator().next();
+}
