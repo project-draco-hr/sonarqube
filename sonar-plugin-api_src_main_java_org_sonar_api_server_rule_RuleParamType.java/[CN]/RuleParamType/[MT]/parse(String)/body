@@ -10,12 +10,23 @@
   }
   if (s.startsWith("s[")) {
     String values=StringUtils.substringBetween(s,"[","]");
-    return ofValues(StringUtils.split(values,','));
+    return multipleListOfValues(StringUtils.split(values,','));
   }
-  String format=StringUtils.substringBefore(s,FIELD_SEPARATOR);
-  String options=StringUtils.substringAfter(s,FIELD_SEPARATOR);
-  if (StringUtils.isBlank(options)) {
+  String format=StringUtils.substringBefore(s,OPTION_SEPARATOR);
+  String values=null;
+  boolean multiple=false;
+  String[] options=s.split(CSV_SPLIT_REGEX);
+  for (  String option : options) {
+    String opt=StringEscapeUtils.unescapeCsv(option);
+    if (opt.startsWith(VALUES_PARAM + PARAMETER_SEPARATOR)) {
+      values=StringEscapeUtils.unescapeCsv(StringUtils.substringAfter(opt,VALUES_PARAM + PARAMETER_SEPARATOR));
+    }
+ else     if (opt.startsWith(MULTIPLE_PARAM + PARAMETER_SEPARATOR)) {
+      multiple=Boolean.parseBoolean(StringUtils.substringAfter(opt,MULTIPLE_PARAM + PARAMETER_SEPARATOR));
+    }
+  }
+  if (values == null || StringUtils.isBlank(values)) {
     return new RuleParamType(format);
   }
-  return new RuleParamType(format,options.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)"));
+  return new RuleParamType(format,multiple,values.split(CSV_SPLIT_REGEX));
 }

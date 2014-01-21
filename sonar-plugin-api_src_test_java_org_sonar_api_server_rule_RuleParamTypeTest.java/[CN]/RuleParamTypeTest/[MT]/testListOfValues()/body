@@ -1,10 +1,22 @@
 {
-  RuleParamType selectList=RuleParamType.parse("SINGLE_SELECT_LIST|foo,bar,");
+  RuleParamType selectList=RuleParamType.parse("SINGLE_SELECT_LIST,values=\"foo,bar\",");
   assertThat(selectList.type()).isEqualTo("SINGLE_SELECT_LIST");
-  assertThat(selectList.options()).containsOnly("foo","bar");
-  assertThat(selectList.toString()).isEqualTo("SINGLE_SELECT_LIST|foo,bar,");
-  selectList=RuleParamType.ofValues("foo","one,two|three,four");
+  assertThat(selectList.values()).containsOnly("foo","bar");
+  assertThat(selectList.multiple()).isFalse();
+  assertThat(selectList.toString()).isEqualTo("SINGLE_SELECT_LIST,values=\"foo,bar,\"");
+  RuleParamType.parse("SINGLE_SELECT_LIST,values=\"foo,bar\",multiple=false");
   assertThat(selectList.type()).isEqualTo("SINGLE_SELECT_LIST");
-  assertThat(selectList.options()).containsOnly("foo","one,two|three,four");
-  assertThat(selectList.toString()).isEqualTo("SINGLE_SELECT_LIST|foo,\"one,two|three,four\",");
+  assertThat(selectList.values()).containsOnly("foo","bar");
+  assertThat(selectList.multiple()).isFalse();
+  assertThat(selectList.toString()).isEqualTo("SINGLE_SELECT_LIST,values=\"foo,bar,\"");
+  RuleParamType.parse("SINGLE_SELECT_LIST,\"values=foo,bar\",\"multiple=false\"");
+  assertThat(selectList.type()).isEqualTo("SINGLE_SELECT_LIST");
+  assertThat(selectList.values()).containsOnly("foo","bar");
+  assertThat(selectList.multiple()).isFalse();
+  assertThat(selectList.toString()).isEqualTo("SINGLE_SELECT_LIST,values=\"foo,bar,\"");
+  selectList=RuleParamType.singleListOfValues("foo","one,two|three,four");
+  assertThat(selectList.type()).isEqualTo("SINGLE_SELECT_LIST");
+  assertThat(selectList.values()).containsOnly("foo","one,two|three,four");
+  assertThat(selectList.multiple()).isFalse();
+  assertThat(selectList.toString()).isEqualTo("SINGLE_SELECT_LIST,values=\"foo,\"\"one,two|three,four\"\",\"");
 }
