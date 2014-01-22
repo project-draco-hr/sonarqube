@@ -1,11 +1,10 @@
 {
-  String issueKey="ABCD";
-  Issue issue=new DefaultIssue().setKey(issueKey).setComponentKey("org.sonar.server.issue.IssueClient").setProjectKey("org.sonar.Sonar").setRuleKey(RuleKey.of("squid","AvoidCycle")).setStatus("OPEN");
+  Issue issue=createStandardIssue().setStatus("OPEN");
   issues.add(issue);
   Action action=mock(Action.class);
   when(action.key()).thenReturn("link-to-jira");
   when(actionService.listAvailableActions(issue)).thenReturn(newArrayList(action));
   MockUserSession.set().setLogin("john");
-  SimpleRequest request=new SimpleRequest().setParam("key",issueKey);
+  SimpleRequest request=new SimpleRequest().setParam("key",issue.key());
   tester.execute("show",request).assertJson(getClass(),"show_issue_with_actions_defined_by_plugins.json");
 }

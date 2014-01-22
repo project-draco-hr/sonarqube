@@ -1,8 +1,10 @@
 {
+  String actionPlanKey=issue.actionPlanKey();
   WorkDayDuration technicalDebt=issue.technicalDebt();
-  String techDebtLabel=technicalDebt != null ? technicalDebtService.format(technicalDebt) : null;
-  json.prop("key",issue.key()).prop("component",issue.componentKey()).prop("project",result.project(issue).key()).prop("rule",issue.ruleKey().toString()).prop("line",issue.line()).prop("technicalDebt",techDebtLabel).prop("message",issue.message()).prop("resolution",issue.resolution()).prop("status",issue.status()).prop("severity",issue.severity()).prop("actionPlan",issue.actionPlanKey());
-  addUserField(result,issue.assignee(),"assignee",json);
-  addUserField(result,issue.reporter(),"reporter",json);
-  addUserField(result,issue.authorLogin(),"author",json);
+  Date updateDate=issue.updateDate();
+  Date closeDate=issue.closeDate();
+  json.prop("key",issue.key()).prop("component",issue.componentKey()).prop("project",result.project(issue).key()).prop("rule",issue.ruleKey().toString()).prop("ruleName",result.rule(issue).getName()).prop("line",issue.line()).prop("message",issue.message()).prop("resolution",issue.resolution()).prop("status",issue.status()).prop("severity",issue.severity()).prop("actionPlan",actionPlanKey).prop("actionPlanName",actionPlanKey != null ? result.actionPlan(issue).name() : null).prop("technicalDebt",technicalDebt != null ? technicalDebtService.format(technicalDebt) : null).prop("creationDate",DateUtils.formatDateTime(issue.creationDate())).prop("updateDate",updateDate != null ? DateUtils.formatDateTime(updateDate) : null).prop("closeDate",closeDate != null ? DateUtils.formatDateTime(closeDate) : null);
+  addUserWithLabel(result,issue.assignee(),"assignee",json);
+  addUserWithLabel(result,issue.reporter(),"reporter",json);
+  addUserWithLabel(result,issue.authorLogin(),"author",json);
 }
