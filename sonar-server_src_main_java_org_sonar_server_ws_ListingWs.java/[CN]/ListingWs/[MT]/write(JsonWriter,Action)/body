@@ -4,5 +4,18 @@
   writer.prop("description",action.description());
   writer.prop("since",action.since());
   writer.prop("post",action.isPost());
+  if (!action.params().isEmpty()) {
+    Ordering<Param> ordering=Ordering.natural().onResultOf(new Function<Param,String>(){
+      public String apply(      Param param){
+        return param.key();
+      }
+    }
+);
+    writer.name("params").beginArray();
+    for (    Param param : ordering.sortedCopy(action.params())) {
+      write(writer,param);
+    }
+    writer.endArray();
+  }
   writer.endObject();
 }

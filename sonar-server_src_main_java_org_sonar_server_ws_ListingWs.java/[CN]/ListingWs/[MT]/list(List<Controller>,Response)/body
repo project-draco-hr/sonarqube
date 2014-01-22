@@ -2,7 +2,13 @@
   JsonWriter writer=response.newJsonWriter();
   writer.beginObject();
   writer.name("webServices").beginArray();
-  for (  Controller controller : controllers) {
+  Ordering<Controller> ordering=Ordering.natural().onResultOf(new Function<Controller,String>(){
+    public String apply(    Controller controller){
+      return controller.path();
+    }
+  }
+);
+  for (  Controller controller : ordering.sortedCopy(controllers)) {
     write(writer,controller);
   }
   writer.endArray();

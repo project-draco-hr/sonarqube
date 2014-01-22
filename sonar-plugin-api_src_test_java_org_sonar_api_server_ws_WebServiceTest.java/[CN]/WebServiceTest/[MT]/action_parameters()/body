@@ -1,0 +1,19 @@
+{
+  new WebService(){
+    @Override public void define(    Context context){
+      NewController newController=context.newController("api/rule");
+      NewAction create=newController.newAction("create").setHandler(mock(RequestHandler.class));
+      create.newParam("key").setDescription("Key of the new rule");
+      create.newParam("severity");
+      newController.done();
+    }
+  }
+.define(context);
+  WebService.Action action=context.controller("api/rule").action("create");
+  assertThat(action.params()).hasSize(2);
+  assertThat(action.param("key").key()).isEqualTo("key");
+  assertThat(action.param("key").description()).isEqualTo("Key of the new rule");
+  assertThat(action.param("key").toString()).isEqualTo("key");
+  assertThat(action.param("severity").key()).isEqualTo("severity");
+  assertThat(action.param("severity").description()).isNull();
+}
