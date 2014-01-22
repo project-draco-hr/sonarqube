@@ -1,0 +1,9 @@
+{
+  String issueKey="ABCD";
+  Issue issue=new DefaultIssue().setKey(issueKey).setComponentKey("org.sonar.server.issue.IssueClient").setProjectKey("org.sonar.Sonar").setRuleKey(RuleKey.of("squid","AvoidCycle")).setStatus("RESOLVED").setResolution("FIXED");
+  issues.add(issue);
+  when(issueService.listTransitions(eq(issue),any(UserSession.class))).thenReturn(newArrayList(Transition.create("reopen","RESOLVED","REOPEN")));
+  MockUserSession.set().setLogin("john");
+  SimpleRequest request=new SimpleRequest().setParam("key",issueKey);
+  tester.execute("show",request).assertJson(getClass(),"show_issue_with_transitions.json");
+}
