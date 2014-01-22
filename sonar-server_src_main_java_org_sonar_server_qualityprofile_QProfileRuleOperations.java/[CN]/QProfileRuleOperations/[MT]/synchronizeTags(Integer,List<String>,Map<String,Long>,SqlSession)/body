@@ -1,0 +1,21 @@
+{
+  boolean ruleChanged=false;
+  Set<String> tagsToKeep=Sets.newHashSet();
+  List<RuleRuleTagDto> currentTags=ruleDao.selectTags(ruleId,session);
+  for (  RuleRuleTagDto existingTag : currentTags) {
+    if (existingTag.getType() == RuleTagType.ADMIN && !newTags.contains(existingTag.getTag())) {
+      ruleDao.deleteTag(existingTag,session);
+      ruleChanged=true;
+    }
+ else {
+      tagsToKeep.add(existingTag.getTag());
+    }
+  }
+  for (  String tag : newTags) {
+    if (!tagsToKeep.contains(tag)) {
+      ruleDao.insert(new RuleRuleTagDto().setRuleId(ruleId).setTagId(neededTagIds.get(tag)).setType(RuleTagType.ADMIN),session);
+      ruleChanged=true;
+    }
+  }
+  return ruleChanged;
+}
