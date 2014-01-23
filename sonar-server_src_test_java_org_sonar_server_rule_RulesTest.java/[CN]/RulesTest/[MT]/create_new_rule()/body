@@ -1,0 +1,9 @@
+{
+  RuleDto rule=new RuleDto().setId(10).setRepositoryKey("squid").setRuleKey("AvoidCycle");
+  when(ruleDao.selectById(10)).thenReturn(rule);
+  RuleDto newRule=new RuleDto().setId(11);
+  Map<String,String> paramsByKey=ImmutableMap.of("max","20");
+  when(ruleOperations.createRule(eq(rule),eq("Rule name"),eq(Severity.MAJOR),eq("My note"),eq(paramsByKey),any(UserSession.class))).thenReturn(newRule);
+  assertThat(rules.createRule(10,"Rule name",Severity.MAJOR,"My note",paramsByKey)).isEqualTo(11);
+  verify(ruleOperations).createRule(eq(rule),eq("Rule name"),eq(Severity.MAJOR),eq("My note"),eq(paramsByKey),any(UserSession.class));
+}
