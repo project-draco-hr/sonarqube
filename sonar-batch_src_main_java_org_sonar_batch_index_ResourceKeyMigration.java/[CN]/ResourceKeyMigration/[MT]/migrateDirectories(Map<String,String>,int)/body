@@ -1,0 +1,16 @@
+{
+  StringBuilder hql=new StringBuilder().append("from ").append(ResourceModel.class.getSimpleName()).append(" where enabled = true ").append(" and rootId = :rootId ").append(" and qualifier = '").append(Qualifiers.DIRECTORY).append("')");
+  List<ResourceModel> resources=session.createQuery(hql.toString()).setParameter("rootId",moduleId).getResultList();
+  for (  ResourceModel resourceModel : resources) {
+    String oldEffectiveKey=resourceModel.getKey();
+    if (deprecatedDirectoryKeyMapper.containsKey(oldEffectiveKey)) {
+      String newEffectiveKey=deprecatedDirectoryKeyMapper.get(oldEffectiveKey);
+      resourceModel.setKey(newEffectiveKey);
+      resourceModel.setDeprecatedKey(oldEffectiveKey);
+      logger.info("Migrated resource " + oldEffectiveKey + " to "+ newEffectiveKey);
+    }
+ else {
+      logger.warn("Unable to migrate resource " + oldEffectiveKey);
+    }
+  }
+}

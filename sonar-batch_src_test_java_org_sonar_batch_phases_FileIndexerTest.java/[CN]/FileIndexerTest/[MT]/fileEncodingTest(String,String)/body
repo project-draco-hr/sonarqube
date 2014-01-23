@@ -2,10 +2,9 @@
   settings.setProperty(CoreProperties.CORE_IMPORT_SOURCES_PROPERTY,"true");
   File javaFile1=new File(baseDir,"src/main/java/foo/bar/Foo.java");
   FileUtils.copyFile(getFile(testFile),javaFile1);
-  when(fs.inputFiles(FileQuery.onSource().onLanguage(Java.KEY))).thenReturn((Iterable)Arrays.asList(new InputFileBuilder(javaFile1,Charset.forName(encoding),"src/main/java/foo/bar/Foo.java").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"foo/bar/Foo.java").build()));
-  when(fs.inputFiles(FileQuery.onTest().onLanguage(Java.KEY))).thenReturn((Iterable)Collections.emptyList());
+  when(fs.inputFiles(FileQuery.all())).thenReturn((Iterable)Arrays.asList(new InputFileBuilder(javaFile1,Charset.forName(encoding),"src/main/java/foo/bar/Foo.java").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"foo/bar/Foo.java").attribute(InputFile.ATTRIBUTE_LANGUAGE,"java").build()));
   when(project.getLanguageKey()).thenReturn(Java.KEY);
-  FileIndexer indexer=new FileIndexer(project,fs,new Languages(Java.INSTANCE),sonarIndex,settings);
+  FileIndexer indexer=new FileIndexer(project,fs,new Languages(Java.INSTANCE),sonarIndex,settings,mock(ResourceKeyMigration.class));
   indexer.execute();
   Resource sonarFile=JavaFile.create("/src/main/java/foo/bar/Foo.java","foo/bar/Foo.java",false);
   verify(sonarIndex).setSource(eq(sonarFile),argThat(new ArgumentMatcher<String>(){

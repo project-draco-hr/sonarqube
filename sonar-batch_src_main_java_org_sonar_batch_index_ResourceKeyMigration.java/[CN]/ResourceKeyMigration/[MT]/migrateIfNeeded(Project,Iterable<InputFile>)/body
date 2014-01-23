@@ -1,0 +1,24 @@
+{
+  if (migrationNeeded) {
+    logger.info("Starting migration of resource keys");
+    Map<String,InputFile> deprecatedFileKeyMapper=new HashMap<String,InputFile>();
+    Map<String,InputFile> deprecatedTestKeyMapper=new HashMap<String,InputFile>();
+    Map<String,String> deprecatedDirectoryKeyMapper=new HashMap<String,String>();
+    for (    InputFile inputFile : inputFiles) {
+      String deprecatedKey=inputFile.attribute(DefaultInputFile.ATTRIBUTE_COMPONENT_DEPRECATED_KEY);
+      if (deprecatedKey != null) {
+        if (InputFile.TYPE_TEST.equals(inputFile.attribute(InputFile.ATTRIBUTE_TYPE))) {
+          deprecatedTestKeyMapper.put(deprecatedKey,inputFile);
+        }
+ else {
+          deprecatedFileKeyMapper.put(deprecatedKey,inputFile);
+        }
+      }
+    }
+    ResourceModel moduleModel=session.getSingleResult(ResourceModel.class,"key",module.getEffectiveKey());
+    int moduleId=moduleModel.getId();
+    migrateFiles(module,deprecatedFileKeyMapper,deprecatedTestKeyMapper,deprecatedDirectoryKeyMapper,moduleId);
+    migrateDirectories(deprecatedDirectoryKeyMapper,moduleId);
+    session.commit();
+  }
+}

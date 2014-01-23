@@ -1,11 +1,7 @@
 {
-  File cobolFile1=new File(baseDir,"src/foo/bar/Foo.cbl");
-  File cobolFile2=new File(baseDir,"src2/foo/bar/Foo.cbl");
-  when(fs.inputFiles(FileQuery.onSource().onLanguage("cobol"))).thenReturn((Iterable)Arrays.asList(new InputFileBuilder(cobolFile1,Charsets.UTF_8,"src/foo/bar/Foo.cbl").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"foo/bar/Foo.cbl").build(),new InputFileBuilder(cobolFile2,Charsets.UTF_8,"src2/foo/bar/Foo.cbl").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"foo/bar/Foo.cbl").build()));
-  File cobolTestFile1=new File(baseDir,"src/test/foo/bar/FooTest.cbl");
-  when(fs.inputFiles(FileQuery.onTest().onLanguage("cobol"))).thenReturn((Iterable)Arrays.asList(new InputFileBuilder(cobolTestFile1,Charsets.UTF_8,"src/test/foo/bar/FooTest.cbl").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"foo/bar/FooTest.cbl").build()));
+  when(fs.inputFiles(FileQuery.all())).thenReturn((Iterable)Arrays.asList(newInputFile("src/foo/bar/Foo.cbl","","foo/bar/Foo.cbl","cobol",false),newInputFile("src2/foo/bar/Foo.cbl","","foo/bar/Foo.cbl","cobol",false),newInputFile("src/test/foo/bar/FooTest.cbl","","foo/bar/FooTest.cbl","cobol",true)));
   when(project.getLanguageKey()).thenReturn("cobol");
-  FileIndexer indexer=new FileIndexer(project,fs,new Languages(cobolLanguage),sonarIndex,settings);
+  FileIndexer indexer=new FileIndexer(project,fs,new Languages(cobolLanguage),sonarIndex,settings,mock(ResourceKeyMigration.class));
   indexer.execute();
   verify(sonarIndex).index(org.sonar.api.resources.File.create("/src/foo/bar/Foo.cbl","foo/bar/Foo.cbl",cobolLanguage,false));
   verify(sonarIndex).index(org.sonar.api.resources.File.create("/src2/foo/bar/Foo.cbl","foo/bar/Foo.cbl",cobolLanguage,false));

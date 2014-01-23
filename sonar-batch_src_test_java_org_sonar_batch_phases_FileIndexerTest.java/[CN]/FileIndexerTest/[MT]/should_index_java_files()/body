@@ -1,11 +1,7 @@
 {
-  File javaFile1=new File(baseDir,"src/main/java/foo/bar/Foo.java");
-  File javaFile2=new File(baseDir,"src/main/java2/foo/bar/Foo.java");
-  when(fs.inputFiles(FileQuery.onSource().onLanguage(Java.KEY))).thenReturn((Iterable)Arrays.asList(new InputFileBuilder(javaFile1,Charsets.UTF_8,"src/main/java/foo/bar/Foo.java").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"foo/bar/Foo.java").build(),new InputFileBuilder(javaFile2,Charsets.UTF_8,"src/main/java2/foo/bar/Foo.java").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"foo/bar/Foo.java").build()));
-  File javaTestFile1=new File(baseDir,"src/test/java/foo/bar/FooTest.java");
-  when(fs.inputFiles(FileQuery.onTest().onLanguage(Java.KEY))).thenReturn((Iterable)Arrays.asList(new InputFileBuilder(javaTestFile1,Charsets.UTF_8,"src/test/java/foo/bar/FooTest.java").attribute(InputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"foo/bar/FooTest.java").build()));
+  when(fs.inputFiles(FileQuery.all())).thenReturn((Iterable)Arrays.asList(newInputFile("src/main/java/foo/bar/Foo.java","","foo/bar/Foo.java","java",false),newInputFile("src/main/java2/foo/bar/Foo.java","","foo/bar/Foo.java","java",false),newInputFile("src/test/java/foo/bar/FooTest.java","","foo/bar/FooTest.java","java",true)));
   when(project.getLanguageKey()).thenReturn(Java.KEY);
-  FileIndexer indexer=new FileIndexer(project,fs,new Languages(Java.INSTANCE),sonarIndex,settings);
+  FileIndexer indexer=new FileIndexer(project,fs,new Languages(Java.INSTANCE),sonarIndex,settings,mock(ResourceKeyMigration.class));
   indexer.execute();
   verify(sonarIndex).index(JavaFile.create("src/main/java/foo/bar/Foo.java","foo/bar/Foo.java",false));
   verify(sonarIndex).index(JavaFile.create("src/main/java2/foo/bar/Foo.java","foo/bar/Foo.java",false));

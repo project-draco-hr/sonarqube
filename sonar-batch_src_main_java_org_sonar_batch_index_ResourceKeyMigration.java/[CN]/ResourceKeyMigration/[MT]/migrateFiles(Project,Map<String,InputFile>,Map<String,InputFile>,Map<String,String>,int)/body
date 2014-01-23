@@ -1,0 +1,34 @@
+{
+  StringBuilder hql=new StringBuilder().append("from ").append(ResourceModel.class.getSimpleName()).append(" where enabled = true ").append(" and rootId = :rootId ").append(" and scope = '").append(Scopes.FILE).append("'");
+  List<ResourceModel> resources=session.createQuery(hql.toString()).setParameter("rootId",moduleId).getResultList();
+  for (  ResourceModel resourceModel : resources) {
+    String oldEffectiveKey=resourceModel.getKey();
+    boolean isTest=Qualifiers.UNIT_TEST_FILE.equals(resourceModel.getQualifier());
+    InputFile matchedFile=findInputFile(deprecatedFileKeyMapper,deprecatedTestKeyMapper,oldEffectiveKey,isTest);
+    if (matchedFile != null) {
+      String newEffectiveKey=matchedFile.attribute(DefaultInputFile.ATTRIBUTE_COMPONENT_KEY);
+      String oldKey=StringUtils.substringAfterLast(oldEffectiveKey,":");
+      Resource sonarFile;
+      if (Java.KEY.equals(resourceModel.getLanguageKey())) {
+        sonarFile=new JavaFile(oldKey);
+      }
+ else {
+        sonarFile=new File(oldKey);
+      }
+      String parentOldKey=module.getEffectiveKey() + ":" + sonarFile.getParent().getDeprecatedKey();
+      String parentNewKey=module.getEffectiveKey() + ":" + getParentKey(matchedFile);
+      if (!deprecatedDirectoryKeyMapper.containsKey(parentOldKey)) {
+        deprecatedDirectoryKeyMapper.put(parentOldKey,parentNewKey);
+      }
+ else       if (!parentNewKey.equals(deprecatedDirectoryKeyMapper.get(parentOldKey))) {
+        logger.warn("Directory with key " + parentOldKey + " matches both "+ deprecatedDirectoryKeyMapper.get(parentOldKey)+ " and "+ parentNewKey+ ". First match is arbitrary chosen.");
+      }
+      resourceModel.setKey(newEffectiveKey);
+      resourceModel.setDeprecatedKey(oldEffectiveKey);
+      logger.info("Migrated resource " + oldEffectiveKey + " to "+ newEffectiveKey);
+    }
+ else {
+      logger.warn("Unable to migrate resource " + oldEffectiveKey + ". No match was found.");
+    }
+  }
+}
