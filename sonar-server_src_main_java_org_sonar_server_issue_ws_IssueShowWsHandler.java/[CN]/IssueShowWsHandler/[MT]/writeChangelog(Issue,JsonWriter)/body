@@ -3,11 +3,11 @@
   IssueChangelog changelog=issueChangelogService.changelog(issue);
   for (  FieldDiffs diffs : changelog.changes()) {
     String userLogin=diffs.userLogin();
-    json.beginObject().prop("userLogin",userLogin).prop("userName",userLogin != null ? changelog.user(diffs).name() : null).prop("creationDate",DateUtils.formatDateTime(diffs.creationDate()));
+    json.beginObject().prop("userName",userLogin != null ? changelog.user(diffs).name() : null).prop("creationDate",DateUtils.formatDateTime(diffs.creationDate()));
     json.name("diffs").beginArray();
-    for (    Map.Entry<String,FieldDiffs.Diff> entry : diffs.diffs().entrySet()) {
-      FieldDiffs.Diff diff=entry.getValue();
-      json.beginObject().prop("key",entry.getKey()).prop("newValue",(String)diff.newValue()).prop("oldValue",(String)diff.oldValue()).endObject();
+    List<String> diffsFormatted=issueChangelogService.formatDiffs(diffs);
+    for (    String diff : diffsFormatted) {
+      json.value(diff);
     }
     json.endArray();
     json.endObject();
