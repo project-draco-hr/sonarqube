@@ -4,7 +4,13 @@
     actions.add("comment");
     if (issue.resolution() == null) {
       actions.add("assign");
+      if (!UserSession.get().login().equals(issue.assignee())) {
+        actions.add("assign_to_me");
+      }
       actions.add("plan");
+      if (UserSession.get().hasProjectPermission(UserRole.ISSUE_ADMIN,issue.projectKey())) {
+        actions.add("severity");
+      }
       for (      Action action : actionService.listAvailableActions(issue)) {
         actions.add(action.key());
       }
