@@ -1,7 +1,11 @@
 {
-  Issue issue=createStandardIssue().addComment(new DefaultIssueComment().setKey("COMMENT-ABCD").setMarkdownText("*My comment*").setUserLogin("john").setCreatedAt(DateUtils.parseDateTime("2014-01-23T19:10:03+0100"))).addComment(new DefaultIssueComment().setKey("COMMENT-ABCE").setMarkdownText("Another comment").setUserLogin("arthur").setCreatedAt(DateUtils.parseDateTime("2014-01-23T19:10:03+0100")));
+  Date date1=DateUtils.parseDateTime("2014-02-22T19:10:03+0100");
+  Date date2=DateUtils.parseDateTime("2014-02-23T19:10:03+0100");
+  Issue issue=createStandardIssue().addComment(new DefaultIssueComment().setKey("COMMENT-ABCD").setMarkdownText("*My comment*").setUserLogin("john").setCreatedAt(date1)).addComment(new DefaultIssueComment().setKey("COMMENT-ABCE").setMarkdownText("Another comment").setUserLogin("arthur").setCreatedAt(date2));
   issues.add(issue);
   result.addUsers(Lists.<User>newArrayList(new DefaultUser().setLogin("john").setName("John"),new DefaultUser().setLogin("arthur").setName("Arthur")));
+  when(i18n.instant(any(Locale.class),eq(date1))).thenReturn("9 days");
+  when(i18n.instant(any(Locale.class),eq(date2))).thenReturn("10 days");
   MockUserSession.set().setLogin("arthur");
   SimpleRequest request=new SimpleRequest().setParam("key",issue.key());
   tester.execute("show",request).assertJson(getClass(),"show_issue_with_comments.json");

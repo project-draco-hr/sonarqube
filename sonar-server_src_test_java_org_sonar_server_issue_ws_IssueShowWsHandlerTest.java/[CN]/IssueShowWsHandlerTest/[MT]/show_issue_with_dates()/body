@@ -1,6 +1,12 @@
 {
-  Issue issue=createStandardIssue().setCreationDate(DateUtils.parseDateTime("2014-01-22T19:10:03+0100")).setUpdateDate(DateUtils.parseDateTime("2014-01-23T19:10:03+0100")).setCloseDate(DateUtils.parseDateTime("2014-01-24T19:10:03+0100"));
+  Date creationDate=DateUtils.parseDateTime("2014-01-22T19:10:03+0100");
+  Date updateDate=DateUtils.parseDateTime("2014-01-23T19:10:03+0100");
+  Date closedDate=DateUtils.parseDateTime("2014-01-24T19:10:03+0100");
+  Issue issue=createStandardIssue().setCreationDate(creationDate).setUpdateDate(updateDate).setCloseDate(closedDate);
   issues.add(issue);
+  when(i18n.formatDateTime(any(Locale.class),eq(creationDate))).thenReturn("Jan 22, 2014 10:03 AM");
+  when(i18n.formatDateTime(any(Locale.class),eq(updateDate))).thenReturn("Jan 23, 2014 10:03 AM");
+  when(i18n.formatDateTime(any(Locale.class),eq(closedDate))).thenReturn("Jan 24, 2014 10:03 AM");
   MockUserSession.set();
   SimpleRequest request=new SimpleRequest().setParam("key",issue.key());
   tester.execute("show",request).assertJson(getClass(),"show_issue_with_dates.json");

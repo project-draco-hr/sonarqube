@@ -1,12 +1,16 @@
 {
   Issue issue=createStandardIssue();
   issues.add(issue);
+  Date date1=DateUtils.parseDateTime("2014-02-22T19:10:03+0100");
+  Date date2=DateUtils.parseDateTime("2014-02-23T19:10:03+0100");
   List<User> users=Lists.<User>newArrayList(new DefaultUser().setLogin("john").setName("John"));
-  FieldDiffs userChange=new FieldDiffs().setUserLogin("john").setDiff("actionPlan",null,"1.0").setCreationDate(DateUtils.parseDateTime("2014-01-22T19:10:03+0100"));
-  FieldDiffs scanChange=new FieldDiffs().setDiff("severity","INFO","BLOCKER").setDiff("status","REOPEN","RESOLVED").setCreationDate(DateUtils.parseDateTime("2014-01-23T19:10:03+0100"));
+  FieldDiffs userChange=new FieldDiffs().setUserLogin("john").setDiff("actionPlan",null,"1.0").setCreationDate(date1);
+  FieldDiffs scanChange=new FieldDiffs().setDiff("severity","INFO","BLOCKER").setDiff("status","REOPEN","RESOLVED").setCreationDate(date2);
   when(issueChangelogService.changelog(issue)).thenReturn(new IssueChangelog(newArrayList(userChange,scanChange),users));
   when(issueChangelogService.formatDiffs(userChange)).thenReturn(newArrayList("Action plan updated to 1.0"));
   when(issueChangelogService.formatDiffs(scanChange)).thenReturn(newArrayList("Severity updated from Info to Blocker","Status updated from Reopen to Resolved"));
+  when(i18n.formatDateTime(any(Locale.class),eq(date1))).thenReturn("Fev 22, 2014 10:03 AM");
+  when(i18n.formatDateTime(any(Locale.class),eq(date2))).thenReturn("Fev 23, 2014 10:03 AM");
   MockUserSession.set();
   SimpleRequest request=new SimpleRequest().setParam("key",issue.key());
   tester.execute("show",request).assertJson(getClass(),"show_issue_with_changelog.json");
