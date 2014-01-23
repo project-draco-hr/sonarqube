@@ -1,4 +1,11 @@
 {
   when(semaphores.acquire(anyString(),anyInt(),anyInt())).thenReturn(new Semaphores.Semaphore().setLocked(false).setDurationSinceLocked(1234L));
-  projectLock.start();
+  try {
+    projectLock.start();
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(SonarException.class);
+  }
+  verify(i18n).ago(eq(Locale.ENGLISH),eq(1234L));
 }
