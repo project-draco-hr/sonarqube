@@ -1,7 +1,7 @@
 {
-  ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1).setInheritance(ActiveRuleDto.OVERRIDES).setParentId(4);
+  ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(Severity.MINOR).setInheritance(ActiveRuleDto.OVERRIDES).setParentId(4);
   when(activeRuleDao.selectById(5,session)).thenReturn(activeRule);
-  ActiveRuleDto parent=new ActiveRuleDto().setId(4).setProfileId(1).setRuleId(10).setSeverity(1);
+  ActiveRuleDto parent=new ActiveRuleDto().setId(4).setProfileId(1).setRuleId(10).setSeverity(Severity.MINOR);
   when(activeRuleDao.selectById(4,session)).thenReturn(parent);
   when(activeRuleDao.selectParamsByActiveRuleId(eq(4),eq(session))).thenReturn(newArrayList(new ActiveRuleParamDto().setId(101).setActiveRuleId(5).setKey("minimum").setValue("2")));
   when(profilesManager.ruleParamChanged(eq(1),eq(5),eq("minimum"),eq((String)null),eq("2"),eq("Nicolas"))).thenReturn(new ProfilesManager.RuleInheritanceActions());
@@ -15,7 +15,7 @@
   assertThat(paramCaptor.getValue().getValue()).isEqualTo("2");
   verify(session,times(2)).commit();
   verify(profilesManager).ruleParamChanged(eq(1),eq(5),eq("minimum"),eq((String)null),eq("2"),eq("Nicolas"));
-  verify(ruleRegistry).deleteActiveRules(anyListOf(Integer.class));
-  verify(ruleRegistry).bulkIndexActiveRuleIds(anyListOf(Integer.class),eq(session));
-  verify(ruleRegistry).save(eq(activeRule),anyListOf(ActiveRuleParamDto.class));
+  verify(esActiveRule).deleteActiveRules(anyListOf(Integer.class));
+  verify(esActiveRule).bulkIndexActiveRuleIds(anyListOf(Integer.class),eq(session));
+  verify(esActiveRule).save(eq(activeRule),anyListOf(ActiveRuleParamDto.class));
 }

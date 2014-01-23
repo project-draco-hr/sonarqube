@@ -1,6 +1,6 @@
 {
   Date createdAt=DateUtils.parseDate("2013-12-20");
-  ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1).setNoteCreatedAt(createdAt).setNoteData("My previous note").setNoteUserLogin("nicolas");
+  ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(Severity.MINOR).setNoteCreatedAt(createdAt).setNoteData("My previous note").setNoteUserLogin("nicolas");
   List<ActiveRuleParamDto> activeRuleParams=newArrayList(new ActiveRuleParamDto());
   when(activeRuleDao.selectParamsByActiveRuleId(eq(5),eq(session))).thenReturn(activeRuleParams);
   long now=System.currentTimeMillis();
@@ -13,5 +13,5 @@
   assertThat(argumentCaptor.getValue().getNoteCreatedAt()).isEqualTo(createdAt);
   assertThat(argumentCaptor.getValue().getNoteUpdatedAt().getTime()).isEqualTo(now);
   verify(session).commit();
-  verify(ruleRegistry).save(eq(activeRule),eq(activeRuleParams));
+  verify(esActiveRule).save(eq(activeRule),eq(activeRuleParams));
 }

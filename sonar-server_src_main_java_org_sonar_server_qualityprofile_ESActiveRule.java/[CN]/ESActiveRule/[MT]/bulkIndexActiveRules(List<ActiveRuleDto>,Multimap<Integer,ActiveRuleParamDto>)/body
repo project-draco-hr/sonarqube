@@ -1,0 +1,27 @@
+{
+  try {
+    int size=activeRules.size();
+    String[] ids=new String[size];
+    BytesStream[] docs=new BytesStream[size];
+    String[] parentIds=new String[size];
+    int index=0;
+    TimeProfiler profiler=new TimeProfiler();
+    profiler.start("Build active rules documents");
+    for (    ActiveRuleDto activeRule : activeRules) {
+      ids[index]=activeRule.getId().toString();
+      docs[index]=activeRuleDocument(activeRule,paramsByActiveRule.get(activeRule.getId()));
+      parentIds[index]=activeRule.getRulId().toString();
+      index++;
+    }
+    profiler.stop();
+    if (!activeRules.isEmpty()) {
+      profiler.start("Index active rules");
+      esIndex.bulkIndex(RuleRegistry.INDEX_RULES,ESActiveRule.TYPE_ACTIVE_RULE,ids,docs,parentIds);
+      profiler.stop();
+    }
+    return ids;
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Unable to index active rules",e);
+  }
+}

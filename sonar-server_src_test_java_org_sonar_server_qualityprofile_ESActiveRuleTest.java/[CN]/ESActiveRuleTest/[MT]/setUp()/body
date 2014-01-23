@@ -1,0 +1,17 @@
+{
+  when(myBatis.openSession()).thenReturn(session);
+  esSetup=new EsSetup(ImmutableSettings.builder().loadFromUrl(ESNode.class.getResource("config/elasticsearch.json")).build());
+  esSetup.execute(EsSetup.deleteAll());
+  ESNode node=mock(ESNode.class);
+  when(node.client()).thenReturn(esSetup.client());
+  Settings settings=new Settings();
+  settings.setProperty("sonar.log.profilingLevel","FULL");
+  Profiling profiling=new Profiling(settings);
+  searchIndex=new ESIndex(node,profiling);
+  searchIndex.start();
+  RuleRegistry esRule=new RuleRegistry(searchIndex,null);
+  esRule.start();
+  esActiveRule=new ESActiveRule(searchIndex,activeRuleDao,myBatis);
+  esActiveRule.start();
+  esSetup.execute(EsSetup.index("rules","rule","1").withSource(testFileAsString("shared/rule1.json")),EsSetup.index("rules","rule","2").withSource(testFileAsString("shared/rule2.json")),EsSetup.index("rules","rule","3").withSource(testFileAsString("shared/rule3.json")));
+}

@@ -1,6 +1,6 @@
 {
   when(ruleDao.selectById(10,session)).thenReturn(new RuleDto().setId(10));
-  ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1);
+  ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(Severity.MINOR);
   when(activeRuleDao.selectById(5,session)).thenReturn(activeRule);
   when(profilesManager.deactivated(eq(1),anyInt(),eq("Nicolas"))).thenReturn(new ProfilesManager.RuleInheritanceActions());
   int result=operations.deactivateRules(newArrayList(5),authorizedUserSession);
@@ -9,6 +9,6 @@
   verify(activeRuleDao).deleteParameters(eq(5),eq(session));
   verify(session).commit();
   verify(profilesManager).deactivated(eq(1),anyInt(),eq("Nicolas"));
-  verify(ruleRegistry).deleteActiveRules(anyListOf(Integer.class));
-  verify(ruleRegistry).bulkIndexActiveRuleIds(anyListOf(Integer.class),eq(session));
+  verify(esActiveRule).deleteActiveRules(anyListOf(Integer.class));
+  verify(esActiveRule).bulkIndexActiveRuleIds(anyListOf(Integer.class),eq(session));
 }

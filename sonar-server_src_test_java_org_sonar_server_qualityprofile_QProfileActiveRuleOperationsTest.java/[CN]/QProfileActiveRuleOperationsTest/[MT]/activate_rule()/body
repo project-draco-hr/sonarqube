@@ -10,13 +10,13 @@
   ArgumentCaptor<ActiveRuleDto> activeRuleArgument=ArgumentCaptor.forClass(ActiveRuleDto.class);
   verify(activeRuleDao).insert(activeRuleArgument.capture(),eq(session));
   assertThat(activeRuleArgument.getValue().getRulId()).isEqualTo(10);
-  assertThat(activeRuleArgument.getValue().getSeverity()).isEqualTo(3);
+  assertThat(activeRuleArgument.getValue().getSeverityString()).isEqualTo(Severity.CRITICAL);
   ArgumentCaptor<ActiveRuleParamDto> activeRuleParamArgument=ArgumentCaptor.forClass(ActiveRuleParamDto.class);
   verify(activeRuleDao).insert(activeRuleParamArgument.capture(),eq(session));
   assertThat(activeRuleParamArgument.getValue().getKey()).isEqualTo("max");
   assertThat(activeRuleParamArgument.getValue().getValue()).isEqualTo("10");
   verify(session).commit();
   verify(profilesManager).activated(eq(1),anyInt(),eq("Nicolas"));
-  verify(ruleRegistry).deleteActiveRules(eq(newArrayList(idActiveRuleToDelete)));
-  verify(ruleRegistry).bulkIndexActiveRuleIds(eq(newArrayList(idActiveRuleToUpdate)),eq(session));
+  verify(esActiveRule).deleteActiveRules(eq(newArrayList(idActiveRuleToDelete)));
+  verify(esActiveRule).bulkIndexActiveRuleIds(eq(newArrayList(idActiveRuleToUpdate)),eq(session));
 }

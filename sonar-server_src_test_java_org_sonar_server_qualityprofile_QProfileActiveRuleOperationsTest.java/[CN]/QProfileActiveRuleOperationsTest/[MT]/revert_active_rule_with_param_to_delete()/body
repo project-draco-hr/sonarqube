@@ -1,8 +1,8 @@
 {
-  ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1).setInheritance(ActiveRuleDto.OVERRIDES).setParentId(4);
+  ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(Severity.MINOR).setInheritance(ActiveRuleDto.OVERRIDES).setParentId(4);
   when(activeRuleDao.selectById(5,session)).thenReturn(activeRule);
   when(activeRuleDao.selectParamsByActiveRuleId(eq(5),eq(session))).thenReturn(newArrayList(new ActiveRuleParamDto().setId(103).setActiveRuleId(5).setKey("format").setValue("abc")));
-  ActiveRuleDto parent=new ActiveRuleDto().setId(4).setProfileId(1).setRuleId(10).setSeverity(1);
+  ActiveRuleDto parent=new ActiveRuleDto().setId(4).setProfileId(1).setRuleId(10).setSeverity(Severity.MINOR);
   when(activeRuleDao.selectById(4,session)).thenReturn(parent);
   when(profilesManager.ruleParamChanged(eq(1),eq(5),eq("format"),eq("abc"),eq((String)null),eq("Nicolas"))).thenReturn(new ProfilesManager.RuleInheritanceActions());
   operations.revertActiveRule(5,authorizedUserSession);
@@ -12,7 +12,7 @@
   verify(activeRuleDao).deleteParameter(103,session);
   verify(session,times(2)).commit();
   verify(profilesManager).ruleParamChanged(eq(1),eq(5),eq("format"),eq("abc"),eq((String)null),eq("Nicolas"));
-  verify(ruleRegistry).deleteActiveRules(anyListOf(Integer.class));
-  verify(ruleRegistry).bulkIndexActiveRuleIds(anyListOf(Integer.class),eq(session));
-  verify(ruleRegistry).save(eq(activeRule),anyListOf(ActiveRuleParamDto.class));
+  verify(esActiveRule).deleteActiveRules(anyListOf(Integer.class));
+  verify(esActiveRule).bulkIndexActiveRuleIds(anyListOf(Integer.class),eq(session));
+  verify(esActiveRule).save(eq(activeRule),anyListOf(ActiveRuleParamDto.class));
 }

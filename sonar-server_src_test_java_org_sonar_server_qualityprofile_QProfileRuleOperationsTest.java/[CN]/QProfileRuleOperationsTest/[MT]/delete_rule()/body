@@ -6,7 +6,7 @@
   ArrayList<RuleRuleTagDto> ruleTags=newArrayList(new RuleRuleTagDto().setId(30L).setTag("style").setType(RuleTagType.SYSTEM));
   when(ruleDao.selectTags(eq(ruleId),eq(session))).thenReturn(ruleTags);
   final int activeRuleId=5;
-  ActiveRuleDto activeRule=new ActiveRuleDto().setId(activeRuleId).setProfileId(1).setRuleId(ruleId).setSeverity(1);
+  ActiveRuleDto activeRule=new ActiveRuleDto().setId(activeRuleId).setProfileId(1).setRuleId(ruleId).setSeverity(Severity.MINOR);
   when(activeRuleDao.selectByRuleId(ruleId)).thenReturn(newArrayList(activeRule));
   long now=System.currentTimeMillis();
   doReturn(now).when(system).now();
@@ -19,5 +19,5 @@
   verify(activeRuleDao).deleteParameters(eq(activeRuleId),eq(session));
   verify(activeRuleDao).deleteFromRule(eq(ruleId),eq(session));
   verify(session,times(2)).commit();
-  verify(ruleRegistry).deleteActiveRules(newArrayList(activeRuleId));
+  verify(esActiveRule).deleteActiveRules(newArrayList(activeRuleId));
 }

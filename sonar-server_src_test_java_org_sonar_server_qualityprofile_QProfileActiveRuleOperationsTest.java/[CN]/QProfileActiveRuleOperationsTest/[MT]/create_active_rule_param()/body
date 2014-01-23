@@ -1,5 +1,5 @@
 {
-  ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(1);
+  ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(Severity.MINOR);
   when(activeRuleDao.selectById(5,session)).thenReturn(activeRule);
   RuleParamDto ruleParam=new RuleParamDto().setRuleId(10).setName("max").setDefaultValue("20").setType(PropertyType.INTEGER.name());
   when(ruleDao.selectParamByRuleAndKey(10,"max",session)).thenReturn(ruleParam);
@@ -13,6 +13,6 @@
   verify(typeValidations).validate(eq("30"),eq("INTEGER"),anyList());
   verify(session).commit();
   verify(profilesManager).ruleParamChanged(eq(1),eq(5),eq("max"),eq((String)null),eq("30"),eq("Nicolas"));
-  verify(ruleRegistry).deleteActiveRules(anyListOf(Integer.class));
-  verify(ruleRegistry).bulkIndexActiveRuleIds(anyListOf(Integer.class),eq(session));
+  verify(esActiveRule).deleteActiveRules(anyListOf(Integer.class));
+  verify(esActiveRule).bulkIndexActiveRuleIds(anyListOf(Integer.class),eq(session));
 }
