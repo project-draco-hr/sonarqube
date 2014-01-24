@@ -1,0 +1,42 @@
+{
+  id=(Integer)ruleSource.get(RuleDocument.FIELD_ID);
+  key=(String)ruleSource.get(RuleDocument.FIELD_KEY);
+  repositoryKey=(String)ruleSource.get(RuleDocument.FIELD_REPOSITORY_KEY);
+  name=(String)ruleSource.get(RuleDocument.FIELD_NAME);
+  description=(String)ruleSource.get(RuleDocument.FIELD_DESCRIPTION);
+  status=(String)ruleSource.get(RuleDocument.FIELD_STATUS);
+  cardinality=(String)ruleSource.get("cardinality");
+  templateId=(Integer)ruleSource.get(RuleDocument.FIELD_TEMPLATE_ID);
+  createdAt=parseOptionalDate(RuleDocument.FIELD_CREATED_AT,ruleSource);
+  updatedAt=parseOptionalDate(RuleDocument.FIELD_UPDATED_AT,ruleSource);
+  if (ruleSource.containsKey(RuleDocument.FIELD_NOTE)) {
+    Map<String,Object> ruleNoteDocument=(Map<String,Object>)ruleSource.get(RuleDocument.FIELD_NOTE);
+    ruleNote=new RuleNote((String)ruleNoteDocument.get(RuleDocument.FIELD_NOTE_DATA),(String)ruleNoteDocument.get(RuleDocument.FIELD_NOTE_USER_LOGIN),parseOptionalDate(RuleDocument.FIELD_NOTE_CREATED_AT,ruleNoteDocument),parseOptionalDate(RuleDocument.FIELD_NOTE_UPDATED_AT,ruleNoteDocument));
+  }
+ else {
+    ruleNote=null;
+  }
+  params=Lists.newArrayList();
+  if (ruleSource.containsKey(RuleDocument.FIELD_PARAMS)) {
+    Map<String,Map<String,Object>> ruleParams=Maps.newHashMap();
+    for (    Map<String,Object> ruleParam : (List<Map<String,Object>>)ruleSource.get(RuleDocument.FIELD_PARAMS)) {
+      ruleParams.put((String)ruleParam.get(RuleDocument.FIELD_PARAM_KEY),ruleParam);
+    }
+    for (    Map.Entry<String,Map<String,Object>> ruleParam : ruleParams.entrySet()) {
+      RuleParamType type=RuleParamType.parse((String)ruleParam.getValue().get(RuleDocument.FIELD_PARAM_TYPE));
+      params.add(new RuleParam((String)ruleParam.getValue().get(RuleDocument.FIELD_PARAM_KEY),(String)ruleParam.getValue().get(RuleDocument.FIELD_PARAM_DESCRIPTION),(String)ruleParam.getValue().get(RuleDocument.FIELD_PARAM_DEFAULT_VALUE),type));
+    }
+  }
+  systemTags=Lists.newArrayList();
+  if (ruleSource.containsKey(RuleDocument.FIELD_SYSTEM_TAGS)) {
+    for (    String tag : (List<String>)ruleSource.get(RuleDocument.FIELD_SYSTEM_TAGS)) {
+      systemTags.add(tag);
+    }
+  }
+  adminTags=Lists.newArrayList();
+  if (ruleSource.containsKey(RuleDocument.FIELD_ADMIN_TAGS)) {
+    for (    String tag : (List<String>)ruleSource.get(RuleDocument.FIELD_ADMIN_TAGS)) {
+      adminTags.add(tag);
+    }
+  }
+}
