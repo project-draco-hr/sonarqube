@@ -17,6 +17,9 @@
       LOG.info("Disable rule " + ruleDto.getRuleKey());
       ruleDto.setStatus(Rule.STATUS_REMOVED);
       ruleDto.setUpdatedAt(buffer.now());
+      for (      RuleRuleTagDto removed : buffer.tagsByRuleId.removeAll(ruleDto.getId())) {
+        ruleDao.deleteTag(removed,sqlSession);
+      }
       ruleDao.update(ruleDto,sqlSession);
       removedIds.add(ruleDto.getId());
       if (removedIds.size() % 100 == 0) {
