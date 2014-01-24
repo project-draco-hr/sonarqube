@@ -1,0 +1,10 @@
+{
+  String languageKey=moduleLanguages.getModuleLanguageKeys().iterator().next();
+  String profileName=StringUtils.defaultIfBlank(settings.getString("sonar.profile"),settings.getString("sonar.profile." + languageKey));
+  RulesProfile profile=dao.getProfile(languageKey,profileName);
+  if (profile == null) {
+    throw new SonarException("Quality profile not found : " + profileName + ", language "+ languageKey);
+  }
+  LOG.info("Quality profile for {}: {}",languageKey,profile);
+  return hibernateHack(profile);
+}

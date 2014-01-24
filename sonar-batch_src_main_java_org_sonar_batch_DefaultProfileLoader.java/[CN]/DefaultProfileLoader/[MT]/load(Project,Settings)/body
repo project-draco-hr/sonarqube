@@ -1,17 +1,7 @@
 {
   Map<String,RulesProfile> profilesPerLanguageKey=new HashMap<String,RulesProfile>();
-  for (  Language language : languages.all()) {
-    String languageKey=language.getKey();
-    String profileName=StringUtils.defaultIfBlank(settings.getString("sonar.profile"),settings.getString("sonar.profile." + languageKey));
-    RulesProfile profile=dao.getProfile(languageKey,profileName);
-    if (profile == null) {
-      throw new SonarException("Quality profile not found : " + profileName + ", language "+ languageKey);
-    }
-    profilesPerLanguageKey.put(languageKey,hibernateHack(profile));
+  if (!moduleLanguages.getModuleLanguageKeys().isEmpty()) {
+    return loadSingleProfile(settings);
   }
-  RulesProfile profile=new RulesProfileWrapper(moduleLanguages,profilesPerLanguageKey);
-  for (  Map.Entry<String,RulesProfile> profiles : profilesPerLanguageKey.entrySet()) {
-    LOG.info("Quality profile for {}: {}",profiles.getKey(),profiles.getValue());
-  }
-  return profile;
+  return loadProfileWrapper(settings,profilesPerLanguageKey);
 }
