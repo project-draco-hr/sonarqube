@@ -1,0 +1,14 @@
+{
+  SqlSession session=mybatis.openSession();
+  try {
+    Collection<SnapshotDataDto> snapshotDataEntries=snapshotDataDao.selectSnapshotDataByComponentKey(componentKey,highlightingDataTypes(),session);
+    if (!snapshotDataEntries.isEmpty()) {
+      String snapshotSource=snapshotSourceDao.selectSnapshotSourceByComponentKey(componentKey,session);
+      return decorate(snapshotSource,snapshotDataEntries);
+    }
+    return null;
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

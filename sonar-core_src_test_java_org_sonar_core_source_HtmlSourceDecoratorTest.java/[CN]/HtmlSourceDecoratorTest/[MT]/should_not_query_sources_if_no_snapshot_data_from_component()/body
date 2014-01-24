@@ -1,0 +1,8 @@
+{
+  SnapshotSourceDao snapshotSourceDao=mock(SnapshotSourceDao.class);
+  SnapshotDataDao snapshotDataDao=mock(SnapshotDataDao.class);
+  HtmlSourceDecorator sourceDecorator=new HtmlSourceDecorator(mock(MyBatis.class),snapshotSourceDao,snapshotDataDao);
+  sourceDecorator.getDecoratedSourceAsHtml("org.apache.struts:struts:DebuggingInterceptor");
+  verify(snapshotDataDao,times(1)).selectSnapshotDataByComponentKey(eq("org.apache.struts:struts:DebuggingInterceptor"),eq(Lists.newArrayList("highlight_syntax","symbol")),any(SqlSession.class));
+  verify(snapshotSourceDao,times(0)).selectSnapshotSourceByComponentKey(eq("org.apache.struts:struts:DebuggingInterceptor"),any(SqlSession.class));
+}

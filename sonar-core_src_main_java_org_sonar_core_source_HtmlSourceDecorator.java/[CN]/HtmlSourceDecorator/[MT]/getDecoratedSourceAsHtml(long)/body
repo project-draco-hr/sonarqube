@@ -1,15 +1,9 @@
 {
-  List<String> highlightingDataTypes=Lists.newArrayList(SnapshotDataTypes.SYNTAX_HIGHLIGHTING,SnapshotDataTypes.SYMBOL_HIGHLIGHTING);
-  Collection<SnapshotDataDto> snapshotDataEntries=snapshotDataDao.selectSnapshotData(snapshotId,highlightingDataTypes);
+  Collection<SnapshotDataDto> snapshotDataEntries=snapshotDataDao.selectSnapshotData(snapshotId,highlightingDataTypes());
   if (!snapshotDataEntries.isEmpty()) {
     String snapshotSource=snapshotSourceDao.selectSnapshotSource(snapshotId);
     if (snapshotSource != null) {
-      DecorationDataHolder decorationDataHolder=new DecorationDataHolder();
-      for (      SnapshotDataDto snapshotDataEntry : snapshotDataEntries) {
-        loadSnapshotData(decorationDataHolder,snapshotDataEntry);
-      }
-      HtmlTextDecorator textDecorator=new HtmlTextDecorator();
-      return textDecorator.decorateTextWithHtml(snapshotSource,decorationDataHolder);
+      return decorate(snapshotSource,snapshotDataEntries);
     }
   }
   return null;
