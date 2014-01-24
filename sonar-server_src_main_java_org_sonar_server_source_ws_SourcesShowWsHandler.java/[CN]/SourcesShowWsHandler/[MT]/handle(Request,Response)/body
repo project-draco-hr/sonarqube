@@ -1,0 +1,14 @@
+{
+  String componentKey=request.requiredParam("key");
+  List<String> sourceHtml=sourceDecorator.getDecoratedSourceAsHtml(componentKey);
+  if (sourceHtml == null) {
+    throw new NotFoundException("Source code not found for : " + componentKey);
+  }
+  JsonWriter json=response.newJsonWriter();
+  json.beginObject().name("source").beginObject();
+  for (int i=0; i < sourceHtml.size(); i++) {
+    String line=sourceHtml.get(i);
+    json.prop(Integer.toString(i + 1),line);
+  }
+  json.endObject().endObject().close();
+}
