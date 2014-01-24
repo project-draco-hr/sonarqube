@@ -2,11 +2,12 @@
   File javaFile1=new File(baseDir,"src/main/java/Foo.java");
   File javaTestFile1=new File(baseDir,"src/test/java/FooTest.java");
   when(fs.inputFiles(FileQuery.all())).thenReturn((Iterable)Arrays.asList(new InputFileBuilder(javaFile1,Charsets.UTF_8,"src/main/java/Foo.java").attribute(DefaultInputFile.ATTRIBUTE_COMPONENT_KEY,"polop:src/main/java/Foo.java").build(),new InputFileBuilder(javaTestFile1,Charsets.UTF_8,"src/test/java/FooTest.java").attribute(DefaultInputFile.ATTRIBUTE_COMPONENT_KEY,"polop:src/test/java/FooTest.java").build()));
-  when(exclusionPatternInitializer.hasFileContentPattern()).thenReturn(false);
+  when(exclusionPatternInitializer.hasFileContentPattern()).thenReturn(true);
   scanner.analyse(project,null);
   verify(inclusionPatternInitializer).initializePatternsForPath("src/main/java/Foo.java","polop:src/main/java/Foo.java");
   verify(inclusionPatternInitializer).initializePatternsForPath("src/test/java/FooTest.java","polop:src/test/java/FooTest.java");
   verify(exclusionPatternInitializer).initializePatternsForPath("src/main/java/Foo.java","polop:src/main/java/Foo.java");
   verify(exclusionPatternInitializer).initializePatternsForPath("src/test/java/FooTest.java","polop:src/test/java/FooTest.java");
-  verifyZeroInteractions(regexpScanner);
+  verify(regexpScanner).scan("polop:src/main/java/Foo.java",javaFile1,UTF_8);
+  verify(regexpScanner).scan("polop:src/test/java/FooTest.java",javaTestFile1,UTF_8);
 }

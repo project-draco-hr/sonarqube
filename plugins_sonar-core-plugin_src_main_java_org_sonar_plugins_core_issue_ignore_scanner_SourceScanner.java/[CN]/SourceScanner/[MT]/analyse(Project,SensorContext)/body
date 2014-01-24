@@ -1,4 +1,19 @@
 {
-  parseDirs(project,false);
-  parseDirs(project,true);
+  Charset sourcesEncoding=fileSystem.sourceCharset();
+  for (  InputFile inputFile : fileSystem.inputFiles(FileQuery.all())) {
+    try {
+      String componentEffectiveKey=inputFile.attribute(DefaultInputFile.ATTRIBUTE_COMPONENT_KEY);
+      if (componentEffectiveKey != null) {
+        String path=inputFile.path();
+        inclusionPatternInitializer.initializePatternsForPath(path,componentEffectiveKey);
+        exclusionPatternInitializer.initializePatternsForPath(path,componentEffectiveKey);
+        if (exclusionPatternInitializer.hasFileContentPattern()) {
+          regexpScanner.scan(componentEffectiveKey,inputFile.file(),sourcesEncoding);
+        }
+      }
+    }
+ catch (    Exception e) {
+      throw new SonarException("Unable to read the source file : '" + inputFile.absolutePath() + "' with the charset : '"+ sourcesEncoding.name()+ "'.",e);
+    }
+  }
 }
