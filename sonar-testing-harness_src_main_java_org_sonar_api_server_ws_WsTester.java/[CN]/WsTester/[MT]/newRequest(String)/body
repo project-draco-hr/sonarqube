@@ -2,5 +2,10 @@
   if (context.controllers().size() != 1) {
     throw new IllegalStateException("The method newRequest(String) requires to define one, and only one, controller");
   }
-  return new TestRequest(context.controllers().get(0),actionKey);
+  WebService.Controller controller=context.controllers().get(0);
+  WebService.Action action=controller.action(actionKey);
+  if (action == null) {
+    throw new IllegalArgumentException("Action not found: " + actionKey);
+  }
+  return new TestRequest(controller,action);
 }

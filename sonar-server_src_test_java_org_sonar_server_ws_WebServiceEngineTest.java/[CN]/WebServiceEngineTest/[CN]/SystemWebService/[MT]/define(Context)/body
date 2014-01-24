@@ -1,26 +1,41 @@
 {
   NewController newController=context.newController("api/system");
   newController.newAction("health").setHandler(new RequestHandler(){
-    @Override public void handle(    Request request,    Response response) throws Exception {
-      response.stream().output().write("good".getBytes());
+    @Override public void handle(    Request request,    Response response){
+      try {
+        response.stream().output().write("good".getBytes());
+      }
+ catch (      IOException e) {
+        throw new IllegalStateException(e);
+      }
     }
   }
 );
   newController.newAction("ping").setPost(true).setHandler(new RequestHandler(){
-    @Override public void handle(    Request request,    Response response) throws Exception {
-      response.stream().output().write("pong".getBytes());
+    @Override public void handle(    Request request,    Response response){
+      try {
+        response.stream().output().write("pong".getBytes());
+      }
+ catch (      IOException e) {
+        throw new IllegalStateException(e);
+      }
     }
   }
 );
   newController.newAction("fail").setHandler(new RequestHandler(){
-    @Override public void handle(    Request request,    Response response) throws Exception {
+    @Override public void handle(    Request request,    Response response){
       throw new IllegalStateException("Unexpected");
     }
   }
 );
   newController.newAction("print").newParam("message","required message").newParam("author","optional author").setHandler(new RequestHandler(){
-    @Override public void handle(    Request request,    Response response) throws Exception {
-      IOUtils.write(request.requiredParam("message") + " by " + request.param("author","-"),response.stream().output());
+    @Override public void handle(    Request request,    Response response){
+      try {
+        IOUtils.write(request.requiredParam("message") + " by " + request.param("author","-"),response.stream().output());
+      }
+ catch (      IOException e) {
+        throw new IllegalStateException(e);
+      }
     }
   }
 );
