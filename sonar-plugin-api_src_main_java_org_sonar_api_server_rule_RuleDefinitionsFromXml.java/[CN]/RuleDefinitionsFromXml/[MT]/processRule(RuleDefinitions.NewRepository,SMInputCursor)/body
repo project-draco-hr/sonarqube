@@ -1,5 +1,5 @@
 {
-  String key=null, name=null, description=null, metadata=null, severity=Severity.MAJOR, status=null;
+  String key=null, name=null, description=null, metadata=null, severity=Severity.defaultSeverity(), status=null;
   Cardinality cardinality=Cardinality.SINGLE;
   List<ParamStruct> params=new ArrayList<ParamStruct>();
   String keyAttribute=ruleC.getAttrValue("key");
@@ -41,9 +41,9 @@
       params.add(processParameter(cursor));
     }
   }
-  RuleDefinitions.NewRule rule=repo.newRule(key).setHtmlDescription(description).setDefaultSeverity(severity).setName(name).setMetadata(metadata).setTemplate(cardinality == Cardinality.MULTIPLE);
+  RuleDefinitions.NewRule rule=repo.newRule(key).setHtmlDescription(description).setSeverity(severity).setName(name).setMetadata(metadata).setTemplate(cardinality == Cardinality.MULTIPLE);
   if (status != null) {
-    rule.setStatus(RuleDefinitions.Status.valueOf(status));
+    rule.setStatus(RuleStatus.valueOf(status));
   }
   for (  ParamStruct param : params) {
     rule.newParam(param.key).setDefaultValue(param.defaultValue).setType(param.type).setDescription(param.description);
