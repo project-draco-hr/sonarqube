@@ -1,0 +1,13 @@
+{
+  setupData("shared");
+  QualityProfileDao dao=new QualityProfileDao(getMyBatis());
+  settings.setProperty("sonar.profile.java","Unknown");
+  settings.setProperty("sonar.profile.php","Php One");
+  try {
+    new ModuleQProfiles(settings,languages,dao,new ProfileLoader[0]);
+    fail();
+  }
+ catch (  MessageException e) {
+    assertThat(e).hasMessage("Quality profile not found : 'Unknown' on language 'java'");
+  }
+}

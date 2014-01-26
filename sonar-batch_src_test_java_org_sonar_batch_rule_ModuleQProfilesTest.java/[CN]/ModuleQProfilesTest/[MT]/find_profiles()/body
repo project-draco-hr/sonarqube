@@ -1,0 +1,23 @@
+{
+  setupData("shared");
+  QualityProfileDao dao=new QualityProfileDao(getMyBatis());
+  settings.setProperty("sonar.profile.java","Java Two");
+  settings.setProperty("sonar.profile.abap","Abap One");
+  settings.setProperty("sonar.profile.php","Php One");
+  ModuleQProfiles moduleQProfiles=new ModuleQProfiles(settings,languages,dao,new ProfileLoader[0]);
+  List<ModuleQProfiles.QProfile> qProfiles=Lists.newArrayList(moduleQProfiles.findAll());
+  assertThat(qProfiles).hasSize(2);
+  assertThat(moduleQProfiles.findByLanguage("java")).isNotNull();
+  assertThat(moduleQProfiles.findByLanguage("php")).isNotNull();
+  assertThat(moduleQProfiles.findByLanguage("abap")).isNull();
+  ModuleQProfiles.QProfile javaProfile=qProfiles.get(0);
+  assertThat(javaProfile.id()).isEqualTo(2);
+  assertThat(javaProfile.name()).isEqualTo("Java Two");
+  assertThat(javaProfile.language()).isEqualTo("java");
+  assertThat(javaProfile.version()).isEqualTo(20);
+  ModuleQProfiles.QProfile phpProfile=qProfiles.get(1);
+  assertThat(phpProfile.id()).isEqualTo(3);
+  assertThat(phpProfile.name()).isEqualTo("Php One");
+  assertThat(phpProfile.language()).isEqualTo("php");
+  assertThat(phpProfile.version()).isEqualTo(30);
+}

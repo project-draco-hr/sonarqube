@@ -1,0 +1,12 @@
+{
+  setupData("shared");
+  QualityProfileDao dao=new QualityProfileDao(getMyBatis());
+  when(moduleQProfiles.findByLanguage("java")).thenReturn(new ModuleQProfiles.QProfile(dao.selectById(2)));
+  when(moduleQProfiles.findByLanguage("php")).thenReturn(new ModuleQProfiles.QProfile(dao.selectById(3)));
+  when(moduleQProfiles.findByLanguage("abap")).thenReturn(null);
+  when(moduleLanguages.keys()).thenReturn(Arrays.asList("java","php","abap"));
+  QProfileSensor sensor=new QProfileSensor(moduleQProfiles,moduleLanguages,dao);
+  assertThat(sensor.shouldExecuteOnProject(project)).isTrue();
+  sensor.analyse(project,sensorContext);
+  checkTable("mark_profiles_as_used","rules_profiles");
+}
