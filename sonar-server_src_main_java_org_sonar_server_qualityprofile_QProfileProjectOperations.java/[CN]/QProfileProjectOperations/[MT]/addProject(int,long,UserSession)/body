@@ -1,0 +1,13 @@
+{
+  checkPermission(userSession);
+  SqlSession session=myBatis.openSession();
+  try {
+    ComponentDto project=(ComponentDto)findProjectNotNull(projectId,session);
+    QualityProfileDto qualityProfile=findNotNull(profileId,session);
+    propertiesDao.setProperty(new PropertyDto().setKey(QProfileOperations.PROFILE_PROPERTY_PREFIX + qualityProfile.getLanguage()).setValue(qualityProfile.getName()).setResourceId(project.getId()),session);
+    session.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

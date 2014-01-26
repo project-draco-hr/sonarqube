@@ -1,12 +1,15 @@
 {
   try {
     QualityProfileDto qualityProfile=new QualityProfileDto().setId(1).setName("My profile").setLanguage("java");
+    when(qualityProfileDao.selectById(1,session)).thenReturn(qualityProfile);
     ComponentDto project=new ComponentDto().setId(10L).setKey("org.codehaus.sonar:sonar").setName("SonarQube");
-    service.addProject(qualityProfile,project,MockUserSession.create());
+    when(resourceDao.findById(10L,session)).thenReturn(project);
+    service.addProject(1,10L,MockUserSession.create());
     fail();
   }
  catch (  Exception e) {
     assertThat(e).isInstanceOf(ForbiddenException.class);
   }
   verifyNoMoreInteractions(propertiesDao);
+  verify(session,never()).commit();
 }

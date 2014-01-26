@@ -1,0 +1,14 @@
+{
+  try {
+    when(qualityProfileDao.selectById(1,session)).thenReturn(null);
+    ComponentDto project=new ComponentDto().setId(10L).setKey("org.codehaus.sonar:sonar").setName("SonarQube");
+    when(resourceDao.findById(10L,session)).thenReturn(project);
+    service.addProject(1,10L,authorizedSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(NotFoundException.class);
+  }
+  verifyNoMoreInteractions(propertiesDao);
+  verify(session,never()).commit();
+}

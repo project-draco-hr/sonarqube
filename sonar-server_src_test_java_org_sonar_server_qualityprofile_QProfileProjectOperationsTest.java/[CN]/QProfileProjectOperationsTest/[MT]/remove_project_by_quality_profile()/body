@@ -1,6 +1,9 @@
 {
   QualityProfileDto qualityProfile=new QualityProfileDto().setId(1).setName("My profile").setLanguage("java");
+  when(qualityProfileDao.selectById(1,session)).thenReturn(qualityProfile);
   ComponentDto project=new ComponentDto().setId(10L).setKey("org.codehaus.sonar:sonar").setName("SonarQube");
-  service.removeProject(qualityProfile,project,authorizedSession);
-  verify(propertiesDao).deleteProjectProperty("sonar.profile.java",10L);
+  when(resourceDao.findById(10L,session)).thenReturn(project);
+  service.removeProject(1,10L,authorizedSession);
+  verify(propertiesDao).deleteProjectProperty("sonar.profile.java",10L,session);
+  verify(session).commit();
 }

@@ -1,7 +1,6 @@
 {
   QualityProfileDto qualityProfile=new QualityProfileDto().setId(1).setName("My profile").setLanguage("java");
-  when(qualityProfileDao.selectProjects("My profile","sonar.profile.java")).thenReturn(newArrayList(new ComponentDto().setId(1L).setKey("org.codehaus.sonar:sonar").setName("SonarQube")));
-  QProfileProjectLookup.QProfileProjects result=lookup.projects(qualityProfile);
-  assertThat(result.profile()).isNotNull();
-  assertThat(result.projects()).hasSize(1);
+  when(qualityProfileDao.selectById(1,session)).thenReturn(qualityProfile);
+  when(qualityProfileDao.selectProjects("My profile","sonar.profile.java",session)).thenReturn(newArrayList(new ComponentDto().setId(1L).setKey("org.codehaus.sonar:sonar").setName("SonarQube")));
+  assertThat(lookup.projects(1)).hasSize(1);
 }

@@ -1,5 +1,7 @@
 {
   QualityProfileDto qualityProfile=new QualityProfileDto().setId(1).setName("My profile").setLanguage("java");
-  service.removeAllProjects(qualityProfile,authorizedSession);
-  verify(propertiesDao).deleteProjectProperties("sonar.profile.java","My profile");
+  when(qualityProfileDao.selectById(1,session)).thenReturn(qualityProfile);
+  service.removeAllProjects(1,authorizedSession);
+  verify(propertiesDao).deleteProjectProperties("sonar.profile.java","My profile",session);
+  verify(session).commit();
 }

@@ -1,0 +1,12 @@
+{
+  SqlSession session=myBatis.openSession();
+  try {
+    QualityProfileDto qualityProfile=qualityProfileDao.selectById(profileId,session);
+    QProfileValidations.checkProfileIsNotNull(qualityProfile);
+    List<ComponentDto> componentDtos=qualityProfileDao.selectProjects(qualityProfile.getName(),QProfileOperations.PROFILE_PROPERTY_PREFIX + qualityProfile.getLanguage(),session);
+    return Lists.<Component>newArrayList(componentDtos);
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

@@ -1,11 +1,12 @@
 {
   Date createdAt=DateUtils.parseDate("2013-12-20");
   ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(Severity.MINOR).setNoteCreatedAt(createdAt).setNoteData("My previous note").setNoteUserLogin("nicolas");
+  when(activeRuleDao.selectById(5,session)).thenReturn(activeRule);
   List<ActiveRuleParamDto> activeRuleParams=newArrayList(new ActiveRuleParamDto());
   when(activeRuleDao.selectParamsByActiveRuleId(eq(5),eq(session))).thenReturn(activeRuleParams);
   long now=System.currentTimeMillis();
   doReturn(now).when(system).now();
-  operations.updateActiveRuleNote(activeRule,"My new note",MockUserSession.create().setLogin("guy").setName("Guy").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN));
+  operations.updateActiveRuleNote(5,"My new note",MockUserSession.create().setLogin("guy").setName("Guy").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN));
   ArgumentCaptor<ActiveRuleDto> argumentCaptor=ArgumentCaptor.forClass(ActiveRuleDto.class);
   verify(activeRuleDao).update(argumentCaptor.capture(),eq(session));
   assertThat(argumentCaptor.getValue().getNoteData()).isEqualTo("My new note");

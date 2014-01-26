@@ -1,0 +1,14 @@
+{
+  try {
+    QualityProfileDto qualityProfile=new QualityProfileDto().setId(1).setName("My profile").setLanguage("java");
+    when(qualityProfileDao.selectById(1,session)).thenReturn(qualityProfile);
+    when(resourceDao.findById(10L,session)).thenReturn(null);
+    service.addProject(1,10L,authorizedSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(NotFoundException.class);
+  }
+  verifyNoMoreInteractions(propertiesDao);
+  verify(session,never()).commit();
+}

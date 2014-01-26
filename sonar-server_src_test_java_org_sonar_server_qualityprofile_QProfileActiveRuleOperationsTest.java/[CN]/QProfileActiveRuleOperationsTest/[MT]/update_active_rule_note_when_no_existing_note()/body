@@ -1,10 +1,11 @@
 {
   ActiveRuleDto activeRule=new ActiveRuleDto().setId(5).setProfileId(1).setRuleId(10).setSeverity(Severity.MINOR).setNoteCreatedAt(null).setNoteData(null);
+  when(activeRuleDao.selectById(5,session)).thenReturn(activeRule);
   List<ActiveRuleParamDto> activeRuleParams=newArrayList(new ActiveRuleParamDto());
   when(activeRuleDao.selectParamsByActiveRuleId(eq(5),eq(session))).thenReturn(activeRuleParams);
   long now=System.currentTimeMillis();
   doReturn(now).when(system).now();
-  operations.updateActiveRuleNote(activeRule,"My note",authorizedUserSession);
+  operations.updateActiveRuleNote(5,"My note",authorizedUserSession);
   ArgumentCaptor<ActiveRuleDto> argumentCaptor=ArgumentCaptor.forClass(ActiveRuleDto.class);
   verify(activeRuleDao).update(argumentCaptor.capture(),eq(session));
   assertThat(argumentCaptor.getValue().getNoteData()).isEqualTo("My note");

@@ -1,0 +1,28 @@
+{
+  checkPermission(UserSession.get());
+  SqlSession session=myBatis.openSession();
+  QProfileResult result=new QProfileResult();
+  try {
+    ValidationMessages messages=ValidationMessages.create();
+    RulesProfile importedProfile=xmlProfileParser.parse(new StringReader(xmlBackup),messages);
+    processValidationMessages(messages,result);
+    if (importedProfile != null) {
+      DatabaseSession hibernateSession=sessionFactory.getSession();
+      checkProfileDoesNotExists(importedProfile,deleteExisting,hibernateSession);
+      hibernateSession.saveWithoutFlush(importedProfile);
+      hibernateSession.commit();
+      QProfile newProfile=qProfileLookup.profile(importedProfile.getId(),session);
+      if (newProfile == null) {
+        throw new BadRequestException("Restore of the profile has failed.");
+      }
+      esActiveRule.bulkIndexProfile(newProfile.id(),session);
+      dryRunCache.reportGlobalModification(session);
+      session.commit();
+      result.setProfile(newProfile);
+    }
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+  return result;
+}

@@ -1,12 +1,14 @@
 {
   when(profileDao.selectById(1,session)).thenReturn(new QualityProfileDto().setId(1).setName("Default").setLanguage("java"));
   when(ruleDao.selectById(10,session)).thenReturn(new RuleDto().setId(10).setSeverity(Severity.CRITICAL));
+  ProfileRuleQuery query=ProfileRuleQuery.create(1);
+  when(rules.searchInactiveProfileRuleIds(query)).thenReturn(newArrayList(10));
   when(ruleDao.selectParameters(eq(10),eq(session))).thenReturn(newArrayList(new RuleParamDto().setId(20).setName("max").setDefaultValue("10")));
   final int idActiveRuleToUpdate=42;
   final int idActiveRuleToDelete=24;
   ProfilesManager.RuleInheritanceActions inheritanceActions=new ProfilesManager.RuleInheritanceActions().addToIndex(idActiveRuleToUpdate).addToDelete(idActiveRuleToDelete);
   when(profilesManager.activated(eq(1),anyInt(),eq("Nicolas"))).thenReturn(inheritanceActions);
-  operations.activateRules(1,newArrayList(10),authorizedUserSession);
+  operations.activateRules(1,query,authorizedUserSession);
   ArgumentCaptor<ActiveRuleDto> activeRuleArgument=ArgumentCaptor.forClass(ActiveRuleDto.class);
   verify(activeRuleDao).insert(activeRuleArgument.capture(),eq(session));
   assertThat(activeRuleArgument.getValue().getRulId()).isEqualTo(10);

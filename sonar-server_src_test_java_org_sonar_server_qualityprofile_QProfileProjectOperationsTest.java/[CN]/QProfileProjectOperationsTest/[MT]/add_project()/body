@@ -1,10 +1,13 @@
 {
   QualityProfileDto qualityProfile=new QualityProfileDto().setId(1).setName("My profile").setLanguage("java");
+  when(qualityProfileDao.selectById(1,session)).thenReturn(qualityProfile);
   ComponentDto project=new ComponentDto().setId(10L).setKey("org.codehaus.sonar:sonar").setName("SonarQube");
-  service.addProject(qualityProfile,project,authorizedSession);
+  when(resourceDao.findById(10L,session)).thenReturn(project);
+  service.addProject(1,10L,authorizedSession);
   ArgumentCaptor<PropertyDto> argumentCaptor=ArgumentCaptor.forClass(PropertyDto.class);
-  verify(propertiesDao).setProperty(argumentCaptor.capture());
+  verify(propertiesDao).setProperty(argumentCaptor.capture(),eq(session));
   assertThat(argumentCaptor.getValue().getKey()).isEqualTo("sonar.profile.java");
   assertThat(argumentCaptor.getValue().getValue()).isEqualTo("My profile");
   assertThat(argumentCaptor.getValue().getResourceId()).isEqualTo(10);
+  verify(session).commit();
 }
