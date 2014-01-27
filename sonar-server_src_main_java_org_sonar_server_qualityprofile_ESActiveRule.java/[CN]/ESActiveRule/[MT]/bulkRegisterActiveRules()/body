@@ -1,11 +1,10 @@
 {
   SqlSession session=myBatis.openSession();
   try {
-    TimeProfiler profiler=new TimeProfiler();
-    profiler.start("Rebuilding active rules index - query");
+    StopWatch bulkWatch=startWatch();
     List<ActiveRuleDto> activeRules=activeRuleDao.selectAll(session);
     List<ActiveRuleParamDto> activeRuleParams=activeRuleDao.selectAllParams(session);
-    profiler.stop();
+    bulkWatch.stop(String.format("Loaded %d active rules from DB",activeRules.size()));
     Multimap<Integer,ActiveRuleParamDto> paramsByActiveRule=ArrayListMultimap.create();
     for (    ActiveRuleParamDto param : activeRuleParams) {
       paramsByActiveRule.put(param.getActiveRuleId(),param);
