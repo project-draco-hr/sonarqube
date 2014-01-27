@@ -1,0 +1,51 @@
+{
+  StringBuilder currentHtmlLine=new StringBuilder();
+  List<String> decoratedHtmlLines=Lists.newArrayList();
+  int currentLine=1;
+  BufferedReader stringBuffer=null;
+  try {
+    stringBuffer=new BufferedReader(new StringReader(text));
+    CharactersReader charsReader=new CharactersReader(stringBuffer);
+    while (charsReader.readNextChar()) {
+      if (shouldStartNewLine(charsReader)) {
+        addLine(decoratedHtmlLines,currentHtmlLine.toString(),currentLine,from,to);
+        currentLine++;
+        currentHtmlLine=new StringBuilder();
+        if (shouldReopenPendingTags(charsReader)) {
+          reopenCurrentSyntaxTags(charsReader,currentHtmlLine);
+        }
+      }
+      int numberOfTagsToClose=getNumberOfTagsToClose(charsReader.getCurrentIndex(),decorationDataHolder);
+      closeCompletedTags(charsReader,numberOfTagsToClose,currentHtmlLine);
+      if (shouldClosePendingTags(charsReader)) {
+        closeCurrentSyntaxTags(charsReader,currentHtmlLine);
+      }
+      Collection<String> tagsToOpen=getTagsToOpen(charsReader.getCurrentIndex(),decorationDataHolder);
+      openNewTags(charsReader,tagsToOpen,currentHtmlLine);
+      if (shouldAppendCharToHtmlOutput(charsReader)) {
+        char currentChar=(char)charsReader.getCurrentValue();
+        currentHtmlLine.append(normalize(currentChar));
+      }
+    }
+    closeCurrentSyntaxTags(charsReader,currentHtmlLine);
+    if (shouldStartNewLine(charsReader)) {
+      addLine(decoratedHtmlLines,currentHtmlLine.toString(),currentLine,from,to);
+      currentLine++;
+      addLine(decoratedHtmlLines,"",currentLine,from,to);
+      currentLine++;
+    }
+ else     if (currentHtmlLine.length() > 0) {
+      addLine(decoratedHtmlLines,currentHtmlLine.toString(),currentLine,from,to);
+      currentLine++;
+    }
+  }
+ catch (  IOException exception) {
+    String errorMsg="An exception occurred while highlighting the syntax of one of the project's files";
+    LoggerFactory.getLogger(HtmlTextDecorator.class).error(errorMsg);
+    throw new IllegalStateException(errorMsg,exception);
+  }
+ finally {
+    Closeables.closeQuietly(stringBuffer);
+  }
+  return decoratedHtmlLines;
+}
