@@ -1,6 +1,6 @@
 {
   when(myBatis.openSession()).thenReturn(session);
-  esSetup=new EsSetup(ImmutableSettings.builder().loadFromUrl(ESNode.class.getResource("config/elasticsearch.json")).build());
+  esSetup=new EsSetup(ImmutableSettings.builder().loadFromUrl(ESNode.class.getResource("config/elasticsearch.json")).put("http.port","9200").build());
   esSetup.execute(EsSetup.deleteAll());
   ESNode node=mock(ESNode.class);
   when(node.client()).thenReturn(esSetup.client());
@@ -12,4 +12,5 @@
   registry=new RuleRegistry(searchIndex,ruleDao);
   registry.start();
   esSetup.execute(EsSetup.index("rules","rule","1").withSource(testFileAsString("shared/rule1.json")),EsSetup.index("rules","rule","2").withSource(testFileAsString("shared/rule2.json")),EsSetup.index("rules","rule","3").withSource(testFileAsString("shared/rule3.json")));
+  esSetup.client().admin().cluster().prepareHealth(RuleRegistry.INDEX_RULES).setWaitForGreenStatus().execute().actionGet();
 }
