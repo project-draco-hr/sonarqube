@@ -1,0 +1,10 @@
+{
+  RuleKey ruleKey=RuleKey.of("squid","org.sonar.api.batch.rule.CheckWithStringProperty");
+  builder.activate(ruleKey).setParam("pattern","foo");
+  CheckFactory checkFactory=new CheckFactory(builder.build());
+  CheckWithStringProperty check=new CheckWithStringProperty();
+  Checks checks=checkFactory.create("squid").addAnnotatedChecks(check);
+  Object createdCheck=checks.of(ruleKey);
+  assertThat(createdCheck).isSameAs(check);
+  assertThat(((CheckWithStringProperty)createdCheck).getPattern()).isEqualTo("foo");
+}

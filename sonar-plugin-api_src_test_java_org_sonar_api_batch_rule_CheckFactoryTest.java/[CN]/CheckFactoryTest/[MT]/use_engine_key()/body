@@ -1,0 +1,11 @@
+{
+  RuleKey ruleKey=RuleKey.of("squid","One");
+  builder.activate(ruleKey).setEngineKey("S0001");
+  CheckFactory checkFactory=new CheckFactory(builder.build());
+  Checks checks=checkFactory.create("squid").addAnnotatedChecks(CheckWithKey.class);
+  Object check=checks.of(ruleKey);
+  assertThat(check).isInstanceOf(CheckWithKey.class);
+  assertThat(checks.of(ruleKey)).isSameAs(check);
+  assertThat(checks.ruleKey(check)).isEqualTo(ruleKey);
+  assertThat(checks.all()).containsOnly(check);
+}

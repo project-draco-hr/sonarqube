@@ -1,0 +1,16 @@
+{
+  Map<String,Object> checksByEngineKey=Maps.newHashMap();
+  for (  Object checkClassesOrObject : checkClassesOrObjects) {
+    String engineKey=annotatedEngineKey(checkClassesOrObject);
+    if (engineKey != null) {
+      checksByEngineKey.put(engineKey,checkClassesOrObject);
+    }
+  }
+  for (  ModuleRule moduleRule : moduleRules.findByRepository(repository)) {
+    String engineKey=StringUtils.defaultIfBlank(moduleRule.engineKey(),moduleRule.ruleKey().rule());
+    Object checkClassesOrObject=checksByEngineKey.get(engineKey);
+    Object obj=instantiate(moduleRule,checkClassesOrObject);
+    add(moduleRule.ruleKey(),(C)obj);
+  }
+  return this;
+}
