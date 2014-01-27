@@ -1,17 +1,18 @@
 {
   String componentKey=request.requiredParam("key");
-  Integer from=request.intParam("from");
-  Integer to=request.intParam("to");
-  List<String> sourceHtml=sourceService.sourcesFromComponent(componentKey,from,to);
+  Integer fromParam=request.intParam("from");
+  Integer toParam=request.intParam("to");
+  List<String> sourceHtml=sourceService.sourcesFromComponent(componentKey,fromParam,toParam);
   if (sourceHtml == null) {
     throw new NotFoundException("Component : " + componentKey + " has no source.");
   }
-  from=from != null ? from : 1;
+  String scmAuthorData=sourceService.findDataFromComponent(componentKey,CoreMetrics.SCM_AUTHORS_BY_LINE_KEY);
+  String scmDataData=sourceService.findDataFromComponent(componentKey,CoreMetrics.SCM_LAST_COMMIT_DATETIMES_BY_LINE_KEY);
+  int from=fromParam != null ? fromParam : 1;
+  int to=toParam != null ? toParam : sourceHtml.size() + from;
   JsonWriter json=response.newJsonWriter();
-  json.beginObject().name("source").beginObject();
-  for (int i=0; i < sourceHtml.size(); i++) {
-    String line=sourceHtml.get(i);
-    json.prop(Integer.toString(i + from),line);
-  }
-  json.endObject().endObject().close();
+  json.beginObject();
+  writeSource(sourceHtml,from,json);
+  writeScm(scmAuthorData,scmDataData,from,to,json);
+  json.endObject().close();
 }
