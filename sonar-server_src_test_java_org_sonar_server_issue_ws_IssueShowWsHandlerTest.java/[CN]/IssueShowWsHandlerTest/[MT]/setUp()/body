@@ -1,17 +1,11 @@
 {
   issues=new ArrayList<Issue>();
   result=new DefaultIssueQueryResult(issues);
-  Component component=mock(Component.class);
-  when(component.key()).thenReturn("org.sonar.server.issue.IssueClient");
-  when(component.longName()).thenReturn("SonarQube :: Issue Client");
-  when(component.qualifier()).thenReturn("FIL");
-  result.addComponents(newArrayList(component));
-  Component project=mock(Component.class);
-  when(project.key()).thenReturn("org.sonar.Sonar");
-  when(project.longName()).thenReturn("SonarQube");
-  result.addProjects(newArrayList(project));
   result.addRules(newArrayList(Rule.create("squid","AvoidCycle").setName("Avoid cycle")));
   when(issueFinder.find(any(IssueQuery.class))).thenReturn(result);
   when(issueChangelogService.changelog(any(Issue.class))).thenReturn(mock(IssueChangelog.class));
+  issue_creation_date=DateUtils.parseDateTime("2014-01-22T19:10:03+0100");
+  when(i18n.formatDateTime(any(Locale.class),eq(issue_creation_date))).thenReturn("Jan 22, 2014 10:03 AM");
+  when(i18n.message(any(Locale.class),eq("created"),eq((String)null))).thenReturn("Created");
   tester=new WsTester(new IssuesWs(new IssueShowWsHandler(issueFinder,issueService,issueChangelogService,actionService,technicalDebtFormatter,i18n)));
 }
