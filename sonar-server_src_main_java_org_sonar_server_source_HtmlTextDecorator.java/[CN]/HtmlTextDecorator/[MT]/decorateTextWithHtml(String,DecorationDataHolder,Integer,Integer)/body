@@ -1,42 +1,32 @@
 {
   StringBuilder currentHtmlLine=new StringBuilder();
-  List<String> decoratedHtmlLines=Lists.newArrayList();
+  List<String> decoratedHtmlLines=newArrayList();
   int currentLine=1;
   BufferedReader stringBuffer=null;
   try {
     stringBuffer=new BufferedReader(new StringReader(text));
     CharactersReader charsReader=new CharactersReader(stringBuffer);
     while (charsReader.readNextChar()) {
+      if (shouldStop(currentLine,to)) {
+        break;
+      }
       if (shouldStartNewLine(charsReader)) {
-        addLine(decoratedHtmlLines,currentHtmlLine.toString(),currentLine,from,to);
+        if (canAddLine(currentLine,from)) {
+          decoratedHtmlLines.add(currentHtmlLine.toString());
+        }
         currentLine++;
         currentHtmlLine=new StringBuilder();
-        if (shouldReopenPendingTags(charsReader)) {
-          reopenCurrentSyntaxTags(charsReader,currentHtmlLine);
-        }
       }
-      int numberOfTagsToClose=getNumberOfTagsToClose(charsReader.getCurrentIndex(),decorationDataHolder);
-      closeCompletedTags(charsReader,numberOfTagsToClose,currentHtmlLine);
-      if (shouldClosePendingTags(charsReader)) {
-        closeCurrentSyntaxTags(charsReader,currentHtmlLine);
-      }
-      Collection<String> tagsToOpen=getTagsToOpen(charsReader.getCurrentIndex(),decorationDataHolder);
-      openNewTags(charsReader,tagsToOpen,currentHtmlLine);
-      if (shouldAppendCharToHtmlOutput(charsReader)) {
-        char currentChar=(char)charsReader.getCurrentValue();
-        currentHtmlLine.append(normalize(currentChar));
-      }
+      addCharToCurrentLine(charsReader,currentHtmlLine,decorationDataHolder);
     }
     closeCurrentSyntaxTags(charsReader,currentHtmlLine);
     if (shouldStartNewLine(charsReader)) {
       addLine(decoratedHtmlLines,currentHtmlLine.toString(),currentLine,from,to);
       currentLine++;
       addLine(decoratedHtmlLines,"",currentLine,from,to);
-      currentLine++;
     }
  else     if (currentHtmlLine.length() > 0) {
       addLine(decoratedHtmlLines,currentHtmlLine.toString(),currentLine,from,to);
-      currentLine++;
     }
   }
  catch (  IOException exception) {
