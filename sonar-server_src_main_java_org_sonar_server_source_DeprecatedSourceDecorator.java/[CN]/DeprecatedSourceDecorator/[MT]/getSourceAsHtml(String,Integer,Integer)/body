@@ -1,0 +1,19 @@
+{
+  SqlSession session=mybatis.openSession();
+  try {
+    ResourceDto component=resourceDao.getResource(ResourceQuery.create().setKey(componentKey),session);
+    if (component == null) {
+      throw new NotFoundException("The component '" + componentKey + "' does not exists.");
+    }
+    String source=snapshotSourceDao.selectSnapshotSourceByComponentKey(componentKey,session);
+    if (source != null) {
+      return splitSourceByLine(source,component.getLanguage(),from,to);
+    }
+ else {
+      return null;
+    }
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

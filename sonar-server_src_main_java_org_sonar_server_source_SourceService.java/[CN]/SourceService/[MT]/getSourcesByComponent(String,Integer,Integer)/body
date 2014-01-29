@@ -1,0 +1,14 @@
+{
+  ResourceDto project=resourceDao.getRootProjectByComponentKey(componentKey);
+  if (project == null) {
+    throw new NotFoundException("This component does not exists.");
+  }
+  UserSession.get().checkProjectPermission(UserRole.CODEVIEWER,project.getKey());
+  List<String> decoratedSource=sourceDecorator.getDecoratedSourceAsHtml(componentKey,from,to);
+  if (decoratedSource != null) {
+    return decoratedSource;
+  }
+ else {
+    return deprecatedSourceDecorator.getSourceAsHtml(componentKey,from,to);
+  }
+}

@@ -1,0 +1,10 @@
+{
+  String componentKey="org.sonar.sample:Sample";
+  String source="line 1\nline 2\nline 3\n";
+  String htmlSource="<span>line 1</span>\n<span>line 2</span>\n<span>line 3</span>\n";
+  when(resourceDao.getResource(any(ResourceQuery.class),eq(session))).thenReturn(new ResourceDto().setKey(componentKey).setLanguage("java"));
+  when(snapshotSourceDao.selectSnapshotSourceByComponentKey(componentKey,session)).thenReturn(source);
+  when(codeColorizers.toHtml(source,"java")).thenReturn(htmlSource);
+  List<String> result=sourceDecorator.getSourceAsHtml(componentKey,2,3);
+  assertThat(result).containsExactly("<span>line 2</span>","<span>line 3</span>");
+}
