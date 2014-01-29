@@ -1,0 +1,8 @@
+{
+  DefaultInputFile inputFile=newInputFile("src/main/java/foo/bar/Foo.java","line1\nline2\nline3","foo/bar/Foo.java","java",false);
+  when(fs.inputFiles(FileQuery.all())).thenReturn((Iterable)Arrays.asList(inputFile));
+  Languages languages=new Languages(Java.INSTANCE);
+  ComponentIndexer indexer=new ComponentIndexer(project,languages,sonarIndex,settings,mock(ResourceKeyMigration.class),new DefaultModuleLanguages(settings,languages),mock(ResourceDao.class),mock(InputFileCache.class));
+  indexer.execute(fs);
+  assertThat(inputFile.attribute(InputFile.ATTRIBUTE_LINE_COUNT)).isEqualTo("3");
+}
