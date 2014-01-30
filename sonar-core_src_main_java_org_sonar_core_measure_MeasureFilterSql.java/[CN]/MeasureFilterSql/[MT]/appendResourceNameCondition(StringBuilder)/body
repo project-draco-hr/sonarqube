@@ -1,8 +1,9 @@
 {
   if (StringUtils.isNotBlank(filter.getResourceName())) {
     sb.append(" AND s.project_id IN (SELECT rindex.resource_id FROM resource_index rindex WHERE rindex.kee LIKE '");
-    sb.append(StringEscapeUtils.escapeSql(StringUtils.lowerCase(filter.getResourceName())));
+    sb.append(escapePercentAndUnderscrore(StringEscapeUtils.escapeSql(StringUtils.lowerCase(filter.getResourceName()))));
     sb.append("%'");
+    appendEscapeForSomeDb(sb);
     if (!filter.getResourceQualifiers().isEmpty()) {
       sb.append(" AND rindex.qualifier IN ");
       appendInStatement(filter.getResourceQualifiers(),sb);
