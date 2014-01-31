@@ -1,14 +1,16 @@
 {
   List<String> actions=newArrayList();
-  if (UserSession.get().isLoggedIn()) {
+  String login=UserSession.get().login();
+  if (login != null) {
     actions.add("comment");
     if (issue.resolution() == null) {
       actions.add("assign");
-      if (!UserSession.get().login().equals(issue.assignee())) {
+      if (!login.equals(issue.assignee())) {
         actions.add("assign_to_me");
       }
       actions.add("plan");
-      if (UserSession.get().hasProjectPermission(UserRole.ISSUE_ADMIN,issue.projectKey())) {
+      String projectKey=issue.projectKey();
+      if (projectKey != null && UserSession.get().hasProjectPermission(UserRole.ISSUE_ADMIN,projectKey)) {
         actions.add("set_severity");
       }
       for (      Action action : actionService.listAvailableActions(issue)) {
