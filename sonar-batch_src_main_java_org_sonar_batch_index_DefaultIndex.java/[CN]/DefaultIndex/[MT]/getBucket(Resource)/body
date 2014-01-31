@@ -1,16 +1,14 @@
 {
-  if (StringUtils.isNotBlank(res.getKey())) {
-    return buckets.get(res);
+  if (StringUtils.isNotBlank(reference.getKey())) {
+    return buckets.get(reference);
   }
-  if (StringUtils.isNotBlank(res.getDeprecatedKey())) {
-    for (    Map.Entry<Resource,Bucket> entry : buckets.entrySet()) {
-      Resource indexedResource=entry.getKey();
-      if (res.getClass() == indexedResource.getClass() && res.getDeprecatedKey().equals(indexedResource.getDeprecatedKey())) {
-        LOG.debug("Resource " + res + " was found using deprecated key. Please update your plugin.");
-        Bucket bucket=entry.getValue();
-        res.setKey(bucket.getResource().getKey());
-        return bucket;
-      }
+  if (StringUtils.isNotBlank(reference.getDeprecatedKey())) {
+    Bucket bucket=bucketsByDeprecatedKey.get(reference.getDeprecatedKey());
+    if (bucket != null) {
+      reference.setKey(bucket.getResource().getKey());
+      reference.setPath(bucket.getResource().getPath());
+      LOG.debug("Resource {} was found using deprecated key. Please update your plugin.",reference);
+      return bucket;
     }
   }
   return null;
