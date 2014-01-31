@@ -1,0 +1,12 @@
+{
+  settings.setProperty("sonar.language","java");
+  ModuleQProfiles.QProfile qProfile=new ModuleQProfiles.QProfile(33,"Sonar way","java",12);
+  when(qProfiles.findByLanguage("java")).thenReturn(qProfile);
+  RulesProfile hibernateProfile=new RulesProfile("Sonar way","java").setVersion(12);
+  when(dao.getProfile("java","Sonar way")).thenReturn(hibernateProfile);
+  RulesProfile profile=provider.provide(qProfiles,settings,dao);
+  assertThat(profile).isNotNull();
+  assertThat(profile.getLanguage()).isEqualTo("java");
+  assertThat(profile.getName()).isEqualTo("Sonar way");
+  assertThat(profile.getVersion()).isEqualTo(12);
+}
