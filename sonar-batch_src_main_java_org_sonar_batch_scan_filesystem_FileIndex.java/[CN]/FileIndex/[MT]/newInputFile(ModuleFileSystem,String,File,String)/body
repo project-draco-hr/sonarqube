@@ -1,0 +1,15 @@
+{
+  Map<String,String> attributes=Maps.newHashMap();
+  set(attributes,InputFile.ATTRIBUTE_TYPE,type);
+  String resourceKey=PathUtils.sanitize(path);
+  set(attributes,DefaultInputFile.ATTRIBUTE_COMPONENT_KEY,project.getEffectiveKey() + ":" + resourceKey);
+  initStatus(file,fileSystem.sourceCharset(),path,attributes);
+  DefaultInputFile inputFile=DefaultInputFile.create(file,fileSystem.sourceCharset(),path,attributes);
+  String lang=languageRecognizer.of(inputFile);
+  if (lang == null) {
+    return null;
+  }
+  set(inputFile.attributes(),InputFile.ATTRIBUTE_LANGUAGE,lang);
+  setDeprecatedAttributes(fileSystem,type,file,attributes,inputFile,lang);
+  return inputFile;
+}

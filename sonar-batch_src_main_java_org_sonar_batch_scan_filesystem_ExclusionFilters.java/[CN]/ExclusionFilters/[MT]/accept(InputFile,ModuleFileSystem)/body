@@ -1,0 +1,30 @@
+{
+  String type=inputFile.attribute(InputFile.ATTRIBUTE_TYPE);
+  PathPattern[] inclusionPatterns=null;
+  PathPattern[] exclusionPatterns=null;
+  if (InputFile.TYPE_MAIN.equals(type)) {
+    inclusionPatterns=sourceInclusions(fs);
+    exclusionPatterns=sourceExclusions();
+  }
+ else   if (InputFile.TYPE_TEST.equals(type)) {
+    inclusionPatterns=testInclusions(fs);
+    exclusionPatterns=testExclusions();
+  }
+  boolean matchInclusion=false;
+  if (inclusionPatterns != null && inclusionPatterns.length > 0) {
+    for (    PathPattern pattern : inclusionPatterns) {
+      matchInclusion|=pattern.match(inputFile);
+    }
+    if (!matchInclusion) {
+      return false;
+    }
+  }
+  if (exclusionPatterns != null && exclusionPatterns.length > 0) {
+    for (    PathPattern pattern : exclusionPatterns) {
+      if (pattern.match(inputFile)) {
+        return false;
+      }
+    }
+  }
+  return matchInclusion;
+}

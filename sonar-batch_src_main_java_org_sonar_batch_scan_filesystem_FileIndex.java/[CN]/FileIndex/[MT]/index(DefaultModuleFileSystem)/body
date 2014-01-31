@@ -1,25 +1,18 @@
 {
   Logger logger=LoggerFactory.getLogger(FileIndex.class);
   logger.info("Index files");
+  exclusionFilters.logConfiguration(fileSystem);
   Progress progress=new Progress(fileCache.fileRelativePaths(fileSystem.moduleKey()));
-  if (fileSystem.sourceFiles().isEmpty()) {
-    for (    File sourceDir : fileSystem.sourceDirs()) {
-      indexDirectory(fileSystem,progress,sourceDir,InputFile.TYPE_MAIN);
-    }
+  if (!fileSystem.sourceFiles().isEmpty() || !fileSystem.testFiles().isEmpty()) {
+    indexFiles(fileSystem,progress,fileSystem.sourceFiles(),InputFile.TYPE_MAIN);
+    indexFiles(fileSystem,progress,fileSystem.testFiles(),InputFile.TYPE_TEST);
   }
  else {
-    indexFiles(fileSystem,progress,fileSystem.sourceDirs(),fileSystem.sourceFiles(),InputFile.TYPE_MAIN);
-  }
-  if (fileSystem.testFiles().isEmpty()) {
-    for (    File testDir : fileSystem.testDirs()) {
-      indexDirectory(fileSystem,progress,testDir,InputFile.TYPE_TEST);
-    }
-  }
- else {
-    indexFiles(fileSystem,progress,fileSystem.testDirs(),fileSystem.testFiles(),InputFile.TYPE_TEST);
+    indexDirectory(fileSystem,progress,fileSystem.baseDir(),InputFile.TYPE_MAIN);
+    indexDirectory(fileSystem,progress,fileSystem.baseDir(),InputFile.TYPE_TEST);
   }
   for (  String path : progress.removedPaths) {
     fileCache.remove(fileSystem.moduleKey(),path);
   }
-  logger.info(String.format("%d files indexed",progress.count));
+  logger.info(String.format("%d files indexed",progress.count()));
 }
