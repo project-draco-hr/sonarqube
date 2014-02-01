@@ -1,0 +1,12 @@
+{
+  SecurityRealm realm=spy(new AlwaysFailsRealm());
+  settings.setProperty(CoreProperties.CORE_AUTHENTICATOR_REALM,realm.getName());
+  try {
+    new SecurityRealmFactory(settings,new SecurityRealm[]{realm}).start();
+    fail();
+  }
+ catch (  SonarException e) {
+    assertThat(e.getCause()).isInstanceOf(IllegalStateException.class);
+    assertThat(e.getMessage()).contains("Security realm fails to start");
+  }
+}
