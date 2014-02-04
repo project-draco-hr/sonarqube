@@ -1,7 +1,15 @@
 {
-  ActiveRule activeRule=qProfile.getActiveRule(issue.ruleKey().repository(),issue.ruleKey().rule());
+  RuleKey ruleKey=issue.ruleKey();
+  Rule rule=ruleFinder.findByKey(ruleKey);
+  if (rule == null) {
+    throw MessageException.of(String.format("The rule '%s' does not exists.",ruleKey));
+  }
+  ActiveRule activeRule=qProfile.getActiveRule(ruleKey.repository(),ruleKey.rule());
   if (activeRule == null || activeRule.getRule() == null) {
     return false;
+  }
+  if (Strings.isNullOrEmpty(issue.message())) {
+    issue.setMessage(rule.getName());
   }
   issue.setCreationDate(project.getAnalysisDate());
   issue.setUpdateDate(project.getAnalysisDate());

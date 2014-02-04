@@ -4,14 +4,14 @@
   when(activeRule.getRule()).thenReturn(rule);
   when(activeRule.getSeverity()).thenReturn(RulePriority.INFO);
   when(qProfile.getActiveRule("squid","AvoidCycle")).thenReturn(activeRule);
-  when(ruleFinder.findByKey(SQUID_RULE_KEY)).thenReturn(Rule.create("squid","AvoidCycle"));
+  when(ruleFinder.findByKey(SQUID_RULE_KEY)).thenReturn(Rule.create("squid","AvoidCycle").setName("Avoid Cycle"));
   Date analysisDate=new Date();
   when(project.getAnalysisDate()).thenReturn(analysisDate);
-  DefaultIssue issue=new DefaultIssue().setKey("ABCDE").setRuleKey(SQUID_RULE_KEY).setSeverity(Severity.CRITICAL);
-  when(technicalDebtCalculator.calculTechnicalDebt(issue)).thenReturn(WorkDayDuration.of(10,0,0));
+  DefaultIssue issue=new DefaultIssue().setKey("ABCDE").setRuleKey(SQUID_RULE_KEY).setSeverity(Severity.CRITICAL).setMessage("");
   when(filters.accept(issue,null)).thenReturn(true);
-  moduleIssues.initAndAddIssue(issue);
+  boolean added=moduleIssues.initAndAddIssue(issue);
+  assertThat(added).isTrue();
   ArgumentCaptor<DefaultIssue> argument=ArgumentCaptor.forClass(DefaultIssue.class);
   verify(cache).put(argument.capture());
-  assertThat(argument.getValue().technicalDebt()).isEqualTo(WorkDayDuration.of(10,0,0));
+  assertThat(argument.getValue().message()).isEqualTo("Avoid Cycle");
 }
