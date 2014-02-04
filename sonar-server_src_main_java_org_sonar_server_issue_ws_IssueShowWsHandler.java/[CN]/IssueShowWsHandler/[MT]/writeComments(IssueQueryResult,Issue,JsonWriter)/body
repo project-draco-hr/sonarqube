@@ -3,7 +3,8 @@
   String login=UserSession.get().login();
   for (  IssueComment comment : issue.comments()) {
     String userLogin=comment.userLogin();
-    json.beginObject().prop("key",comment.key()).prop("userName",userLogin != null ? queryResult.user(userLogin).name() : null).prop("raw",comment.markdownText()).prop("html",Markdown.convertToHtml(comment.markdownText())).prop("createdAt",DateUtils.formatDateTime(comment.createdAt())).prop("fCreatedAge",formatAgeDate(comment.createdAt())).prop("updatable",login != null && login.equals(comment.userLogin())).endObject();
+    User user=userLogin != null ? queryResult.user(userLogin) : null;
+    json.beginObject().prop("key",comment.key()).prop("userName",user != null ? user.name() : null).prop("raw",comment.markdownText()).prop("html",Markdown.convertToHtml(comment.markdownText())).prop("createdAt",DateUtils.formatDateTime(comment.createdAt())).prop("fCreatedAge",formatAgeDate(comment.createdAt())).prop("updatable",login != null && login.equals(userLogin)).endObject();
   }
   json.endArray();
 }
