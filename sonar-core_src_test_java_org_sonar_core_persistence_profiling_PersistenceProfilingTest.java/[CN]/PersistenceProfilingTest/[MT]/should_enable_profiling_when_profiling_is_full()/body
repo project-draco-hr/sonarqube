@@ -1,0 +1,34 @@
+{
+  final Logger sqlLogger=(Logger)LoggerFactory.getLogger("sql");
+  ListAppender<ILoggingEvent> appender=new ListAppender<ILoggingEvent>();
+  appender.setContext(new ContextBase());
+  appender.start();
+  sqlLogger.addAppender(appender);
+  BasicDataSource originDataSource=mock(BasicDataSource.class);
+  Connection connection=mock(Connection.class);
+  when(originDataSource.getConnection()).thenReturn(connection);
+  String sql="select 'polop' from dual;";
+  PreparedStatement preparedStatement=mock(PreparedStatement.class);
+  when(connection.prepareStatement(sql)).thenReturn(preparedStatement);
+  when(preparedStatement.execute()).thenReturn(true);
+  Statement statement=mock(Statement.class);
+  when(connection.createStatement()).thenReturn(statement);
+  when(statement.execute(sql)).thenReturn(true);
+  Settings settings=new Settings();
+  settings.setProperty(Profiling.CONFIG_PROFILING_LEVEL,Profiling.Level.FULL.toString());
+  BasicDataSource resultDataSource=PersistenceProfiling.addProfilingIfNeeded(originDataSource,settings);
+  assertThat(resultDataSource).isInstanceOf(ProfilingDataSource.class);
+  assertThat(resultDataSource.getUrl()).isNull();
+  assertThat(resultDataSource.getConnection().getClientInfo()).isNull();
+  PreparedStatement preparedStatementProxy=resultDataSource.getConnection().prepareStatement(sql);
+  assertThat(preparedStatementProxy.getConnection()).isNull();
+  assertThat(preparedStatementProxy.execute()).isTrue();
+  final Statement statementProxy=resultDataSource.getConnection().createStatement();
+  assertThat(statementProxy.getConnection()).isNull();
+  assertThat(statementProxy.execute(sql)).isTrue();
+  assertThat(appender.list).hasSize(2);
+  for (  ILoggingEvent event : appender.list) {
+    assertThat(event.getLevel()).isEqualTo(Level.INFO);
+    assertThat(event.getFormattedMessage()).contains(sql);
+  }
+}
