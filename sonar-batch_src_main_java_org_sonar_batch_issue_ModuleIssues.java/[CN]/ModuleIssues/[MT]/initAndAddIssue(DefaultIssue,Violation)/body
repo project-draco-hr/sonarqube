@@ -1,25 +1,12 @@
 {
   RuleKey ruleKey=issue.ruleKey();
   Rule rule=ruleFinder.findByKey(ruleKey);
-  if (rule == null) {
-    throw MessageException.of(String.format("The rule '%s' does not exist.",ruleKey));
-  }
-  if (Strings.isNullOrEmpty(rule.getName()) && Strings.isNullOrEmpty(issue.message())) {
-    throw MessageException.of(String.format("The rule '%s' has no name and the related issue has no message.",ruleKey));
-  }
+  validateRule(issue,rule);
   ActiveRule activeRule=qProfile.getActiveRule(ruleKey.repository(),ruleKey.rule());
   if (activeRule == null || activeRule.getRule() == null) {
     return false;
   }
-  if (Strings.isNullOrEmpty(issue.message())) {
-    issue.setMessage(rule.getName());
-  }
-  issue.setCreationDate(project.getAnalysisDate());
-  issue.setUpdateDate(project.getAnalysisDate());
-  if (issue.severity() == null) {
-    issue.setSeverity(activeRule.getSeverity().name());
-  }
-  issue.setTechnicalDebt(technicalDebtCalculator.calculTechnicalDebt(issue));
+  updateIssue(issue,rule,activeRule);
   if (filters.accept(issue,violation)) {
     cache.put(issue);
     return true;
