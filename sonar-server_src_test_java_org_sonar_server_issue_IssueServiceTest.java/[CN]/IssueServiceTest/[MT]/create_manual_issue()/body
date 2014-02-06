@@ -1,10 +1,11 @@
 {
   RuleKey ruleKey=RuleKey.of("manual","manualRuleKey");
-  DefaultIssue manualIssue=new DefaultIssue().setKey("GHIJ").setRuleKey(RuleKey.of("manual","manualRuleKey")).setComponentKey("org.sonar.Sample");
+  DefaultIssue manualIssue=new DefaultIssue().setKey("GHIJ").setRuleKey(RuleKey.of("manual","manualRuleKey")).setComponentKey("org.sonar.Sample").setMessage("Fix it");
   when(ruleFinder.findByKey(ruleKey)).thenReturn(Rule.create("manual","manualRuleKey"));
   when(resourceDao.getResource(any(ResourceQuery.class))).thenReturn(mock(ResourceDto.class));
   Issue result=issueService.createManualIssue(manualIssue,userSession);
   assertThat(result).isNotNull();
+  assertThat(result.message()).isEqualTo("Fix it");
   assertThat(result.creationDate()).isNotNull();
   assertThat(result.updateDate()).isNotNull();
   verify(issueStorage).save(manualIssue);
