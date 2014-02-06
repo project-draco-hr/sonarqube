@@ -1,0 +1,14 @@
+{
+  String ruleKey="manual:api";
+  org.sonar.api.rules.Rule rule=mock(org.sonar.api.rules.Rule.class);
+  when(rule.getKey()).thenReturn("api");
+  when(rule.getRepositoryKey()).thenReturn("manual");
+  when(rule.getName()).thenReturn("API");
+  when(rule.getDescription()).thenReturn("API rule description");
+  when(rule.getSeverity()).thenReturn(null);
+  when(ruleFinder.findByKey(RuleKey.of("manual","api"))).thenReturn(rule);
+  MockUserSession.set();
+  WsTester.TestRequest request=tester.newRequest("show").setParam("key",ruleKey);
+  request.execute();
+  request.execute().assertJson(getClass(),"show_manuel_rule.json");
+}
