@@ -2,8 +2,19 @@
   if (method.getName().startsWith("execute")) {
     StopWatch watch=PROFILING.start();
     Object result=method.invoke(statement,args);
-    PROFILING.stop(watch,sql);
+    StringBuilder sqlBuilder=new StringBuilder().append(sql);
+    if (!arguments.isEmpty()) {
+      sqlBuilder.append(" - parameters are: ");
+      for (      Object arg : arguments) {
+        sqlBuilder.append(PARAM_PREFIX).append(arg).append(PARAM_SUFFIX).append(PARAM_SEPARATOR);
+      }
+    }
+    PROFILING.stop(watch,StringUtils.removeEnd(sqlBuilder.toString(),PARAM_SEPARATOR));
     return result;
+  }
+ else   if (method.getName().startsWith("set") && args.length > 1) {
+    arguments.set((Integer)args[0] - 1,args[1]);
+    return method.invoke(statement,args);
   }
  else {
     return method.invoke(statement,args);
