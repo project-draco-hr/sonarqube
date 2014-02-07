@@ -1,11 +1,16 @@
 {
   if (method.getName().startsWith("execute")) {
     StopWatch watch=PROFILING.start();
-    Object result=method.invoke(statement,args);
-    PROFILING.stop(watch,(String)args[0]);
+    Object result=null;
+    try {
+      result=InvocationUtils.invokeQuietly(statement,method,args);
+    }
+  finally {
+      PROFILING.stop(watch,(String)args[0]);
+    }
     return result;
   }
  else {
-    return method.invoke(statement,args);
+    return InvocationUtils.invokeQuietly(statement,method,args);
   }
 }

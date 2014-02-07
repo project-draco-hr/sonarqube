@@ -1,0 +1,12 @@
+{
+  Connection target=mock(Connection.class);
+  String failSql="any sql";
+  when(target.prepareStatement(failSql)).thenThrow(new SQLException("Expected"));
+  try {
+    InvocationUtils.invokeQuietly(target,Connection.class.getMethod("prepareStatement",String.class),new Object[]{failSql});
+    Fail.fail();
+  }
+ catch (  Throwable t) {
+    assertThat(t).isInstanceOf(SQLException.class);
+  }
+}
