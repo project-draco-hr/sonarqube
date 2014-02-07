@@ -1,0 +1,14 @@
+{
+  Rule rule=Rule.create("repo","key");
+  rule.setId(1);
+  when(ruleFinder.findById(1)).thenReturn(rule);
+  when(dao.selectByRuleId(rule.getId())).thenReturn(new CharacteristicDto().setId(3).setRuleId(10).setParentId(2).setRootId(1).setFunction("linear").setFactorValue(30.0).setFactorUnit("mn"));
+  Characteristic result=finder.findRequirementByRuleId(1);
+  assertThat(result.id()).isEqualTo(3);
+  assertThat(result.parentId()).isEqualTo(2);
+  assertThat(result.rootId()).isEqualTo(1);
+  assertThat(result.ruleKey()).isEqualTo(RuleKey.of("repo","key"));
+  assertThat(result.function()).isEqualTo("linear");
+  assertThat(result.factor()).isEqualTo(WorkUnit.create(30.0,WorkUnit.MINUTES));
+  assertThat(result.offset()).isEqualTo(WorkUnit.create());
+}
