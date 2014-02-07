@@ -1,0 +1,11 @@
+{
+  Rule rule=Rule.create().setRepositoryKey("squid").setKey("AvoidCycle");
+  when(ruleFinder.findByIds(anyCollection())).thenReturn(newArrayList(rule));
+  IssueQuery query=IssueQuery.builder().hideRules(true).build();
+  IssueDto issue=new IssueDto().setId(1L).setRuleId(50).setComponentId(123l).setRootComponentId(100l).setComponentKey_unit_test_only("Action.java").setRootComponentKey_unit_test_only("struts").setRuleKey_unit_test_only("squid","AvoidCycle").setStatus("OPEN").setResolution("OPEN");
+  when(issueDao.selectByIds(anyCollection(),any(SqlSession.class))).thenReturn(newArrayList(issue));
+  IssueQueryResult results=finder.find(query);
+  Issue result=results.issues().iterator().next();
+  assertThat(results.rule(result)).isNull();
+  assertThat(results.rules()).isEmpty();
+}
