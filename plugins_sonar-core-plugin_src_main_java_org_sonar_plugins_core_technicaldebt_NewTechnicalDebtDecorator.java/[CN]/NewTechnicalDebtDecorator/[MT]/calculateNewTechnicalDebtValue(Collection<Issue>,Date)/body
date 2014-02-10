@@ -1,13 +1,17 @@
 {
   double value=0;
   for (  Issue issue : issues) {
-    WorkDayDuration currentTechnicalDebt=((DefaultIssue)issue).technicalDebt();
+    double currentTechnicalDebtValue=0d;
+    WorkUnit currentTechnicalDebt=((DefaultIssue)issue).technicalDebt();
+    if (currentTechnicalDebt != null) {
+      currentTechnicalDebtValue=currentTechnicalDebt.toDays(hoursInDay);
+    }
     Date periodDatePlusOneSecond=periodDate != null ? DateUtils.addSeconds(periodDate,1) : null;
     if (isAfter(issue.creationDate(),periodDatePlusOneSecond)) {
-      value+=technicalDebtConverter.toDays(currentTechnicalDebt);
+      value+=currentTechnicalDebtValue;
     }
  else {
-      value+=calculateNewTechnicalDebtValueFromChangelog(currentTechnicalDebt,issue,periodDate);
+      value+=calculateNewTechnicalDebtValueFromChangelog(currentTechnicalDebtValue,issue,periodDate);
     }
   }
   return value;

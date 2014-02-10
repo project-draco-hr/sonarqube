@@ -1,7 +1,6 @@
 {
-  when(technicalDebtConverter.toDays(oneDaysDebt)).thenReturn(1d);
-  when(technicalDebtConverter.toDays(twoDaysDebt)).thenReturn(2d);
-  when(technicalDebtConverter.toDays(fiveDaysDebt)).thenReturn(5d);
+  Settings settings=new Settings();
+  settings.setProperty(CoreProperties.HOURS_IN_DAY,"8");
   ResourcePerspectives perspectives=mock(ResourcePerspectives.class);
   when(perspectives.as(Issuable.class,resource)).thenReturn(issuable);
   rightNow=new Date();
@@ -11,5 +10,5 @@
   fiveDaysAgo=org.apache.commons.lang.time.DateUtils.addDays(rightNow,-5);
   fourDaysAgo=org.apache.commons.lang.time.DateUtils.addDays(rightNow,-4);
   when(timeMachineConfiguration.periods()).thenReturn(newArrayList(new Period(1,fiveDaysAgo),new Period(2,tenDaysAgo)));
-  decorator=new NewTechnicalDebtDecorator(perspectives,timeMachineConfiguration,technicalDebtConverter);
+  decorator=new NewTechnicalDebtDecorator(perspectives,timeMachineConfiguration,settings);
 }

@@ -7,11 +7,10 @@
   Mockito.when(requirement.offset()).thenReturn(fiveMinutes);
   when(model.requirementsByRule(ruleKey)).thenReturn(requirement);
   try {
-    remediationCostCalculator.calculTechnicalDebt(issue);
+    assertThat(remediationCostCalculator.calculTechnicalDebt(issue)).isEqualTo(new WorkUnit.Builder().setMinutes(15).build());
     fail();
   }
  catch (  Exception e) {
     assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("Requirement for 'squid:AvoidCycle' can not use 'Constant/issue' remediation function because this rule does not have a fixed remediation cost.");
   }
-  verifyZeroInteractions(converter);
 }
