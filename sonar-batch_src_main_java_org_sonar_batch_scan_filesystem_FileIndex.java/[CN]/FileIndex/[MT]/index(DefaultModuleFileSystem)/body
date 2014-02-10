@@ -4,15 +4,14 @@
     return;
   }
   logger.info("Index files");
-  exclusionFilters.logConfiguration(fileSystem);
+  exclusionFilters.prepare(fileSystem);
   Progress progress=new Progress(fileCache.fileRelativePaths(fileSystem.moduleKey()));
   if (!fileSystem.sourceFiles().isEmpty() || !fileSystem.testFiles().isEmpty()) {
     indexFiles(fileSystem,progress,fileSystem.sourceFiles(),InputFile.TYPE_MAIN);
     indexFiles(fileSystem,progress,fileSystem.testFiles(),InputFile.TYPE_TEST);
   }
  else   if (fileSystem.baseDir() != null) {
-    indexDirectory(fileSystem,progress,fileSystem.baseDir(),InputFile.TYPE_MAIN);
-    indexDirectory(fileSystem,progress,fileSystem.baseDir(),InputFile.TYPE_TEST);
+    indexDirectory(fileSystem,progress,fileSystem.baseDir());
   }
   for (  String path : progress.removedPaths) {
     fileCache.remove(fileSystem.moduleKey(),path);

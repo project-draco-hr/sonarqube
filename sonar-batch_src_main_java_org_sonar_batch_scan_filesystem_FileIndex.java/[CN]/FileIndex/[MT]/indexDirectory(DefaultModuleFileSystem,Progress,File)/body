@@ -1,0 +1,17 @@
+{
+  Collection<File> files=FileUtils.listFiles(dirToIndex,FILE_FILTER,DIR_FILTER);
+  for (  File sourceFile : files) {
+    String path=pathResolver.relativePath(fileSystem.baseDir(),sourceFile);
+    if (path == null) {
+      LoggerFactory.getLogger(getClass()).warn(String.format("File '%s' is not declared in module basedir %s",sourceFile.getAbsoluteFile(),fileSystem.baseDir()));
+    }
+ else {
+      if (exclusionFilters.accept(sourceFile,path,InputFile.TYPE_MAIN)) {
+        indexFile(fileSystem,status,sourceFile,path,InputFile.TYPE_MAIN);
+      }
+      if (exclusionFilters.accept(sourceFile,path,InputFile.TYPE_TEST)) {
+        indexFile(fileSystem,status,sourceFile,path,InputFile.TYPE_TEST);
+      }
+    }
+  }
+}
