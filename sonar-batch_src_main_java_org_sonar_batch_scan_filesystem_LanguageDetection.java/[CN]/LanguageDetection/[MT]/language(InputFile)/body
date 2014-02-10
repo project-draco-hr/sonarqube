@@ -1,0 +1,29 @@
+{
+  String detectedLanguage=null;
+  for (  String languageKey : languagesToConsider) {
+    PathPattern[] patterns=patternByLanguage.get(languageKey);
+    if (patterns != null) {
+      for (      PathPattern pathPattern : patterns) {
+        if (pathPattern.match(inputFile,false)) {
+          if (detectedLanguage == null) {
+            detectedLanguage=languageKey;
+            break;
+          }
+ else {
+            throw MessageException.of("Language of file '" + inputFile.path() + "' can not be decided as the file matches patterns of both "+ getDetails(detectedLanguage)+ " and "+ getDetails(languageKey));
+          }
+        }
+      }
+    }
+  }
+  if (detectedLanguage != null) {
+    LOG.debug("Language of file '" + inputFile.path() + "' was detected to be '"+ detectedLanguage+ "'");
+    return detectedLanguage;
+  }
+  if (forcedLanguage != null) {
+    if (patternByLanguage.get(forcedLanguage).length == 0) {
+      return forcedLanguage;
+    }
+  }
+  return null;
+}

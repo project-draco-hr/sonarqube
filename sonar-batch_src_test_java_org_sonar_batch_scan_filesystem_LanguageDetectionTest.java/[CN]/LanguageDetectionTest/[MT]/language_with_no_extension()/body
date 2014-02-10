@@ -1,0 +1,13 @@
+{
+  Languages languages=new Languages(new MockLanguage("java","java"),new MockLanguage("abap"));
+  LanguageDetection detection=new LanguageDetection(new Settings(),languages);
+  assertThat(detection.language(newInputFile("abc"))).isNull();
+  assertThat(detection.language(newInputFile("abc.abap"))).isNull();
+  assertThat(detection.language(newInputFile("abc.java"))).isEqualTo("java");
+  Settings settings=new Settings();
+  settings.setProperty(CoreProperties.PROJECT_LANGUAGE_PROPERTY,"abap");
+  detection=new LanguageDetection(settings,languages);
+  assertThat(detection.language(newInputFile("abc"))).isEqualTo("abap");
+  assertThat(detection.language(newInputFile("abc.txt"))).isEqualTo("abap");
+  assertThat(detection.language(newInputFile("abc.java"))).isEqualTo("abap");
+}

@@ -1,0 +1,16 @@
+{
+  Languages languages=new Languages(new MockLanguage("abap","abap"),new MockLanguage("cobol","cobol"));
+  Settings settings=new Settings();
+  settings.setProperty("sonar.lang.patterns.abap","*.abap,*.txt");
+  settings.setProperty("sonar.lang.patterns.cobol","*.cobol,*.txt");
+  LanguageDetection detection=new LanguageDetection(settings,languages);
+  assertThat(detection.language(newInputFile("abc.abap"))).isEqualTo("abap");
+  assertThat(detection.language(newInputFile("abc.cobol"))).isEqualTo("cobol");
+  try {
+    detection.language(newInputFile("abc.txt"));
+    fail();
+  }
+ catch (  MessageException e) {
+    assertThat(e.getMessage()).contains("Language of file 'abc.txt' can not be decided as the file matches patterns of both ").contains("sonar.lang.patterns.abap : *.abap,*.txt").contains("sonar.lang.patterns.cobol : *.cobol,*.txt");
+  }
+}

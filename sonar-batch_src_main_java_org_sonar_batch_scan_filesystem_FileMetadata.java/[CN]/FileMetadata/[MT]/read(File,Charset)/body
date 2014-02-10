@@ -1,0 +1,43 @@
+{
+  Reader reader=null;
+  long lines=0L;
+  char c=(char)-1;
+  try {
+    MessageDigest md5Digest=DigestUtils.getMd5Digest();
+    md5Digest.reset();
+    reader=new BufferedReader(new InputStreamReader(new FileInputStream(file),encoding));
+    int i=reader.read();
+    boolean afterCR=true;
+    while (i != -1) {
+      c=(char)i;
+      if (afterCR) {
+        afterCR=false;
+        if (c == LINE_FEED) {
+          i=reader.read();
+          lines++;
+          continue;
+        }
+      }
+      if (c == CARRIAGE_RETURN) {
+        afterCR=true;
+        c=LINE_FEED;
+      }
+ else       if (c == LINE_FEED) {
+        lines++;
+      }
+      md5Digest.update(charToBytesUTF(c));
+      i=reader.read();
+    }
+    if (c != LINE_FEED) {
+      lines++;
+    }
+    String hash=Hex.encodeHexString(md5Digest.digest());
+    return new Metadata(lines,hash);
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException(String.format("Fail to read file '%s' with encoding '%s'",file.getAbsolutePath(),encoding),e);
+  }
+ finally {
+    IOUtils.closeQuietly(reader);
+  }
+}

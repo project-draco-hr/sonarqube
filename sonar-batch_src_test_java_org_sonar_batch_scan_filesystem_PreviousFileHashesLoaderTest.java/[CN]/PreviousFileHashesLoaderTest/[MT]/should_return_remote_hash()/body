@@ -1,0 +1,11 @@
+{
+  Snapshot previousSnapshot=mock(Snapshot.class);
+  when(previousSnapshot.getId()).thenReturn(123);
+  PastSnapshot pastSnapshot=new PastSnapshot("foo",new Date(),previousSnapshot);
+  when(pastSnapshotFinder.findPreviousAnalysis(snapshot)).thenReturn(pastSnapshot);
+  SnapshotDataDto snapshotDataDto=new SnapshotDataDto();
+  snapshotDataDto.setData("src/main/java/foo/Bar.java=abcd1234");
+  when(snapshotDataDao.selectSnapshotData(123,Arrays.asList(SnapshotDataTypes.FILE_HASHES))).thenReturn(Arrays.asList(snapshotDataDto));
+  Map<String,String> hashByRelativePath=loader.hashByRelativePath();
+  assertThat(hashByRelativePath.get("src/main/java/foo/Bar.java")).isEqualTo("abcd1234");
+}
