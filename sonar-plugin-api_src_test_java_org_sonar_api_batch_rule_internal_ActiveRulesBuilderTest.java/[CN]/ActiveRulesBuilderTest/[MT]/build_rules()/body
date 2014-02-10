@@ -1,0 +1,30 @@
+{
+  ActiveRulesBuilder builder=new ActiveRulesBuilder();
+  NewActiveRule newSquid1=builder.activate(RuleKey.of("squid","S0001"));
+  newSquid1.setSeverity(Severity.CRITICAL);
+  newSquid1.setInternalKey("__S0001__");
+  newSquid1.setParam("min","20");
+  builder.activate(RuleKey.of("squid","S0002"));
+  builder.activate(RuleKey.of("findbugs","NPE")).setInternalKey(null).setSeverity(null).setParam("foo",null);
+  ActiveRules activeRules=builder.build();
+  assertThat(activeRules.findAll()).hasSize(3);
+  assertThat(activeRules.findByRepository("squid")).hasSize(2);
+  assertThat(activeRules.findByRepository("findbugs")).hasSize(1);
+  assertThat(activeRules.findByRepository("unknown")).isEmpty();
+  ActiveRule squid1=activeRules.find(RuleKey.of("squid","S0001"));
+  assertThat(squid1.ruleKey().repository()).isEqualTo("squid");
+  assertThat(squid1.ruleKey().rule()).isEqualTo("S0001");
+  assertThat(squid1.severity()).isEqualTo(Severity.CRITICAL);
+  assertThat(squid1.internalKey()).isEqualTo("__S0001__");
+  assertThat(squid1.params()).hasSize(1);
+  assertThat(squid1.param("min")).isEqualTo("20");
+  ActiveRule squid2=activeRules.find(RuleKey.of("squid","S0002"));
+  assertThat(squid2.ruleKey().repository()).isEqualTo("squid");
+  assertThat(squid2.ruleKey().rule()).isEqualTo("S0002");
+  assertThat(squid2.severity()).isEqualTo(Severity.defaultSeverity());
+  assertThat(squid2.params()).isEmpty();
+  ActiveRule findbugsRule=activeRules.find(RuleKey.of("findbugs","NPE"));
+  assertThat(findbugsRule.severity()).isEqualTo(Severity.defaultSeverity());
+  assertThat(findbugsRule.internalKey()).isNull();
+  assertThat(findbugsRule.params()).isEmpty();
+}

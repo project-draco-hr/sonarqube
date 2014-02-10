@@ -1,0 +1,31 @@
+{
+  ActiveRulesBuilder builder=new ActiveRulesBuilder();
+  for (  ModuleQProfiles.QProfile qProfile : qProfiles.findAll()) {
+    ListMultimap<Integer,ActiveRuleParamDto> paramDtosByActiveRuleId=ArrayListMultimap.create();
+    for (    ActiveRuleParamDto dto : dao.selectParamsByProfileId(qProfile.id())) {
+      paramDtosByActiveRuleId.put(dto.getActiveRuleId(),dto);
+    }
+    for (    ActiveRuleDto activeDto : dao.selectByProfileId(qProfile.id())) {
+      Rule rule=ruleFinder.findById(activeDto.getRulId());
+      if (rule != null) {
+        NewActiveRule newActiveRule=builder.activate(rule.ruleKey());
+        newActiveRule.setSeverity(activeDto.getSeverityString());
+        if (rule.getParent() != null) {
+          newActiveRule.setInternalKey(rule.getParent().getConfigKey());
+        }
+ else {
+          newActiveRule.setInternalKey(rule.getConfigKey());
+        }
+        for (        ActiveRuleParamDto paramDto : paramDtosByActiveRuleId.get(activeDto.getId())) {
+          newActiveRule.setParam(paramDto.getKey(),paramDto.getValue());
+        }
+        for (        RuleParam param : rule.getParams()) {
+          if (!newActiveRule.params().containsKey(param.getKey())) {
+            newActiveRule.setParam(param.getKey(),param.getDefaultValue());
+          }
+        }
+      }
+    }
+  }
+  return builder.build();
+}

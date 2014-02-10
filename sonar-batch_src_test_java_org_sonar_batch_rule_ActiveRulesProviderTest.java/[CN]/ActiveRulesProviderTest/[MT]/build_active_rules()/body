@@ -1,0 +1,22 @@
+{
+  setupData("shared");
+  QualityProfileDao profileDao=new QualityProfileDao(getMyBatis());
+  when(qProfiles.findAll()).thenReturn(Arrays.asList(new ModuleQProfiles.QProfile(profileDao.selectById(2)),new ModuleQProfiles.QProfile(profileDao.selectById(3))));
+  ActiveRulesProvider provider=new ActiveRulesProvider();
+  ActiveRuleDao activeRuleDao=new ActiveRuleDao(getMyBatis());
+  ActiveRules activeRules=provider.provide(qProfiles,activeRuleDao,ruleFinder);
+  assertThat(activeRules.findAll()).hasSize(2);
+  assertThat(activeRules.findByRepository("squid")).hasSize(1);
+  assertThat(activeRules.findByRepository("phpunit")).hasSize(1);
+  assertThat(activeRules.findByRepository("unknown")).isEmpty();
+  ActiveRule squidRule=activeRules.find(RuleKey.of("squid","S0001"));
+  assertThat(squidRule.severity()).isEqualTo(Severity.INFO);
+  assertThat(squidRule.internalKey()).isNull();
+  assertThat(squidRule.params()).hasSize(3);
+  assertThat(squidRule.param("min")).isEqualTo("12");
+  assertThat(squidRule.param("max")).isEqualTo("20");
+  assertThat(squidRule.param("format")).isEqualTo("html");
+  ActiveRule phpRule=activeRules.find(RuleKey.of("phpunit","P1"));
+  assertThat(phpRule.severity()).isEqualTo(Severity.BLOCKER);
+  assertThat(phpRule.params()).isEmpty();
+}
