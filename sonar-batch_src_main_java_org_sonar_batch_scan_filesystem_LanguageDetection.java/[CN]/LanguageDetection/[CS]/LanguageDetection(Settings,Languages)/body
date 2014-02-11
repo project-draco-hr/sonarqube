@@ -3,7 +3,7 @@
     String[] filePatterns=settings.getStringArray(getFileLangPatternPropKey(language.getKey()));
     PathPattern[] pathPatterns=PathPattern.create(filePatterns);
     if (pathPatterns.length > 0) {
-      patternByLanguage.put(language.getKey(),pathPatterns);
+      patternsByLanguage.put(language.getKey(),pathPatterns);
     }
  else {
       String[] patterns=Arrays.copyOf(language.getFileSuffixes(),language.getFileSuffixes().length);
@@ -13,18 +13,18 @@
         patterns[i]="**/*." + extension;
       }
       PathPattern[] defaultLanguagePatterns=PathPattern.create(patterns);
-      patternByLanguage.put(language.getKey(),defaultLanguagePatterns);
+      patternsByLanguage.put(language.getKey(),defaultLanguagePatterns);
       LOG.debug("Declared extensions of language " + language + " were converted to "+ getDetails(language.getKey()));
     }
   }
   forcedLanguage=StringUtils.defaultIfBlank(settings.getString(CoreProperties.PROJECT_LANGUAGE_PROPERTY),null);
   if (forcedLanguage != null) {
-    if (!patternByLanguage.containsKey(forcedLanguage)) {
+    if (!patternsByLanguage.containsKey(forcedLanguage)) {
       throw MessageException.of("No language is installed with key '" + forcedLanguage + "'. Please update property '"+ CoreProperties.PROJECT_LANGUAGE_PROPERTY+ "'");
     }
     languagesToConsider.add(forcedLanguage);
   }
  else {
-    languagesToConsider.addAll(patternByLanguage.keySet());
+    languagesToConsider.addAll(patternsByLanguage.keySet());
   }
 }

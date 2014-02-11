@@ -1,0 +1,12 @@
+{
+  File basedir=temp.newFolder();
+  File srcFile=new File(basedir,"src/main/java/foo/Bar.java");
+  FileUtils.touch(srcFile);
+  FileUtils.write(srcFile,"single line");
+  when(fs.baseDir()).thenReturn(basedir);
+  when(fs.sourceCharset()).thenReturn(Charsets.UTF_8);
+  when(langDetection.language(any(InputFile.class))).thenReturn(null);
+  InputFileBuilder builder=new InputFileBuilder("struts",new PathResolver(),langDetection,statusDetection,fs);
+  DefaultInputFile inputFile=builder.create(srcFile,InputFile.TYPE_MAIN);
+  assertThat(inputFile).isNull();
+}
