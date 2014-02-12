@@ -10,9 +10,11 @@
       pathFromSourceDir=inputFile.path();
     }
     Resource sonarFile=File.create(inputFile.path(),pathFromSourceDir,languages.get(languageKey),unitTest);
-    String deprecatedKey=inputFile.attribute(DefaultInputFile.ATTRIBUTE_COMPONENT_DEPRECATED_KEY);
-    if (deprecatedKey != null) {
-      sonarFile.setDeprecatedKey(deprecatedKey);
+    if (Java.KEY.equals(languageKey)) {
+      sonarFile.setDeprecatedKey(JavaFile.fromRelativePath(pathFromSourceDir,false).getDeprecatedKey());
+    }
+ else {
+      sonarFile.setDeprecatedKey(pathFromSourceDir);
     }
     if (sonarFile != null) {
       moduleLanguages.addLanguage(languageKey);
