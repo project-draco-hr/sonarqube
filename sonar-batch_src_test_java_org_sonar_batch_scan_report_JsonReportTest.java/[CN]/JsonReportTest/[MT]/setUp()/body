@@ -6,5 +6,16 @@
   mode=mock(AnalysisMode.class);
   when(mode.isPreview()).thenReturn(true);
   userFinder=mock(UserFinder.class);
-  jsonReport=new JsonReport(settings,fileSystem,server,ruleFinder,issueCache,mock(EventBus.class),new DefaultComponentSelector(),mode,userFinder);
+  InputFile inputFile=mock(InputFile.class);
+  when(inputFile.path()).thenReturn("src/main/java/org/apache/struts/Action.java");
+  when(inputFile.attribute(DefaultInputFile.ATTRIBUTE_COMPONENT_KEY)).thenReturn("struts:src/main/java/org/apache/struts/Action.java");
+  when(inputFile.attribute(InputFile.ATTRIBUTE_STATUS)).thenReturn(InputFile.STATUS_CHANGED);
+  InputFileCache fileCache=mock(InputFileCache.class);
+  when(fileCache.all()).thenReturn(Arrays.asList(inputFile));
+  Project rootModule=new Project("struts");
+  Project moduleA=new Project("struts-core");
+  moduleA.setParent(rootModule).setPath("core");
+  Project moduleB=new Project("struts-ui");
+  moduleB.setParent(rootModule).setPath("ui");
+  jsonReport=new JsonReport(settings,fileSystem,server,ruleFinder,issueCache,mock(EventBus.class),mode,userFinder,rootModule,fileCache);
 }
