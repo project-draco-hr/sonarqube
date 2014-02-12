@@ -1,7 +1,8 @@
 {
-  String key=null, name=null, description=null, engineKey=null, severity=Severity.defaultSeverity(), status=null;
+  String key=null, name=null, description=null, internalKey=null, severity=Severity.defaultSeverity(), status=null;
   Cardinality cardinality=Cardinality.SINGLE;
   List<ParamStruct> params=new ArrayList<ParamStruct>();
+  List<String> tags=new ArrayList<String>();
   String keyAttribute=ruleC.getAttrValue("key");
   if (StringUtils.isNotBlank(keyAttribute)) {
     key=StringUtils.trim(keyAttribute);
@@ -23,7 +24,10 @@
       key=StringUtils.trim(cursor.collectDescendantText(false));
     }
  else     if (StringUtils.equalsIgnoreCase("configKey",nodeName)) {
-      engineKey=StringUtils.trim(cursor.collectDescendantText(false));
+      internalKey=StringUtils.trim(cursor.collectDescendantText(false));
+    }
+ else     if (StringUtils.equalsIgnoreCase("internalKey",nodeName)) {
+      internalKey=StringUtils.trim(cursor.collectDescendantText(false));
     }
  else     if (StringUtils.equalsIgnoreCase("priority",nodeName)) {
       severity=StringUtils.trim(cursor.collectDescendantText(false));
@@ -40,8 +44,11 @@
  else     if (StringUtils.equalsIgnoreCase("param",nodeName)) {
       params.add(processParameter(cursor));
     }
+ else     if (StringUtils.equalsIgnoreCase("tag",nodeName)) {
+      tags.add(StringUtils.trim(cursor.collectDescendantText(false)));
+    }
   }
-  RuleDefinitions.NewRule rule=repo.newRule(key).setHtmlDescription(description).setSeverity(severity).setName(name).setEngineKey(engineKey).setTemplate(cardinality == Cardinality.MULTIPLE);
+  RuleDefinitions.NewRule rule=repo.newRule(key).setHtmlDescription(description).setSeverity(severity).setName(name).setInternalKey(internalKey).setTags(tags.toArray(new String[tags.size()])).setTemplate(cardinality == Cardinality.MULTIPLE);
   if (status != null) {
     rule.setStatus(RuleStatus.valueOf(status));
   }
