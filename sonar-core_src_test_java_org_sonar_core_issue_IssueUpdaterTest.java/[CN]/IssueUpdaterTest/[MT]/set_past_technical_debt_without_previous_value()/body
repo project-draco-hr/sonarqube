@@ -1,10 +1,11 @@
 {
-  issue.setTechnicalDebt(new WorkUnit.Builder().setDays(15).build());
+  WorkDuration newDebt=WorkDuration.createFromValueAndUnit(15,WorkDuration.UNIT.DAYS,8);
+  issue.setTechnicalDebt(newDebt);
   boolean updated=updater.setPastTechnicalDebt(issue,null,context);
   assertThat(updated).isTrue();
-  assertThat(issue.technicalDebt()).isEqualTo(new WorkUnit.Builder().setDays(15).build());
+  assertThat(issue.technicalDebt()).isEqualTo(newDebt);
   assertThat(issue.mustSendNotifications()).isFalse();
   FieldDiffs.Diff diff=issue.currentChange().get(TECHNICAL_DEBT);
   assertThat(diff.oldValue()).isNull();
-  assertThat(diff.newValue()).isEqualTo(new WorkUnit.Builder().setDays(15).build().toLong());
+  assertThat(diff.newValue()).isEqualTo(newDebt.toLong());
 }

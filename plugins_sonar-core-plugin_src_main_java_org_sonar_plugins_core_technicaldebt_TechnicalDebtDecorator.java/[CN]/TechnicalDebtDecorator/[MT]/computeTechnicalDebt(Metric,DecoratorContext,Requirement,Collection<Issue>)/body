@@ -1,16 +1,11 @@
 {
-  double value=0.0;
+  WorkDuration debt=workDurationFactory.createFromWorkingLong(0l);
   if (issues != null) {
     for (    Issue issue : issues) {
-      WorkUnit debt=((DefaultIssue)issue).technicalDebt();
-      if (debt != null) {
-        value+=debt.toDays(hoursInDay);
-      }
- else {
-        value+=0d;
-      }
+      debt=debt.add(((DefaultIssue)issue).technicalDebt());
     }
   }
+  double value=debt.toWorkingDays();
   for (  Measure measure : context.getChildrenMeasures(MeasuresFilters.requirement(metric,requirement))) {
     Requirement measureRequirement=measure.getRequirement();
     if (measureRequirement != null && measureRequirement.equals(requirement) && measure.getValue() != null) {
