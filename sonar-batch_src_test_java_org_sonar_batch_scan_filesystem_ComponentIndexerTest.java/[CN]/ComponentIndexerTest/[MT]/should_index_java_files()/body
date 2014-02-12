@@ -3,12 +3,12 @@
   Languages languages=new Languages(Java.INSTANCE);
   ComponentIndexer indexer=new ComponentIndexer(project,languages,sonarIndex,settings,mock(ResourceKeyMigration.class),new DefaultModuleLanguages(settings,languages),mock(ResourceDao.class),mock(InputFileCache.class));
   indexer.execute(fs);
-  verify(sonarIndex).index(JavaFile.create("src/main/java/foo/bar/Foo.java","foo/bar/Foo.java",false));
-  verify(sonarIndex).index(JavaFile.create("src/main/java2/foo/bar/Foo.java","foo/bar/Foo.java",false));
-  verify(sonarIndex).index(argThat(new ArgumentMatcher<JavaFile>(){
+  verify(sonarIndex).index(org.sonar.api.resources.File.create("src/main/java/foo/bar/Foo.java","foo/bar/Foo.java",Java.INSTANCE,false));
+  verify(sonarIndex).index(org.sonar.api.resources.File.create("src/main/java2/foo/bar/Foo.java","foo/bar/Foo.java",Java.INSTANCE,false));
+  verify(sonarIndex).index(argThat(new ArgumentMatcher<org.sonar.api.resources.File>(){
     @Override public boolean matches(    Object arg0){
-      JavaFile javaFile=(JavaFile)arg0;
-      return javaFile.getKey().equals("src/test/java/foo/bar/FooTest.java") && javaFile.getDeprecatedKey().equals("foo.bar.FooTest") && javaFile.getPath().equals("src/test/java/foo/bar/FooTest.java")&& javaFile.getQualifier().equals(Qualifiers.UNIT_TEST_FILE);
+      org.sonar.api.resources.File javaFile=(org.sonar.api.resources.File)arg0;
+      return javaFile.getKey().equals("src/test/java/foo/bar/FooTest.java") && javaFile.getPath().equals("src/test/java/foo/bar/FooTest.java") && javaFile.getQualifier().equals(Qualifiers.UNIT_TEST_FILE);
     }
   }
 ));
