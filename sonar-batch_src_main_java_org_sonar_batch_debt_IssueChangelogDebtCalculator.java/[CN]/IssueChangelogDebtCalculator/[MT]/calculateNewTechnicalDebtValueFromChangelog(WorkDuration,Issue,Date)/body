@@ -3,11 +3,13 @@
   for (Iterator<FieldDiffs> iterator=changelog.iterator(); iterator.hasNext(); ) {
     FieldDiffs diff=iterator.next();
     Date date=diff.creationDate();
+    WorkDuration newValue=newValue(diff);
+    WorkDuration oldValue=oldValue(diff);
     if (isLesserOrEqual(date,periodDate)) {
-      return currentTechnicalDebtValue.subtract(newValue(diff));
+      return subtractNeverNegative(currentTechnicalDebtValue,newValue);
     }
     if (!iterator.hasNext()) {
-      return currentTechnicalDebtValue.subtract(oldValue(diff));
+      return subtractNeverNegative(currentTechnicalDebtValue,oldValue);
     }
   }
   return null;
