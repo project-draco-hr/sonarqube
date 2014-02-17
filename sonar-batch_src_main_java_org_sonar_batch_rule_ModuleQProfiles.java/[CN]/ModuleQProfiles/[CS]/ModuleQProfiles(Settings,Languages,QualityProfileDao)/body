@@ -1,16 +1,15 @@
 {
   ImmutableMap.Builder<String,QProfile> builder=ImmutableMap.builder();
-  String defaultName=settings.getString("sonar.profile");
+  String defaultName=settings.getString(SONAR_PROFILE_PROP);
   for (  Language language : languages.all()) {
-    QProfile profile;
+    QProfile profile=null;
     if (StringUtils.isNotBlank(defaultName)) {
       profile=loadDefaultQProfile(dao,defaultName,language.getKey());
     }
- else {
+    if (profile == null) {
       profile=loadQProfile(dao,settings,language.getKey());
     }
     if (profile != null) {
-      LOG.info("Quality profile for {}: {}",profile.language(),profile.name());
       builder.put(profile.language(),profile);
     }
   }

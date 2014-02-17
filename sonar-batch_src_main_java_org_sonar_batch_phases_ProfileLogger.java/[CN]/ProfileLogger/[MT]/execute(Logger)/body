@@ -1,0 +1,14 @@
+{
+  String defaultName=settings.getString(ModuleQProfiles.SONAR_PROFILE_PROP);
+  boolean defaultNameUsed=StringUtils.isBlank(defaultName);
+  for (  Language lang : languages.languages()) {
+    QProfile profile=profiles.findByLanguage(lang.getKey());
+    logger.info("Quality profile for {}: {}",lang.getName(),profile.name());
+    if (StringUtils.isNotBlank(defaultName) && defaultName.equals(profile.name())) {
+      defaultNameUsed=true;
+    }
+  }
+  if (!defaultNameUsed) {
+    throw new SonarException("sonar.profile was set to '" + defaultName + "' but didn't match any profile for any language. Please check your configuration.");
+  }
+}
