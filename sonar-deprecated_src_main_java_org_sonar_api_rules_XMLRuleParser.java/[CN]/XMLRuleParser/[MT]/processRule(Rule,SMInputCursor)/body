@@ -7,6 +7,7 @@
   if (StringUtils.isNotBlank(priorityAttribute)) {
     rule.setSeverity(RulePriority.valueOf(StringUtils.trim(priorityAttribute)));
   }
+  List<String> tags=Lists.newArrayList();
   SMInputCursor cursor=ruleC.childElementCursor();
   while (cursor.getNext() != null) {
     String nodeName=cursor.getLocalName();
@@ -34,8 +35,12 @@
  else     if (StringUtils.equalsIgnoreCase("param",nodeName)) {
       processParameter(rule,cursor);
     }
+ else     if (StringUtils.equalsIgnoreCase("tag",nodeName)) {
+      tags.add(StringUtils.trim(cursor.collectDescendantText(false)));
+    }
   }
   if (Strings.isNullOrEmpty(rule.getKey())) {
     throw new SonarException("Node <key> is missing in <rule>");
   }
+  rule.setTags(tags.toArray(new String[tags.size()]));
 }
