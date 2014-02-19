@@ -1,0 +1,11 @@
+{
+  db.prepareDbUnit(getClass(),"migrate_issues_debt.xml");
+  try {
+    settings.setProperty(IssueMigration.HOURS_IN_DAY_PROPERTY,-2);
+    new IssueMigration(db.database(),settings,system2).execute();
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(MessageException.class);
+  }
+}

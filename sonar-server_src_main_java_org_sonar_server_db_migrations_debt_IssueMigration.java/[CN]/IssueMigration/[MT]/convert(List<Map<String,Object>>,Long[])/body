@@ -1,0 +1,25 @@
+{
+  Connection readConnection=null;
+  Connection writeConnection=null;
+  try {
+    readConnection=db.getDataSource().getConnection();
+    writeConnection=db.getDataSource().getConnection();
+    writeConnection.setAutoCommit(false);
+    int hoursInDay=hoursInDay();
+    List<Object[]> allParams=Lists.newArrayList();
+    QueryRunner runner=new QueryRunner();
+    for (    Map<String,Object> row : rows) {
+      Object[] params=new Object[3];
+      params[0]=createFromLong((Long)row.get(DEBT),hoursInDay);
+      params[1]=new Date(system2.now());
+      params[2]=row.get(ID);
+      allParams.add(params);
+    }
+    runner.batch(writeConnection,SQL_UPDATE_ISSUE,allParams.toArray(new Object[allParams.size()][]));
+    writeConnection.commit();
+  }
+  finally {
+    DbUtils.closeQuietly(readConnection);
+    DbUtils.closeQuietly(writeConnection);
+  }
+}
