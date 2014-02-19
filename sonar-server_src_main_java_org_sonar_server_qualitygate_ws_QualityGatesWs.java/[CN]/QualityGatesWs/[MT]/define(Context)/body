@@ -5,12 +5,38 @@
       create(request,response);
     }
   }
-).newParam("name");
+).newParam("name").setDescription("The name of the quality gate to create.");
+  controller.newAction("set_as_default").setDescription("Select the default quality gate.").setPost(true).setHandler(new RequestHandler(){
+    @Override public void handle(    Request request,    Response response){
+      setDefault(request,response);
+    }
+  }
+).newParam("id").setDescription("The ID of the quality gate to use as default.");
+  controller.newAction("unset_default").setDescription("Unselect the default quality gate.").setPost(true).setHandler(new RequestHandler(){
+    @Override public void handle(    Request request,    Response response){
+      unsetDefault(response);
+    }
+  }
+);
+  NewAction rename=controller.newAction("rename").setDescription("Rename a quality gate, given its id and new name.").setPost(true).setHandler(new RequestHandler(){
+    @Override public void handle(    Request request,    Response response){
+      rename(request,response);
+    }
+  }
+);
+  rename.newParam("id").setDescription("The ID of the quality gate to rename.");
+  rename.newParam("name").setDescription("The new name for the quality gate.");
   controller.newAction("list").setDescription("List all quality gates.").setHandler(new RequestHandler(){
     @Override public void handle(    Request request,    Response response){
       list(request,response);
     }
   }
 );
+  controller.newAction("destroy").setDescription("Destroy a quality gate, given its id.").setPost(true).setHandler(new RequestHandler(){
+    @Override public void handle(    Request request,    Response response){
+      destroy(request,response);
+    }
+  }
+).newParam("id").setDescription("The numerical ID of the quality gate to destroy.");
   controller.done();
 }
