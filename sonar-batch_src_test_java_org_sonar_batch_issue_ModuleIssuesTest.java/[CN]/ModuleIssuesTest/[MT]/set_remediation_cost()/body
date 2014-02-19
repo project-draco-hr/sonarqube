@@ -8,11 +8,11 @@
   Date analysisDate=new Date();
   when(project.getAnalysisDate()).thenReturn(analysisDate);
   DefaultIssue issue=new DefaultIssue().setKey("ABCDE").setRuleKey(SQUID_RULE_KEY).setSeverity(Severity.CRITICAL);
-  WorkDuration debt=WorkDuration.createFromValueAndUnit(10,WorkDuration.UNIT.DAYS,8);
+  Long debt=10L;
   when(technicalDebtCalculator.calculateTechnicalDebt(issue.ruleKey(),issue.effortToFix())).thenReturn(debt);
   when(filters.accept(issue,null)).thenReturn(true);
   moduleIssues.initAndAddIssue(issue);
   ArgumentCaptor<DefaultIssue> argument=ArgumentCaptor.forClass(DefaultIssue.class);
   verify(cache).put(argument.capture());
-  assertThat(argument.getValue().technicalDebt()).isEqualTo(debt);
+  assertThat(argument.getValue().debt()).isEqualTo(debt);
 }
