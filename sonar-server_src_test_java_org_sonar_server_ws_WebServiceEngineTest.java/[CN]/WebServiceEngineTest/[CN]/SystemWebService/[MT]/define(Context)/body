@@ -24,6 +24,13 @@
 );
   newController.newAction("fail").setHandler(new RequestHandler(){
     @Override public void handle(    Request request,    Response response){
+      if (request.param("count") != null) {
+        List<BadRequestException.Message> errors=Lists.newArrayList();
+        for (int count=0; count < Integer.valueOf(request.param("count")); count++) {
+          errors.add(Message.ofL10n("bad.request.reason",count));
+        }
+        throw BadRequestException.of(errors);
+      }
       throw new IllegalStateException("Unexpected");
     }
   }

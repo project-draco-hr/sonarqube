@@ -1,0 +1,11 @@
+{
+  InternalRequest request=new SimpleRequest().setParam("count","3");
+  ServletResponse response=new ServletResponse();
+  when(i18n.message(Locale.getDefault(),"bad.request.reason",null,0)).thenReturn("Bad request reason #0");
+  when(i18n.message(Locale.getDefault(),"bad.request.reason",null,1)).thenReturn("Bad request reason #1");
+  when(i18n.message(Locale.getDefault(),"bad.request.reason",null,2)).thenReturn("Bad request reason #2");
+  engine.execute(request,response,"api/system","fail");
+  assertThat(response.stream().outputAsString()).isEqualTo("{\"errors\":[" + "{\"msg\":\"Bad request reason #0\"}," + "{\"msg\":\"Bad request reason #1\"},"+ "{\"msg\":\"Bad request reason #2\"}"+ "]}");
+  assertThat(response.stream().httpStatus()).isEqualTo(400);
+  assertThat(response.stream().mediaType()).isEqualTo(MimeTypes.JSON);
+}
