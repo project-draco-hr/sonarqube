@@ -1,7 +1,7 @@
 {
   String[] cpdExclusions=settings.getStringArray(CoreProperties.CPD_EXCLUSIONS);
   logExclusions(cpdExclusions,LOG);
-  Iterable<InputFile> sourceFiles=fileSystem.inputFiles(FileQuery.onMain().onLanguage(languageKey).withExclusions(cpdExclusions));
+  Iterable<InputFile> sourceFiles=fs.inputFiles(FilePredicates.and(FilePredicates.hasType(InputFile.Type.MAIN),FilePredicates.hasLanguage(languageKey),FilePredicates.doesNotMatchPathPatterns(cpdExclusions)));
   if (!sourceFiles.iterator().hasNext()) {
     return;
   }
@@ -10,10 +10,10 @@
     return;
   }
   SonarDuplicationsIndex index=indexFactory.create(project);
-  TokenizerBridge bridge=new TokenizerBridge(mapping.getTokenizer(),fileSystem.sourceCharset().name(),getBlockSize(project,languageKey));
+  TokenizerBridge bridge=new TokenizerBridge(mapping.getTokenizer(),fs.encoding().name(),getBlockSize(project,languageKey));
   for (  InputFile inputFile : sourceFiles) {
     LOG.debug("Populating index from {}",inputFile);
-    String resourceEffectiveKey=inputFile.attribute(DefaultInputFile.ATTRIBUTE_COMPONENT_KEY);
+    String resourceEffectiveKey=((DefaultInputFile)inputFile).key();
     List<Block> blocks=bridge.chunk(resourceEffectiveKey,inputFile.file());
     index.insert(inputFile,blocks);
   }
@@ -22,7 +22,7 @@
   try {
     for (    InputFile inputFile : sourceFiles) {
       LOG.debug("Detection of duplications for {}",inputFile);
-      String resourceEffectiveKey=inputFile.attribute(DefaultInputFile.ATTRIBUTE_COMPONENT_KEY);
+      String resourceEffectiveKey=((DefaultInputFile)inputFile).key();
       Collection<Block> fileBlocks=index.getByInputFile(inputFile,resourceEffectiveKey);
       Iterable<CloneGroup> filtered;
       try {

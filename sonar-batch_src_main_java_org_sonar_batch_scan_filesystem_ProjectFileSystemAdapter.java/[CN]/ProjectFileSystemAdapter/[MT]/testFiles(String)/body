@@ -1,15 +1,3 @@
 {
-  List<InputFile> result=Lists.newArrayList();
-  Iterable<org.sonar.api.scan.filesystem.InputFile> files=target.inputFiles(FileQuery.onTest().onLanguage(langs));
-  for (  org.sonar.api.scan.filesystem.InputFile file : files) {
-    String sourceDir=file.attribute(org.sonar.api.scan.filesystem.internal.DefaultInputFile.ATTRIBUTE_SOURCEDIR_PATH);
-    String sourceRelativePath=file.attribute(org.sonar.api.scan.filesystem.internal.DefaultInputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH);
-    if (sourceDir != null && sourceRelativePath != null) {
-      result.add(InputFileUtils.create(new File(sourceDir),sourceRelativePath));
-    }
- else {
-      result.add(InputFileUtils.create(target.baseDir(),file.path()));
-    }
-  }
-  return result;
+  return Lists.newArrayList((Iterable)target.inputFiles(FilePredicates.and(FilePredicates.hasType(org.sonar.api.batch.fs.InputFile.Type.TEST),FilePredicates.hasLanguages(Arrays.asList(langs)))));
 }

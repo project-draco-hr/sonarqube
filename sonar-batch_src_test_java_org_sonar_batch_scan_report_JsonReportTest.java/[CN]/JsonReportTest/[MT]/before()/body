@@ -1,0 +1,19 @@
+{
+  SIMPLE_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+02:00"));
+  when(resource.getEffectiveKey()).thenReturn("Action.java");
+  when(server.getVersion()).thenReturn("3.6");
+  mode=mock(AnalysisMode.class);
+  when(mode.isPreview()).thenReturn(true);
+  userFinder=mock(UserFinder.class);
+  DefaultInputFile inputFile=new DefaultInputFile("src/main/java/org/apache/struts/Action.java");
+  inputFile.setKey("struts:src/main/java/org/apache/struts/Action.java");
+  inputFile.setStatus(InputFile.Status.CHANGED);
+  InputFileCache fileCache=mock(InputFileCache.class);
+  when(fileCache.all()).thenReturn(Arrays.<InputFile>asList(inputFile));
+  Project rootModule=new Project("struts");
+  Project moduleA=new Project("struts-core");
+  moduleA.setParent(rootModule).setPath("core");
+  Project moduleB=new Project("struts-ui");
+  moduleB.setParent(rootModule).setPath("ui");
+  jsonReport=new JsonReport(settings,fs,server,ruleFinder,issueCache,mock(EventBus.class),mode,userFinder,rootModule,fileCache);
+}

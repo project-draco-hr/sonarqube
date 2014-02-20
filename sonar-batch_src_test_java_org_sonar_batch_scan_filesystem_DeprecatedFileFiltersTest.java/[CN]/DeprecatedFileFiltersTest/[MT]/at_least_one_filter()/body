@@ -2,7 +2,7 @@
   DeprecatedFileFilters filters=new DeprecatedFileFilters(new FileSystemFilter[]{filter});
   File basedir=temp.newFolder();
   File file=temp.newFile();
-  InputFile inputFile=DefaultInputFile.create(file,Charsets.UTF_8,"src/main/java/Foo.java",ImmutableMap.of(DefaultInputFile.ATTRIBUTE_SOURCEDIR_PATH,new File(basedir,"src/main/java").getAbsolutePath(),DefaultInputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"Foo.java",InputFile.ATTRIBUTE_TYPE,InputFile.TYPE_TEST));
+  InputFile inputFile=new DefaultInputFile("src/main/java/Foo.java").setFile(file).setType(InputFile.Type.MAIN).setSourceDirAbsolutePath(new File(basedir,"src/main/java").getAbsolutePath()).setPathRelativeToSourceDir("Foo.java");
   when(filter.accept(eq(file),any(DeprecatedFileFilters.DeprecatedContext.class))).thenReturn(false);
   assertThat(filters.accept(inputFile)).isFalse();
   ArgumentCaptor<DeprecatedFileFilters.DeprecatedContext> argument=ArgumentCaptor.forClass(DeprecatedFileFilters.DeprecatedContext.class);
@@ -11,5 +11,5 @@
   assertThat(context.canonicalPath()).isEqualTo(FilenameUtils.separatorsToUnix(file.getAbsolutePath()));
   assertThat(context.relativeDir()).isEqualTo(new File(basedir,"src/main/java"));
   assertThat(context.relativePath()).isEqualTo("Foo.java");
-  assertThat(context.type()).isEqualTo(FileType.TEST);
+  assertThat(context.type()).isEqualTo(FileType.MAIN);
 }

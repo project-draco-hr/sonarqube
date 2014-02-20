@@ -1,10 +1,10 @@
 {
-  File sonarDirectory=temporaryFolder.newFolder("sonar");
+  File workDir=temporaryFolder.newFolder("sonar");
+  fs.setWorkDir(workDir);
   Rule rule=Rule.create("squid","AvoidCycles").setName("Avoid Cycles");
   when(ruleFinder.findByKey(RuleKey.of("squid","AvoidCycles"))).thenReturn(rule);
   when(jsonReport.getIssues()).thenReturn(Collections.<DefaultIssue>emptyList());
   settings.setProperty("sonar.report.export.path","output.json");
-  when(fileSystem.workingDir()).thenReturn(sonarDirectory);
   jsonReport.execute();
-  assertThat(new File(sonarDirectory,"output.json")).exists();
+  assertThat(new File(workDir,"output.json")).exists();
 }

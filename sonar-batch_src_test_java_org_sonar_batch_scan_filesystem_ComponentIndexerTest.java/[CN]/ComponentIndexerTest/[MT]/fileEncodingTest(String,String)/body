@@ -1,8 +1,9 @@
 {
   settings.setProperty(CoreProperties.CORE_IMPORT_SOURCES_PROPERTY,"true");
+  fs.setEncoding(Charset.forName(encoding));
   File javaFile1=new File(baseDir,"src/main/java/foo/bar/Foo.java");
   FileUtils.copyFile(getFile(testFile),javaFile1);
-  when(fs.inputFiles(FileQuery.all())).thenReturn((Iterable)Arrays.asList(new InputFileBuilder(javaFile1,Charset.forName(encoding),"src/main/java/foo/bar/Foo.java").attribute(DefaultInputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH,"foo/bar/Foo.java").attribute(InputFile.ATTRIBUTE_LANGUAGE,"java").build()));
+  fs.add(new DefaultInputFile("src/main/java/foo/bar/Foo.java").setFile(javaFile1).setPathRelativeToSourceDir("foo/bar/Foo.java").setLanguage("java"));
   Languages languages=new Languages(Java.INSTANCE);
   ComponentIndexer indexer=new ComponentIndexer(project,languages,sonarIndex,settings,mock(ResourceKeyMigration.class),new DefaultModuleLanguages(settings,languages),mock(InputFileCache.class));
   indexer.execute(fs);

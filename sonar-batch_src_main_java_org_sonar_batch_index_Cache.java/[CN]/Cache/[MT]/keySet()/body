@@ -1,3 +1,15 @@
 {
-  return keySet(DEFAULT_GROUP);
+  try {
+    Set<Object> keys=Sets.newLinkedHashSet();
+    exchange.clear();
+    Exchange iteratorExchange=new Exchange(exchange);
+    iteratorExchange.append(Key.BEFORE);
+    while (iteratorExchange.next(false)) {
+      keys.add(iteratorExchange.getKey().indexTo(-1).decode());
+    }
+    return keys;
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Fail to get keys from cache " + name,e);
+  }
 }

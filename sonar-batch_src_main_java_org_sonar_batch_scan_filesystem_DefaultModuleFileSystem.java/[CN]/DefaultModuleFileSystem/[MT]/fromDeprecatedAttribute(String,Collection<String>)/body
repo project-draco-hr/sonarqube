@@ -1,0 +1,59 @@
+{
+  if ("TYPE".equals(key)) {
+    return FilePredicates.or(Collections2.transform(value,new Function<String,FilePredicate>(){
+      @Override public FilePredicate apply(      @Nullable String s){
+        return FilePredicates.hasType(org.sonar.api.batch.fs.InputFile.Type.valueOf(s));
+      }
+    }
+));
+  }
+  if ("STATUS".equals(key)) {
+    return FilePredicates.or(Collections2.transform(value,new Function<String,FilePredicate>(){
+      @Override public FilePredicate apply(      @Nullable String s){
+        return FilePredicates.hasStatus(org.sonar.api.batch.fs.InputFile.Status.valueOf(s));
+      }
+    }
+));
+  }
+  if ("LANG".equals(key)) {
+    return FilePredicates.or(Collections2.transform(value,new Function<String,FilePredicate>(){
+      @Override public FilePredicate apply(      @Nullable String s){
+        return FilePredicates.hasLanguage(s);
+      }
+    }
+));
+  }
+  if ("CMP_KEY".equals(key)) {
+    return FilePredicates.or(Collections2.transform(value,new Function<String,FilePredicate>(){
+      @Override public FilePredicate apply(      @Nullable String s){
+        return new FilePredicateAdapters.KeyPredicate(s);
+      }
+    }
+));
+  }
+  if ("CMP_DEPRECATED_KEY".equals(key)) {
+    return FilePredicates.or(Collections2.transform(value,new Function<String,FilePredicate>(){
+      @Override public FilePredicate apply(      @Nullable String s){
+        return new FilePredicateAdapters.DeprecatedKeyPredicate(s);
+      }
+    }
+));
+  }
+  if ("SRC_REL_PATH".equals(key)) {
+    return FilePredicates.or(Collections2.transform(value,new Function<String,FilePredicate>(){
+      @Override public FilePredicate apply(      @Nullable String s){
+        return new FilePredicateAdapters.SourceRelativePathPredicate(s);
+      }
+    }
+));
+  }
+  if ("SRC_DIR_PATH".equals(key)) {
+    return FilePredicates.or(Collections2.transform(value,new Function<String,FilePredicate>(){
+      @Override public FilePredicate apply(      @Nullable String s){
+        return new FilePredicateAdapters.SourceDirPredicate(s);
+      }
+    }
+));
+  }
+  throw new IllegalArgumentException("Unsupported file attribute: " + key);
+}

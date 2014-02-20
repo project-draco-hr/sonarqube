@@ -1,0 +1,25 @@
+{
+  boolean shouldImportSource=settings.getBoolean(CoreProperties.CORE_IMPORT_SOURCES_PROPERTY);
+  Iterable<InputFile> inputFiles=fs.inputFiles(FilePredicates.all());
+  migration.migrateIfNeeded(module,inputFiles);
+  for (  InputFile inputFile : inputFiles) {
+    String languageKey=inputFile.language();
+    boolean unitTest=InputFile.Type.TEST == inputFile.type();
+    String pathFromSourceDir=((DefaultInputFile)inputFile).pathRelativeToSourceDir();
+    if (pathFromSourceDir == null) {
+      pathFromSourceDir=inputFile.relativePath();
+    }
+    Resource sonarFile=File.create(inputFile.relativePath(),pathFromSourceDir,languages.get(languageKey),unitTest);
+    if (Java.KEY.equals(languageKey)) {
+      sonarFile.setDeprecatedKey(JavaFile.fromRelativePath(pathFromSourceDir,false).getDeprecatedKey());
+    }
+ else {
+      sonarFile.setDeprecatedKey(pathFromSourceDir);
+    }
+    if (sonarFile != null) {
+      moduleLanguages.addLanguage(languageKey);
+      sonarIndex.index(sonarFile);
+      importSources(fs,shouldImportSource,inputFile,sonarFile);
+    }
+  }
+}

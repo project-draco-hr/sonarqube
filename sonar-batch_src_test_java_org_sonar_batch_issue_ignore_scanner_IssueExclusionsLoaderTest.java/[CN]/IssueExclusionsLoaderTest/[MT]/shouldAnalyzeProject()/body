@@ -1,0 +1,14 @@
+{
+  File javaFile1=new File(baseDir,"src/main/java/Foo.java");
+  fs.add(new DefaultInputFile("src/main/java/Foo.java").setFile(javaFile1).setType(InputFile.Type.MAIN).setKey("polop:src/main/java/Foo.java"));
+  File javaTestFile1=new File(baseDir,"src/test/java/FooTest.java");
+  fs.add(new DefaultInputFile("src/test/java/FooTest.java").setFile(javaTestFile1).setType(InputFile.Type.TEST).setKey("polop:src/test/java/FooTest.java"));
+  when(exclusionPatternInitializer.hasFileContentPattern()).thenReturn(true);
+  scanner.execute();
+  verify(inclusionPatternInitializer).initializePatternsForPath("src/main/java/Foo.java","polop:src/main/java/Foo.java");
+  verify(inclusionPatternInitializer).initializePatternsForPath("src/test/java/FooTest.java","polop:src/test/java/FooTest.java");
+  verify(exclusionPatternInitializer).initializePatternsForPath("src/main/java/Foo.java","polop:src/main/java/Foo.java");
+  verify(exclusionPatternInitializer).initializePatternsForPath("src/test/java/FooTest.java","polop:src/test/java/FooTest.java");
+  verify(regexpScanner).scan("polop:src/main/java/Foo.java",javaFile1,UTF_8);
+  verify(regexpScanner).scan("polop:src/test/java/FooTest.java",javaTestFile1,UTF_8);
+}

@@ -4,14 +4,14 @@
   FileUtils.touch(srcFile);
   FileUtils.write(srcFile,"single line");
   when(fs.baseDir()).thenReturn(basedir);
-  when(fs.sourceCharset()).thenReturn(Charsets.UTF_8);
+  when(fs.encoding()).thenReturn(Charsets.UTF_8);
   File sourceDir=new File(basedir,"src");
   when(fs.sourceDirs()).thenReturn(Arrays.asList(sourceDir));
   when(langDetection.language(any(InputFile.class))).thenReturn("php");
-  when(statusDetection.status("src/Bar.php","6c1d64c0b3555892fe7273e954f6fb5a")).thenReturn(InputFile.STATUS_ADDED);
-  InputFileBuilder builder=new InputFileBuilder("struts",new PathResolver(),langDetection,statusDetection,fs);
-  DefaultInputFile inputFile=builder.create(srcFile,InputFile.TYPE_MAIN);
-  assertThat(inputFile.attribute(DefaultInputFile.ATTRIBUTE_SOURCE_RELATIVE_PATH)).isEqualTo("foo/Bar.php");
-  assertThat(inputFile.attribute(DefaultInputFile.ATTRIBUTE_SOURCEDIR_PATH)).isEqualTo(PathUtils.sanitize(sourceDir.getAbsolutePath()));
-  assertThat(inputFile.attribute(DefaultInputFile.ATTRIBUTE_COMPONENT_DEPRECATED_KEY)).isEqualTo("struts:foo/Bar.php");
+  when(statusDetection.status("src/Bar.php","6c1d64c0b3555892fe7273e954f6fb5a")).thenReturn(InputFile.Status.ADDED);
+  InputFileBuilder builder=new InputFileBuilder("struts",new PathResolver(),langDetection,statusDetection,fs,analysisMode);
+  DefaultInputFile inputFile=builder.create(srcFile,InputFile.Type.MAIN);
+  assertThat(inputFile.pathRelativeToSourceDir()).isEqualTo("foo/Bar.php");
+  assertThat(inputFile.sourceDirAbsolutePath()).isEqualTo(PathUtils.sanitize(sourceDir.getAbsolutePath()));
+  assertThat(inputFile.deprecatedKey()).isEqualTo("struts:foo/Bar.php");
 }

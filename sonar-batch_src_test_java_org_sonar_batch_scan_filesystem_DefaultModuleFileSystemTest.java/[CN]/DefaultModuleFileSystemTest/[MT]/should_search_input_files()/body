@@ -1,12 +1,12 @@
 {
-  DefaultModuleFileSystem fs=new DefaultModuleFileSystem(new Project("foo"),settings,fileIndex,initializer,mode,componentIndexer);
+  DefaultModuleFileSystem fs=new DefaultModuleFileSystem(moduleInputFileCache,new Project("foo"),settings,fileIndexer,initializer,componentIndexer);
   File mainFile=temp.newFile();
-  InputFile mainInput=DefaultInputFile.create(mainFile,Charsets.UTF_8,"Main.java",ImmutableMap.of(InputFile.ATTRIBUTE_TYPE,InputFile.TYPE_MAIN));
-  InputFile testInput=DefaultInputFile.create(temp.newFile(),Charsets.UTF_8,"Test.java",ImmutableMap.of(InputFile.ATTRIBUTE_TYPE,InputFile.TYPE_TEST));
-  when(fileIndex.inputFiles("foo")).thenReturn(Lists.newArrayList(mainInput,testInput));
+  InputFile mainInput=new DefaultInputFile("Main.java").setFile(mainFile).setType(InputFile.Type.MAIN);
+  InputFile testInput=new DefaultInputFile("Test.java").setFile(temp.newFile()).setType(InputFile.Type.TEST);
+  when(moduleInputFileCache.inputFiles()).thenReturn(Lists.newArrayList(mainInput,testInput));
   fs.index();
-  Iterable<InputFile> inputFiles=fs.inputFiles(FileQuery.onSource());
+  Iterable<InputFile> inputFiles=fs.inputFiles(FilePredicates.hasType(InputFile.Type.MAIN));
   assertThat(inputFiles).containsOnly(mainInput);
-  List<File> files=fs.files(FileQuery.onSource());
+  Iterable<File> files=fs.files(FilePredicates.hasType(InputFile.Type.MAIN));
   assertThat(files).containsOnly(mainFile);
 }

@@ -1,0 +1,27 @@
+{
+  Cache<String> cache=caches.createCache("capitals");
+  assertThat(cache.get("france")).isNull();
+  cache.put("france","paris");
+  cache.put("italy","rome");
+  assertThat(cache.get("france")).isEqualTo("paris");
+  assertThat(cache.keySet()).containsOnly("france","italy");
+  assertThat(cache.keySet("france")).isEmpty();
+  assertThat(cache.values()).containsOnly("paris","rome");
+  assertThat(cache.containsKey("france")).isTrue();
+  Cache.Entry[] entries=Iterables.toArray(cache.<String>entries(),Cache.Entry.class);
+  assertThat(entries).hasSize(2);
+  assertThat(entries[0].key()[0]).isEqualTo("france");
+  assertThat(entries[0].value()).isEqualTo("paris");
+  assertThat(entries[1].key()[0]).isEqualTo("italy");
+  assertThat(entries[1].value()).isEqualTo("rome");
+  cache.remove("france");
+  assertThat(cache.get("france")).isNull();
+  assertThat(cache.get("italy")).isEqualTo("rome");
+  assertThat(cache.keySet()).containsOnly("italy");
+  assertThat(cache.keySet("france")).isEmpty();
+  assertThat(cache.containsKey("france")).isFalse();
+  assertThat(cache.containsKey("italy")).isTrue();
+  assertThat(cache.values()).containsOnly("rome");
+  cache.clear();
+  assertThat(cache.values()).isEmpty();
+}

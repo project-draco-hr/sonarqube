@@ -1,0 +1,21 @@
+{
+  Logger logger=LoggerFactory.getLogger(FileIndexer.class);
+  if (!module.getModules().isEmpty()) {
+    return;
+  }
+  logger.info("Index files");
+  exclusionFilters.prepare(fileSystem);
+  Progress progress=new Progress(fileCache.byModule(fileSystem.moduleKey()));
+  InputFileBuilder inputFileBuilder=inputFileBuilderFactory.create(fileSystem);
+  if (!fileSystem.sourceFiles().isEmpty() || !fileSystem.testFiles().isEmpty()) {
+    indexFiles(inputFileBuilder,fileSystem,progress,fileSystem.sourceFiles(),InputFile.Type.MAIN);
+    indexFiles(inputFileBuilder,fileSystem,progress,fileSystem.testFiles(),InputFile.Type.TEST);
+  }
+ else   if (fileSystem.baseDir() != null) {
+    indexDirectory(inputFileBuilder,fileSystem,progress,fileSystem.baseDir());
+  }
+  for (  InputFile removed : progress.removed) {
+    fileCache.remove(fileSystem.moduleKey(),removed);
+  }
+  logger.info(String.format("%d files indexed",progress.count()));
+}

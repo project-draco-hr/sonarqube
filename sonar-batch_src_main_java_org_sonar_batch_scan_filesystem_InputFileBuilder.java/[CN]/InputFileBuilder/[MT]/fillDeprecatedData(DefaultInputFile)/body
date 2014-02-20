@@ -1,15 +1,15 @@
 {
-  List<File> sourceDirs=InputFile.TYPE_MAIN.equals(inputFile.type()) ? fs.sourceDirs() : fs.testDirs();
+  List<File> sourceDirs=InputFile.Type.MAIN == inputFile.type() ? fs.sourceDirs() : fs.testDirs();
   for (  File sourceDir : sourceDirs) {
     String sourceRelativePath=pathResolver.relativePath(sourceDir,inputFile.file());
     if (sourceRelativePath != null) {
       inputFile.setPathRelativeToSourceDir(sourceRelativePath);
       inputFile.setSourceDirAbsolutePath(FilenameUtils.normalize(sourceDir.getAbsolutePath(),true));
       if (Java.KEY.equals(inputFile.language())) {
-        inputFile.setDeprecatedKey(moduleKey + ":" + JavaFile.fromRelativePath(sourceRelativePath,false).getDeprecatedKey());
+        inputFile.setDeprecatedKey(new StringBuilder().append(moduleKey).append(":").append(JavaFile.fromRelativePath(sourceRelativePath,false).getDeprecatedKey()).toString());
       }
  else {
-        inputFile.setDeprecatedKey(moduleKey + ":" + sourceRelativePath);
+        inputFile.setDeprecatedKey(new StringBuilder().append(moduleKey).append(":").append(sourceRelativePath).toString());
       }
     }
   }
