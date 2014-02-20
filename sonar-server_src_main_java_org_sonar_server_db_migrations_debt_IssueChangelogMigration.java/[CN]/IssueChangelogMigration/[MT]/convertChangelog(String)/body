@@ -1,0 +1,22 @@
+{
+  Pattern pattern=Pattern.compile("technicalDebt=(\\d*)\\|(\\d*)",Pattern.CASE_INSENSITIVE);
+  Matcher matcher=pattern.matcher(data);
+  StringBuffer sb=new StringBuffer();
+  if (matcher.find()) {
+    String replacement="technicalDebt=";
+    String oldValue=matcher.group(1);
+    if (!Strings.isNullOrEmpty(oldValue)) {
+      long oldDebt=debtConvertor.createFromLong(Long.parseLong(oldValue));
+      replacement+=Long.toString(oldDebt);
+    }
+    replacement+="|";
+    String newValue=matcher.group(2);
+    if (!Strings.isNullOrEmpty(newValue)) {
+      long newDebt=debtConvertor.createFromLong(Long.parseLong(newValue));
+      replacement+=Long.toString(newDebt);
+    }
+    matcher.appendReplacement(sb,replacement);
+  }
+  matcher.appendTail(sb);
+  return sb.toString();
+}
