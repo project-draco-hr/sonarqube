@@ -1,7 +1,6 @@
 {
-  long technicalDebt=1 * 8 * 60* 60L;
-  Issue issue1=createIssue("rule1","repo1").setDebt(technicalDebt);
-  Issue issue2=createIssue("rule1","repo1").setDebt(technicalDebt);
+  Issue issue1=createIssue("rule1","repo1").setDebt(ONE_DAY_DEBT);
+  Issue issue2=createIssue("rule1","repo1").setDebt(ONE_DAY_DEBT);
   when(issuable.issues()).thenReturn(newArrayList(issue1,issue2));
   DefaultCharacteristic rootCharacteristic=new DefaultCharacteristic().setKey("rootCharacteristic");
   DefaultCharacteristic characteristic=new DefaultCharacteristic().setKey("characteristic").setParent(rootCharacteristic);
@@ -9,9 +8,9 @@
   DefaultRequirement requirement=new DefaultRequirement().setRuleKey(ruleKey1).setCharacteristic(characteristic);
   when(defaultTechnicalDebtModel.requirementsByRule(ruleKey1)).thenReturn(requirement);
   doReturn(newArrayList(requirement)).when(defaultTechnicalDebtModel).requirements();
-  Measure measure=new Measure().setRequirement(requirement).setValue(5.0);
+  Measure measure=new Measure().setRequirement(requirement).setValue(5d * ONE_DAY_DEBT);
   when(context.getChildrenMeasures(any(MeasuresFilter.class))).thenReturn(newArrayList(measure));
   decorator.decorate(resource,context);
-  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,7.0)));
-  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,requirement,7.0)));
+  verify(context).saveMeasure(CoreMetrics.TECHNICAL_DEBT,7d * ONE_DAY_DEBT);
+  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,requirement,7d * ONE_DAY_DEBT)));
 }
