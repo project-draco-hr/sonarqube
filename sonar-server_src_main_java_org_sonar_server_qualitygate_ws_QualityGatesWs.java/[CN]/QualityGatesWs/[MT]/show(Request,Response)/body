@@ -1,0 +1,14 @@
+{
+  final Long qGateId=parseId(request,"id");
+  QualityGateDto qGate=qualityGates.get(qGateId);
+  JsonWriter writer=response.newJsonWriter().beginObject().prop("id",qGate.getId()).prop("name",qGate.getName());
+  Collection<QualityGateConditionDto> conditions=qualityGates.listConditions(qGateId);
+  if (!conditions.isEmpty()) {
+    writer.name("conditions").beginArray();
+    for (    QualityGateConditionDto condition : conditions) {
+      writeQualityGateCondition(condition,writer);
+    }
+    writer.endArray();
+  }
+  writer.endObject().close();
+}
