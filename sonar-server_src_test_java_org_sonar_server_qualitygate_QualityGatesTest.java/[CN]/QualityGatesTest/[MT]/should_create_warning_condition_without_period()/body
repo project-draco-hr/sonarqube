@@ -1,0 +1,19 @@
+{
+  long qGateId=42L;
+  String metricKey="coverage";
+  String operator="LT";
+  String warningThreshold="90";
+  when(dao.selectById(qGateId)).thenReturn(new QualityGateDto().setId(qGateId));
+  Integer metricId=10;
+  Metric coverage=Mockito.spy(CoreMetrics.COVERAGE);
+  when(coverage.getId()).thenReturn(metricId);
+  when(metricFinder.findByKey(metricKey)).thenReturn(coverage);
+  QualityGateConditionDto newCondition=qGates.createCondition(qGateId,metricKey,operator,warningThreshold,null,null);
+  assertThat(newCondition.getQualityGateId()).isEqualTo(qGateId);
+  assertThat(newCondition.getMetricId()).isEqualTo(metricId);
+  assertThat(newCondition.getOperator()).isEqualTo(operator);
+  assertThat(newCondition.getWarningThreshold()).isEqualTo(warningThreshold);
+  assertThat(newCondition.getErrorThreshold()).isNull();
+  assertThat(newCondition.getPeriod()).isNull();
+  verify(conditionDao).insert(newCondition);
+}
