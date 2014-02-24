@@ -1,0 +1,22 @@
+{
+  long condId=42L;
+  String metricKey="new_coverage";
+  String operator="LT";
+  String errorThreshold="80";
+  final QualityGateConditionDto condition=new QualityGateConditionDto().setId(condId).setMetricId(666L).setOperator("GT").setWarningThreshold("123");
+  when(conditionDao.selectById(condId)).thenReturn(condition);
+  Integer metricId=10;
+  Metric newCoverage=Mockito.spy(CoreMetrics.NEW_COVERAGE);
+  when(newCoverage.getId()).thenReturn(metricId);
+  when(metricFinder.findByKey(metricKey)).thenReturn(newCoverage);
+  int period=2;
+  assertThat(qGates.updateCondition(condId,metricKey,operator,null,errorThreshold,period)).isEqualTo(condition);
+  assertThat(condition.getId()).isEqualTo(condId);
+  assertThat(condition.getMetricId()).isEqualTo(metricId);
+  assertThat(condition.getMetricKey()).isEqualTo(metricKey);
+  assertThat(condition.getOperator()).isEqualTo(operator);
+  assertThat(condition.getWarningThreshold()).isNull();
+  assertThat(condition.getErrorThreshold()).isEqualTo(errorThreshold);
+  assertThat(condition.getPeriod()).isEqualTo(period);
+  verify(conditionDao).update(condition);
+}

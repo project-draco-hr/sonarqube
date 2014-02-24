@@ -1,60 +1,6 @@
 {
   NewController controller=context.newController("api/qualitygates").setSince("4.3").setDescription("This service can be used to manage quality gates, including requirements and project association.");
-  controller.newAction("create").setDescription("Create a quality gate, given its name.").setPost(true).setHandler(new RequestHandler(){
-    @Override public void handle(    Request request,    Response response){
-      create(request,response);
-    }
-  }
-).newParam("name").setDescription("The name of the quality gate to create.");
-  controller.newAction("set_as_default").setDescription("Select the default quality gate.").setPost(true).setHandler(new RequestHandler(){
-    @Override public void handle(    Request request,    Response response){
-      setDefault(request,response);
-    }
-  }
-).newParam("id").setDescription("The ID of the quality gate to use as default.");
-  controller.newAction("unset_default").setDescription("Unselect the default quality gate.").setPost(true).setHandler(new RequestHandler(){
-    @Override public void handle(    Request request,    Response response){
-      unsetDefault(response);
-    }
-  }
-);
-  NewAction rename=controller.newAction("rename").setDescription("Rename a quality gate, given its id and new name.").setPost(true).setHandler(new RequestHandler(){
-    @Override public void handle(    Request request,    Response response){
-      rename(request,response);
-    }
-  }
-);
-  rename.newParam("id").setDescription("The ID of the quality gate to rename.");
-  rename.newParam("name").setDescription("The new name for the quality gate.");
-  controller.newAction("list").setDescription("List all quality gates.").setHandler(new RequestHandler(){
-    @Override public void handle(    Request request,    Response response){
-      list(request,response);
-    }
-  }
-);
-  controller.newAction("show").setDescription("Show a quality gate in details, with associated conditions.").setHandler(new RequestHandler(){
-    @Override public void handle(    Request request,    Response response){
-      show(request,response);
-    }
-  }
-).newParam("id").setDescription("The ID of the quality gate.");
-  controller.newAction("destroy").setDescription("Destroy a quality gate, given its id.").setPost(true).setHandler(new RequestHandler(){
-    @Override public void handle(    Request request,    Response response){
-      destroy(request,response);
-    }
-  }
-).newParam("id").setDescription("The numerical ID of the quality gate to destroy.");
-  NewAction createCondition=controller.newAction("create_condition").setDescription("Add a new condition to a quality gate.").setPost(true).setHandler(new RequestHandler(){
-    @Override public void handle(    Request request,    Response response){
-      createCondition(request,response);
-    }
-  }
-);
-  createCondition.newParam(PARAM_GATE_ID).setDescription("The numerical ID of the quality gate.");
-  createCondition.newParam(PARAM_METRIC).setDescription("The key for the metric tested by this condition.");
-  createCondition.newParam(PARAM_OPERATOR).setDescription("The operator used for the test, one of 'EQ', 'NE', 'LT', 'GT'.");
-  createCondition.newParam(PARAM_PERIOD).setDescription("The optional period to use (for differential measures).");
-  createCondition.newParam(PARAM_WARNING).setDescription("An optional value for the warning threshold.");
-  createCondition.newParam(PARAM_ERROR).setDescription("An optional value for the error threshold.");
+  defineQualityGateActions(controller);
+  defineConditionActions(controller);
   controller.done();
 }
