@@ -6,6 +6,8 @@
   settings.setProperty(CoreProperties.PROJECT_EXCLUSIONS_PROPERTY,"file:" + excludedFile.getCanonicalPath());
   ExclusionFilters filter=new ExclusionFilters(new FileExclusions(settings));
   filter.prepare(fs);
-  assertThat(filter.accept(includedFile,"src/main/java/org/bar/Foo.java",InputFile.Type.MAIN)).isTrue();
-  assertThat(filter.accept(excludedFile,"src/main/java/org/bar/Bar.java",InputFile.Type.MAIN)).isFalse();
+  DefaultInputFile inputFile=new DefaultInputFile("src/main/java/org/bar/Foo.java").setFile(includedFile);
+  assertThat(filter.accept(inputFile,InputFile.Type.MAIN)).isTrue();
+  inputFile=new DefaultInputFile("src/main/java/org/bar/Bar.java").setFile(excludedFile);
+  assertThat(filter.accept(inputFile,InputFile.Type.MAIN)).isFalse();
 }

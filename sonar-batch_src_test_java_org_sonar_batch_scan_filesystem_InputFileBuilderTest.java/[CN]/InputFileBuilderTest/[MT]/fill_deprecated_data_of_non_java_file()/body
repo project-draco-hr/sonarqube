@@ -10,7 +10,8 @@
   when(langDetection.language(any(InputFile.class))).thenReturn("php");
   when(statusDetection.status("src/Bar.php","6c1d64c0b3555892fe7273e954f6fb5a")).thenReturn(InputFile.Status.ADDED);
   InputFileBuilder builder=new InputFileBuilder("struts",new PathResolver(),langDetection,statusDetection,fs,analysisMode);
-  DefaultInputFile inputFile=builder.create(srcFile,InputFile.Type.MAIN);
+  DefaultInputFile inputFile=builder.create(srcFile);
+  inputFile=builder.complete(inputFile,InputFile.Type.MAIN);
   assertThat(inputFile.pathRelativeToSourceDir()).isEqualTo("foo/Bar.php");
   assertThat(inputFile.sourceDirAbsolutePath()).isEqualTo(PathUtils.sanitize(sourceDir.getAbsolutePath()));
   assertThat(inputFile.deprecatedKey()).isEqualTo("struts:foo/Bar.php");

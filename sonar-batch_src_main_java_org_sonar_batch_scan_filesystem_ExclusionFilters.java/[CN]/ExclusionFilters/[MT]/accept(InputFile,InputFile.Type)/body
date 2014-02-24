@@ -1,0 +1,29 @@
+{
+  PathPattern[] inclusionPatterns=null;
+  PathPattern[] exclusionPatterns=null;
+  if (InputFile.Type.MAIN == type) {
+    inclusionPatterns=sourceInclusions;
+    exclusionPatterns=sourceExclusions;
+  }
+ else   if (InputFile.Type.TEST == type) {
+    inclusionPatterns=testInclusions;
+    exclusionPatterns=testExclusions;
+  }
+  boolean matchInclusion=false;
+  if (inclusionPatterns != null && inclusionPatterns.length > 0) {
+    for (    PathPattern pattern : inclusionPatterns) {
+      matchInclusion|=pattern.match(inputFile);
+    }
+    if (!matchInclusion) {
+      return false;
+    }
+  }
+  if (exclusionPatterns != null && exclusionPatterns.length > 0) {
+    for (    PathPattern pattern : exclusionPatterns) {
+      if (pattern.match(inputFile)) {
+        return false;
+      }
+    }
+  }
+  return matchInclusion;
+}

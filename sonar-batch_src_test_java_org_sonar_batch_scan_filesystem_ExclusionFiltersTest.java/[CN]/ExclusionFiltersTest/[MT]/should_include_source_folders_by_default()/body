@@ -4,7 +4,10 @@
   when(fs.sourceDirs()).thenReturn(Arrays.asList(new File(basedir,"src/main/java")));
   filter.prepare(fs);
   java.io.File file=temp.newFile();
-  assertThat(filter.accept(file,"src/main/java/com/mycompany/Foo.java",InputFile.Type.MAIN)).isTrue();
-  assertThat(filter.accept(file,"src/main/java2/com/mycompany/FooDao.java",InputFile.Type.MAIN)).isFalse();
-  assertThat(filter.accept(file,"src/main/java/com/mycompany/Foo.java",InputFile.Type.TEST)).isFalse();
+  DefaultInputFile inputFile=new DefaultInputFile("src/main/java/com/mycompany/Foo.java").setFile(file);
+  assertThat(filter.accept(inputFile,InputFile.Type.MAIN)).isTrue();
+  inputFile=new DefaultInputFile("src/main/java2/com/mycompany/FooDao.java").setFile(file);
+  assertThat(filter.accept(inputFile,InputFile.Type.MAIN)).isFalse();
+  inputFile=new DefaultInputFile("src/main/java/com/mycompany/FooDao.java").setFile(file);
+  assertThat(filter.accept(inputFile,InputFile.Type.TEST)).isFalse();
 }

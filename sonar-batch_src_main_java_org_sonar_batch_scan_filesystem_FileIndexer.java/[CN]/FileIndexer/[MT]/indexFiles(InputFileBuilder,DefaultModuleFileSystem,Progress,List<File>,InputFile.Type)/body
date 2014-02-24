@@ -1,13 +1,8 @@
 {
   for (  File sourceFile : sourceFiles) {
-    String path=pathResolver.relativePath(fileSystem.baseDir(),sourceFile);
-    if (path == null) {
-      LoggerFactory.getLogger(getClass()).warn(String.format(FILE_IS_NOT_DECLARED_IN_MODULE_BASEDIR,sourceFile.getAbsoluteFile(),fileSystem.baseDir()));
-    }
- else {
-      if (exclusionFilters.accept(sourceFile,path,type)) {
-        indexFile(inputFileBuilder,fileSystem,progress,sourceFile,path,type);
-      }
+    DefaultInputFile inputFile=inputFileBuilder.create(sourceFile);
+    if (inputFile != null && exclusionFilters.accept(inputFile,type)) {
+      indexFile(inputFileBuilder,fileSystem,progress,inputFile,type);
     }
   }
 }
