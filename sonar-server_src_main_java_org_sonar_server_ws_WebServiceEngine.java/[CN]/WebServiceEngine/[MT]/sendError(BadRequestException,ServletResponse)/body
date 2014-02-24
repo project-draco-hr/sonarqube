@@ -1,16 +1,7 @@
 {
-  JsonWriter json=initErrorStream(e.httpCode(),response);
-  try {
-    json.beginObject();
-    json.name("errors").beginArray();
-    for (    Message message : e.errors()) {
-      String messageToSend=i18n.message(Locale.getDefault(),message.l10nKey(),message.text(),message.l10nParams());
-      json.beginObject().prop("msg",messageToSend).endObject();
-    }
-    json.endArray();
-    json.endObject();
+  Collection<String> messages=Lists.newArrayList();
+  for (  Message message : e.errors()) {
+    messages.add(i18n.message(Locale.getDefault(),message.l10nKey(),message.text(),message.l10nParams()));
   }
-  finally {
-    json.close();
-  }
+  sendErrors(response,e.httpCode(),messages.toArray(new String[0]));
 }

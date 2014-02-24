@@ -1,0 +1,19 @@
+{
+  ServletResponse.ServletStream stream=response.stream();
+  stream.reset();
+  stream.setStatus(status);
+  stream.setMediaType(MimeTypes.JSON);
+  JsonWriter json=JsonWriter.of(new OutputStreamWriter(stream.output()));
+  try {
+    json.beginObject();
+    json.name("errors").beginArray();
+    for (    String message : errors) {
+      json.beginObject().prop("msg",message).endObject();
+    }
+    json.endArray();
+    json.endObject();
+  }
+  finally {
+    json.close();
+  }
+}
