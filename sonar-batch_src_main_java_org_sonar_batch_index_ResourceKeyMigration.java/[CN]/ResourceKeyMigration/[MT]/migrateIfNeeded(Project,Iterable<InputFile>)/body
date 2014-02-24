@@ -1,16 +1,16 @@
 {
   if (migrationNeeded) {
-    logger.info("Starting migration of resource keys");
+    logger.info("Update component keys");
     Map<String,InputFile> deprecatedFileKeyMapper=new HashMap<String,InputFile>();
     Map<String,InputFile> deprecatedTestKeyMapper=new HashMap<String,InputFile>();
     Map<String,String> deprecatedDirectoryKeyMapper=new HashMap<String,String>();
     for (    InputFile inputFile : inputFiles) {
       String deprecatedKey=((DefaultInputFile)inputFile).deprecatedKey();
       if (deprecatedKey != null) {
-        if (InputFile.Type.TEST == inputFile.type()) {
+        if (InputFile.Type.TEST == inputFile.type() && !deprecatedTestKeyMapper.containsKey(deprecatedKey)) {
           deprecatedTestKeyMapper.put(deprecatedKey,inputFile);
         }
- else {
+ else         if (InputFile.Type.MAIN == inputFile.type() && !deprecatedFileKeyMapper.containsKey(deprecatedKey)) {
           deprecatedFileKeyMapper.put(deprecatedKey,inputFile);
         }
       }
