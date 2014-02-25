@@ -1,0 +1,14 @@
+{
+  Long gateId=validateId(query.gateId());
+  int pageSize=query.pageSize();
+  int pageIndex=query.pageIndex();
+  int offset=(pageIndex - 1) * pageSize;
+  int limit=pageSize + 1;
+  List<ProjectQgateAssociationDto> dtos=associationDao.selectProjects(query,gateId,offset,limit);
+  boolean hasMoreResults=false;
+  if (dtos.size() == limit) {
+    hasMoreResults=true;
+    dtos.remove(dtos.size() - 1);
+  }
+  return new Association(toProjectAssociations(dtos),hasMoreResults);
+}

@@ -1,0 +1,10 @@
+{
+  Association associations=projectFinder.find(ProjectQgateAssociationQuery.builder().gateId(request.requiredParam(PARAM_GATE_ID)).membership(request.param("selected")).projectSearch(request.param("query")).pageIndex(request.intParam("page")).pageSize(request.intParam("pageSize")).build());
+  JsonWriter writer=response.newJsonWriter();
+  writer.beginObject().prop("more",associations.hasMoreResults());
+  writer.name("results").beginArray();
+  for (  ProjectQgateAssociation project : associations.projects()) {
+    writer.beginObject().prop("id",project.id()).prop("name",project.name()).prop("selected",project.isMember()).endObject();
+  }
+  writer.endArray().endObject().close();
+}
