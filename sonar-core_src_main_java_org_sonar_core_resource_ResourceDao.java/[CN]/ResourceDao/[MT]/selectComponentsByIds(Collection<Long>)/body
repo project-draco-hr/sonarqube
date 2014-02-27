@@ -1,0 +1,18 @@
+{
+  if (ids.isEmpty()) {
+    return Collections.emptyList();
+  }
+  SqlSession session=mybatis.openSession();
+  try {
+    List<ComponentDto> components=newArrayList();
+    List<List<Long>> partitionList=Lists.partition(newArrayList(ids),1000);
+    for (    List<Long> partition : partitionList) {
+      List<ComponentDto> dtos=session.getMapper(ResourceMapper.class).selectComponentsByIds(partition);
+      components.addAll(dtos);
+    }
+    return components;
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

@@ -2,15 +2,8 @@
   String issueKey="ABCD";
   Issue issue=new DefaultIssue().setKey(issueKey).setComponentKey("org.sonar.server.issue.IssueClient").setProjectKey("org.sonar.Sonar").setRuleKey(RuleKey.of("squid","AvoidCycle")).setLine(12).setEffortToFix(2.0).setMessage("Fix it").setResolution("FIXED").setStatus("CLOSED").setSeverity("MAJOR").setCreationDate(issue_creation_date);
   issues.add(issue);
-  Component component=mock(Component.class);
-  when(component.key()).thenReturn("org.sonar.server.issue.IssueClient");
-  when(component.longName()).thenReturn("SonarQube :: Issue Client");
-  when(component.qualifier()).thenReturn("FIL");
-  result.addComponents(newArrayList(component));
-  Component project=mock(Component.class);
-  when(project.key()).thenReturn("org.sonar.Sonar");
-  when(project.longName()).thenReturn("SonarQube");
-  result.addProjects(newArrayList(project));
+  result.addComponents(Lists.<Component>newArrayList(new ComponentDto().setId(10L).setKey("org.sonar.server.issue.IssueClient").setLongName("SonarQube :: Issue Client").setQualifier("FIL").setGroupId(1L).setRootId(1L)));
+  result.addComponents(Lists.<Component>newArrayList(new ComponentDto().setId(1L).setKey("org.sonar.Sonar").setLongName("SonarQube").setRootId(1L)));
   MockUserSession.set();
   WsTester.TestRequest request=tester.newRequest("show").setParam("key",issueKey);
   request.execute().assertJson(getClass(),"show_issue.json");

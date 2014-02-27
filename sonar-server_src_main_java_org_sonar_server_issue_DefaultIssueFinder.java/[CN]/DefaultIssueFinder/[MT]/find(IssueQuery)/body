@@ -11,18 +11,16 @@
     List<IssueDto> pagedSortedIssues=sort(pagedIssues,query,authorizedIssues.size());
     Map<String,DefaultIssue> issuesByKey=newHashMap();
     List<Issue> issues=newArrayList();
-    Set<Integer> ruleIds=Sets.newHashSet();
-    Set<Long> componentIds=Sets.newHashSet();
-    Set<Long> projectIds=Sets.newHashSet();
-    Set<String> actionPlanKeys=Sets.newHashSet();
-    Set<String> users=Sets.newHashSet();
+    Set<Integer> ruleIds=newHashSet();
+    Set<Long> componentIds=newHashSet();
+    Set<String> actionPlanKeys=newHashSet();
+    Set<String> users=newHashSet();
     for (    IssueDto dto : pagedSortedIssues) {
       DefaultIssue defaultIssue=dto.toDefaultIssue();
       issuesByKey.put(dto.getKee(),defaultIssue);
       issues.add(defaultIssue);
       ruleIds.add(dto.getRuleId());
       componentIds.add(dto.getComponentId());
-      projectIds.add(dto.getRootComponentId());
       actionPlanKeys.add(dto.getActionPlanKey());
       if (dto.getReporter() != null) {
         users.add(dto.getReporter());
@@ -39,7 +37,13 @@
         users.add(comment.userLogin());
       }
     }
-    return new DefaultIssueQueryResult(issues).setMaxResultsReached(authorizedIssues.size() == query.maxResults()).addRules(hideRules(query) ? Collections.<Rule>emptyList() : findRules(ruleIds)).addComponents(findComponents(componentIds)).addProjects(findComponents(projectIds)).addActionPlans(findActionPlans(actionPlanKeys)).addUsers(findUsers(users)).setPaging(paging);
+    Collection<Component> components=findComponents(componentIds);
+    Collection<Component> groupComponents=findGroupComponents(components);
+    Collection<Component> rootComponents=findRootComponents(components);
+    Set<Component> allComponents=newHashSet(components);
+    allComponents.addAll(groupComponents);
+    allComponents.addAll(rootComponents);
+    return new DefaultIssueQueryResult(issues).setMaxResultsReached(authorizedIssues.size() == query.maxResults()).addRules(hideRules(query) ? Collections.<Rule>emptyList() : findRules(ruleIds)).addComponents(allComponents).addProjects(rootComponents).addActionPlans(findActionPlans(actionPlanKeys)).addUsers(findUsers(users)).setPaging(paging);
   }
   finally {
     MyBatis.closeQuietly(sqlSession);
