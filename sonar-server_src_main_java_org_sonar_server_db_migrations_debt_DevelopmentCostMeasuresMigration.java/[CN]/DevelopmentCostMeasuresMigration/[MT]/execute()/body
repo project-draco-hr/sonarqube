@@ -1,19 +1,28 @@
 {
-  try {
-    logger.info("Initialize input");
-    Referentials referentials=new Referentials(db,SQL_SELECT);
-    if (referentials.size() > 0) {
-      logger.info("Migrate {} rows",referentials.size());
-      convert(referentials);
+  new MassUpdater(db).execute(new MassUpdater.InputLoader<Row>(){
+    @Override public String selectSql(){
+      return SELECT_SQL;
+    }
+    @Override public Row load(    ResultSet rs) throws SQLException {
+      Row row=new Row();
+      row.id=SqlUtil.getLong(rs,ID);
+      row.value=SqlUtil.getDouble(rs,VALUE);
+      return row;
     }
   }
- catch (  SQLException e) {
-    logger.error(FAILURE_MESSAGE,e);
-    SqlUtil.log(logger,e);
-    throw MessageException.of(FAILURE_MESSAGE);
+,new MassUpdater.InputConverter<Row>(){
+    @Override public String updateSql(){
+      return UPDATE_SQL;
+    }
+    @Override public void convert(    Row row,    PreparedStatement statement) throws SQLException {
+      if (row.value != null) {
+        statement.setString(1,convertDebtForDays(row.value));
+      }
+ else {
+        statement.setNull(1,Types.NULL);
+      }
+      statement.setDouble(2,row.id);
+    }
   }
-catch (  Exception e) {
-    logger.error(FAILURE_MESSAGE,e);
-    throw MessageException.of(FAILURE_MESSAGE);
-  }
+);
 }
