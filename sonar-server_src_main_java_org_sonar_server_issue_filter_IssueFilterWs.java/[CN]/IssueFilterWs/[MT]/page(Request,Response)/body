@@ -2,11 +2,15 @@
   UserSession session=UserSession.get();
   JsonWriter json=response.newJsonWriter();
   json.beginObject();
-  json.prop("canManageFilter",session.isLoggedIn());
-  json.prop("canBulkChange",session.isLoggedIn());
   int filterId=request.intParam("id",-1);
+  DefaultIssueFilter filter=null;
   if (filterId >= 0) {
-    DefaultIssueFilter filter=service.find((long)filterId,session);
+    filter=service.find((long)filterId,session);
+  }
+  json.prop("canManageFilters",session.isLoggedIn());
+  json.prop("canBulkChange",session.isLoggedIn());
+  json.prop("canModifyFilter",canModifyFilter(session,filter));
+  if (filter != null) {
     json.name("filter").beginObject().prop("id",filter.id()).prop("name",filter.name()).prop("user",filter.user()).prop("shared",filter.shared()).prop("query",filter.data()).endObject();
   }
   if (session.isLoggedIn()) {
