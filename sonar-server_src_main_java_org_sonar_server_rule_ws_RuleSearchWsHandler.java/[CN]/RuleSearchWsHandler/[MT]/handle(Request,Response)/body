@@ -1,0 +1,29 @@
+{
+  final String ruleKeyParam=request.param("k");
+  Collection<Rule> foundRules=Collections.emptyList();
+  boolean hasMore=false;
+  if (ruleKeyParam == null) {
+    final String ruleSearchParam=request.param("s");
+    final int pageSize=request.paramAsInt("ps",25);
+    final int pageIndex=request.paramAsInt("p",1);
+    PagedResult<Rule> searchResult=rules.find(RuleQuery.builder().withSearchQuery(ruleSearchParam).withPageSize(pageSize).withPage(pageIndex).build());
+    foundRules=searchResult.results();
+    hasMore=searchResult.paging().hasNextPage();
+  }
+ else {
+    RuleKey ruleKey=RuleKey.parse(ruleKeyParam);
+    Rule rule=findRule(ruleKey);
+    if (rule != null) {
+      foundRules=Collections.singleton(rule);
+    }
+    hasMore=false;
+  }
+  JsonWriter json=response.newJsonWriter();
+  json.beginObject().name("results").beginArray();
+  for (  Rule rule : foundRules) {
+    json.beginObject();
+    writeRule(rule,json);
+    json.endObject();
+  }
+  json.endArray().prop("more",hasMore).endObject().close();
+}
