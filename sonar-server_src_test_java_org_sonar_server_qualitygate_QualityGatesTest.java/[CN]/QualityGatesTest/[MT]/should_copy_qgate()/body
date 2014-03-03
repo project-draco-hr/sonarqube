@@ -1,0 +1,27 @@
+{
+  String name="Atlantis";
+  long sourceId=42L;
+  final long destId=43L;
+  long metric1Id=1L;
+  long metric2Id=2L;
+  QualityGateConditionDto cond1=new QualityGateConditionDto().setMetricId(metric1Id);
+  QualityGateConditionDto cond2=new QualityGateConditionDto().setMetricId(metric2Id);
+  Collection<QualityGateConditionDto> conditions=ImmutableList.of(cond1,cond2);
+  when(dao.selectById(sourceId)).thenReturn(new QualityGateDto().setId(sourceId).setName("SG-1"));
+  SqlSession session=mock(SqlSession.class);
+  when(myBatis.openSession()).thenReturn(session);
+  Mockito.doAnswer(new Answer<Object>(){
+    @Override public Object answer(    InvocationOnMock invocation) throws Throwable {
+      ((QualityGateDto)invocation.getArguments()[0]).setId(destId);
+      return null;
+    }
+  }
+).when(dao).insert(any(QualityGateDto.class),eq(session));
+  when(conditionDao.selectForQualityGate(anyLong(),eq(session))).thenReturn(conditions);
+  QualityGateDto atlantis=qGates.copy(sourceId,name);
+  assertThat(atlantis.getName()).isEqualTo(name);
+  verify(dao).selectByName(name);
+  verify(dao).insert(atlantis,session);
+  verify(conditionDao).selectForQualityGate(anyLong(),eq(session));
+  verify(conditionDao,times(conditions.size())).insert(any(QualityGateConditionDto.class),eq(session));
+}
