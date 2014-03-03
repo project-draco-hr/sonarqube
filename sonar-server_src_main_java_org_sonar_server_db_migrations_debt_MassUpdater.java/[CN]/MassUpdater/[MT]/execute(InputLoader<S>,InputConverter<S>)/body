@@ -1,4 +1,5 @@
 {
+  int count=0;
   try {
     Connection readConnection=db.getDataSource().getConnection();
     Statement stmt=null;
@@ -23,6 +24,7 @@
         converter.convert(inputLoader.load(rs),writeStatement);
         writeStatement.addBatch();
         cursor++;
+        count++;
         if (cursor == GROUP_SIZE) {
           writeStatement.executeBatch();
           writeConnection.commit();
@@ -40,6 +42,7 @@
       }
       DbUtils.closeQuietly(writeConnection);
       DbUtils.closeQuietly(readConnection,stmt,rs);
+      logger.info("{} rows have been updated",count);
     }
   }
  catch (  SQLException e) {
