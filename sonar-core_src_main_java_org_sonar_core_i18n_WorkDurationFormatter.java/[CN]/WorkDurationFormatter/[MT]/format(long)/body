@@ -1,25 +1,8 @@
 {
-  List<Result> results=newArrayList();
-  if (durationInSeconds == 0) {
+  if (durationInMinutes == 0) {
     return newArrayList(new Result("0",null));
   }
-  boolean isNegative=durationInSeconds < 0;
-  Long absDuration=Math.abs(durationInSeconds);
-  WorkDuration workDuration=workDurationFactory.createFromMinutes(absDuration);
-  if (workDuration.days() > 0) {
-    results.add(message("work_duration.x_days",isNegative ? -1 * workDuration.days() : workDuration.days()));
-  }
-  if (workDuration.hours() > 0 && workDuration.days() < 10) {
-    if (!results.isEmpty()) {
-      results.add(new Result(" ",null));
-    }
-    results.add(message("work_duration.x_hours",isNegative && results.isEmpty() ? -1 * workDuration.hours() : workDuration.hours()));
-  }
-  if (workDuration.minutes() > 0 && workDuration.hours() < 10 && workDuration.days() == 0) {
-    if (!results.isEmpty()) {
-      results.add(new Result(" ",null));
-    }
-    results.add(message("work_duration.x_minutes",isNegative && results.isEmpty() ? -1 * workDuration.minutes() : workDuration.minutes()));
-  }
-  return results;
+  boolean isNegative=durationInMinutes < 0;
+  Long absDuration=Math.abs(durationInMinutes);
+  return format(workDurationFactory.createFromMinutes(absDuration),isNegative);
 }
