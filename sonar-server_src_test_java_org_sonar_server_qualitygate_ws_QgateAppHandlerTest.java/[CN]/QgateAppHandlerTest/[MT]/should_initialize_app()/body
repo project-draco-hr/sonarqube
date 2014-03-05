@@ -1,0 +1,18 @@
+{
+  doAnswer(new Answer<String>(){
+    @Override public String answer(    InvocationOnMock invocation) throws Throwable {
+      return (String)invocation.getArguments()[1];
+    }
+  }
+).when(i18n).message(any(Locale.class),any(String.class),any(String.class));
+  String json=tester.newRequest("app").execute().outputAsString();
+  Map responseJson=(Map)JSONValue.parse(json);
+  assertThat((Boolean)responseJson.get("edit")).isFalse();
+  Collection<Map> periods=(Collection<Map>)responseJson.get("periods");
+  assertThat(periods).hasSize(3);
+  Map messages=(Map)responseJson.get("messages");
+  assertThat(messages).isNotNull().isNotEmpty().hasSize(45);
+  for (  Entry message : (Set<Entry>)messages.entrySet()) {
+    assertThat(message.getKey()).isEqualTo(message.getValue());
+  }
+}
