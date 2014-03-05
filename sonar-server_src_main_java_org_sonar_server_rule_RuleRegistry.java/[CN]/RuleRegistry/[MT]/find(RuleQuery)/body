@@ -1,5 +1,9 @@
 {
-  SearchHits hits=searchIndex.executeRequest(searchIndex.client().prepareSearch(INDEX_RULES).setTypes(TYPE_RULE).setPostFilter(FilterBuilders.boolFilter().must(FilterBuilders.termFilter(RuleDocument.FIELD_NAME,query.query())).mustNot(FilterBuilders.termFilter(RuleDocument.FIELD_STATUS,STATUS_REMOVED))).addSort(RuleDocument.FIELD_NAME,SortOrder.ASC).setSize(query.paging().pageSize()).setFrom(query.paging().offset()));
+  BoolFilterBuilder mainFilter=FilterBuilders.boolFilter().mustNot(FilterBuilders.termFilter(RuleDocument.FIELD_STATUS,STATUS_REMOVED));
+  if (StringUtils.isNotBlank(query.query())) {
+    mainFilter.must(FilterBuilders.queryFilter(QueryBuilders.matchQuery(RuleDocument.FIELD_NAME + ".search",query.query()).operator(Operator.AND)));
+  }
+  SearchHits hits=searchIndex.executeRequest(searchIndex.client().prepareSearch(INDEX_RULES).setTypes(TYPE_RULE).setPostFilter(mainFilter).addSort(RuleDocument.FIELD_NAME,SortOrder.ASC).setSize(query.paging().pageSize()).setFrom(query.paging().offset()));
   Builder<Rule> rulesBuilder=ImmutableList.builder();
   for (  SearchHit hit : hits.hits()) {
     rulesBuilder.add(RuleDocumentParser.parse(hit.sourceAsMap()));
