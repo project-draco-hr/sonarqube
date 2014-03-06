@@ -1,0 +1,10 @@
+{
+  long qGateId=12345L;
+  String qGateName="Sonar way";
+  when(settings.getString("sonar.qualitygate")).thenReturn(Long.toString(qGateId));
+  QualityGateDetails qGate=mock(QualityGateDetails.class);
+  when(qualityGateClient.show(qGateId)).thenReturn(qGate);
+  when(qGate.name()).thenReturn(qGateName);
+  assertThat(new QualityGateProvider().init(settings,client,logger).name()).isEqualTo(qGateName);
+  verify(logger).info("Loaded quality gate '{}'",qGateName);
+}
