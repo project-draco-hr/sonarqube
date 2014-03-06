@@ -1,23 +1,23 @@
 {
   new MassUpdater(db).execute(new MassUpdater.InputLoader<Row>(){
     @Override public String selectSql(){
-      return SELECT_SQL;
+      return "SELECT ic.id, ic.change_data  FROM issue_changes ic " + " WHERE ic.change_type = 'diff' AND ic.change_data LIKE '%technicalDebt%'";
     }
     @Override public Row load(    ResultSet rs) throws SQLException {
       Row row=new Row();
-      row.id=SqlUtil.getLong(rs,ID);
-      row.changeData=rs.getString(CHANGE_DATA);
+      row.id=SqlUtil.getLong(rs,1);
+      row.changeData=rs.getString(2);
       return row;
     }
   }
 ,new MassUpdater.InputConverter<Row>(){
     @Override public String updateSql(){
-      return UPDATE_SQL;
+      return "UPDATE issue_changes SET change_data=?,updated_at=? WHERE id=?";
     }
-    @Override public void convert(    Row row,    PreparedStatement statement) throws SQLException {
-      statement.setString(1,convertChangelog(row.changeData));
-      statement.setDate(2,new Date(system2.now()));
-      statement.setLong(3,row.id);
+    @Override public void convert(    Row row,    PreparedStatement updateStatement) throws SQLException {
+      updateStatement.setString(1,convertChangelog(row.changeData));
+      updateStatement.setDate(2,new Date(system2.now()));
+      updateStatement.setLong(3,row.id);
     }
   }
 );
