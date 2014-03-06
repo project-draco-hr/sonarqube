@@ -1,0 +1,15 @@
+{
+  metric.setType(Metric.ValueType.BOOL);
+  measure.setValue(0d);
+  when(condition.operator()).thenReturn(QualityGateConditionDto.OPERATOR_EQUALS);
+  when(condition.metric()).thenReturn(metric);
+  when(condition.errorThreshold()).thenReturn("1");
+  Assert.assertEquals(Metric.Level.OK,ConditionUtils.getLevel(condition,measure));
+  when(condition.errorThreshold()).thenReturn("0");
+  Assert.assertEquals(Metric.Level.ERROR,ConditionUtils.getLevel(condition,measure));
+  when(condition.operator()).thenReturn(QualityGateConditionDto.OPERATOR_NOT_EQUALS);
+  when(condition.errorThreshold()).thenReturn("1");
+  Assert.assertEquals(Metric.Level.ERROR,ConditionUtils.getLevel(condition,measure));
+  when(condition.errorThreshold()).thenReturn("0");
+  Assert.assertEquals(Metric.Level.OK,ConditionUtils.getLevel(condition,measure));
+}

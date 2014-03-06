@@ -5,6 +5,16 @@
   QualityGateDetails qGate=mock(QualityGateDetails.class);
   when(qualityGateClient.show(qGateId)).thenReturn(qGate);
   when(qGate.name()).thenReturn(qGateName);
-  assertThat(new QualityGateProvider().init(settings,client,logger).name()).isEqualTo(qGateName);
+  String metricKey1="metric1";
+  QualityGateCondition serverCondition1=mock(QualityGateCondition.class);
+  when(serverCondition1.metricKey()).thenReturn(metricKey1);
+  String metricKey2="metric2";
+  QualityGateCondition serverCondition2=mock(QualityGateCondition.class);
+  when(serverCondition2.metricKey()).thenReturn(metricKey2);
+  Collection<QualityGateCondition> conditions=ImmutableList.of(serverCondition1,serverCondition2);
+  when(qGate.conditions()).thenReturn(conditions);
+  assertThat(new QualityGateProvider().init(settings,client,metricFinder,logger).name()).isEqualTo(qGateName);
   verify(logger).info("Loaded quality gate '{}'",qGateName);
+  verify(metricFinder).findByKey(metricKey1);
+  verify(metricFinder).findByKey(metricKey2);
 }

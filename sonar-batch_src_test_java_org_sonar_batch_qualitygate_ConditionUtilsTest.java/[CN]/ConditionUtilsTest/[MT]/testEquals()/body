@@ -1,0 +1,17 @@
+{
+  metric.setType(Metric.ValueType.FLOAT);
+  measure.setValue(10.2d);
+  when(condition.operator()).thenReturn(QualityGateConditionDto.OPERATOR_EQUALS);
+  when(condition.metric()).thenReturn(metric);
+  when(condition.errorThreshold()).thenReturn("10.2");
+  Assert.assertEquals(Metric.Level.ERROR,ConditionUtils.getLevel(condition,measure));
+  when(condition.errorThreshold()).thenReturn("10.1");
+  Assert.assertEquals(Metric.Level.OK,ConditionUtils.getLevel(condition,measure));
+  metric.setType(Metric.ValueType.STRING);
+  measure.setData("TEST");
+  measure.setValue(null);
+  when(condition.errorThreshold()).thenReturn("TEST");
+  Assert.assertEquals(Metric.Level.ERROR,ConditionUtils.getLevel(condition,measure));
+  when(condition.errorThreshold()).thenReturn("TEST2");
+  Assert.assertEquals(Metric.Level.OK,ConditionUtils.getLevel(condition,measure));
+}

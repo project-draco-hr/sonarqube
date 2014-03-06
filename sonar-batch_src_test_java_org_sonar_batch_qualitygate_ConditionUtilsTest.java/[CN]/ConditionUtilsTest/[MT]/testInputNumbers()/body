@@ -1,0 +1,30 @@
+{
+  metric.setType(Metric.ValueType.FLOAT);
+  measure.setValue(10.2d);
+  when(condition.operator()).thenReturn(QualityGateConditionDto.OPERATOR_LESS_THAN);
+  when(condition.metric()).thenReturn(metric);
+  try {
+    metric.setType(Metric.ValueType.FLOAT);
+    when(condition.errorThreshold()).thenReturn("20");
+    ConditionUtils.getLevel(condition,measure);
+  }
+ catch (  NumberFormatException ex) {
+    Assert.fail();
+  }
+  try {
+    metric.setType(Metric.ValueType.INT);
+    when(condition.errorThreshold()).thenReturn("20.1");
+    ConditionUtils.getLevel(condition,measure);
+  }
+ catch (  NumberFormatException ex) {
+    Assert.fail();
+  }
+  try {
+    metric.setType(Metric.ValueType.PERCENT);
+    when(condition.errorThreshold()).thenReturn("20.1");
+    ConditionUtils.getLevel(condition,measure);
+  }
+ catch (  NumberFormatException ex) {
+    Assert.fail();
+  }
+}

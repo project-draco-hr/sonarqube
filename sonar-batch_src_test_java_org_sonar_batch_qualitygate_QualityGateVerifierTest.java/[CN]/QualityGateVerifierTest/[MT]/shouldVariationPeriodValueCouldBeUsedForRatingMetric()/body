@@ -1,0 +1,10 @@
+{
+  Metric ratingMetric=new Metric.Builder("key_rating_metric","Rating metric",Metric.ValueType.RATING).create();
+  Measure measureRatingMetric=new Measure(ratingMetric,150d);
+  measureRatingMetric.setVariation1(50d);
+  when(context.getMeasure(ratingMetric)).thenReturn(measureRatingMetric);
+  ArrayList<ResolvedCondition> conditions=Lists.newArrayList(mockCondition(ratingMetric,QualityGateConditionDto.OPERATOR_GREATER_THAN,null,"100",1));
+  when(qualityGate.conditions()).thenReturn(conditions);
+  verifier.decorate(project,context);
+  verify(context).saveMeasure(argThat(matchesMetric(CoreMetrics.QUALITY_GATE_STATUS,Metric.Level.OK,null)));
+}

@@ -1,0 +1,13 @@
+{
+  Metric newMetric=new Metric.Builder("new_metric_key","New Metric",Metric.ValueType.INT).create();
+  Measure measure=new Measure(newMetric,15d);
+  measure.setVariation1(50d);
+  when(context.getMeasure(newMetric)).thenReturn(measure);
+  measureClasses.setVariation1(40d);
+  when(i18n.message(any(Locale.class),eq("metric.new_metric_key.name"),anyString())).thenReturn("New Measure");
+  when(periods.label(snapshot,1)).thenReturn("since someday");
+  ArrayList<ResolvedCondition> conditions=Lists.newArrayList(mockCondition(newMetric,QualityGateConditionDto.OPERATOR_GREATER_THAN,null,"30",1));
+  when(qualityGate.conditions()).thenReturn(conditions);
+  verifier.decorate(project,context);
+  verify(context).saveMeasure(argThat(matchesMetric(CoreMetrics.QUALITY_GATE_STATUS,Metric.Level.WARN,"New Measure GT 30 since someday")));
+}

@@ -1,7 +1,24 @@
 {
   Metric.Level globalLevel=Metric.Level.OK;
+  List<String> labels=Lists.newArrayList();
+  for (  ResolvedCondition condition : qualityGate.conditions()) {
+    Measure measure=context.getMeasure(condition.metric());
+    if (measure != null) {
+      Metric.Level level=ConditionUtils.getLevel(condition,measure);
+      String text=getText(condition,level);
+      if (!StringUtils.isBlank(text)) {
+        labels.add(text);
+      }
+      if (Metric.Level.WARN == level && globalLevel != Metric.Level.ERROR) {
+        globalLevel=Metric.Level.WARN;
+      }
+ else       if (Metric.Level.ERROR == level) {
+        globalLevel=Metric.Level.ERROR;
+      }
+    }
+  }
   Measure globalMeasure=new Measure(CoreMetrics.QUALITY_GATE_STATUS,globalLevel);
   globalMeasure.setAlertStatus(globalLevel);
-  globalMeasure.setAlertText("");
+  globalMeasure.setAlertText(StringUtils.join(labels,", "));
   context.saveMeasure(globalMeasure);
 }

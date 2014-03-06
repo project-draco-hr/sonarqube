@@ -1,0 +1,8 @@
+{
+  when(i18n.message(any(Locale.class),eq("metric.classes.name"),anyString())).thenReturn("Classes");
+  when(i18n.message(any(Locale.class),eq("metric.coverage.name"),anyString())).thenReturn("Coverages");
+  ArrayList<ResolvedCondition> conditions=Lists.newArrayList(mockCondition(CoreMetrics.CLASSES,QualityGateConditionDto.OPERATOR_LESS_THAN,null,"10000"),mockCondition(CoreMetrics.COVERAGE,QualityGateConditionDto.OPERATOR_LESS_THAN,"50.0","80.0"));
+  when(qualityGate.conditions()).thenReturn(conditions);
+  verifier.decorate(project,context);
+  verify(context).saveMeasure(argThat(matchesMetric(CoreMetrics.QUALITY_GATE_STATUS,Metric.Level.ERROR,"Classes LT 10000, Coverages LT 50.0")));
+}

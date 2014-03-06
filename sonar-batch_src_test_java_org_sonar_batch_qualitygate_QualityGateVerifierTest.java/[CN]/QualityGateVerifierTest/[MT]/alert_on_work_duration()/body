@@ -1,0 +1,10 @@
+{
+  Metric metric=new Metric.Builder("tech_debt","Debt",Metric.ValueType.WORK_DUR).create();
+  when(i18n.message(any(Locale.class),eq("metric.tech_debt.name"),anyString())).thenReturn("The Debt");
+  when(durations.format(any(Locale.class),eq(Duration.create(3600L)),eq(Durations.DurationFormat.SHORT))).thenReturn("1h");
+  when(context.getMeasure(metric)).thenReturn(new Measure(metric,1800d));
+  ArrayList<ResolvedCondition> conditions=Lists.newArrayList(mockCondition(metric,QualityGateConditionDto.OPERATOR_LESS_THAN,"3600",null));
+  when(qualityGate.conditions()).thenReturn(conditions);
+  verifier.decorate(project,context);
+  verify(context).saveMeasure(argThat(matchesMetric(CoreMetrics.QUALITY_GATE_STATUS,Metric.Level.ERROR,"The Debt LT 1h")));
+}
