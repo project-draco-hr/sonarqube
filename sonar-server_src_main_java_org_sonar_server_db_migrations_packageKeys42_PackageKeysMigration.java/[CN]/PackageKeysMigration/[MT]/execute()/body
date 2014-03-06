@@ -1,0 +1,23 @@
+{
+  new MassUpdater(db).execute(new MassUpdater.InputLoader<Row>(){
+    @Override public String selectSql(){
+      return "SELECT id, kee FROM projects WHERE qualifier='PAC'";
+    }
+    @Override public Row load(    ResultSet rs) throws SQLException {
+      Row row=new Row();
+      row.id=SqlUtil.getLong(rs,1);
+      row.key=rs.getString(2);
+      return row;
+    }
+  }
+,new MassUpdater.InputConverter<Row>(){
+    @Override public String updateSql(){
+      return "UPDATE projects SET qualifier='DIR', kee=? WHERE id=?";
+    }
+    @Override public void convert(    Row row,    PreparedStatement updateStatement) throws SQLException {
+      updateStatement.setString(1,convertKey(row.key));
+      updateStatement.setLong(2,row.id);
+    }
+  }
+);
+}
