@@ -1,0 +1,23 @@
+{
+  new MassUpdater(db).execute(new MassUpdater.InputLoader<Row>(){
+    @Override public String selectSql(){
+      return "SELECT i.id, r.name FROM issues i INNER JOIN rules r ON r.id=i.rule_id WHERE i.message IS NULL";
+    }
+    @Override public Row load(    ResultSet rs) throws SQLException {
+      Row row=new Row();
+      row.issueId=SqlUtil.getLong(rs,1);
+      row.ruleName=rs.getString(2);
+      return row;
+    }
+  }
+,new MassUpdater.InputConverter<Row>(){
+    @Override public String updateSql(){
+      return "UPDATE issues SET message=? WHERE id=?";
+    }
+    @Override public void convert(    Row row,    PreparedStatement updateStatement) throws SQLException {
+      updateStatement.setString(1,row.ruleName);
+      updateStatement.setLong(2,row.issueId);
+    }
+  }
+);
+}
