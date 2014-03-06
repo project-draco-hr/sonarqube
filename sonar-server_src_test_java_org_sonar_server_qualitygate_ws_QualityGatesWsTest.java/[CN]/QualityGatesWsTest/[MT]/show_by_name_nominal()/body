@@ -1,0 +1,7 @@
+{
+  long qGateId=12345L;
+  String gateName="Golden";
+  when(qGates.get(gateName)).thenReturn(new QualityGateDto().setId(qGateId).setName(gateName));
+  when(qGates.listConditions(qGateId)).thenReturn(ImmutableList.of(new QualityGateConditionDto().setId(1L).setMetricKey("ncloc").setOperator("GT").setErrorThreshold("10000"),new QualityGateConditionDto().setId(2L).setMetricKey("new_coverage").setOperator("LT").setWarningThreshold("90").setPeriod(3)));
+  tester.newRequest("show").setParam("name",gateName).execute().assertJson("{'id':12345,'name':'Golden','conditions':[" + "{'id':1,'metric':'ncloc','op':'GT','error':'10000'}," + "{'id':2,'metric':'new_coverage','op':'LT','warning':'90','period':3}"+ "]}");
+}

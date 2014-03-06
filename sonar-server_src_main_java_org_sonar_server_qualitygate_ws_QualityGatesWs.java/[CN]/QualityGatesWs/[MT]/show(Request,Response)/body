@@ -1,6 +1,16 @@
 {
-  final Long qGateId=parseId(request,PARAM_ID);
-  QualityGateDto qGate=qualityGates.get(qGateId);
+  Long qGateId=request.paramAsLong(PARAM_ID);
+  String qGateName=request.param(PARAM_NAME);
+  if (qGateId == null && qGateName == null) {
+    throw new BadRequestException("Either one of 'id' or 'name' is required.");
+  }
+ else   if (qGateId != null && qGateName != null) {
+    throw new BadRequestException("Only one of 'id' or 'name' must be provided.");
+  }
+  QualityGateDto qGate=qGateId == null ? qualityGates.get(qGateName) : qualityGates.get(qGateId);
+  if (qGateId == null) {
+    qGateId=qGate.getId();
+  }
   JsonWriter writer=response.newJsonWriter().beginObject().prop(PARAM_ID,qGate.getId()).prop(PARAM_NAME,qGate.getName());
   Collection<QualityGateConditionDto> conditions=qualityGates.listConditions(qGateId);
   if (!conditions.isEmpty()) {
