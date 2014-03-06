@@ -1,0 +1,31 @@
+{
+  Property function=properties.function();
+  Property factor=properties.factor();
+  Property offset=properties.offset();
+  if (function != null) {
+    requirement.factor="0" + Duration.DAY;
+    requirement.offset="0" + Duration.DAY;
+    String functionKey=function.getTextValue();
+    if ("linear_threshold".equals(functionKey)) {
+      function.setTextValue(RemediationFunction.LINEAR.name().toLowerCase());
+      offset.setValue(0);
+      offset.setTextValue(Duration.DAY);
+      LOG.warn(String.format("Linear with threshold function is no longer used, remediation function of '%s' is replaced by linear.",requirement.ruleKey));
+    }
+ else     if ("constant_resource".equals(functionKey)) {
+      LOG.warn(String.format("Constant/file function is no longer used, technical debt definitions on '%s' are ignored.",requirement.ruleKey));
+      return null;
+    }
+    requirement.function=RemediationFunction.valueOf(function.getTextValue().toUpperCase());
+    if (factor != null) {
+      requirement.factor=Integer.toString(factor.getValue());
+      requirement.factor+=!Strings.isNullOrEmpty(factor.getTextValue()) ? factor.getTextValue() : Duration.DAY;
+    }
+    if (offset != null) {
+      requirement.offset=Integer.toString(offset.getValue());
+      requirement.offset+=!Strings.isNullOrEmpty(offset.getTextValue()) ? offset.getTextValue() : Duration.DAY;
+    }
+    return requirement;
+  }
+  return null;
+}

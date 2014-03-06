@@ -1,0 +1,18 @@
+{
+  DefaultTechnicalDebtModel model=new DefaultTechnicalDebtModel();
+  try {
+    SMInputFactory inputFactory=initStax();
+    SMHierarchicCursor cursor=inputFactory.rootElementCursor(xml);
+    cursor.advance();
+    SMInputCursor chcCursor=cursor.childElementCursor(CHARACTERISTIC);
+    while (chcCursor.getNext() != null) {
+      processCharacteristic(model,null,chcCursor,messages);
+    }
+    cursor.getStreamReader().closeCompletely();
+  }
+ catch (  XMLStreamException e) {
+    LOG.error("XML is not valid",e);
+    messages.addErrorText("XML is not valid: " + e.getMessage());
+  }
+  return model;
+}
