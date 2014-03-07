@@ -1,0 +1,17 @@
+{
+  when(myBatis.openSession()).thenReturn(session);
+  defaultModel=new DefaultTechnicalDebtModel();
+  Reader defaultModelReader=mock(Reader.class);
+  when(debtModelPluginRepository.createReaderForXMLFile("technical-debt")).thenReturn(defaultModelReader);
+  when(xmlImporter.importXML(eq(defaultModelReader),any(ValidationMessages.class),eq(ruleCache))).thenReturn(defaultModel);
+  doAnswer(new Answer(){
+    public Object answer(    InvocationOnMock invocation){
+      Object[] args=invocation.getArguments();
+      CharacteristicDto dto=(CharacteristicDto)args[0];
+      dto.setId(currentId++);
+      return null;
+    }
+  }
+).when(dao).insert(any(CharacteristicDto.class),any(SqlSession.class));
+  manager=new TechnicalDebtModelSynchronizer(myBatis,dao,debtModelPluginRepository,xmlImporter);
+}

@@ -1,0 +1,20 @@
+{
+  String xml=getFileContent("import_characteristics.xml");
+  ValidationMessages messages=ValidationMessages.create();
+  DefaultTechnicalDebtModel debtModel=new CharacteristicsDebtModelXMLImporter().importXML(xml,messages);
+  assertThat(debtModel.rootCharacteristics()).hasSize(2);
+  assertThat(debtModel.rootCharacteristics().get(0).key()).isEqualTo("PORTABILITY");
+  assertThat(debtModel.rootCharacteristics().get(1).key()).isEqualTo("MAINTAINABILITY");
+  DefaultCharacteristic portability=debtModel.characteristicByKey("PORTABILITY");
+  assertThat(portability.order()).isEqualTo(1);
+  assertThat(portability.children()).hasSize(2);
+  assertThat(portability.children().get(0).key()).isEqualTo("COMPILER_RELATED_PORTABILITY");
+  assertThat(debtModel.characteristicByKey("COMPILER_RELATED_PORTABILITY").parent().key()).isEqualTo("PORTABILITY");
+  assertThat(portability.children().get(1).key()).isEqualTo("HARDWARE_RELATED_PORTABILITY");
+  assertThat(debtModel.characteristicByKey("HARDWARE_RELATED_PORTABILITY").parent().key()).isEqualTo("PORTABILITY");
+  DefaultCharacteristic maintainability=debtModel.characteristicByKey("MAINTAINABILITY");
+  assertThat(maintainability.order()).isEqualTo(2);
+  assertThat(maintainability.children()).hasSize(1);
+  assertThat(maintainability.children().get(0).key()).isEqualTo("READABILITY");
+  assertThat(debtModel.characteristicByKey("READABILITY").parent().key()).isEqualTo("MAINTAINABILITY");
+}

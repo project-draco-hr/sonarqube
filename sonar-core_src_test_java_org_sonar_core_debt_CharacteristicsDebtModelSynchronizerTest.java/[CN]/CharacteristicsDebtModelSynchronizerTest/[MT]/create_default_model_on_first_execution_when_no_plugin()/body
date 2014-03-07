@@ -1,0 +1,15 @@
+{
+  DefaultCharacteristic rootCharacteristic=new DefaultCharacteristic().setKey("PORTABILITY");
+  new DefaultCharacteristic().setKey("COMPILER_RELATED_PORTABILITY").setParent(rootCharacteristic);
+  defaultModel.addRootCharacteristic(rootCharacteristic);
+  when(debtModelPluginRepository.getContributingPluginList()).thenReturn(Collections.<String>emptyList());
+  when(dao.selectEnabledCharacteristics()).thenReturn(Lists.<CharacteristicDto>newArrayList());
+  manager.synchronize(ValidationMessages.create());
+  verify(dao).selectEnabledCharacteristics();
+  ArgumentCaptor<CharacteristicDto> characteristicCaptor=ArgumentCaptor.forClass(CharacteristicDto.class);
+  verify(dao,times(2)).insert(characteristicCaptor.capture(),eq(session));
+  List<CharacteristicDto> result=characteristicCaptor.getAllValues();
+  assertThat(result.get(0).getKey()).isEqualTo("PORTABILITY");
+  assertThat(result.get(1).getKey()).isEqualTo("COMPILER_RELATED_PORTABILITY");
+  verifyNoMoreInteractions(dao);
+}

@@ -1,0 +1,28 @@
+{
+  DefaultCharacteristic defaultRootCharacteristic=new DefaultCharacteristic().setKey("PORTABILITY");
+  new DefaultCharacteristic().setKey("COMPILER_RELATED_PORTABILITY").setParent(defaultRootCharacteristic).setRoot(defaultRootCharacteristic);
+  defaultModel.addRootCharacteristic(defaultRootCharacteristic);
+  when(dao.selectEnabledCharacteristics()).thenReturn(Lists.<CharacteristicDto>newArrayList());
+  DefaultTechnicalDebtModel javaModel=new DefaultTechnicalDebtModel();
+  DefaultCharacteristic javaRootCharacteristic=new DefaultCharacteristic().setKey("PORTABILITY");
+  DefaultCharacteristic javaCharacteristic=new DefaultCharacteristic().setKey("COMPILER_RELATED_PORTABILITY").setParent(javaRootCharacteristic).setRoot(javaRootCharacteristic);
+  javaModel.addRootCharacteristic(javaRootCharacteristic);
+  Rule rule=Rule.create();
+  rule.setId(10);
+  RuleKey ruleKey=RuleKey.of("checkstyle","import");
+  when(ruleCache.getByRuleKey(ruleKey)).thenReturn(rule);
+  new DefaultRequirement().setRuleKey(ruleKey).setFunction("linear").setFactorValue(30).setFactorUnit(WorkDuration.UNIT.MINUTES).setCharacteristic(javaCharacteristic).setRootCharacteristic(javaRootCharacteristic);
+  Reader javaModelReader=mock(Reader.class);
+  when(xmlImporter.importXML(eq(javaModelReader),any(ValidationMessages.class),eq(ruleCache))).thenReturn(javaModel);
+  when(debtModelPluginRepository.createReaderForXMLFile("java")).thenReturn(javaModelReader);
+  when(debtModelPluginRepository.getContributingPluginList()).thenReturn(newArrayList("java"));
+  manager.synchronize(ValidationMessages.create(),ruleCache);
+  verify(dao).selectEnabledCharacteristics();
+  ArgumentCaptor<CharacteristicDto> characteristicCaptor=ArgumentCaptor.forClass(CharacteristicDto.class);
+  verify(dao,times(3)).insert(characteristicCaptor.capture(),eq(session));
+  List<CharacteristicDto> result=characteristicCaptor.getAllValues();
+  assertThat(result.get(0).getKey()).isEqualTo("PORTABILITY");
+  assertThat(result.get(1).getKey()).isEqualTo("COMPILER_RELATED_PORTABILITY");
+  assertThat(result.get(2).getRuleId()).isEqualTo(10);
+  verifyNoMoreInteractions(dao);
+}

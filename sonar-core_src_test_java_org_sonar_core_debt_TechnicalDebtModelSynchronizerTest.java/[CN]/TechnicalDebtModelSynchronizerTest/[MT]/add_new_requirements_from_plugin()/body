@@ -1,0 +1,33 @@
+{
+  DefaultCharacteristic defaultRootCharacteristic=new DefaultCharacteristic().setKey("PORTABILITY");
+  new DefaultCharacteristic().setKey("COMPILER_RELATED_PORTABILITY").setParent(defaultRootCharacteristic).setRoot(defaultRootCharacteristic);
+  defaultModel.addRootCharacteristic(defaultRootCharacteristic);
+  CharacteristicDto dbRootCharacteristic=new CharacteristicDto().setId(1).setKey("PORTABILITY");
+  CharacteristicDto dbCharacteristic=new CharacteristicDto().setId(2).setKey("COMPILER_RELATED_PORTABILITY").setParentId(1).setRootId(1);
+  CharacteristicDto requirement=new CharacteristicDto().setId(3).setRuleId(10).setParentId(2).setRootId(1).setFactorValue(30.0).setFactorUnit("mn");
+  RuleKey ruleKey1=RuleKey.of("checkstyle","import");
+  Rule rule1=Rule.create();
+  rule1.setId(10);
+  when(ruleCache.getByRuleKey(ruleKey1)).thenReturn(rule1);
+  when(ruleCache.exists(10)).thenReturn(true);
+  when(dao.selectEnabledCharacteristics()).thenReturn(newArrayList(requirement,dbCharacteristic,dbRootCharacteristic));
+  DefaultTechnicalDebtModel javaModel=new DefaultTechnicalDebtModel();
+  DefaultCharacteristic javaRootCharacteristic=new DefaultCharacteristic().setKey("PORTABILITY");
+  DefaultCharacteristic javaCharacteristic=new DefaultCharacteristic().setKey("COMPILER_RELATED_PORTABILITY").setParent(javaRootCharacteristic).setRoot(javaRootCharacteristic);
+  javaModel.addRootCharacteristic(javaRootCharacteristic);
+  RuleKey ruleKey2=RuleKey.of("checkstyle","export");
+  Rule rule2=Rule.create();
+  rule2.setId(11);
+  when(ruleCache.getByRuleKey(ruleKey2)).thenReturn(rule2);
+  new DefaultRequirement().setRuleKey(ruleKey2).setFunction("linear").setFactorValue(1).setFactorUnit(WorkDuration.UNIT.HOURS).setCharacteristic(javaCharacteristic).setRootCharacteristic(javaRootCharacteristic);
+  Reader javaModelReader=mock(Reader.class);
+  when(debtModelPluginRepository.createReaderForXMLFile("java")).thenReturn(javaModelReader);
+  when(xmlImporter.importXML(eq(javaModelReader),any(ValidationMessages.class),eq(ruleCache))).thenReturn(javaModel);
+  when(debtModelPluginRepository.getContributingPluginList()).thenReturn(newArrayList("java"));
+  manager.synchronize(ValidationMessages.create(),ruleCache);
+  verify(dao).selectEnabledCharacteristics();
+  ArgumentCaptor<CharacteristicDto> characteristicCaptor=ArgumentCaptor.forClass(CharacteristicDto.class);
+  verify(dao).insert(characteristicCaptor.capture(),eq(session));
+  assertThat(characteristicCaptor.getValue().getRuleId()).isEqualTo(11);
+  verifyNoMoreInteractions(dao);
+}
