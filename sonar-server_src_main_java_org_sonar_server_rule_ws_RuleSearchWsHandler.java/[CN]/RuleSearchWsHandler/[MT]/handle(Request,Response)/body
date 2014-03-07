@@ -2,6 +2,7 @@
   final String ruleKeyParam=request.param("k");
   Collection<Rule> foundRules=Collections.emptyList();
   boolean hasMore=false;
+  long total=0L;
   if (ruleKeyParam == null) {
     final String ruleSearchParam=request.param("s");
     final int pageSize=request.paramAsInt("ps",25);
@@ -9,12 +10,14 @@
     PagedResult<Rule> searchResult=rules.find(RuleQuery.builder().withSearchQuery(ruleSearchParam).withPageSize(pageSize).withPage(pageIndex).build());
     foundRules=searchResult.results();
     hasMore=searchResult.paging().hasNextPage();
+    total=searchResult.paging().total();
   }
  else {
     RuleKey ruleKey=RuleKey.parse(ruleKeyParam);
     Rule rule=findRule(ruleKey);
     if (rule != null) {
       foundRules=Collections.singleton(rule);
+      total=1L;
     }
     hasMore=false;
   }
@@ -25,5 +28,5 @@
     writeRule(rule,json);
     json.endObject();
   }
-  json.endArray().prop("more",hasMore).endObject().close();
+  json.endArray().prop("more",hasMore).prop("total",total).endObject().close();
 }
