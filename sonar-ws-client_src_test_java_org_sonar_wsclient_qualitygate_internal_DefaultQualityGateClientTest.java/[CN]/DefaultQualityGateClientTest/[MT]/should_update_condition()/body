@@ -1,0 +1,10 @@
+{
+  HttpRequestFactory requestFactory=new HttpRequestFactory(httpServer.url());
+  httpServer.stubResponseBody("{\"id\":12345,\"metric\":\"ncloc\",\"op\":\"GT\",\"warning\":\"1000\",\"error\":\"2000\",\"period\":1}");
+  QualityGateClient client=new DefaultQualityGateClient(requestFactory);
+  QualityGateCondition result=client.updateCondition(UpdateCondition.create(12345L).metricKey("ncloc").operator("GT").warningThreshold("1000").errorThreshold("2000").period(1));
+  assertThat(httpServer.requestedPath()).isEqualTo("/api/qualitygates/update_condition");
+  assertThat(httpServer.requestParams()).includes(entry("id","12345"),entry("metric","ncloc"),entry("op","GT"),entry("warning","1000"),entry("error","2000"),entry("period","1"));
+  assertThat(result).isNotNull();
+  assertThat(result.id()).isEqualTo(12345L);
+}
