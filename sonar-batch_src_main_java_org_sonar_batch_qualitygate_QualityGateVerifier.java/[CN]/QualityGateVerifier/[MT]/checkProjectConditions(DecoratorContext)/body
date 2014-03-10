@@ -5,10 +5,13 @@
     Measure measure=context.getMeasure(condition.metric());
     if (measure != null) {
       Metric.Level level=ConditionUtils.getLevel(condition,measure);
+      measure.setAlertStatus(level);
       String text=getText(condition,level);
       if (!StringUtils.isBlank(text)) {
+        measure.setAlertText(text);
         labels.add(text);
       }
+      context.saveMeasure(measure);
       if (Metric.Level.WARN == level && globalLevel != Metric.Level.ERROR) {
         globalLevel=Metric.Level.WARN;
       }
@@ -17,7 +20,7 @@
       }
     }
   }
-  Measure globalMeasure=new Measure(CoreMetrics.QUALITY_GATE_STATUS,globalLevel);
+  Measure globalMeasure=new Measure(CoreMetrics.ALERT_STATUS,globalLevel);
   globalMeasure.setAlertStatus(globalLevel);
   globalMeasure.setAlertText(StringUtils.join(labels,", "));
   context.saveMeasure(globalMeasure);

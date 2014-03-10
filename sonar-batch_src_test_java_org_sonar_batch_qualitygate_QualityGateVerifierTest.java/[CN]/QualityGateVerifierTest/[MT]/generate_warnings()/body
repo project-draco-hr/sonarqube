@@ -2,5 +2,7 @@
   ArrayList<ResolvedCondition> conditions=Lists.newArrayList(mockCondition(CoreMetrics.CLASSES,QualityGateConditionDto.OPERATOR_GREATER_THAN,null,"100"),mockCondition(CoreMetrics.COVERAGE,QualityGateConditionDto.OPERATOR_LESS_THAN,null,"95.0"));
   when(qualityGate.conditions()).thenReturn(conditions);
   verifier.decorate(project,context);
-  verify(context).saveMeasure(argThat(matchesMetric(CoreMetrics.QUALITY_GATE_STATUS,Metric.Level.WARN,null)));
+  verify(context).saveMeasure(argThat(matchesMetric(CoreMetrics.ALERT_STATUS,Metric.Level.WARN,null)));
+  verify(context).saveMeasure(argThat(hasLevel(measureClasses,Metric.Level.OK)));
+  verify(context).saveMeasure(argThat(hasLevel(measureCoverage,Metric.Level.WARN)));
 }
