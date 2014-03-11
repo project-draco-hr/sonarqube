@@ -1,0 +1,13 @@
+{
+  ruleBuilder.add(SQUID_RULE_KEY).setName(SQUID_RULE_NAME).setCharacteristic("COMPILER_RELATED_PORTABILITY").setFunction(RemediationFunction.LINEAR_OFFSET).setFactor(Duration.create(10L)).setOffset(Duration.create(25L));
+  activeRulesBuilder.activate(SQUID_RULE_KEY).setSeverity(Severity.INFO);
+  initModuleIssues();
+  Date analysisDate=new Date();
+  when(project.getAnalysisDate()).thenReturn(analysisDate);
+  DefaultIssue issue=new DefaultIssue().setKey("ABCDE").setRuleKey(SQUID_RULE_KEY).setSeverity(Severity.CRITICAL).setEffortToFix(2d);
+  when(filters.accept(issue,null)).thenReturn(true);
+  moduleIssues.initAndAddIssue(issue);
+  ArgumentCaptor<DefaultIssue> argument=ArgumentCaptor.forClass(DefaultIssue.class);
+  verify(cache).put(argument.capture());
+  assertThat(argument.getValue().debt()).isEqualTo(Duration.create(45L));
+}

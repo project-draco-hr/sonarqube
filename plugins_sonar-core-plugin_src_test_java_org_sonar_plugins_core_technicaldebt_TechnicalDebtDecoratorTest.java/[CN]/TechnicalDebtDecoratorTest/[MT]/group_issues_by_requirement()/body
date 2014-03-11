@@ -1,15 +1,10 @@
 {
-  Requirement requirement1=mock(Requirement.class);
-  Requirement requirement2=mock(Requirement.class);
   Issue issue1=createIssue("rule1","repo1");
   Issue issue2=createIssue("rule1","repo1");
   Issue issue3=createIssue("rule2","repo2");
-  Issue issue4=createIssue("unmatchable","repo2");
-  List<Issue> issues=newArrayList(issue1,issue2,issue3,issue4);
-  when(defaultTechnicalDebtModel.requirementsByRule(RuleKey.of("repo1","rule1"))).thenReturn(requirement1);
-  when(defaultTechnicalDebtModel.requirementsByRule(RuleKey.of("repo2","rule2"))).thenReturn(requirement2);
-  ListMultimap<Requirement,Issue> result=decorator.issuesByRequirement(issues);
+  List<Issue> issues=newArrayList(issue1,issue2,issue3);
+  ListMultimap<Rule,Issue> result=decorator.issuesByRule(issues);
   assertThat(result.keySet().size()).isEqualTo(2);
-  assertThat(result.get(requirement1)).containsExactly(issue1,issue2);
-  assertThat(result.get(requirement2)).containsExactly(issue3);
+  assertThat(result.get(rules.find(ruleKey1))).containsExactly(issue1,issue2);
+  assertThat(result.get(rules.find(ruleKey2))).containsExactly(issue3);
 }

@@ -1,0 +1,19 @@
+{
+  long debt=0L;
+  if (issues != null) {
+    for (    Issue issue : issues) {
+      Long currentDebt=((DefaultIssue)issue).debtInMinutes();
+      if (currentDebt != null) {
+        debt+=currentDebt;
+      }
+    }
+  }
+  org.sonar.api.rules.Rule oldRule=toOldRule(rule);
+  for (  Measure measure : context.getChildrenMeasures(MeasuresFilters.rule(metric,oldRule))) {
+    RuleMeasure ruleMeasure=(RuleMeasure)measure;
+    if (measure != null && ruleMeasure.getRule().equals(oldRule) && measure.getValue() != null) {
+      debt+=measure.getValue();
+    }
+  }
+  return debt;
+}

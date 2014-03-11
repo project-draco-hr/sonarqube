@@ -6,17 +6,9 @@
   Issue issue3=createIssue("rule2","repo2").setDebt(Duration.create(technicalDebt2));
   Issue issue4=createIssue("rule2","repo2").setDebt(Duration.create(technicalDebt2));
   when(issuable.issues()).thenReturn(newArrayList(issue1,issue2,issue3,issue4));
-  DefaultCharacteristic rootCharacteristic=new DefaultCharacteristic().setKey("rootCharacteristic");
-  DefaultCharacteristic characteristic=new DefaultCharacteristic().setKey("characteristic").setParent(rootCharacteristic);
-  RuleKey ruleKey1=RuleKey.of("repo1","rule1");
-  DefaultRequirement requirement1=new DefaultRequirement().setRuleKey(ruleKey1).setCharacteristic(characteristic);
-  RuleKey ruleKey2=RuleKey.of("repo2","rule2");
-  DefaultRequirement requirement2=new DefaultRequirement().setRuleKey(ruleKey2).setCharacteristic(characteristic);
-  when(defaultTechnicalDebtModel.requirementsByRule(ruleKey1)).thenReturn(requirement1);
-  when(defaultTechnicalDebtModel.requirementsByRule(ruleKey2)).thenReturn(requirement2);
-  doReturn(newArrayList(requirement1,requirement2)).when(defaultTechnicalDebtModel).requirements();
+  when(defaultTechnicalDebtModel.characteristicByKey("MEMORY_EFFICIENCY")).thenReturn(new DefaultCharacteristic().setKey("MEMORY_EFFICIENCY").setParent(new DefaultCharacteristic().setKey("EFFICIENCY")),new DefaultCharacteristic().setKey("MODULARITY").setParent(new DefaultCharacteristic().setKey("REUSABILITY")));
   decorator.decorate(resource,context);
   verify(context).saveMeasure(CoreMetrics.TECHNICAL_DEBT,6d * ONE_DAY_IN_MINUTES);
-  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,requirement1,2d * ONE_DAY_IN_MINUTES)));
-  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,requirement2,4d * ONE_DAY_IN_MINUTES)));
+  verify(context).saveMeasure(argThat(new IsRuleMeasure(CoreMetrics.TECHNICAL_DEBT,ruleKey1,2d * ONE_DAY_IN_MINUTES)));
+  verify(context).saveMeasure(argThat(new IsRuleMeasure(CoreMetrics.TECHNICAL_DEBT,ruleKey2,4d * ONE_DAY_IN_MINUTES)));
 }

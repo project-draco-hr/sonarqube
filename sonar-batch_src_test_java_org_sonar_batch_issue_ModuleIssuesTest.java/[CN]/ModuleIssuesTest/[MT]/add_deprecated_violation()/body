@@ -1,15 +1,13 @@
 {
-  Rule rule=SQUID_RULE;
+  ruleBuilder.add(SQUID_RULE_KEY).setName(SQUID_RULE_NAME);
+  activeRulesBuilder.activate(SQUID_RULE_KEY).setSeverity(Severity.INFO);
+  initModuleIssues();
+  org.sonar.api.rules.Rule rule=org.sonar.api.rules.Rule.create("squid","AvoidCycle","Avoid Cycle");
   Resource resource=new JavaFile("org.struts.Action").setEffectiveKey("struts:org.struts.Action");
   Violation violation=new Violation(rule,resource);
   violation.setLineId(42);
   violation.setSeverity(RulePriority.CRITICAL);
   violation.setMessage("the message");
-  ActiveRule activeRule=mock(ActiveRule.class);
-  when(activeRule.getRule()).thenReturn(rule);
-  when(activeRule.getSeverity()).thenReturn(RulePriority.INFO);
-  when(qProfile.getActiveRule("squid","AvoidCycle")).thenReturn(activeRule);
-  when(ruleFinder.findByKey(SQUID_RULE_KEY)).thenReturn(rule);
   when(filters.accept(any(DefaultIssue.class),eq(violation))).thenReturn(true);
   boolean added=moduleIssues.initAndAddViolation(violation);
   assertThat(added).isTrue();
@@ -21,5 +19,5 @@
   assertThat(issue.message()).isEqualTo("the message");
   assertThat(issue.key()).isNotEmpty();
   assertThat(issue.ruleKey().toString()).isEqualTo("squid:AvoidCycle");
-  assertThat(issue.componentKey().toString()).isEqualTo("struts:org.struts.Action");
+  assertThat(issue.componentKey()).isEqualTo("struts:org.struts.Action");
 }

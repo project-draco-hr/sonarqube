@@ -1,16 +1,20 @@
 {
-  ListMultimap<Requirement,Issue> issuesByRequirement=issuesByRequirement(issues);
+  ListMultimap<Rule,Issue> issuesByRule=issuesByRule(issues);
   double total=0.0;
   Map<Characteristic,Double> characteristicCosts=newHashMap();
-  Map<Requirement,Double> requirementCosts=newHashMap();
-  for (  Requirement requirement : model.requirements()) {
-    List<Issue> requirementIssues=issuesByRequirement.get(requirement);
-    double value=computeTechnicalDebt(CoreMetrics.TECHNICAL_DEBT,context,requirement,requirementIssues);
-    requirementCosts.put(requirement,value);
-    total+=value;
-    propagateTechnicalDebtInParents(requirement.characteristic(),value,characteristicCosts);
+  Map<Rule,Double> ruleDebtCosts=newHashMap();
+  for (  Rule rule : rules.findAll()) {
+    String characteristicKey=rule.characteristic();
+    if (characteristicKey != null) {
+      List<Issue> requirementIssues=issuesByRule.get(rule);
+      double value=computeTechnicalDebt(CoreMetrics.TECHNICAL_DEBT,context,rule,requirementIssues);
+      ruleDebtCosts.put(rule,value);
+      total+=value;
+      Characteristic characteristic=model.characteristicByKey(characteristicKey);
+      propagateTechnicalDebtInParents(characteristic,value,characteristicCosts);
+    }
   }
   context.saveMeasure(CoreMetrics.TECHNICAL_DEBT,total);
   saveOnCharacteristic(context,characteristicCosts);
-  saveOnRequirement(context,requirementCosts);
+  saveOnRequirement(context,ruleDebtCosts);
 }

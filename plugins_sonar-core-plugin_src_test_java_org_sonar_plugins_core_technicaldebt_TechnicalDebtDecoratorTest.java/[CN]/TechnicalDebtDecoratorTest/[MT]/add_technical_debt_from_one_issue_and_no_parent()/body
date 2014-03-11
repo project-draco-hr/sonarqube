@@ -1,10 +1,7 @@
 {
   Issue issue=createIssue("rule1","repo1").setDebt(Duration.create(ONE_DAY_IN_MINUTES));
   when(issuable.issues()).thenReturn(newArrayList(issue));
-  Requirement requirement=mock(Requirement.class);
-  when(defaultTechnicalDebtModel.requirementsByRule(RuleKey.of("repo1","rule1"))).thenReturn(requirement);
-  doReturn(newArrayList(requirement)).when(defaultTechnicalDebtModel).requirements();
   decorator.decorate(resource,context);
   verify(context).saveMeasure(CoreMetrics.TECHNICAL_DEBT,ONE_DAY_IN_MINUTES.doubleValue());
-  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,null,requirement,ONE_DAY_IN_MINUTES.doubleValue())));
+  verify(context).saveMeasure(argThat(new IsRuleMeasure(CoreMetrics.TECHNICAL_DEBT,ruleKey1,ONE_DAY_IN_MINUTES.doubleValue())));
 }

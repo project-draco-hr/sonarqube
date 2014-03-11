@@ -1,15 +1,12 @@
 {
   Issue issue=createIssue("rule1","repo1").setDebt(Duration.create(ONE_DAY_IN_MINUTES));
   when(issuable.issues()).thenReturn(newArrayList(issue));
-  DefaultCharacteristic parentCharacteristic=new DefaultCharacteristic().setKey("parentCharacteristic");
-  DefaultCharacteristic characteristic=new DefaultCharacteristic().setKey("characteristic").setParent(parentCharacteristic);
-  RuleKey ruleKey=RuleKey.of("repo1","rule1");
-  DefaultRequirement requirement=new DefaultRequirement().setCharacteristic(characteristic).setRuleKey(ruleKey);
-  when(defaultTechnicalDebtModel.requirementsByRule(ruleKey)).thenReturn(requirement);
-  doReturn(newArrayList(requirement)).when(defaultTechnicalDebtModel).requirements();
+  DefaultCharacteristic parentCharacteristic=new DefaultCharacteristic().setKey("EFFICIENCY");
+  DefaultCharacteristic characteristic=new DefaultCharacteristic().setKey("MEMORY_EFFICIENCY").setParent(parentCharacteristic);
+  when(defaultTechnicalDebtModel.characteristicByKey("MEMORY_EFFICIENCY")).thenReturn(characteristic);
   decorator.decorate(resource,context);
   verify(context).saveMeasure(CoreMetrics.TECHNICAL_DEBT,ONE_DAY_IN_MINUTES.doubleValue());
   verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,parentCharacteristic,ONE_DAY_IN_MINUTES.doubleValue())));
   verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,characteristic,ONE_DAY_IN_MINUTES.doubleValue())));
-  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,requirement,ONE_DAY_IN_MINUTES.doubleValue())));
+  verify(context).saveMeasure(argThat(new IsRuleMeasure(CoreMetrics.TECHNICAL_DEBT,ruleKey1,ONE_DAY_IN_MINUTES.doubleValue())));
 }

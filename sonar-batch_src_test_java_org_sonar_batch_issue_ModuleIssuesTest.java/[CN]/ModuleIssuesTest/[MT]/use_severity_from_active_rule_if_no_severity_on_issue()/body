@@ -1,0 +1,14 @@
+{
+  ruleBuilder.add(SQUID_RULE_KEY).setName(SQUID_RULE_NAME);
+  activeRulesBuilder.activate(SQUID_RULE_KEY).setSeverity(Severity.INFO);
+  initModuleIssues();
+  Date analysisDate=new Date();
+  when(project.getAnalysisDate()).thenReturn(analysisDate);
+  DefaultIssue issue=new DefaultIssue().setRuleKey(SQUID_RULE_KEY).setSeverity(null);
+  when(filters.accept(issue,null)).thenReturn(true);
+  moduleIssues.initAndAddIssue(issue);
+  ArgumentCaptor<DefaultIssue> argument=ArgumentCaptor.forClass(DefaultIssue.class);
+  verify(cache).put(argument.capture());
+  assertThat(argument.getValue().severity()).isEqualTo(Severity.INFO);
+  assertThat(argument.getValue().creationDate()).isEqualTo(DateUtils.truncate(analysisDate,Calendar.SECOND));
+}

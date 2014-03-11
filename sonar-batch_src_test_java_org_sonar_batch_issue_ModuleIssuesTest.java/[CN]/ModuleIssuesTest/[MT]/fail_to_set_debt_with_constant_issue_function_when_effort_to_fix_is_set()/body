@@ -1,0 +1,14 @@
+{
+  ruleBuilder.add(SQUID_RULE_KEY).setName(SQUID_RULE_NAME).setCharacteristic("COMPILER_RELATED_PORTABILITY").setFunction(RemediationFunction.CONSTANT_ISSUE).setOffset(Duration.create(25L));
+  activeRulesBuilder.activate(SQUID_RULE_KEY).setSeverity(Severity.INFO);
+  initModuleIssues();
+  DefaultIssue issue=new DefaultIssue().setKey("ABCDE").setRuleKey(SQUID_RULE_KEY).setSeverity(Severity.CRITICAL).setEffortToFix(2d);
+  when(filters.accept(issue,null)).thenReturn(true);
+  try {
+    moduleIssues.initAndAddIssue(issue);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("Rule 'squid:AvoidCycle' can not use 'Constant/issue' remediation function because this rule does not have a fixed remediation cost.");
+  }
+}
