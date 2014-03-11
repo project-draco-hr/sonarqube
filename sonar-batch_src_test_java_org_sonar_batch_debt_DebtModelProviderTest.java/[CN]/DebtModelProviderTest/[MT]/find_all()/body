@@ -1,11 +1,7 @@
 {
   CharacteristicDto rootCharacteristicDto=new CharacteristicDto().setId(1).setKey("MEMORY_EFFICIENCY").setName("Memory use");
   CharacteristicDto characteristicDto=new CharacteristicDto().setId(2).setKey("EFFICIENCY").setName("Efficiency").setParentId(1);
-  CharacteristicDto requirementDto=new CharacteristicDto().setId(3).setParentId(2).setRuleId(100).setFunction("linear").setFactorValue(2d).setFactorUnit(CharacteristicDto.DAYS).setOffsetValue(0d).setOffsetUnit(CharacteristicDto.MINUTES);
-  RuleKey ruleKey=RuleKey.of("checkstyle","Regexp");
-  Rule rule=Rule.create(ruleKey.repository(),ruleKey.rule());
-  rule.setId(100);
-  when(dao.selectCharacteristics()).thenReturn(newArrayList(rootCharacteristicDto,characteristicDto,requirementDto));
+  when(dao.selectEnabledCharacteristics()).thenReturn(newArrayList(rootCharacteristicDto,characteristicDto));
   DefaultTechnicalDebtModel result=(DefaultTechnicalDebtModel)provider.provide(dao);
   assertThat(result.rootCharacteristics()).hasSize(1);
   DefaultCharacteristic rootCharacteristic=result.characteristicByKey("MEMORY_EFFICIENCY");
