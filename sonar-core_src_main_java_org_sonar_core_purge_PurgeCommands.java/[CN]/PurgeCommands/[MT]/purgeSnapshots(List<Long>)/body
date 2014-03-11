@@ -14,17 +14,6 @@
     session.commit();
   }
   profiler.stop();
-  profiler.start("deleteSnapshotMeasuresOnCharacteristics (project_measures)");
-  List<Long> characteristicIds=purgeMapper.selectCharacteristicIdsToPurge();
-  if (!characteristicIds.isEmpty()) {
-    for (    List<Long> partSnapshotIds : snapshotIdsPartition) {
-      for (      List<Long> ids : Iterables.partition(characteristicIds,MAX_CHARACTERISTICS_PER_QUERY)) {
-        purgeMapper.deleteSnapshotMeasuresOnCharacteristics(partSnapshotIds,ids);
-      }
-    }
-    session.commit();
-  }
-  profiler.stop();
   profiler.start("updatePurgeStatusToOne (snapshots)");
   for (  Long snapshotId : snapshotIds) {
     purgeMapper.updatePurgeStatusToOne(snapshotId);
