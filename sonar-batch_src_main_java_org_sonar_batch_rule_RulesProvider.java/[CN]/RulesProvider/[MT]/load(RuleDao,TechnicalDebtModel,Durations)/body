@@ -8,12 +8,14 @@
   for (  RuleDto ruleDto : ruleDao.selectEnablesAndNonManual()) {
     RuleKey ruleKey=RuleKey.of(ruleDto.getRepositoryKey(),ruleDto.getRuleKey());
     NewRule newRule=rulesBuilder.add(ruleKey).setId(ruleDto.getId()).setName(ruleDto.getName()).setSeverity(ruleDto.getSeverityString()).setDescription(ruleDto.getDescription()).setStatus(RuleStatus.valueOf(ruleDto.getStatus()));
-    if (ruleDto.getCharacteristicId() != null) {
-      Characteristic characteristic=characteristic(ruleDto.getCharacteristicId(),ruleKey,debtModel);
+    Integer characteristicId=ruleDto.getCharacteristicId();
+    Integer defaultCharacteristicId=ruleDto.getDefaultCharacteristicId();
+    if (characteristicId != null) {
+      Characteristic characteristic=characteristic(characteristicId,ruleKey,debtModel);
       updateRuleDebtDefinitions(newRule,ruleKey,characteristic,ruleDto.getRemediationFunction(),ruleDto.getRemediationFactor(),ruleDto.getRemediationOffset(),durations);
     }
- else     if (ruleDto.getDefaultCharacteristicId() != null) {
-      Characteristic characteristic=characteristic(ruleDto.getDefaultCharacteristicId(),ruleKey,debtModel);
+ else     if (defaultCharacteristicId != null) {
+      Characteristic characteristic=characteristic(defaultCharacteristicId,ruleKey,debtModel);
       updateRuleDebtDefinitions(newRule,ruleKey,characteristic,ruleDto.getDefaultRemediationFunction(),ruleDto.getDefaultRemediationFactor(),ruleDto.getDefaultRemediationOffset(),durations);
     }
     for (    RuleParamDto ruleParamDto : paramDtosByRuleId.get(ruleDto.getId())) {
