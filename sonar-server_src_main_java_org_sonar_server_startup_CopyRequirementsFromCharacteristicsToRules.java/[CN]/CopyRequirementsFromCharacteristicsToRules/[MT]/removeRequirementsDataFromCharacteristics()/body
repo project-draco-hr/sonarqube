@@ -1,10 +1,16 @@
 {
+  Connection connection=null;
+  Statement stmt=null;
   try {
-    Connection connection=db.getDataSource().getConnection();
-    Statement stmt=connection.createStatement();
+    connection=db.getDataSource().getConnection();
+    stmt=connection.createStatement();
     stmt.executeUpdate("DELETE FROM characteristics WHERE rule_id IS NOT NULL");
   }
  catch (  SQLException e) {
-    throw new IllegalStateException("Fail to remove requirements data from characteristics");
+    throw new IllegalStateException("Fail to remove requirements data from characteristics",e);
+  }
+ finally {
+    DbUtils.closeQuietly(stmt);
+    DbUtils.closeQuietly(connection);
   }
 }
