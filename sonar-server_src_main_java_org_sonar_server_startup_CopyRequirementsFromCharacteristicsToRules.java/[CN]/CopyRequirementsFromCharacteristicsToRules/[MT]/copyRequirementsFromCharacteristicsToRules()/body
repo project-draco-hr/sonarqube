@@ -1,0 +1,74 @@
+{
+  List<RequirementDto> requirementDtos=requirementDao.selectRequirements();
+  final Multimap<Integer,RequirementDto> requirementsByRuleId=ArrayListMultimap.create();
+  for (  RequirementDto requirementDto : requirementDtos) {
+    requirementsByRuleId.put(requirementDto.getRuleId(),requirementDto);
+  }
+  new MassUpdater(db).execute(new MassUpdater.InputLoader<Row>(){
+    @Override public String selectSql(){
+      return "SELECT r.id,r.characteristic_id,r.remediation_function,r.remediation_factor,r.remediation_offset," + "r.default_characteristic_id,r.default_remediation_function,r.default_remediation_factor,r.default_remediation_offset,r.status " + "FROM rules r";
+    }
+    @Override public Row load(    ResultSet rs) throws SQLException {
+      Row row=new Row();
+      row.id=SqlUtil.getInt(rs,1);
+      row.characteristicId=SqlUtil.getInt(rs,2);
+      row.function=rs.getString(3);
+      row.factor=rs.getString(4);
+      row.offset=rs.getString(5);
+      row.defaultCharacteristicId=SqlUtil.getInt(rs,6);
+      row.defaultFunction=rs.getString(7);
+      row.defaultFactor=rs.getString(8);
+      row.defaultOffset=rs.getString(9);
+      row.status=rs.getString(10);
+      return row;
+    }
+  }
+,new MassUpdater.InputConverter<Row>(){
+    @Override public String updateSql(){
+      return "UPDATE rules SET characteristic_id=?,remediation_function=?,remediation_factor=?,remediation_offset=?,updated_at=? WHERE id=?";
+    }
+    @Override public boolean convert(    Row row,    PreparedStatement updateStatement) throws SQLException {
+      Collection<RequirementDto> requirementsForCurrentRule=requirementsByRuleId.get(row.id);
+      if (requirementsForCurrentRule.isEmpty()) {
+        return false;
+      }
+ else {
+        RequirementDto enabledRequirement=Iterables.find(requirementsForCurrentRule,new Predicate<RequirementDto>(){
+          @Override public boolean apply(          RequirementDto input){
+            return input.isEnabled();
+          }
+        }
+,null);
+        if (enabledRequirement == null && !"REMOVED".equals(row.getStatus())) {
+          updateStatement.setInt(1,RuleDto.DISABLED_CHARACTERISTIC_ID);
+          updateStatement.setNull(2,Types.VARCHAR);
+          updateStatement.setNull(3,Types.VARCHAR);
+          updateStatement.setNull(4,Types.VARCHAR);
+          updateStatement.setDate(5,new Date(system2.now()));
+          updateStatement.setInt(6,row.getId());
+          return true;
+        }
+ else         if (enabledRequirement != null) {
+          row.setCharacteristicId(enabledRequirement.getParentId());
+          row.setFunction(enabledRequirement.getFunction().toUpperCase());
+          row.setFactor(convertDuration(enabledRequirement.getFactorValue(),enabledRequirement.getFactorUnit()));
+          row.setOffset(convertDuration(enabledRequirement.getOffsetValue(),enabledRequirement.getOffsetUnit()));
+          if (isDebtDefaultValuesSameAsOverriddenValues(row)) {
+            return false;
+          }
+ else {
+            updateStatement.setInt(1,row.getCharacteristicId());
+            updateStatement.setString(2,row.getFunction());
+            updateStatement.setString(3,row.getFactor());
+            updateStatement.setString(4,row.getOffset());
+            updateStatement.setDate(5,new Date(system2.now()));
+            updateStatement.setInt(6,row.getId());
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+  }
+);
+}
