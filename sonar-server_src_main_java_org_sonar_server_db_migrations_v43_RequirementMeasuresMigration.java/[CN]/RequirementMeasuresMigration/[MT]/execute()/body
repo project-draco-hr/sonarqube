@@ -1,0 +1,24 @@
+{
+  new MassUpdater(db).execute(new MassUpdater.InputLoader<Row>(){
+    @Override public String selectSql(){
+      return "SELECT project_measures.id,characteristics.rule_id FROM project_measures " + "INNER JOIN characteristics ON characteristics.id = project_measures.characteristic_id " + "WHERE characteristics.rule_id IS NOT NULL";
+    }
+    @Override public Row load(    ResultSet rs) throws SQLException {
+      Row row=new Row();
+      row.id=SqlUtil.getLong(rs,1);
+      row.ruleId=SqlUtil.getInt(rs,2);
+      return row;
+    }
+  }
+,new MassUpdater.InputConverter<Row>(){
+    @Override public String updateSql(){
+      return "UPDATE project_measures SET characteristic_id=null,rule_id=? WHERE id=?";
+    }
+    @Override public boolean convert(    Row row,    PreparedStatement updateStatement) throws SQLException {
+      updateStatement.setInt(1,row.ruleId);
+      updateStatement.setLong(2,row.id);
+      return true;
+    }
+  }
+);
+}
