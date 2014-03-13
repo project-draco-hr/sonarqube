@@ -1,6 +1,6 @@
 {
-  NewController newController=context.newController("api/system");
-  newController.newAction("health").setHandler(new RequestHandler(){
+  NewController newController=context.createController("api/system");
+  newController.createAction("health").setHandler(new RequestHandler(){
     @Override public void handle(    Request request,    Response response){
       try {
         response.stream().output().write("good".getBytes());
@@ -11,7 +11,7 @@
     }
   }
 );
-  newController.newAction("ping").setPost(true).setHandler(new RequestHandler(){
+  newController.createAction("ping").setPost(true).setHandler(new RequestHandler(){
     @Override public void handle(    Request request,    Response response){
       try {
         response.stream().output().write("pong".getBytes());
@@ -22,7 +22,7 @@
     }
   }
 );
-  newController.newAction("fail").setHandler(new RequestHandler(){
+  newController.createAction("fail").setHandler(new RequestHandler(){
     @Override public void handle(    Request request,    Response response){
       if (request.param("count") != null) {
         List<BadRequestException.Message> errors=Lists.newArrayList();
@@ -35,13 +35,13 @@
     }
   }
 );
-  newController.newAction("alive").setHandler(new RequestHandler(){
+  newController.createAction("alive").setHandler(new RequestHandler(){
     @Override public void handle(    Request request,    Response response){
       response.noContent();
     }
   }
 );
-  newController.newAction("print").newParam("message","required message").newParam("author","optional author").setHandler(new RequestHandler(){
+  newController.createAction("print").createParam("message","required message").createParam("author","optional author").setHandler(new RequestHandler(){
     @Override public void handle(    Request request,    Response response){
       try {
         IOUtils.write(request.mandatoryParam("message") + " by " + request.param("author","-"),response.stream().output());
