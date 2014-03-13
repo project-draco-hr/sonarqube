@@ -1,13 +1,13 @@
 {
-  ListMultimap<Rule,Issue> issuesByRule=issuesByRule(issues);
+  ListMultimap<RuleKey,Issue> issuesByRule=issuesByRule(issues);
   double total=0.0;
   Map<Characteristic,Double> characteristicCosts=newHashMap();
-  Map<Rule,Double> ruleDebtCosts=newHashMap();
-  for (  Rule rule : rules.findAll()) {
-    String characteristicKey=rule.characteristic();
+  Map<org.sonar.api.rules.Rule,Double> ruleDebtCosts=newHashMap();
+  for (  Rule newRule : rules.findWithDebt()) {
+    String characteristicKey=newRule.characteristic();
     if (characteristicKey != null) {
-      List<Issue> requirementIssues=issuesByRule.get(rule);
-      double value=computeTechnicalDebt(CoreMetrics.TECHNICAL_DEBT,context,rule,requirementIssues);
+      org.sonar.api.rules.Rule rule=ruleFinder.findByKey(newRule.key());
+      double value=computeTechnicalDebt(CoreMetrics.TECHNICAL_DEBT,context,rule,issuesByRule.get(newRule.key()));
       ruleDebtCosts.put(rule,value);
       total+=value;
       Characteristic characteristic=model.characteristicByKey(characteristicKey);
@@ -16,5 +16,5 @@
   }
   context.saveMeasure(CoreMetrics.TECHNICAL_DEBT,total);
   saveOnCharacteristic(context,characteristicCosts);
-  saveOnRequirement(context,ruleDebtCosts);
+  saveOnRule(context,ruleDebtCosts);
 }
