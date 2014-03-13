@@ -1,6 +1,6 @@
 {
-  setupData("shouldCleanAlerts");
-  RegisterMetrics loader=new RegisterMetrics(getSession(),new MeasuresDao(getSession()),null);
+  QualityGateConditionDao conditionDao=mock(QualityGateConditionDao.class);
+  RegisterMetrics loader=new RegisterMetrics(getSession(),new MeasuresDao(getSession()),conditionDao,null);
   loader.cleanAlerts();
-  checkTables("shouldCleanAlerts","metrics","alerts");
+  verify(conditionDao).deleteConditionsWithInvalidMetrics();
 }
