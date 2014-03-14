@@ -1,20 +1,24 @@
 {
-  ListMultimap<RuleKey,Issue> issuesByRule=issuesByRule(issues);
-  double total=0.0;
-  Map<Characteristic,Double> characteristicCosts=newHashMap();
-  Map<org.sonar.api.rules.Rule,Double> ruleDebtCosts=newHashMap();
-  for (  Rule newRule : rules.findWithDebt()) {
-    String characteristicKey=newRule.characteristic();
-    if (characteristicKey != null) {
-      org.sonar.api.rules.Rule rule=ruleFinder.findByKey(newRule.key());
-      double value=computeTechnicalDebt(CoreMetrics.TECHNICAL_DEBT,context,rule,issuesByRule.get(newRule.key()));
-      ruleDebtCosts.put(rule,value);
-      total+=value;
-      Characteristic characteristic=model.characteristicByKey(characteristicKey);
-      propagateTechnicalDebtInParents(characteristic,value,characteristicCosts);
+  Long total=0L;
+  SumMap<RuleKey> ruleDebts=new SumMap<RuleKey>();
+  SumMap<Characteristic> characteristicDebts=new SumMap<Characteristic>();
+  for (  Issue issue : issues) {
+    Long debt=((DefaultIssue)issue).debtInMinutes();
+    if (computeDebt(debt,issue.ruleKey(),ruleDebts,characteristicDebts)) {
+      total+=debt;
     }
   }
-  context.saveMeasure(CoreMetrics.TECHNICAL_DEBT,total);
-  saveOnCharacteristic(context,characteristicCosts);
-  saveOnRule(context,ruleDebtCosts);
+  for (  Measure measure : context.getChildrenMeasures(MeasuresFilters.rules(CoreMetrics.TECHNICAL_DEBT))) {
+    Long debt=measure.getValue().longValue();
+    RuleMeasure ruleMeasure=(RuleMeasure)measure;
+    if (computeDebt(debt,ruleMeasure.getRule().ruleKey(),ruleDebts,characteristicDebts)) {
+      total+=debt;
+    }
+  }
+  context.saveMeasure(CoreMetrics.TECHNICAL_DEBT,total.doubleValue());
+  saveOnRule(context,ruleDebts);
+  for (  Characteristic characteristic : model.characteristics()) {
+    Long debt=characteristicDebts.get(characteristic);
+    saveTechnicalDebt(context,characteristic,debt != null ? debt.doubleValue() : 0d,false);
+  }
 }

@@ -1,0 +1,11 @@
+{
+  Issue issue1=createIssue("rule1","repo1").setDebt(Duration.create(ONE_DAY_IN_MINUTES));
+  Issue issue2=createIssue("rule1","repo1").setDebt(Duration.create(ONE_DAY_IN_MINUTES));
+  when(issuable.issues()).thenReturn(newArrayList(issue1,issue2));
+  when(context.getChildrenMeasures(any(MeasuresFilter.class))).thenReturn(Lists.<Measure>newArrayList(new RuleMeasure(CoreMetrics.TECHNICAL_DEBT,org.sonar.api.rules.Rule.create(ruleKey1.repository(),ruleKey1.rule()),null,null).setValue(5d * ONE_DAY_IN_MINUTES)));
+  decorator.decorate(resource,context);
+  verify(context).saveMeasure(CoreMetrics.TECHNICAL_DEBT,7d * ONE_DAY_IN_MINUTES);
+  verify(context).saveMeasure(argThat(new IsRuleMeasure(CoreMetrics.TECHNICAL_DEBT,ruleKey1,7d * ONE_DAY_IN_MINUTES)));
+  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,memoryEfficiency,7d * ONE_DAY_IN_MINUTES)));
+  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,efficiency,7d * ONE_DAY_IN_MINUTES)));
+}

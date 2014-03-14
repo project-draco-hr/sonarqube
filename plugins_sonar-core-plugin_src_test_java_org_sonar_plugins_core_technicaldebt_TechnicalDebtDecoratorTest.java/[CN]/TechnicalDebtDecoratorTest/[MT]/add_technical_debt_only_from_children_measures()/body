@@ -1,0 +1,12 @@
+{
+  when(issuable.issues()).thenReturn(Collections.<Issue>emptyList());
+  when(context.getChildrenMeasures(any(MeasuresFilter.class))).thenReturn(Lists.<Measure>newArrayList(new RuleMeasure(CoreMetrics.TECHNICAL_DEBT,org.sonar.api.rules.Rule.create(ruleKey1.repository(),ruleKey1.rule()),null,null).setValue(5d * ONE_DAY_IN_MINUTES),new RuleMeasure(CoreMetrics.TECHNICAL_DEBT,org.sonar.api.rules.Rule.create(ruleKey2.repository(),ruleKey2.rule()),null,null).setValue(10d * ONE_DAY_IN_MINUTES)));
+  decorator.decorate(resource,context);
+  verify(context).saveMeasure(CoreMetrics.TECHNICAL_DEBT,15d * ONE_DAY_IN_MINUTES);
+  verify(context).saveMeasure(argThat(new IsRuleMeasure(CoreMetrics.TECHNICAL_DEBT,ruleKey1,5d * ONE_DAY_IN_MINUTES)));
+  verify(context).saveMeasure(argThat(new IsRuleMeasure(CoreMetrics.TECHNICAL_DEBT,ruleKey2,10d * ONE_DAY_IN_MINUTES)));
+  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,memoryEfficiency,5d * ONE_DAY_IN_MINUTES)));
+  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,efficiency,5d * ONE_DAY_IN_MINUTES)));
+  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,reusability,10d * ONE_DAY_IN_MINUTES)));
+  verify(context).saveMeasure(argThat(new IsCharacteristicMeasure(CoreMetrics.TECHNICAL_DEBT,modularity,10d * ONE_DAY_IN_MINUTES)));
+}
