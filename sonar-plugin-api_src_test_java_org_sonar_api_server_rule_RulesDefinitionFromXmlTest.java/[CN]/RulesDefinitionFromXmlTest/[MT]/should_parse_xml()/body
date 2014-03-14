@@ -1,0 +1,26 @@
+{
+  InputStreamReader reader=new InputStreamReader(getClass().getResourceAsStream("/org/sonar/api/server/rule/RuleDefinitionsFromXmlTest/rules.xml"),Charsets.UTF_8.name());
+  RulesDefinition.Repository repository=load(reader);
+  assertThat(repository.rules()).hasSize(2);
+  RulesDefinition.Rule rule=repository.rule("complete");
+  assertThat(rule.key()).isEqualTo("complete");
+  assertThat(rule.name()).isEqualTo("Complete");
+  assertThat(rule.htmlDescription()).isEqualTo("Description of Complete");
+  assertThat(rule.severity()).isEqualTo(Severity.BLOCKER);
+  assertThat(rule.template()).isTrue();
+  assertThat(rule.status()).isEqualTo(RuleStatus.BETA);
+  assertThat(rule.internalKey()).isEqualTo("Checker/TreeWalker/LocalVariableName");
+  assertThat(rule.tags()).containsOnly("style","security");
+  assertThat(rule.params()).hasSize(2);
+  RulesDefinition.Param ignore=rule.param("ignore");
+  assertThat(ignore.key()).isEqualTo("ignore");
+  assertThat(ignore.description()).isEqualTo("Ignore ?");
+  assertThat(ignore.defaultValue()).isEqualTo("false");
+  rule=repository.rule("minimal");
+  assertThat(rule.key()).isEqualTo("minimal");
+  assertThat(rule.name()).isEqualTo("Minimal");
+  assertThat(rule.htmlDescription()).isEqualTo("Description of Minimal");
+  assertThat(rule.params()).isEmpty();
+  assertThat(rule.status()).isEqualTo(RuleStatus.READY);
+  assertThat(rule.severity()).isEqualTo(Severity.MAJOR);
+}
