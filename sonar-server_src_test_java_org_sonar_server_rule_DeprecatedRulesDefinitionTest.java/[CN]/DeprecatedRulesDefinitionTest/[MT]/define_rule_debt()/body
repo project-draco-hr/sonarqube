@@ -1,6 +1,6 @@
 {
   RulesDefinition.Context context=new RulesDefinition.Context();
-  List<DebtRulesXMLImporter.RuleDebt> ruleDebts=newArrayList(new DebtRulesXMLImporter.RuleDebt().setCharacteristicKey("MEMORY_EFFICIENCY").setRuleKey(RuleKey.of("checkstyle","ConstantName")).setFunction(RemediationFunction.LINEAR_OFFSET).setFactor("1d").setOffset("10min"));
+  List<DebtRulesXMLImporter.RuleDebt> ruleDebts=newArrayList(new DebtRulesXMLImporter.RuleDebt().setCharacteristicKey("MEMORY_EFFICIENCY").setRuleKey(RuleKey.of("checkstyle","ConstantName")).setFunction(DebtRemediationFunction.createLinearWithOffset("1d","10min")));
   Reader javaModelReader=mock(Reader.class);
   when(debtModelRepository.createReaderForXMLFile("java")).thenReturn(javaModelReader);
   when(debtModelRepository.getContributingPluginList()).thenReturn(newArrayList("java"));
@@ -12,8 +12,6 @@
   RulesDefinition.Rule rule=checkstyle.rule("ConstantName");
   assertThat(rule).isNotNull();
   assertThat(rule.key()).isEqualTo("ConstantName");
-  assertThat(rule.characteristicKey()).isEqualTo("MEMORY_EFFICIENCY");
-  assertThat(rule.remediationFunction()).isEqualTo(RemediationFunction.LINEAR_OFFSET);
-  assertThat(rule.remediationFactor()).isEqualTo("1d");
-  assertThat(rule.remediationOffset()).isEqualTo("10min");
+  assertThat(rule.debtCharacteristic()).isEqualTo("MEMORY_EFFICIENCY");
+  assertThat(rule.debtRemediationFunction()).isEqualTo(DebtRemediationFunction.createLinearWithOffset("1d","10min"));
 }

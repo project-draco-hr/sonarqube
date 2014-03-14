@@ -1,9 +1,12 @@
 {
-  RemediationFunction remediationFunction=ruleDef.remediationFunction();
   RuleDto ruleDto=new RuleDto().setCardinality(ruleDef.template() ? Cardinality.MULTIPLE : Cardinality.SINGLE).setConfigKey(ruleDef.internalKey()).setDescription(ruleDef.htmlDescription()).setLanguage(ruleDef.repository().language()).setName(ruleDef.name()).setRepositoryKey(ruleDef.repository().key()).setRuleKey(ruleDef.key()).setSeverity(ruleDef.severity()).setCreatedAt(buffer.now()).setUpdatedAt(buffer.now()).setStatus(ruleDef.status().name());
   CharacteristicDto characteristic=findCharacteristic(characteristicDtos,ruleDef);
-  if (characteristic != null) {
-    ruleDto.setDefaultCharacteristicId(characteristic.getId()).setDefaultRemediationFunction(remediationFunction != null ? remediationFunction.name() : null).setDefaultRemediationFactor(ruleDef.remediationFactor()).setDefaultRemediationOffset(ruleDef.remediationOffset()).setEffortToFixL10nKey(ruleDef.effortToFixL10nKey());
+  ruleDto.setDefaultCharacteristicId(characteristic != null ? characteristic.getId() : null).setEffortToFixL10nKey(ruleDef.effortToFixL10nKey());
+  DebtRemediationFunction remediationFunction=ruleDef.debtRemediationFunction();
+  if (remediationFunction != null) {
+    ruleDto.setDefaultRemediationFunction(remediationFunction.type().name());
+    ruleDto.setDefaultRemediationFactor(remediationFunction.factor());
+    ruleDto.setDefaultRemediationOffset(remediationFunction.offset());
   }
   ruleDao.insert(ruleDto,sqlSession);
   buffer.add(ruleDto);
