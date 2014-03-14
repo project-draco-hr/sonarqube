@@ -4,21 +4,17 @@
   SumMap<Characteristic> characteristicDebts=new SumMap<Characteristic>();
   for (  Issue issue : issues) {
     Long debt=((DefaultIssue)issue).debtInMinutes();
-    if (computeDebt(debt,issue.ruleKey(),ruleDebts,characteristicDebts)) {
-      total+=debt;
-    }
+    total+=computeDebt(debt,issue.ruleKey(),ruleDebts,characteristicDebts);
   }
   for (  Measure measure : context.getChildrenMeasures(MeasuresFilters.rules(CoreMetrics.TECHNICAL_DEBT))) {
     Long debt=measure.getValue().longValue();
     RuleMeasure ruleMeasure=(RuleMeasure)measure;
-    if (computeDebt(debt,ruleMeasure.getRule().ruleKey(),ruleDebts,characteristicDebts)) {
-      total+=debt;
-    }
+    total+=computeDebt(debt,ruleMeasure.getRule().ruleKey(),ruleDebts,characteristicDebts);
   }
   context.saveMeasure(CoreMetrics.TECHNICAL_DEBT,total.doubleValue());
   saveOnRule(context,ruleDebts);
   for (  Characteristic characteristic : model.characteristics()) {
     Long debt=characteristicDebts.get(characteristic);
-    saveTechnicalDebt(context,characteristic,debt != null ? debt.doubleValue() : 0d,false);
+    saveCharacteristicMeasure(context,characteristic,debt != null ? debt.doubleValue() : 0d,false);
   }
 }
