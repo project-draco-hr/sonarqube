@@ -1,0 +1,15 @@
+{
+  Platform platform=mock(Platform.class);
+  Settings settings=new Settings();
+  RestartHandler restartHandler=new RestartHandler(settings,platform);
+  PlatformWs ws=new PlatformWs(restartHandler);
+  WsTester tester=new WsTester(ws);
+  try {
+    tester.newRequest("restart").execute();
+    fail();
+  }
+ catch (  BadRequestException e) {
+    assertThat(e).hasMessage("Available in development mode only (sonar.dev=true)");
+    verifyZeroInteractions(platform);
+  }
+}
