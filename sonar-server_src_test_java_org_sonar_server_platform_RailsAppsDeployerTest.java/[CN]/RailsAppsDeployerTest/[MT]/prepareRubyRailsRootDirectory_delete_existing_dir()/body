@@ -1,0 +1,12 @@
+{
+  ServerFileSystem fileSystem=mock(ServerFileSystem.class);
+  File tempDir=this.temp.getRoot();
+  when(fileSystem.getTempDir()).thenReturn(tempDir);
+  File file=new File(tempDir,"ror/foo/bar.txt");
+  FileUtils.writeStringToFile(file,"foooo");
+  File dir=new RailsAppsDeployer(fileSystem,mock(PluginRepository.class)).prepareRailsDirectory();
+  assertThat(dir.isDirectory(),is(true));
+  assertThat(dir.exists(),is(true));
+  assertThat(dir.getCanonicalPath(),is(new File(tempDir,"ror").getCanonicalPath()));
+  assertThat(FileUtils.listFiles(new File(tempDir,"ror"),null,true).size(),is(0));
+}

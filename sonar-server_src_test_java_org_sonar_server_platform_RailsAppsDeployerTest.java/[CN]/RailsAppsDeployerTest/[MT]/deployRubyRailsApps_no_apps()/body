@@ -1,0 +1,12 @@
+{
+  ServerFileSystem fileSystem=mock(ServerFileSystem.class);
+  File tempDir=this.temp.getRoot();
+  when(fileSystem.getTempDir()).thenReturn(tempDir);
+  PluginRepository pluginRepository=mock(PluginRepository.class);
+  when(pluginRepository.getMetadata()).thenReturn(Collections.<PluginMetadata>emptyList());
+  new RailsAppsDeployer(fileSystem,pluginRepository).start();
+  File appDir=new File(tempDir,"ror");
+  assertThat(appDir.isDirectory(),is(true));
+  assertThat(appDir.exists(),is(true));
+  assertThat(FileUtils.listFiles(appDir,null,true).size(),is(0));
+}
