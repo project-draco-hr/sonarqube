@@ -11,8 +11,13 @@
     indexFiles(inputFileBuilder,fileSystem,progress,fileSystem.sourceFiles(),InputFile.Type.MAIN);
     indexFiles(inputFileBuilder,fileSystem,progress,fileSystem.testFiles(),InputFile.Type.TEST);
   }
- else   if (fileSystem.baseDir() != null) {
-    indexDirectory(inputFileBuilder,fileSystem,progress,fileSystem.baseDir());
+ else {
+    for (    File mainDir : fileSystem.sourceDirs()) {
+      indexDirectory(inputFileBuilder,fileSystem,progress,mainDir,InputFile.Type.MAIN);
+    }
+    for (    File testDir : fileSystem.testDirs()) {
+      indexDirectory(inputFileBuilder,fileSystem,progress,testDir,InputFile.Type.TEST);
+    }
   }
   for (  InputFile removed : progress.removed) {
     fileCache.remove(fileSystem.moduleKey(),removed);
