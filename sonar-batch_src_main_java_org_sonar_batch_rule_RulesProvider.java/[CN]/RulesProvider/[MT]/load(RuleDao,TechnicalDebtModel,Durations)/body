@@ -9,8 +9,8 @@
     RuleKey ruleKey=RuleKey.of(ruleDto.getRepositoryKey(),ruleDto.getRuleKey());
     NewRule newRule=rulesBuilder.add(ruleKey).setId(ruleDto.getId()).setName(ruleDto.getName()).setSeverity(ruleDto.getSeverityString()).setDescription(ruleDto.getDescription()).setStatus(RuleStatus.valueOf(ruleDto.getStatus()));
     if (ruleDto.hasCharacteristic()) {
-      newRule.setCharacteristic(characteristic(ruleDto,ruleKey,debtModel).key());
-      setFunction(ruleDto,newRule,ruleKey,durations);
+      newRule.setDebtCharacteristic(effectiveCharacteristic(ruleDto,ruleKey,debtModel).key());
+      newRule.setDebtRemediationFunction(effectiveFunction(ruleDto,ruleKey,newRule,durations));
     }
     for (    RuleParamDto ruleParamDto : paramDtosByRuleId.get(ruleDto.getId())) {
       newRule.addParam(ruleParamDto.getName()).setDescription(ruleParamDto.getDescription());
