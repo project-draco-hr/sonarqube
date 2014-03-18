@@ -1,11 +1,12 @@
 {
   boolean changed=false;
-  CharacteristicDto characteristic=findCharacteristic(characteristicDtos,def);
+  CharacteristicDto characteristic=findCharacteristic(def,dto.getCharacteristicId(),characteristicDtos);
+  boolean hasCharacteristic=characteristic != null;
+  DebtRemediationFunction debtRemediationFunction=characteristic != null ? def.debtRemediationFunction() : null;
   Integer characteristicId=characteristic != null ? characteristic.getId() : null;
-  DebtRemediationFunction debtRemediationFunction=def.debtRemediationFunction();
-  String remediationFactor=debtRemediationFunction != null ? debtRemediationFunction.factor() : null;
-  String remediationOffset=debtRemediationFunction != null ? debtRemediationFunction.offset() : null;
-  String effortToFixL10nKey=def.effortToFixL10nKey();
+  String remediationFactor=hasCharacteristic ? debtRemediationFunction.factor() : null;
+  String remediationOffset=hasCharacteristic ? debtRemediationFunction.offset() : null;
+  String effortToFixL10nKey=hasCharacteristic ? def.effortToFixL10nKey() : null;
   if (!ObjectUtils.equals(dto.getDefaultCharacteristicId(),characteristicId)) {
     dto.setDefaultCharacteristicId(characteristicId);
     changed=true;
