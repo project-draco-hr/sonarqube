@@ -1,0 +1,10 @@
+{
+  when(dao.selectById(10,session)).thenReturn(new CharacteristicDto().setId(10).setOrder(2));
+  when(dao.selectNext(2,session)).thenReturn(new CharacteristicDto().setId(2).setOrder(3));
+  DebtCharacteristic result=service.moveDown(10);
+  ArgumentCaptor<CharacteristicDto> argument=ArgumentCaptor.forClass(CharacteristicDto.class);
+  verify(dao,times(2)).update(argument.capture(),eq(session));
+  assertThat(result.order()).isEqualTo(3);
+  assertThat(argument.getAllValues().get(0).getOrder()).isEqualTo(2);
+  assertThat(argument.getAllValues().get(1).getOrder()).isEqualTo(3);
+}

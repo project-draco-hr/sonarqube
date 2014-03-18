@@ -1,10 +1,11 @@
 {
+  checkPermission();
   SqlSession session=mybatis.openSession();
   try {
     checkNotAlreadyExists(name,session);
     CharacteristicDto newCharacteristic=new CharacteristicDto().setKey(name.toUpperCase().replace(" ","_")).setName(name).setEnabled(true);
     if (parentId != null) {
-      CharacteristicDto parent=findCharacteristic(parentId);
+      CharacteristicDto parent=findCharacteristic(parentId,session);
       if (parent.getParentId() != null) {
         throw new BadRequestException("A sub characteristic can not have a sub characteristic as parent.");
       }
