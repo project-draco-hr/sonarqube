@@ -1,0 +1,32 @@
+{
+  checkPermission();
+  SqlSession session=mybatis.openBatchSession();
+  try {
+    Date now=new Date(system2.now());
+    CharacteristicDto characteristicOrSubCharacteristicDto=findCharacteristic(characteristicOrSubCharactteristicId,session);
+    List<RuleDto> ruleDtos=ruleDao.selectByCharacteristicOrSubCharacteristicId(characteristicOrSubCharacteristicDto.getId(),session);
+    for (    RuleDto ruleDto : ruleDtos) {
+      ruleDto.setCharacteristicId(RuleDto.DISABLED_CHARACTERISTIC_ID);
+      ruleDto.setRemediationFunction(null);
+      ruleDto.setRemediationFactor(null);
+      ruleDto.setRemediationOffset(null);
+      ruleDto.setUpdatedAt(now);
+      ruleDao.update(ruleDto,session);
+    }
+    if (characteristicOrSubCharacteristicDto.getParentId() == null) {
+      List<CharacteristicDto> dtos=dao.selectCharacteristicsByParentId(characteristicOrSubCharacteristicDto.getId(),session);
+      for (      CharacteristicDto subCharacteristicDto : dtos) {
+        subCharacteristicDto.setEnabled(false);
+        subCharacteristicDto.setUpdatedAt(now);
+        dao.update(subCharacteristicDto,session);
+      }
+    }
+    characteristicOrSubCharacteristicDto.setEnabled(false);
+    characteristicOrSubCharacteristicDto.setUpdatedAt(now);
+    dao.update(characteristicOrSubCharacteristicDto,session);
+    session.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}
