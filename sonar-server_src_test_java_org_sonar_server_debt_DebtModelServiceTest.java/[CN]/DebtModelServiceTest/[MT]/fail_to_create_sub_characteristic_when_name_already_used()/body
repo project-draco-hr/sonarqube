@@ -1,0 +1,12 @@
+{
+  when(dao.selectByName("Compilation",session)).thenReturn(new CharacteristicDto());
+  when(dao.selectById(1,session)).thenReturn(rootCharacteristicDto);
+  try {
+    service.create("Compilation",1);
+    fail();
+  }
+ catch (  BadRequestException e) {
+    assertThat(e.l10nKey()).isEqualTo("errors.is_already_used");
+    assertThat(e.l10nParams().iterator().next()).isEqualTo("Compilation");
+  }
+}

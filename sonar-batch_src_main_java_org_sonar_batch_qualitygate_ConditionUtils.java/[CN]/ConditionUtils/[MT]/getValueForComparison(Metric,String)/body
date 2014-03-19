@@ -1,18 +1,27 @@
 {
-  if (isADouble(metric)) {
-    return Double.parseDouble(value);
+  Comparable valueToCompare=null;
+  try {
+    if (isADouble(metric)) {
+      valueToCompare=Double.parseDouble(value);
+    }
+ else     if (isAInteger(metric)) {
+      valueToCompare=parseInteger(value);
+    }
+ else     if (isAString(metric)) {
+      valueToCompare=value;
+    }
+ else     if (isABoolean(metric)) {
+      valueToCompare=Integer.parseInt(value);
+    }
+ else     if (isAWorkDuration(metric)) {
+      valueToCompare=Long.parseLong(value);
+    }
+ else {
+      throw new NotImplementedException(metric.getType().toString());
+    }
   }
-  if (isAInteger(metric)) {
-    return parseInteger(value);
+ catch (  NumberFormatException badValueFormat) {
+    throw new IllegalArgumentException(String.format("Unable to parse value '%s' to compare against %s",value,metric.getName()));
   }
-  if (isAString(metric)) {
-    return value;
-  }
-  if (isABoolean(metric)) {
-    return Integer.parseInt(value);
-  }
-  if (isAWorkDuration(metric)) {
-    return Long.parseLong(value);
-  }
-  throw new NotImplementedException(metric.getType().toString());
+  return valueToCompare;
 }

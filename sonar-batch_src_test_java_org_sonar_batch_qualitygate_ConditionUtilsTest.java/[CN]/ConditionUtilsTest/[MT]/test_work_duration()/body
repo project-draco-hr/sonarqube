@@ -4,5 +4,13 @@
   when(condition.operator()).thenReturn(QualityGateConditionDto.OPERATOR_EQUALS);
   when(condition.metric()).thenReturn(metric);
   when(condition.errorThreshold()).thenReturn("60");
-  Assert.assertEquals(Metric.Level.ERROR,ConditionUtils.getLevel(condition,measure));
+  assertThat(ConditionUtils.getLevel(condition,measure)).isEqualTo(Metric.Level.ERROR);
+  when(condition.errorThreshold()).thenReturn("polop");
+  try {
+    ConditionUtils.getLevel(condition,measure);
+    fail();
+  }
+ catch (  Exception expected) {
+    assertThat(expected).isInstanceOf(IllegalArgumentException.class).hasMessage("Unable to parse value 'polop' to compare against name");
+  }
 }
