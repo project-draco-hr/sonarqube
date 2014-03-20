@@ -1,0 +1,19 @@
+{
+  BatchSession batchSession=mock(BatchSession.class);
+  when(mybatis.openBatchSession()).thenReturn(batchSession);
+  when(ruleDao.selectByCharacteristicOrSubCharacteristicId(1,batchSession)).thenReturn(newArrayList(new RuleDto().setCharacteristicId(2).setRemediationFunction("LINEAR_OFFSET").setRemediationFactor("2h").setRemediationOffset("5min")));
+  when(dao.selectCharacteristicsByParentId(1,batchSession)).thenReturn(newArrayList(subCharacteristicDto));
+  when(dao.selectById(1,batchSession)).thenReturn(characteristicDto);
+  service.delete(1);
+  verify(ruleDao).update(any(RuleDto.class),eq(batchSession));
+  ArgumentCaptor<CharacteristicDto> characteristicArgument=ArgumentCaptor.forClass(CharacteristicDto.class);
+  verify(dao,times(2)).update(characteristicArgument.capture(),eq(batchSession));
+  CharacteristicDto subCharacteristicDto=characteristicArgument.getAllValues().get(0);
+  CharacteristicDto characteristicDto=characteristicArgument.getAllValues().get(1);
+  assertThat(subCharacteristicDto.getId()).isEqualTo(2);
+  assertThat(subCharacteristicDto.isEnabled()).isFalse();
+  assertThat(subCharacteristicDto.getUpdatedAt()).isEqualTo(now);
+  assertThat(characteristicDto.getId()).isEqualTo(1);
+  assertThat(characteristicDto.isEnabled()).isFalse();
+  assertThat(characteristicDto.getUpdatedAt()).isEqualTo(now);
+}

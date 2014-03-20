@@ -2,6 +2,7 @@
   ComponentContainer startupContainer=pico.createChild();
   startupContainer.addSingleton(GwtPublisher.class);
   startupContainer.addSingleton(RegisterMetrics.class);
+  startupContainer.addSingleton(RegisterBuiltinQualityGate.class);
   startupContainer.addSingleton(DeprecatedRulesDefinition.class);
   startupContainer.addSingleton(RuleDefinitionsLoader.class);
   startupContainer.addSingleton(RuleRegistration.class);
@@ -18,8 +19,10 @@
   startupContainer.addSingleton(RegisterServletFilters.class);
   startupContainer.addSingleton(CleanPreviewAnalysisCache.class);
   startupContainer.addSingleton(CopyRequirementsFromCharacteristicsToRules.class);
+  DoPrivileged.start();
   startupContainer.startComponents();
   startupContainer.getComponentByType(ServerLifecycleNotifier.class).notifyStart();
+  DoPrivileged.stop();
   startupContainer.stopComponents();
   pico.getComponentByType(DatabaseSessionFactory.class).clear();
 }

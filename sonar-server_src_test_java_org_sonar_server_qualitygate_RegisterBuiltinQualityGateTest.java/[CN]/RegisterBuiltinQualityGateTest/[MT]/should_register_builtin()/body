@@ -1,0 +1,15 @@
+{
+  String templateType="QUALITY_GATE";
+  String templateName="SonarQube way";
+  when(templateDao.countByTypeAndKey(templateType,templateName)).thenReturn(0);
+  when(qualityGates.create(templateName)).thenReturn(new QualityGateDto().setId(42L));
+  task.start();
+  verify(templateDao).countByTypeAndKey(templateType,templateName);
+  verify(qualityGates).create(templateName);
+  verify(qualityGates,times(8)).createCondition(anyLong(),anyString(),anyString(),anyString(),anyString(),anyInt());
+  ArgumentCaptor<LoadedTemplateDto> templateArg=ArgumentCaptor.forClass(LoadedTemplateDto.class);
+  verify(templateDao).insert(templateArg.capture());
+  LoadedTemplateDto template=templateArg.getValue();
+  assertThat(template.getType()).isEqualTo(templateType);
+  assertThat(template.getKey()).isEqualTo(templateName);
+}

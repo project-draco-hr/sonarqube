@@ -1,6 +1,10 @@
 {
   String xml=getFileContent("import_badly_formatted_xml.xml");
-  ValidationMessages messages=ValidationMessages.create();
-  DefaultTechnicalDebtModel debtModel=new DebtCharacteristicsXMLImporter().importXML(xml,messages);
-  checkXmlCorrectlyImported(debtModel,messages);
+  DebtCharacteristicsXMLImporter.DebtModel debtModel=new DebtCharacteristicsXMLImporter().importXML(xml);
+  assertThat(debtModel.rootCharacteristics()).hasSize(2);
+  DefaultCharacteristic efficiency=debtModel.characteristicByKey("EFFICIENCY");
+  assertThat(efficiency.name()).isEqualTo("Efficiency");
+  assertThat(efficiency.children()).hasSize(1);
+  DefaultCharacteristic memoryEfficiency=debtModel.characteristicByKey("MEMORY_EFFICIENCY");
+  assertThat(memoryEfficiency.name()).isEqualTo("Memory use");
 }
