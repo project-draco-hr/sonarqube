@@ -1,0 +1,16 @@
+{
+  List<String> repositoryKeys=newArrayList(Iterables.transform(repositories,new Function<RuleRepositories.Repository,String>(){
+    @Override public String apply(    RuleRepositories.Repository input){
+      return input.getKey();
+    }
+  }
+));
+  for (  RuleDto rule : ruleDao.selectOverridingDebt(repositoryKeys,session)) {
+    rule.setCharacteristicId(null);
+    rule.setRemediationFunction(null);
+    rule.setRemediationFactor(null);
+    rule.setRemediationOffset(null);
+    rule.setUpdatedAt(updateDate);
+    ruleDao.update(rule,session);
+  }
+}

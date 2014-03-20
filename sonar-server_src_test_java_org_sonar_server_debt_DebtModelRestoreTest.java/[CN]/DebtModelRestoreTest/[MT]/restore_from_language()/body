@@ -2,20 +2,17 @@
   Date oldDate=DateUtils.parseDate("2014-01-01");
   defaultModel.addRootCharacteristic(new DefaultDebtCharacteristic().setKey("PORTABILITY").setName("Portability").setOrder(1)).addSubCharacteristic(new DefaultDebtCharacteristic().setKey("COMPILER_RELATED_PORTABILITY").setName("Compiler"),"PORTABILITY");
   when(dao.selectEnabledCharacteristics()).thenReturn(newArrayList(new CharacteristicDto().setId(1).setKey("PORTABILITY").setName("Portability updated").setOrder(2).setCreatedAt(oldDate),new CharacteristicDto().setId(2).setKey("COMPILER_RELATED_PORTABILITY").setName("Compiler updated").setParentId(1).setCreatedAt(oldDate)));
-  when(ruleDao.selectOverridingDebt(Collections.<String>emptyList(),session)).thenReturn(newArrayList(new RuleDto().setCharacteristicId(10).setRemediationFunction("LINEAR_OFFSET").setRemediationFactor("2h").setRemediationOffset("15min").setCreatedAt(oldDate).setUpdatedAt(oldDate)));
-  debtModelRestore.restore();
+  when(ruleDao.selectOverridingDebt(newArrayList("squid"),session)).thenReturn(newArrayList(new RuleDto().setRepositoryKey("squid").setCharacteristicId(10).setRemediationFunction("LINEAR_OFFSET").setRemediationFactor("2h").setRemediationOffset("15min").setCreatedAt(oldDate).setUpdatedAt(oldDate)));
+  RuleRepositories.Repository squid=mock(RuleRepositories.Repository.class);
+  when(squid.getKey()).thenReturn("squid");
+  when(ruleRepositories.repositoriesForLang("java")).thenReturn(newArrayList(squid));
+  debtModelRestore.restore("java");
   verify(dao).selectEnabledCharacteristics();
   verify(dao,times(2)).update(any(CharacteristicDto.class),eq(session));
   verifyNoMoreInteractions(dao);
-  verify(ruleDao).selectOverridingDebt(Collections.<String>emptyList(),session);
+  verify(ruleDao).selectOverridingDebt(newArrayList("squid"),session);
   ArgumentCaptor<RuleDto> ruleArgument=ArgumentCaptor.forClass(RuleDto.class);
   verify(ruleDao).update(ruleArgument.capture(),eq(session));
   verifyNoMoreInteractions(ruleDao);
-  RuleDto rule=ruleArgument.getValue();
-  assertThat(rule.getCharacteristicId()).isNull();
-  assertThat(rule.getRemediationFunction()).isNull();
-  assertThat(rule.getRemediationFactor()).isNull();
-  assertThat(rule.getRemediationOffset()).isNull();
-  assertThat(rule.getUpdatedAt()).isEqualTo(now);
   verify(session).commit();
 }
