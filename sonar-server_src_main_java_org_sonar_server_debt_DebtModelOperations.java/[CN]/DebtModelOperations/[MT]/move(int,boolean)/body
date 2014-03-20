@@ -2,12 +2,20 @@
   checkPermission();
   SqlSession session=mybatis.openSession();
   try {
-    CharacteristicDto dto=findCharacteristic(characteristicId,session);
+    final CharacteristicDto dto=findCharacteristic(characteristicId,session);
     int currentOrder=dto.getOrder();
-    CharacteristicDto dtoToSwitchOrderWith=moveUpOrDown ? dao.selectPrevious(currentOrder,session) : dao.selectNext(currentOrder,session);
-    if (dtoToSwitchOrderWith == null) {
+    List<CharacteristicDto> rootCharacteristics=dao.selectEnabledRootCharacteristics(session);
+    int currentPosition=Iterables.indexOf(rootCharacteristics,new Predicate<CharacteristicDto>(){
+      @Override public boolean apply(      CharacteristicDto input){
+        return input.getKey().equals(dto.getKey());
+      }
+    }
+);
+    Integer nextMove=moveUpOrDown ? (currentPosition > 0 ? currentPosition - 1 : null) : (currentPosition < rootCharacteristics.size() - 1 ? currentPosition + 1 : null);
+    if (nextMove == null) {
       return toCharacteristic(dto);
     }
+    CharacteristicDto dtoToSwitchOrderWith=Iterables.get(rootCharacteristics,nextMove);
     int nextOrder=dtoToSwitchOrderWith.getOrder();
     dtoToSwitchOrderWith.setOrder(currentOrder);
     dtoToSwitchOrderWith.setUpdatedAt(new Date(system2.now()));
