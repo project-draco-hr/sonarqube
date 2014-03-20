@@ -1,0 +1,23 @@
+{
+  DefaultDebtCharacteristic characteristic=new DefaultDebtCharacteristic();
+  SMInputCursor cursor=chcCursor.childElementCursor();
+  while (cursor.getNext() != null) {
+    String node=cursor.getLocalName();
+    if (StringUtils.equals(node,CHARACTERISTIC_KEY)) {
+      characteristic.setKey(cursor.collectDescendantText().trim());
+      if (parent == null) {
+        characteristic.setOrder(debtModel.rootCharacteristics().size() + 1);
+        debtModel.addRootCharacteristic(characteristic);
+      }
+ else {
+        debtModel.addSubCharacteristic(characteristic,parent);
+      }
+    }
+ else     if (StringUtils.equals(node,CHARACTERISTIC_NAME)) {
+      characteristic.setName(cursor.collectDescendantText().trim());
+    }
+ else     if (StringUtils.equals(node,CHARACTERISTIC)) {
+      process(debtModel,characteristic.key(),cursor);
+    }
+  }
+}

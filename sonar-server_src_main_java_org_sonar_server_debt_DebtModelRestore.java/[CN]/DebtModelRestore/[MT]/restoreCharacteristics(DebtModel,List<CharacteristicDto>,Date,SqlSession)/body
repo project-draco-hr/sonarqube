@@ -1,0 +1,13 @@
+{
+  for (  DebtCharacteristic characteristic : targetModel.rootCharacteristics()) {
+    CharacteristicDto rootCharacteristicDto=restoreCharacteristic(characteristic,null,sourceCharacteristics,updateDate,session);
+    for (    DebtCharacteristic subCharacteristic : targetModel.subCharacteristics(characteristic.key())) {
+      restoreCharacteristic(subCharacteristic,rootCharacteristicDto.getId(),sourceCharacteristics,updateDate,session);
+    }
+  }
+  for (  CharacteristicDto sourceCharacteristic : sourceCharacteristics) {
+    if (targetModel.characteristicByKey(sourceCharacteristic.getKey()) == null) {
+      debtModelOperations.disableCharacteristic(sourceCharacteristic,updateDate,session);
+    }
+  }
+}

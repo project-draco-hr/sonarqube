@@ -1,0 +1,17 @@
+{
+  CharacteristicDto sourceCharacteristic=dtoByKey(sourceCharacteristics,targetCharacteristic.key());
+  if (sourceCharacteristic == null) {
+    CharacteristicDto newCharacteristic=toDto(targetCharacteristic,parentId).setCreatedAt(updateDate);
+    dao.insert(newCharacteristic,session);
+    return newCharacteristic;
+  }
+ else {
+    if (ObjectUtils.notEqual(sourceCharacteristic.getName(),targetCharacteristic.name()) || ObjectUtils.notEqual(sourceCharacteristic.getOrder(),targetCharacteristic.order())) {
+      sourceCharacteristic.setName(targetCharacteristic.name());
+      sourceCharacteristic.setOrder(targetCharacteristic.order());
+      sourceCharacteristic.setUpdatedAt(updateDate);
+      dao.update(sourceCharacteristic,session);
+    }
+    return sourceCharacteristic;
+  }
+}

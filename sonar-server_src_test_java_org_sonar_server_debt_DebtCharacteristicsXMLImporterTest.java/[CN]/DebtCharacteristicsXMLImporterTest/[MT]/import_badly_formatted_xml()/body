@@ -1,10 +1,13 @@
 {
   String xml=getFileContent("import_badly_formatted_xml.xml");
-  DebtCharacteristicsXMLImporter.DebtModel debtModel=new DebtCharacteristicsXMLImporter().importXML(xml);
-  assertThat(debtModel.rootCharacteristics()).hasSize(2);
-  DefaultCharacteristic efficiency=debtModel.characteristicByKey("EFFICIENCY");
-  assertThat(efficiency.name()).isEqualTo("Efficiency");
-  assertThat(efficiency.children()).hasSize(1);
-  DefaultCharacteristic memoryEfficiency=debtModel.characteristicByKey("MEMORY_EFFICIENCY");
-  assertThat(memoryEfficiency.name()).isEqualTo("Memory use");
+  DebtModel debtModel=new DebtCharacteristicsXMLImporter().importXML(xml);
+  List<DebtCharacteristic> rootCharacteristics=debtModel.rootCharacteristics();
+  assertThat(rootCharacteristics).hasSize(2);
+  assertThat(rootCharacteristics.get(0).key()).isEqualTo("USABILITY");
+  assertThat(rootCharacteristics.get(0).name()).isEqualTo("Usability");
+  assertThat(rootCharacteristics.get(1).key()).isEqualTo("EFFICIENCY");
+  assertThat(rootCharacteristics.get(1).name()).isEqualTo("Efficiency");
+  assertThat(debtModel.subCharacteristics("EFFICIENCY")).hasSize(1);
+  assertThat(debtModel.subCharacteristics("EFFICIENCY").get(0).key()).isEqualTo("MEMORY_EFFICIENCY");
+  assertThat(debtModel.subCharacteristics("EFFICIENCY").get(0).name()).isEqualTo("Memory use");
 }

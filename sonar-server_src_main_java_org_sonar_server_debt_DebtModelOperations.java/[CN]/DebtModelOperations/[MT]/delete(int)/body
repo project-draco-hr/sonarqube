@@ -1,0 +1,20 @@
+{
+  checkPermission();
+  Date updateDate=new Date(system2.now());
+  SqlSession session=mybatis.openBatchSession();
+  try {
+    CharacteristicDto characteristicOrSubCharacteristic=findCharacteristic(characteristicOrSubCharacteristicId,session);
+    disableDebtRules(ruleDao.selectByCharacteristicOrSubCharacteristicId(characteristicOrSubCharacteristic.getId(),session),updateDate,session);
+    if (characteristicOrSubCharacteristic.getParentId() == null) {
+      List<CharacteristicDto> subChracteristics=dao.selectCharacteristicsByParentId(characteristicOrSubCharacteristic.getId(),session);
+      for (      CharacteristicDto subCharacteristic : subChracteristics) {
+        disableCharacteristic(subCharacteristic,updateDate,session);
+      }
+    }
+    disableCharacteristic(characteristicOrSubCharacteristic,updateDate,session);
+    session.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

@@ -1,0 +1,20 @@
+{
+  Date oldDate=DateUtils.parseDate("2014-01-01");
+  debtModelRestore.restoreCharacteristics(new DebtModel().addRootCharacteristic(new DefaultDebtCharacteristic().setKey("PORTABILITY").setName("Portability").setOrder(1)).addSubCharacteristic(new DefaultDebtCharacteristic().setKey("COMPILER_RELATED_PORTABILITY").setName("Compiler"),"PORTABILITY"),newArrayList(new CharacteristicDto().setId(1).setKey("PORTABILITY").setName("Portability updated").setOrder(2).setCreatedAt(oldDate).setUpdatedAt(oldDate),new CharacteristicDto().setId(2).setKey("COMPILER_RELATED_PORTABILITY").setName("Compiler updated").setParentId(1).setCreatedAt(oldDate).setUpdatedAt(oldDate)),now,session);
+  ArgumentCaptor<CharacteristicDto> characteristicArgument=ArgumentCaptor.forClass(CharacteristicDto.class);
+  verify(dao,times(2)).update(characteristicArgument.capture(),eq(session));
+  assertThat(characteristicArgument.getAllValues().get(0).getId()).isEqualTo(1);
+  assertThat(characteristicArgument.getAllValues().get(0).getKey()).isEqualTo("PORTABILITY");
+  assertThat(characteristicArgument.getAllValues().get(0).getName()).isEqualTo("Portability");
+  assertThat(characteristicArgument.getAllValues().get(0).getParentId()).isNull();
+  assertThat(characteristicArgument.getAllValues().get(0).getOrder()).isEqualTo(1);
+  assertThat(characteristicArgument.getAllValues().get(0).getCreatedAt()).isEqualTo(oldDate);
+  assertThat(characteristicArgument.getAllValues().get(0).getUpdatedAt()).isEqualTo(now);
+  assertThat(characteristicArgument.getAllValues().get(1).getId()).isEqualTo(2);
+  assertThat(characteristicArgument.getAllValues().get(1).getKey()).isEqualTo("COMPILER_RELATED_PORTABILITY");
+  assertThat(characteristicArgument.getAllValues().get(1).getName()).isEqualTo("Compiler");
+  assertThat(characteristicArgument.getAllValues().get(1).getParentId()).isEqualTo(1);
+  assertThat(characteristicArgument.getAllValues().get(1).getOrder()).isNull();
+  assertThat(characteristicArgument.getAllValues().get(1).getCreatedAt()).isEqualTo(oldDate);
+  assertThat(characteristicArgument.getAllValues().get(1).getUpdatedAt()).isEqualTo(now);
+}

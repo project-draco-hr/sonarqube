@@ -1,0 +1,18 @@
+{
+  checkPermission();
+  SqlSession session=mybatis.openSession();
+  try {
+    checkNotAlreadyExists(newName,session);
+    CharacteristicDto dto=findCharacteristic(characteristicId,session);
+    if (!dto.getName().equals(newName)) {
+      dto.setName(newName);
+      dto.setUpdatedAt(new Date(system2.now()));
+      dao.update(dto,session);
+      session.commit();
+    }
+    return toCharacteristic(dto);
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

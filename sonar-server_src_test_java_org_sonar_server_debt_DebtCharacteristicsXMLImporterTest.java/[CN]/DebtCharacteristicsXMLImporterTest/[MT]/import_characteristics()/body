@@ -1,19 +1,22 @@
 {
   String xml=getFileContent("import_characteristics.xml");
-  DebtCharacteristicsXMLImporter.DebtModel debtModel=new DebtCharacteristicsXMLImporter().importXML(xml);
-  assertThat(debtModel.rootCharacteristics()).hasSize(2);
-  assertThat(debtModel.rootCharacteristics().get(0).key()).isEqualTo("PORTABILITY");
-  assertThat(debtModel.rootCharacteristics().get(1).key()).isEqualTo("MAINTAINABILITY");
-  DefaultCharacteristic portability=debtModel.characteristicByKey("PORTABILITY");
-  assertThat(portability.order()).isEqualTo(1);
-  assertThat(portability.children()).hasSize(2);
-  assertThat(portability.children().get(0).key()).isEqualTo("COMPILER_RELATED_PORTABILITY");
-  assertThat(debtModel.characteristicByKey("COMPILER_RELATED_PORTABILITY").parent().key()).isEqualTo("PORTABILITY");
-  assertThat(portability.children().get(1).key()).isEqualTo("HARDWARE_RELATED_PORTABILITY");
-  assertThat(debtModel.characteristicByKey("HARDWARE_RELATED_PORTABILITY").parent().key()).isEqualTo("PORTABILITY");
-  DefaultCharacteristic maintainability=debtModel.characteristicByKey("MAINTAINABILITY");
-  assertThat(maintainability.order()).isEqualTo(2);
-  assertThat(maintainability.children()).hasSize(1);
-  assertThat(maintainability.children().get(0).key()).isEqualTo("READABILITY");
-  assertThat(debtModel.characteristicByKey("READABILITY").parent().key()).isEqualTo("MAINTAINABILITY");
+  DebtModel debtModel=new DebtCharacteristicsXMLImporter().importXML(xml);
+  List<DebtCharacteristic> rootCharacteristics=debtModel.rootCharacteristics();
+  assertThat(rootCharacteristics).hasSize(2);
+  assertThat(rootCharacteristics.get(0).key()).isEqualTo("PORTABILITY");
+  assertThat(rootCharacteristics.get(0).name()).isEqualTo("Portability");
+  assertThat(rootCharacteristics.get(0).order()).isEqualTo(1);
+  assertThat(rootCharacteristics.get(1).key()).isEqualTo("MAINTAINABILITY");
+  assertThat(rootCharacteristics.get(1).name()).isEqualTo("Maintainability");
+  assertThat(rootCharacteristics.get(1).order()).isEqualTo(2);
+  List<DebtCharacteristic> portabilitySubCharacteristics=debtModel.subCharacteristics("PORTABILITY");
+  assertThat(portabilitySubCharacteristics).hasSize(2);
+  assertThat(portabilitySubCharacteristics.get(0).key()).isEqualTo("COMPILER_RELATED_PORTABILITY");
+  assertThat(portabilitySubCharacteristics.get(0).name()).isEqualTo("Compiler related portability");
+  assertThat(portabilitySubCharacteristics.get(1).key()).isEqualTo("HARDWARE_RELATED_PORTABILITY");
+  assertThat(portabilitySubCharacteristics.get(1).name()).isEqualTo("Hardware related portability");
+  List<DebtCharacteristic> maintainabilitySubCharacteristics=debtModel.subCharacteristics("MAINTAINABILITY");
+  assertThat(maintainabilitySubCharacteristics).hasSize(1);
+  assertThat(maintainabilitySubCharacteristics.get(0).key()).isEqualTo("READABILITY");
+  assertThat(maintainabilitySubCharacteristics.get(0).name()).isEqualTo("Readability");
 }

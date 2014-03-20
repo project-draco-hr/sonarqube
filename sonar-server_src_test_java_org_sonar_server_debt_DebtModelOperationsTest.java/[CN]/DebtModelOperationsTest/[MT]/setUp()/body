@@ -1,0 +1,16 @@
+{
+  when(system2.now()).thenReturn(now.getTime());
+  MockUserSession.set().setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
+  currentId=10;
+  doAnswer(new Answer(){
+    public Object answer(    InvocationOnMock invocation){
+      Object[] args=invocation.getArguments();
+      CharacteristicDto dto=(CharacteristicDto)args[0];
+      dto.setId(++currentId);
+      return null;
+    }
+  }
+).when(dao).insert(any(CharacteristicDto.class),any(SqlSession.class));
+  when(mybatis.openSession()).thenReturn(session);
+  service=new DebtModelOperations(mybatis,dao,ruleDao,system2);
+}

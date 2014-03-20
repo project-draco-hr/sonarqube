@@ -1,12 +1,15 @@
 {
   SqlSession session=mybatis.openSession();
-  List<CharacteristicDto> model=newArrayList();
+  List<CharacteristicDto> characteristics=newArrayList();
   try {
-    model=synchronize(session);
-    session.commit();
+    DebtModel defaultModel=loadModelFromXml(TechnicalDebtModelRepository.DEFAULT_MODEL);
+    List<CharacteristicDto> existingCharacteristics=dao.selectEnabledCharacteristics();
+    if (existingCharacteristics.isEmpty()) {
+      return createDebtModel(defaultModel,session);
+    }
   }
   finally {
     MyBatis.closeQuietly(session);
   }
-  return model;
+  return characteristics;
 }

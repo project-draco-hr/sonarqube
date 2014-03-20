@@ -1,24 +1,3 @@
 {
-  checkPermission();
-  SqlSession session=mybatis.openSession();
-  try {
-    checkNotAlreadyExists(name,session);
-    CharacteristicDto newCharacteristic=new CharacteristicDto().setKey(name.toUpperCase().replace(" ","_")).setName(name).setEnabled(true);
-    if (parentId != null) {
-      CharacteristicDto parent=findCharacteristic(parentId,session);
-      if (parent.getParentId() != null) {
-        throw new BadRequestException("A sub characteristic can not have a sub characteristic as parent.");
-      }
-      newCharacteristic.setParentId(parent.getId());
-    }
- else {
-      newCharacteristic.setOrder(dao.selectMaxCharacteristicOrder(session) + 1);
-    }
-    dao.insert(newCharacteristic,session);
-    session.commit();
-    return toCharacteristic(newCharacteristic);
-  }
-  finally {
-    MyBatis.closeQuietly(session);
-  }
+  return debtModelOperations.create(name,parentId);
 }

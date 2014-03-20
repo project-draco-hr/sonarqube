@@ -1,9 +1,10 @@
 {
-  DefaultCharacteristic rootCharacteristic=new DefaultCharacteristic().setKey("PORTABILITY");
-  new DefaultCharacteristic().setKey("COMPILER_RELATED_PORTABILITY").setParent(rootCharacteristic);
-  defaultModel.addRootCharacteristic(rootCharacteristic);
+  DebtCharacteristic characteristic=new DefaultDebtCharacteristic().setKey("PORTABILITY");
+  DebtCharacteristic subCharacteristic=new DefaultDebtCharacteristic().setKey("COMPILER_RELATED_PORTABILITY");
+  defaultModel.addRootCharacteristic(characteristic);
+  defaultModel.addSubCharacteristic(subCharacteristic,"PORTABILITY");
   when(technicalDebtModelRepository.getContributingPluginList()).thenReturn(Collections.<String>emptyList());
-  when(dao.selectEnabledCharacteristics()).thenReturn(Lists.newArrayList(new CharacteristicDto()));
+  when(dao.selectEnabledCharacteristics()).thenReturn(newArrayList(new CharacteristicDto()));
   manager.synchronize();
   verify(dao,never()).insert(any(CharacteristicDto.class),eq(session));
 }

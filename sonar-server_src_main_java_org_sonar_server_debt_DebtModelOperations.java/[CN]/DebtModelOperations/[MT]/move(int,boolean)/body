@@ -1,0 +1,24 @@
+{
+  checkPermission();
+  SqlSession session=mybatis.openSession();
+  try {
+    CharacteristicDto dto=findCharacteristic(characteristicId,session);
+    int currentOrder=dto.getOrder();
+    CharacteristicDto dtoToSwitchOrderWith=moveUpOrDown ? dao.selectPrevious(currentOrder,session) : dao.selectNext(currentOrder,session);
+    if (dtoToSwitchOrderWith == null) {
+      return toCharacteristic(dto);
+    }
+    int nextOrder=dtoToSwitchOrderWith.getOrder();
+    dtoToSwitchOrderWith.setOrder(currentOrder);
+    dtoToSwitchOrderWith.setUpdatedAt(new Date(system2.now()));
+    dao.update(dtoToSwitchOrderWith,session);
+    dto.setOrder(nextOrder);
+    dto.setUpdatedAt(new Date(system2.now()));
+    dao.update(dto,session);
+    session.commit();
+    return toCharacteristic(dto);
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}
