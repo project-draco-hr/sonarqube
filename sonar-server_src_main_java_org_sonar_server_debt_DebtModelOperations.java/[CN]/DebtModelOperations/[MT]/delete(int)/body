@@ -4,14 +4,16 @@
   SqlSession session=mybatis.openBatchSession();
   try {
     CharacteristicDto characteristicOrSubCharacteristic=findCharacteristic(characteristicId,session);
-    disableDebtRules(ruleDao.selectByCharacteristicOrSubCharacteristicId(characteristicOrSubCharacteristic.getId(),session),updateDate,session);
     if (characteristicOrSubCharacteristic.getParentId() == null) {
       List<CharacteristicDto> subCharacteristics=dao.selectCharacteristicsByParentId(characteristicOrSubCharacteristic.getId(),session);
       for (      CharacteristicDto subCharacteristic : subCharacteristics) {
-        disableCharacteristic(subCharacteristic,updateDate,session);
+        disableSubChracteristic(subCharacteristic,updateDate,session);
       }
+      disableCharacteristic(characteristicOrSubCharacteristic,updateDate,session);
     }
-    disableCharacteristic(characteristicOrSubCharacteristic,updateDate,session);
+ else {
+      disableSubChracteristic(characteristicOrSubCharacteristic,updateDate,session);
+    }
     session.commit();
   }
   finally {

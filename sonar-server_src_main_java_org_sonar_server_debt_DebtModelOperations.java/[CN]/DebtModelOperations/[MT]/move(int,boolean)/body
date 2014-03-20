@@ -4,18 +4,10 @@
   try {
     final CharacteristicDto dto=findCharacteristic(characteristicId,session);
     int currentOrder=dto.getOrder();
-    List<CharacteristicDto> rootCharacteristics=dao.selectEnabledRootCharacteristics(session);
-    int currentPosition=Iterables.indexOf(rootCharacteristics,new Predicate<CharacteristicDto>(){
-      @Override public boolean apply(      CharacteristicDto input){
-        return input.getKey().equals(dto.getKey());
-      }
-    }
-);
-    Integer nextMove=moveUpOrDown ? (currentPosition > 0 ? currentPosition - 1 : null) : (currentPosition < rootCharacteristics.size() - 1 ? currentPosition + 1 : null);
-    if (nextMove == null) {
+    CharacteristicDto dtoToSwitchOrderWith=findCharacteristicToSwitchWith(dto,moveUpOrDown,session);
+    if (dtoToSwitchOrderWith == null) {
       return toCharacteristic(dto);
     }
-    CharacteristicDto dtoToSwitchOrderWith=Iterables.get(rootCharacteristics,nextMove);
     int nextOrder=dtoToSwitchOrderWith.getOrder();
     dtoToSwitchOrderWith.setOrder(currentOrder);
     dtoToSwitchOrderWith.setUpdatedAt(new Date(system2.now()));
