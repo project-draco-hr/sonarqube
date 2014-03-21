@@ -1,5 +1,9 @@
 {
-  for (  File file : fileSystem.getCorePlugins()) {
-    registerPlugin(file,true,false);
+  for (  File file : fs.getCorePlugins()) {
+    DefaultPluginMetadata metadata=installer.extractMetadata(file,true);
+    PluginMetadata existing=pluginByKeys.put(metadata.getKey(),metadata);
+    if (existing != null) {
+      throw new IllegalStateException("Found two plugins with the same key '" + metadata.getKey() + "': "+ metadata.getFile().getName()+ " and "+ existing.getFile().getName());
+    }
   }
 }

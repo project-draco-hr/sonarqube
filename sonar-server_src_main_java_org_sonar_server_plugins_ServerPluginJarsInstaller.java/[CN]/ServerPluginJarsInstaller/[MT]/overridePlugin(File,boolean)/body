@@ -1,0 +1,28 @@
+{
+  File destDir=fs.getUserPluginsDir();
+  File destFile=new File(destDir,sourceFile.getName());
+  if (destFile.exists()) {
+    FileUtils.deleteQuietly(destFile);
+  }
+  try {
+    if (deleteSource) {
+      FileUtils.moveFile(sourceFile,destFile);
+    }
+ else {
+      FileUtils.copyFile(sourceFile,destFile);
+    }
+  }
+ catch (  IOException e) {
+    LOG.error(String.format("Fail to move or copy plugin: %s to %s",sourceFile.getAbsolutePath(),destFile.getAbsolutePath()),e);
+  }
+  DefaultPluginMetadata metadata=installer.extractMetadata(destFile,false);
+  if (StringUtils.isNotBlank(metadata.getKey())) {
+    PluginMetadata existing=pluginByKeys.put(metadata.getKey(),metadata);
+    if (existing != null) {
+      if (!existing.getFile().getName().equals(destFile.getName())) {
+        FileUtils.deleteQuietly(existing.getFile());
+      }
+      LOG.info("Plugin " + metadata.getKey() + " replaced by new version");
+    }
+  }
+}

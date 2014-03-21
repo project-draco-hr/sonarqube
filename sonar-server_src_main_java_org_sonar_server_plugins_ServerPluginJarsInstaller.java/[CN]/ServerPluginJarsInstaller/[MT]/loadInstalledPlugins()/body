@@ -1,0 +1,11 @@
+{
+  for (  File file : fs.getUserPlugins()) {
+    DefaultPluginMetadata metadata=installer.extractMetadata(file,false);
+    if (StringUtils.isNotBlank(metadata.getKey())) {
+      PluginMetadata existing=pluginByKeys.put(metadata.getKey(),metadata);
+      if (existing != null) {
+        throw MessageException.of(String.format("Found two files for the same plugin '%s': %s and %s",metadata.getKey(),metadata.getFile().getName(),existing.getFile().getName()));
+      }
+    }
+  }
+}
