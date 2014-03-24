@@ -2,7 +2,10 @@
   Reader xmlFileReader=null;
   try {
     xmlFileReader=languageModelFinder.createReaderForXMLFile(pluginKey);
-    return importer.importXML(xmlFileReader);
+    ValidationMessages validationMessages=ValidationMessages.create();
+    List<DebtRulesXMLImporter.RuleDebt> rules=importer.importXML(xmlFileReader,validationMessages);
+    validationMessages.log(LOG);
+    return rules;
   }
   finally {
     IOUtils.closeQuietly(xmlFileReader);

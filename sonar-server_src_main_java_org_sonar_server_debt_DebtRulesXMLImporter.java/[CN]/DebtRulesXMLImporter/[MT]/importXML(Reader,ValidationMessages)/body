@@ -1,0 +1,17 @@
+{
+  List<RuleDebt> ruleDebts=newArrayList();
+  try {
+    SMInputFactory inputFactory=initStax();
+    SMHierarchicCursor cursor=inputFactory.rootElementCursor(xml);
+    cursor.advance();
+    SMInputCursor rootCursor=cursor.childElementCursor(CHARACTERISTIC);
+    while (rootCursor.getNext() != null) {
+      process(ruleDebts,null,null,validationMessages,rootCursor);
+    }
+    cursor.getStreamReader().closeCompletely();
+  }
+ catch (  XMLStreamException e) {
+    throw new IllegalStateException("XML is not valid",e);
+  }
+  return ruleDebts;
+}

@@ -1,0 +1,20 @@
+{
+  Date oldDate=DateUtils.parseDate("2014-01-01");
+  characteristics.addRootCharacteristic(new DefaultDebtCharacteristic().setKey("PORTABILITY").setName("Portability").setOrder(1)).addSubCharacteristic(new DefaultDebtCharacteristic().setKey("COMPILER").setName("Compiler"),"PORTABILITY");
+  when(dao.selectEnabledCharacteristics()).thenReturn(newArrayList(new CharacteristicDto().setId(1).setKey("PORTABILITY").setName("Portability").setOrder(1).setCreatedAt(oldDate),new CharacteristicDto().setId(2).setKey("COMPILER").setName("Compiler").setParentId(1).setCreatedAt(oldDate)));
+  rules.add(new DebtRulesXMLImporter.RuleDebt().setRuleKey(RuleKey.of("squid","UselessImportCheck")).setCharacteristicKey("COMPILER").setFunction(DebtRemediationFunction.Type.LINEAR_OFFSET).setFactor("2h").setOffset("15min"));
+  when(ruleDao.selectEnablesAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setId(1).setRepositoryKey("squid").setRuleKey("UselessImportCheck").setDefaultCharacteristicId(2).setDefaultRemediationFunction("LINEAR_OFFSET").setDefaultRemediationFactor("2h").setDefaultRemediationOffset("15min").setCreatedAt(oldDate).setUpdatedAt(oldDate)));
+  debtModelRestore.restoreFromXml("<xml/>");
+  verify(ruleDao).selectEnablesAndNonManual(session);
+  ArgumentCaptor<RuleDto> ruleArgument=ArgumentCaptor.forClass(RuleDto.class);
+  verify(ruleDao).update(ruleArgument.capture(),eq(session));
+  verifyNoMoreInteractions(ruleDao);
+  RuleDto rule=ruleArgument.getValue();
+  assertThat(rule.getId()).isEqualTo(1);
+  assertThat(rule.getCharacteristicId()).isNull();
+  assertThat(rule.getRemediationFunction()).isNull();
+  assertThat(rule.getRemediationFactor()).isNull();
+  assertThat(rule.getRemediationOffset()).isNull();
+  assertThat(rule.getUpdatedAt()).isEqualTo(now);
+  verify(session).commit();
+}

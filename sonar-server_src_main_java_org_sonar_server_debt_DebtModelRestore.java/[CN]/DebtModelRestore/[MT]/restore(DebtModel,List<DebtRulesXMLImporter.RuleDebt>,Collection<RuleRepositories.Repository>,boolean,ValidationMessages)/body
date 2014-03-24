@@ -1,0 +1,14 @@
+{
+  checkPermission();
+  Date updateDate=new Date(system2.now());
+  SqlSession session=mybatis.openSession();
+  try {
+    List<CharacteristicDto> persisted=dao.selectEnabledCharacteristics();
+    List<CharacteristicDto> characteristicDtos=restoreCharacteristics(modelToImport,persisted,updateDate,session);
+    restoreRules(characteristicDtos,repositories,ruleDebts,disableCharacteristicWhenRuleNotFound,validationMessages,updateDate,session);
+    session.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

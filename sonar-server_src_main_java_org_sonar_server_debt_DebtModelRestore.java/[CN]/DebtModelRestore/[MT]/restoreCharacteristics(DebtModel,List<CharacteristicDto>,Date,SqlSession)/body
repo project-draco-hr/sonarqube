@@ -1,8 +1,10 @@
 {
+  List<CharacteristicDto> result=newArrayList();
   for (  DebtCharacteristic characteristic : targetModel.rootCharacteristics()) {
     CharacteristicDto rootCharacteristicDto=restoreCharacteristic(characteristic,null,sourceCharacteristics,updateDate,session);
+    result.add(rootCharacteristicDto);
     for (    DebtCharacteristic subCharacteristic : targetModel.subCharacteristics(characteristic.key())) {
-      restoreCharacteristic(subCharacteristic,rootCharacteristicDto.getId(),sourceCharacteristics,updateDate,session);
+      result.add(restoreCharacteristic(subCharacteristic,rootCharacteristicDto.getId(),sourceCharacteristics,updateDate,session));
     }
   }
   for (  CharacteristicDto sourceCharacteristic : sourceCharacteristics) {
@@ -10,4 +12,5 @@
       debtModelOperations.disableCharacteristic(sourceCharacteristic,updateDate,session);
     }
   }
+  return result;
 }

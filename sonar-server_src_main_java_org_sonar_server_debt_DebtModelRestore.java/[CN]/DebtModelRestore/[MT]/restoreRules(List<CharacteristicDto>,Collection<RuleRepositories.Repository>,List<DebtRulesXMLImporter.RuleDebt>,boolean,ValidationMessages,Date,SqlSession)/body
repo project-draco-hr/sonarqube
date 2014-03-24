@@ -1,0 +1,34 @@
+{
+  List<String> repositoryKeys=newArrayList(Iterables.transform(repositories,new Function<RuleRepositories.Repository,String>(){
+    @Override public String apply(    RuleRepositories.Repository input){
+      return input.getKey();
+    }
+  }
+));
+  for (  RuleDto rule : ruleDao.selectEnablesAndNonManual(session)) {
+    if (repositories.isEmpty() || repositoryKeys.contains(rule.getRepositoryKey())) {
+      DebtRulesXMLImporter.RuleDebt ruleDebt=ruleDebtByRule(rule,ruleDebts);
+      if (ruleDebt == null) {
+        rule.setCharacteristicId(disableCharacteristicWhenRuleNotFound ? RuleDto.DISABLED_CHARACTERISTIC_ID : null);
+        rule.setRemediationFunction(null);
+        rule.setRemediationFactor(null);
+        rule.setRemediationOffset(null);
+      }
+ else {
+        CharacteristicDto characteristicDto=characteristicByKey(ruleDebt.characteristicKey(),characteristicDtos,false);
+        boolean isSameCharacteristic=characteristicDto.getId().equals(rule.getDefaultCharacteristicId());
+        boolean isSameFunction=isSameRemediationFunction(ruleDebt,rule);
+        rule.setCharacteristicId((!isSameCharacteristic ? characteristicDto.getId() : null));
+        rule.setRemediationFunction((!isSameFunction ? ruleDebt.function().name() : null));
+        rule.setRemediationFactor((!isSameFunction ? ruleDebt.factor() : null));
+        rule.setRemediationOffset((!isSameFunction ? ruleDebt.offset() : null));
+      }
+      ruleDebts.remove(ruleDebt);
+      rule.setUpdatedAt(updateDate);
+      ruleDao.update(rule,session);
+    }
+  }
+  for (  DebtRulesXMLImporter.RuleDebt ruleDebt : ruleDebts) {
+    validationMessages.addWarningText(String.format("The rule '%s' does not exist.",ruleDebt.ruleKey()));
+  }
+}
