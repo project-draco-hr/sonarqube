@@ -1,0 +1,20 @@
+{
+  Properties newProperties=new Properties();
+  try {
+    for (    String key : properties.stringPropertyNames()) {
+      if (key.contains(".password")) {
+        try {
+          String decrypted=securityDispatcher.decrypt(properties.getProperty(key));
+          newProperties.setProperty(key,decrypted);
+        }
+ catch (        SecDispatcherException e) {
+          getLog().warn("Unable to decrypt property " + key,e);
+        }
+      }
+    }
+  }
+ catch (  Exception e) {
+    getLog().warn("Unable to decrypt properties",e);
+  }
+  return newProperties;
+}
