@@ -1,10 +1,10 @@
 {
   setupData("last_snapshot");
   ServerClient server=mock(ServerClient.class);
-  when(server.request(anyString(),eq(false))).thenThrow(new HttpDownloader.HttpException(new URI(""),404));
+  when(server.request(anyString(),eq(false),eq(30 * 1000))).thenThrow(new HttpDownloader.HttpException(new URI(""),404));
   when(mode.isPreview()).thenReturn(true);
   LastSnapshots lastSnapshots=new LastSnapshots(mode,getSession(),server);
   String source=lastSnapshots.getSource(newFile());
   assertThat(source).isEqualTo("");
-  verify(server).request("/api/sources?resource=myproject:org/foo/Bar.c&format=txt",false);
+  verify(server).request("/api/sources?resource=myproject:org/foo/Bar.c&format=txt",false,30 * 1000);
 }
