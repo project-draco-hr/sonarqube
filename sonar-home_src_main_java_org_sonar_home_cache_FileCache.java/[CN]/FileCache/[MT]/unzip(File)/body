@@ -1,15 +1,25 @@
 {
   String filename=cachedFile.getName();
   File destDir=new File(cachedFile.getParentFile(),filename + "_unzip");
+  File lockFile=new File(cachedFile.getParentFile(),filename + "_unzip.lock");
   if (!destDir.exists()) {
-    File tempDir=createTempDir();
-    ZipUtils.unzip(cachedFile,tempDir,new LibFilter());
+    FileOutputStream out=new FileOutputStream(lockFile);
     try {
-      if (!destDir.exists()) {
-        FileUtils.moveDirectory(tempDir,destDir);
+      java.nio.channels.FileLock lock=out.getChannel().lock();
+      try {
+        if (!destDir.exists()) {
+          File tempDir=createTempDir();
+          ZipUtils.unzip(cachedFile,tempDir,new LibFilter());
+          FileUtils.moveDirectory(tempDir,destDir);
+        }
+      }
+  finally {
+        lock.release();
       }
     }
- catch (    FileExistsException e) {
+  finally {
+      out.close();
+      FileUtils.deleteQuietly(lockFile);
     }
   }
   return destDir;
