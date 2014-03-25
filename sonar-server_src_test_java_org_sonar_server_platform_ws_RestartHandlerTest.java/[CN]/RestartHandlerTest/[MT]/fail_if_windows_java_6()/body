@@ -2,10 +2,16 @@
   Platform platform=mock(Platform.class);
   Settings settings=new Settings();
   settings.setProperty("sonar.dev",true);
-  when(system.isOsWindows()).thenReturn(false);
+  when(system.isOsWindows()).thenReturn(true);
+  when(system.isJavaAtLeast17()).thenReturn(false);
   RestartHandler restartHandler=new RestartHandler(settings,platform,system);
   SystemWs ws=new SystemWs(restartHandler);
   WsTester tester=new WsTester(ws);
-  tester.newRequest("restart").execute();
-  verify(platform).restart();
+  try {
+    tester.newRequest("restart").execute();
+    fail();
+  }
+ catch (  ForbiddenException e) {
+    verifyZeroInteractions(platform);
+  }
 }
