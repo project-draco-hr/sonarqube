@@ -1,0 +1,11 @@
+{
+  debtModel.addRootCharacteristic(new DefaultDebtCharacteristic().setKey("PORTABILITY").setName("Portability").setOrder(1)).addSubCharacteristic(new DefaultDebtCharacteristic().setKey("COMPILER").setName("Compiler"),"PORTABILITY");
+  when(dao.selectEnabledCharacteristics(session)).thenReturn(newArrayList(new CharacteristicDto().setId(1).setKey("PORTABILITY").setName("Portability").setOrder(1).setCreatedAt(oldDate),new CharacteristicDto().setId(2).setKey("COMPILER").setName("Compiler").setParentId(1).setCreatedAt(oldDate)));
+  rules.add(new RuleDebt().setRuleKey(RuleKey.of("squid","UselessImportCheck")).setCharacteristicKey("COMPILER").setFunction(DebtRemediationFunction.Type.LINEAR).setFactor("2h"));
+  when(ruleDao.selectEnablesAndNonManual(session)).thenReturn(Collections.<RuleDto>emptyList());
+  ValidationMessages validationMessages=debtModelBackup.restoreFromXml("<xml/>");
+  assertThat(validationMessages.getWarnings()).hasSize(1);
+  verify(ruleDao).selectEnablesAndNonManual(session);
+  verifyNoMoreInteractions(ruleDao);
+  verify(session).commit();
+}

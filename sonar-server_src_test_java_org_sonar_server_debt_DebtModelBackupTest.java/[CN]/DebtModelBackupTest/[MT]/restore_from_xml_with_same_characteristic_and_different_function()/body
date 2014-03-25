@@ -1,0 +1,18 @@
+{
+  debtModel.addRootCharacteristic(new DefaultDebtCharacteristic().setKey("PORTABILITY").setName("Portability").setOrder(1)).addSubCharacteristic(new DefaultDebtCharacteristic().setKey("COMPILER").setName("Compiler"),"PORTABILITY");
+  when(dao.selectEnabledCharacteristics(session)).thenReturn(newArrayList(new CharacteristicDto().setId(1).setKey("PORTABILITY").setName("Portability").setOrder(1).setCreatedAt(oldDate),new CharacteristicDto().setId(2).setKey("COMPILER").setName("Compiler").setParentId(1).setCreatedAt(oldDate)));
+  rules.add(new RuleDebt().setRuleKey(RuleKey.of("squid","UselessImportCheck")).setCharacteristicKey("COMPILER").setFunction(DebtRemediationFunction.Type.LINEAR_OFFSET).setFactor("12h").setOffset("11min"));
+  when(ruleDao.selectEnablesAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setId(1).setRepositoryKey("squid").setRuleKey("UselessImportCheck").setDefaultCharacteristicId(2).setDefaultRemediationFunction("LINEAR").setDefaultRemediationFactor("2h").setCreatedAt(oldDate).setUpdatedAt(oldDate)));
+  debtModelBackup.restoreFromXml("<xml/>");
+  verify(ruleDao).selectEnablesAndNonManual(session);
+  verify(ruleDao).update(ruleArgument.capture(),eq(session));
+  verifyNoMoreInteractions(ruleDao);
+  RuleDto rule=ruleArgument.getValue();
+  assertThat(rule.getId()).isEqualTo(1);
+  assertThat(rule.getCharacteristicId()).isNull();
+  assertThat(rule.getRemediationFunction()).isEqualTo("LINEAR_OFFSET");
+  assertThat(rule.getRemediationFactor()).isEqualTo("12h");
+  assertThat(rule.getRemediationOffset()).isEqualTo("11min");
+  assertThat(rule.getUpdatedAt()).isEqualTo(now);
+  verify(session).commit();
+}

@@ -1,0 +1,22 @@
+{
+  checkPermission();
+  Date updateDate=new Date(system2.now());
+  SqlSession session=mybatis.openSession();
+  try {
+    restoreCharacteristics(modelToImport,updateDate,session);
+    for (    RuleDto rule : ruleDao.selectEnablesAndNonManual(session)) {
+      if (languageKey == null || languageKey.equals(rule.getLanguage())) {
+        rule.setCharacteristicId(null);
+        rule.setRemediationFunction(null);
+        rule.setRemediationFactor(null);
+        rule.setRemediationOffset(null);
+        rule.setUpdatedAt(updateDate);
+        ruleDao.update(rule,session);
+      }
+    }
+    session.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

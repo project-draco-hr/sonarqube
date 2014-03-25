@@ -1,0 +1,19 @@
+{
+  debtModel.addRootCharacteristic(new DefaultDebtCharacteristic().setKey("PORTABILITY").setName("Portability").setOrder(1)).addSubCharacteristic(new DefaultDebtCharacteristic().setKey("COMPILER").setName("Compiler"),"PORTABILITY");
+  when(dao.selectEnabledCharacteristics(session)).thenReturn(newArrayList(new CharacteristicDto().setId(1).setKey("PORTABILITY").setName("Portability updated").setOrder(2).setCreatedAt(oldDate),new CharacteristicDto().setId(2).setKey("COMPILER").setName("Compiler updated").setParentId(1).setCreatedAt(oldDate)));
+  when(ruleDao.selectEnablesAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setRepositoryKey("squid").setCharacteristicId(2).setRemediationFunction("LINEAR_OFFSET").setRemediationFactor("2h").setRemediationOffset("15min").setCreatedAt(oldDate).setUpdatedAt(oldDate)));
+  debtModelBackup.restore();
+  verify(dao).selectEnabledCharacteristics(session);
+  verify(dao,times(2)).update(any(CharacteristicDto.class),eq(session));
+  verifyNoMoreInteractions(dao);
+  verify(ruleDao).selectEnablesAndNonManual(session);
+  verify(ruleDao).update(ruleArgument.capture(),eq(session));
+  verifyNoMoreInteractions(ruleDao);
+  RuleDto rule=ruleArgument.getValue();
+  assertThat(rule.getCharacteristicId()).isNull();
+  assertThat(rule.getRemediationFunction()).isNull();
+  assertThat(rule.getRemediationFactor()).isNull();
+  assertThat(rule.getRemediationOffset()).isNull();
+  assertThat(rule.getUpdatedAt()).isEqualTo(now);
+  verify(session).commit();
+}

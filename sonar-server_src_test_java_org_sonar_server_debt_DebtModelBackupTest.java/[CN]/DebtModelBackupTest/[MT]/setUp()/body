@@ -1,0 +1,21 @@
+{
+  MockUserSession.set().setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
+  when(system2.now()).thenReturn(now.getTime());
+  currentId=10;
+  doAnswer(new Answer(){
+    public Object answer(    InvocationOnMock invocation){
+      Object[] args=invocation.getArguments();
+      CharacteristicDto dto=(CharacteristicDto)args[0];
+      dto.setId(currentId++);
+      return null;
+    }
+  }
+).when(dao).insert(any(CharacteristicDto.class),any(SqlSession.class));
+  when(myBatis.openSession()).thenReturn(session);
+  Reader defaultModelReader=mock(Reader.class);
+  when(debtModelPluginRepository.createReaderForXMLFile("technical-debt")).thenReturn(defaultModelReader);
+  when(characteristicsXMLImporter.importXML(eq(defaultModelReader))).thenReturn(debtModel);
+  when(characteristicsXMLImporter.importXML(anyString())).thenReturn(debtModel);
+  when(rulesXMLImporter.importXML(anyString(),any(ValidationMessages.class))).thenReturn(rules);
+  debtModelBackup=new DebtModelBackup(myBatis,dao,ruleDao,debtModelOperations,debtModelPluginRepository,characteristicsXMLImporter,rulesXMLImporter,debtModelXMLExporter,system2);
+}

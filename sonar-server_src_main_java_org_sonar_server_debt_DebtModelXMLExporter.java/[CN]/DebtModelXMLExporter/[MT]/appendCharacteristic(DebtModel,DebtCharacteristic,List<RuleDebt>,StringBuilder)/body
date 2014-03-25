@@ -1,0 +1,22 @@
+{
+  xml.append("<" + CHARACTERISTIC + ">");
+  if (StringUtils.isNotBlank(characteristic.key())) {
+    xml.append("<" + CHARACTERISTIC_KEY + ">");
+    xml.append(StringEscapeUtils.escapeXml(characteristic.key()));
+    xml.append("</" + CHARACTERISTIC_KEY + "><"+ CHARACTERISTIC_NAME+ ">");
+    xml.append(StringEscapeUtils.escapeXml(characteristic.name()));
+    xml.append("</" + CHARACTERISTIC_NAME + ">");
+  }
+  if (characteristic.parentId() != null) {
+    List<RuleDebt> rules=rules(allRules,characteristic.key());
+    for (    RuleDebt ruleDto : rules) {
+      appendRule(ruleDto,xml);
+    }
+  }
+ else {
+    for (    DebtCharacteristic child : debtModel.subCharacteristics(characteristic.key())) {
+      appendCharacteristic(debtModel,child,allRules,xml);
+    }
+  }
+  xml.append("</" + CHARACTERISTIC + ">");
+}
