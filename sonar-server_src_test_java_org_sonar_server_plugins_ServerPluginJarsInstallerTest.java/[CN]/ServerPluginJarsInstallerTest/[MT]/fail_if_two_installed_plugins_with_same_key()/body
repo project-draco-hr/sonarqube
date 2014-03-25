@@ -1,0 +1,12 @@
+{
+  when(upgradeStatus.isFreshInstall()).thenReturn(false);
+  FileUtils.copyFileToDirectory(jar("foo-plugin-1.0.jar"),pluginsDir);
+  FileUtils.copyFileToDirectory(jar("foo-plugin-2.0.jar"),pluginsDir);
+  try {
+    jarsInstaller.install();
+    fail();
+  }
+ catch (  MessageException e) {
+    assertThat(e.getMessage()).contains("Found two files for the same plugin 'foo'").contains("foo-plugin-1.0.jar").contains("foo-plugin-2.0.jar");
+  }
+}

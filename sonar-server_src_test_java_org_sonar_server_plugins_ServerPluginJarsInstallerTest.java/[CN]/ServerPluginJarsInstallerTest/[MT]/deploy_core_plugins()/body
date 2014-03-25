@@ -1,0 +1,10 @@
+{
+  when(upgradeStatus.isFreshInstall()).thenReturn(false);
+  FileUtils.copyFileToDirectory(jar("foo-plugin-1.0.jar"),coreDir);
+  jarsInstaller.install();
+  assertThat(FileUtils.listFiles(pluginsDir,new String[]{"jar"},false)).hasSize(0);
+  assertThat(FileUtils.listFiles(coreDir,new String[]{"jar"},false)).hasSize(1);
+  PluginMetadata plugin=jarsInstaller.getMetadata("foo");
+  assertThat(plugin).isNotNull();
+  assertThat(plugin.isCore()).isTrue();
+}

@@ -1,5 +1,6 @@
 {
-  when(serverUpgradeStatus.isFreshInstall()).thenReturn(false);
+  when(upgradeStatus.isFreshInstall()).thenReturn(false);
+  FileUtils.copyFileToDirectory(jar("foo-plugin-1.0.jar"),pluginsDir);
   jarsInstaller.install();
   assertThat(jarsInstaller.getMetadata()).hasSize(1);
   PluginMetadata plugin=jarsInstaller.getMetadata("foo");
@@ -7,7 +8,6 @@
   assertThat(plugin.getDeployedFiles()).hasSize(1);
   assertThat(plugin.isCore()).isFalse();
   assertThat(plugin.isUseChildFirstClassLoader()).isFalse();
-  File deployedJar=new File(deployDir,"plugins/foo/foo-plugin.jar");
-  assertThat(deployedJar).exists();
-  assertThat(deployedJar).isFile();
+  assertThat(FileUtils.listFiles(pluginsDir,new String[]{"jar"},false)).hasSize(1);
+  assertThat(new File(pluginsDir,"foo-plugin-1.0.jar")).exists().isFile();
 }

@@ -1,0 +1,12 @@
+{
+  when(upgradeStatus.isFreshInstall()).thenReturn(true);
+  FileUtils.copyFileToDirectory(jar("foo-plugin-1.0.jar"),bundledDir);
+  FileUtils.copyFileToDirectory(jar("foo-plugin-2.0.jar"),pluginsDir);
+  FileUtils.copyFileToDirectory(jar("bar-plugin-1.0.jar"),pluginsDir);
+  jarsInstaller.install();
+  assertThat(FileUtils.listFiles(pluginsDir,new String[]{"jar"},false)).hasSize(2);
+  assertThat(new File(pluginsDir,"foo-plugin-2.0.jar")).exists().isFile();
+  assertThat(new File(pluginsDir,"bar-plugin-1.0.jar")).exists().isFile();
+  PluginMetadata plugin=jarsInstaller.getMetadata("foo");
+  assertThat(plugin.getVersion()).isEqualTo("2.0");
+}

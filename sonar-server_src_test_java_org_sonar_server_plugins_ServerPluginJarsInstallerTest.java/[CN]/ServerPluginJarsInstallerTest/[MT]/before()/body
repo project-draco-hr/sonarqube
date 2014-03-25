@@ -1,9 +1,15 @@
 {
   when(server.getVersion()).thenReturn("3.1");
-  homeDir=TestUtils.getResource(ServerPluginJarsInstallerTest.class,name.getMethodName());
-  deployDir=TestUtils.getTestTempDir(ServerPluginJarsInstallerTest.class,name.getMethodName() + "/deploy");
-  fileSystem=new DefaultServerFileSystem(null,homeDir,deployDir);
+  homeDir=temp.newFolder("home");
+  pluginsDir=new File(homeDir,"extensions/plugins");
+  FileUtils.forceMkdir(pluginsDir);
+  downloadsDir=new File(homeDir,"extensions/downloads");
+  trashDir=new File(homeDir,"extensions/trash");
+  bundledDir=new File(homeDir,"lib/bundled-plugins");
+  coreDir=new File(homeDir,"lib/core-plugins");
+  FileUtils.forceMkdir(bundledDir);
+  deployDir=temp.newFolder("deploy");
+  fileSystem=new DefaultServerFileSystem(mock(Database.class),homeDir,deployDir);
   jarInstaller=new ServerPluginJarInstaller();
-  serverUpgradeStatus=mock(ServerUpgradeStatus.class);
-  jarsInstaller=new ServerPluginJarsInstaller(server,serverUpgradeStatus,fileSystem,jarInstaller);
+  jarsInstaller=new ServerPluginJarsInstaller(server,upgradeStatus,fileSystem,jarInstaller);
 }
