@@ -1,3 +1,32 @@
 {
-  return new Duration(extractValue(text,DAY),extractValue(text,HOUR),extractValue(text,MINUTE),hoursInDay);
+  int days=0, hours=0, minutes=0;
+  String sanitizedText=StringUtils.deleteWhitespace(text);
+  Pattern pattern=Pattern.compile("\\s*+(?:(\\d++)\\s*+" + DAY + ")?+\\s*+(?:(\\d++)\\s*+"+ HOUR+ ")?+\\s*+(?:(\\d++)\\s*+"+ MINUTE+ ")?+\\s*+");
+  Matcher matcher=pattern.matcher(text);
+  try {
+    if (matcher.find()) {
+      String daysDuration=matcher.group(1);
+      if (daysDuration != null) {
+        days=Integer.parseInt(daysDuration);
+        sanitizedText=sanitizedText.replace(daysDuration + DAY,"");
+      }
+      String hoursText=matcher.group(2);
+      if (hoursText != null) {
+        hours=Integer.parseInt(hoursText);
+        sanitizedText=sanitizedText.replace(hoursText + HOUR,"");
+      }
+      String minutesText=matcher.group(3);
+      if (minutesText != null) {
+        minutes=Integer.parseInt(minutesText);
+        sanitizedText=sanitizedText.replace(minutesText + MINUTE,"");
+      }
+      if (sanitizedText.isEmpty()) {
+        return new Duration(days,hours,minutes,hoursInDay);
+      }
+    }
+    throw invalid(text,null);
+  }
+ catch (  NumberFormatException e) {
+    throw invalid(text,e);
+  }
 }
