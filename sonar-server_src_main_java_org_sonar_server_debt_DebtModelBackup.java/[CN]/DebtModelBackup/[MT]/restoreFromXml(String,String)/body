@@ -1,21 +1,3 @@
 {
-  checkPermission();
-  ValidationMessages validationMessages=ValidationMessages.create();
-  Date updateDate=new Date(system2.now());
-  SqlSession session=mybatis.openSession();
-  try {
-    List<CharacteristicDto> characteristicDtos=dao.selectEnabledCharacteristics(session);
-    List<RuleDto> rules=newArrayList(Iterables.filter(ruleDao.selectEnablesAndNonManual(session),new Predicate<RuleDto>(){
-      @Override public boolean apply(      @Nullable RuleDto input){
-        return input != null && languageKey.equals(input.getLanguage());
-      }
-    }
-));
-    restoreRules(characteristicDtos,rules,rulesXMLImporter.importXML(xml,validationMessages),validationMessages,updateDate,session);
-    session.commit();
-  }
-  finally {
-    MyBatis.closeQuietly(session);
-  }
-  return validationMessages;
+  return restoreXmlModel(xml,languageKey);
 }
