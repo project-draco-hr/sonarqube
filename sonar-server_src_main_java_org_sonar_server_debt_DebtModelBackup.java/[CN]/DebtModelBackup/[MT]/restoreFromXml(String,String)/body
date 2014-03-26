@@ -1,7 +1,21 @@
 {
-  DebtModel debtModel=characteristicsXMLImporter.importXML(xml);
+  checkPermission();
   ValidationMessages validationMessages=ValidationMessages.create();
-  List<RuleDebt> ruleDebts=rulesXMLImporter.importXML(xml,validationMessages);
-  restore(debtModel,ruleDebts,languageKey,validationMessages);
+  Date updateDate=new Date(system2.now());
+  SqlSession session=mybatis.openSession();
+  try {
+    List<CharacteristicDto> characteristicDtos=dao.selectEnabledCharacteristics(session);
+    List<RuleDto> rules=newArrayList(Iterables.filter(ruleDao.selectEnablesAndNonManual(session),new Predicate<RuleDto>(){
+      @Override public boolean apply(      RuleDto input){
+        return languageKey.equals(input.getLanguage());
+      }
+    }
+));
+    restoreRules(characteristicDtos,rules,rulesXMLImporter.importXML(xml,validationMessages),validationMessages,updateDate,session);
+    session.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
   return validationMessages;
 }

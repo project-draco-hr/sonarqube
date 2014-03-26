@@ -1,26 +1,26 @@
 {
-  for (  RuleDto rule : ruleDao.selectEnablesAndNonManual(session)) {
-    if (languageKey == null || languageKey.equals(rule.getLanguage())) {
-      RuleDebt ruleDebt=ruleDebtByRule(rule,ruleDebts);
-      if (ruleDebt == null) {
-        rule.setCharacteristicId(rule.getDefaultCharacteristicId() != null ? RuleDto.DISABLED_CHARACTERISTIC_ID : null);
-        rule.setRemediationFunction(null);
-        rule.setRemediationFactor(null);
-        rule.setRemediationOffset(null);
+  for (  RuleDto rule : rules) {
+    RuleDebt ruleDebt=ruleDebtByRule(rule,ruleDebts);
+    if (ruleDebt == null) {
+      disabledRuleDebt(rule,updateDate,session);
+    }
+ else {
+      CharacteristicDto characteristicDto=characteristicByKey(ruleDebt.characteristicKey(),characteristicDtos);
+      if (characteristicDto == null) {
+        disabledRuleDebt(rule,updateDate,session);
       }
  else {
-        CharacteristicDto characteristicDto=characteristicByKey(ruleDebt.characteristicKey(),characteristicDtos,false);
         boolean isSameCharacteristic=characteristicDto.getId().equals(rule.getDefaultCharacteristicId());
         boolean isSameFunction=isSameRemediationFunction(ruleDebt,rule);
         rule.setCharacteristicId((!isSameCharacteristic ? characteristicDto.getId() : null));
         rule.setRemediationFunction((!isSameFunction ? ruleDebt.function().name() : null));
         rule.setRemediationFactor((!isSameFunction ? ruleDebt.factor() : null));
         rule.setRemediationOffset((!isSameFunction ? ruleDebt.offset() : null));
+        rule.setUpdatedAt(updateDate);
+        ruleDao.update(rule,session);
       }
-      ruleDebts.remove(ruleDebt);
-      rule.setUpdatedAt(updateDate);
-      ruleDao.update(rule,session);
     }
+    ruleDebts.remove(ruleDebt);
   }
   for (  RuleDebt ruleDebt : ruleDebts) {
     validationMessages.addWarningText(String.format("The rule '%s' does not exist.",ruleDebt.ruleKey()));

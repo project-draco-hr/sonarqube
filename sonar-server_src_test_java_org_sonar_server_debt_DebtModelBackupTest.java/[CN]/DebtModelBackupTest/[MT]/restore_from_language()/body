@@ -1,15 +1,16 @@
 {
-  debtModel.addRootCharacteristic(new DefaultDebtCharacteristic().setKey("PORTABILITY").setName("Portability").setOrder(1)).addSubCharacteristic(new DefaultDebtCharacteristic().setKey("COMPILER").setName("Compiler"),"PORTABILITY");
-  when(dao.selectEnabledCharacteristics(session)).thenReturn(newArrayList(new CharacteristicDto().setId(1).setKey("PORTABILITY").setName("Portability updated").setOrder(2).setCreatedAt(oldDate),new CharacteristicDto().setId(2).setKey("COMPILER").setName("Compiler updated").setParentId(1).setCreatedAt(oldDate)));
-  when(ruleDao.selectEnablesAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setId(1).setRepositoryKey("squid").setLanguage("java").setCharacteristicId(2).setRemediationFunction("LINEAR_OFFSET").setRemediationFactor("2h").setRemediationOffset("15min").setCreatedAt(oldDate).setUpdatedAt(oldDate),new RuleDto().setId(2).setRepositoryKey("checkstyle").setLanguage("java2").setCharacteristicId(3).setRemediationFunction("LINEAR").setRemediationFactor("2h").setCreatedAt(oldDate).setUpdatedAt(oldDate)));
+  when(ruleDao.selectEnablesAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setId(1).setRepositoryKey("squid").setLanguage("java").setCharacteristicId(2).setRemediationFunction("LINEAR_OFFSET").setRemediationFactor("2h").setRemediationOffset("15min").setCreatedAt(oldDate).setUpdatedAt(oldDate),new RuleDto().setId(2).setRepositoryKey("checkstyle").setLanguage("java2").setCharacteristicId(2).setRemediationFunction("LINEAR").setRemediationFactor("2h").setCreatedAt(oldDate).setUpdatedAt(oldDate)));
   debtModelBackup.restore("java");
-  verify(dao).selectEnabledCharacteristics(session);
-  verify(dao,times(2)).update(any(CharacteristicDto.class),eq(session));
-  verifyNoMoreInteractions(dao);
+  verify(dao,never()).update(any(CharacteristicDto.class),eq(session));
   verify(ruleDao).selectEnablesAndNonManual(session);
   verify(ruleDao).update(ruleArgument.capture(),eq(session));
   verifyNoMoreInteractions(ruleDao);
   RuleDto rule=ruleArgument.getValue();
   assertThat(rule.getId()).isEqualTo(1);
+  assertThat(rule.getCharacteristicId()).isNull();
+  assertThat(rule.getRemediationFunction()).isNull();
+  assertThat(rule.getRemediationFactor()).isNull();
+  assertThat(rule.getRemediationOffset()).isNull();
+  assertThat(rule.getUpdatedAt()).isEqualTo(now);
   verify(session).commit();
 }
