@@ -1,0 +1,12 @@
+{
+  when(dao.selectById(10,session)).thenReturn(new CharacteristicDto().setId(10).setKey("MEMORY_EFFICIENCY").setParentId(1));
+  when(dao.selectEnabledRootCharacteristics(session)).thenReturn(newArrayList(new CharacteristicDto().setId(10).setKey("MEMORY_EFFICIENCY").setOrder(2),new CharacteristicDto().setId(2).setKey("PORTABILITY").setOrder(3)));
+  try {
+    service.moveDown(10);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(BadRequestException.class).hasMessage("Sub characteristics can not be moved.");
+  }
+  verify(dao,never()).update(any(CharacteristicDto.class),eq(session));
+}

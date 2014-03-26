@@ -3,12 +3,15 @@
   SqlSession session=mybatis.openSession();
   try {
     final CharacteristicDto dto=findCharacteristic(characteristicId,session);
-    int currentOrder=dto.getOrder();
+    if (dto.getParentId() != null) {
+      throw new BadRequestException("Sub characteristics can not be moved.");
+    }
+    int currentOrder=getOrder(dto);
     CharacteristicDto dtoToSwitchOrderWith=findCharacteristicToSwitchWith(dto,moveUpOrDown,session);
     if (dtoToSwitchOrderWith == null) {
       return toCharacteristic(dto);
     }
-    int nextOrder=dtoToSwitchOrderWith.getOrder();
+    int nextOrder=getOrder(dtoToSwitchOrderWith);
     dtoToSwitchOrderWith.setOrder(currentOrder);
     dtoToSwitchOrderWith.setUpdatedAt(new Date(system2.now()));
     dao.update(dtoToSwitchOrderWith,session);

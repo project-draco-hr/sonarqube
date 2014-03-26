@@ -14,9 +14,11 @@
     }
     List<RuleDebt> rules=newArrayList();
     for (    RuleDto rule : ruleDao.selectEnablesAndNonManual(session)) {
-      if ((languageKey == null || languageKey.equals(rule.getLanguage())) && rule.hasCharacteristic()) {
-        Integer characteristicId=rule.getCharacteristicId() != null ? rule.getCharacteristicId() : rule.getDefaultCharacteristicId();
-        rules.add(toRuleDebt(rule,debtModel.characteristicById(characteristicId).key()));
+      if ((languageKey == null || languageKey.equals(rule.getLanguage()))) {
+        Integer effectiveCharacteristicId=rule.getCharacteristicId() != null ? rule.getCharacteristicId() : rule.getDefaultCharacteristicId();
+        if (effectiveCharacteristicId != null && !RuleDto.DISABLED_CHARACTERISTIC_ID.equals(effectiveCharacteristicId)) {
+          rules.add(toRuleDebt(rule,debtModel.characteristicById(effectiveCharacteristicId).key()));
+        }
       }
     }
     return debtModelXMLExporter.export(debtModel,rules);

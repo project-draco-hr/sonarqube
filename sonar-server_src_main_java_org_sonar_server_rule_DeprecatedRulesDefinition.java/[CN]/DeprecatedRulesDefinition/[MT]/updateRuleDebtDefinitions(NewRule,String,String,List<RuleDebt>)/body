@@ -2,18 +2,20 @@
   RuleDebt ruleDebt=findRequirement(ruleDebts,repoKey,ruleKey);
   if (ruleDebt != null) {
     newRule.setDebtSubCharacteristic(ruleDebt.characteristicKey());
-switch (ruleDebt.function()) {
-case LINEAR:
-      newRule.setDebtRemediationFunction(newRule.debtRemediationFunctions().linear(ruleDebt.factor()));
-    break;
-case LINEAR_OFFSET:
-  newRule.setDebtRemediationFunction(newRule.debtRemediationFunctions().linearWithOffset(ruleDebt.factor(),ruleDebt.offset()));
-break;
-case CONSTANT_ISSUE:
-newRule.setDebtRemediationFunction(newRule.debtRemediationFunctions().constantPerIssue(ruleDebt.offset()));
-break;
-default :
-throw new IllegalArgumentException(String.format("The type '%s' is unknown",ruleDebt.function()));
-}
-}
+    DebtRemediationFunction.Type function=ruleDebt.function();
+    String coefficient=ruleDebt.coefficient();
+    String offset=ruleDebt.offset();
+    if (DebtRemediationFunction.Type.LINEAR.equals(function) && coefficient != null) {
+      newRule.setDebtRemediationFunction(newRule.debtRemediationFunctions().linear(coefficient));
+    }
+ else     if (DebtRemediationFunction.Type.CONSTANT_ISSUE.equals(function) && offset != null) {
+      newRule.setDebtRemediationFunction(newRule.debtRemediationFunctions().constantPerIssue(offset));
+    }
+ else     if (DebtRemediationFunction.Type.LINEAR_OFFSET.equals(function) && coefficient != null && offset != null) {
+      newRule.setDebtRemediationFunction(newRule.debtRemediationFunctions().linearWithOffset(coefficient,offset));
+    }
+ else {
+      throw new IllegalArgumentException(String.format("Debt definition on rule '%s:%s' is invalid",repoKey,ruleKey));
+    }
+  }
 }

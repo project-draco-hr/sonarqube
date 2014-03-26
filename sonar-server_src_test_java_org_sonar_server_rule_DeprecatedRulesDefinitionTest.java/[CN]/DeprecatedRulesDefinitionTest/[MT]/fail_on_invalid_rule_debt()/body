@@ -1,0 +1,16 @@
+{
+  RulesDefinition.Context context=new RulesDefinition.Context();
+  List<DebtModelXMLExporter.RuleDebt> ruleDebts=newArrayList(new DebtModelXMLExporter.RuleDebt().setCharacteristicKey("MEMORY_EFFICIENCY").setRuleKey(RuleKey.of("checkstyle","ConstantName")).setFunction(DebtRemediationFunction.Type.LINEAR_OFFSET).setCoefficient("1d"));
+  Reader javaModelReader=mock(Reader.class);
+  when(debtModelRepository.createReaderForXMLFile("java")).thenReturn(javaModelReader);
+  when(debtModelRepository.getContributingPluginList()).thenReturn(newArrayList("java"));
+  when(importer.importXML(eq(javaModelReader),any(ValidationMessages.class))).thenReturn(ruleDebts);
+  try {
+    new DeprecatedRulesDefinition(i18n,new RuleRepository[]{new CheckstyleRules()},debtModelRepository,importer).define(context);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalArgumentException.class);
+  }
+  assertThat(context.repositories()).isEmpty();
+}
