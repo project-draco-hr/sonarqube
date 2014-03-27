@@ -1,0 +1,12 @@
+{
+  if (!ComponentKeys.isValidModuleKey(moduleDef.getKey())) {
+    validationMessages.add(String.format("\"%s\" is not a valid project or module key",moduleDef.getKey()));
+  }
+ else   if (moduleDef.getParent() != null) {
+    String key=ComponentKeys.createKey(moduleDef.getKey(),branch);
+    ResourceDto root=resourceDao.getRootProjectByComponentKey(key);
+    if (root != null && !rootProjectKey.equals(root.getKey())) {
+      throw new SonarException(String.format("Module \"%s\" is already part of project \"%s\"",moduleDef.getKey(),root.getKey()));
+    }
+  }
+}

@@ -1,15 +1,12 @@
 {
-  if (settings.getBoolean(CoreProperties.CORE_PREVENT_AUTOMATIC_PROJECT_CREATION)) {
-    String projectKey=reactor.getRoot().getKey();
-    if (resourceDao.findByKey(projectKey) == null) {
-      throw new SonarException("Unable to scan non-existing project " + projectKey);
-    }
-  }
+  preventAutomaticProjectCreationIfNeeded(reactor);
+  String branch=settings.getString(CoreProperties.PROJECT_BRANCH_PROPERTY);
+  String rootProjectKey=ComponentKeys.createKey(reactor.getRoot().getKey(),branch);
   List<String> validationMessages=new ArrayList<String>();
   for (  ProjectDefinition moduleDef : reactor.getProjects()) {
-    validateModule(moduleDef,validationMessages);
+    validateModule(moduleDef,validationMessages,branch,rootProjectKey);
   }
-  validateBranch(validationMessages);
+  validateBranch(validationMessages,branch);
   if (!validationMessages.isEmpty()) {
     throw new SonarException("Validation of project reactor failed:\n  o " + Joiner.on("\n  o ").join(validationMessages));
   }
