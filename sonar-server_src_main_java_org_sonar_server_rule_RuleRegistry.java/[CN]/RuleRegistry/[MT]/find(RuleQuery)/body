@@ -1,12 +1,19 @@
 {
-  BoolFilterBuilder mainFilter=FilterBuilders.boolFilter().mustNot(FilterBuilders.termFilter(RuleDocument.FIELD_STATUS,STATUS_REMOVED));
+  BoolFilterBuilder mainFilter=boolFilter().mustNot(termFilter(RuleDocument.FIELD_STATUS,STATUS_REMOVED));
   if (StringUtils.isNotBlank(query.query())) {
     mainFilter.must(FilterBuilders.queryFilter(QueryBuilders.multiMatchQuery(query.query(),RuleDocument.FIELD_NAME + ".search",RuleDocument.FIELD_KEY).operator(Operator.AND)));
   }
-  SearchHits hits=searchIndex.executeRequest(searchIndex.client().prepareSearch(INDEX_RULES).setTypes(TYPE_RULE).setPostFilter(mainFilter).addSort(RuleDocument.FIELD_NAME,SortOrder.ASC).setSize(query.paging().pageSize()).setFrom(query.paging().offset()));
+  if (query.characteristicKey() != null) {
+    mainFilter.must(termFilter(RuleDocument.FIELD_CHARACTERISTIC_KEY,query.characteristicKey()));
+  }
+  if (query.subCharacteristicKey() != null) {
+    mainFilter.must(termFilter(RuleDocument.FIELD_SUB_CHARACTERISTIC_KEY,query.subCharacteristicKey()));
+  }
+  Paging paging=Paging.create(query.pageSize(),query.pageIndex());
+  SearchHits hits=searchIndex.executeRequest(searchIndex.client().prepareSearch(INDEX_RULES).setTypes(TYPE_RULE).setPostFilter(mainFilter).addSort(RuleDocument.FIELD_NAME,SortOrder.ASC).setSize(paging.pageSize()).setFrom(paging.offset()));
   Builder<Rule> rulesBuilder=ImmutableList.builder();
   for (  SearchHit hit : hits.hits()) {
     rulesBuilder.add(RuleDocumentParser.parse(hit.sourceAsMap()));
   }
-  return new PagedResult<Rule>(rulesBuilder.build(),PagingResult.create(query.paging().pageSize(),query.paging().pageIndex(),hits.getTotalHits()));
+  return new PagedResult<Rule>(rulesBuilder.build(),PagingResult.create(paging.pageSize(),paging.pageIndex(),hits.getTotalHits()));
 }

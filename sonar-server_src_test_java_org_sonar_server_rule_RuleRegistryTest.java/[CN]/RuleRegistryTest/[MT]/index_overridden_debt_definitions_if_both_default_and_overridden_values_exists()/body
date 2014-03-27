@@ -1,0 +1,19 @@
+{
+  Map<Integer,CharacteristicDto> characteristics=newHashMap();
+  characteristics.put(10,new CharacteristicDto().setId(10).setKey("REUSABILITY").setName("Reusability"));
+  characteristics.put(11,new CharacteristicDto().setId(11).setKey("MODULARITY").setName("Modularity").setParentId(10));
+  characteristics.put(12,new CharacteristicDto().setId(12).setKey("PORTABILITY").setName("Portability"));
+  characteristics.put(13,new CharacteristicDto().setId(13).setKey("COMPILER").setName("Compiler").setParentId(12));
+  List<RuleDto> rules=ImmutableList.of(new RuleDto().setId(10).setRepositoryKey("repo").setRuleKey("key1").setSeverity(Severity.MINOR).setDefaultSubCharacteristicId(11).setDefaultRemediationFunction("LINEAR").setDefaultRemediationCoefficient("2h").setSubCharacteristicId(13).setRemediationFunction("LINEAR_OFFSET").setRemediationCoefficient("1h").setRemediationOffset("15min"));
+  registry.bulkRegisterRules(rules,characteristics,ArrayListMultimap.<Integer,RuleParamDto>create(),ArrayListMultimap.<Integer,RuleRuleTagDto>create());
+  Map<String,Object> ruleDocument=esSetup.client().prepareGet("rules","rule",Integer.toString(10)).execute().actionGet().getSourceAsMap();
+  assertThat(ruleDocument.get(RuleDocument.FIELD_CHARACTERISTIC_ID)).isEqualTo(12);
+  assertThat(ruleDocument.get(RuleDocument.FIELD_CHARACTERISTIC_KEY)).isEqualTo("PORTABILITY");
+  assertThat(ruleDocument.get(RuleDocument.FIELD_CHARACTERISTIC_NAME)).isEqualTo("Portability");
+  assertThat(ruleDocument.get(RuleDocument.FIELD_SUB_CHARACTERISTIC_ID)).isEqualTo(13);
+  assertThat(ruleDocument.get(RuleDocument.FIELD_SUB_CHARACTERISTIC_KEY)).isEqualTo("COMPILER");
+  assertThat(ruleDocument.get(RuleDocument.FIELD_SUB_CHARACTERISTIC_NAME)).isEqualTo("Compiler");
+  assertThat(ruleDocument.get(RuleDocument.FIELD_REMEDIATION_FUNCTION)).isEqualTo("LINEAR_OFFSET");
+  assertThat(ruleDocument.get(RuleDocument.FIELD_REMEDIATION_COEFFICIENT)).isEqualTo("1h");
+  assertThat(ruleDocument.get(RuleDocument.FIELD_REMEDIATION_OFFSET)).isEqualTo("15min");
+}
