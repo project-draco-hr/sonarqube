@@ -1,6 +1,6 @@
 {
   when(dao.selectEnabledCharacteristics(session)).thenReturn(newArrayList(new CharacteristicDto().setId(1).setKey("PORTABILITY").setName("Portability updated").setOrder(2),new CharacteristicDto().setId(2).setKey("COMPILER").setName("Compiler updated").setParentId(1)));
-  when(ruleDao.selectEnablesAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setRepositoryKey("squid").setRuleKey("UselessImportCheck").setCharacteristicId(2).setRemediationFunction("LINEAR_OFFSET").setRemediationCoefficient("2h").setRemediationOffset("15min"),new RuleDto().setRepositoryKey("squid").setRuleKey("AvoidNPE").setDefaultCharacteristicId(2).setDefaultRemediationFunction("LINEAR").setDefaultRemediationCoefficient("2h")));
+  when(ruleDao.selectEnablesAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setRepositoryKey("squid").setRuleKey("UselessImportCheck").setSubCharacteristicId(2).setRemediationFunction("LINEAR_OFFSET").setRemediationCoefficient("2h").setRemediationOffset("15min"),new RuleDto().setRepositoryKey("squid").setRuleKey("AvoidNPE").setDefaultSubCharacteristicId(2).setDefaultRemediationFunction("LINEAR").setDefaultRemediationCoefficient("2h")));
   debtModelBackup.backup();
   ArgumentCaptor<DebtModel> debtModelArgument=ArgumentCaptor.forClass(DebtModel.class);
   verify(debtModelXMLExporter).export(debtModelArgument.capture(),ruleDebtListCaptor.capture());
@@ -11,14 +11,14 @@
   RuleDebt rule=rules.get(0);
   assertThat(rule.ruleKey().repository()).isEqualTo("squid");
   assertThat(rule.ruleKey().rule()).isEqualTo("UselessImportCheck");
-  assertThat(rule.characteristicKey()).isEqualTo("COMPILER");
+  assertThat(rule.subCharacteristicKey()).isEqualTo("COMPILER");
   assertThat(rule.function().name()).isEqualTo("LINEAR_OFFSET");
   assertThat(rule.coefficient()).isEqualTo("2h");
   assertThat(rule.offset()).isEqualTo("15min");
   rule=rules.get(1);
   assertThat(rule.ruleKey().repository()).isEqualTo("squid");
   assertThat(rule.ruleKey().rule()).isEqualTo("AvoidNPE");
-  assertThat(rule.characteristicKey()).isEqualTo("COMPILER");
+  assertThat(rule.subCharacteristicKey()).isEqualTo("COMPILER");
   assertThat(rule.function().name()).isEqualTo("LINEAR");
   assertThat(rule.coefficient()).isEqualTo("2h");
   assertThat(rule.offset()).isNull();

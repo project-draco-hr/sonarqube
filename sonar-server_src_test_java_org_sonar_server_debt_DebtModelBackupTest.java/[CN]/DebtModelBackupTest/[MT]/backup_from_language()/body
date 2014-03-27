@@ -1,6 +1,6 @@
 {
   when(dao.selectEnabledCharacteristics(session)).thenReturn(newArrayList(new CharacteristicDto().setId(1).setKey("PORTABILITY").setName("Portability updated").setOrder(2),new CharacteristicDto().setId(2).setKey("COMPILER").setName("Compiler updated").setParentId(1)));
-  when(ruleDao.selectEnablesAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setId(1).setRepositoryKey("squid").setRuleKey("UselessImportCheck").setLanguage("java").setCharacteristicId(2).setRemediationFunction("CONSTANT_ISSUE").setRemediationOffset("15min").setCreatedAt(oldDate).setUpdatedAt(oldDate),new RuleDto().setId(2).setRepositoryKey("checkstyle").setLanguage("java2").setCharacteristicId(3).setRemediationFunction("LINEAR").setRemediationCoefficient("2h").setCreatedAt(oldDate).setUpdatedAt(oldDate)));
+  when(ruleDao.selectEnablesAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setId(1).setRepositoryKey("squid").setRuleKey("UselessImportCheck").setLanguage("java").setSubCharacteristicId(2).setRemediationFunction("CONSTANT_ISSUE").setRemediationOffset("15min").setCreatedAt(oldDate).setUpdatedAt(oldDate),new RuleDto().setId(2).setRepositoryKey("checkstyle").setLanguage("java2").setSubCharacteristicId(3).setRemediationFunction("LINEAR").setRemediationCoefficient("2h").setCreatedAt(oldDate).setUpdatedAt(oldDate)));
   debtModelBackup.backup("java");
   verify(debtModelXMLExporter).export(any(DebtModel.class),ruleDebtListCaptor.capture());
   List<RuleDebt> rules=ruleDebtListCaptor.getValue();
@@ -8,7 +8,7 @@
   RuleDebt rule=rules.get(0);
   assertThat(rule.ruleKey().repository()).isEqualTo("squid");
   assertThat(rule.ruleKey().rule()).isEqualTo("UselessImportCheck");
-  assertThat(rule.characteristicKey()).isEqualTo("COMPILER");
+  assertThat(rule.subCharacteristicKey()).isEqualTo("COMPILER");
   assertThat(rule.function().name()).isEqualTo("CONSTANT_ISSUE");
   assertThat(rule.coefficient()).isNull();
   assertThat(rule.offset()).isEqualTo("15min");
