@@ -1,0 +1,7 @@
+{
+  when(characteristicsXMLImporter.importXML(anyString())).thenReturn(new DebtModel().addRootCharacteristic(new DefaultDebtCharacteristic().setKey("PORTABILITY").setName("Portability").setOrder(1)).addSubCharacteristic(new DefaultDebtCharacteristic().setKey("COMPILER").setName("Compiler"),"PORTABILITY"));
+  when(dao.selectEnabledCharacteristics(session)).thenReturn(newArrayList(new CharacteristicDto().setId(1).setKey("PORTABILITY").setName("Portability").setOrder(1)));
+  debtModelBackup.restoreFromXml("<xml/>","java");
+  verify(debtModelOperations,never()).disableCharacteristic(any(CharacteristicDto.class),eq(now),eq(session));
+  verify(session).commit();
+}
