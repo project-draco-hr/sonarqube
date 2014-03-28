@@ -3,8 +3,19 @@
   if (StringUtils.isNotBlank(query.query())) {
     mainFilter.must(FilterBuilders.queryFilter(QueryBuilders.multiMatchQuery(query.query(),RuleDocument.FIELD_NAME + ".search",RuleDocument.FIELD_KEY).operator(Operator.AND)));
   }
-  if (query.characteristicKey() != null) {
-    mainFilter.must(FilterBuilders.queryFilter(QueryBuilders.multiMatchQuery(query.characteristicKey(),RuleDocument.FIELD_CHARACTERISTIC_KEY,RuleDocument.FIELD_SUB_CHARACTERISTIC_KEY).operator(Operator.OR)));
+  if (query.characteristic() != null) {
+    mainFilter.must(FilterBuilders.queryFilter(QueryBuilders.multiMatchQuery(query.characteristic(),RuleDocument.FIELD_CHARACTERISTIC_KEY,RuleDocument.FIELD_SUB_CHARACTERISTIC_KEY).operator(Operator.OR)));
+  }
+  if (query.language() != null) {
+    mainFilter.must(termFilter(RuleDocument.FIELD_LANGUAGE,query.language()));
+  }
+  if (!query.repositories().isEmpty()) {
+    if (query.repositories().size() == 1) {
+      mainFilter.must(termFilter(RuleDocument.FIELD_REPOSITORY_KEY,query.repositories().iterator().next()));
+    }
+ else {
+      mainFilter.must(termsFilter(RuleDocument.FIELD_REPOSITORY_KEY,query.repositories().toArray()));
+    }
   }
   Paging paging=Paging.create(query.pageSize(),query.pageIndex());
   SearchHits hits=searchIndex.executeRequest(searchIndex.client().prepareSearch(INDEX_RULES).setTypes(TYPE_RULE).setPostFilter(mainFilter).addSort(RuleDocument.FIELD_NAME,SortOrder.ASC).setSize(paging.pageSize()).setFrom(paging.offset()));
