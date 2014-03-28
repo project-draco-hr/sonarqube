@@ -1,10 +1,9 @@
 {
-  MeasureFilterFactory factory=new MeasureFilterFactory(newMetricFinder());
-  Map<String,Object> props=ImmutableMap.<String,Object>of("ageMaxDays","50","ageMinDays","3");
+  long today=DateUtils.parseDateTime("2013-05-18T11:00:00+0000").getTime();
+  when(system.now()).thenReturn(today);
+  MeasureFilterFactory factory=new MeasureFilterFactory(newMetricFinder(),system);
+  Map<String,Object> props=ImmutableMap.<String,Object>of("ageMaxDays","3","ageMinDays","1");
   MeasureFilter filter=factory.create(props);
-  long today=org.apache.commons.lang.time.DateUtils.truncate(new Date(),Calendar.DATE).getTime();
-  long msFrom=today - filter.getFromDate().getTime();
-  long msTo=today - filter.getToDate().getTime();
-  assertThat(millisecondsToDays(msFrom)).isEqualTo(50);
-  assertThat(millisecondsToDays(msTo)).isEqualTo(3);
+  assertThat(DateUtils.formatDate(filter.getFromDate())).isEqualTo("2013-05-15");
+  assertThat(DateUtils.formatDate(filter.getToDate())).isEqualTo("2013-05-17");
 }
