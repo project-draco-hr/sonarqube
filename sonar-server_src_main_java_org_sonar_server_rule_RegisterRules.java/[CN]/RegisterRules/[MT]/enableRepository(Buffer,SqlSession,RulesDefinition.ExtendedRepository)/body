@@ -1,0 +1,18 @@
+{
+  int count=0;
+  for (  RulesDefinition.Rule ruleDef : repoDef.rules()) {
+    RuleDto dto=buffer.rule(RuleKey.of(ruleDef.repository().key(),ruleDef.key()));
+    if (dto == null) {
+      dto=enableAndInsert(buffer,sqlSession,ruleDef);
+    }
+ else {
+      enableAndUpdate(buffer,sqlSession,ruleDef,dto);
+    }
+    buffer.markProcessed(dto);
+    count++;
+    if (count % 100 == 0) {
+      sqlSession.commit();
+    }
+  }
+  sqlSession.commit();
+}

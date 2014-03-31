@@ -1,0 +1,17 @@
+{
+  RuleDto ruleDto=new RuleDto().setCardinality(ruleDef.template() ? Cardinality.MULTIPLE : Cardinality.SINGLE).setConfigKey(ruleDef.internalKey()).setDescription(ruleDef.htmlDescription()).setLanguage(ruleDef.repository().language()).setName(ruleDef.name()).setRepositoryKey(ruleDef.repository().key()).setRuleKey(ruleDef.key()).setSeverity(ruleDef.severity()).setCreatedAt(buffer.now()).setUpdatedAt(buffer.now()).setStatus(ruleDef.status().name());
+  CharacteristicDto characteristic=buffer.characteristic(ruleDef.debtSubCharacteristic(),ruleDef.repository().key(),ruleDef.key(),null);
+  DebtRemediationFunction remediationFunction=ruleDef.debtRemediationFunction();
+  if (characteristic != null && remediationFunction != null) {
+    ruleDto.setDefaultSubCharacteristicId(characteristic.getId()).setDefaultRemediationFunction(remediationFunction.type().name()).setDefaultRemediationCoefficient(remediationFunction.coefficient()).setDefaultRemediationOffset(remediationFunction.offset()).setEffortToFixDescription(ruleDef.effortToFixDescription());
+  }
+  ruleDao.insert(ruleDto,sqlSession);
+  buffer.add(ruleDto);
+  for (  RulesDefinition.Param param : ruleDef.params()) {
+    RuleParamDto paramDto=new RuleParamDto().setRuleId(ruleDto.getId()).setDefaultValue(param.defaultValue()).setDescription(param.description()).setName(param.name()).setType(param.type().toString());
+    ruleDao.insert(paramDto,sqlSession);
+    buffer.add(paramDto);
+  }
+  mergeTags(buffer,sqlSession,ruleDef,ruleDto);
+  return ruleDto;
+}
