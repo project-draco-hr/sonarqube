@@ -1,5 +1,13 @@
 {
   Rule.Builder ruleBuilder=new Rule.Builder().setId((Integer)ruleSource.get(RuleDocument.FIELD_ID)).setKey((String)ruleSource.get(RuleDocument.FIELD_KEY)).setLanguage((String)ruleSource.get(RuleDocument.FIELD_LANGUAGE)).setRepositoryKey((String)ruleSource.get(RuleDocument.FIELD_REPOSITORY_KEY)).setSeverity((String)ruleSource.get(RuleDocument.FIELD_SEVERITY)).setName((String)ruleSource.get(RuleDocument.FIELD_NAME)).setDescription((String)ruleSource.get(RuleDocument.FIELD_DESCRIPTION)).setStatus((String)ruleSource.get(RuleDocument.FIELD_STATUS)).setCardinality((String)ruleSource.get("cardinality")).setTemplateId((Integer)ruleSource.get(RuleDocument.FIELD_TEMPLATE_ID)).setCreatedAt(parseOptionalDate(RuleDocument.FIELD_CREATED_AT,ruleSource)).setUpdatedAt(parseOptionalDate(RuleDocument.FIELD_UPDATED_AT,ruleSource));
+  if (ruleSource.containsKey(RuleDocument.FIELD_CHARACTERISTIC_KEY)) {
+    try {
+      ruleBuilder.setDebtCharacteristicKey((String)ruleSource.get(RuleDocument.FIELD_CHARACTERISTIC_KEY)).setDebtCharacteristicName((String)ruleSource.get(RuleDocument.FIELD_CHARACTERISTIC_NAME)).setDebtSubCharacteristicKey((String)ruleSource.get(RuleDocument.FIELD_CHARACTERISTIC_KEY)).setDebtSubCharacteristicName((String)ruleSource.get(RuleDocument.FIELD_CHARACTERISTIC_NAME)).setDebtRemediationFunction(new DefaultDebtRemediationFunction(DebtRemediationFunction.Type.valueOf((String)ruleSource.get(RuleDocument.FIELD_REMEDIATION_FUNCTION)),(String)ruleSource.get(RuleDocument.FIELD_REMEDIATION_COEFFICIENT),(String)ruleSource.get(RuleDocument.FIELD_REMEDIATION_OFFSET)));
+    }
+ catch (    IllegalArgumentException e) {
+      throw new RuntimeException("Fail on rule '" + ruleSource.get(RuleDocument.FIELD_KEY) + "', "+ e.getMessage(),e);
+    }
+  }
   if (ruleSource.containsKey(RuleDocument.FIELD_NOTE)) {
     Map<String,Object> ruleNoteDocument=(Map<String,Object>)ruleSource.get(RuleDocument.FIELD_NOTE);
     ruleBuilder.setRuleNote(new RuleNote((String)ruleNoteDocument.get(RuleDocument.FIELD_NOTE_DATA),(String)ruleNoteDocument.get(RuleDocument.FIELD_NOTE_USER_LOGIN),parseOptionalDate(RuleDocument.FIELD_NOTE_CREATED_AT,ruleNoteDocument),parseOptionalDate(RuleDocument.FIELD_NOTE_UPDATED_AT,ruleNoteDocument)));
