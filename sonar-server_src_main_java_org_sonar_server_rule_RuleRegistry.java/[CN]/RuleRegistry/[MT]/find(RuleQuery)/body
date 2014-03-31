@@ -21,11 +21,28 @@
       mainFilter.mustNot(FilterBuilders.existsFilter(RuleDocument.FIELD_CHARACTERISTIC_KEY));
     }
   }
-  Paging paging=Paging.create(query.pageSize(),query.pageIndex());
-  SearchHits hits=searchIndex.executeRequest(searchIndex.client().prepareSearch(INDEX_RULES).setTypes(TYPE_RULE).setPostFilter(mainFilter).addSort(RuleDocument.FIELD_NAME,SortOrder.ASC).setSize(paging.pageSize()).setFrom(paging.offset()));
   Builder<Rule> rulesBuilder=ImmutableList.builder();
-  for (  SearchHit hit : hits.hits()) {
-    rulesBuilder.add(RuleDocumentParser.parse(hit.sourceAsMap()));
+  SearchRequestBuilder searchRequestBuilder=searchIndex.client().prepareSearch(INDEX_RULES).setTypes(TYPE_RULE).setPostFilter(mainFilter).addSort(RuleDocument.FIELD_NAME,SortOrder.ASC);
+  if (RuleQuery.NO_PAGINATION == query.pageSize()) {
+    final int scrollTime=100;
+    SearchResponse scrollResp=searchRequestBuilder.setSearchType(SearchType.SCAN).setScroll(new TimeValue(scrollTime)).setSize(50).execute().actionGet();
+    while (true) {
+      scrollResp=searchIndex.client().prepareSearchScroll(scrollResp.getScrollId()).setScroll(new TimeValue(scrollTime)).execute().actionGet();
+      for (      SearchHit hit : scrollResp.getHits()) {
+        rulesBuilder.add(RuleDocumentParser.parse(hit.sourceAsMap()));
+      }
+      if (scrollResp.getHits().getHits().length == 0) {
+        break;
+      }
+    }
+    return new PagedResult<Rule>(rulesBuilder.build(),null);
   }
-  return new PagedResult<Rule>(rulesBuilder.build(),PagingResult.create(paging.pageSize(),paging.pageIndex(),hits.getTotalHits()));
+ else {
+    Paging paging=Paging.create(query.pageSize(),query.pageIndex());
+    SearchHits hits=searchIndex.executeRequest(searchRequestBuilder.setSize(paging.pageSize()).setFrom(paging.offset()));
+    for (    SearchHit hit : hits.hits()) {
+      rulesBuilder.add(RuleDocumentParser.parse(hit.sourceAsMap()));
+    }
+    return new PagedResult<Rule>(rulesBuilder.build(),PagingResult.create(paging.pageSize(),paging.pageIndex(),hits.getTotalHits()));
+  }
 }
