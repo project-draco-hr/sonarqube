@@ -4,15 +4,13 @@
   when(ruleDao.selectParameters(eq(10),eq(session))).thenReturn(ruleParams);
   List<RuleRuleTagDto> ruleTags=newArrayList(new RuleRuleTagDto().setId(30L).setTag("style").setType(RuleTagType.SYSTEM));
   when(ruleDao.selectTags(eq(10),eq(session))).thenReturn(ruleTags);
-  long now=System.currentTimeMillis();
-  doReturn(now).when(system).now();
   operations.updateRuleNote(rule,"My note",authorizedUserSession);
   ArgumentCaptor<RuleDto> argumentCaptor=ArgumentCaptor.forClass(RuleDto.class);
   verify(ruleDao).update(argumentCaptor.capture());
   assertThat(argumentCaptor.getValue().getNoteData()).isEqualTo("My note");
   assertThat(argumentCaptor.getValue().getNoteUserLogin()).isEqualTo("nicolas");
-  assertThat(argumentCaptor.getValue().getNoteCreatedAt().getTime()).isEqualTo(now);
-  assertThat(argumentCaptor.getValue().getNoteUpdatedAt().getTime()).isEqualTo(now);
+  assertThat(argumentCaptor.getValue().getNoteCreatedAt()).isEqualTo(now);
+  assertThat(argumentCaptor.getValue().getNoteUpdatedAt()).isEqualTo(now);
   verify(session).commit();
   verify(ruleRegistry).save(eq(rule),any(CharacteristicDto.class),any(CharacteristicDto.class),eq(ruleParams),eq(ruleTags));
 }

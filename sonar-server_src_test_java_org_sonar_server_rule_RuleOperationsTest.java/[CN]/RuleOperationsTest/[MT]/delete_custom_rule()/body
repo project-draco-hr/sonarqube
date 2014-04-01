@@ -8,12 +8,10 @@
   final int activeRuleId=5;
   ActiveRuleDto activeRule=new ActiveRuleDto().setId(activeRuleId).setProfileId(1).setRuleId(ruleId).setSeverity(Severity.MINOR);
   when(activeRuleDao.selectByRuleId(ruleId)).thenReturn(newArrayList(activeRule));
-  long now=System.currentTimeMillis();
-  doReturn(now).when(system).now();
   operations.deleteCustomRule(rule,authorizedUserSession);
   verify(ruleDao).update(ruleCaptor.capture(),eq(session));
   assertThat(ruleCaptor.getValue().getStatus()).isEqualTo(Rule.STATUS_REMOVED);
-  assertThat(ruleCaptor.getValue().getUpdatedAt()).isEqualTo(new Date(now));
+  assertThat(ruleCaptor.getValue().getUpdatedAt()).isEqualTo(now);
   verify(ruleRegistry).save(eq(ruleCaptor.getValue()),any(CharacteristicDto.class),any(CharacteristicDto.class),eq(newArrayList(param)),eq(ruleTags));
   verify(activeRuleDao).deleteParameters(eq(activeRuleId),eq(session));
   verify(activeRuleDao).deleteFromRule(eq(ruleId),eq(session));
