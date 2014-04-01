@@ -1,9 +1,8 @@
 {
-  Map<Integer,CharacteristicDto> characteristics=newHashMap();
-  characteristics.put(10,new CharacteristicDto().setId(10).setKey("REUSABILITY").setName("Reusability"));
-  characteristics.put(11,new CharacteristicDto().setId(11).setKey("MODULARITY").setName("Modularity").setParentId(10));
-  List<RuleDto> rules=ImmutableList.of(new RuleDto().setId(10).setRepositoryKey("repo").setRuleKey("key1").setSeverity(Severity.MINOR).setDefaultSubCharacteristicId(11).setDefaultRemediationFunction("CONSTANT_ISSUE").setDefaultRemediationOffset("15min").setSubCharacteristicId(11).setRemediationFunction("LINEAR").setRemediationCoefficient("1h"));
-  registry.bulkRegisterRules(rules,characteristics,ArrayListMultimap.<Integer,RuleParamDto>create(),ArrayListMultimap.<Integer,RuleRuleTagDto>create());
+  when(ruleDao.selectEnablesAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setId(10).setRepositoryKey("repo").setRuleKey("key1").setSeverity(Severity.MINOR).setDefaultSubCharacteristicId(11).setDefaultRemediationFunction("CONSTANT_ISSUE").setDefaultRemediationOffset("15min").setSubCharacteristicId(11).setRemediationFunction("LINEAR").setRemediationCoefficient("1h")));
+  when(characteristicDao.selectCharacteristicsByIds(newHashSet(11),session)).thenReturn(newArrayList(new CharacteristicDto().setId(11).setKey("MODULARITY").setName("Modularity").setParentId(10)));
+  when(characteristicDao.selectCharacteristicsByIds(newHashSet(10),session)).thenReturn(newArrayList(new CharacteristicDto().setId(10).setKey("REUSABILITY").setName("Reusability")));
+  registry.reindex();
   Map<String,Object> ruleDocument=esSetup.client().prepareGet("rules","rule",Integer.toString(10)).execute().actionGet().getSourceAsMap();
   assertThat(ruleDocument.get(RuleDocument.FIELD_CHARACTERISTIC_ID)).isEqualTo(10);
   assertThat(ruleDocument.get(RuleDocument.FIELD_CHARACTERISTIC_KEY)).isEqualTo("REUSABILITY");

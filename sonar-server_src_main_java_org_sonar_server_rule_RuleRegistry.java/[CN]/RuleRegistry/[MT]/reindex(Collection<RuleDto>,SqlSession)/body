@@ -1,0 +1,32 @@
+{
+  Multimap<Integer,RuleParamDto> paramsByRuleId=ArrayListMultimap.create();
+  Multimap<Integer,RuleRuleTagDto> tagsByRuleId=ArrayListMultimap.create();
+  Map<Integer,CharacteristicDto> characteristicsById=newHashMap();
+  List<Integer> ruleIds=newArrayList();
+  Collection<Integer> subCharacteristicIds=newHashSet();
+  for (  RuleDto ruleDto : rules) {
+    ruleIds.add(ruleDto.getId());
+    if (ruleDto.getDefaultSubCharacteristicId() != null) {
+      subCharacteristicIds.add(ruleDto.getDefaultSubCharacteristicId());
+    }
+    if (ruleDto.getSubCharacteristicId() != null) {
+      subCharacteristicIds.add(ruleDto.getSubCharacteristicId());
+    }
+  }
+  List<CharacteristicDto> allCharacteristicDtos=characteristicDao.selectCharacteristicsByIds(subCharacteristicIds,session);
+  Collection<Integer> characteristicIds=newHashSet();
+  for (  CharacteristicDto subCharacteristicDto : allCharacteristicDtos) {
+    characteristicIds.add(subCharacteristicDto.getParentId());
+  }
+  allCharacteristicDtos.addAll(characteristicDao.selectCharacteristicsByIds(characteristicIds,session));
+  for (  RuleParamDto paramDto : ruleDao.selectParametersByRuleIds(ruleIds,session)) {
+    paramsByRuleId.put(paramDto.getRuleId(),paramDto);
+  }
+  for (  RuleRuleTagDto tagDto : ruleDao.selectTagsByRuleIds(ruleIds,session)) {
+    tagsByRuleId.put(tagDto.getRuleId(),tagDto);
+  }
+  for (  CharacteristicDto characteristicDto : allCharacteristicDtos) {
+    characteristicsById.put(characteristicDto.getId(),characteristicDto);
+  }
+  return bulkIndexRules(rules,characteristicsById,paramsByRuleId,tagsByRuleId);
+}

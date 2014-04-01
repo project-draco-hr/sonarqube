@@ -4,14 +4,14 @@
   try {
     RuleDto rule=new RuleDto().setParentId(templateRule.getId()).setName(name).setDescription(description).setSeverity(severity).setRepositoryKey(templateRule.getRepositoryKey()).setConfigKey(templateRule.getConfigKey()).setRuleKey(templateRule.getRuleKey() + "_" + system.now()).setCardinality(Cardinality.SINGLE).setStatus(Rule.STATUS_READY).setLanguage(templateRule.getLanguage()).setCreatedAt(new Date(system.now())).setUpdatedAt(new Date(system.now()));
     ruleDao.insert(rule,session);
-    List<RuleParamDto> templateRuleParams=ruleDao.selectParameters(templateRule.getId(),session);
+    List<RuleParamDto> templateRuleParams=ruleDao.selectParametersByRuleId(templateRule.getId(),session);
     for (    RuleParamDto templateRuleParam : templateRuleParams) {
       String key=templateRuleParam.getName();
       String value=paramsByKey.get(key);
       RuleParamDto param=new RuleParamDto().setRuleId(rule.getId()).setName(key).setDescription(templateRuleParam.getDescription()).setType(templateRuleParam.getType()).setDefaultValue(Strings.emptyToNull(value));
       ruleDao.insert(param,session);
     }
-    List<RuleRuleTagDto> templateRuleTags=ruleDao.selectTags(templateRule.getId(),session);
+    List<RuleRuleTagDto> templateRuleTags=ruleDao.selectTagsByRuleIds(templateRule.getId(),session);
     for (    RuleRuleTagDto tag : templateRuleTags) {
       RuleRuleTagDto newTag=new RuleRuleTagDto().setRuleId(rule.getId()).setTagId(tag.getTagId()).setTag(tag.getTag()).setType(tag.getType());
       ruleDao.insert(newTag,session);

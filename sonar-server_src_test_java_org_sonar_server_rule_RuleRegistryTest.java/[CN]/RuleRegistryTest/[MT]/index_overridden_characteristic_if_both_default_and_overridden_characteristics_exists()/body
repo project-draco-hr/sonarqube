@@ -1,11 +1,8 @@
 {
-  Map<Integer,CharacteristicDto> characteristics=newHashMap();
-  characteristics.put(10,new CharacteristicDto().setId(10).setKey("REUSABILITY").setName("Reusability"));
-  characteristics.put(11,new CharacteristicDto().setId(11).setKey("MODULARITY").setName("Modularity").setParentId(10));
-  characteristics.put(12,new CharacteristicDto().setId(12).setKey("PORTABILITY").setName("Portability"));
-  characteristics.put(13,new CharacteristicDto().setId(13).setKey("COMPILER").setName("Compiler").setParentId(12));
-  List<RuleDto> rules=ImmutableList.of(new RuleDto().setId(10).setRepositoryKey("repo").setRuleKey("key1").setSeverity(Severity.MINOR).setDefaultSubCharacteristicId(11).setDefaultRemediationFunction("LINEAR").setDefaultRemediationCoefficient("2h").setSubCharacteristicId(13).setRemediationFunction("LINEAR_OFFSET").setRemediationCoefficient("1h").setRemediationOffset("15min"));
-  registry.bulkRegisterRules(rules,characteristics,ArrayListMultimap.<Integer,RuleParamDto>create(),ArrayListMultimap.<Integer,RuleRuleTagDto>create());
+  when(ruleDao.selectEnablesAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setId(10).setRepositoryKey("repo").setRuleKey("key1").setSeverity(Severity.MINOR).setDefaultSubCharacteristicId(11).setDefaultRemediationFunction("LINEAR").setDefaultRemediationCoefficient("2h").setSubCharacteristicId(13).setRemediationFunction("LINEAR_OFFSET").setRemediationCoefficient("1h").setRemediationOffset("15min")));
+  when(characteristicDao.selectCharacteristicsByIds(newHashSet(11,13),session)).thenReturn(newArrayList(new CharacteristicDto().setId(11).setKey("MODULARITY").setName("Modularity").setParentId(10),new CharacteristicDto().setId(13).setKey("COMPILER").setName("Compiler").setParentId(12)));
+  when(characteristicDao.selectCharacteristicsByIds(newHashSet(10,12),session)).thenReturn(newArrayList(new CharacteristicDto().setId(10).setKey("REUSABILITY").setName("Reusability"),new CharacteristicDto().setId(12).setKey("PORTABILITY").setName("Portability")));
+  registry.reindex();
   Map<String,Object> ruleDocument=esSetup.client().prepareGet("rules","rule",Integer.toString(10)).execute().actionGet().getSourceAsMap();
   assertThat(ruleDocument.get(RuleDocument.FIELD_CHARACTERISTIC_ID)).isEqualTo(12);
   assertThat(ruleDocument.get(RuleDocument.FIELD_CHARACTERISTIC_KEY)).isEqualTo("PORTABILITY");

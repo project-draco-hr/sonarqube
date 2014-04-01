@@ -2,12 +2,12 @@
   for (  RuleDto rule : rules) {
     RuleDebt ruleDebt=ruleDebtByRule(rule,ruleDebts);
     if (ruleDebt == null) {
-      disabledRuleDebt(rule,updateDate,session);
+      disabledOverriddenRuleDebt(rule);
     }
  else {
       CharacteristicDto subCharacteristicDto=characteristicByKey(ruleDebt.subCharacteristicKey(),allCharacteristicDtos);
       if (subCharacteristicDto == null) {
-        disabledRuleDebt(rule,updateDate,session);
+        disabledOverriddenRuleDebt(rule);
       }
  else {
         boolean isSameCharacteristicAsDefault=subCharacteristicDto.getId().equals(rule.getDefaultSubCharacteristicId());
@@ -16,10 +16,10 @@
         rule.setRemediationFunction(!isSameFunctionAsDefault ? ruleDebt.function().name() : null);
         rule.setRemediationCoefficient(!isSameFunctionAsDefault ? ruleDebt.coefficient() : null);
         rule.setRemediationOffset(!isSameFunctionAsDefault ? ruleDebt.offset() : null);
-        rule.setUpdatedAt(updateDate);
-        ruleDao.update(rule,session);
       }
     }
+    rule.setUpdatedAt(updateDate);
+    ruleDao.update(rule,session);
     ruleDebts.remove(ruleDebt);
   }
   for (  RuleDebt ruleDebt : ruleDebts) {
