@@ -1,0 +1,22 @@
+{
+  final int ruleId=11;
+  RuleDto rule=new RuleDto().setId(ruleId).setRepositoryKey("squid").setRuleKey("XPath_1387869254").setConfigKey("Xpath").setUpdatedAt(DateUtils.parseDate("2013-12-23"));
+  RuleParamDto param=new RuleParamDto().setId(21).setName("max").setDefaultValue("20");
+  when(ruleDao.selectParameters(eq(ruleId),eq(session))).thenReturn(newArrayList(param));
+  ArrayList<RuleRuleTagDto> ruleTags=newArrayList(new RuleRuleTagDto().setId(30L).setTag("style").setType(RuleTagType.SYSTEM));
+  when(ruleDao.selectTags(eq(ruleId),eq(session))).thenReturn(ruleTags);
+  final int activeRuleId=5;
+  ActiveRuleDto activeRule=new ActiveRuleDto().setId(activeRuleId).setProfileId(1).setRuleId(ruleId).setSeverity(Severity.MINOR);
+  when(activeRuleDao.selectByRuleId(ruleId)).thenReturn(newArrayList(activeRule));
+  long now=System.currentTimeMillis();
+  doReturn(now).when(system).now();
+  operations.deleteCustomRule(rule,authorizedUserSession);
+  verify(ruleDao).update(ruleCaptor.capture(),eq(session));
+  assertThat(ruleCaptor.getValue().getStatus()).isEqualTo(Rule.STATUS_REMOVED);
+  assertThat(ruleCaptor.getValue().getUpdatedAt()).isEqualTo(new Date(now));
+  verify(ruleRegistry).save(eq(ruleCaptor.getValue()),any(CharacteristicDto.class),any(CharacteristicDto.class),eq(newArrayList(param)),eq(ruleTags));
+  verify(activeRuleDao).deleteParameters(eq(activeRuleId),eq(session));
+  verify(activeRuleDao).deleteFromRule(eq(ruleId),eq(session));
+  verify(session,times(2)).commit();
+  verify(esActiveRule).deleteActiveRules(newArrayList(activeRuleId));
+}

@@ -1,4 +1,17 @@
 {
-  facade.updateRule(10,"Rule name",Severity.MAJOR,"My note",ImmutableMap.of("max","20"));
-  verify(rules).updateRule(10,"Rule name",Severity.MAJOR,"My note",ImmutableMap.of("max","20"));
+  Map<String,Object> params=newHashMap();
+  params.put("ruleKey","squid:UselessImportCheck");
+  params.put("debtCharacteristicKey","MODULARITY");
+  params.put("debtRemediationFunction","LINEAR_OFFSET");
+  params.put("debtRemediationCoefficient","1h");
+  params.put("debtRemediationOffset","10min");
+  facade.updateRule(params);
+  ArgumentCaptor<RuleOperations.RuleChange> ruleChangeCaptor=ArgumentCaptor.forClass(RuleOperations.RuleChange.class);
+  verify(rules).updateRule(ruleChangeCaptor.capture());
+  RuleOperations.RuleChange ruleChange=ruleChangeCaptor.getValue();
+  assertThat(ruleChange.ruleKey()).isEqualTo(RuleKey.of("squid","UselessImportCheck"));
+  assertThat(ruleChange.debtCharacteristicKey()).isEqualTo("MODULARITY");
+  assertThat(ruleChange.debtRemediationFunction()).isEqualTo("LINEAR_OFFSET");
+  assertThat(ruleChange.debtRemediationCoefficient()).isEqualTo("1h");
+  assertThat(ruleChange.debtRemediationOffset()).isEqualTo("10min");
 }

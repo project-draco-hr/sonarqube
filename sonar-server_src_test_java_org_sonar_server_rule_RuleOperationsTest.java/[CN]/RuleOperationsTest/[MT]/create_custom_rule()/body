@@ -1,0 +1,29 @@
+{
+  RuleDto templateRule=new RuleDto().setId(10).setRepositoryKey("squid").setRuleKey("AvoidCycle").setConfigKey("Xpath");
+  when(ruleDao.selectParameters(eq(10),eq(session))).thenReturn(newArrayList(new RuleParamDto().setId(20).setName("max").setDefaultValue("10")));
+  when(ruleDao.selectTags(eq(10),eq(session))).thenReturn(newArrayList(new RuleRuleTagDto().setId(30L).setTag("style").setType(RuleTagType.SYSTEM)));
+  Map<String,String> paramsByKey=ImmutableMap.of("max","20");
+  RuleDto result=operations.createCustomRule(templateRule,"My New Rule",Severity.BLOCKER,"Rule Description",paramsByKey,authorizedUserSession);
+  assertThat(result).isNotNull();
+  ArgumentCaptor<RuleDto> ruleArgument=ArgumentCaptor.forClass(RuleDto.class);
+  verify(ruleDao).insert(ruleArgument.capture(),eq(session));
+  assertThat(ruleArgument.getValue().getParentId()).isEqualTo(10);
+  assertThat(ruleArgument.getValue().getName()).isEqualTo("My New Rule");
+  assertThat(ruleArgument.getValue().getDescription()).isEqualTo("Rule Description");
+  assertThat(ruleArgument.getValue().getSeverityString()).isEqualTo(Severity.BLOCKER);
+  assertThat(ruleArgument.getValue().getConfigKey()).isEqualTo("Xpath");
+  assertThat(ruleArgument.getValue().getRepositoryKey()).isEqualTo("squid");
+  assertThat(ruleArgument.getValue().getRuleKey()).startsWith("AvoidCycle");
+  assertThat(ruleArgument.getValue().getStatus()).isEqualTo("READY");
+  assertThat(ruleArgument.getValue().getCardinality()).isEqualTo(Cardinality.SINGLE);
+  ArgumentCaptor<RuleParamDto> ruleParamArgument=ArgumentCaptor.forClass(RuleParamDto.class);
+  verify(ruleDao).insert(ruleParamArgument.capture(),eq(session));
+  assertThat(ruleParamArgument.getValue().getName()).isEqualTo("max");
+  assertThat(ruleParamArgument.getValue().getDefaultValue()).isEqualTo("20");
+  ArgumentCaptor<RuleRuleTagDto> ruleTagArgument=ArgumentCaptor.forClass(RuleRuleTagDto.class);
+  verify(ruleDao).insert(ruleTagArgument.capture(),eq(session));
+  assertThat(ruleTagArgument.getValue().getTag()).isEqualTo("style");
+  assertThat(ruleTagArgument.getValue().getType()).isEqualTo(RuleTagType.SYSTEM);
+  verify(session).commit();
+  verify(ruleRegistry).save(eq(ruleArgument.getValue()),isNull(CharacteristicDto.class),isNull(CharacteristicDto.class),anyListOf(RuleParamDto.class),anyListOf(RuleRuleTagDto.class));
+}

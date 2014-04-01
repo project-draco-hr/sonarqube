@@ -1,0 +1,16 @@
+{
+  RuleDto dto=new RuleDto().setId(1).setRepositoryKey("squid").setRuleKey("UselessImportCheck").setSubCharacteristicId(2).setRemediationFunction("LINEAR").setRemediationCoefficient("1h");
+  RuleKey ruleKey=RuleKey.of("squid","UselessImportCheck");
+  when(ruleDao.selectByKey(ruleKey,session)).thenReturn(dto);
+  CharacteristicDto subCharacteristic=new CharacteristicDto().setId(2).setKey("COMPILER").setName("Compiler").setParentId(1);
+  when(characteristicDao.selectByKey("COMPILER",session)).thenReturn(subCharacteristic);
+  try {
+    operations.updateRule(new RuleChange().setRuleKey(ruleKey).setDebtCharacteristicKey("COMPILER").setDebtRemediationFunction("LINEAR").setDebtRemediationCoefficient("foo"),authorizedUserSession);
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(BadRequestException.class).hasMessage("Invalid coefficient: foo");
+  }
+  verify(ruleDao,never()).update(any(RuleDto.class),eq(session));
+  verify(session,never()).commit();
+  verify(ruleRegistry,never()).save(any(RuleDto.class),any(CharacteristicDto.class),any(CharacteristicDto.class),anyListOf(RuleParamDto.class),anyListOf(RuleRuleTagDto.class));
+}

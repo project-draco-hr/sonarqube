@@ -1,0 +1,49 @@
+{
+  checkPermission(userSession);
+  SqlSession session=myBatis.openSession();
+  try {
+    boolean updated=false;
+    RuleDto ruleDto=ruleDao.selectByKey(ruleChange.ruleKey(),session);
+    if (ruleDto == null) {
+      throw new NotFoundException(String.format("Unknown rule '%s'",ruleChange.ruleKey()));
+    }
+    String subCharacteristicKey=ruleChange.debtCharacteristicKey();
+    if (!Strings.isNullOrEmpty(subCharacteristicKey)) {
+      CharacteristicDto subCharacteristic=characteristicDao.selectByKey(subCharacteristicKey,session);
+      if (subCharacteristic == null) {
+        throw new NotFoundException(String.format("Unknown sub characteristic '%s'",ruleChange.debtCharacteristicKey()));
+      }
+      if (!subCharacteristic.getId().equals(ruleDto.getSubCharacteristicId())) {
+        ruleDto.setSubCharacteristicId(subCharacteristic.getId());
+        updated=true;
+      }
+      if (!isSameRemediationFunction(ruleChange.debtRemediationFunction(),ruleChange.debtRemediationCoefficient(),ruleChange.debtRemediationOffset(),ruleDto)) {
+        DefaultDebtRemediationFunction debtRemediationFunction=new DefaultDebtRemediationFunction(DebtRemediationFunction.Type.valueOf(ruleChange.debtRemediationFunction()),ruleChange.debtRemediationCoefficient(),ruleChange.debtRemediationOffset());
+        ruleDto.setRemediationFunction(debtRemediationFunction.type().name());
+        ruleDto.setRemediationCoefficient(debtRemediationFunction.coefficient());
+        ruleDto.setRemediationOffset(debtRemediationFunction.offset());
+        updated=true;
+      }
+    }
+ else {
+      if (!ruleDto.getSubCharacteristicId().equals(RuleDto.DISABLED_CHARACTERISTIC_ID)) {
+        ruleDto.setSubCharacteristicId(RuleDto.DISABLED_CHARACTERISTIC_ID);
+        ruleDto.setRemediationFunction(null);
+        ruleDto.setRemediationCoefficient(null);
+        ruleDto.setRemediationOffset(null);
+        updated=true;
+      }
+    }
+    if (updated) {
+      ruleDao.update(ruleDto,session);
+      session.commit();
+      reindexRule(ruleDto,session);
+    }
+  }
+ catch (  IllegalArgumentException e) {
+    throw BadRequestException.of(e.getMessage());
+  }
+ finally {
+    MyBatis.closeQuietly(session);
+  }
+}

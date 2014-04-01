@@ -1,0 +1,16 @@
+{
+  RuleDto rule=new RuleDto().setId(10).setRepositoryKey("squid").setRuleKey("AvoidCycle");
+  when(ruleDao.selectById(10)).thenReturn(rule);
+  RuleDto newRule=new RuleDto().setId(11);
+  Map<String,String> paramsByKey=ImmutableMap.of("max","20");
+  when(ruleOperations.createCustomRule(eq(rule),eq("Rule name"),eq(Severity.MAJOR),eq("My note"),eq(paramsByKey),any(UserSession.class))).thenReturn(newRule);
+  try {
+    rules.createCustomRule(10,"","","",paramsByKey);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(BadRequestException.class);
+    assertThat(((BadRequestException)e).errors()).hasSize(3);
+  }
+  verifyZeroInteractions(ruleOperations);
+}
