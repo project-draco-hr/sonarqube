@@ -5,15 +5,15 @@
   when(dao.selectCharacteristicsByParentId(1,batchSession)).thenReturn(newArrayList(subCharacteristicDto));
   when(dao.selectById(1,batchSession)).thenReturn(characteristicDto);
   service.delete(1);
-  verify(ruleDao).update(any(RuleDto.class),eq(batchSession));
-  ArgumentCaptor<CharacteristicDto> characteristicArgument=ArgumentCaptor.forClass(CharacteristicDto.class);
-  verify(dao,times(2)).update(characteristicArgument.capture(),eq(batchSession));
-  CharacteristicDto subCharacteristicDto=characteristicArgument.getAllValues().get(0);
-  CharacteristicDto characteristicDto=characteristicArgument.getAllValues().get(1);
+  verify(ruleDao).update(ruleCaptor.capture(),eq(batchSession));
+  verify(dao,times(2)).update(characteristicCaptor.capture(),eq(batchSession));
+  CharacteristicDto subCharacteristicDto=characteristicCaptor.getAllValues().get(0);
+  CharacteristicDto characteristicDto=characteristicCaptor.getAllValues().get(1);
   assertThat(subCharacteristicDto.getId()).isEqualTo(2);
   assertThat(subCharacteristicDto.isEnabled()).isFalse();
   assertThat(subCharacteristicDto.getUpdatedAt()).isEqualTo(now);
   assertThat(characteristicDto.getId()).isEqualTo(1);
   assertThat(characteristicDto.isEnabled()).isFalse();
   assertThat(characteristicDto.getUpdatedAt()).isEqualTo(now);
+  verify(ruleRegistry).reindex(ruleCaptor.getAllValues(),batchSession);
 }

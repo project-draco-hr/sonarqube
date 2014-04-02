@@ -2,11 +2,10 @@
   when(dao.selectById(10,session)).thenReturn(new CharacteristicDto().setId(10).setKey("MEMORY_EFFICIENCY").setOrder(2));
   when(dao.selectEnabledRootCharacteristics(session)).thenReturn(newArrayList(new CharacteristicDto().setId(10).setKey("MEMORY_EFFICIENCY").setOrder(2),new CharacteristicDto().setId(2).setKey("PORTABILITY").setOrder(3)));
   DebtCharacteristic result=service.moveDown(10);
-  ArgumentCaptor<CharacteristicDto> argument=ArgumentCaptor.forClass(CharacteristicDto.class);
-  verify(dao,times(2)).update(argument.capture(),eq(session));
+  verify(dao,times(2)).update(characteristicCaptor.capture(),eq(session));
   assertThat(result.order()).isEqualTo(3);
-  assertThat(argument.getAllValues().get(0).getOrder()).isEqualTo(2);
-  assertThat(argument.getAllValues().get(0).getUpdatedAt()).isEqualTo(now);
-  assertThat(argument.getAllValues().get(1).getOrder()).isEqualTo(3);
-  assertThat(argument.getAllValues().get(1).getUpdatedAt()).isEqualTo(now);
+  assertThat(characteristicCaptor.getAllValues().get(0).getOrder()).isEqualTo(2);
+  assertThat(characteristicCaptor.getAllValues().get(0).getUpdatedAt()).isEqualTo(now);
+  assertThat(characteristicCaptor.getAllValues().get(1).getOrder()).isEqualTo(3);
+  assertThat(characteristicCaptor.getAllValues().get(1).getUpdatedAt()).isEqualTo(now);
 }

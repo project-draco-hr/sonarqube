@@ -5,14 +5,15 @@
   when(ruleDao.selectEnablesAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setId(1).setRepositoryKey("squid").setRuleKey("UselessImportCheck").setLanguage("java").setDefaultSubCharacteristicId(3).setDefaultRemediationFunction("LINEAR").setDefaultRemediationCoefficient("2h").setSubCharacteristicId(2).setRemediationFunction("LINEAR_OFFSET").setRemediationCoefficient("2h").setRemediationOffset("15min").setCreatedAt(oldDate).setUpdatedAt(oldDate)));
   debtModelBackup.restoreFromXml("<xml/>","java");
   verify(ruleDao).selectEnablesAndNonManual(session);
-  verify(ruleDao).update(ruleArgument.capture(),eq(session));
+  verify(ruleDao).update(ruleCaptor.capture(),eq(session));
   verifyNoMoreInteractions(ruleDao);
-  RuleDto rule=ruleArgument.getValue();
+  verify(ruleRegistry).reindex(ruleCaptor.getAllValues(),session);
+  verify(session).commit();
+  RuleDto rule=ruleCaptor.getValue();
   assertThat(rule.getId()).isEqualTo(1);
   assertThat(rule.getSubCharacteristicId()).isEqualTo(-1);
   assertThat(rule.getRemediationFunction()).isNull();
   assertThat(rule.getRemediationCoefficient()).isNull();
   assertThat(rule.getRemediationOffset()).isNull();
   assertThat(rule.getUpdatedAt()).isEqualTo(now);
-  verify(session).commit();
 }

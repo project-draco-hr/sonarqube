@@ -7,13 +7,14 @@
   verify(dao,times(2)).update(any(CharacteristicDto.class),eq(session));
   verifyNoMoreInteractions(dao);
   verify(ruleDao).selectEnablesAndNonManual(session);
-  verify(ruleDao).update(ruleArgument.capture(),eq(session));
+  verify(ruleDao).update(ruleCaptor.capture(),eq(session));
   verifyNoMoreInteractions(ruleDao);
-  RuleDto rule=ruleArgument.getValue();
+  verify(ruleRegistry).reindex(ruleCaptor.getAllValues(),session);
+  verify(session).commit();
+  RuleDto rule=ruleCaptor.getValue();
   assertThat(rule.getSubCharacteristicId()).isNull();
   assertThat(rule.getRemediationFunction()).isNull();
   assertThat(rule.getRemediationCoefficient()).isNull();
   assertThat(rule.getRemediationOffset()).isNull();
   assertThat(rule.getUpdatedAt()).isEqualTo(now);
-  verify(session).commit();
 }

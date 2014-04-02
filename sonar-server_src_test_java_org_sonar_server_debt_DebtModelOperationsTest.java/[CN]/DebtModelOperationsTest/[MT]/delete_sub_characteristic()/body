@@ -4,9 +4,8 @@
   when(ruleDao.selectBySubCharacteristicId(2,batchSession)).thenReturn(newArrayList(new RuleDto().setSubCharacteristicId(2).setRemediationFunction("LINEAR_OFFSET").setRemediationCoefficient("2h").setRemediationOffset("5min").setDefaultSubCharacteristicId(10).setDefaultRemediationFunction("LINEAR_OFFSET").setDefaultRemediationCoefficient("4h").setDefaultRemediationOffset("15min")));
   when(dao.selectById(2,batchSession)).thenReturn(subCharacteristicDto);
   service.delete(2);
-  ArgumentCaptor<RuleDto> ruleArgument=ArgumentCaptor.forClass(RuleDto.class);
-  verify(ruleDao).update(ruleArgument.capture(),eq(batchSession));
-  RuleDto ruleDto=ruleArgument.getValue();
+  verify(ruleDao).update(ruleCaptor.capture(),eq(batchSession));
+  RuleDto ruleDto=ruleCaptor.getValue();
   assertThat(ruleDto.getUpdatedAt()).isEqualTo(now);
   assertThat(ruleDto.getSubCharacteristicId()).isNull();
   assertThat(ruleDto.getRemediationFunction()).isNull();
@@ -16,10 +15,10 @@
   assertThat(ruleDto.getDefaultRemediationFunction()).isEqualTo("LINEAR_OFFSET");
   assertThat(ruleDto.getDefaultRemediationCoefficient()).isEqualTo("4h");
   assertThat(ruleDto.getDefaultRemediationOffset()).isEqualTo("15min");
-  ArgumentCaptor<CharacteristicDto> characteristicArgument=ArgumentCaptor.forClass(CharacteristicDto.class);
-  verify(dao).update(characteristicArgument.capture(),eq(batchSession));
-  CharacteristicDto characteristicDto=characteristicArgument.getValue();
+  verify(dao).update(characteristicCaptor.capture(),eq(batchSession));
+  CharacteristicDto characteristicDto=characteristicCaptor.getValue();
   assertThat(characteristicDto.getId()).isEqualTo(2);
   assertThat(characteristicDto.isEnabled()).isFalse();
   assertThat(characteristicDto.getUpdatedAt()).isEqualTo(now);
+  verify(ruleRegistry).reindex(ruleCaptor.getAllValues(),batchSession);
 }

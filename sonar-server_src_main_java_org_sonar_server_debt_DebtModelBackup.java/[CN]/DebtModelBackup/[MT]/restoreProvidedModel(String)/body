@@ -4,11 +4,13 @@
   SqlSession session=mybatis.openSession();
   try {
     restoreCharacteristics(loadModelFromPlugin(DebtModelPluginRepository.DEFAULT_MODEL),languageKey == null,updateDate,session);
-    for (    RuleDto rule : rules(languageKey,session)) {
+    List<RuleDto> ruleDtos=rules(languageKey,session);
+    for (    RuleDto rule : ruleDtos) {
       disabledOverriddenRuleDebt(rule);
       rule.setUpdatedAt(updateDate);
       ruleDao.update(rule,session);
     }
+    ruleRegistry.reindex(ruleDtos,session);
     session.commit();
   }
   finally {
