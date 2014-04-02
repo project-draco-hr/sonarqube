@@ -1,3 +1,36 @@
 {
-  restoreProvidedModel();
+  checkPermission();
+  Date updateDate=new Date(system2.now());
+  SqlSession session=mybatis.openSession();
+  try {
+    List<CharacteristicDto> allCharacteristicDtos=restoreCharacteristics(loadModelFromPlugin(DebtModelPluginRepository.DEFAULT_MODEL),true,updateDate,session);
+    RulesDefinition.Context context=defLoader.load();
+    List<RulesDefinition.Rule> rules=newArrayList();
+    for (    RulesDefinition.Repository repoDef : context.repositories()) {
+      rules.addAll(repoDef.rules());
+    }
+    List<RuleDto> ruleDtos=rules(null,session);
+    for (    RuleDto rule : ruleDtos) {
+      RulesDefinition.Rule ruleDef=ruleDef(rule,rules);
+      String subCharacteristicKey=ruleDef.debtSubCharacteristic();
+      CharacteristicDto subCharacteristicDto=characteristicByKey(subCharacteristicKey,allCharacteristicDtos);
+      DebtRemediationFunction remediationFunction=ruleDef.debtRemediationFunction();
+      boolean hasDebtDefinition=subCharacteristicDto != null && remediationFunction != null;
+      rule.setDefaultSubCharacteristicId(hasDebtDefinition ? subCharacteristicDto.getId() : null);
+      rule.setDefaultRemediationFunction(hasDebtDefinition ? remediationFunction.type().name() : null);
+      rule.setDefaultRemediationCoefficient(hasDebtDefinition ? remediationFunction.coefficient() : null);
+      rule.setDefaultRemediationOffset(hasDebtDefinition ? remediationFunction.offset() : null);
+      rule.setSubCharacteristicId(null);
+      rule.setRemediationFunction(null);
+      rule.setRemediationCoefficient(null);
+      rule.setRemediationOffset(null);
+      rule.setUpdatedAt(updateDate);
+      ruleDao.update(rule,session);
+    }
+    ruleRegistry.reindex(ruleDtos,session);
+    session.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
 }
