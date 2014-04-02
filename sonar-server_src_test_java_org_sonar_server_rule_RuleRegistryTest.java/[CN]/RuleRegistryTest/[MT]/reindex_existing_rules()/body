@@ -1,0 +1,10 @@
+{
+  assertThat(esSetup.exists("rules","rule","3")).isTrue();
+  when(ruleDao.selectEnablesAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setId(3).setRepositoryKey("repo").setRuleKey("key").setSeverity(Severity.MAJOR)));
+  registry.reindex();
+  Map<String,Object> ruleDocument=esSetup.client().prepareGet("rules","rule",Integer.toString(3)).execute().actionGet().getSourceAsMap();
+  assertThat(ruleDocument.get(RuleDocument.FIELD_ID)).isEqualTo(3);
+  assertThat(ruleDocument.get(RuleDocument.FIELD_REPOSITORY_KEY)).isEqualTo("repo");
+  assertThat(ruleDocument.get(RuleDocument.FIELD_KEY)).isEqualTo("key");
+  assertThat(ruleDocument.get(RuleDocument.FIELD_SEVERITY)).isEqualTo("MAJOR");
+}

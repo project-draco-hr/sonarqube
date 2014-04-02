@@ -1,0 +1,26 @@
+{
+  RuleDto ruleDto=new RuleDto().setId(3).setRepositoryKey("repo").setRuleKey("key").setSeverity(Severity.MINOR).setNoteData("noteData").setNoteUserLogin("userLogin").setDefaultSubCharacteristicId(11).setDefaultRemediationFunction("LINEAR_OFFSET").setDefaultRemediationCoefficient("1h").setDefaultRemediationOffset("15min");
+  when(ruleDao.selectParametersByRuleIds(newArrayList(3),session)).thenReturn(newArrayList(new RuleParamDto().setRuleId(3).setName("name")));
+  when(ruleDao.selectTagsByRuleIds(newArrayList(3),session)).thenReturn(newArrayList(new RuleRuleTagDto().setRuleId(3).setTag("tag1").setType(RuleTagType.SYSTEM),new RuleRuleTagDto().setRuleId(3).setTag("tag2").setType(RuleTagType.SYSTEM),new RuleRuleTagDto().setRuleId(3).setTag("tag").setType(RuleTagType.ADMIN)));
+  when(characteristicDao.selectById(11,session)).thenReturn(new CharacteristicDto().setId(11).setKey("MODULARITY").setName("Modularity").setParentId(10));
+  when(characteristicDao.selectById(10,session)).thenReturn(new CharacteristicDto().setId(10).setKey("REUSABILITY").setName("Reusability"));
+  registry.reindex(ruleDto);
+  Map<String,Object> ruleDocument=esSetup.client().prepareGet("rules","rule",Integer.toString(3)).execute().actionGet().getSourceAsMap();
+  assertThat(ruleDocument.get(RuleDocument.FIELD_ID)).isEqualTo(3);
+  assertThat(ruleDocument.get(RuleDocument.FIELD_REPOSITORY_KEY)).isEqualTo("repo");
+  assertThat(ruleDocument.get(RuleDocument.FIELD_KEY)).isEqualTo("key");
+  assertThat(ruleDocument.get(RuleDocument.FIELD_SEVERITY)).isEqualTo("MINOR");
+  assertThat(ruleDocument.get(RuleDocument.FIELD_NOTE)).isNotNull();
+  assertThat((List<String>)ruleDocument.get(RuleDocument.FIELD_PARAMS)).hasSize(1);
+  assertThat((List<String>)ruleDocument.get(RuleDocument.FIELD_SYSTEM_TAGS)).hasSize(2);
+  assertThat((List<String>)ruleDocument.get(RuleDocument.FIELD_ADMIN_TAGS)).hasSize(1);
+  assertThat(ruleDocument.get(RuleDocument.FIELD_CHARACTERISTIC_ID)).isEqualTo(10);
+  assertThat(ruleDocument.get(RuleDocument.FIELD_CHARACTERISTIC_KEY)).isEqualTo("REUSABILITY");
+  assertThat(ruleDocument.get(RuleDocument.FIELD_CHARACTERISTIC_NAME)).isEqualTo("Reusability");
+  assertThat(ruleDocument.get(RuleDocument.FIELD_SUB_CHARACTERISTIC_ID)).isEqualTo(11);
+  assertThat(ruleDocument.get(RuleDocument.FIELD_SUB_CHARACTERISTIC_KEY)).isEqualTo("MODULARITY");
+  assertThat(ruleDocument.get(RuleDocument.FIELD_SUB_CHARACTERISTIC_NAME)).isEqualTo("Modularity");
+  assertThat(ruleDocument.get(RuleDocument.FIELD_REMEDIATION_FUNCTION)).isEqualTo("LINEAR_OFFSET");
+  assertThat(ruleDocument.get(RuleDocument.FIELD_REMEDIATION_COEFFICIENT)).isEqualTo("1h");
+  assertThat(ruleDocument.get(RuleDocument.FIELD_REMEDIATION_OFFSET)).isEqualTo("15min");
+}

@@ -1,7 +1,7 @@
 {
   when(ruleDao.selectEnablesAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setId(10).setRepositoryKey("repo").setRuleKey("key1").setSeverity(Severity.MINOR).setDefaultSubCharacteristicId(11).setDefaultRemediationFunction("LINEAR").setDefaultRemediationCoefficient("2h").setSubCharacteristicId(13).setRemediationFunction("LINEAR_OFFSET").setRemediationCoefficient("1h").setRemediationOffset("15min")));
-  when(characteristicDao.selectCharacteristicsByIds(newHashSet(11,13),session)).thenReturn(newArrayList(new CharacteristicDto().setId(11).setKey("MODULARITY").setName("Modularity").setParentId(10),new CharacteristicDto().setId(13).setKey("COMPILER").setName("Compiler").setParentId(12)));
   when(characteristicDao.selectCharacteristicsByIds(newHashSet(10,12),session)).thenReturn(newArrayList(new CharacteristicDto().setId(10).setKey("REUSABILITY").setName("Reusability"),new CharacteristicDto().setId(12).setKey("PORTABILITY").setName("Portability")));
+  when(characteristicDao.selectCharacteristicsByIds(newHashSet(11,13),session)).thenReturn(newArrayList(new CharacteristicDto().setId(11).setKey("MODULARITY").setName("Modularity").setParentId(10),new CharacteristicDto().setId(13).setKey("COMPILER").setName("Compiler").setParentId(12)));
   registry.reindex();
   Map<String,Object> ruleDocument=esSetup.client().prepareGet("rules","rule",Integer.toString(10)).execute().actionGet().getSourceAsMap();
   assertThat(ruleDocument.get(RuleDocument.FIELD_CHARACTERISTIC_ID)).isEqualTo(12);

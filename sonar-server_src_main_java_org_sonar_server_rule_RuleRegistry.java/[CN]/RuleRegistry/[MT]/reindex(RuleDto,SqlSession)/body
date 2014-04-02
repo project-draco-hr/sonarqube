@@ -1,0 +1,12 @@
+{
+  try {
+    Integer ruleId=rule.getId();
+    Integer effectiveSubCharacteristicId=rule.getSubCharacteristicId() != null ? rule.getSubCharacteristicId() : rule.getDefaultSubCharacteristicId();
+    CharacteristicDto subCharacteristic=effectiveSubCharacteristicId != null ? characteristicDao.selectById(effectiveSubCharacteristicId,session) : null;
+    CharacteristicDto characteristic=subCharacteristic != null ? characteristicDao.selectById(subCharacteristic.getParentId(),session) : null;
+    searchIndex.putSynchronous(INDEX_RULES,TYPE_RULE,Long.toString(ruleId),ruleDocument(rule,characteristic,subCharacteristic,ruleDao.selectParametersByRuleIds(newArrayList(ruleId),session),ruleDao.selectTagsByRuleIds(newArrayList(ruleId),session)));
+  }
+ catch (  IOException ioexception) {
+    throw new IllegalStateException("Unable to index rule with id=" + rule.getId(),ioexception);
+  }
+}
