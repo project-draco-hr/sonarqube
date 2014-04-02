@@ -1,0 +1,17 @@
+{
+  if (mavenSession != null) {
+    String moduleKey=definition.getKey();
+    MavenProject foundMavenModule=null;
+    for (    MavenProject mavenModule : (List<MavenProject>)mavenSession.getSortedProjects()) {
+      String mavenModuleKey=mavenModule.getGroupId() + ":" + mavenModule.getArtifactId();
+      if (mavenModuleKey.equals(moduleKey)) {
+        foundMavenModule=mavenModule;
+        break;
+      }
+    }
+    if (foundMavenModule == null) {
+      throw new IllegalStateException("Unable to find Maven project in reactor with key " + moduleKey);
+    }
+    definition.addContainerExtension(foundMavenModule);
+  }
+}
