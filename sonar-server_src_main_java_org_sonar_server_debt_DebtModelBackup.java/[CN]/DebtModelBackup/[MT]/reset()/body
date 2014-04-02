@@ -12,14 +12,16 @@
     List<RuleDto> ruleDtos=rules(null,session);
     for (    RuleDto rule : ruleDtos) {
       RulesDefinition.Rule ruleDef=ruleDef(rule,rules);
-      String subCharacteristicKey=ruleDef.debtSubCharacteristic();
-      CharacteristicDto subCharacteristicDto=characteristicByKey(subCharacteristicKey,allCharacteristicDtos);
-      DebtRemediationFunction remediationFunction=ruleDef.debtRemediationFunction();
-      boolean hasDebtDefinition=subCharacteristicDto != null && remediationFunction != null;
-      rule.setDefaultSubCharacteristicId(hasDebtDefinition ? subCharacteristicDto.getId() : null);
-      rule.setDefaultRemediationFunction(hasDebtDefinition ? remediationFunction.type().name() : null);
-      rule.setDefaultRemediationCoefficient(hasDebtDefinition ? remediationFunction.coefficient() : null);
-      rule.setDefaultRemediationOffset(hasDebtDefinition ? remediationFunction.offset() : null);
+      if (ruleDef != null) {
+        String subCharacteristicKey=ruleDef.debtSubCharacteristic();
+        CharacteristicDto subCharacteristicDto=characteristicByKey(subCharacteristicKey,allCharacteristicDtos);
+        DebtRemediationFunction remediationFunction=ruleDef.debtRemediationFunction();
+        boolean hasDebtDefinition=subCharacteristicDto != null && remediationFunction != null;
+        rule.setDefaultSubCharacteristicId(hasDebtDefinition ? subCharacteristicDto.getId() : null);
+        rule.setDefaultRemediationFunction(hasDebtDefinition ? remediationFunction.type().name() : null);
+        rule.setDefaultRemediationCoefficient(hasDebtDefinition ? remediationFunction.coefficient() : null);
+        rule.setDefaultRemediationOffset(hasDebtDefinition ? remediationFunction.offset() : null);
+      }
       rule.setSubCharacteristicId(null);
       rule.setRemediationFunction(null);
       rule.setRemediationCoefficient(null);
