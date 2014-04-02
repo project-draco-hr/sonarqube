@@ -4,9 +4,12 @@
     ProjectBootstrapper bootstrapper=getComponentByType(ProjectBootstrapper.class);
     BootstrapSettings settings=getComponentByType(BootstrapSettings.class);
     if (bootstrapper == null || "true".equals(settings.property("sonar.mojoUseRunner"))) {
-      bootstrapper=new DefaultProjectBootstrapper(settings,getComponentByType(MavenSession.class));
+      ProjectReactorBuilder builder=getComponentByType(ProjectReactorBuilder.class);
+      reactor=builder.execute();
     }
-    reactor=bootstrapper.bootstrap();
+ else {
+      reactor=bootstrapper.bootstrap();
+    }
     if (reactor == null) {
       throw new SonarException(bootstrapper + " has returned null as ProjectReactor");
     }

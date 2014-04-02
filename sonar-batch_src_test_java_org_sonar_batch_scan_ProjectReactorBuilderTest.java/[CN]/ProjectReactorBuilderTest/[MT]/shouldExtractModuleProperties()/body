@@ -1,0 +1,17 @@
+{
+  Properties props=new Properties();
+  props.setProperty("sources","src/main/java");
+  props.setProperty("tests","src/test/java");
+  props.setProperty("foo.sources","src/main/java");
+  props.setProperty("foobar.tests","src/test/java");
+  props.setProperty("foobar.binaries","target/classes");
+  Properties moduleProps=ProjectReactorBuilder.extractModuleProperties("bar",props);
+  assertThat(moduleProps.size()).isEqualTo(0);
+  moduleProps=ProjectReactorBuilder.extractModuleProperties("foo",props);
+  assertThat(moduleProps.size()).isEqualTo(1);
+  assertThat(moduleProps.get("sources")).isEqualTo("src/main/java");
+  moduleProps=ProjectReactorBuilder.extractModuleProperties("foobar",props);
+  assertThat(moduleProps.size()).isEqualTo(2);
+  assertThat(moduleProps.get("tests")).isEqualTo("src/test/java");
+  assertThat(moduleProps.get("binaries")).isEqualTo("target/classes");
+}
