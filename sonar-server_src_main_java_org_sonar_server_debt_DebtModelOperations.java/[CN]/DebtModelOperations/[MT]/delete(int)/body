@@ -3,17 +3,7 @@
   Date updateDate=new Date(system2.now());
   SqlSession session=mybatis.openBatchSession();
   try {
-    CharacteristicDto characteristicOrSubCharacteristic=findCharacteristic(characteristicId,session);
-    if (characteristicOrSubCharacteristic.getParentId() == null) {
-      List<CharacteristicDto> subCharacteristics=dao.selectCharacteristicsByParentId(characteristicOrSubCharacteristic.getId(),session);
-      for (      CharacteristicDto subCharacteristic : subCharacteristics) {
-        disableSubCharacteristic(subCharacteristic,updateDate,session);
-      }
-      disableCharacteristic(characteristicOrSubCharacteristic,updateDate,session);
-    }
- else {
-      disableSubCharacteristic(characteristicOrSubCharacteristic,updateDate,session);
-    }
+    delete(findCharacteristic(characteristicId,session),updateDate,session);
     session.commit();
   }
   finally {
