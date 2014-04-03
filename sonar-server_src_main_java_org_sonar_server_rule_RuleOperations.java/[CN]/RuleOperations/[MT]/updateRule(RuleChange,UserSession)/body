@@ -13,11 +13,11 @@
       if (subCharacteristic == null) {
         throw new NotFoundException(String.format("Unknown sub characteristic '%s'",ruleChange.debtCharacteristicKey()));
       }
-      if (!subCharacteristic.getId().equals(ruleDto.getSubCharacteristicId())) {
+      if (!subCharacteristic.getId().equals(ruleDto.getSubCharacteristicId()) && !subCharacteristic.getId().equals(ruleDto.getDefaultSubCharacteristicId())) {
         ruleDto.setSubCharacteristicId(subCharacteristic.getId());
         updated=true;
       }
-      if (!isSameRemediationFunction(ruleChange.debtRemediationFunction(),ruleChange.debtRemediationCoefficient(),ruleChange.debtRemediationOffset(),ruleDto)) {
+      if (!isSameRemediationFunction(ruleChange,ruleDto.getRemediationFunction(),ruleDto.getRemediationCoefficient(),ruleDto.getRemediationOffset()) && !isSameRemediationFunction(ruleChange,ruleDto.getDefaultRemediationFunction(),ruleDto.getDefaultRemediationCoefficient(),ruleDto.getDefaultRemediationOffset())) {
         DefaultDebtRemediationFunction debtRemediationFunction=new DefaultDebtRemediationFunction(DebtRemediationFunction.Type.valueOf(ruleChange.debtRemediationFunction()),ruleChange.debtRemediationCoefficient(),ruleChange.debtRemediationOffset());
         ruleDto.setRemediationFunction(debtRemediationFunction.type().name());
         ruleDto.setRemediationCoefficient(debtRemediationFunction.coefficient());
