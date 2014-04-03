@@ -2,7 +2,7 @@
   checkPermission(userSession);
   SqlSession session=myBatis.openSession();
   try {
-    boolean updated=false;
+    boolean needUpdate=false;
     RuleDto ruleDto=ruleDao.selectByKey(ruleChange.ruleKey(),session);
     if (ruleDto == null) {
       throw new NotFoundException(String.format("Unknown rule '%s'",ruleChange.ruleKey()));
@@ -13,16 +13,15 @@
       if (subCharacteristic == null) {
         throw new NotFoundException(String.format("Unknown sub characteristic '%s'",ruleChange.debtCharacteristicKey()));
       }
-      if (!subCharacteristic.getId().equals(ruleDto.getSubCharacteristicId()) && !subCharacteristic.getId().equals(ruleDto.getDefaultSubCharacteristicId())) {
+      boolean iSameAsOverriddenValues=subCharacteristic.getId().equals(ruleDto.getSubCharacteristicId()) && isSameRemediationFunction(ruleChange,ruleDto.getRemediationFunction(),ruleDto.getRemediationCoefficient(),ruleDto.getRemediationOffset());
+      boolean iSameAsDefaultValues=subCharacteristic.getId().equals(ruleDto.getDefaultSubCharacteristicId()) && isSameRemediationFunction(ruleChange,ruleDto.getDefaultRemediationFunction(),ruleDto.getDefaultRemediationCoefficient(),ruleDto.getDefaultRemediationOffset());
+      if (!iSameAsOverriddenValues && !iSameAsDefaultValues) {
         ruleDto.setSubCharacteristicId(subCharacteristic.getId());
-        updated=true;
-      }
-      if (!isSameRemediationFunction(ruleChange,ruleDto.getRemediationFunction(),ruleDto.getRemediationCoefficient(),ruleDto.getRemediationOffset()) && !isSameRemediationFunction(ruleChange,ruleDto.getDefaultRemediationFunction(),ruleDto.getDefaultRemediationCoefficient(),ruleDto.getDefaultRemediationOffset())) {
         DefaultDebtRemediationFunction debtRemediationFunction=new DefaultDebtRemediationFunction(DebtRemediationFunction.Type.valueOf(ruleChange.debtRemediationFunction()),ruleChange.debtRemediationCoefficient(),ruleChange.debtRemediationOffset());
         ruleDto.setRemediationFunction(debtRemediationFunction.type().name());
         ruleDto.setRemediationCoefficient(debtRemediationFunction.coefficient());
         ruleDto.setRemediationOffset(debtRemediationFunction.offset());
-        updated=true;
+        needUpdate=true;
       }
     }
  else {
@@ -31,10 +30,10 @@
         ruleDto.setRemediationFunction(null);
         ruleDto.setRemediationCoefficient(null);
         ruleDto.setRemediationOffset(null);
-        updated=true;
+        needUpdate=true;
       }
     }
-    if (updated) {
+    if (needUpdate) {
       ruleDto.setUpdatedAt(new Date(system.now()));
       ruleDao.update(ruleDto,session);
       session.commit();

@@ -5,17 +5,20 @@
       disabledOverriddenRuleDebt(rule);
     }
  else {
-      CharacteristicDto subCharacteristicDto=characteristicByKey(ruleDebt.subCharacteristicKey(),allCharacteristicDtos);
-      if (subCharacteristicDto == null) {
-        disabledOverriddenRuleDebt(rule);
+      CharacteristicDto subCharacteristicDto=characteristicByKey(ruleDebt.subCharacteristicKey(),allCharacteristicDtos,true);
+      boolean isSameCharacteristicAsDefault=subCharacteristicDto.getId().equals(rule.getDefaultSubCharacteristicId());
+      boolean isSameFunctionAsDefault=isSameRemediationFunction(ruleDebt,rule);
+      if (!isSameCharacteristicAsDefault || !isSameFunctionAsDefault) {
+        rule.setSubCharacteristicId(subCharacteristicDto.getId());
+        rule.setRemediationFunction(ruleDebt.function().name());
+        rule.setRemediationCoefficient(ruleDebt.coefficient());
+        rule.setRemediationOffset(ruleDebt.offset());
       }
  else {
-        boolean isSameCharacteristicAsDefault=subCharacteristicDto.getId().equals(rule.getDefaultSubCharacteristicId());
-        boolean isSameFunctionAsDefault=isSameRemediationFunction(ruleDebt,rule);
-        rule.setSubCharacteristicId(!isSameCharacteristicAsDefault ? subCharacteristicDto.getId() : null);
-        rule.setRemediationFunction(!isSameFunctionAsDefault ? ruleDebt.function().name() : null);
-        rule.setRemediationCoefficient(!isSameFunctionAsDefault ? ruleDebt.coefficient() : null);
-        rule.setRemediationOffset(!isSameFunctionAsDefault ? ruleDebt.offset() : null);
+        rule.setSubCharacteristicId(null);
+        rule.setRemediationFunction(null);
+        rule.setRemediationCoefficient(null);
+        rule.setRemediationOffset(null);
       }
     }
     rule.setUpdatedAt(updateDate);
