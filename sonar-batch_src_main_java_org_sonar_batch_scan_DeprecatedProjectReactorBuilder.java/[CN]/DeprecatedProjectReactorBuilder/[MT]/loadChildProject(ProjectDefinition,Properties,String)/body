@@ -3,10 +3,22 @@
   if (moduleProps.containsKey(PROPERTY_PROJECT_BASEDIR)) {
     baseDir=resolvePath(parentProject.getBaseDir(),moduleProps.getProperty(PROPERTY_PROJECT_BASEDIR));
     setProjectBaseDir(baseDir,moduleProps,moduleId);
+    try {
+      if (!parentProject.getBaseDir().getCanonicalFile().equals(baseDir.getCanonicalFile())) {
+        tryToFindAndLoadPropsFile(baseDir,moduleProps,moduleId);
+      }
+    }
+ catch (    IOException e) {
+      throw new IllegalStateException("Error when resolving baseDir",e);
+    }
+  }
+ else   if (moduleProps.containsKey(PROPERTY_PROJECT_CONFIG_FILE)) {
+    baseDir=loadPropsFile(parentProject,moduleProps,moduleId);
   }
  else {
     baseDir=new File(parentProject.getBaseDir(),moduleId);
     setProjectBaseDir(baseDir,moduleProps,moduleId);
+    tryToFindAndLoadPropsFile(baseDir,moduleProps,moduleId);
   }
   setModuleKeyAndNameIfNotDefined(moduleProps,moduleId,parentProject.getKey());
   checkMandatoryProperties(moduleProps,MANDATORY_PROPERTIES_FOR_CHILD);
