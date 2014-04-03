@@ -1,0 +1,20 @@
+{
+  RulesBuilder rulesBuilder=new RulesBuilder();
+  List<RuleParamDto> ruleParamDtos=ruleDao.selectParameters();
+  ListMultimap<Integer,RuleParamDto> paramDtosByRuleId=ArrayListMultimap.create();
+  for (  RuleParamDto dto : ruleParamDtos) {
+    paramDtosByRuleId.put(dto.getRuleId(),dto);
+  }
+  for (  RuleDto ruleDto : ruleDao.selectEnablesAndNonManual()) {
+    RuleKey ruleKey=RuleKey.of(ruleDto.getRepositoryKey(),ruleDto.getRuleKey());
+    NewRule newRule=rulesBuilder.add(ruleKey).setId(ruleDto.getId()).setName(ruleDto.getName()).setSeverity(ruleDto.getSeverityString()).setDescription(ruleDto.getDescription()).setStatus(RuleStatus.valueOf(ruleDto.getStatus()));
+    if (hasCharacteristic(ruleDto)) {
+      newRule.setDebtSubCharacteristic(effectiveCharacteristic(ruleDto,ruleKey,debtModel).key());
+      newRule.setDebtRemediationFunction(effectiveFunction(ruleDto,ruleKey,durations));
+    }
+    for (    RuleParamDto ruleParamDto : paramDtosByRuleId.get(ruleDto.getId())) {
+      newRule.addParam(ruleParamDto.getName()).setDescription(ruleParamDto.getDescription());
+    }
+  }
+  return rulesBuilder.build();
+}

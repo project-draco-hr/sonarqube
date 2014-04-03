@@ -1,0 +1,17 @@
+{
+  CharacteristicDto rootCharacteristicDto=new CharacteristicDto().setId(1).setKey("MEMORY_EFFICIENCY").setName("Memory use").setOrder(1);
+  CharacteristicDto characteristicDto=new CharacteristicDto().setId(2).setKey("EFFICIENCY").setName("Efficiency").setParentId(1);
+  when(dao.selectEnabledCharacteristics()).thenReturn(newArrayList(rootCharacteristicDto,characteristicDto));
+  DebtModel result=provider.provide(dao);
+  assertThat(result.characteristics()).hasSize(1);
+  DebtCharacteristic characteristic=result.characteristicByKey("MEMORY_EFFICIENCY");
+  assertThat(characteristic.key()).isEqualTo("MEMORY_EFFICIENCY");
+  assertThat(characteristic.name()).isEqualTo("Memory use");
+  assertThat(characteristic.isSub()).isFalse();
+  assertThat(characteristic.order()).isEqualTo(1);
+  DebtCharacteristic subCharacteristic=result.characteristicByKey("EFFICIENCY");
+  assertThat(subCharacteristic.key()).isEqualTo("EFFICIENCY");
+  assertThat(subCharacteristic.name()).isEqualTo("Efficiency");
+  assertThat(subCharacteristic.isSub()).isTrue();
+  assertThat(subCharacteristic.order()).isNull();
+}

@@ -1,8 +1,14 @@
 {
-  DefaultTechnicalDebtModel debtModel=new DefaultTechnicalDebtModel();
-  List<CharacteristicDto> dtos=dao.selectEnabledCharacteristics();
-  Map<Integer,DefaultCharacteristic> characteristicsById=newHashMap();
-  addRootCharacteristics(debtModel,dtos,characteristicsById);
-  addCharacteristics(dtos,characteristicsById);
+  DefaultDebtModel debtModel=new DefaultDebtModel();
+  List<CharacteristicDto> allCharacteristics=dao.selectEnabledCharacteristics();
+  for (  CharacteristicDto dto : allCharacteristics) {
+    Integer parentId=dto.getParentId();
+    if (parentId == null) {
+      debtModel.addCharacteristic(toDebtCharacteristic(dto));
+    }
+ else {
+      debtModel.addSubCharacteristic(toDebtCharacteristic(dto),characteristicById(parentId,allCharacteristics).getKey());
+    }
+  }
   return debtModel;
 }
