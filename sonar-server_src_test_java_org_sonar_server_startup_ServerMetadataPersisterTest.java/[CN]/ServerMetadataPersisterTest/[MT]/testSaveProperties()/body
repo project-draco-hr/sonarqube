@@ -7,6 +7,12 @@
   when(server.getStartedAt()).thenReturn(date);
   ServerMetadataPersister persister=new ServerMetadataPersister(server,persistentSettings);
   persister.start();
-  verify(persistentSettings).saveProperties(ImmutableMap.of(CoreProperties.SERVER_ID,"123",CoreProperties.SERVER_VERSION,"3.2",CoreProperties.SERVER_STARTTIME,"2010-05-18T17:59:00+0000"));
+  verify(persistentSettings).saveProperties(argThat(new ArgumentMatcher<Map<String,String>>(){
+    @Override public boolean matches(    Object argument){
+      Map<String,String> props=(Map<String,String>)argument;
+      return props.get(CoreProperties.SERVER_ID).equals("123") && props.get(CoreProperties.SERVER_VERSION).equals("3.2") && props.get(CoreProperties.SERVER_STARTTIME).startsWith("2010-05-18T");
+    }
+  }
+));
   persister.stop();
 }
