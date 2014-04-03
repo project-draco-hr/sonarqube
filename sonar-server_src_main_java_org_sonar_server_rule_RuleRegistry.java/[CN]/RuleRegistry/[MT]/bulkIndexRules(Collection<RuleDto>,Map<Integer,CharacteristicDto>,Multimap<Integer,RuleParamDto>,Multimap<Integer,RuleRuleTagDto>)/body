@@ -3,8 +3,7 @@
     String[] ids=new String[rules.size()];
     BytesStream[] docs=new BytesStream[rules.size()];
     int index=0;
-    TimeProfiler profiler=new TimeProfiler();
-    profiler.start("Build rules documents");
+    TIME_PROFILER.start("Build rules documents");
     for (    RuleDto rule : rules) {
       ids[index]=rule.getId().toString();
       CharacteristicDto effectiveSubCharacteristic=characteristicsById.get(rule.getSubCharacteristicId() != null ? rule.getSubCharacteristicId() : rule.getDefaultSubCharacteristicId());
@@ -12,11 +11,11 @@
       docs[index]=ruleDocument(rule,effectiveCharacteristic,effectiveSubCharacteristic,paramsByRule.get(rule.getId()),tagsByRule.get(rule.getId()));
       index++;
     }
-    profiler.stop();
+    TIME_PROFILER.stop();
     if (!rules.isEmpty()) {
-      profiler.start("Index rules");
+      TIME_PROFILER.start("Index rules");
       searchIndex.bulkIndex(INDEX_RULES,TYPE_RULE,ids,docs);
-      profiler.stop();
+      TIME_PROFILER.stop();
     }
     return ids;
   }
