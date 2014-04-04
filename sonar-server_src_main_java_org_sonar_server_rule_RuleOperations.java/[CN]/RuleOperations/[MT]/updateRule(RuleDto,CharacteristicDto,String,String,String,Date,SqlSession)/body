@@ -1,16 +1,14 @@
 {
   boolean needUpdate=false;
-  if (newSubCharacteristic != null) {
-    boolean iSameAsDefaultValues=newSubCharacteristic.getId().equals(ruleDto.getDefaultSubCharacteristicId()) && isSameRemediationFunction(newFunction,newCoefficient,newOffset,ruleDto.getDefaultRemediationFunction(),ruleDto.getDefaultRemediationCoefficient(),ruleDto.getDefaultRemediationOffset());
-    boolean iSameAsOverriddenValues=newSubCharacteristic.getId().equals(ruleDto.getSubCharacteristicId()) && isSameRemediationFunction(newFunction,newCoefficient,newOffset,ruleDto.getRemediationFunction(),ruleDto.getRemediationCoefficient(),ruleDto.getRemediationOffset());
-    if (iSameAsDefaultValues) {
+  if (newSubCharacteristic != null && newFunction != null) {
+    if (isRuleDebtSameAsDefaultValues(ruleDto,newSubCharacteristic,newFunction,newCoefficient,newOffset)) {
       ruleDto.setSubCharacteristicId(null);
       ruleDto.setRemediationFunction(null);
       ruleDto.setRemediationCoefficient(null);
       ruleDto.setRemediationOffset(null);
       needUpdate=true;
     }
- else     if (!iSameAsOverriddenValues) {
+ else     if (!isRuleDebtSameAsOverriddenValues(ruleDto,newSubCharacteristic,newFunction,newCoefficient,newOffset)) {
       ruleDto.setSubCharacteristicId(newSubCharacteristic.getId());
       DefaultDebtRemediationFunction debtRemediationFunction=new DefaultDebtRemediationFunction(DebtRemediationFunction.Type.valueOf(newFunction),newCoefficient,newOffset);
       ruleDto.setRemediationFunction(debtRemediationFunction.type().name());

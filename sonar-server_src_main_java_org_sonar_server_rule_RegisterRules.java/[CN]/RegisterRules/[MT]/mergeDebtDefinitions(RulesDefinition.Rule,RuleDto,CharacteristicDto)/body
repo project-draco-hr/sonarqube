@@ -1,31 +1,5 @@
 {
-  boolean changed=false;
-  boolean hasCharacteristic=subCharacteristic != null;
-  DebtRemediationFunction debtRemediationFunction=hasCharacteristic ? def.debtRemediationFunction() : null;
-  Integer characteristicId=hasCharacteristic ? subCharacteristic.getId() : null;
-  String remediationFactor=hasCharacteristic ? debtRemediationFunction.coefficient() : null;
-  String remediationOffset=hasCharacteristic ? debtRemediationFunction.offset() : null;
-  String effortToFixDescription=hasCharacteristic ? def.effortToFixDescription() : null;
-  if (!ObjectUtils.equals(dto.getDefaultSubCharacteristicId(),characteristicId)) {
-    dto.setDefaultSubCharacteristicId(characteristicId);
-    changed=true;
-  }
-  String remediationFunctionString=debtRemediationFunction != null ? debtRemediationFunction.type().name() : null;
-  if (!StringUtils.equals(dto.getDefaultRemediationFunction(),remediationFunctionString)) {
-    dto.setDefaultRemediationFunction(remediationFunctionString);
-    changed=true;
-  }
-  if (!StringUtils.equals(dto.getDefaultRemediationCoefficient(),remediationFactor)) {
-    dto.setDefaultRemediationCoefficient(remediationFactor);
-    changed=true;
-  }
-  if (!StringUtils.equals(dto.getDefaultRemediationOffset(),remediationOffset)) {
-    dto.setDefaultRemediationOffset(remediationOffset);
-    changed=true;
-  }
-  if (!StringUtils.equals(dto.getEffortToFixDescription(),effortToFixDescription)) {
-    dto.setEffortToFixDescription(effortToFixDescription);
-    changed=true;
-  }
-  return changed;
+  DebtRemediationFunction debtRemediationFunction=subCharacteristic != null ? def.debtRemediationFunction() : null;
+  boolean hasDebt=subCharacteristic != null && debtRemediationFunction != null;
+  return mergeDebtDefinitions(def,dto,hasDebt ? subCharacteristic.getId() : null,debtRemediationFunction != null ? debtRemediationFunction.type().name() : null,hasDebt ? debtRemediationFunction.coefficient() : null,hasDebt ? debtRemediationFunction.offset() : null,hasDebt ? def.effortToFixDescription() : null);
 }

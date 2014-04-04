@@ -1,0 +1,22 @@
+{
+  ruleRow.setCharacteristicId(enabledRequirement.getParentId());
+  ruleRow.setFunction(enabledRequirement.getFunction().toUpperCase());
+  ruleRow.setCoefficient(convertDuration(enabledRequirement.getCoefficientValue(),enabledRequirement.getCoefficientUnit()));
+  ruleRow.setOffset(convertDuration(enabledRequirement.getOffsetValue(),enabledRequirement.getOffsetUnit()));
+  if ((DebtRemediationFunction.Type.LINEAR.name().equals(ruleRow.getFunction()) || DebtRemediationFunction.Type.LINEAR_OFFSET.name().equals(ruleRow.getFunction())) && ruleRow.getCoefficient() == null) {
+    ruleRow.setCoefficient("0" + convertUnit(enabledRequirement.getCoefficientUnit()));
+  }
+ else   if ((DebtRemediationFunction.Type.CONSTANT_ISSUE.name().equals(ruleRow.getFunction()) || DebtRemediationFunction.Type.LINEAR_OFFSET.name().equals(ruleRow.getFunction())) && ruleRow.getOffset() == null) {
+    ruleRow.setOffset("0" + convertUnit(enabledRequirement.getOffsetUnit()));
+  }
+  if (!isDebtDefaultValuesSameAsOverriddenValues(ruleRow)) {
+    updateStatement.setInt(1,ruleRow.getCharacteristicId());
+    updateStatement.setString(2,ruleRow.getFunction());
+    updateStatement.setString(3,ruleRow.getCoefficient());
+    updateStatement.setString(4,ruleRow.getOffset());
+    updateStatement.setTimestamp(5,new Timestamp(system2.now()));
+    updateStatement.setInt(6,ruleRow.getId());
+    return true;
+  }
+  return false;
+}
