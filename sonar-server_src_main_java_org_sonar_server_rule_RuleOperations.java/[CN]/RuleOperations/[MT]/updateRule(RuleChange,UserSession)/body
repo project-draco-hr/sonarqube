@@ -2,40 +2,20 @@
   checkPermission(userSession);
   SqlSession session=myBatis.openSession();
   try {
-    boolean needUpdate=false;
     RuleDto ruleDto=ruleDao.selectByKey(ruleChange.ruleKey(),session);
     if (ruleDto == null) {
       throw new NotFoundException(String.format("Unknown rule '%s'",ruleChange.ruleKey()));
     }
     String subCharacteristicKey=ruleChange.debtCharacteristicKey();
+    CharacteristicDto subCharacteristic=null;
     if (!Strings.isNullOrEmpty(subCharacteristicKey)) {
-      CharacteristicDto subCharacteristic=characteristicDao.selectByKey(subCharacteristicKey,session);
+      subCharacteristic=characteristicDao.selectByKey(subCharacteristicKey,session);
       if (subCharacteristic == null) {
         throw new NotFoundException(String.format("Unknown sub characteristic '%s'",ruleChange.debtCharacteristicKey()));
       }
-      boolean iSameAsOverriddenValues=subCharacteristic.getId().equals(ruleDto.getSubCharacteristicId()) && isSameRemediationFunction(ruleChange,ruleDto.getRemediationFunction(),ruleDto.getRemediationCoefficient(),ruleDto.getRemediationOffset());
-      boolean iSameAsDefaultValues=subCharacteristic.getId().equals(ruleDto.getDefaultSubCharacteristicId()) && isSameRemediationFunction(ruleChange,ruleDto.getDefaultRemediationFunction(),ruleDto.getDefaultRemediationCoefficient(),ruleDto.getDefaultRemediationOffset());
-      if (!iSameAsOverriddenValues && !iSameAsDefaultValues) {
-        ruleDto.setSubCharacteristicId(subCharacteristic.getId());
-        DefaultDebtRemediationFunction debtRemediationFunction=new DefaultDebtRemediationFunction(DebtRemediationFunction.Type.valueOf(ruleChange.debtRemediationFunction()),ruleChange.debtRemediationCoefficient(),ruleChange.debtRemediationOffset());
-        ruleDto.setRemediationFunction(debtRemediationFunction.type().name());
-        ruleDto.setRemediationCoefficient(debtRemediationFunction.coefficient());
-        ruleDto.setRemediationOffset(debtRemediationFunction.offset());
-        needUpdate=true;
-      }
     }
- else {
-      if (!RuleDto.DISABLED_CHARACTERISTIC_ID.equals(ruleDto.getSubCharacteristicId())) {
-        ruleDto.setSubCharacteristicId(RuleDto.DISABLED_CHARACTERISTIC_ID);
-        ruleDto.setRemediationFunction(null);
-        ruleDto.setRemediationCoefficient(null);
-        ruleDto.setRemediationOffset(null);
-        needUpdate=true;
-      }
-    }
+    boolean needUpdate=updateRule(ruleDto,subCharacteristic,ruleChange.debtRemediationFunction(),ruleChange.debtRemediationCoefficient(),ruleChange.debtRemediationOffset(),new Date(system.now()),session);
     if (needUpdate) {
-      ruleDto.setUpdatedAt(new Date(system.now()));
-      ruleDao.update(ruleDto,session);
       session.commit();
       reindexRule(ruleDto,session);
     }

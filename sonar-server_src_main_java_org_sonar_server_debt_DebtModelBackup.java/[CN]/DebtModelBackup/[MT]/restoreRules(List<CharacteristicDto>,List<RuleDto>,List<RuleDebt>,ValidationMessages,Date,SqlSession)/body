@@ -1,28 +1,10 @@
 {
   for (  RuleDto rule : rules) {
     RuleDebt ruleDebt=ruleDebt(rule.getRepositoryKey(),rule.getRuleKey(),ruleDebts);
-    if (ruleDebt == null) {
-      disabledOverriddenRuleDebt(rule);
-    }
- else {
-      CharacteristicDto subCharacteristicDto=characteristicByKey(ruleDebt.subCharacteristicKey(),allCharacteristicDtos,true);
-      boolean isSameCharacteristicAsDefault=subCharacteristicDto.getId().equals(rule.getDefaultSubCharacteristicId());
-      boolean isSameFunctionAsDefault=isSameRemediationFunction(ruleDebt,rule);
-      if (!isSameCharacteristicAsDefault || !isSameFunctionAsDefault) {
-        rule.setSubCharacteristicId(subCharacteristicDto.getId());
-        rule.setRemediationFunction(ruleDebt.function().name());
-        rule.setRemediationCoefficient(ruleDebt.coefficient());
-        rule.setRemediationOffset(ruleDebt.offset());
-      }
- else {
-        rule.setSubCharacteristicId(null);
-        rule.setRemediationFunction(null);
-        rule.setRemediationCoefficient(null);
-        rule.setRemediationOffset(null);
-      }
-    }
+    String subCharacteristicKey=ruleDebt != null ? ruleDebt.subCharacteristicKey() : null;
+    CharacteristicDto subCharacteristicDto=subCharacteristicKey != null ? characteristicByKey(ruleDebt.subCharacteristicKey(),allCharacteristicDtos,true) : null;
+    ruleOperations.updateRule(rule,subCharacteristicDto,ruleDebt != null ? ruleDebt.function() : null,ruleDebt != null ? ruleDebt.coefficient() : null,ruleDebt != null ? ruleDebt.offset() : null,updateDate,session);
     rule.setUpdatedAt(updateDate);
-    ruleDao.update(rule,session);
     ruleDebts.remove(ruleDebt);
   }
   ruleRegistry.reindex(rules,session);

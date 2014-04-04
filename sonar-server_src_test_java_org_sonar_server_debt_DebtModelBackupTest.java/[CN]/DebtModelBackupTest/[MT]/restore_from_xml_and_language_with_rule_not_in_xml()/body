@@ -4,16 +4,8 @@
   when(rulesXMLImporter.importXML(anyString(),any(ValidationMessages.class))).thenReturn(Collections.<RuleDebt>emptyList());
   when(ruleDao.selectEnablesAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setId(1).setRepositoryKey("squid").setRuleKey("UselessImportCheck").setLanguage("java").setDefaultSubCharacteristicId(2).setDefaultRemediationFunction("LINEAR").setDefaultRemediationCoefficient("2h").setSubCharacteristicId(2).setRemediationFunction("LINEAR_OFFSET").setRemediationCoefficient("2h").setRemediationOffset("15min").setCreatedAt(oldDate).setUpdatedAt(oldDate)));
   debtModelBackup.restoreFromXml("<xml/>","java");
+  verify(ruleOperations).updateRule(ruleCaptor.capture(),isNull(CharacteristicDto.class),isNull(String.class),isNull(String.class),isNull(String.class),eq(now),eq(session));
   verify(ruleDao).selectEnablesAndNonManual(session);
-  verify(ruleDao).update(ruleCaptor.capture(),eq(session));
-  verifyNoMoreInteractions(ruleDao);
   verify(ruleRegistry).reindex(ruleCaptor.getAllValues(),session);
   verify(session).commit();
-  RuleDto rule=ruleCaptor.getValue();
-  assertThat(rule.getId()).isEqualTo(1);
-  assertThat(rule.getSubCharacteristicId()).isEqualTo(-1);
-  assertThat(rule.getRemediationFunction()).isNull();
-  assertThat(rule.getRemediationCoefficient()).isNull();
-  assertThat(rule.getRemediationOffset()).isNull();
-  assertThat(rule.getUpdatedAt()).isEqualTo(now);
 }

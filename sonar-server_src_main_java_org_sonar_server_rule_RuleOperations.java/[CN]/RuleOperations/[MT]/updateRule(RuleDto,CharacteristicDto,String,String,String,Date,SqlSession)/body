@@ -1,0 +1,36 @@
+{
+  boolean needUpdate=false;
+  if (newSubCharacteristic != null) {
+    boolean iSameAsDefaultValues=newSubCharacteristic.getId().equals(ruleDto.getDefaultSubCharacteristicId()) && isSameRemediationFunction(newFunction,newCoefficient,newOffset,ruleDto.getDefaultRemediationFunction(),ruleDto.getDefaultRemediationCoefficient(),ruleDto.getDefaultRemediationOffset());
+    boolean iSameAsOverriddenValues=newSubCharacteristic.getId().equals(ruleDto.getSubCharacteristicId()) && isSameRemediationFunction(newFunction,newCoefficient,newOffset,ruleDto.getRemediationFunction(),ruleDto.getRemediationCoefficient(),ruleDto.getRemediationOffset());
+    if (iSameAsDefaultValues) {
+      ruleDto.setSubCharacteristicId(null);
+      ruleDto.setRemediationFunction(null);
+      ruleDto.setRemediationCoefficient(null);
+      ruleDto.setRemediationOffset(null);
+      needUpdate=true;
+    }
+ else     if (!iSameAsOverriddenValues) {
+      ruleDto.setSubCharacteristicId(newSubCharacteristic.getId());
+      DefaultDebtRemediationFunction debtRemediationFunction=new DefaultDebtRemediationFunction(DebtRemediationFunction.Type.valueOf(newFunction),newCoefficient,newOffset);
+      ruleDto.setRemediationFunction(debtRemediationFunction.type().name());
+      ruleDto.setRemediationCoefficient(debtRemediationFunction.coefficient());
+      ruleDto.setRemediationOffset(debtRemediationFunction.offset());
+      needUpdate=true;
+    }
+  }
+ else {
+    if (ruleDto.getSubCharacteristicId() == null || !RuleDto.DISABLED_CHARACTERISTIC_ID.equals(ruleDto.getSubCharacteristicId())) {
+      ruleDto.setSubCharacteristicId(ruleDto.getDefaultSubCharacteristicId() != null ? RuleDto.DISABLED_CHARACTERISTIC_ID : null);
+      ruleDto.setRemediationFunction(null);
+      ruleDto.setRemediationCoefficient(null);
+      ruleDto.setRemediationOffset(null);
+      needUpdate=true;
+    }
+  }
+  if (needUpdate) {
+    ruleDto.setUpdatedAt(updateDate);
+    ruleDao.update(ruleDto,session);
+  }
+  return needUpdate;
+}
