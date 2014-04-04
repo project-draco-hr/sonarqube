@@ -4,14 +4,16 @@
   DebtCharacteristic subCharacteristic=(effectiveSubCharacteristicId != null && !RuleDto.DISABLED_CHARACTERISTIC_ID.equals(effectiveSubCharacteristicId)) ? debtModel.characteristicById(effectiveSubCharacteristicId) : null;
   if (subCharacteristic != null) {
     ruleDebt.setSubCharacteristicKey(subCharacteristic.key());
-    if (rule.getRemediationFunction() != null) {
-      ruleDebt.setFunction(rule.getRemediationFunction());
+    String overriddenFunction=rule.getRemediationFunction();
+    String defaultFunction=rule.getDefaultRemediationFunction();
+    if (overriddenFunction != null) {
+      ruleDebt.setFunction(overriddenFunction);
       ruleDebt.setCoefficient(rule.getRemediationCoefficient());
       ruleDebt.setOffset(rule.getRemediationOffset());
       return ruleDebt;
     }
- else     if (rule.getDefaultRemediationFunction() != null) {
-      ruleDebt.setFunction(rule.getDefaultRemediationFunction());
+ else     if (defaultFunction != null) {
+      ruleDebt.setFunction(defaultFunction);
       ruleDebt.setCoefficient(rule.getDefaultRemediationCoefficient());
       ruleDebt.setOffset(rule.getDefaultRemediationOffset());
       return ruleDebt;
