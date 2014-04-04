@@ -1,0 +1,11 @@
+{
+  when(characteristicsXMLImporter.importXML(anyString())).thenReturn(new DebtModel().addRootCharacteristic(new DefaultDebtCharacteristic().setKey("PORTABILITY").setName("Portability").setOrder(1)).addSubCharacteristic(new DefaultDebtCharacteristic().setKey("COMPILER").setName("Compiler"),"PORTABILITY"));
+  when(dao.selectEnabledCharacteristics(session)).thenReturn(newArrayList(new CharacteristicDto().setId(1).setKey("PORTABILITY").setName("Portability").setOrder(1).setCreatedAt(oldDate),new CharacteristicDto().setId(2).setKey("COMPILER").setName("Compiler").setParentId(1).setCreatedAt(oldDate)));
+  when(rulesXMLImporter.importXML(anyString(),any(ValidationMessages.class))).thenReturn(newArrayList(new RuleDebt().setRuleKey(RuleKey.of("squid","UselessImportCheck")).setSubCharacteristicKey("COMPILER").setFunction(DebtRemediationFunction.Type.LINEAR.name()).setCoefficient("2h")));
+  when(ruleDao.selectEnablesAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setId(1).setRepositoryKey("squid").setRuleKey("UselessImportCheck").setDefaultSubCharacteristicId(3).setDefaultRemediationFunction("LINEAR").setDefaultRemediationCoefficient("2h").setCreatedAt(oldDate).setUpdatedAt(oldDate)));
+  when(ruleOperations.updateRule(any(RuleDto.class),any(CharacteristicDto.class),anyString(),anyString(),anyString(),any(Date.class),eq(session))).thenThrow(IllegalArgumentException.class);
+  assertThat(debtModelBackup.restoreFromXml("<xml/>").getErrors()).hasSize(1);
+  verify(ruleDao).selectEnablesAndNonManual(session);
+  verifyZeroInteractions(ruleRegistry);
+  verify(session,never()).commit();
+}

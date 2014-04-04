@@ -1,0 +1,18 @@
+{
+  when(dao.selectEnabledCharacteristics(session)).thenReturn(newArrayList(new CharacteristicDto().setId(1).setKey("PORTABILITY").setName("Portability updated").setOrder(2),new CharacteristicDto().setId(2).setKey("COMPILER").setName("Compiler updated").setParentId(1)));
+  when(ruleDao.selectEnablesAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setRepositoryKey("squid").setRuleKey("AvoidNPE").setDefaultSubCharacteristicId(2).setDefaultRemediationFunction("LINEAR").setDefaultRemediationCoefficient("2h").setSubCharacteristicId(2).setRemediationFunction("CONSTANT_ISSUE").setRemediationOffset("15min")));
+  debtModelBackup.backup();
+  ArgumentCaptor<DebtModel> debtModelArgument=ArgumentCaptor.forClass(DebtModel.class);
+  verify(debtModelXMLExporter).export(debtModelArgument.capture(),ruleDebtListCaptor.capture());
+  assertThat(debtModelArgument.getValue().rootCharacteristics()).hasSize(1);
+  assertThat(debtModelArgument.getValue().subCharacteristics("PORTABILITY")).hasSize(1);
+  List<RuleDebt> rules=ruleDebtListCaptor.getValue();
+  assertThat(rules).hasSize(1);
+  RuleDebt rule=rules.get(0);
+  assertThat(rule.ruleKey().repository()).isEqualTo("squid");
+  assertThat(rule.ruleKey().rule()).isEqualTo("AvoidNPE");
+  assertThat(rule.subCharacteristicKey()).isEqualTo("COMPILER");
+  assertThat(rule.function()).isEqualTo("CONSTANT_ISSUE");
+  assertThat(rule.offset()).isEqualTo("15min");
+  assertThat(rule.coefficient()).isNull();
+}

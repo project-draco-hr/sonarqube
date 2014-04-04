@@ -15,10 +15,9 @@
     List<RuleDebt> rules=newArrayList();
     for (    RuleDto rule : ruleDao.selectEnablesAndNonManual(session)) {
       if (languageKey == null || languageKey.equals(rule.getLanguage())) {
-        Integer effectiveSubCharacteristicId=rule.getSubCharacteristicId() != null ? rule.getSubCharacteristicId() : rule.getDefaultSubCharacteristicId();
-        String effectiveFunction=rule.getRemediationFunction() != null ? rule.getRemediationFunction() : rule.getDefaultRemediationFunction();
-        if (!RuleDto.DISABLED_CHARACTERISTIC_ID.equals(effectiveSubCharacteristicId) && effectiveSubCharacteristicId != null && effectiveFunction != null) {
-          rules.add(toRuleDebt(rule,debtModel.characteristicById(effectiveSubCharacteristicId).key(),effectiveFunction));
+        RuleDebt ruleDebt=toRuleDebt(rule,debtModel);
+        if (ruleDebt != null) {
+          rules.add(ruleDebt);
         }
       }
     }

@@ -1,0 +1,21 @@
+{
+  RuleDebt ruleDebt=new RuleDebt().setRuleKey(RuleKey.of(rule.getRepositoryKey(),rule.getRuleKey()));
+  Integer effectiveSubCharacteristicId=rule.getSubCharacteristicId() != null ? rule.getSubCharacteristicId() : rule.getDefaultSubCharacteristicId();
+  DebtCharacteristic subCharacteristic=(effectiveSubCharacteristicId != null && !RuleDto.DISABLED_CHARACTERISTIC_ID.equals(effectiveSubCharacteristicId)) ? debtModel.characteristicById(effectiveSubCharacteristicId) : null;
+  if (subCharacteristic != null) {
+    ruleDebt.setSubCharacteristicKey(subCharacteristic.key());
+    if (rule.getRemediationFunction() != null) {
+      ruleDebt.setFunction(rule.getRemediationFunction());
+      ruleDebt.setCoefficient(rule.getRemediationCoefficient());
+      ruleDebt.setOffset(rule.getRemediationOffset());
+      return ruleDebt;
+    }
+ else     if (rule.getDefaultRemediationFunction() != null) {
+      ruleDebt.setFunction(rule.getDefaultRemediationFunction());
+      ruleDebt.setCoefficient(rule.getDefaultRemediationCoefficient());
+      ruleDebt.setOffset(rule.getDefaultRemediationOffset());
+      return ruleDebt;
+    }
+  }
+  return null;
+}

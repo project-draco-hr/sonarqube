@@ -4,8 +4,8 @@
   when(rulesXMLImporter.importXML(anyString(),any(ValidationMessages.class))).thenReturn(newArrayList(new RuleDebt().setRuleKey(RuleKey.of("squid","UselessImportCheck")).setSubCharacteristicKey("COMPILER").setFunction(DebtRemediationFunction.Type.LINEAR.name()).setCoefficient("2h")));
   when(ruleDao.selectEnablesAndNonManual(session)).thenReturn(Collections.<RuleDto>emptyList());
   assertThat(debtModelBackup.restoreFromXml("<xml/>").getWarnings()).hasSize(1);
+  verifyZeroInteractions(ruleOperations);
   verify(ruleDao).selectEnablesAndNonManual(session);
-  verifyNoMoreInteractions(ruleDao);
   verify(ruleRegistry).reindex(ruleCaptor.getAllValues(),session);
   verify(session).commit();
 }
