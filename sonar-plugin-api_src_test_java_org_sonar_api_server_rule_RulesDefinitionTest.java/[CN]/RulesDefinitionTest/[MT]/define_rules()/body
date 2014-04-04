@@ -1,7 +1,6 @@
 {
   RulesDefinition.NewRepository newRepo=context.createRepository("findbugs","java");
-  RulesDefinition.NewRule newRule=newRepo.createRule("NPE").setName("Detect NPE").setHtmlDescription("Detect <code>java.lang.NullPointerException</code>").setSeverity(Severity.BLOCKER).setInternalKey("/something").setStatus(RuleStatus.BETA).setDebtSubCharacteristic("COMPILER").setEffortToFixDescription("squid.S115.effortToFix").setTags("one","two").addTags("two","three","four");
-  newRule.setDebtRemediationFunction(newRule.debtRemediationFunctions().linearWithOffset("1h","10min"));
+  newRepo.createRule("NPE").setName("Detect NPE").setHtmlDescription("Detect <code>java.lang.NullPointerException</code>").setSeverity(Severity.BLOCKER).setInternalKey("/something").setStatus(RuleStatus.BETA).setTags("one","two").addTags("two","three","four");
   newRepo.createRule("ABC").setName("ABC").setHtmlDescription("ABC");
   newRepo.done();
   RulesDefinition.Repository repo=context.repository("findbugs");
@@ -16,11 +15,6 @@
   assertThat(rule.internalKey()).isEqualTo("/something");
   assertThat(rule.template()).isFalse();
   assertThat(rule.status()).isEqualTo(RuleStatus.BETA);
-  assertThat(rule.debtSubCharacteristic()).isEqualTo("COMPILER");
-  assertThat(rule.debtRemediationFunction().type()).isEqualTo(DebtRemediationFunction.Type.LINEAR_OFFSET);
-  assertThat(rule.debtRemediationFunction().coefficient()).isEqualTo("1h");
-  assertThat(rule.debtRemediationFunction().offset()).isEqualTo("10min");
-  assertThat(rule.effortToFixDescription()).isEqualTo("squid.S115.effortToFix");
   assertThat(rule.toString()).isEqualTo("[repository=findbugs, key=NPE]");
   assertThat(rule.repository()).isSameAs(repo);
   RulesDefinition.Rule otherRule=repo.rule("ABC");

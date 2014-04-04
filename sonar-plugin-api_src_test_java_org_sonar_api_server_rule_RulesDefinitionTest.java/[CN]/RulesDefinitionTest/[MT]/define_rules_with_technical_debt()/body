@@ -1,0 +1,14 @@
+{
+  RulesDefinition.NewRepository newRepo=context.createRepository("common-java","java");
+  RulesDefinition.NewRule newRule=newRepo.createRule("InsufficientBranchCoverage").setName("Insufficient branch coverage").setHtmlDescription("Insufficient branch coverage by unit tests").setSeverity(Severity.MAJOR).setDebtSubCharacteristic(RulesDefinition.SubCharacteristics.UNIT_TESTS).setEffortToFixDescription("Effort to test one uncovered branch");
+  newRule.setDebtRemediationFunction(newRule.debtRemediationFunctions().linearWithOffset("1h","10min"));
+  newRepo.done();
+  RulesDefinition.Repository repo=context.repository("common-java");
+  assertThat(repo.rules()).hasSize(1);
+  RulesDefinition.Rule rule=repo.rule("InsufficientBranchCoverage");
+  assertThat(rule.debtSubCharacteristic()).isEqualTo("UNIT_TESTS");
+  assertThat(rule.debtRemediationFunction().type()).isEqualTo(DebtRemediationFunction.Type.LINEAR_OFFSET);
+  assertThat(rule.debtRemediationFunction().coefficient()).isEqualTo("1h");
+  assertThat(rule.debtRemediationFunction().offset()).isEqualTo("10min");
+  assertThat(rule.effortToFixDescription()).isEqualTo("Effort to test one uncovered branch");
+}
