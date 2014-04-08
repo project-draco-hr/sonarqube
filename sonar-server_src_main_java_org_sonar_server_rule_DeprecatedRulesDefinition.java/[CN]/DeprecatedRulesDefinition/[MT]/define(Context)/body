@@ -11,10 +11,11 @@
     }
     for (    org.sonar.api.rules.Rule rule : repository.createRules()) {
       NewRule newRule=newRepository.createRule(rule.getKey());
+      boolean isTemplate=Cardinality.MULTIPLE.equals(rule.getCardinality());
       newRule.setName(ruleName(repository.getKey(),rule));
       newRule.setHtmlDescription(ruleDescription(repository.getKey(),rule));
       newRule.setInternalKey(rule.getConfigKey());
-      newRule.setTemplate(Cardinality.MULTIPLE.equals(rule.getCardinality()));
+      newRule.setTemplate(isTemplate);
       newRule.setSeverity(rule.getSeverity().toString());
       newRule.setStatus(rule.getStatus() == null ? RuleStatus.defaultStatus() : RuleStatus.valueOf(rule.getStatus()));
       newRule.setTags(rule.getTags());
@@ -24,7 +25,7 @@
         newParam.setDescription(paramDescription(repository.getKey(),rule.getKey(),param));
         newParam.setType(RuleParamType.parse(param.getType()));
       }
-      updateRuleDebtDefinitions(newRule,repository.getKey(),rule.getKey(),ruleDebts);
+      updateRuleDebtDefinitions(newRule,repository.getKey(),rule.getKey(),isTemplate,ruleDebts);
     }
     newRepository.done();
   }
