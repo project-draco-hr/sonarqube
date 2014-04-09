@@ -1,0 +1,25 @@
+{
+  new MassUpdater(db).execute(new MassUpdater.InputLoader<Row>(){
+    @Override public String selectSql(){
+      return "SELECT i.id, i.technical_debt FROM issues i WHERE i.technical_debt IS NOT NULL";
+    }
+    @Override public Row load(    ResultSet rs) throws SQLException {
+      Row row=new Row();
+      row.id=SqlUtil.getLong(rs,1);
+      row.debt=SqlUtil.getLong(rs,2);
+      return row;
+    }
+  }
+,new MassUpdater.InputConverter<Row>(){
+    @Override public String updateSql(){
+      return "UPDATE issues SET technical_debt=?,updated_at=? WHERE id=?";
+    }
+    @Override public boolean convert(    Row row,    PreparedStatement updateStatement) throws SQLException {
+      updateStatement.setLong(1,workDurationConvertor.createFromLong(row.debt));
+      updateStatement.setTimestamp(2,new Timestamp(system2.now()));
+      updateStatement.setLong(3,row.id);
+      return true;
+    }
+  }
+);
+}
