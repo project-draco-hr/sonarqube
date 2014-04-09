@@ -1,23 +1,23 @@
 {
   new MassUpdater(db).execute(new MassUpdater.InputLoader<Row>(){
     @Override public String selectSql(){
-      return "SELECT i.id, i.technical_debt FROM issues i WHERE i.technical_debt IS NOT NULL";
+      return "SELECT i.id FROM issues i " + "INNER JOIN projects p on p.id=i.component_id " + "WHERE p.enabled=${_false} AND i.resolution IS NULL ";
     }
     @Override public Row load(    ResultSet rs) throws SQLException {
       Row row=new Row();
       row.id=SqlUtil.getLong(rs,1);
-      row.debt=SqlUtil.getLong(rs,2);
       return row;
     }
   }
 ,new MassUpdater.InputConverter<Row>(){
     @Override public String updateSql(){
-      return "UPDATE issues SET technical_debt=?,updated_at=? WHERE id=?";
+      return "UPDATE issues SET status=?,resolution=?,updated_at=? WHERE id=?";
     }
     @Override public boolean convert(    Row row,    PreparedStatement updateStatement) throws SQLException {
-      updateStatement.setLong(1,workDurationConvertor.createFromLong(row.debt));
-      updateStatement.setTimestamp(2,new Timestamp(system2.now()));
-      updateStatement.setLong(3,row.id);
+      updateStatement.setString(1,Issue.STATUS_CLOSED);
+      updateStatement.setString(2,Issue.RESOLUTION_REMOVED);
+      updateStatement.setTimestamp(3,new Timestamp(system2.now()));
+      updateStatement.setLong(4,row.id);
       return true;
     }
   }
