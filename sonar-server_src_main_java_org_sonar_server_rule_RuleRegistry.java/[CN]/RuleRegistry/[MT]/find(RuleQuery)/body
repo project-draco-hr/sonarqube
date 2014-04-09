@@ -1,7 +1,7 @@
 {
-  BoolFilterBuilder mainFilter=convertRuleQueryToFilterBuilder(query);
+  QueryBuilder mainQuery=convertRuleQueryToFilterBuilder(query);
   Builder<Rule> rulesBuilder=ImmutableList.builder();
-  SearchRequestBuilder searchRequestBuilder=searchIndex.client().prepareSearch(INDEX_RULES).setTypes(TYPE_RULE).setPostFilter(mainFilter).addSort(RuleDocument.FIELD_NAME,SortOrder.ASC);
+  SearchRequestBuilder searchRequestBuilder=searchIndex.client().prepareSearch(INDEX_RULES).setTypes(TYPE_RULE).setQuery(mainQuery).addSort(RuleDocument.FIELD_NAME,SortOrder.ASC);
   if (RuleQuery.NO_PAGINATION == query.pageSize()) {
     final int scrollTime=100;
     SearchResponse scrollResp=searchRequestBuilder.setSearchType(SearchType.SCAN).setScroll(new TimeValue(scrollTime)).setSize(50).execute().actionGet();

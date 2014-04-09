@@ -1,8 +1,9 @@
 {
-  BoolFilterBuilder mainFilter=boolFilter().mustNot(termFilter(RuleDocument.FIELD_STATUS,STATUS_REMOVED));
+  QueryBuilder mainQuery=QueryBuilders.matchAllQuery();
   if (StringUtils.isNotBlank(query.searchQuery())) {
-    mainFilter.must(FilterBuilders.queryFilter(QueryBuilders.multiMatchQuery(query.searchQuery(),RuleDocument.FIELD_NAME + ".search",RuleDocument.FIELD_KEY).operator(Operator.AND)));
+    mainQuery=QueryBuilders.multiMatchQuery(query.searchQuery(),RuleDocument.FIELD_KEY,RuleDocument.FIELD_NAME,RuleDocument.FIELD_NAME + ".search").operator(Operator.AND);
   }
+  BoolFilterBuilder mainFilter=boolFilter().mustNot(termFilter(RuleDocument.FIELD_STATUS,STATUS_REMOVED));
   addMustTermOrTerms(mainFilter,RuleDocument.FIELD_LANGUAGE,query.languages());
   addMustTermOrTerms(mainFilter,RuleDocument.FIELD_REPOSITORY_KEY,query.repositories());
   addMustTermOrTerms(mainFilter,RuleDocument.FIELD_SEVERITY,query.severities());
@@ -21,5 +22,5 @@
       mainFilter.mustNot(FilterBuilders.existsFilter(RuleDocument.FIELD_CHARACTERISTIC_KEY));
     }
   }
-  return mainFilter;
+  return QueryBuilders.filteredQuery(mainQuery,mainFilter);
 }
