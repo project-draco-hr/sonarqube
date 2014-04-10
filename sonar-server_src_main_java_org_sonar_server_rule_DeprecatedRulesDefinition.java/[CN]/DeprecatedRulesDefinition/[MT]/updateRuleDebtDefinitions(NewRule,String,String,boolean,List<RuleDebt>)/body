@@ -6,21 +6,7 @@
     }
  else {
       newRule.setDebtSubCharacteristic(ruleDebt.subCharacteristicKey());
-      String function=ruleDebt.function();
-      String coefficient=ruleDebt.coefficient();
-      String offset=ruleDebt.offset();
-      if (DebtRemediationFunction.Type.LINEAR.name().equals(function) && coefficient != null) {
-        newRule.setDebtRemediationFunction(newRule.debtRemediationFunctions().linear(coefficient));
-      }
- else       if (DebtRemediationFunction.Type.CONSTANT_ISSUE.name().equals(function) && offset != null) {
-        newRule.setDebtRemediationFunction(newRule.debtRemediationFunctions().constantPerIssue(offset));
-      }
- else       if (DebtRemediationFunction.Type.LINEAR_OFFSET.name().equals(function) && coefficient != null && offset != null) {
-        newRule.setDebtRemediationFunction(newRule.debtRemediationFunctions().linearWithOffset(coefficient,offset));
-      }
- else {
-        throw new IllegalArgumentException(String.format("Debt definition on rule '%s:%s' is invalid",repoKey,ruleKey));
-      }
+      newRule.setDebtRemediationFunction(remediationFunction(DebtRemediationFunction.Type.valueOf(ruleDebt.function()),ruleDebt.coefficient(),ruleDebt.offset(),newRule.debtRemediationFunctions(),repoKey,ruleKey));
     }
   }
 }
