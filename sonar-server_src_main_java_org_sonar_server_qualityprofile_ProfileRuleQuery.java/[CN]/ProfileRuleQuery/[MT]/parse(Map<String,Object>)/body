@@ -20,31 +20,8 @@
   if (params.get(PARAM_TAGS) != null) {
     result.addTags(optionalVarargs(params.get(PARAM_TAGS)));
   }
-  if (params.containsKey(PARAM_INHERITANCE)) {
-    String inheritance=(String)params.get(PARAM_INHERITANCE);
-    validateInheritance(inheritance,errors);
-    if (inheritance.equals(INHERITANCE_ANY)) {
-      result.setAnyInheritance(true);
-    }
- else     if (inheritance.equals(INHERITANCE_NOT)) {
-      result.setNoInheritance(true);
-    }
- else {
-      result.setInheritance(inheritance);
-    }
-  }
- else {
-    result.setAnyInheritance(true);
-  }
-  if (params.get(PARAM_SORT) != null) {
-    String sort=(String)params.get(PARAM_SORT);
-    Boolean asc=RubyUtils.toBoolean(params.get(PARAM_ASC));
-    validateSort(sort,errors);
-    result.setSort(sort);
-    if (asc != null) {
-      result.setAsc(asc);
-    }
-  }
+  parseInheritance(params,errors,result);
+  parseParams(params,errors,result);
   if (!errors.isEmpty()) {
     throw BadRequestException.of("Incorrect rule search parameters",errors);
   }
