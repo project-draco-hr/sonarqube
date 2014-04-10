@@ -1,0 +1,28 @@
+{
+  db.prepareDbUnit(getClass(),"migrate_data.xml");
+  try {
+    new MassUpdater(db.database()).execute(new MassUpdater.InputLoader<Row>(){
+      @Override public String selectSql(){
+        return "SELECT i.id FROM issues i";
+      }
+      @Override public Row load(      ResultSet rs) throws SQLException {
+        Row row=new Row();
+        row.id=SqlUtil.getLong(rs,1);
+        return row;
+      }
+    }
+,new MassUpdater.InputConverter<Row>(){
+      @Override public String updateSql(){
+        throw new RuntimeException("Unknown error");
+      }
+      @Override public boolean convert(      Row row,      PreparedStatement updateStatement) throws SQLException {
+        return true;
+      }
+    }
+);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(MessageException.class);
+  }
+}

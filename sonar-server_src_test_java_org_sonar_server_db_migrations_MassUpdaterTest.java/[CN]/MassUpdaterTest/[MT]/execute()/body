@@ -1,0 +1,25 @@
+{
+  db.prepareDbUnit(getClass(),"migrate_data.xml");
+  new MassUpdater(db.database()).execute(new MassUpdater.InputLoader<Row>(){
+    @Override public String selectSql(){
+      return "SELECT i.id FROM issues i";
+    }
+    @Override public Row load(    ResultSet rs) throws SQLException {
+      Row row=new Row();
+      row.id=SqlUtil.getLong(rs,1);
+      return row;
+    }
+  }
+,new MassUpdater.InputConverter<Row>(){
+    @Override public String updateSql(){
+      return "UPDATE issues SET severity=? WHERE id=?";
+    }
+    @Override public boolean convert(    Row row,    PreparedStatement updateStatement) throws SQLException {
+      updateStatement.setString(1,"MAJOR");
+      updateStatement.setLong(2,row.id);
+      return true;
+    }
+  }
+);
+  db.assertDbUnit(getClass(),"migrate_data_result.xml","issues");
+}
