@@ -1,5 +1,9 @@
 {
-  Rule rule=rules.findByKey(RuleKey.parse(request.mandatoryParam("key")));
+  RuleKey ruleKey=RuleKey.parse(request.mandatoryParam("key"));
+  Rule rule=rules.findByKey(ruleKey);
+  if (rule == null) {
+    throw new NotFoundException("No rule found for key " + ruleKey);
+  }
   Set<String> allAdminTags=Sets.newHashSet(rule.adminTags());
   String[] tagsFromRequest=request.mandatoryParam("tags").split(",");
   updateTags(allAdminTags,tagsFromRequest);
