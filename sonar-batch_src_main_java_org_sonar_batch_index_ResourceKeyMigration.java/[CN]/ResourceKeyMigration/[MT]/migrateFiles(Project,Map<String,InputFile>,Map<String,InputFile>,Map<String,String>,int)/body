@@ -1,5 +1,5 @@
 {
-  StringBuilder hql=new StringBuilder().append("from ").append(ResourceModel.class.getSimpleName()).append(" where enabled = true ").append(" and rootId = :rootId ").append(" and scope = '").append(Scopes.FILE).append("' order by qualifier, key");
+  StringBuilder hql=newResourceQuery().append(" and scope = '").append(Scopes.FILE).append("' order by qualifier, key");
   List<ResourceModel> resources=session.createQuery(hql.toString()).setParameter("rootId",moduleId).getResultList();
   for (  ResourceModel resourceModel : resources) {
     String oldEffectiveKey=resourceModel.getKey();
@@ -26,10 +26,10 @@
       }
       resourceModel.setKey(newEffectiveKey);
       resourceModel.setDeprecatedKey(oldEffectiveKey);
-      logger.info("Component {} changed to {}",oldEffectiveKey,newEffectiveKey);
+      logger.info(COMPONENT_CHANGED_TO,oldEffectiveKey,newEffectiveKey);
     }
  else {
-      logger.warn("Unable to update component {}. No match was found.",oldEffectiveKey);
+      logger.warn(UNABLE_TO_UPDATE_COMPONENT_NO_MATCH_WAS_FOUND,oldEffectiveKey);
     }
   }
 }

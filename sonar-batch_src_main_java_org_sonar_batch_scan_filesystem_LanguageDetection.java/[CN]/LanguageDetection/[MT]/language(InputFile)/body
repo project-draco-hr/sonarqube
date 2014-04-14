@@ -1,18 +1,12 @@
 {
   String detectedLanguage=null;
   for (  String languageKey : languagesToConsider) {
-    PathPattern[] patterns=patternsByLanguage.get(languageKey);
-    if (patterns != null) {
-      for (      PathPattern pathPattern : patterns) {
-        if (pathPattern.match(inputFile,false)) {
-          if (detectedLanguage == null) {
-            detectedLanguage=languageKey;
-            break;
-          }
+    if (isCandidateForLanguage(inputFile,languageKey)) {
+      if (detectedLanguage == null) {
+        detectedLanguage=languageKey;
+      }
  else {
-            throw MessageException.of("Language of file '" + inputFile.relativePath() + "' can not be decided as the file matches patterns of both "+ getDetails(detectedLanguage)+ " and "+ getDetails(languageKey));
-          }
-        }
+        throw MessageException.of(MessageFormat.format("Language of file ''{0}'' can not be decided as the file matches patterns of both {1} and {2}",inputFile.relativePath(),getDetails(detectedLanguage),getDetails(languageKey)));
       }
     }
   }
