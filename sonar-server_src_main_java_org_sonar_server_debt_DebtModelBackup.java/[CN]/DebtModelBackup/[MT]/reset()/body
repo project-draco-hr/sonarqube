@@ -11,33 +11,7 @@
       for (      RulesDefinition.Repository repoDef : context.repositories()) {
         rules.addAll(repoDef.rules());
       }
-      for (      RuleDto rule : ruleDtos) {
-        RulesDefinition.Rule ruleDef;
-        if (rule.getParentId() != null) {
-          RuleDto templateRule=rule(rule.getParentId(),ruleDtos);
-          ruleDef=ruleDef(templateRule.getRepositoryKey(),templateRule.getRuleKey(),rules);
-        }
- else {
-          ruleDef=ruleDef(rule.getRepositoryKey(),rule.getRuleKey(),rules);
-        }
-        if (ruleDef != null) {
-          String subCharacteristicKey=ruleDef.debtSubCharacteristic();
-          CharacteristicDto subCharacteristicDto=characteristicByKey(subCharacteristicKey,allCharacteristicDtos,false);
-          DebtRemediationFunction remediationFunction=ruleDef.debtRemediationFunction();
-          boolean hasDebtDefinition=subCharacteristicDto != null && remediationFunction != null;
-          rule.setDefaultSubCharacteristicId(hasDebtDefinition ? subCharacteristicDto.getId() : null);
-          rule.setDefaultRemediationFunction(hasDebtDefinition ? remediationFunction.type().name() : null);
-          rule.setDefaultRemediationCoefficient(hasDebtDefinition ? remediationFunction.coefficient() : null);
-          rule.setDefaultRemediationOffset(hasDebtDefinition ? remediationFunction.offset() : null);
-        }
-        rule.setSubCharacteristicId(null);
-        rule.setRemediationFunction(null);
-        rule.setRemediationCoefficient(null);
-        rule.setRemediationOffset(null);
-        rule.setUpdatedAt(updateDate);
-        ruleDao.update(rule,session);
-      }
-      ruleRegistry.reindex(ruleDtos,session);
+      resetRules(ruleDtos,rules,allCharacteristicDtos,updateDate,session);
     }
     session.commit();
   }
