@@ -1,0 +1,14 @@
+{
+  if (StringUtils.isBlank(path)) {
+    throw new IllegalStateException("Secret key not found. Please set the property " + ENCRYPTION_SECRET_KEY_PATH);
+  }
+  File file=new File(path);
+  if (!file.exists() || !file.isFile()) {
+    throw new IllegalStateException("The property " + ENCRYPTION_SECRET_KEY_PATH + " does not link to a valid file: "+ path);
+  }
+  String s=FileUtils.readFileToString(file);
+  if (StringUtils.isBlank(s)) {
+    throw new IllegalStateException("No secret key in the file: " + path);
+  }
+  return new SecretKeySpec(Base64.decodeBase64(StringUtils.trim(s)),CRYPTO_KEY);
+}

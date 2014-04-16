@@ -5,7 +5,11 @@
   try {
     reader=new FileReader(propsFile);
     p.load(reader);
+    p.putAll(System.getenv());
     p.putAll(System.getProperties());
+    p=ConfigurationUtils.interpolateEnvVariables(p);
+    p=decrypt(p);
+    System.setProperties(p);
     return new Props(p);
   }
  catch (  Exception e) {

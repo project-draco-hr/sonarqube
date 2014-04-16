@@ -2,13 +2,16 @@
   FileUtils.forceMkdir(indexFile.getParentFile());
   FileWriter writer=new FileWriter(indexFile,false);
   try {
-    for (    String path : getLibs(servletContext)) {
-      writer.append(path);
-      InputStream is=servletContext.getResourceAsStream("/WEB-INF/lib/" + path);
-      writer.append("|").append(new FileHashes().of(is));
-      writer.append(CharUtils.LF);
+    File libDir=new File(server.getRootDir(),LIB_DIR);
+    if (libDir.exists()) {
+      for (      String path : getLibs(libDir)) {
+        writer.append(path);
+        File is=new File(libDir,path);
+        writer.append("|").append(new FileHashes().of(is));
+        writer.append(CharUtils.LF);
+      }
+      writer.flush();
     }
-    writer.flush();
   }
   finally {
     IOUtils.closeQuietly(writer);
