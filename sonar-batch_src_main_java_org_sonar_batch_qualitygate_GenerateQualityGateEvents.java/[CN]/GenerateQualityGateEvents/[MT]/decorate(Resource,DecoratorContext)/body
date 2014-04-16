@@ -9,21 +9,5 @@
   TimeMachineQuery query=new TimeMachineQuery(resource).setOnlyLastAnalysis(true).setMetrics(CoreMetrics.ALERT_STATUS);
   List<Measure> measures=timeMachine.getMeasures(query);
   Measure pastStatus=measures != null && measures.size() == 1 ? measures.get(0) : null;
-  String alertText=currentStatus.getAlertText();
-  Level alertLevel=currentStatus.getDataAsLevel();
-  String alertName=null;
-  boolean isNewAlert=true;
-  if (pastStatus != null && pastStatus.getDataAsLevel() != alertLevel) {
-    alertName=getName(pastStatus,currentStatus);
-    if (pastStatus.getDataAsLevel() != Metric.Level.OK) {
-      isNewAlert=false;
-    }
-    createEvent(context,alertName,alertText);
-    notifyUsers(resource,alertName,alertText,alertLevel,isNewAlert);
-  }
- else   if (pastStatus == null && alertLevel != Metric.Level.OK) {
-    alertName=getName(currentStatus);
-    createEvent(context,alertName,alertText);
-    notifyUsers(resource,alertName,alertText,alertLevel,isNewAlert);
-  }
+  checkQualityGateStatusChange(resource,context,currentStatus,pastStatus);
 }
