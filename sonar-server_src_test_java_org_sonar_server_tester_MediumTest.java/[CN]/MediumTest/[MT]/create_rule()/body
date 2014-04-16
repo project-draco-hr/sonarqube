@@ -1,0 +1,8 @@
+{
+  Rules rules=serverTester.get(Rules.class);
+  assertThat(rules.find(RuleQuery.builder().build()).results()).isEmpty();
+  RuleDto ruleDto=new RuleDto().setRepositoryKey("repo").setRuleKey("key").setSeverity("MAJOR");
+  serverTester.get(RuleDao.class).insert(ruleDto);
+  serverTester.get(RuleRegistry.class).reindex(ruleDto);
+  assertThat(rules.find(RuleQuery.builder().build()).results()).hasSize(1);
+}
