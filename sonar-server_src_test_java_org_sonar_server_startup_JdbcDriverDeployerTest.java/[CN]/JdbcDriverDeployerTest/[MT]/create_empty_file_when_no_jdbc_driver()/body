@@ -1,0 +1,12 @@
+{
+  DefaultServerFileSystem fs=mock(DefaultServerFileSystem.class);
+  when(fs.getJdbcDriver()).thenReturn(null);
+  File deployDir=temp.newFolder("deploy");
+  when(fs.getDeployDir()).thenReturn(deployDir);
+  File deployedIndex=new File(deployDir,"jdbc-driver.txt");
+  assertThat(deployedIndex).doesNotExist();
+  when(fs.getDeployedJdbcDriverIndex()).thenReturn(deployedIndex);
+  new JdbcDriverDeployer(fs).start();
+  assertThat(deployedIndex).exists();
+  assertThat(Files.toString(deployedIndex,Charsets.UTF_8)).isEqualTo("");
+}
