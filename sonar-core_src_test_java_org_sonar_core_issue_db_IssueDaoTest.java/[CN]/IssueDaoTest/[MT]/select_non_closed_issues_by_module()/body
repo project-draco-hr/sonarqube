@@ -1,0 +1,17 @@
+{
+  setupData("shared","should_select_non_closed_issues_by_module");
+  DefaultResultHandler handler=new DefaultResultHandler();
+  dao.selectNonClosedIssuesByModule(400,handler);
+  assertThat(handler.getResultList()).hasSize(3);
+  IssueDto issue=(IssueDto)handler.getResultList().get(0);
+  assertThat(issue.getRuleRepo()).isNotNull();
+  assertThat(issue.getRule()).isNotNull();
+  assertThat(issue.getComponentKey()).isNotNull();
+  assertThat(issue.getRootComponentKey()).isEqualTo("struts");
+  handler=new DefaultResultHandler();
+  dao.selectNonClosedIssuesByModule(399,handler);
+  assertThat(handler.getResultList()).hasSize(1);
+  issue=(IssueDto)handler.getResultList().get(0);
+  assertThat(issue.getComponentKey()).isEqualTo("struts");
+  assertThat(issue.getRootComponentKey()).isEqualTo("struts");
+}

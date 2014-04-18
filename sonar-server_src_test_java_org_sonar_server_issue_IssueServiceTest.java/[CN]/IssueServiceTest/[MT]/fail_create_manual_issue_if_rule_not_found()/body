@@ -1,0 +1,14 @@
+{
+  when(resourceDao.getResource(any(ResourceQuery.class))).thenReturn(resource);
+  when(resourceDao.getRootProjectByComponentKey(anyString())).thenReturn(project);
+  RuleKey ruleKey=RuleKey.of("manual","manualRuleKey");
+  when(ruleFinder.findByKey(ruleKey)).thenReturn(null);
+  try {
+    issueService.createManualIssue("org.sonar.Sample",RuleKey.of("manual","manualRuleKey"),null,null,null,null,userSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("Unknown rule: manual:manualRuleKey");
+  }
+  verifyZeroInteractions(issueStorage);
+}

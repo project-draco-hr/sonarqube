@@ -1,0 +1,13 @@
+{
+  when(resourceDao.getResource(any(ResourceQuery.class))).thenReturn(resource);
+  when(resourceDao.getRootProjectByComponentKey(anyString())).thenReturn(project);
+  RuleKey ruleKey=RuleKey.of("squid","s100");
+  try {
+    issueService.createManualIssue("org.sonar.Sample",ruleKey,null,null,null,null,userSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("Issues can be created only on rules marked as 'manual': squid:s100");
+  }
+  verifyZeroInteractions(issueStorage);
+}

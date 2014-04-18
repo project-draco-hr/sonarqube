@@ -1,0 +1,14 @@
+{
+  RuleKey ruleKey=RuleKey.of("manual","manualRuleKey");
+  when(resourceDao.getResource(any(ResourceQuery.class))).thenReturn(resource);
+  when(resourceDao.getRootProjectByComponentKey(anyString())).thenReturn(project);
+  when(ruleFinder.findByKey(ruleKey)).thenReturn(Rule.create("manual","manualRuleKey"));
+  when(authorizationDao.isAuthorizedComponentKey(anyString(),eq(10),anyString())).thenReturn(false);
+  try {
+    issueService.createManualIssue("org.sonar.Sample",ruleKey,null,null,null,null,userSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalStateException.class).hasMessage("User does not have the required role");
+  }
+}

@@ -1,0 +1,13 @@
+{
+  RuleKey ruleKey=RuleKey.of("manual","manualRuleKey");
+  when(ruleFinder.findByKey(ruleKey)).thenReturn(Rule.create("manual","manualRuleKey"));
+  when(resourceDao.getResource(any(ResourceQuery.class))).thenReturn(null);
+  try {
+    issueService.createManualIssue("org.sonar.Sample",RuleKey.of("manual","manualRuleKey"),null,null,null,null,userSession);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("Unknown component: org.sonar.Sample");
+  }
+  verifyZeroInteractions(issueStorage);
+}
