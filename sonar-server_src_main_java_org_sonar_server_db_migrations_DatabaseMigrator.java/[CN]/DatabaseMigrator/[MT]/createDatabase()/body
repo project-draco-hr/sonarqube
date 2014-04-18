@@ -1,18 +1,18 @@
 {
-  if (!DdlUtils.supportsDialect(database.getDialect().getId())) {
-    return false;
-  }
-  LoggerFactory.getLogger(getClass()).info("Create database");
-  SqlSession session=null;
-  Connection connection=null;
-  try {
-    session=myBatis.openSession();
-    connection=session.getConnection();
-    createSchema(connection,database.getDialect().getId());
-    return true;
-  }
+  if (DdlUtils.supportsDialect(database.getDialect().getId()) && serverUpgradeStatus.isFreshInstall()) {
+    LoggerFactory.getLogger(getClass()).info("Create database");
+    SqlSession session=null;
+    Connection connection=null;
+    try {
+      session=myBatis.openSession();
+      connection=session.getConnection();
+      createSchema(connection,database.getDialect().getId());
+      return true;
+    }
   finally {
-    MyBatis.closeQuietly(session);
-    DbUtils.closeQuietly(connection);
+      MyBatis.closeQuietly(session);
+      DbUtils.closeQuietly(connection);
+    }
   }
+  return false;
 }
