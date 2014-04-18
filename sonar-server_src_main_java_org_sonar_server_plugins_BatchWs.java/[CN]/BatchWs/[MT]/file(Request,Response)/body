@@ -1,0 +1,14 @@
+{
+  String filename=request.mandatoryParam("name");
+  try {
+    File input=new File(batchDir,filename);
+    if (!input.exists() || !FileUtils.directoryContains(batchDir,input)) {
+      throw new IllegalArgumentException("Bad filename: " + filename);
+    }
+    response.stream().setMediaType("application/java-archive");
+    FileUtils.copyFile(input,response.stream().output());
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Fail to send batch file " + filename,e);
+  }
+}

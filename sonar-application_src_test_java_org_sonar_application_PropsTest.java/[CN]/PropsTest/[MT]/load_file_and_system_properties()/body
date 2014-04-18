@@ -1,9 +1,13 @@
 {
+  System.setProperty("hello","bar");
   Env env=mock(Env.class);
-  File propsFile=new File(getClass().getResource("/org/sonar/application/PropsTest/sonar.properties").toURI());
+  File propsFile=new File(Resources.getResource(getClass(),"PropsTest/sonar.properties").getFile());
   when(env.file("conf/sonar.properties")).thenReturn(propsFile);
   Props props=Props.create(env);
   assertThat(props.of("foo")).isEqualTo("bar");
   assertThat(props.of("java.version")).isNotNull();
+  assertThat(props.of("hello")).isEqualTo("bar");
   assertThat(props.of("java.io.tmpdir")).isNotEmpty().isNotEqualTo("/should/be/overridden");
+  assertThat(System.getProperty("foo")).isEqualTo("bar");
+  assertThat(System.getProperty("hello")).isEqualTo("bar");
 }

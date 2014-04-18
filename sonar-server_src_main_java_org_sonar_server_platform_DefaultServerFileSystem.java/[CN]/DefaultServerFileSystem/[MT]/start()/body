@@ -3,18 +3,18 @@
   if (!homeDir.isDirectory() || !homeDir.exists()) {
     throw new IllegalStateException("SonarQube home directory does not exist");
   }
-  if (deployDir == null) {
-    throw new IllegalStateException("The target directory to deploy libraries is not set");
-  }
   try {
-    LOGGER.info("Deploy dir: " + deployDir.getAbsolutePath());
-    FileUtils.forceMkdir(deployDir);
-    for (    File subDirectory : deployDir.listFiles((FileFilter)FileFilterUtils.directoryFileFilter())) {
+    if (getDeployDir() == null) {
+      throw new IllegalArgumentException("Web app directory does not exist: " + getDeployDir());
+    }
+    LOGGER.info("Deploy dir: " + getDeployDir().getAbsolutePath());
+    FileUtils.forceMkdir(getDeployDir());
+    for (    File subDirectory : getDeployDir().listFiles((FileFilter)FileFilterUtils.directoryFileFilter())) {
       FileUtils.cleanDirectory(subDirectory);
     }
   }
  catch (  IOException e) {
-    throw new IllegalStateException("The following directory can not be created: " + deployDir.getAbsolutePath(),e);
+    throw new IllegalStateException("The following directory can not be created: " + getDeployDir().getAbsolutePath(),e);
   }
   File deprecated=getDeprecatedPluginsDir();
   try {

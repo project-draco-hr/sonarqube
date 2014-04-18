@@ -1,0 +1,17 @@
+{
+  FileCache cache=mock(FileCache.class);
+  File fakeDriver=new File(Resources.getResource(JdbcDriverHolderTest.class,"JdbcDriverHolderTest/jdbc-driver.jar").getFile());
+  when(cache.get(eq("ojdbc14.jar"),eq("fakemd5"),any(FileCache.Downloader.class))).thenReturn(fakeDriver);
+  assertThat(Thread.currentThread().getContextClassLoader().getResource("foo/foo.txt")).isNull();
+  ServerClient server=mock(ServerClient.class);
+  when(server.request("/deploy/jdbc-driver.txt")).thenReturn("ojdbc14.jar|fakemd5");
+  when(server.request("/deploy/ojdbc14.jar")).thenReturn("fakecontent");
+  JdbcDriverHolder holder=new JdbcDriverHolder(cache,mode,server);
+  holder.start();
+  assertThat(holder.getClassLoader().getResource("foo/foo.txt")).isNotNull();
+  assertThat(Thread.currentThread().getContextClassLoader()).isSameAs(holder.getClassLoader());
+  assertThat(holder.getClassLoader().getParent()).isSameAs(getClass().getClassLoader());
+  holder.stop();
+  assertThat(Thread.currentThread().getContextClassLoader()).isSameAs(getClass().getClassLoader());
+  assertThat(holder.getClassLoader()).isNull();
+}

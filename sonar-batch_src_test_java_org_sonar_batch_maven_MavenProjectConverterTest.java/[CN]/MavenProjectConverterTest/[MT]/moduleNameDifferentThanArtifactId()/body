@@ -1,0 +1,16 @@
+{
+  File rootDir=TestUtils.getResource("/org/sonar/batch/maven/MavenProjectConverterTest/moduleNameDifferentThanArtifactId/");
+  MavenProject parent=loadPom("/org/sonar/batch/maven/MavenProjectConverterTest/moduleNameDifferentThanArtifactId/pom.xml",true);
+  MavenProject module1=loadPom("/org/sonar/batch/maven/MavenProjectConverterTest/moduleNameDifferentThanArtifactId/path1/pom.xml",false);
+  MavenProject module2=loadPom("/org/sonar/batch/maven/MavenProjectConverterTest/moduleNameDifferentThanArtifactId/path2/pom.xml",false);
+  ProjectDefinition rootDef=converter.configure(Arrays.asList(parent,module1,module2),parent);
+  assertThat(rootDef.getSubProjects().size(),is(2));
+  assertThat(rootDef.getKey(),is("org.test:parent"));
+  assertNull(rootDef.getParent());
+  assertThat(rootDef.getBaseDir(),is(rootDir));
+  ProjectDefinition module1Def=rootDef.getSubProjects().get(0);
+  assertThat(module1Def.getKey(),Is.is("org.test:module1"));
+  assertThat(module1Def.getParent(),Is.is(rootDef));
+  assertThat(module1Def.getBaseDir(),Is.is(new File(rootDir,"path1")));
+  assertThat(module1Def.getSubProjects().size(),Is.is(0));
+}

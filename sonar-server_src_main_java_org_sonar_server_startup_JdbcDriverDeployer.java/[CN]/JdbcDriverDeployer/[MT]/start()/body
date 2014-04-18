@@ -1,18 +1,20 @@
 {
+  File deployedDriver=null;
   File driver=fileSystem.getJdbcDriver();
-  File deployedDriver=new File(fileSystem.getDeployDir(),driver.getName());
-  if (!deployedDriver.exists() || deployedDriver.length() != driver.length()) {
-    try {
-      FileUtils.copyFile(driver,deployedDriver);
-    }
- catch (    IOException e) {
-      throw new IllegalStateException("Can not copy the JDBC driver from " + driver + " to "+ deployedDriver,e);
+  if (driver != null) {
+    deployedDriver=new File(fileSystem.getDeployDir(),driver.getName());
+    if (!deployedDriver.exists() || deployedDriver.length() != driver.length()) {
+      try {
+        FileUtils.copyFile(driver,deployedDriver);
+      }
+ catch (      IOException e) {
+        throw new IllegalStateException("Can not copy the JDBC driver from " + driver + " to "+ deployedDriver,e);
+      }
     }
   }
   File deployedDriverIndex=fileSystem.getDeployedJdbcDriverIndex();
   try {
-    String hash=new FileHashes().of(deployedDriver);
-    FileUtils.writeStringToFile(deployedDriverIndex,deployedDriver.getName() + "|" + hash);
+    FileUtils.writeStringToFile(deployedDriverIndex,driverIndexContent(deployedDriver));
   }
  catch (  IOException e) {
     throw new IllegalStateException("Can not generate index of JDBC driver",e);

@@ -3,22 +3,24 @@
     try {
       LOG.info("Install JDBC driver");
       String[] nameAndHash=downloadJdbcDriverIndex();
-      String filename=nameAndHash[0];
-      String hash=nameAndHash[1];
-      File jdbcDriver=fileCache.get(filename,hash,new FileCache.Downloader(){
-        public void download(        String filename,        File toFile) throws IOException {
-          String url="/deploy/" + filename;
-          if (LOG.isDebugEnabled()) {
-            LOG.debug("Download {} to {}",url,toFile.getAbsolutePath());
-          }
+      if (nameAndHash != null) {
+        String filename=nameAndHash[0];
+        String hash=nameAndHash[1];
+        File jdbcDriver=fileCache.get(filename,hash,new FileCache.Downloader(){
+          public void download(          String filename,          File toFile) throws IOException {
+            String url="/deploy/" + filename;
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("Download {} to {}",url,toFile.getAbsolutePath());
+            }
  else {
-            LOG.info("Download {}",filename);
+              LOG.info("Download {}",filename);
+            }
+            serverClient.download(url,toFile);
           }
-          serverClient.download(url,toFile);
         }
-      }
 );
-      classLoader=initClassloader(jdbcDriver);
+        classLoader=initClassloader(jdbcDriver);
+      }
     }
  catch (    SonarException e) {
       throw e;
