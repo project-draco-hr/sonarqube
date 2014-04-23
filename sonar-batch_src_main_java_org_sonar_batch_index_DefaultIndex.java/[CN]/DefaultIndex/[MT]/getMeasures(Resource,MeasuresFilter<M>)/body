@@ -1,7 +1,11 @@
 {
-  Bucket bucket=buckets.get(resource);
-  if (bucket != null) {
-    return bucket.getMeasures(filter);
+  Resource indexedResource=getResource(resource);
+  Iterable<Measure> unfiltered=measureCache.byResource(indexedResource);
+  Collection<Measure> all=new ArrayList<Measure>();
+  if (unfiltered != null) {
+    for (    Measure measure : unfiltered) {
+      all.add(measure);
+    }
   }
-  return null;
+  return filter.filter(all);
 }

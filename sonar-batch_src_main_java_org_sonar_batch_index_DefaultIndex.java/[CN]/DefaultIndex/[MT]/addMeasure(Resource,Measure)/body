@@ -6,10 +6,10 @@
       throw new SonarException("Unknown metric: " + measure.getMetricKey());
     }
     measure.setMetric(metric);
-    bucket.addMeasure(measure);
-    if (measure.getPersistenceMode().useDatabase()) {
-      persistence.saveMeasure(bucket.getResource(),measure);
+    if (measureCache.contains(resource,measure) && !measure.getMetric().equals(CoreMetrics.TESTS)) {
+      throw new SonarException("Can not add twice the same measure on " + resource + ": "+ measure);
     }
+    measureCache.put(resource,measure);
   }
   return measure;
 }

@@ -6,7 +6,7 @@
   ArrayList<ResolvedCondition> conditions=Lists.newArrayList(mockCondition(metric,QualityGateConditionDto.OPERATOR_GREATER_THAN,"3600",null));
   when(qualityGate.conditions()).thenReturn(conditions);
   verifier.decorate(project,context);
-  verify(context).saveMeasure(argThat(matchesMetric(metric,Level.ERROR,"The Debt > 1h")));
+  verify(index).updateMeasure(eq(project),argThat(matchesMetric(metric,Level.ERROR,"The Debt > 1h")));
   verify(context).saveMeasure(argThat(matchesMetric(CoreMetrics.ALERT_STATUS,Metric.Level.ERROR,"The Debt > 1h")));
   verify(context).saveMeasure(argThat(new IsMeasure(CoreMetrics.QUALITY_GATE_DETAILS,"{\"level\":\"ERROR\"," + "\"conditions\":" + "["+ "{\"metric\":\"tech_debt\",\"op\":\"GT\",\"error\":\"3600\",\"actual\":\"7200.0\",\"level\":\"ERROR\"}"+ "]"+ "}")));
 }

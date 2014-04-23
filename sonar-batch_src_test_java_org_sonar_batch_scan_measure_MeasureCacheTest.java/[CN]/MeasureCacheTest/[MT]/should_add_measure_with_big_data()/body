@@ -1,0 +1,27 @@
+{
+  MeasureCache cache=new MeasureCache(caches);
+  Project p=new Project("struts");
+  assertThat(cache.entries()).hasSize(0);
+  assertThat(cache.byResource(p)).hasSize(0);
+  Measure m=new Measure(CoreMetrics.NCLOC,1.0).setDate(new Date());
+  m.setAlertText("foooooooooooooooooooooooooooooooooooo");
+  StringBuilder data=new StringBuilder();
+  for (int i=0; i < 1048575; i++) {
+    data.append("a");
+  }
+  m.setData(data.toString());
+  cache.put(p,m);
+  assertThat(cache.contains(p,m)).isTrue();
+  assertThat(cache.entries()).hasSize(1);
+  Iterator<Entry<Measure>> iterator=cache.entries().iterator();
+  iterator.hasNext();
+  Entry<Measure> next=iterator.next();
+  assertThat(next.value()).isEqualTo(m);
+  assertThat(next.key()[0]).isEqualTo("struts");
+  assertThat(cache.byResource(p)).hasSize(1);
+  assertThat(cache.byResource(p).iterator().next()).isEqualTo(m);
+  RuleMeasure mRule=RuleMeasure.createForPriority(CoreMetrics.CRITICAL_VIOLATIONS,RulePriority.BLOCKER,1.0);
+  mRule.setRuleKey(RuleKey.of("repo","rule"));
+  cache.put(p,mRule);
+  assertThat(cache.entries()).hasSize(2);
+}

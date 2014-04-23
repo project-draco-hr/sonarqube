@@ -1,31 +1,31 @@
 {
   if (shouldSaveNewMetrics) {
     Metric metric=SeverityUtils.severityToNewMetricIssue(severity);
-    ListMultimap<Rule,Measure> childMeasuresPerRule=ArrayListMultimap.create();
-    ListMultimap<Rule,Issue> issuesPerRule=ArrayListMultimap.create();
-    Set<Rule> rules=Sets.newHashSet();
+    ListMultimap<RuleKey,Measure> childMeasuresPerRuleKeys=ArrayListMultimap.create();
+    ListMultimap<RuleKey,Issue> issuesPerRuleKeys=ArrayListMultimap.create();
+    Set<RuleKey> ruleKeys=Sets.newHashSet();
     Collection<Measure> children=context.getChildrenMeasures(MeasuresFilters.rules(metric));
     for (    Measure child : children) {
       RuleMeasure childRuleMeasure=(RuleMeasure)child;
-      Rule rule=childRuleMeasure.getRule();
-      if (rule != null) {
-        childMeasuresPerRule.put(rule,childRuleMeasure);
-        rules.add(rule);
+      RuleKey ruleKey=childRuleMeasure.ruleKey();
+      if (ruleKey != null) {
+        childMeasuresPerRuleKeys.put(ruleKey,childRuleMeasure);
+        ruleKeys.add(ruleKey);
       }
     }
     for (    Issue issue : issues) {
       if (RulePriority.valueOf(issue.severity()).equals(severity)) {
-        Rule rule=rulefinder.findByKey(issue.ruleKey().repository(),issue.ruleKey().rule());
-        rules.add(rule);
-        issuesPerRule.put(rule,issue);
+        ruleKeys.add(issue.ruleKey());
+        issuesPerRuleKeys.put(issue.ruleKey(),issue);
       }
     }
-    for (    Rule rule : rules) {
+    for (    RuleKey ruleKey : ruleKeys) {
+      Rule rule=rulefinder.findByKey(ruleKey);
       RuleMeasure measure=RuleMeasure.createForRule(metric,rule,null);
       measure.setSeverity(severity);
       for (      Period period : timeMachineConfiguration.periods()) {
         int variationIndex=period.getIndex();
-        double sum=MeasureUtils.sumOnVariation(true,variationIndex,childMeasuresPerRule.get(rule)) + countIssues(issuesPerRule.get(rule),period);
+        double sum=MeasureUtils.sumOnVariation(true,variationIndex,childMeasuresPerRuleKeys.get(rule.ruleKey())) + countIssues(issuesPerRuleKeys.get(rule.ruleKey()),period);
         measure.setVariation(variationIndex,sum);
       }
       context.saveMeasure(measure);
