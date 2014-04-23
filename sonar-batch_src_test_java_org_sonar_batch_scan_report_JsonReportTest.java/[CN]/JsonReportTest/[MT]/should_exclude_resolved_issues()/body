@@ -2,8 +2,9 @@
   RuleKey ruleKey=RuleKey.of("squid","AvoidCycles");
   DefaultIssue issue=new DefaultIssue().setKey("200").setComponentKey("struts:src/main/java/org/apache/struts/Action.java").setRuleKey(ruleKey).setStatus(Issue.STATUS_CLOSED).setResolution(Issue.RESOLUTION_FIXED).setCreationDate(SIMPLE_DATE_FORMAT.parse("2013-04-24")).setUpdateDate(SIMPLE_DATE_FORMAT.parse("2013-04-25")).setCloseDate(SIMPLE_DATE_FORMAT.parse("2013-04-26")).setNew(false);
   when(ruleFinder.findByKey(ruleKey)).thenReturn(Rule.create(ruleKey.repository(),ruleKey.rule()).setName("Avoid Cycles"));
-  when(jsonReport.getIssues()).thenReturn(Lists.<DefaultIssue>newArrayList(issue));
+  when(jsonReport.getIssues()).thenReturn(Lists.newArrayList(issue));
   StringWriter writer=new StringWriter();
   jsonReport.writeJson(writer);
-  JSONAssert.assertEquals(TestUtils.getResourceContent("/org/sonar/batch/scan/report/JsonReportTest/report-without-resolved-issues.json"),writer.toString(),false);
+  String expected=Resources.toString(Resources.getResource("org/sonar/batch/scan/report/JsonReportTest/report-without-resolved-issues.json"),Charsets.UTF_8);
+  JSONAssert.assertEquals(expected,writer.toString(),false);
 }
