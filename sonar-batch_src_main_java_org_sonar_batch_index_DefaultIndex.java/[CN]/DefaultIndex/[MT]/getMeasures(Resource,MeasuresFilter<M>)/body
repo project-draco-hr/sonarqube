@@ -1,7 +1,11 @@
 {
-  Bucket bucket=buckets.get(resource);
-  if (bucket != null) {
-    return bucket.getMeasures(filter);
+  Resource indexedResource=getResource(resource);
+  Iterable<Measure> unfiltered;
+  if (filter instanceof MeasuresFilters.MetricFilter) {
+    unfiltered=measureCache.byMetric(indexedResource,((MeasuresFilters.MetricFilter)filter).filterOnMetricKey());
   }
-  return null;
+ else {
+    unfiltered=measureCache.byResource(indexedResource);
+  }
+  return filter.filter(unfiltered);
 }

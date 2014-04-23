@@ -1,0 +1,20 @@
+{
+  Metric metric=SeverityUtils.severityToIssueMetric(severity);
+  Collection<Measure> children=context.getChildrenMeasures(MeasuresFilters.rules(metric));
+  for (  Measure child : children) {
+    RuleMeasure childRuleMeasure=(RuleMeasure)child;
+    RuleKey ruleKey=childRuleMeasure.ruleKey();
+    if (ruleKey != null && MeasureUtils.hasValue(childRuleMeasure)) {
+      Multiset<RuleKey> rulesBag=initRules(rulesPerSeverity,severity);
+      rulesBag.add(ruleKey,childRuleMeasure.getIntValue());
+    }
+  }
+  Multiset<RuleKey> rulesBag=rulesPerSeverity.get(severity);
+  if (rulesBag != null) {
+    for (    Multiset.Entry<RuleKey> entry : rulesBag.entrySet()) {
+      RuleMeasure measure=RuleMeasure.createForRule(metric,entry.getElement(),(double)entry.getCount());
+      measure.setSeverity(severity);
+      context.saveMeasure(measure);
+    }
+  }
+}

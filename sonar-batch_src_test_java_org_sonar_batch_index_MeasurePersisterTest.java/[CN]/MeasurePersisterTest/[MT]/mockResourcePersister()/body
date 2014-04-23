@@ -1,7 +1,11 @@
 {
-  when(resourcePersister.getSnapshotOrFail(project)).thenReturn(projectSnapshot);
-  when(resourcePersister.getSnapshotOrFail(aDirectory)).thenReturn(packageSnapshot);
-  when(resourcePersister.getSnapshot(project)).thenReturn(projectSnapshot);
-  when(resourcePersister.getSnapshot(aDirectory)).thenReturn(packageSnapshot);
-  measurePersister=new MeasurePersister(getMyBatis(),resourcePersister,ruleFinder,memoryOptimizer);
+  snapshotCache=mock(SnapshotCache.class);
+  measureCache=mock(MeasureCache.class);
+  ResourceCache resourceCache=mock(ResourceCache.class);
+  when(snapshotCache.get("foo")).thenReturn(projectSnapshot);
+  when(snapshotCache.get("foo:org/foo")).thenReturn(packageSnapshot);
+  when(resourceCache.get("foo")).thenReturn(project);
+  when(resourceCache.get("foo:org/foo/Bar.java")).thenReturn(aFile);
+  when(resourceCache.get("foo:org/foo")).thenReturn(aDirectory);
+  measurePersister=new MeasurePersister(getMyBatis(),ruleFinder,measureCache,snapshotCache,resourceCache);
 }
