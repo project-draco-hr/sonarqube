@@ -3,17 +3,18 @@
   Project p=new Project("struts");
   assertThat(cache.entries()).hasSize(0);
   assertThat(cache.byResource(p)).hasSize(0);
-  assertThat(cache.byMetric(p,"ncloc")).hasSize(0);
   Measure m=new Measure(CoreMetrics.NCLOC,1.0);
   cache.put(p,m);
   assertThat(cache.entries()).hasSize(1);
-  assertThat(cache.byMetric(p,"ncloc")).hasSize(1);
-  assertThat(cache.byMetric(p,"ncloc").iterator().next()).isEqualTo(m);
+  Iterator<Entry<Measure>> iterator=cache.entries().iterator();
+  iterator.hasNext();
+  Entry<Measure> next=iterator.next();
+  assertThat(next.value()).isEqualTo(m);
+  assertThat(next.key()[0]).isEqualTo("struts");
   assertThat(cache.byResource(p)).hasSize(1);
   assertThat(cache.byResource(p).iterator().next()).isEqualTo(m);
   Measure mRule=RuleMeasure.createForPriority(CoreMetrics.CRITICAL_VIOLATIONS,RulePriority.BLOCKER,1.0);
   cache.put(p,mRule);
   assertThat(cache.entries()).hasSize(2);
   assertThat(cache.byResource(p)).hasSize(2);
-  assertThat(cache.byMetric(p,"ncloc")).hasSize(1);
 }
