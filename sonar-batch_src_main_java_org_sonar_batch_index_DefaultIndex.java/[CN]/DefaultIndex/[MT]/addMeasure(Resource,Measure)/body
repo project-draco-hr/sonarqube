@@ -6,6 +6,9 @@
       throw new SonarException("Unknown metric: " + measure.getMetricKey());
     }
     measure.setMetric(metric);
+    if (measureCache.contains(resource,measure) && !measure.getMetric().equals(CoreMetrics.TESTS)) {
+      throw new SonarException("Can not add twice the same measure on " + resource + ": "+ measure);
+    }
     measureCache.put(resource,measure);
   }
   return measure;
