@@ -1,0 +1,17 @@
+{
+  RulesProfile rulesProfile=RulesProfile.create("Default","java");
+  ProfileDefinition profileDefinition=mock(ProfileDefinition.class);
+  when(profileDefinition.createProfile(any(ValidationMessages.class))).thenReturn(rulesProfile);
+  definitions.add(profileDefinition);
+  QProfile profile=new QProfile();
+  when(qProfileOperations.newProfile(eq("Default"),eq("java"),eq(true),any(UserSession.class),eq(session))).thenReturn(profile);
+  registerQualityProfiles.start();
+  verify(qProfileBackup).restoreFromActiveRules(eq(profile),eq(rulesProfile),eq(session));
+  ArgumentCaptor<LoadedTemplateDto> templateCaptor=ArgumentCaptor.forClass(LoadedTemplateDto.class);
+  verify(loadedTemplateDao).insert(templateCaptor.capture(),eq(session));
+  assertThat(templateCaptor.getValue().getKey()).isEqualTo("java:Default");
+  assertThat(templateCaptor.getValue().getType()).isEqualTo("QUALITY_PROFILE");
+  verify(settings).saveProperty("sonar.profile.java","Default");
+  verify(session).commit();
+  verify(esActiveRule).bulkRegisterActiveRules();
+}

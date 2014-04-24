@@ -1,0 +1,16 @@
+{
+  RulesProfile rulesProfile1=RulesProfile.create("Basic","java");
+  ProfileDefinition profileDefinition1=mock(ProfileDefinition.class);
+  when(profileDefinition1.createProfile(any(ValidationMessages.class))).thenReturn(rulesProfile1);
+  definitions.add(profileDefinition1);
+  RulesProfile rulesProfile2=RulesProfile.create("Default","java");
+  ProfileDefinition profileDefinition2=mock(ProfileDefinition.class);
+  when(profileDefinition2.createProfile(any(ValidationMessages.class))).thenReturn(rulesProfile2);
+  definitions.add(profileDefinition2);
+  QProfile profile1=new QProfile();
+  when(qProfileOperations.newProfile(eq("Basic"),eq("java"),eq(true),any(UserSession.class),eq(session))).thenReturn(profile1);
+  QProfile profile2=new QProfile();
+  when(qProfileOperations.newProfile(eq("Default"),eq("java"),eq(true),any(UserSession.class),eq(session))).thenReturn(profile2);
+  registerQualityProfiles.start();
+  verify(settings).saveProperty("sonar.profile.java","Basic");
+}

@@ -1,10 +1,16 @@
 {
-  String parent=profile.parent();
-  if (parent != null) {
-    QualityProfileDto parentDto=findQualityProfile(parent,profile.language());
-    if (parentDto != null) {
-      return QProfile.from(parentDto);
+  SqlSession session=myBatis.openSession();
+  try {
+    String parent=profile.parent();
+    if (parent != null) {
+      QualityProfileDto parentDto=findQualityProfile(parent,profile.language(),session);
+      if (parentDto != null) {
+        return QProfile.from(parentDto);
+      }
     }
+    return null;
   }
-  return null;
+  finally {
+    MyBatis.closeQuietly(session);
+  }
 }

@@ -1,0 +1,10 @@
+{
+  ProfileDefinition profileDefinition=mock(ProfileDefinition.class);
+  when(profileDefinition.createProfile(any(ValidationMessages.class))).thenReturn(RulesProfile.create("Default","java"));
+  definitions.add(profileDefinition);
+  QProfile profile=new QProfile();
+  when(qProfileOperations.newProfile(eq("Default"),eq("java"),eq(true),any(UserSession.class),eq(session))).thenReturn(profile);
+  when(settings.getString(eq("sonar.profile.java"))).thenReturn("Existing Default Profile");
+  registerQualityProfiles.start();
+  verify(settings,never()).saveProperty(anyString(),anyString());
+}

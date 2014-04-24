@@ -1,0 +1,18 @@
+{
+  QProfiles qProfiles=serverTester.get(QProfiles.class);
+  List<QProfile> profiles=qProfiles.profilesByLanguage("xoo");
+  assertThat(profiles).hasSize(1);
+  QProfile profile=profiles.get(0);
+  assertThat(profile.id()).isNotNull();
+  assertThat(profile.name()).isEqualTo("Basic");
+  assertThat(profile.language()).isEqualTo("xoo");
+  assertThat(qProfiles.defaultProfile("xoo").name()).isEqualTo("Basic");
+  assertThat(qProfiles.searchProfileRules(ProfileRuleQuery.create(profile.id()),Paging.create(10,1)).rules()).hasSize(2);
+  QProfileRule qProfileRule=qProfiles.searchProfileRules(ProfileRuleQuery.create(profile.id()).setNameOrKey("x1"),Paging.create(10,1)).rules().get(0);
+  assertThat(qProfileRule.key()).isEqualTo("x1");
+  assertThat(qProfileRule.severity()).isEqualTo("MAJOR");
+  assertThat(qProfileRule.params()).hasSize(1);
+  QProfileRuleParam qProfileRuleParam=qProfileRule.params().get(0);
+  assertThat(qProfileRuleParam.key()).isEqualTo("acceptWhitespace");
+  assertThat(qProfileRuleParam.value()).isEqualTo("true");
+}

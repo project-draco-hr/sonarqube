@@ -1,0 +1,11 @@
+{
+  ProfileDefinition profileDefinition=mock(ProfileDefinition.class);
+  when(profileDefinition.createProfile(any(ValidationMessages.class))).thenReturn(RulesProfile.create("Default","java"));
+  definitions.add(profileDefinition);
+  when(loadedTemplateDao.countByTypeAndKey(anyString(),anyString(),eq(session))).thenReturn(1);
+  registerQualityProfiles.start();
+  verify(loadedTemplateDao,never()).insert(any(LoadedTemplateDto.class),eq(session));
+  verifyZeroInteractions(qProfileBackup);
+  verifyZeroInteractions(qProfileOperations);
+  verify(settings).saveProperty("sonar.profile.java","Default");
+}

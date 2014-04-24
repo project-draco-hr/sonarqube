@@ -1,0 +1,18 @@
+{
+  RulesProfile rulesProfile1=RulesProfile.create("Default","java");
+  ProfileDefinition profileDefinition1=mock(ProfileDefinition.class);
+  when(profileDefinition1.createProfile(any(ValidationMessages.class))).thenReturn(rulesProfile1);
+  definitions.add(profileDefinition1);
+  RulesProfile rulesProfile2=RulesProfile.create("Default","java");
+  ProfileDefinition profileDefinition2=mock(ProfileDefinition.class);
+  when(profileDefinition2.createProfile(any(ValidationMessages.class))).thenReturn(rulesProfile2);
+  definitions.add(profileDefinition2);
+  QProfile profile=new QProfile();
+  when(qProfileOperations.newProfile(eq("Default"),eq("java"),eq(true),any(UserSession.class),eq(session))).thenReturn(profile);
+  registerQualityProfiles.start();
+  ArgumentCaptor<RulesProfile> rulesProfileCaptor=ArgumentCaptor.forClass(RulesProfile.class);
+  verify(qProfileBackup,times(2)).restoreFromActiveRules(eq(profile),rulesProfileCaptor.capture(),eq(session));
+  assertThat(rulesProfileCaptor.getAllValues().get(0)).isEqualTo(rulesProfile1);
+  assertThat(rulesProfileCaptor.getAllValues().get(1)).isEqualTo(rulesProfile2);
+  verify(session).commit();
+}

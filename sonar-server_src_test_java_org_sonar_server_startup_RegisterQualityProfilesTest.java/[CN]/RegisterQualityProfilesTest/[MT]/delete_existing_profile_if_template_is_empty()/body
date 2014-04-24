@@ -1,0 +1,14 @@
+{
+  RulesProfile rulesProfile=RulesProfile.create("Default","java");
+  ProfileDefinition profileDefinition=mock(ProfileDefinition.class);
+  when(profileDefinition.createProfile(any(ValidationMessages.class))).thenReturn(rulesProfile);
+  definitions.add(profileDefinition);
+  QProfile profile=new QProfile();
+  when(qProfileLookup.profile(eq("Default"),eq("java"),eq(session))).thenReturn(new QProfile());
+  when(qProfileOperations.newProfile(eq("Default"),eq("java"),eq(true),any(UserSession.class),eq(session))).thenReturn(profile);
+  when(loadedTemplateDao.countByTypeAndKey(anyString(),anyString(),eq(session))).thenReturn(0);
+  registerQualityProfiles.start();
+  verify(qProfileOperations).deleteProfile(anyInt(),eq(session));
+  verify(qProfileBackup).restoreFromActiveRules(eq(profile),eq(rulesProfile),eq(session));
+  verify(session).commit();
+}

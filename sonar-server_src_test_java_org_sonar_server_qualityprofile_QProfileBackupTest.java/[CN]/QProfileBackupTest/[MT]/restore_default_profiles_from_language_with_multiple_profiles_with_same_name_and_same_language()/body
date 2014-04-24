@@ -1,0 +1,20 @@
+{
+  RulesProfile profile1=RulesProfile.create("Default","java");
+  profile1.activateRule(Rule.create("pmd","rule").setSeverity(RulePriority.BLOCKER),null);
+  ProfileDefinition profileDefinition1=mock(ProfileDefinition.class);
+  when(profileDefinition1.createProfile(any(ValidationMessages.class))).thenReturn(profile1);
+  definitions.add(profileDefinition1);
+  RulesProfile profile2=RulesProfile.create("Default","java");
+  profile2.activateRule(Rule.create("checkstyle","rule").setSeverity(RulePriority.MAJOR),null);
+  ProfileDefinition profileDefinition2=mock(ProfileDefinition.class);
+  when(profileDefinition2.createProfile(any(ValidationMessages.class))).thenReturn(profile2);
+  definitions.add(profileDefinition2);
+  when(qProfileOperations.newProfile(eq("Default"),eq("java"),eq(true),any(UserSession.class),eq(session))).thenReturn(new QProfile().setId(1));
+  backup.restoreDefaultProfilesFromLanguage("java");
+  verify(qProfileActiveRuleOperations).createActiveRule(eq(1),eq(RuleKey.of("pmd","rule")),eq("BLOCKER"),eq(session));
+  verify(qProfileActiveRuleOperations).createActiveRule(eq(1),eq(RuleKey.of("checkstyle","rule")),eq("MAJOR"),eq(session));
+  verifyNoMoreInteractions(qProfileActiveRuleOperations);
+  verify(esActiveRule).bulkIndexProfile(eq(1),eq(session));
+  verify(dryRunCache).reportGlobalModification(session);
+  verify(session).commit();
+}

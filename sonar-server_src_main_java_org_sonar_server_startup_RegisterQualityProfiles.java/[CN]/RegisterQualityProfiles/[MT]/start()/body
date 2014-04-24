@@ -1,20 +1,24 @@
 {
   TimeProfiler profiler=new TimeProfiler(LOGGER).start("Register Quality Profiles");
-  session=sessionFactory.getSession();
-  session.commit();
-  ListMultimap<String,RulesProfile> profilesByLanguage=loadDefinitions();
-  for (  String language : profilesByLanguage.keySet()) {
-    List<RulesProfile> profiles=profilesByLanguage.get(language);
-    verifyLanguage(language,profiles);
-    for (    Map.Entry<String,Collection<RulesProfile>> entry : groupByName(profiles).entrySet()) {
-      String name=entry.getKey();
-      if (shouldRegister(language,name)) {
-        register(language,name,entry.getValue());
+  SqlSession session=myBatis.openSession();
+  try {
+    ListMultimap<String,RulesProfile> profilesByLanguage=profilesByLanguage();
+    for (    String language : profilesByLanguage.keySet()) {
+      List<RulesProfile> profiles=profilesByLanguage.get(language);
+      verifyLanguage(language,profiles);
+      for (      Map.Entry<String,Collection<RulesProfile>> entry : profilesByName(profiles).entrySet()) {
+        String name=entry.getKey();
+        if (shouldRegister(language,name,session)) {
+          register(language,name,entry.getValue(),session);
+        }
       }
+      setDefault(language,profiles,session);
     }
-    setDefault(language,profiles);
+    session.commit();
+    esActiveRule.bulkRegisterActiveRules();
   }
-  session.commit();
-  profiler.stop();
-  esActiveRule.bulkRegisterActiveRules();
+  finally {
+    MyBatis.closeQuietly(session);
+    profiler.stop();
+  }
 }

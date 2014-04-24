@@ -1,0 +1,22 @@
+{
+  checkPermission(UserSession.get());
+  QProfileResult result=new QProfileResult();
+  SqlSession session=myBatis.openSession();
+  try {
+    ListMultimap<String,RulesProfile> profilesByName=profilesByName(language,result);
+    for (    Map.Entry<String,Collection<RulesProfile>> entry : profilesByName.asMap().entrySet()) {
+      String name=entry.getKey();
+      QProfile profile=qProfileOperations.newProfile(name,language,true,UserSession.get(),session);
+      for (      RulesProfile currentRulesProfile : entry.getValue()) {
+        restoreFromActiveRules(profile,currentRulesProfile,session);
+      }
+      esActiveRule.bulkIndexProfile(profile.id(),session);
+    }
+    dryRunCache.reportGlobalModification(session);
+    session.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+  return result;
+}

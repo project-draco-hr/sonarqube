@@ -1,0 +1,14 @@
+{
+  RuleKey ruleKey=RuleKey.of("repo","key");
+  when(ruleDao.selectByKey(ruleKey,session)).thenReturn(null);
+  try {
+    operations.createActiveRule(1,ruleKey,Severity.CRITICAL,session);
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(NotFoundException.class);
+  }
+  verifyZeroInteractions(session);
+  verifyZeroInteractions(activeRuleDao);
+  verifyZeroInteractions(profilesManager);
+  verifyZeroInteractions(esActiveRule);
+}

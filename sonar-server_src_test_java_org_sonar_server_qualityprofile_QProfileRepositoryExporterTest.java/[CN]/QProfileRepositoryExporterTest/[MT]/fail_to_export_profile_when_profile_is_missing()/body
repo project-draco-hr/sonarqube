@@ -1,0 +1,16 @@
+{
+  RulesProfile profile=mock(RulesProfile.class);
+  when(profile.getId()).thenReturn(1);
+  when(hibernateSession.getSingleResult(any(Class.class),eq("id"),eq(1))).thenReturn(null);
+  ProfileExporter exporter=mock(ProfileExporter.class);
+  when(exporter.getKey()).thenReturn("pmd");
+  exporters.add(exporter);
+  try {
+    operations.exportToXml(new QProfile().setId(1),"pmd");
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(NotFoundException.class).hasMessage("This profile does not exists.");
+  }
+  verify(exporter,never()).exportProfile(any(RulesProfile.class),any(Writer.class));
+}
