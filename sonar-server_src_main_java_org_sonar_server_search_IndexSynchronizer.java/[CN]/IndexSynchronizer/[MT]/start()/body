@@ -1,0 +1,12 @@
+{
+  LOG.info("Starting synchronization thread for ",index.getClass().getSimpleName());
+  Long since=index.getLastSynchronization();
+  index.setLastSynchronization(System.currentTimeMillis());
+  for (  Object key : index.synchronizeSince(since)) {
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Adding {} to workQueue for {}",key,index.getClass().getSimpleName());
+    }
+    workQueue.enqueInsert(index.getIndexName(),key);
+  }
+  return this;
+}
