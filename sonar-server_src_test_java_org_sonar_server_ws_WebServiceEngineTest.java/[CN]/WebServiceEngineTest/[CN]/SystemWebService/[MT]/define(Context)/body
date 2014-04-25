@@ -24,14 +24,33 @@
 );
   newController.createAction("fail").setHandler(new RequestHandler(){
     @Override public void handle(    Request request,    Response response){
-      if (request.param("count") != null) {
-        List<BadRequestException.Message> errors=Lists.newArrayList();
-        for (int count=0; count < Integer.valueOf(request.param("count")); count++) {
-          errors.add(Message.ofL10n("bad.request.reason",count));
-        }
-        throw BadRequestException.of(errors);
-      }
       throw new IllegalStateException("Unexpected");
+    }
+  }
+);
+  newController.createAction("fail_with_i18n_message").setHandler(new RequestHandler(){
+    @Override public void handle(    Request request,    Response response){
+      throw BadRequestException.ofL10n("bad.request.reason",0);
+    }
+  }
+);
+  newController.createAction("fail_with_multiple_messages").setHandler(new RequestHandler(){
+    @Override public void handle(    Request request,    Response response){
+      List<BadRequestException.Message> errors=Lists.newArrayList();
+      for (int count=0; count < Integer.valueOf(request.param("count")); count++) {
+        errors.add(Message.of("Bad request reason #" + count));
+      }
+      throw BadRequestException.of(errors);
+    }
+  }
+);
+  newController.createAction("fail_with_multiple_i18n_messages").setHandler(new RequestHandler(){
+    @Override public void handle(    Request request,    Response response){
+      List<BadRequestException.Message> errors=Lists.newArrayList();
+      for (int count=0; count < Integer.valueOf(request.param("count")); count++) {
+        errors.add(Message.ofL10n("bad.request.reason",count));
+      }
+      throw BadRequestException.of(errors);
     }
   }
 );
