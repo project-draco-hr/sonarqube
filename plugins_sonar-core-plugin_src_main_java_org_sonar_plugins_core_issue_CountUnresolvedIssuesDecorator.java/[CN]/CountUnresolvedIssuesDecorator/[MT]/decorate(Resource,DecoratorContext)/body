@@ -4,15 +4,15 @@
     Collection<Issue> issues=issuable.issues();
     boolean shouldSaveNewMetrics=shouldSaveNewMetrics(context);
     Multiset<RulePriority> severityBag=HashMultiset.create();
-    Map<RulePriority,Multiset<RuleKey>> rulesPerSeverity=Maps.newHashMap();
+    Map<RulePriority,Multiset<Rule>> rulesPerSeverity=Maps.newHashMap();
     ListMultimap<RulePriority,Issue> issuesPerSeverity=ArrayListMultimap.create();
     int countOpen=0;
     int countReopened=0;
     int countConfirmed=0;
     for (    Issue issue : issues) {
       severityBag.add(RulePriority.valueOf(issue.severity()));
-      Multiset<RuleKey> rulesBag=initRules(rulesPerSeverity,RulePriority.valueOf(issue.severity()));
-      rulesBag.add(issue.ruleKey());
+      Multiset<Rule> rulesBag=initRules(rulesPerSeverity,RulePriority.valueOf(issue.severity()));
+      rulesBag.add(rulefinder.findByKey(issue.ruleKey().repository(),issue.ruleKey().rule()));
       issuesPerSeverity.put(RulePriority.valueOf(issue.severity()),issue);
       if (Issue.STATUS_OPEN.equals(issue.status())) {
         countOpen++;

@@ -1,7 +1,10 @@
 {
   setupData("empty");
   Measure withLargeData=new Measure(ncloc()).setData(LONG);
-  when(measureCache.entries()).thenReturn(Arrays.asList(new Cache.Entry<Measure>(new String[]{"foo","ncloc"},withLargeData)));
-  measurePersister.persist();
+  measurePersister.saveMeasure(project,withLargeData);
   checkTables("shouldInsertMeasureWithLargeData","project_measures","measure_data");
+  ArgumentCaptor<MeasureModel> validMeasureModel=ArgumentCaptor.forClass(MeasureModel.class);
+  verify(memoryOptimizer).evictDataMeasure(eq(withLargeData),validMeasureModel.capture());
+  assertThat(validMeasureModel.getValue().getMeasureData().getId()).isNotNull();
+  assertThat(withLargeData.getId()).isNotNull();
 }

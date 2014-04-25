@@ -1,0 +1,19 @@
+{
+  if (shouldSaveLater(measure)) {
+    if (measure.getMetric().equals(CoreMetrics.TESTS) && unsavedMeasuresByResource.get(resource).contains(measure)) {
+      unsavedMeasuresByResource.remove(resource,measure);
+    }
+    unsavedMeasuresByResource.put(resource,measure);
+    return;
+  }
+  MeasureModel model;
+  try {
+    model=insertOrUpdate(resource,measure);
+  }
+ catch (  Exception e) {
+    throw new SonarException(String.format("Unable to save measure for metric [%s] on component [%s]",measure.getMetricKey(),resource.getKey()),e);
+  }
+  if (model != null) {
+    memoryOptimizer.evictDataMeasure(measure,model);
+  }
+}

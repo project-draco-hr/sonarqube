@@ -1,0 +1,17 @@
+{
+  if (measure.getId() != null && dataIdByMeasureId.containsKey(measure.getId()) && !measure.hasData()) {
+    Integer dataId=dataIdByMeasureId.get(measure.getId());
+    MeasureData data=session.getSingleResult(MeasureData.class,"id",dataId);
+    if (data == null) {
+      LOG.error("The MEASURE_DATA row with id {} is lost",dataId);
+    }
+ else {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Reload the data measure: {}, id={}",measure.getMetricKey(),measure.getId());
+      }
+      measure.setData(data.getText());
+      loadedMeasures.add(measure);
+    }
+  }
+  return measure;
+}

@@ -9,10 +9,9 @@
   Measure currentNcloc=newMeasure(NCLOC,200.0);
   Measure currentCoverage=newMeasure(COVERAGE,80.0);
   when(context.getMeasures(Matchers.<MeasuresFilter>anyObject())).thenReturn(Arrays.asList(currentNcloc,currentCoverage));
-  DefaultIndex index=mock(DefaultIndex.class);
-  VariationDecorator decorator=new VariationDecorator(pastMeasuresLoader,mock(MetricFinder.class),Arrays.asList(pastSnapshot1,pastSnapshot3),mock(RuleFinder.class),index);
+  VariationDecorator decorator=new VariationDecorator(pastMeasuresLoader,mock(MetricFinder.class),Arrays.asList(pastSnapshot1,pastSnapshot3));
   decorator.decorate(dir,context);
-  verify(index,times(3)).updateMeasure(eq(dir),Matchers.<Measure>anyObject());
+  verify(context,times(3)).saveMeasure(Matchers.<Measure>anyObject());
   assertThat(currentNcloc.getVariation1()).isEqualTo(20.0);
   assertThat(currentNcloc.getVariation2()).isNull();
   assertThat(currentNcloc.getVariation3()).isEqualTo(-40.0);

@@ -1,11 +1,8 @@
 {
-  RuleFinder ruleFinder=mock(RuleFinder.class);
-  Rule rule1=Rule.create("repo","rule1");
+  Rule rule1=Rule.create();
   rule1.setId(1);
-  Rule rule2=Rule.create("repo","rule2");
+  Rule rule2=Rule.create();
   rule2.setId(2);
-  when(ruleFinder.findByKey(rule1.ruleKey())).thenReturn(rule1);
-  when(ruleFinder.findByKey(rule2.ruleKey())).thenReturn(rule2);
   Resource dir=new Directory("org/foo");
   PastMeasuresLoader pastMeasuresLoader=mock(PastMeasuresLoader.class);
   PastSnapshot pastSnapshot1=new PastSnapshot("days",new Date()).setIndex(1);
@@ -15,9 +12,8 @@
   Measure violationsRule1=RuleMeasure.createForRule(VIOLATIONS,rule1,130.0);
   Measure violationsRule2=RuleMeasure.createForRule(VIOLATIONS,rule2,70.0);
   when(context.getMeasures(Matchers.<MeasuresFilter>anyObject())).thenReturn(Arrays.asList(violations,violationsRule1,violationsRule2));
-  DefaultIndex index=mock(DefaultIndex.class);
-  VariationDecorator decorator=new VariationDecorator(pastMeasuresLoader,mock(MetricFinder.class),Arrays.asList(pastSnapshot1),ruleFinder,index);
+  VariationDecorator decorator=new VariationDecorator(pastMeasuresLoader,mock(MetricFinder.class),Arrays.asList(pastSnapshot1));
   decorator.decorate(dir,context);
-  verify(index,times(3)).updateMeasure(eq(dir),Matchers.<Measure>anyObject());
+  verify(context,times(3)).saveMeasure(Matchers.<Measure>anyObject());
   assertThat(violations.getVariation1()).isEqualTo(20.0);
 }
