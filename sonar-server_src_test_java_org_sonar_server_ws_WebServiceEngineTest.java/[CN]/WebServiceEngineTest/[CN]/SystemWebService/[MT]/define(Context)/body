@@ -34,7 +34,7 @@
     }
   }
 );
-  newController.createAction("fail_with_multiple_messages").setHandler(new RequestHandler(){
+  newController.createAction("fail_with_multiple_messages").createParam("count","Number of error messages to generate").setHandler(new RequestHandler(){
     @Override public void handle(    Request request,    Response response){
       List<BadRequestException.Message> errors=Lists.newArrayList();
       for (int count=0; count < Integer.valueOf(request.param("count")); count++) {
@@ -44,7 +44,7 @@
     }
   }
 );
-  newController.createAction("fail_with_multiple_i18n_messages").setHandler(new RequestHandler(){
+  newController.createAction("fail_with_multiple_i18n_messages").createParam("count","Number of error messages to generate").setHandler(new RequestHandler(){
     @Override public void handle(    Request request,    Response response){
       List<BadRequestException.Message> errors=Lists.newArrayList();
       for (int count=0; count < Integer.valueOf(request.param("count")); count++) {
@@ -66,10 +66,19 @@
     }
   }
 );
-  newController.createAction("print").createParam("message","required message").createParam("author","optional author").setHandler(new RequestHandler(){
+  newController.createAction("fail_with_undeclared_parameter").setHandler(new RequestHandler(){
+    @Override public void handle(    Request request,    Response response){
+      response.newJsonWriter().prop("unknown",request.param("unknown"));
+    }
+  }
+);
+  NewAction print=newController.createAction("print");
+  print.createParam("message").setDescription("required message").setRequired(true);
+  print.createParam("author").setDescription("optional author").setDefaultValue("-");
+  print.setHandler(new RequestHandler(){
     @Override public void handle(    Request request,    Response response){
       try {
-        IOUtils.write(request.mandatoryParam("message") + " by " + request.param("author","-"),response.stream().output());
+        IOUtils.write(request.mandatoryParam("message") + " by " + request.param("author","nobody"),response.stream().output());
       }
  catch (      IOException e) {
         throw new IllegalStateException(e);
