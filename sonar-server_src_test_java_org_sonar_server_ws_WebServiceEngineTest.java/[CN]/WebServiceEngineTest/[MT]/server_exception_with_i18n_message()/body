@@ -1,0 +1,9 @@
+{
+  InternalRequest request=new SimpleRequest();
+  ServletResponse response=new ServletResponse();
+  when(i18n.message(eq(Locale.getDefault()),eq("not.found"),anyString())).thenReturn("Element is not found");
+  engine.execute(request,response,"api/system","server_exception_with_i18n_message");
+  assertThat(response.stream().outputAsString()).isEqualTo("{\"errors\":[{\"msg\":\"Element is not found\"}]}");
+  assertThat(response.stream().httpStatus()).isEqualTo(404);
+  assertThat(response.stream().mediaType()).isEqualTo(MimeTypes.JSON);
+}
