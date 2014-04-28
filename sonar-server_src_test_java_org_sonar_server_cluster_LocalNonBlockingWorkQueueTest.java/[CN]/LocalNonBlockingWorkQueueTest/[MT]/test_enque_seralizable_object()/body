@@ -1,0 +1,13 @@
+{
+  LocalNonBlockingWorkQueue queue=new LocalNonBlockingWorkQueue();
+class NonSerializable implements Serializable {
+    private Object var1;
+    private Map<String,Object> objs;
+  }
+  NonSerializable nonSer=new NonSerializable();
+  assertThat(queue.enqueInsert(WORKING_INDEX,nonSer)).isNotNull();
+  Object dequeued=queue.dequeInsert(WORKING_INDEX);
+  assertThat(queue.dequeInsert(NON_WORKING_INDEX)).isNull();
+  assertThat(dequeued).isNotNull();
+  assertThat(dequeued.getClass()).isEqualTo(NonSerializable.class);
+}
