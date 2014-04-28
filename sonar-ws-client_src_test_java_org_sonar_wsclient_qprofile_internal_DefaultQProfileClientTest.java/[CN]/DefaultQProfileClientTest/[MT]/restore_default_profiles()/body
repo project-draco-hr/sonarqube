@@ -1,0 +1,11 @@
+{
+  HttpRequestFactory requestFactory=new HttpRequestFactory(httpServer.url());
+  httpServer.stubResponseBody("{\"infos\":[\"Some info\"],\"warnings\":[\"Some warnings\"]}");
+  DefaultQProfileClient client=new DefaultQProfileClient(requestFactory);
+  QProfileResult result=client.restoreDefault("java");
+  assertThat(httpServer.requestedPath()).isEqualTo("/api/qprofiles/restore_default");
+  assertThat(httpServer.requestParams()).includes(entry("language","java"));
+  assertThat(result).isNotNull();
+  assertThat(result.infos()).containsOnly("Some info");
+  assertThat(result.warnings()).containsOnly("Some warnings");
+}

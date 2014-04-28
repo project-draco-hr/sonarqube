@@ -2,7 +2,14 @@
   checkPermission(userSession);
   SqlSession session=myBatis.openSession();
   try {
-    deleteProfile(profileId,session);
+    QualityProfileDto profile=findNotNull(profileId,session);
+    QProfile qProfile=QProfile.from(profile);
+    if (!profileLookup.isDeletable(QProfile.from(profile),session)) {
+      throw new BadRequestException("This profile can not be deleted");
+    }
+ else {
+      deleteProfile(qProfile,session);
+    }
     session.commit();
   }
   finally {

@@ -1,0 +1,12 @@
+{
+  MockUserSession.set().setLogin("julien").setName("Julien").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN);
+  QProfileBackup qProfileBackup=serverTester.get(QProfileBackup.class);
+  try {
+    qProfileBackup.restoreDefaultProfilesByLanguage("xoo");
+    fail();
+  }
+ catch (  BadRequestException e) {
+    assertThat(e.l10nKey()).isEqualTo("quality_profiles.profile_x_already_exists");
+    assertThat(e.l10nParams()).containsOnly("Basic");
+  }
+}
