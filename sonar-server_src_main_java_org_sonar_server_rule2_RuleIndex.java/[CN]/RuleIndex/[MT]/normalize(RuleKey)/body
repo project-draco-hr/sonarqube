@@ -1,3 +1,29 @@
 {
+  RuleDto rule=dao.getByKey(key);
+  try {
+    XContentBuilder document=jsonBuilder().startObject();
+    Map<String,Object> properties=BeanUtils.describe(rule);
+    for (    Entry<String,Object> property : properties.entrySet()) {
+      LOG.trace("NORMALIZING: {} -> {}",property.getKey(),property.getValue());
+      document.field(property.getKey(),property.getValue());
+    }
+    return document.endObject();
+  }
+ catch (  IOException e) {
+    LOG.error("Could not normalize {} in {}",key,this.getClass().getSimpleName());
+    e.printStackTrace();
+  }
+catch (  IllegalAccessException e) {
+    LOG.error("Could not normalize {} in {}",key,this.getClass().getSimpleName());
+    e.printStackTrace();
+  }
+catch (  InvocationTargetException e) {
+    LOG.error("Could not normalize {} in {}",key,this.getClass().getSimpleName());
+    e.printStackTrace();
+  }
+catch (  NoSuchMethodException e) {
+    LOG.error("Could not normalize {} in {}",key,this.getClass().getSimpleName());
+    e.printStackTrace();
+  }
   return null;
 }
