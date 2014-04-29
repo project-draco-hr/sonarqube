@@ -1,0 +1,24 @@
+{
+  WebService ws=new WebService(){
+    @Override public void define(    Context context){
+      try {
+        NewController controller=context.createController("foo");
+        controller.createAction("bar").setHandler(mock(RequestHandler.class)).setResponseExample(new URL("file:/does/not/exist"));
+        controller.done();
+      }
+ catch (      MalformedURLException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+;
+  ws.define(context);
+  WebService.Action action=context.controller("foo").action("bar");
+  try {
+    action.responseExampleAsString();
+    fail();
+  }
+ catch (  IllegalStateException e) {
+    assertThat(e).hasMessage("Fail to load file:/does/not/exist");
+  }
+}
