@@ -1,4 +1,9 @@
 {
-  LOG.info("Update document with key {}",key);
-  IndexResponse result=getClient().index(new IndexRequest().type(this.getType()).index(this.getIndexName()).id(this.getKeyValue(key)).source(this.normalize(key))).actionGet();
+  try {
+    LOG.info("Update document with key {}",key);
+    UpdateResponse result=getClient().update(new UpdateRequest(this.getIndexName(),this.getType(),this.getKeyValue(key)).doc(this.normalize(key))).get();
+  }
+ catch (  Exception e) {
+    LOG.error("Could not update documet for index {}: {}",this.getIndexName(),e.getMessage());
+  }
 }

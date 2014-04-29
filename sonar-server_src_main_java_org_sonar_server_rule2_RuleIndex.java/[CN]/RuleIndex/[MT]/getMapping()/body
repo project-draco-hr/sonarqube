@@ -1,6 +1,12 @@
 {
   try {
-    return jsonBuilder().startObject().startObject(this.getType()).field("dynamic",true).startObject("properties").startObject("id").field("type","string").field("index","not_analyzed").endObject().startObject("key").field("type","string").field("index","not_analyzed").endObject().startObject("repositoryKey").field("type","string").field("index","not_analyzed").endObject().startObject("severity").field("type","string").field("index","not_analyzed").endObject().endObject().endObject().endObject();
+    XContentBuilder mapping=jsonBuilder().startObject().startObject(this.getType()).field("dynamic",true).startObject("properties");
+    addMatchField(mapping,"id","string");
+    addMatchField(mapping,"key","string");
+    addMatchField(mapping,"repositoryKey","string");
+    addMatchField(mapping,"severity","string");
+    mapping.startObject("active").field("type","nested").field("dynamic",true).endObject();
+    return mapping.endObject().endObject().endObject();
   }
  catch (  IOException e) {
     LOG.error("Could not create mapping for {}",this.getIndexName());

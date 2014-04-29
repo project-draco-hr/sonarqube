@@ -1,36 +1,40 @@
 {
-  RuleDto rule=dao.getByKey(key);
   try {
+    long start=System.currentTimeMillis();
+    RuleDto rule=dao.getByKey(key);
+    LOG.info("Action dao.getByKey(key) in {} took {}ms",this.getIndexName(),(System.currentTimeMillis() - start));
     XContentBuilder document=jsonBuilder().startObject();
     Map<String,Object> properties=BeanUtils.describe(rule);
     for (    Entry<String,Object> property : properties.entrySet()) {
-      LOG.info("NORMALIZING: {} -> {}",property.getKey(),property.getValue());
+      LOG.trace("NORMALIZING: {} -> {}",property.getKey(),property.getValue());
       document.field(property.getKey(),property.getValue());
     }
+    start=System.currentTimeMillis();
+    document.startArray("active");
     for (    ActiveRuleDto activeRule : activeRuleDao.selectByRuleId(rule.getId())) {
+      document.startObject();
       Map<String,Object> activeRuleProperties=BeanUtils.describe(activeRule);
       for (      Entry<String,Object> activeRuleProp : activeRuleProperties.entrySet()) {
-        LOG.info("NORMALIZING: --- {} -> {}",activeRuleProp.getKey(),activeRuleProp.getValue());
+        LOG.trace("NORMALIZING: --- {} -> {}",activeRuleProp.getKey(),activeRuleProp.getValue());
         document.field(activeRuleProp.getKey(),activeRuleProp.getValue());
       }
+      document.endObject();
     }
+    document.endArray();
+    LOG.info("Action activeRuleDao.selectByRuleId(rule.getId()) in {} took {}ms",this.getIndexName(),(System.currentTimeMillis() - start));
     return document.endObject();
   }
  catch (  IOException e) {
-    LOG.error("Could not normalize {} in {}",key,this.getClass().getSimpleName());
-    e.printStackTrace();
+    LOG.error("Could not normalize {} in {} because {}",key,this.getClass().getSimpleName(),e.getMessage());
   }
 catch (  IllegalAccessException e) {
-    LOG.error("Could not normalize {} in {}",key,this.getClass().getSimpleName());
-    e.printStackTrace();
+    LOG.error("Could not normalize {} in {} because {}",key,this.getClass().getSimpleName(),e.getMessage());
   }
 catch (  InvocationTargetException e) {
-    LOG.error("Could not normalize {} in {}",key,this.getClass().getSimpleName());
-    e.printStackTrace();
+    LOG.error("Could not normalize {} in {} because {}",key,this.getClass().getSimpleName(),e.getMessage());
   }
 catch (  NoSuchMethodException e) {
-    LOG.error("Could not normalize {} in {}",key,this.getClass().getSimpleName());
-    e.printStackTrace();
+    LOG.error("Could not normalize {} in {} because {}",key,this.getClass().getSimpleName(),e.getMessage());
   }
   return null;
 }
