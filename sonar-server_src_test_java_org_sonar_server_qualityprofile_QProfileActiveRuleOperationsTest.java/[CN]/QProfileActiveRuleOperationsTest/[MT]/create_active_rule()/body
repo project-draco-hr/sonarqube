@@ -1,8 +1,7 @@
 {
   RuleKey ruleKey=RuleKey.of("repo","key");
-  when(ruleDao.selectByKey(ruleKey,session)).thenReturn(new RuleDto().setId(10));
   when(ruleDao.selectParametersByRuleId(eq(10),eq(session))).thenReturn(newArrayList(new RuleParamDto().setId(20).setName("max").setDefaultValue("10")));
-  operations.createActiveRule(1,ruleKey,Severity.CRITICAL,session);
+  operations.createActiveRule(1,10,Severity.CRITICAL,session);
   ArgumentCaptor<ActiveRuleDto> activeRuleArgument=ArgumentCaptor.forClass(ActiveRuleDto.class);
   verify(activeRuleDao).insert(activeRuleArgument.capture(),eq(session));
   assertThat(activeRuleArgument.getValue().getRulId()).isEqualTo(10);

@@ -9,10 +9,12 @@
   ProfileDefinition profileDefinition2=mock(ProfileDefinition.class);
   when(profileDefinition2.createProfile(any(ValidationMessages.class))).thenReturn(profile2);
   definitions.add(profileDefinition2);
+  when(ruleDao.selectByKey(RuleKey.of("pmd","rule"),session)).thenReturn(new RuleDto().setId(10).setSeverity("INFO"));
+  when(ruleDao.selectByKey(RuleKey.of("checkstyle","rule"),session)).thenReturn(new RuleDto().setId(11).setSeverity("INFO"));
   when(qProfileOperations.newProfile(eq("Default"),eq("java"),eq(true),any(UserSession.class),eq(session))).thenReturn(new QProfile().setId(1));
   backup.restoreDefaultProfilesByLanguage("java");
-  verify(qProfileActiveRuleOperations).createActiveRule(eq(1),eq(RuleKey.of("pmd","rule")),eq("BLOCKER"),eq(session));
-  verify(qProfileActiveRuleOperations).createActiveRule(eq(1),eq(RuleKey.of("checkstyle","rule")),eq("MAJOR"),eq(session));
+  verify(qProfileActiveRuleOperations).createActiveRule(eq(1),eq(10),eq("BLOCKER"),eq(session));
+  verify(qProfileActiveRuleOperations).createActiveRule(eq(1),eq(11),eq("MAJOR"),eq(session));
   verifyNoMoreInteractions(qProfileActiveRuleOperations);
   verify(esActiveRule).bulkIndexProfile(eq(1),eq(session));
   verify(dryRunCache).reportGlobalModification(session);
