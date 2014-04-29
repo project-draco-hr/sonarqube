@@ -1,18 +1,17 @@
 {
   String fileKey=request.mandatoryParam("key");
   int from=Math.max(request.paramAsInt("from",1),1);
-  Integer toParam=request.paramAsInt("to");
-  List<String> sourceHtml=sourceService.getLinesAsHtml(fileKey,from,toParam);
+  int to=request.paramAsInt("to",Integer.MAX_VALUE);
+  List<String> sourceHtml=sourceService.getLinesAsHtml(fileKey,from,to);
   if (sourceHtml.isEmpty()) {
     throw new NotFoundException("File '" + fileKey + "' has no sources");
   }
-  int to=toParam != null ? toParam : sourceHtml.size() + from;
   JsonWriter json=response.newJsonWriter().beginObject();
   writeSource(sourceHtml,from,json);
   if (request.paramAsBoolean("scm",false)) {
     String scmAuthorData=sourceService.getScmAuthorData(fileKey);
     String scmDataData=sourceService.getScmDateData(fileKey);
-    writeScm(scmAuthorData,scmDataData,from,to,json);
+    scmWriter.write(scmAuthorData,scmDataData,from,to,request.paramAsBoolean("groupCommits",true),json);
   }
   json.endObject().close();
 }
