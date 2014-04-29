@@ -1,14 +1,16 @@
 {
   RuleDao dao=tester.get(RuleDao.class);
+  ActiveRuleDao adao=tester.get(ActiveRuleDao.class);
   RuleIndex index=tester.get(RuleIndex.class);
   RuleDto dto=getRuleDto();
   dao.insert(dto);
+  adao.insert(getActiveRuleDto(dto));
   try {
-    Thread.sleep(1000000);
+    Thread.sleep(100);
   }
  catch (  InterruptedException e) {
     ;
   }
   Hit hit=index.getByKey(dto.getKey());
-  assertThat(hit.getFields().get("key")).isEqualTo(dto.getRuleKey());
+  assertThat(hit.getFields().get("ruleKey")).isEqualTo(dto.getRuleKey());
 }
