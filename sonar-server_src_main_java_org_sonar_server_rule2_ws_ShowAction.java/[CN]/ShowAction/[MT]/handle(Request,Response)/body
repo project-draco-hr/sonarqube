@@ -1,2 +1,11 @@
 {
+  String repoKey=request.mandatoryParam("repo");
+  String ruleKey=request.mandatoryParam("key");
+  Rule rule=service.getByKey(RuleKey.of(repoKey,ruleKey));
+  if (rule == null) {
+    throw new NotFoundException("Rule not found");
+  }
+  JsonWriter json=response.newJsonWriter().beginObject().name("rule").beginObject();
+  writeRule(rule,json);
+  json.endObject().endObject().close();
 }
