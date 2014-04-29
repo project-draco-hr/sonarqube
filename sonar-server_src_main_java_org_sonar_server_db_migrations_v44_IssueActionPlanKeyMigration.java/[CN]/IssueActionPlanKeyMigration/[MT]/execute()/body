@@ -1,0 +1,23 @@
+{
+  new MassUpdater(db).execute(new MassUpdater.InputLoader<Row>(){
+    @Override public String selectSql(){
+      return "SELECT i.id FROM issues i " + "LEFT OUTER JOIN action_plans ap ON ap.kee=i.action_plan_key " + "WHERE i.action_plan_key IS NOT NULL "+ "AND ap.kee is null ";
+    }
+    @Override public Row load(    ResultSet rs) throws SQLException {
+      Row row=new Row();
+      row.id=SqlUtil.getLong(rs,1);
+      return row;
+    }
+  }
+,new MassUpdater.InputConverter<Row>(){
+    @Override public String updateSql(){
+      return "UPDATE issues SET action_plan_key=NULL,updated_at=? WHERE id=?";
+    }
+    @Override public boolean convert(    Row row,    PreparedStatement updateStatement) throws SQLException {
+      updateStatement.setTimestamp(1,new Timestamp(system2.now()));
+      updateStatement.setLong(2,row.id);
+      return true;
+    }
+  }
+);
+}
