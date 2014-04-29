@@ -1,0 +1,17 @@
+{
+  LOG.info("Starting Worker Thread");
+  Thread thisThread=Thread.currentThread();
+  while (worker == thisThread) {
+    try {
+      Thread.sleep(200);
+    }
+ catch (    InterruptedException e) {
+      Log.error("Oops");
+    }
+    @SuppressWarnings("rawtypes") IndexAction action=queue.dequeue();
+    if (action != null && indexes.containsKey(action.getIndexName())) {
+      indexes.get(action.getIndexName()).executeAction(action);
+    }
+  }
+  LOG.info("Stoping Worker Thread");
+}
