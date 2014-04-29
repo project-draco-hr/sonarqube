@@ -1,0 +1,12 @@
+{
+  ResourceDto project=resourceDao.getRootProjectByComponentKey(fileKey);
+  if (project == null) {
+    throw new NotFoundException("File does not exist");
+  }
+  UserSession.get().checkProjectPermission(UserRole.CODEVIEWER,project.getKey());
+  List<String> decoratedSource=sourceDecorator.getDecoratedSourceAsHtml(fileKey,from,to);
+  if (!decoratedSource.isEmpty()) {
+    return decoratedSource;
+  }
+  return deprecatedSourceDecorator.getSourceAsHtml(fileKey,from,to);
+}
