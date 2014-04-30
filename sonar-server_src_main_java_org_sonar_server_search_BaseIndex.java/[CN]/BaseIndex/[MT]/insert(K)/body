@@ -1,16 +1,16 @@
 {
   try {
     XContentBuilder doc=normalizer.normalize(key);
-    String keyValue=this.getKeyValue(key);
+    String keyValue=getKeyValue(key);
     if (doc != null && keyValue != null && !keyValue.isEmpty()) {
-      LOG.debug("Update document with key {}",key);
-      IndexResponse result=getClient().index(new IndexRequest(this.getIndexName(),this.getType(),keyValue).refresh(true).source(doc)).get();
+      LOG.debug("Insert document with key {}",key);
+      getClient().index(new IndexRequest(this.getIndexName(),getType(),keyValue).source(doc)).get();
     }
  else {
-      LOG.error("Could not normalize document {} for insert in ",key,this.getIndexName());
+      LOG.error("Could not normalize document {} for insert in {}",key,getIndexName());
     }
   }
  catch (  Exception e) {
-    LOG.error("Could not update documet for index {}: {}",this.getIndexName(),e.getMessage());
+    LOG.error("Could not update document for index {}: {}",getIndexName(),e.getMessage());
   }
 }
