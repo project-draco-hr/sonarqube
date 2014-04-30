@@ -11,10 +11,21 @@
   this.addTermFilter(RuleField.REPOSITORY.key(),query.getRepositories(),fb);
   this.addTermFilter(RuleField.SEVERITY.key(),query.getSeverities(),fb);
   this.addTermFilter(RuleField.KEY.key(),query.getKey(),fb);
-  SearchResponse esResult=getClient().prepareSearch(this.getIndexName()).setQuery(QueryBuilders.filteredQuery(qb,fb)).addFields(options.getFieldsToReturn().toArray(new String[options.getFieldsToReturn().size()])).get();
+  QueryBuilder mainQuery=QueryBuilders.filteredQuery(qb,fb);
+  SearchRequestBuilder esSearch=getClient().prepareSearch(this.getIndexName()).setQuery(mainQuery).addFields(options.getFieldsToReturn().toArray(new String[options.getFieldsToReturn().size()]));
+  SearchResponse esResult=esSearch.get();
   Results results=new Results().setTotal((int)esResult.getHits().totalHits()).setTime(esResult.getTookInMillis());
-  for (  SearchHit hit : esResult.getHits().getHits()) {
-    results.getHits().add(Hit.fromMap(hit.score(),hit.sourceAsMap()));
+  for (  SearchHit esHit : esResult.getHits().getHits()) {
+    Hit hit=new Hit(esHit.score());
+    for (    Map.Entry<String,SearchHitField> entry : esHit.fields().entrySet()) {
+      if (entry.getValue().getValues().size() > 1) {
+        hit.getFields().put(entry.getKey(),entry.getValue().getValues());
+      }
+ else {
+        hit.getFields().put(entry.getKey(),entry.getValue().getValue());
+      }
+    }
+    results.getHits().add(hit);
   }
   return results;
 }
