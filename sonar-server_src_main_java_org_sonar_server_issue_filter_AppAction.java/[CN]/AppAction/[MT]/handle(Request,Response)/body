@@ -1,0 +1,25 @@
+{
+  UserSession session=UserSession.get();
+  JsonWriter json=response.newJsonWriter();
+  json.beginObject();
+  int filterId=request.paramAsInt("id",-1);
+  DefaultIssueFilter filter=null;
+  if (filterId >= 0) {
+    filter=service.find((long)filterId,session);
+  }
+  json.prop("canManageFilters",session.isLoggedIn());
+  json.prop("canBulkChange",session.isLoggedIn());
+  if (filter != null) {
+    issueFilterWriter.write(session,filter,json);
+  }
+  if (session.isLoggedIn()) {
+    List<DefaultIssueFilter> favorites=service.findFavoriteFilters(session);
+    json.name("favorites").beginArray();
+    for (    DefaultIssueFilter favorite : favorites) {
+      json.beginObject().prop("id",favorite.id()).prop("name",favorite.name()).endObject();
+    }
+    json.endArray();
+  }
+  json.endObject();
+  json.close();
+}

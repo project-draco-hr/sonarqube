@@ -1,0 +1,12 @@
+{
+  when(resourceDao.getResource(any(ResourceQuery.class))).thenReturn(new ResourceDto().setKey(projectKey).setId(1l));
+  when(actionPlanDao.findOpenByProjectId(1l)).thenReturn(newArrayList(new ActionPlanDto().setKey("ABCD")));
+  try {
+    actionPlanService.findOpenByProjectKey(projectKey,unauthorizedUserSession);
+    Fail.fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(ForbiddenException.class);
+  }
+  verifyZeroInteractions(actionPlanDao);
+}

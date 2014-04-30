@@ -1,0 +1,12 @@
+{
+  when(resourceDao.getResource(any(ResourceQuery.class))).thenReturn(new ResourceDto().setKey(projectKey).setId(1l));
+  ActionPlan actionPlan=DefaultActionPlan.create("Long term");
+  try {
+    actionPlanService.create(actionPlan,unauthorizedUserSession);
+    Fail.fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(ForbiddenException.class);
+  }
+  verifyZeroInteractions(actionPlanDao);
+}
