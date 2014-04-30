@@ -1,0 +1,13 @@
+{
+  CountDownLatch latch=new CountDownLatch(actions.size());
+  for (  ClusterAction action : actions) {
+    action.setLatch(latch);
+    queue.enqueue(action);
+  }
+  try {
+    latch.await();
+  }
+ catch (  InterruptedException e) {
+    LOG.error("ES update has been interrupted: {}",e.getMessage());
+  }
+}

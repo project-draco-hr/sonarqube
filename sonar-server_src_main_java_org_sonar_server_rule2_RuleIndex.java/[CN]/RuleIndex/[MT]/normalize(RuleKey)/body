@@ -1,15 +1,12 @@
 {
   try {
-    long start=System.currentTimeMillis();
     RuleDto rule=dao.getByKey(key);
-    LOG.info("Action dao.getByKey(key) in {} took {}ms",this.getIndexName(),(System.currentTimeMillis() - start));
     XContentBuilder document=jsonBuilder().startObject();
     Map<String,Object> properties=BeanUtils.describe(rule);
     for (    Entry<String,Object> property : properties.entrySet()) {
       LOG.trace("NORMALIZING: {} -> {}",property.getKey(),property.getValue());
       document.field(property.getKey(),property.getValue());
     }
-    start=System.currentTimeMillis();
     document.startArray("active");
     for (    ActiveRuleDto activeRule : activeRuleDao.selectByRuleId(rule.getId())) {
       document.startObject();
@@ -21,7 +18,6 @@
       document.endObject();
     }
     document.endArray();
-    LOG.info("Action activeRuleDao.selectByRuleId(rule.getId()) in {} took {}ms",this.getIndexName(),(System.currentTimeMillis() - start));
     return document.endObject();
   }
  catch (  IOException e) {
