@@ -3,5 +3,16 @@
   query.setQueryText(request.param("q"));
   query.setSeverities(request.paramAsStrings("severities"));
   query.setRepositories(request.paramAsStrings("repositories"));
-  service.search(query);
+  Results results=service.search(query,new QueryOptions());
+  JsonWriter json=response.newJsonWriter().beginObject().name("hits").beginArray();
+  for (  Hit hit : results.getHits()) {
+    json.beginObject();
+    for (    Map.Entry<String,Object> entry : hit.getFields().entrySet()) {
+      Object value=entry.getValue();
+      json.prop(entry.getKey(),value == null ? null : value.toString());
+    }
+    json.endObject();
+  }
+  json.endArray();
+  json.endObject().close();
 }
