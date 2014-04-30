@@ -1,4 +1,20 @@
 {
-  Results results=new Results();
+  QueryBuilder qb;
+  if (query.getQueryText() != null && !query.getQueryText().isEmpty()) {
+    qb=QueryBuilders.multiMatchQuery(query.getQueryText(),RuleField.NAME.key(),RuleField.DESCRIPTION.key(),RuleField.KEY.key(),RuleField.LANGUAGE.key(),RuleField.TAGS.key());
+  }
+ else {
+    qb=QueryBuilders.matchAllQuery();
+  }
+  BoolFilterBuilder fb=FilterBuilders.boolFilter();
+  this.addTermFilter(RuleField.LANGUAGE.key(),query.getLanguages(),fb);
+  this.addTermFilter(RuleField.REPOSITORY.key(),query.getRepositories(),fb);
+  this.addTermFilter(RuleField.SEVERITY.key(),query.getSeverities(),fb);
+  this.addTermFilter(RuleField.KEY.key(),query.getKey(),fb);
+  SearchResponse esResult=getClient().prepareSearch(this.getIndexName()).setQuery(QueryBuilders.filteredQuery(qb,fb)).addFields(options.getFieldsToReturn().toArray(new String[options.getFieldsToReturn().size()])).get();
+  Results results=new Results().setTotal((int)esResult.getHits().totalHits()).setTime(esResult.getTookInMillis());
+  for (  SearchHit hit : esResult.getHits().getHits()) {
+    results.getHits().add(Hit.fromMap(hit.score(),hit.sourceAsMap()));
+  }
   return results;
 }
