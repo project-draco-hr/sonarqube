@@ -11,7 +11,13 @@
   this.addTermFilter(RuleField.REPOSITORY.key(),query.getRepositories(),fb);
   this.addTermFilter(RuleField.SEVERITY.key(),query.getSeverities(),fb);
   this.addTermFilter(RuleField.KEY.key(),query.getKey(),fb);
-  QueryBuilder mainQuery=QueryBuilders.filteredQuery(qb,fb);
+  QueryBuilder mainQuery;
+  if ((query.getLanguages() != null && !query.getLanguages().isEmpty()) || (query.getRepositories() != null && !query.getRepositories().isEmpty()) || (query.getSeverities() != null && !query.getSeverities().isEmpty())|| (query.getKey() != null && !query.getKey().isEmpty())) {
+    mainQuery=QueryBuilders.filteredQuery(qb,fb);
+  }
+ else {
+    mainQuery=qb;
+  }
   SearchRequestBuilder esSearch=getClient().prepareSearch(this.getIndexName()).setQuery(mainQuery).addFields(options.getFieldsToReturn().toArray(new String[options.getFieldsToReturn().size()]));
   SearchResponse esResult=esSearch.get();
   Results results=new Results().setTotal((int)esResult.getHits().totalHits()).setTime(esResult.getTookInMillis());
