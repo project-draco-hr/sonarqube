@@ -1,10 +1,13 @@
 {
+  String lang="java";
   RuleDao dao=tester.get(RuleDao.class);
-  dao.insert(newRuleDto(RuleKey.of("javascript","S001")));
+  dao.insert(newRuleDto(RuleKey.of("javascript","S001")).setLanguage(lang));
   RuleService service=tester.get(RuleService.class).refresh();
   RuleQuery query=service.newRuleQuery();
-  Results results=service.search(query,new QueryOptions());
+  QueryOptions options=new QueryOptions();
+  Results results=service.search(query,options);
   assertThat(results.getTotal()).isEqualTo(1);
   assertThat(results.getHits()).hasSize(1);
   assertThat(Iterables.getFirst(results.getHits(),null).getFieldAsString("key")).isEqualTo("S001");
+  assertThat(Iterables.getFirst(results.getHits(),null).getFieldAsString(RuleNormalizer.RuleField.LANGUAGE.key())).isNull();
 }

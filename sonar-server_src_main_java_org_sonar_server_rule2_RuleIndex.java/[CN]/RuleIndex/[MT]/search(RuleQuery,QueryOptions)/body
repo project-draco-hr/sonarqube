@@ -18,7 +18,10 @@
  else {
     mainQuery=qb;
   }
-  SearchRequestBuilder esSearch=getClient().prepareSearch(this.getIndexName()).setQuery(mainQuery).addFields(options.getFieldsToReturn().toArray(new String[options.getFieldsToReturn().size()]));
+  Set<String> fields=new HashSet<String>();
+  fields.addAll(options.getFieldsToReturn());
+  fields.add(RuleField.KEY.key());
+  SearchRequestBuilder esSearch=getClient().prepareSearch(this.getIndexName()).setQuery(mainQuery).addFields(fields.toArray(new String[fields.size()]));
   SearchResponse esResult=esSearch.get();
   Results results=new Results().setTotal((int)esResult.getHits().totalHits()).setTime(esResult.getTookInMillis());
   for (  SearchHit esHit : esResult.getHits().getHits()) {
