@@ -5,7 +5,12 @@
       if (paramDef == null) {
         throw new BadRequestException(String.format("Parameter '%s' is undefined for action '%s'",key,action.key()));
       }
-      return StringUtils.defaultString(super.param(key),paramDef.defaultValue());
+      String value=StringUtils.defaultString(super.param(key),paramDef.defaultValue());
+      List<String> possibleValues=paramDef.possibleValues();
+      if (value != null && possibleValues != null && !possibleValues.contains(value)) {
+        throw new BadRequestException(String.format("Value of parameter '%s' can only be one of %s",key,possibleValues));
+      }
+      return value;
     }
   }
 ;
