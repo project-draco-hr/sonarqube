@@ -1,12 +1,18 @@
 {
-  Serializable value=null;
+  try {
+    exchange.next(keyFilter);
+  }
+ catch (  PersistitException e) {
+    throw new IllegalStateException(e);
+  }
   if (exchange.getValue().isDefined()) {
-    value=(Serializable)exchange.getValue().get();
+    T value=(T)exchange.getValue().get();
+    Key key=exchange.getKey();
+    Object[] array=new Object[key.getDepth()];
+    for (int i=0; i < key.getDepth(); i++) {
+      array[i]=key.indexTo(i - key.getDepth()).decode();
+    }
+    return new Entry<T>(array,value);
   }
-  Key key=exchange.getKey();
-  Object[] array=new Object[key.getDepth()];
-  for (int i=0; i < key.getDepth(); i++) {
-    array[i]=key.indexTo(i - key.getDepth()).decode();
-  }
-  return new Entry(array,value);
+  throw new NoSuchElementException();
 }
