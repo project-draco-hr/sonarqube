@@ -1,0 +1,16 @@
+{
+  dao.insert(newRuleDto(RuleKey.of("java","S001")).setName("abcd"));
+  dao.insert(newRuleDto(RuleKey.of("java","S002")).setName("ABC"));
+  dao.insert(newRuleDto(RuleKey.of("java","S003")).setName("FGH"));
+  index.refresh();
+  RuleQuery query=new RuleQuery().setSortField(RuleQuery.SortField.NAME);
+  Results results=index.search(query,new QueryOptions());
+  assertThat(results.getHits()).hasSize(3);
+  assertThat(Iterables.getFirst(results.getHits(),null).getFieldAsString("key")).isEqualTo("S002");
+  assertThat(Iterables.getLast(results.getHits(),null).getFieldAsString("key")).isEqualTo("S003");
+  query=new RuleQuery().setSortField(RuleQuery.SortField.NAME).setAscendingSort(false);
+  results=index.search(query,new QueryOptions());
+  assertThat(results.getHits()).hasSize(3);
+  assertThat(Iterables.getFirst(results.getHits(),null).getFieldAsString("key")).isEqualTo("S003");
+  assertThat(Iterables.getLast(results.getHits(),null).getFieldAsString("key")).isEqualTo("S002");
+}

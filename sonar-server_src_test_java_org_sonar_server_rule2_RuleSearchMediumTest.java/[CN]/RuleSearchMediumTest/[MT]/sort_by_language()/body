@@ -1,0 +1,13 @@
+{
+  dao.insert(newRuleDto(RuleKey.of("java","S001")).setLanguage("java"));
+  dao.insert(newRuleDto(RuleKey.of("java","S002")).setLanguage("php"));
+  index.refresh();
+  RuleQuery query=new RuleQuery().setSortField(RuleQuery.SortField.LANGUAGE);
+  Results results=index.search(query,new QueryOptions());
+  assertThat(Iterables.getFirst(results.getHits(),null).getFieldAsString("key")).isEqualTo("S001");
+  assertThat(Iterables.getLast(results.getHits(),null).getFieldAsString("key")).isEqualTo("S002");
+  query=new RuleQuery().setSortField(RuleQuery.SortField.LANGUAGE).setAscendingSort(false);
+  results=index.search(query,new QueryOptions());
+  assertThat(Iterables.getFirst(results.getHits(),null).getFieldAsString("key")).isEqualTo("S001");
+  assertThat(Iterables.getLast(results.getHits(),null).getFieldAsString("key")).isEqualTo("S001");
+}
