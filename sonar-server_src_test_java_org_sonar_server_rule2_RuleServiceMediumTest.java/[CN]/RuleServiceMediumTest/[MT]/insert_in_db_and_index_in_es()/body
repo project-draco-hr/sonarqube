@@ -1,13 +1,11 @@
 {
   RuleKey ruleKey=RuleKey.of("javascript","S001");
-  RuleDao dao=tester.get(RuleDao.class);
   dao.insert(newRuleDto(ruleKey));
   RuleDto persistedDto=dao.selectByKey(ruleKey);
   assertThat(persistedDto).isNotNull();
   assertThat(persistedDto.getId()).isGreaterThanOrEqualTo(0);
   assertThat(persistedDto.getRuleKey()).isEqualTo(ruleKey.rule());
   assertThat(persistedDto.getLanguage()).isEqualTo("js");
-  RuleIndex index=tester.get(RuleIndex.class);
   index.refresh();
   Hit hit=index.getByKey(ruleKey);
   assertThat(hit).isNotNull();

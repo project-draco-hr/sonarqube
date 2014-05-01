@@ -1,0 +1,17 @@
+{
+  DbSession dbSession=tester.get(MyBatis.class).openSession(false);
+  RuleKey ruleKey=RuleKey.of("javascript","S001");
+  RuleDto ruleDto=newRuleDto(ruleKey);
+  dao.insert(ruleDto,dbSession);
+  RuleParamDto minParamDto=new RuleParamDto().setRuleId(ruleDto.getId()).setName("min").setType(RuleParamType.INTEGER.type()).setDefaultValue("2").setDescription("Minimum");
+  dao.insert(minParamDto,dbSession);
+  RuleParamDto maxParamDto=new RuleParamDto().setRuleId(ruleDto.getId()).setName("max").setType(RuleParamType.INTEGER.type()).setDefaultValue("10").setDescription("Maximum");
+  dao.insert(maxParamDto,dbSession);
+  dbSession.commit();
+  List<RuleParamDto> persistedDtos=dao.selectParametersByRuleId(ruleDto.getId());
+  assertThat(persistedDtos).hasSize(2);
+  index.refresh();
+  Hit hit=index.getByKey(ruleKey);
+  assertThat(hit).isNotNull();
+  assertThat(hit.getField("params")).isNotNull();
+}
