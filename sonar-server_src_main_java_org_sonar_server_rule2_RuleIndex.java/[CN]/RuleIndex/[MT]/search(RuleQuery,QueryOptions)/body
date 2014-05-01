@@ -27,7 +27,24 @@
     mainQuery=qb;
   }
   esSearch.setQuery(mainQuery);
-  System.out.println(mainQuery.toString());
+  if (query.getSortField() != null) {
+    FieldSortBuilder sort=SortBuilders.fieldSort(query.getSortField().field().key());
+    if (query.isAscendingSort()) {
+      sort.order(SortOrder.ASC);
+    }
+ else {
+      sort.order(SortOrder.DESC);
+    }
+    esSearch.addSort(sort);
+  }
+ else   if (query.getQueryText() != null && !query.getQueryText().isEmpty()) {
+    esSearch.addSort(SortBuilders.scoreSort());
+  }
+ else {
+    esSearch.addSort(RuleField.UPDATED_AT.key(),SortOrder.DESC);
+  }
+  esSearch.setFrom(options.getOffset());
+  esSearch.setSize(options.getLimit());
   if (options.getFieldsToReturn() != null && !options.getFieldsToReturn().isEmpty()) {
     for (    String field : options.getFieldsToReturn()) {
       esSearch.addField(field);
@@ -39,7 +56,6 @@
     }
   }
   SearchResponse esResult=esSearch.get();
-  System.out.println(esResult);
   Results results=new Results().setTotal((int)esResult.getHits().totalHits()).setTime(esResult.getTookInMillis()).setHits(this.toHit(esResult.getHits()));
   return results;
 }
