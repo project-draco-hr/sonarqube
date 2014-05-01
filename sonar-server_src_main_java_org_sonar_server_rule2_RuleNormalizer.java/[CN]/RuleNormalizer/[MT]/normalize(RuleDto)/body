@@ -31,14 +31,16 @@
     }
   }
   List<RuleParamDto> params=ruleDao.selectParametersByRuleId(rule.getId());
+  Map<Integer,String> paramIdNameLookup=new HashMap<Integer,String>();
   if (!params.isEmpty()) {
     document.startArray(RuleField.PARAMS.key());
     for (    RuleParamDto param : params) {
+      paramIdNameLookup.put(param.getId(),param.getName());
       document.startObject();
       indexField(RuleParamField.NAME.key(),param.getName(),document);
       indexField(RuleParamField.TYPE.key(),param.getType(),document);
       indexField(RuleParamField.DESCRIPTION.key(),param.getDescription(),document);
-      indexField(RuleParamField.DEFAULT_VALUE.key(),param.getDefaultValue(),document);
+      indexField(RuleParamField.VALUE.key(),param.getDefaultValue(),document);
       document.endObject();
     }
     document.endArray();
@@ -57,6 +59,17 @@
       indexField(ActiveRuleField.PROFILE_ID.key(),activeRule.getProfileId(),document);
       indexField(ActiveRuleField.SEVERITY.key(),activeRule.getSeverityString(),document);
       indexField(ActiveRuleField.PARENT_ID.key(),activeRule.getParentId(),document);
+      List<ActiveRuleParamDto> activeRuleParams=activeRuleDao.selectParamsByActiveRuleId(activeRule.getId());
+      if (!activeRuleParams.isEmpty()) {
+        document.startArray(ActiveRuleField.PARAMS.key());
+        for (        ActiveRuleParamDto param : activeRuleParams) {
+          document.startObject();
+          indexField(RuleParamField.NAME.key(),param.getKey(),document);
+          indexField(RuleParamField.VALUE.key(),param.getValue(),document);
+          document.endObject();
+        }
+        document.endArray();
+      }
       document.endObject();
     }
     document.endArray();

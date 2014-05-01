@@ -1,0 +1,23 @@
+{
+  DbSession dbSession=tester.get(MyBatis.class).openSession(false);
+  ActiveRuleDao activeRuleDao=tester.get(ActiveRuleDao.class);
+  RuleKey ruleKey=RuleKey.of("javascript","S001");
+  RuleDto ruleDto=newRuleDto(ruleKey);
+  dao.insert(ruleDto,dbSession);
+  RuleParamDto ruleParam=new RuleParamDto().setRuleId(ruleDto.getId()).setName("test").setType("STRING");
+  dao.insert(ruleParam);
+  ActiveRuleDto activeRule=new ActiveRuleDto().setInheritance("inherited").setProfileId(1).setRuleId(ruleDto.getId()).setSeverity(Severity.BLOCKER);
+  activeRuleDao.insert(activeRule,dbSession);
+  ActiveRuleParamDto activeRuleParam=new ActiveRuleParamDto().setActiveRuleId(activeRule.getId()).setKey(ruleParam.getName()).setValue("world").setRulesParameterId(ruleParam.getId());
+  activeRuleDao.insert(activeRuleParam,dbSession);
+  dbSession.commit();
+  List<ActiveRuleParamDto> persistedDtos=activeRuleDao.selectParamsByActiveRuleId(activeRule.getId());
+  assertThat(persistedDtos).hasSize(1);
+  index.refresh();
+  Hit hit=index.getByKey(ruleKey);
+  assertThat(hit).isNotNull();
+  List<Map<String,Object>> activeRules=(List<Map<String,Object>>)hit.getField(RuleNormalizer.RuleField.ACTIVE.key());
+  assertThat(Iterables.getFirst(activeRules,null).get(RuleNormalizer.ActiveRuleField.PARAMS.key())).isNotNull();
+  List<Map<String,String>> params=(List<Map<String,String>>)activeRules.get(0).get(RuleNormalizer.ActiveRuleField.PARAMS.key());
+  assertThat(Iterables.getFirst(params,null).get(RuleNormalizer.RuleParamField.NAME.key())).isEqualTo(ruleParam.getName());
+}
