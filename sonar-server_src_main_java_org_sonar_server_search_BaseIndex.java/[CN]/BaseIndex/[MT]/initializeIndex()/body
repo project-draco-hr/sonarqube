@@ -2,14 +2,12 @@
   String index=this.getIndexName();
   IndicesExistsResponse indexExistsResponse=getClient().admin().indices().prepareExists(index).execute().actionGet();
   if (!indexExistsResponse.isExists()) {
-    LOG.info("Setup of index {}",this.getIndexName());
     try {
-      LOG.debug("Settings: {}",getIndexSettings().string());
-      LOG.debug("Mapping: {}",getMapping().string());
+      LOG.info("Setup of index {}",this.getIndexName());
+      getClient().admin().indices().prepareCreate(index).setSettings(getIndexSettings()).addMapping(getType(),getMapping()).execute().actionGet();
     }
- catch (    IOException e) {
-      e.printStackTrace();
+ catch (    Exception e) {
+      throw new RuntimeException("Invalid configuration for index " + this.getIndexName(),e);
     }
-    getClient().admin().indices().prepareCreate(index).setSettings(getIndexSettings()).addMapping(getType(),getMapping()).execute().actionGet();
   }
 }
