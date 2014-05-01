@@ -2,7 +2,7 @@
   SearchRequestBuilder esSearch=getClient().prepareSearch(this.getIndexName()).setIndices(this.getIndexName());
   QueryBuilder qb;
   if (query.getQueryText() != null && !query.getQueryText().isEmpty()) {
-    qb=QueryBuilders.multiMatchQuery(query.getQueryText(),RuleField.NAME.key(),RuleField.NAME.key() + ".search",RuleField.DESCRIPTION.key(),RuleField.KEY.key(),RuleField.LANGUAGE.key(),RuleField.TAGS.key());
+    qb=QueryBuilders.multiMatchQuery(query.getQueryText(),"_id",RuleField.NAME.key(),RuleField.NAME.key() + ".search",RuleField.DESCRIPTION.key(),RuleField.KEY.key(),RuleField.LANGUAGE.key(),RuleField.TAGS.key());
   }
  else {
     qb=QueryBuilders.matchAllQuery();
@@ -20,15 +20,19 @@
     mainQuery=qb;
   }
   esSearch.setQuery(mainQuery);
-  if (options.getFieldsToReturn() == null || options.getFieldsToReturn().isEmpty()) {
-    esSearch.addField("_all");
-  }
- else {
+  System.out.println(mainQuery.toString());
+  if (options.getFieldsToReturn() != null && !options.getFieldsToReturn().isEmpty()) {
     for (    String field : options.getFieldsToReturn()) {
       esSearch.addField(field);
     }
   }
+ else {
+    for (    RuleField field : RuleField.values()) {
+      esSearch.addField(field.key());
+    }
+  }
   SearchResponse esResult=esSearch.get();
+  System.out.println(esResult);
   Results results=new Results().setTotal((int)esResult.getHits().totalHits()).setTime(esResult.getTookInMillis()).setHits(this.toHit(esResult.getHits()));
   return results;
 }
