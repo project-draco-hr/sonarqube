@@ -12,52 +12,54 @@
   indexField(RuleField.INTERNAL_KEY.key(),rule.getConfigKey(),document);
   indexField(RuleField.TEMPLATE.key(),rule.getCardinality() == Cardinality.MULTIPLE,document);
   List<RuleRuleTagDto> tags=ruleDao.selectTagsByRuleId(rule.getId());
-  if (!tags.isEmpty()) {
-    XContentBuilder sysTags=document.startArray(RuleField.SYSTEM_TAGS.key());
-    XContentBuilder adminTags=document.startArray(RuleField.TAGS.key());
+  if (tags != null && !tags.isEmpty()) {
+    ArrayList<String> sys=new ArrayList<String>();
+    ArrayList<String> admin=new ArrayList<String>();
     for (    RuleRuleTagDto tag : tags) {
-switch (tag.getType()) {
-case SYSTEM:
-        sysTags.startObject(tag.getTag()).endObject();
-      break;
-case ADMIN:
-    adminTags.startObject(tag.getTag()).endObject();
-  break;
-}
-}
-sysTags.endArray();
-adminTags.endArray();
-}
-List<RuleParamDto> params=ruleDao.selectParametersByRuleId(rule.getId());
-if (!params.isEmpty()) {
-document.startArray(RuleField.PARAMS.key());
-for (RuleParamDto param : params) {
-document.startObject();
-indexField(RuleParamField.NAME.key(),param.getName(),document);
-indexField(RuleParamField.TYPE.key(),param.getType(),document);
-indexField(RuleParamField.DESCRIPTION.key(),param.getDescription(),document);
-indexField(RuleParamField.DEFAULT_VALUE.key(),param.getDefaultValue(),document);
-document.endObject();
-}
-document.endArray();
-}
-List<ActiveRuleDto> activeRules=activeRuleDao.selectByRuleId(rule.getId());
-if (!activeRules.isEmpty()) {
-document.startArray(RuleField.ACTIVE.key());
-for (ActiveRuleDto activeRule : activeRules) {
-document.startObject();
-indexField(ActiveRuleField.OVERRIDE.key(),activeRule.doesOverride(),document);
-indexField(ActiveRuleField.INHERITANCE.key(),activeRule.getInheritance(),document);
-indexField(ActiveRuleField.NOTE_CREATED.key(),activeRule.getNoteCreatedAt(),document);
-indexField(ActiveRuleField.NOTE_UPDATED.key(),activeRule.getNoteUpdatedAt(),document);
-indexField(ActiveRuleField.NOTE_DATA.key(),activeRule.getNoteData(),document);
-indexField(ActiveRuleField.NOTE_USER.key(),activeRule.getNoteUserLogin(),document);
-indexField(ActiveRuleField.PROFILE_ID.key(),activeRule.getProfileId(),document);
-indexField(ActiveRuleField.SEVERITY.key(),activeRule.getSeverityString(),document);
-indexField(ActiveRuleField.PARENT_ID.key(),activeRule.getParentId(),document);
-document.endObject();
-}
-document.endArray();
-}
-return document.endObject();
+      if (tag.getType().equals(RuleTagType.SYSTEM)) {
+        sys.add(tag.getTag());
+      }
+ else {
+        admin.add(tag.getTag());
+      }
+    }
+    if (!admin.isEmpty()) {
+      document.array(RuleField.TAGS.key(),admin.toArray(new String[admin.size()]));
+    }
+    if (!sys.isEmpty()) {
+      document.array(RuleField.SYSTEM_TAGS.key(),sys.toArray(new String[sys.size()]));
+    }
+  }
+  List<RuleParamDto> params=ruleDao.selectParametersByRuleId(rule.getId());
+  if (!params.isEmpty()) {
+    document.startArray(RuleField.PARAMS.key());
+    for (    RuleParamDto param : params) {
+      document.startObject();
+      indexField(RuleParamField.NAME.key(),param.getName(),document);
+      indexField(RuleParamField.TYPE.key(),param.getType(),document);
+      indexField(RuleParamField.DESCRIPTION.key(),param.getDescription(),document);
+      indexField(RuleParamField.DEFAULT_VALUE.key(),param.getDefaultValue(),document);
+      document.endObject();
+    }
+    document.endArray();
+  }
+  List<ActiveRuleDto> activeRules=activeRuleDao.selectByRuleId(rule.getId());
+  if (!activeRules.isEmpty()) {
+    document.startArray(RuleField.ACTIVE.key());
+    for (    ActiveRuleDto activeRule : activeRules) {
+      document.startObject();
+      indexField(ActiveRuleField.OVERRIDE.key(),activeRule.doesOverride(),document);
+      indexField(ActiveRuleField.INHERITANCE.key(),activeRule.getInheritance(),document);
+      indexField(ActiveRuleField.NOTE_CREATED.key(),activeRule.getNoteCreatedAt(),document);
+      indexField(ActiveRuleField.NOTE_UPDATED.key(),activeRule.getNoteUpdatedAt(),document);
+      indexField(ActiveRuleField.NOTE_DATA.key(),activeRule.getNoteData(),document);
+      indexField(ActiveRuleField.NOTE_USER.key(),activeRule.getNoteUserLogin(),document);
+      indexField(ActiveRuleField.PROFILE_ID.key(),activeRule.getProfileId(),document);
+      indexField(ActiveRuleField.SEVERITY.key(),activeRule.getSeverityString(),document);
+      indexField(ActiveRuleField.PARENT_ID.key(),activeRule.getParentId(),document);
+      document.endObject();
+    }
+    document.endArray();
+  }
+  return document.endObject();
 }
