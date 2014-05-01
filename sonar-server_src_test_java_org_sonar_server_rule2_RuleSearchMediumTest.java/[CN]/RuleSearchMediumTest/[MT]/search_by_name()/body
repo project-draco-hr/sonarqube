@@ -1,0 +1,12 @@
+{
+  dao.insert(newRuleDto(RuleKey.of("javascript","S001")).setName("testing the partial match and matching of rule"));
+  index.refresh();
+  RuleQuery query=new RuleQuery().setQueryText("test");
+  assertThat(index.search(query,new QueryOptions()).getHits()).hasSize(1);
+  query=new RuleQuery().setQueryText("partial match");
+  assertThat(index.search(query,new QueryOptions()).getHits()).hasSize(1);
+  query=new RuleQuery().setQueryText("TESTING");
+  assertThat(index.search(query,new QueryOptions()).getHits()).hasSize(1);
+  query=new RuleQuery().setQueryText("not present");
+  assertThat(index.search(query,new QueryOptions()).getHits()).isEmpty();
+}

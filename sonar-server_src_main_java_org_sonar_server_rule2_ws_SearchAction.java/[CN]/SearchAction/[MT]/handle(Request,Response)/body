@@ -5,16 +5,16 @@
   query.setRepositories(request.paramAsStrings(PARAM_REPOSITORIES));
   query.setStatuses(toStatuses(request.paramAsStrings(PARAM_STATUSES)));
   query.setLanguages(request.paramAsStrings(PARAM_LANGUAGES));
-  Results results=service.search(query,new QueryOptions());
-  JsonWriter json=response.newJsonWriter().beginObject().name("hits").beginArray();
-  for (  Hit hit : results.getHits()) {
-    json.beginObject();
-    for (    Map.Entry<String,Object> entry : hit.getFields().entrySet()) {
-      Object value=entry.getValue();
-      json.prop(entry.getKey(),value == null ? null : value.toString());
-    }
-    json.endObject();
-  }
-  json.endArray();
-  json.endObject().close();
+  query.setDebtCharacteristics(request.paramAsStrings(PARAM_DEBT_CHARACTERISTICS));
+  query.setHasDebtCharacteristic(request.paramAsBoolean(PARAM_HAS_DEBT_CHARACTERISTIC));
+  query.setSortField(RuleQuery.SortField.valueOfOrNull(request.param(PARAM_SORT)));
+  query.setAscendingSort(request.paramAsBoolean(PARAM_ASCENDING,true));
+  QueryOptions options=new QueryOptions();
+  options.setFieldsToReturn(request.paramAsStrings(PARAM_FIELDS));
+  options.setPage(request.paramAsInt(PARAM_PAGE,1),request.paramAsInt(PARAM_PAGE_SIZE,25));
+  Results results=service.search(query,options);
+  JsonWriter json=response.newJsonWriter().beginObject();
+  writeStatistics(results,json);
+  writeHits(results,json);
+  json.close();
 }

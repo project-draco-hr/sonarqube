@@ -1,0 +1,14 @@
+{
+  dao.insert(newRuleDto(RuleKey.of("javascript","S001")));
+  index.refresh();
+  QueryOptions options=new QueryOptions();
+  options.addFieldsToReturn(RuleNormalizer.RuleField.LANGUAGE.key(),RuleNormalizer.RuleField.STATUS.key());
+  Results results=index.search(new RuleQuery(),options);
+  assertThat(results.getHits()).hasSize(1);
+  Hit hit=Iterables.getFirst(results.getHits(),null);
+  assertThat(hit.getFields()).hasSize(4);
+  assertThat(hit.getFieldAsString(RuleNormalizer.RuleField.LANGUAGE.key())).isEqualTo("js");
+  assertThat(hit.getFieldAsString(RuleNormalizer.RuleField.STATUS.key())).isEqualTo(RuleStatus.READY.name());
+  assertThat(hit.getFieldAsString(RuleNormalizer.RuleField.REPOSITORY.key())).isEqualTo("javascript");
+  assertThat(hit.getFieldAsString(RuleNormalizer.RuleField.KEY.key())).isEqualTo("S001");
+}
