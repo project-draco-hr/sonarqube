@@ -1,13 +1,13 @@
 {
-  dao.insert(newRuleDto(RuleKey.of("findbugs","S001")));
-  dao.insert(newRuleDto(RuleKey.of("pmd","S002")));
+  dao.insert(newRuleDto(RuleKey.of("java","S001"))).setLanguage("java");
+  dao.insert(newRuleDto(RuleKey.of("javascript","S002"))).setLanguage("js");
   index.refresh();
-  RuleQuery query=new RuleQuery().setRepositories(Arrays.asList("checkstyle","pmd"));
+  RuleQuery query=new RuleQuery().setLanguages(Arrays.asList("cobol","js"));
   Results results=index.search(query,new QueryOptions());
   assertThat(results.getHits()).hasSize(1);
   assertThat(Iterables.getFirst(results.getHits(),null).getFieldAsString("key")).isEqualTo("S002");
-  query=new RuleQuery().setRepositories(Arrays.asList("checkstyle"));
+  query=new RuleQuery().setLanguages(Arrays.asList("cpp"));
   assertThat(index.search(query,new QueryOptions()).getHits()).isEmpty();
-  query=new RuleQuery().setRepositories(Collections.<String>emptyList());
+  query=new RuleQuery().setLanguages(Collections.<String>emptyList());
   assertThat(index.search(query,new QueryOptions()).getHits()).isEmpty();
 }
