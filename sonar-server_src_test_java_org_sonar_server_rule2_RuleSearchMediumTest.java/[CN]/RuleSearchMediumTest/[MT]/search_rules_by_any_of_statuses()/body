@@ -1,6 +1,6 @@
 {
-  dao.insert(newRuleDto(RuleKey.of("java","S001"))).setStatus(RuleStatus.BETA.name());
-  dao.insert(newRuleDto(RuleKey.of("java","S002"))).setStatus(RuleStatus.READY.name());
+  dao.insert(newRuleDto(RuleKey.of("java","S001")).setStatus(RuleStatus.BETA.name()));
+  dao.insert(newRuleDto(RuleKey.of("java","S002")).setStatus(RuleStatus.READY.name()));
   index.refresh();
   RuleQuery query=new RuleQuery().setStatuses(Arrays.asList(RuleStatus.DEPRECATED,RuleStatus.READY));
   Results results=index.search(query,new QueryOptions());
@@ -9,7 +9,7 @@
   query=new RuleQuery().setStatuses(Arrays.asList(RuleStatus.DEPRECATED));
   assertThat(index.search(query,new QueryOptions()).getHits()).isEmpty();
   query=new RuleQuery().setStatuses(Collections.<RuleStatus>emptyList());
-  assertThat(index.search(query,new QueryOptions()).getHits()).isEmpty();
+  assertThat(index.search(query,new QueryOptions()).getHits()).hasSize(2);
   query=new RuleQuery().setStatuses(null);
-  assertThat(index.search(query,new QueryOptions()).getHits()).isEmpty();
+  assertThat(index.search(query,new QueryOptions()).getHits()).hasSize(2);
 }

@@ -1,6 +1,6 @@
 {
-  dao.insert(newRuleDto(RuleKey.of("java","S001"))).setLanguage("java");
-  dao.insert(newRuleDto(RuleKey.of("javascript","S002"))).setLanguage("js");
+  dao.insert(newRuleDto(RuleKey.of("java","S001")).setLanguage("java"));
+  dao.insert(newRuleDto(RuleKey.of("javascript","S002")).setLanguage("js"));
   index.refresh();
   RuleQuery query=new RuleQuery().setLanguages(Arrays.asList("cobol","js"));
   Results results=index.search(query,new QueryOptions());
@@ -9,7 +9,7 @@
   query=new RuleQuery().setLanguages(Arrays.asList("cpp"));
   assertThat(index.search(query,new QueryOptions()).getHits()).isEmpty();
   query=new RuleQuery().setLanguages(Collections.<String>emptyList());
-  assertThat(index.search(query,new QueryOptions()).getHits()).isEmpty();
+  assertThat(index.search(query,new QueryOptions()).getHits()).hasSize(2);
   query=new RuleQuery().setLanguages(null);
-  assertThat(index.search(query,new QueryOptions()).getHits()).isEmpty();
+  assertThat(index.search(query,new QueryOptions()).getHits()).hasSize(2);
 }
