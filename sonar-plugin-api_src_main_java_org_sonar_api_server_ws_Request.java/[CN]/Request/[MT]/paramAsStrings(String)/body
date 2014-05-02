@@ -1,7 +1,12 @@
 {
-  String s=param(key);
-  if (s == null) {
+  WebService.Param definition=action.param(key);
+  String value=readParamOrDefaultValue(key,definition);
+  if (value == null) {
     return null;
   }
-  return Lists.newArrayList(Splitter.on(',').omitEmptyStrings().trimResults().split(s));
+  List<String> values=Lists.newArrayList(Splitter.on(',').omitEmptyStrings().trimResults().split(value));
+  for (  String s : values) {
+    validate(s,definition);
+  }
+  return values;
 }
