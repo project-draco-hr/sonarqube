@@ -1,5 +1,5 @@
 {
-  DbSession session=mybatis.openSession(true);
+  SqlSession session=mybatis.openSession();
   try {
     MeasureMapper mapper=session.getMapper(MeasureMapper.class);
     for (    Entry<Measure> entry : measureCache.entries()) {
@@ -9,15 +9,17 @@
       if (shouldPersistMeasure(resource,measure)) {
         Snapshot snapshot=snapshotCache.get(effectiveKey);
         MeasureModel measureModel=model(measure).setSnapshotId(snapshot.getId());
-        mapper.insert(measureModel);
+        try {
+          mapper.insert(measureModel);
+        }
+ catch (        Exception e) {
+          throw new SonarException(String.format("Unable to save measure for metric [%s] on component [%s]",measure.getMetricKey(),resource.getKey()),e);
+        }
       }
     }
     session.commit();
   }
- catch (  Exception e) {
-    throw new SonarException("Unable to save some measures",e);
-  }
- finally {
+  finally {
     MyBatis.closeQuietly(session);
   }
 }
