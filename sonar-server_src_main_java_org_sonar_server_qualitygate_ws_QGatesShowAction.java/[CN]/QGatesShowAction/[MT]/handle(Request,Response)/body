@@ -1,0 +1,17 @@
+{
+  Long qGateId=request.paramAsLong(QGatesWs.PARAM_ID);
+  String qGateName=request.param(QGatesWs.PARAM_NAME);
+  checkOneOfIdOrNamePresent(qGateId,qGateName);
+  QualityGateDto qGate=qGateId == null ? qualityGates.get(qGateName) : qualityGates.get(qGateId);
+  qGateId=qGate.getId();
+  JsonWriter writer=response.newJsonWriter().beginObject().prop(QGatesWs.PARAM_ID,qGate.getId()).prop(QGatesWs.PARAM_NAME,qGate.getName());
+  Collection<QualityGateConditionDto> conditions=qualityGates.listConditions(qGateId);
+  if (!conditions.isEmpty()) {
+    writer.name("conditions").beginArray();
+    for (    QualityGateConditionDto condition : conditions) {
+      QGatesWs.writeQualityGateCondition(condition,writer);
+    }
+    writer.endArray();
+  }
+  writer.endObject().close();
+}
