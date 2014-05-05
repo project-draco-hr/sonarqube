@@ -1,7 +1,13 @@
 {
   TestRequest request=new TestRequest(method);
   WebService.Controller controller=context.controller(controllerKey);
+  if (controller == null) {
+    throw new IllegalArgumentException(String.format("Controller '%s' is unknown, did you forget to call NewController.done()?",controllerKey));
+  }
   WebService.Action action=controller.action(actionKey);
+  if (action == null) {
+    throw new IllegalArgumentException(String.format("Action '%s' not found on controller '%s'.",actionKey,controllerKey));
+  }
   request.setAction(action);
   return request;
 }
