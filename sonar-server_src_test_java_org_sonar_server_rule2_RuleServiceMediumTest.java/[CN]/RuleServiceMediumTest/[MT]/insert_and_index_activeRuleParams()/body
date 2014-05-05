@@ -1,6 +1,8 @@
 {
   DbSession dbSession=tester.get(MyBatis.class).openSession(false);
   ActiveRuleDao activeRuleDao=tester.get(ActiveRuleDao.class);
+  QualityProfileDto profileDto=new QualityProfileDto().setName("myprofile").setLanguage("java");
+  qualityProfileDao.insert(profileDto,dbSession);
   RuleKey ruleKey=RuleKey.of("javascript","S001");
   RuleDto ruleDto=newRuleDto(ruleKey);
   dao.insert(ruleDto,dbSession);
@@ -8,13 +10,14 @@
   dao.insert(minParam,dbSession);
   RuleParamDto maxParam=new RuleParamDto().setRuleId(ruleDto.getId()).setName("max").setType("STRING");
   dao.insert(maxParam,dbSession);
-  ActiveRuleDto activeRule=new ActiveRuleDto().setInheritance("inherited").setProfileId(1).setRuleId(ruleDto.getId()).setSeverity(Severity.BLOCKER);
+  ActiveRuleDto activeRule=new ActiveRuleDto().setInheritance("inherited").setProfileId(profileDto.getId()).setRuleId(ruleDto.getId()).setSeverity(Severity.BLOCKER);
   activeRuleDao.insert(activeRule,dbSession);
   ActiveRuleParamDto activeRuleMinParam=new ActiveRuleParamDto().setActiveRuleId(activeRule.getId()).setKey(minParam.getName()).setValue("minimum").setRulesParameterId(minParam.getId());
   activeRuleDao.insert(activeRuleMinParam,dbSession);
   ActiveRuleParamDto activeRuleMaxParam=new ActiveRuleParamDto().setActiveRuleId(activeRule.getId()).setKey(maxParam.getName()).setValue("maximum").setRulesParameterId(maxParam.getId());
   activeRuleDao.insert(activeRuleMaxParam,dbSession);
   dbSession.commit();
+  dbSession.close();
   List<ActiveRuleParamDto> persistedDtos=activeRuleDao.selectParamsByActiveRuleId(activeRule.getId());
   assertThat(persistedDtos).hasSize(2);
   index.refresh();
@@ -29,5 +32,5 @@
   assertThat(_activeRuleParams).isNotNull().hasSize(2);
   Map<String,String> _activeRuleParamValue=(Map<String,String>)_activeRuleParams.get(maxParam.getName());
   assertThat(_activeRuleParamValue).isNotNull().hasSize(1);
-  assertThat(_activeRuleParamValue.get(RuleNormalizer.ActiveRuleParamField.VALUE.key())).isEqualTo("maximum");
+  assertThat(_activeRuleParamValue.get(ActiveRuleNormalizer.ActiveRuleParamField.VALUE.key())).isEqualTo("maximum");
 }

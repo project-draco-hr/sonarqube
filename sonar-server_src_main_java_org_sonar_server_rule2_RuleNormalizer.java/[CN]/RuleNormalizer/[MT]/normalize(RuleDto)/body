@@ -14,30 +14,7 @@
   document.startArray(RuleField.TAGS.key()).endArray();
   document.startArray(RuleField.SYSTEM_TAGS.key()).endArray();
   document.startObject(RuleField.PARAMS.key()).endObject();
-  List<ActiveRuleDto> activeRules=activeRuleDao.selectByRuleId(rule.getId());
-  document.startObject(RuleField.ACTIVE.key());
-  if (!activeRules.isEmpty()) {
-    for (    ActiveRuleDto activeRule : activeRules) {
-      document.startObject(activeRule.getProfileId().toString());
-      indexField(ActiveRuleField.OVERRIDE.key(),activeRule.doesOverride(),document);
-      indexField(ActiveRuleField.INHERITANCE.key(),activeRule.getInheritance(),document);
-      indexField(ActiveRuleField.PROFILE_ID.key(),activeRule.getProfileId(),document);
-      indexField(ActiveRuleField.SEVERITY.key(),activeRule.getSeverityString(),document);
-      indexField(ActiveRuleField.PARENT_ID.key(),activeRule.getParentId(),document);
-      List<ActiveRuleParamDto> activeRuleParams=activeRuleDao.selectParamsByActiveRuleId(activeRule.getId());
-      if (!activeRuleParams.isEmpty()) {
-        document.startObject(ActiveRuleField.PARAMS.key());
-        for (        ActiveRuleParamDto param : activeRuleParams) {
-          document.startObject(param.getKey());
-          indexField(ActiveRuleParamField.VALUE.key(),param.getValue(),document);
-          document.endObject();
-        }
-        document.endObject();
-      }
-      document.endObject();
-    }
-  }
-  document.endObject();
+  document.startObject(RuleField.ACTIVE.key()).endObject();
   document.endObject();
   UpdateRequest request=new UpdateRequest().doc(document);
   request.docAsUpsert(true);
