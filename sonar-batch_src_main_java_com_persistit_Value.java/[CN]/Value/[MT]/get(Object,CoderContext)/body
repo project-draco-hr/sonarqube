@@ -1,0 +1,347 @@
+{
+  Object object=null;
+  final int start=_next;
+  final int classHandle=nextType();
+  final int currentItemCount=_serializedItemCount++;
+switch (classHandle) {
+case TYPE_NULL:
+    break;
+case TYPE_BOOLEAN:
+case CLASS_BOOLEAN:
+  object=getBooleanInternal() ? Boolean.TRUE : Boolean.FALSE;
+break;
+case TYPE_BYTE:
+case CLASS_BYTE:
+object=Byte.valueOf(getByteInternal());
+break;
+case TYPE_SHORT:
+case CLASS_SHORT:
+object=Short.valueOf(getShortInternal());
+break;
+case TYPE_CHAR:
+case CLASS_CHAR:
+object=Character.valueOf(getCharInternal());
+break;
+case TYPE_INT:
+case CLASS_INT:
+object=Integer.valueOf(getIntInternal());
+break;
+case TYPE_FLOAT:
+case CLASS_FLOAT:
+object=Float.valueOf(getFloatInternal());
+break;
+case TYPE_LONG:
+case CLASS_LONG:
+object=Long.valueOf(getLongInternal());
+break;
+case TYPE_DOUBLE:
+case CLASS_DOUBLE:
+object=Double.valueOf(getDoubleInternal());
+break;
+case CLASS_STRING:
+{
+if (target != null && target instanceof Appendable) {
+utfToAppendable((Appendable)target,_next,_end);
+object=target;
+}
+ else {
+final StringBuilder sb=getStringAssemblyBuffer(_end - _next);
+utfToAppendable(sb,_next,_end);
+object=sb.toString();
+}
+closeVariableLengthItem();
+break;
+}
+case CLASS_DATE:
+final long time=Util.getLong(_bytes,_next);
+_next+=8;
+object=new Date(time);
+break;
+case CLASS_BIG_INTEGER:
+{
+final int length=_end - _next;
+final byte[] bytes=new byte[length];
+System.arraycopy(_bytes,_next,bytes,0,length);
+_next+=length;
+object=new BigInteger(bytes);
+closeVariableLengthItem();
+break;
+}
+case CLASS_ACCUMULATOR:
+{
+AccumulatorState accumulator;
+if (target != null && target instanceof AccumulatorState) {
+accumulator=(AccumulatorState)target;
+}
+ else {
+accumulator=new AccumulatorState();
+}
+_depth++;
+try {
+accumulator.load(this);
+}
+  finally {
+_depth--;
+}
+object=accumulator;
+break;
+}
+case CLASS_TREE_STATISTICS:
+{
+TreeStatistics treeStatistics;
+if (target != null && target instanceof TreeStatistics) {
+treeStatistics=(TreeStatistics)target;
+}
+ else {
+treeStatistics=new TreeStatistics();
+}
+_next+=treeStatistics.load(_bytes,_next,_end - _next);
+object=treeStatistics;
+break;
+}
+case CLASS_TREE:
+{
+if (target != null && target instanceof Tree) {
+final Tree tree=(Tree)target;
+_next+=tree.load(_bytes,_next,_end - _next);
+object=tree;
+}
+ else {
+final TreeState treeState=new TreeState();
+_next+=treeState.load(_bytes,_next,_end - _next);
+object=treeState;
+}
+break;
+}
+case CLASS_BIG_DECIMAL:
+{
+final int length=_end - _next;
+final int scale=Util.getInt(_bytes,_next);
+final byte[] bytes=new byte[length - 4];
+System.arraycopy(_bytes,_next + 4,bytes,0,length - 4);
+_next+=length;
+object=new BigDecimal(new BigInteger(bytes),scale);
+closeVariableLengthItem();
+break;
+}
+case CLASS_ANTIVALUE:
+{
+final int length=_end - _next;
+int elisionCount=0;
+byte[] bytes=null;
+if (length > 0) {
+elisionCount=Util.getShort(_bytes,_next);
+bytes=new byte[length - 2];
+System.arraycopy(_bytes,_next + 2,bytes,0,length - 2);
+}
+_next+=length;
+object=new AntiValue(elisionCount,bytes);
+closeVariableLengthItem();
+break;
+}
+case CLASS_ARRAY:
+{
+try {
+_depth++;
+final int componentClassHandle=nextType();
+switch (componentClassHandle) {
+case TYPE_BOOLEAN:
+{
+final boolean[] result=new boolean[_end - _next];
+for (int index=0; index < result.length; index++) {
+result[index]=toBoolean(_next + index);
+}
+object=result;
+break;
+}
+case TYPE_BYTE:
+{
+final byte[] result=new byte[_end - _next];
+System.arraycopy(_bytes,_next,result,0,_end - _next);
+object=result;
+break;
+}
+case TYPE_SHORT:
+{
+final short[] result=new short[arraySize(_end,_next,2)];
+for (int index=0; index < result.length; index++) {
+result[index]=(short)Util.getShort(_bytes,_next + (index * 2));
+}
+object=result;
+break;
+}
+case TYPE_CHAR:
+{
+final char[] result=new char[arraySize(_end,_next,2)];
+for (int index=0; index < result.length; index++) {
+result[index]=(char)Util.getChar(_bytes,_next + (index * 2));
+}
+object=result;
+break;
+}
+case TYPE_INT:
+{
+final int[] result=new int[arraySize(_end,_next,4)];
+for (int index=0; index < result.length; index++) {
+result[index]=Util.getInt(_bytes,_next + (index * 4));
+}
+object=result;
+break;
+}
+case TYPE_LONG:
+{
+final long[] result=new long[arraySize(_end,_next,8)];
+for (int index=0; index < result.length; index++) {
+result[index]=Util.getLong(_bytes,_next + (index * 8));
+}
+object=result;
+break;
+}
+case TYPE_FLOAT:
+{
+final float[] result=new float[arraySize(_end,_next,4)];
+for (int index=0; index < result.length; index++) {
+result[index]=Float.intBitsToFloat(Util.getInt(_bytes,_next + (index * 4)));
+}
+object=result;
+break;
+}
+case TYPE_DOUBLE:
+{
+final double[] result=new double[arraySize(_end,_next,8)];
+for (int index=0; index < result.length; index++) {
+result[index]=Double.longBitsToDouble(Util.getLong(_bytes,_next + (index * 8)));
+}
+object=result;
+break;
+}
+case CLASS_STRING:
+{
+final int length=decodeElementCount();
+final String[] result=new String[length];
+for (int index=0; index < length; index++) {
+result[index]=getString();
+}
+object=result;
+break;
+}
+default :
+{
+final Class<?> componentClass=classForHandle(componentClassHandle);
+final int length=decodeElementCount();
+final Object[] result=(Object[])Array.newInstance(componentClass,length);
+getValueCache().store(currentItemCount,result);
+for (int index=0; index < length; index++) {
+Array.set(result,index,get(null,null));
+}
+object=result;
+break;
+}
+}
+}
+  finally {
+_depth--;
+}
+closeVariableLengthItem();
+break;
+}
+case CLASS_MULTI_ARRAY:
+_next--;
+_serializedItemCount--;
+object=getMultiArray(null);
+break;
+case CLASS_SERIALIZED:
+_depth++;
+try {
+final ObjectInputStream ois=new OldValueInputStream(this);
+object=ois.readObject();
+if (_next != _end) {
+throw new ConversionException("Invalid serialized Object at index=" + _next);
+}
+closeVariableLengthItem();
+}
+ catch (final IOException ioe) {
+throw new ConversionException("@" + start,ioe);
+}
+catch (final ClassNotFoundException cnfe) {
+throw new ConversionException("@" + start,cnfe);
+}
+ finally {
+_depth--;
+}
+break;
+case CLASS_REREF:
+{
+final int base=_bytes[_next++] & 0xFF;
+final int handle=decodeVariableLengthInt(base);
+object=getValueCache().get(handle);
+break;
+}
+case TYPE_MVV:
+{
+final int savedSize=_size;
+final ArrayList<Object> outList=new ArrayList<Object>();
+try {
+_depth++;
+MVV.visitAllVersions(new MVV.VersionVisitor(){
+@Override public void init(){
+}
+@Override public void sawVersion(final long version,final int offset,final int valueLength){
+Object obj=null;
+if (valueLength > 0) {
+_next=offset;
+_end=_size=_next + valueLength;
+obj=get(target,context);
+}
+outList.add(obj);
+}
+}
+,getEncodedBytes(),0,getEncodedSize());
+}
+ catch (final PersistitException pe) {
+throw new ConversionException("@" + start,pe);
+}
+ finally {
+_depth--;
+_next=_end=_size=savedSize;
+}
+return outList.toArray();
+}
+default :
+{
+final int saveDepth=_depth;
+try {
+_depth++;
+final Class<?> cl=classForHandle(classHandle);
+final ValueCoder coder=getValueCoder(cl);
+if (coder != null) {
+if (target == null) {
+object=coder.get(this,cl,context);
+}
+ else if (coder instanceof ValueRenderer) {
+((ValueRenderer)coder).render(this,target,cl,context);
+object=target;
+}
+ else {
+throw new ConversionException("No ValueRenderer for class " + cl.getName());
+}
+}
+ else {
+throw new ConversionException("No ValueCoder for class " + cl.getName());
+}
+}
+  finally {
+_depth=saveDepth;
+}
+closeVariableLengthItem();
+break;
+}
+}
+if (_depth > 0) {
+getValueCache().store(currentItemCount,object);
+}
+ else {
+releaseValueCache();
+}
+return object;
+}

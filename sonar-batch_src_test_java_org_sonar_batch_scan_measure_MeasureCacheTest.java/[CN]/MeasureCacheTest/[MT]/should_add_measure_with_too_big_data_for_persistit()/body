@@ -4,23 +4,12 @@
   assertThat(cache.entries()).hasSize(0);
   assertThat(cache.byResource(p)).hasSize(0);
   Measure m=new Measure(CoreMetrics.NCLOC,1.0).setDate(new Date());
-  StringBuilder data=new StringBuilder();
-  for (int i=0; i < 500000; i++) {
-    data.append("some data");
+  StringBuilder data=new StringBuilder(64 * 1024 * 1024 + 1);
+  for (int i=0; i < (64 * 1024 * 1024 + 1); i++) {
+    data.append('a');
   }
   m.setData(data.toString());
+  thrown.expect(IllegalStateException.class);
+  thrown.expectMessage("Fail to put element in the cache measures");
   cache.put(p,m);
-  assertThat(cache.contains(p,m)).isTrue();
-  assertThat(cache.entries()).hasSize(1);
-  Iterator<Entry<Measure>> iterator=cache.entries().iterator();
-  iterator.hasNext();
-  Entry<Measure> next=iterator.next();
-  assertThat(next.value()).isEqualTo(m);
-  assertThat(next.key()[0]).isEqualTo("struts");
-  assertThat(cache.byResource(p)).hasSize(1);
-  assertThat(cache.byResource(p).iterator().next()).isEqualTo(m);
-  RuleMeasure mRule=RuleMeasure.createForPriority(CoreMetrics.CRITICAL_VIOLATIONS,RulePriority.BLOCKER,1.0);
-  mRule.setRuleKey(RuleKey.of("repo","rule"));
-  cache.put(p,mRule);
-  assertThat(cache.entries()).hasSize(2);
 }

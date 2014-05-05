@@ -1,0 +1,38 @@
+{
+  if (_size == 0) {
+    return UNDEFINED;
+  }
+  if (_longMode && (_bytes[0] & 0xFF) == Buffer.LONGREC_TYPE && (_size >= Buffer.LONGREC_SIZE)) {
+    return toStringLongMode();
+  }
+  final int saveDepth=_depth;
+  final int saveLevel=_level;
+  final int saveNext=_next;
+  final int saveEnd=_end;
+  final StringBuilder sb=new StringBuilder();
+  setStreamMode(true);
+  try {
+    boolean first=true;
+    while (_next < _size) {
+      if (!first) {
+        sb.append(",");
+      }
+      first=false;
+      decodeDisplayable(true,sb,null);
+    }
+  }
+ catch (  final ConversionException e) {
+    final int truncatedSize=Math.min(_size - _next,256);
+    sb.append("ConversionException " + e.getCause() + " index="+ _next+ " size="+ (_size - _next)+ ": "+ Util.hexDump(_bytes,0,truncatedSize));
+  }
+catch (  final Exception e) {
+    sb.append("Exception " + e + " while decoding value at index="+ _next+ ": "+ e);
+  }
+ finally {
+    _end=saveEnd;
+    _next=saveNext;
+    _level=saveLevel;
+    _depth=saveDepth;
+  }
+  return sb.toString();
+}

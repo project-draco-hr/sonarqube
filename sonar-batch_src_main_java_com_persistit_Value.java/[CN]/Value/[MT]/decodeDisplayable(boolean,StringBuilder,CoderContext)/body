@@ -1,0 +1,345 @@
+{
+  checkSize(1);
+  final int start=_next;
+  final int level=_level;
+  final int classHandle=nextType();
+  final int currentItemCount=_serializedItemCount;
+  final boolean isVariableLength=(_next - start) > 1;
+switch (classHandle) {
+case TYPE_NULL:
+{
+      _next=start;
+      sb.append(getNull());
+      break;
+    }
+case TYPE_BYTE:
+{
+    _next=start;
+    appendParenthesizedFriendlyClassName(sb,byte.class);
+    sb.append(getByte());
+    break;
+  }
+case TYPE_CHAR:
+{
+  _next=start;
+  appendParenthesizedFriendlyClassName(sb,char.class);
+  if (quoted)   Util.appendQuotedChar(sb,getChar());
+ else   sb.append((int)getChar());
+  break;
+}
+case TYPE_INT:
+{
+_next=start;
+sb.append(getInt());
+break;
+}
+case TYPE_LONG:
+{
+_next=start;
+appendParenthesizedFriendlyClassName(sb,long.class);
+sb.append(getLong());
+break;
+}
+case TYPE_FLOAT:
+{
+_next=start;
+appendParenthesizedFriendlyClassName(sb,float.class);
+sb.append(getFloat());
+break;
+}
+case TYPE_DOUBLE:
+{
+_next=start;
+sb.append(getDouble());
+break;
+}
+case TYPE_BOOLEAN:
+{
+_next=start;
+sb.append(getBoolean());
+break;
+}
+case CLASS_STRING:
+case CLASS_BOOLEAN:
+case CLASS_BYTE:
+case CLASS_SHORT:
+case CLASS_CHAR:
+case CLASS_INT:
+case CLASS_LONG:
+case CLASS_FLOAT:
+case CLASS_DOUBLE:
+{
+_next=start;
+if (_level != level) _end=popEnd();
+final Object value=get(null,context);
+appendDisplayable(sb,value,quoted,false);
+break;
+}
+case CLASS_REREF:
+{
+_next=start;
+final Object value=get(null,context);
+appendDisplayable(sb,value,quoted,true);
+break;
+}
+case CLASS_ARRAY:
+{
+try {
+_depth++;
+_serializedItemCount++;
+registerEncodedObject(sb.length());
+final int componentClassHandle=nextType();
+switch (componentClassHandle) {
+case TYPE_BOOLEAN:
+{
+sb.append("boolean[]{");
+final int length=_end - _next;
+for (int index=0; index < length; index++) {
+if (index > 0) sb.append(',');
+sb.append(toBoolean(_next) ? "true" : "false");
+_next++;
+}
+break;
+}
+case TYPE_BYTE:
+{
+sb.append("byte[]{");
+final int length=_end - _next;
+for (int index=0; index < length; index++) {
+if (index > 0) sb.append(',');
+sb.append(Util.getByte(_bytes,_next));
+_next++;
+}
+break;
+}
+case TYPE_SHORT:
+{
+sb.append("short[]{");
+final int length=arraySize(_end,_next,2);
+for (int index=0; index < length; index++) {
+if (index > 0) sb.append(',');
+sb.append(Util.getShort(_bytes,_next));
+_next+=2;
+}
+break;
+}
+case TYPE_CHAR:
+{
+sb.append("char[]{");
+final int length=arraySize(_end,_next,2);
+for (int index=0; index < length; index++) {
+if (index > 0) sb.append(',');
+final int c=Util.getChar(_bytes,_next);
+if (quoted) Util.appendQuotedChar(sb,c);
+ else sb.append(c);
+_next+=2;
+}
+break;
+}
+case TYPE_INT:
+{
+sb.append("int[]{");
+final int length=arraySize(_end,_next,4);
+for (int index=0; index < length; index++) {
+if (index > 0) sb.append(',');
+sb.append(Util.getInt(_bytes,_next));
+_next+=4;
+}
+break;
+}
+case TYPE_LONG:
+{
+sb.append("long[]{");
+final int length=arraySize(_end,_next,8);
+for (int index=0; index < length; index++) {
+if (index > 0) sb.append(',');
+sb.append(Util.getLong(_bytes,_next));
+_next+=8;
+}
+break;
+}
+case TYPE_FLOAT:
+{
+sb.append("float[]{");
+final int length=arraySize(_end,_next,4);
+for (int index=0; index < length; index++) {
+if (index > 0) sb.append(',');
+final float f=Float.intBitsToFloat(Util.getInt(_bytes,_next));
+sb.append(f);
+_next+=4;
+}
+break;
+}
+case TYPE_DOUBLE:
+{
+sb.append("double[]{");
+final int length=arraySize(_end,_next,8);
+for (int index=0; index < length; index++) {
+if (index > 0) sb.append(',');
+final double d=Double.longBitsToDouble(Util.getLong(_bytes,_next));
+sb.append(d);
+_next+=8;
+}
+break;
+}
+default :
+{
+final Class<?> cl=classForHandle(componentClassHandle);
+if (cl != null) appendFriendlyClassName(sb,cl);
+sb.append("[]{");
+final int length=decodeElementCount();
+for (int index=0; index < length; index++) {
+if (index > 0) sb.append(',');
+decodeDisplayable(quoted,sb,context);
+}
+break;
+}
+}
+sb.append('}');
+}
+  finally {
+_depth--;
+}
+if (isVariableLength) closeVariableLengthItem();
+break;
+}
+case CLASS_MULTI_ARRAY:
+{
+_next=start;
+decodeDisplayableMultiArray(quoted,sb,context,null);
+break;
+}
+case CLASS_SERIALIZED:
+{
+_next=start;
+final int length=sb.length();
+_depth++;
+try {
+final Object object=get(null,context);
+getValueCache().store(currentItemCount,new DisplayMarker(sb.length()));
+appendDisplayable(sb,object,quoted,false);
+}
+ catch (final Exception e) {
+sb.setLength(length);
+sb.append("(Serialized-Object)");
+Util.bytesToHex(sb,_bytes,start,_end - start);
+}
+ finally {
+_depth--;
+if (isVariableLength) closeVariableLengthItem();
+}
+break;
+}
+case TYPE_MVV:
+{
+final int savedSize=_size;
+sb.append('[');
+try {
+MVV.visitAllVersions(new MVV.VersionVisitor(){
+boolean first=true;
+@Override public void init(){
+}
+@Override public void sawVersion(final long version,final int offset,final int valueLength){
+if (!first) {
+sb.append(',');
+}
+sb.append(TransactionStatus.versionString(version));
+try {
+final long tc=_persistit.getTransactionIndex().commitStatus(version,Long.MAX_VALUE,0);
+sb.append("<" + TransactionStatus.tcString(tc) + ">");
+}
+ catch (final Exception e) {
+sb.append("<" + e + ">");
+}
+sb.append(':');
+if (valueLength == 0) {
+sb.append(UNDEFINED);
+}
+ else {
+_next=offset;
+_end=_size=_next + valueLength;
+decodeDisplayable(quoted,sb,context);
+}
+first=false;
+}
+}
+,getEncodedBytes(),0,getEncodedSize());
+}
+ catch (final Throwable t) {
+sb.append("<<").append(t).append(">>");
+}
+ finally {
+_next=_end=_size=savedSize;
+}
+sb.append(']');
+}
+break;
+default :
+{
+if (classHandle >= CLASS1) {
+try {
+final Class<?> clazz=classForHandle(classHandle);
+ValueCoder coder=null;
+_depth++;
+getValueCache().store(currentItemCount,new DisplayMarker(sb.length()));
+_serializedItemCount++;
+if (clazz != null) {
+coder=getValueCoder(clazz);
+}
+if (coder instanceof ValueDisplayer) {
+appendParenthesizedFriendlyClassName(sb,clazz);
+((ValueDisplayer)coder).display(this,sb,clazz,context);
+}
+ else if (coder instanceof SerialValueCoder) {
+final int length=sb.length();
+try {
+_next=start;
+final Object object=get(null,context);
+getValueCache().store(currentItemCount,new DisplayMarker(sb.length()));
+appendDisplayable(sb,object,quoted,false);
+}
+ catch (final Exception e) {
+sb.setLength(length);
+sb.append("(Serialized-Object)");
+Util.bytesToHex(sb,_bytes,start,_end - start);
+}
+}
+ else {
+appendParenthesizedFriendlyClassName(sb,clazz);
+sb.append('{');
+boolean first=true;
+while (hasMoreItems()) {
+if (!first) sb.append(',');
+first=false;
+decodeDisplayable(true,sb,null);
+}
+sb.append('}');
+}
+break;
+}
+ catch (final Throwable t) {
+sb.append("<<" + t + ">>");
+}
+ finally {
+_depth--;
+if (isVariableLength) closeVariableLengthItem();
+}
+}
+ else {
+try {
+_next=start;
+final Object value=get(null,context);
+getValueCache().store(currentItemCount,new DisplayMarker(sb.length()));
+appendDisplayable(sb,value,quoted,false);
+}
+ catch (final Throwable t) {
+sb.append("<<" + t + ">>");
+}
+ finally {
+if (isVariableLength) closeVariableLengthItem();
+}
+break;
+}
+}
+}
+}

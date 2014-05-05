@@ -3,6 +3,11 @@
   Preconditions.checkState(!cacheNames.contains(cacheName),"Cache is already created: " + cacheName);
   try {
     Exchange exchange=persistit.getExchange(volume,cacheName,true);
+    exchange.getValue().setMaximumSize(Value.MAXIMUM_SIZE);
+    Method getSpareValue=Exchange.class.getDeclaredMethod("getAuxiliaryValue");
+    getSpareValue.setAccessible(true);
+    Value spareValue=(Value)getSpareValue.invoke(exchange);
+    spareValue.setMaximumSize(Value.MAXIMUM_SIZE);
     Cache<V> cache=new Cache<V>(cacheName,exchange);
     cacheNames.add(cacheName);
     return cache;

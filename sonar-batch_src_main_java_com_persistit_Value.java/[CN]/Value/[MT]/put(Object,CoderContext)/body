@@ -1,0 +1,213 @@
+{
+  preparePut();
+  final int currentItemCount=_serializedItemCount++;
+  if (object == null) {
+    ensureFit(1);
+    _bytes[_size++]=TYPE_NULL;
+    return;
+  }
+  if (_depth > 0 && _shared) {
+    final int serializationHandle=getValueCache().put(currentItemCount,object);
+    if (serializationHandle != -1) {
+      ensureFit(5);
+      _bytes[_size++]=(byte)CLASS_REREF;
+      _size+=encodeVariableLengthInt(0,_size,serializationHandle);
+      return;
+    }
+  }
+  Class<?> cl=object.getClass();
+  if (cl == String.class) {
+    final String string=(String)object;
+    putUTF(string);
+  }
+ else   if (cl == Date.class) {
+    ensureFit(9);
+    _bytes[_size++]=CLASS_DATE;
+    Util.putLong(_bytes,_size,((Date)object).getTime());
+    _size+=8;
+  }
+ else   if (cl == BigInteger.class) {
+    final byte[] bytes=((BigInteger)object).toByteArray();
+    final int length=bytes.length;
+    ensureFit(length + 2);
+    int index=_size;
+    _bytes[index++]=CLASS_BIG_INTEGER;
+    System.arraycopy(bytes,0,_bytes,index,length);
+    _size=index + length;
+    endVariableSizeItem(length + 1);
+  }
+ else   if (cl == BigDecimal.class) {
+    final BigDecimal bigDecimalValue=(BigDecimal)object;
+    final BigInteger unscaled=bigDecimalValue.unscaledValue();
+    final byte[] bytes=unscaled.toByteArray();
+    final int length=bytes.length;
+    ensureFit(length + 8);
+    int index=_size;
+    _bytes[index++]=CLASS_BIG_DECIMAL;
+    Util.putInt(_bytes,index,bigDecimalValue.scale());
+    index+=4;
+    System.arraycopy(bytes,0,_bytes,index,length);
+    _size=index + length;
+    endVariableSizeItem(length + 5);
+  }
+ else   if (cl == Boolean.class) {
+    ensureFit(2);
+    _bytes[_size++]=(byte)CLASS_BOOLEAN;
+    _bytes[_size++]=(byte)(((Boolean)object).booleanValue() ? TRUE_CHAR : FALSE_CHAR);
+  }
+ else   if (cl == Byte.class) {
+    ensureFit(2);
+    _bytes[_size++]=(byte)CLASS_BYTE;
+    _bytes[_size++]=((Byte)object).byteValue();
+  }
+ else   if (cl == Short.class) {
+    ensureFit(3);
+    _bytes[_size++]=(byte)CLASS_SHORT;
+    Util.putShort(_bytes,_size,((Short)object).shortValue());
+    _size+=2;
+  }
+ else   if (cl == Character.class) {
+    ensureFit(3);
+    _bytes[_size++]=(byte)CLASS_CHAR;
+    Util.putChar(_bytes,_size,((Character)object).charValue());
+    _size+=2;
+  }
+ else   if (cl == Integer.class) {
+    ensureFit(5);
+    _bytes[_size++]=(byte)CLASS_INT;
+    Util.putInt(_bytes,_size,((Integer)object).intValue());
+    _size+=4;
+  }
+ else   if (cl == Long.class) {
+    ensureFit(9);
+    _bytes[_size++]=(byte)CLASS_LONG;
+    Util.putLong(_bytes,_size,((Long)object).longValue());
+    _size+=8;
+  }
+ else   if (cl == Float.class) {
+    ensureFit(5);
+    _bytes[_size++]=(byte)CLASS_FLOAT;
+    Util.putInt(_bytes,_size,Float.floatToRawIntBits(((Float)object).floatValue()));
+    _size+=4;
+  }
+ else   if (cl == Double.class) {
+    ensureFit(9);
+    _bytes[_size++]=(byte)CLASS_DOUBLE;
+    Util.putLong(_bytes,_size,Double.doubleToRawLongBits(((Double)object).doubleValue()));
+    _size+=8;
+  }
+ else   if (object instanceof Accumulator) {
+    ensureFit(Accumulator.MAX_SERIALIZED_SIZE);
+    _bytes[_size++]=(byte)CLASS_ACCUMULATOR;
+    _depth++;
+    try {
+      ((Accumulator)object).store(this);
+    }
+  finally {
+      _depth--;
+    }
+  }
+ else   if (cl == TreeStatistics.class) {
+    ensureFit(TreeStatistics.MAX_SERIALIZED_SIZE);
+    _bytes[_size++]=(byte)CLASS_TREE_STATISTICS;
+    _size+=((TreeStatistics)object).store(_bytes,_size);
+  }
+ else   if (cl == Tree.class) {
+    ensureFit(Tree.MAX_SERIALIZED_SIZE);
+    _bytes[_size++]=(byte)CLASS_TREE;
+    _size+=((Tree)object).store(_bytes,_size);
+  }
+ else   if (cl.isArray()) {
+    final Class<?> componentClass=cl.getComponentType();
+    final int length=Array.getLength(object);
+    if (componentClass.isPrimitive()) {
+      if (componentClass == Boolean.TYPE) {
+        putBooleanArray1((boolean[])object,0,length);
+      }
+ else       if (componentClass == Byte.TYPE) {
+        putByteArray1((byte[])object,0,length);
+      }
+ else       if (componentClass == Short.TYPE) {
+        putShortArray1((short[])object,0,length);
+      }
+ else       if (componentClass == Character.TYPE) {
+        putCharArray1((char[])object,0,length);
+      }
+ else       if (componentClass == Integer.TYPE) {
+        putIntArray1((int[])object,0,length);
+      }
+ else       if (componentClass == Long.TYPE) {
+        putLongArray1((long[])object,0,length);
+      }
+ else       if (componentClass == Float.TYPE) {
+        putFloatArray1((float[])object,0,length);
+      }
+ else       if (componentClass == Double.TYPE) {
+        putDoubleArray1((double[])object,0,length);
+      }
+    }
+ else {
+      putObjectArray1((Object[])object,0,length);
+    }
+  }
+ else {
+    ensureFit(6);
+    final int start=_size;
+    int end=start;
+    boolean replaced=false;
+    try {
+      if (_shared && _depth == 0) {
+        getValueCache().put(currentItemCount,object);
+      }
+      _depth++;
+      ValueCoder coder=getValueCoder(cl);
+      while (coder instanceof DefaultObjectCoder) {
+        final Object replacement=((DefaultObjectCoder)coder).writeReplace(this,object);
+        if (replacement == object)         break;
+        replaced=true;
+        if (replacement != null) {
+          object=replacement;
+          cl=replacement.getClass();
+          coder=getValueCoder(cl);
+        }
+ else {
+          break;
+        }
+      }
+      if (replaced) {
+        put(object,context);
+        end=_size;
+      }
+ else {
+        int handle;
+        if (cl == Object.class) {
+          handle=CLASS_OBJECT;
+        }
+ else         handle=handleForClass(cl);
+        if (coder != null) {
+          _size+=encodeVariableLengthInt(CLASS1,_size,handle - CLASS1);
+          coder.put(this,object,context);
+          end=_size;
+        }
+ else {
+          _bytes[_size++]=CLASS_SERIALIZED;
+          final ObjectOutputStream oos=new OldValueOutputStream(this);
+          oos.writeObject(object);
+          oos.close();
+          end=_size;
+        }
+      }
+    }
+ catch (    final IOException ioe) {
+      throw new ConversionException(ioe);
+    }
+ finally {
+      _depth--;
+      _size=end;
+    }
+    if (!replaced)     endVariableSizeItem(_size - start);
+  }
+  if (_depth == 0) {
+    releaseValueCache();
+  }
+}

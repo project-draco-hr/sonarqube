@@ -1,0 +1,25 @@
+{
+  final List<Version> versions=new ArrayList<Version>();
+  final MVV.VersionVisitor visitor=new MVV.VersionVisitor(){
+    @Override public void sawVersion(    final long version,    final int valueOffset,    final int valueLength){
+      long tc=-1;
+      try {
+        tc=_persistit.getTransactionIndex().commitStatus(version,TransactionStatus.UNCOMMITTED,0);
+      }
+ catch (      final Exception e) {
+        tc=-1;
+      }
+      final Value value=new Value(_persistit);
+      value.ensureFit(valueLength);
+      System.arraycopy(_bytes,valueOffset,value.getEncodedBytes(),0,valueLength);
+      value.setEncodedSize(valueLength);
+      value.trim();
+      versions.add(new Version(version,tc,value));
+    }
+    @Override public void init() throws PersistitException {
+    }
+  }
+;
+  MVV.visitAllVersions(visitor,getEncodedBytes(),0,getEncodedSize());
+  return versions;
+}

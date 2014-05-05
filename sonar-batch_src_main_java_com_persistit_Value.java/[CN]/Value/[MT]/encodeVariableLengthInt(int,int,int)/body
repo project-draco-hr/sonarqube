@@ -1,0 +1,25 @@
+{
+  Debug.$assert0.t((base & 0x3F) == 0);
+  final int encodingSize=value < 0x00000010 ? 1 : value < 0x00001000 ? 2 : value < 0x00100000 ? 3 : 5;
+  if (_size > index) {
+    ensureFit(encodingSize);
+    System.arraycopy(_bytes,index,_bytes,index + encodingSize,_size - index);
+  }
+  base|=ENCODED_SIZE_BITS[encodingSize];
+switch (encodingSize) {
+case 5:
+    _bytes[index + 4]=(byte)(value & 0xFF);
+  value>>>=8;
+_bytes[index + 3]=(byte)(value & 0xFF);
+value>>>=8;
+case 3:
+_bytes[index + 2]=(byte)(value & 0xFF);
+value>>>=8;
+case 2:
+_bytes[index + 1]=(byte)(value & 0xFF);
+value>>>=8;
+case 1:
+_bytes[index]=(byte)(base | (value & 0x0F));
+}
+return encodingSize;
+}

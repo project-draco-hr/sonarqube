@@ -1,0 +1,19 @@
+{
+  _serializedItemCount++;
+  if (nextType(CLASS_ARRAY) == TYPE_NULL)   return -1;
+  try {
+    _depth++;
+    nextType(TYPE_DOUBLE);
+    final int sourceLength=(_end - _next) / 8;
+    if (length > sourceLength - fromOffset)     length=sourceLength - fromOffset;
+    if (length > array.length - toOffset)     length=array.length - toOffset;
+    for (int index=0; index < length; index++) {
+      array[toOffset + index]=Double.longBitsToDouble(Util.getLong(_bytes,_next + (index + fromOffset) * 8));
+    }
+    closeVariableLengthItem();
+    return length;
+  }
+  finally {
+    _depth--;
+  }
+}

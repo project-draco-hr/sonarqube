@@ -1,0 +1,21 @@
+{
+  if (_classDescriptor == null) {
+    return super.readClassDescriptor();
+  }
+ else   if (_innerClassDescriptor) {
+    final int handle=readInt();
+    final ClassInfo classInfo=_value.classInfoForHandle(handle);
+    ObjectStreamClass classDescriptor=null;
+    if (classInfo != null) {
+      classDescriptor=classInfo.getClassDescriptor();
+    }
+    if (classDescriptor == null) {
+      throw new ConversionException("Unknown class handle " + handle);
+    }
+    return classDescriptor;
+  }
+ else {
+    _innerClassDescriptor=true;
+    return _classDescriptor;
+  }
+}

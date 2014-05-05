@@ -1,0 +1,52 @@
+{
+  if (value == null) {
+    sb.append(value);
+  }
+ else {
+    final Class<?> cl=value.getClass();
+    final String className=cl.getName();
+    if (cl == String.class) {
+      final String s=(String)value;
+      int length=s.length();
+      if (length > 24 && reference)       length=21;
+      if (quoted) {
+        sb.append("\"");
+        for (int index=0; index < s.length(); index++) {
+          Util.appendQuotedChar(sb,s.charAt(index));
+        }
+        sb.append("\"");
+      }
+ else {
+        sb.append(s.substring(0,length));
+      }
+      if (length < s.length())       sb.append("...");
+    }
+ else     if (cl == Date.class) {
+      appendParenthesizedFriendlyClassName(sb,cl);
+      sb.append(Key.SDF.format((Date)value));
+    }
+ else     if (value instanceof Number) {
+      sb.append('(');
+      sb.append(className.startsWith("java.lang.") ? className.substring(10) : className);
+      sb.append(')');
+      sb.append(value);
+    }
+ else     if (value instanceof DisplayMarker) {
+      sb.append(value);
+    }
+ else     if (value instanceof AntiValue) {
+      sb.append(cl.getSimpleName());
+      sb.append(value);
+    }
+ else {
+      appendParenthesizedFriendlyClassName(sb,cl);
+      try {
+        final String s=value.toString();
+        appendDisplayable(sb,s,false,reference);
+      }
+ catch (      final Throwable t) {
+        sb.append("<<" + t + ">>");
+      }
+    }
+  }
+}

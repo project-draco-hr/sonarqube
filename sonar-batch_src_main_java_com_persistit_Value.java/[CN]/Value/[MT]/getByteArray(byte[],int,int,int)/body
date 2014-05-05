@@ -1,0 +1,20 @@
+{
+  _serializedItemCount++;
+  if (array == _bytes) {
+    throw new IllegalArgumentException("Can't overwrite encoded bytes");
+  }
+  if (nextType(CLASS_ARRAY) == TYPE_NULL)   return -1;
+  try {
+    _depth++;
+    nextType(TYPE_BYTE);
+    final int sourceLength=_end - _next;
+    if (length > sourceLength - fromOffset)     length=sourceLength - fromOffset;
+    if (length > array.length - toOffset)     length=array.length - toOffset;
+    if (length > 0)     System.arraycopy(_bytes,_next + fromOffset,array,toOffset,length);
+    closeVariableLengthItem();
+    return length;
+  }
+  finally {
+    _depth--;
+  }
+}
