@@ -1,0 +1,15 @@
+{
+  QualityProfileDto qdto=new QualityProfileDto().setName("name").setLanguage("lang");
+  qDao.insert(qdto);
+  RuleDto rdto=new RuleDto().setRuleKey("ruleKey").setRepositoryKey("repositoryKey");
+  ruleDao.insert(rdto);
+  ActiveRuleDto dto=new ActiveRuleDto().setProfileId(qdto.getId()).setRuleId(rdto.getId()).setSeverity(Severity.BLOCKER).setInheritance(null).setNoteData("text");
+  dao.insert(dto);
+  assertThat(dto.getKey()).isNotNull();
+  assertThat(dto.getKey().ruleKey()).isNotNull();
+  assertThat(dto.getKey().ruleKey().rule()).isEqualTo(rdto.getRuleKey());
+  assertThat(dto.getKey().ruleKey().repository()).isEqualTo(rdto.getRepositoryKey());
+  assertThat(dto.getKey().qProfile()).isNotNull();
+  assertThat(dto.getKey().qProfile().name()).isEqualTo(qdto.getName());
+  assertThat(dto.getKey().qProfile().lang()).isEqualTo(qdto.getLanguage());
+}
