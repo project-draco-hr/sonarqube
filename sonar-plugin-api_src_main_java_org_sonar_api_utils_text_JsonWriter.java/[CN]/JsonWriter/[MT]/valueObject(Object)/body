@@ -1,0 +1,46 @@
+{
+  try {
+    if (value == null) {
+      stream.nullValue();
+    }
+ else {
+      if (value instanceof String) {
+        stream.value((String)value);
+      }
+ else       if (value instanceof Number) {
+        stream.value((Number)value);
+      }
+ else       if (value instanceof Boolean) {
+        stream.value((Boolean)value);
+      }
+ else       if (value instanceof Date) {
+        valueDateTime((Date)value);
+      }
+ else       if (value instanceof Map) {
+        stream.beginObject();
+        for (        Map.Entry<Object,Object> entry : ((Map<Object,Object>)value).entrySet()) {
+          stream.name(entry.getKey().toString());
+          valueObject(entry.getValue());
+        }
+        stream.endObject();
+      }
+ else       if (value instanceof Iterable) {
+        stream.beginArray();
+        for (        Object o : (Iterable<Object>)value) {
+          valueObject(o);
+        }
+        stream.endArray();
+      }
+ else {
+        throw new IllegalArgumentException(getClass() + " does not support encoding of type: " + value.getClass());
+      }
+    }
+    return this;
+  }
+ catch (  IllegalArgumentException e) {
+    throw e;
+  }
+catch (  Exception e) {
+    throw rethrow(e);
+  }
+}
