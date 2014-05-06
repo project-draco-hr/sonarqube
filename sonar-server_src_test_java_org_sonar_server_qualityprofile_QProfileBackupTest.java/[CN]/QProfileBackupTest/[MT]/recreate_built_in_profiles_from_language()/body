@@ -1,0 +1,21 @@
+{
+  String name="Default";
+  String language="java";
+  RulesProfile profile=RulesProfile.create(name,language);
+  Rule rule=Rule.create("pmd","rule");
+  rule.createParameter("max");
+  ActiveRule activeRule=profile.activateRule(rule,RulePriority.BLOCKER);
+  activeRule.setParameter("max","10");
+  ProfileDefinition profileDefinition=mock(ProfileDefinition.class);
+  when(profileDefinition.createProfile(any(ValidationMessages.class))).thenReturn(profile);
+  definitions.add(profileDefinition);
+  when(ruleDao.selectByKey(RuleKey.of("pmd","rule"),session)).thenReturn(new RuleDto().setId(10).setSeverity("INFO"));
+  when(qProfileOperations.newProfile(eq(name),eq(language),eq(true),any(UserSession.class),eq(session))).thenReturn(new QProfile().setId(1));
+  backup.recreateBuiltInProfilesByLanguage(language);
+  verify(qProfileActiveRuleOperations).createActiveRule(eq(1),eq(10),eq("BLOCKER"),eq(session));
+  verify(qProfileActiveRuleOperations).updateActiveRuleParam(any(ActiveRuleDto.class),eq("max"),eq("10"),eq(session));
+  verifyNoMoreInteractions(qProfileActiveRuleOperations);
+  verify(esActiveRule).bulkIndexProfile(eq(1),eq(session));
+  verify(dryRunCache).reportGlobalModification(session);
+  verify(session).commit();
+}

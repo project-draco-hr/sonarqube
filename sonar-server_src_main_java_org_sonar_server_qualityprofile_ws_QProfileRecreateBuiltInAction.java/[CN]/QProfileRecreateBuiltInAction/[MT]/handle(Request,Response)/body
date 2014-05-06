@@ -1,0 +1,26 @@
+{
+  final String language=request.mandatoryParam("language");
+  QProfileResult result=qProfileBackup.recreateBuiltInProfilesByLanguage(language);
+  if (!result.infos().isEmpty() || !result.warnings().isEmpty()) {
+    JsonWriter json=response.newJsonWriter();
+    json.beginObject();
+    if (!result.infos().isEmpty()) {
+      json.name("infos").beginArray();
+      for (      String info : result.infos()) {
+        json.value(info);
+      }
+      json.endArray();
+    }
+    if (!result.warnings().isEmpty()) {
+      json.name("warnings").beginArray();
+      for (      String warning : result.warnings()) {
+        json.value(warning);
+      }
+      json.endArray();
+    }
+    json.endObject().close();
+  }
+ else {
+    response.noContent();
+  }
+}
