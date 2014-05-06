@@ -3,10 +3,10 @@
   index.refresh();
   QueryOptions options=new QueryOptions();
   options.addFieldsToReturn(RuleNormalizer.RuleField.LANGUAGE.key(),RuleNormalizer.RuleField.STATUS.key());
-  Results results=index.search(new RuleQuery(),options);
+  Result<Rule> results=index.search(new RuleQuery(),options);
   assertThat(results.getHits()).hasSize(1);
-  Hit hit=Iterables.getFirst(results.getHits(),null);
-  assertThat(hit.getFields()).hasSize(2);
-  assertThat(hit.getFieldAsString(RuleNormalizer.RuleField.LANGUAGE.key())).isEqualTo("js");
-  assertThat(hit.getFieldAsString(RuleNormalizer.RuleField.STATUS.key())).isEqualTo(RuleStatus.READY.name());
+  Rule hit=Iterables.getFirst(results.getHits(),null);
+  assertThat(hit.language()).isEqualTo("js");
+  assertThat(hit.status()).isEqualTo(RuleStatus.READY);
+  assertThat(hit.htmlDescription()).isNull();
 }

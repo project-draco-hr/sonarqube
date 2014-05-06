@@ -3,11 +3,11 @@
   dao.insert(newRuleDto(RuleKey.of("java","S002")).setLanguage("php"));
   index.refresh();
   RuleQuery query=new RuleQuery().setSortField(RuleQuery.SortField.LANGUAGE);
-  Results results=index.search(query,new QueryOptions());
-  assertThat(Iterables.getFirst(results.getHits(),null).getFieldAsString("key")).isEqualTo("S001");
-  assertThat(Iterables.getLast(results.getHits(),null).getFieldAsString("key")).isEqualTo("S002");
+  Result<Rule> results=index.search(query,new QueryOptions());
+  assertThat(Iterables.getFirst(results.getHits(),null).key().rule()).isEqualTo("S001");
+  assertThat(Iterables.getLast(results.getHits(),null).key().rule()).isEqualTo("S002");
   query=new RuleQuery().setSortField(RuleQuery.SortField.LANGUAGE).setAscendingSort(false);
   results=index.search(query,new QueryOptions());
-  assertThat(Iterables.getFirst(results.getHits(),null).getFieldAsString("key")).isEqualTo("S002");
-  assertThat(Iterables.getLast(results.getHits(),null).getFieldAsString("key")).isEqualTo("S001");
+  assertThat(Iterables.getFirst(results.getHits(),null).key().rule()).isEqualTo("S002");
+  assertThat(Iterables.getLast(results.getHits(),null).key().rule()).isEqualTo("S001");
 }

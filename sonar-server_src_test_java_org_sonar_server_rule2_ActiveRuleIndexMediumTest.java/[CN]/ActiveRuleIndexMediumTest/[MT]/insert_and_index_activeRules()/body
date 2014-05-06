@@ -1,0 +1,19 @@
+{
+  DbSession dbSession=tester.get(MyBatis.class).openSession(false);
+  ActiveRuleDao activeRuleDao=tester.get(ActiveRuleDao.class);
+  QualityProfileDto profileDto=new QualityProfileDto().setName("myprofile").setLanguage("java");
+  qualityProfileDao.insert(profileDto,dbSession);
+  RuleKey ruleKey=RuleKey.of("javascript","S001");
+  RuleDto ruleDto=newRuleDto(ruleKey);
+  dao.insert(ruleDto,dbSession);
+  dbSession.commit();
+  ActiveRuleDto activeRule=new ActiveRuleDto().setInheritance("inherited").setProfileId(profileDto.getId()).setRuleId(ruleDto.getId()).setSeverity(Severity.BLOCKER);
+  activeRuleDao.insert(activeRule,dbSession);
+  dbSession.commit();
+  dbSession.close();
+  List<ActiveRuleDto> persistedDtos=activeRuleDao.selectByRuleId(ruleDto.getId());
+  assertThat(persistedDtos).hasSize(1);
+  index.refresh();
+  Rule hit=index.getByKey(ruleKey);
+  assertThat(hit).isNotNull();
+}

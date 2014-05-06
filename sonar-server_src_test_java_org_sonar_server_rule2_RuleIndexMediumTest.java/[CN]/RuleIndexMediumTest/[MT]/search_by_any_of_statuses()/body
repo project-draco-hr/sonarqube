@@ -3,9 +3,9 @@
   dao.insert(newRuleDto(RuleKey.of("java","S002")).setStatus(RuleStatus.READY.name()));
   index.refresh();
   RuleQuery query=new RuleQuery().setStatuses(Arrays.asList(RuleStatus.DEPRECATED,RuleStatus.READY));
-  Results results=index.search(query,new QueryOptions());
+  Result<Rule> results=index.search(query,new QueryOptions());
   assertThat(results.getHits()).hasSize(1);
-  assertThat(Iterables.getFirst(results.getHits(),null).getFieldAsString("key")).isEqualTo("S002");
+  assertThat(Iterables.getFirst(results.getHits(),null).key().rule()).isEqualTo("S002");
   query=new RuleQuery().setStatuses(Arrays.asList(RuleStatus.DEPRECATED));
   assertThat(index.search(query,new QueryOptions()).getHits()).isEmpty();
   query=new RuleQuery().setStatuses(Collections.<RuleStatus>emptyList());

@@ -24,9 +24,10 @@
   assertThat(persistedDtos).hasSize(3);
   index.refresh();
   index.search(new RuleQuery(),new QueryOptions());
-  Hit hit=index.getByKey(ruleKey);
+  Rule hit=index.getByKey(ruleKey);
   assertThat(hit).isNotNull();
-  assertThat(hit.getField(RuleNormalizer.RuleField.TAGS.key())).isNotNull();
+  assertThat(hit.tags()).containsExactly("hello","world");
+  assertThat(hit.systemTags()).containsExactly("AdMiN");
   RuleService service=tester.get(RuleService.class);
   Rule rule=service.getByKey(ruleKey);
   assertThat(rule.tags()).containsExactly("hello","world");
