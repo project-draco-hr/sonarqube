@@ -1,7 +1,12 @@
 {
-  String field=RuleField.TAGS.key();
-  if (tag.getType().equals(RuleTagType.SYSTEM)) {
-    field=RuleField.SYSTEM_TAGS.key();
+  try {
+    String field=RuleField.TAGS.key();
+    if (tag.getType().equals(RuleTagType.SYSTEM)) {
+      field=RuleField.SYSTEM_TAGS.key();
+    }
+    return new UpdateRequest().script("ctx._source." + field + " += tag").addScriptParam("tag",tag.getTag());
   }
-  return new UpdateRequest().script("ctx._source." + field + " += tag").addScriptParam("tag",tag.getTag());
+ catch (  Exception e) {
+    throw new IllegalStateException(String.format("Could not normalize Object (%s) for key %s",tag.getClass().getSimpleName(),key.toString()),e);
+  }
 }
