@@ -4,9 +4,12 @@
   QueryBuilder qb=this.getQuery(query,options);
   esSearch.setQuery(QueryBuilders.filteredQuery(qb,fb));
   SearchResponse esResult=esSearch.get();
-  Result<R> result=new Result<R>(esResult).setTotal((int)esResult.getHits().totalHits()).setTime(esResult.getTookInMillis());
-  for (  SearchHit hit : esResult.getHits()) {
-    result.getHits().add(this.getSearchResult(hit));
+  Result<R> result=new Result<R>(esResult);
+  if (esResult != null) {
+    result.setTotal((int)esResult.getHits().totalHits()).setTime(esResult.getTookInMillis());
+    for (    SearchHit hit : esResult.getHits()) {
+      result.getHits().add(this.getSearchResult(hit));
+    }
   }
   return result;
 }
