@@ -1,0 +1,19 @@
+{
+  CountDistributionBuilder nclocDistribution=new CountDistributionBuilder(CoreMetrics.NCLOC_LANGUAGE_DISTRIBUTION);
+  if (ResourceUtils.isFile(resource)) {
+    Language language=resource.getLanguage();
+    Measure ncloc=context.getMeasure(CoreMetrics.NCLOC);
+    if (language != null && ncloc != null) {
+      nclocDistribution.add(language.getKey(),ncloc.getIntValue());
+    }
+  }
+ else {
+    for (    Measure measure : context.getChildrenMeasures(CoreMetrics.NCLOC_LANGUAGE_DISTRIBUTION)) {
+      nclocDistribution.add(measure);
+    }
+  }
+  Measure measure=nclocDistribution.build(false);
+  if (measure != null) {
+    context.saveMeasure(measure);
+  }
+}

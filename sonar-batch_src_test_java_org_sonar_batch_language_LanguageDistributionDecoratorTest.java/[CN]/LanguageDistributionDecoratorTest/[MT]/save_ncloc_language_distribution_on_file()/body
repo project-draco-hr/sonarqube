@@ -1,0 +1,12 @@
+{
+  Language language=mock(Language.class);
+  when(language.getKey()).thenReturn("xoo");
+  when(resource.getScope()).thenReturn(Scopes.FILE);
+  when(resource.getLanguage()).thenReturn(language);
+  when(context.getMeasure(CoreMetrics.NCLOC)).thenReturn(new Measure(CoreMetrics.NCLOC,200.0));
+  decorator.decorate(resource,context);
+  verify(context).saveMeasure(measureCaptor.capture());
+  Measure result=measureCaptor.getValue();
+  assertThat(result.getMetric()).isEqualTo(CoreMetrics.NCLOC_LANGUAGE_DISTRIBUTION);
+  assertThat(result.getData()).isEqualTo("xoo=200");
+}

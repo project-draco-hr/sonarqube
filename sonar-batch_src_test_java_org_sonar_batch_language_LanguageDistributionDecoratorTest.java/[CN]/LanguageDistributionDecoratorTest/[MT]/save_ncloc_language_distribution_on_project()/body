@@ -1,0 +1,9 @@
+{
+  when(resource.getScope()).thenReturn(Scopes.PROJECT);
+  when(context.getChildrenMeasures(CoreMetrics.NCLOC_LANGUAGE_DISTRIBUTION)).thenReturn(newArrayList(new Measure(CoreMetrics.NCLOC_LANGUAGE_DISTRIBUTION,KeyValueFormat.format(ImmutableMap.of("java",20))),new Measure(CoreMetrics.NCLOC_LANGUAGE_DISTRIBUTION,KeyValueFormat.format(ImmutableMap.of("xoo",150))),new Measure(CoreMetrics.NCLOC_LANGUAGE_DISTRIBUTION,KeyValueFormat.format(ImmutableMap.of("xoo",50)))));
+  decorator.decorate(resource,context);
+  verify(context).saveMeasure(measureCaptor.capture());
+  Measure result=measureCaptor.getValue();
+  assertThat(result.getMetric()).isEqualTo(CoreMetrics.NCLOC_LANGUAGE_DISTRIBUTION);
+  assertThat(result.getData()).isEqualTo("java=20;xoo=200");
+}
