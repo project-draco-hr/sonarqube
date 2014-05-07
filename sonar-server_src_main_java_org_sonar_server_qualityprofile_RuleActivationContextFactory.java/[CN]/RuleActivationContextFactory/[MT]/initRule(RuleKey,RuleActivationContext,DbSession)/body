@@ -1,0 +1,12 @@
+{
+  RuleDto rule=ruleDao.getByKey(ruleKey,dbSession);
+  if (rule == null) {
+    throw new IllegalArgumentException("Rule not found: " + ruleKey);
+  }
+  if (RuleStatus.REMOVED == RuleStatus.valueOf(rule.getStatus())) {
+    throw new IllegalArgumentException("Rule was removed: " + ruleKey);
+  }
+  context.setRule(rule);
+  context.setRuleParams(ruleDao.findRuleParamsByRuleKey(rule.getKey(),dbSession));
+  return rule;
+}

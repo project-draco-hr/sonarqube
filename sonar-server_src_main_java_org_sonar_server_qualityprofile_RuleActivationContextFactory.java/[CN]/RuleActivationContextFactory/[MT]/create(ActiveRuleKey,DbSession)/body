@@ -1,0 +1,15 @@
+{
+  RuleActivationContext context=new RuleActivationContext();
+  RuleDto rule=initRule(key.ruleKey(),context,session);
+  QualityProfileDto profile=initProfile(key,context,session,false);
+  initActiveRules(key,context,session,false);
+  if (!profile.getLanguage().equals(rule.getLanguage())) {
+    throw new IllegalArgumentException(String.format("Rule %s and profile %s have different languages",rule.getKey(),profile));
+  }
+  if (profile.getParent() != null) {
+    ActiveRuleKey parentKey=ActiveRuleKey.of(QualityProfileKey.of(profile.getParent(),profile.getLanguage()),rule.getKey());
+    initProfile(parentKey,context,session,true);
+    initActiveRules(parentKey,context,session,true);
+  }
+  return context;
+}

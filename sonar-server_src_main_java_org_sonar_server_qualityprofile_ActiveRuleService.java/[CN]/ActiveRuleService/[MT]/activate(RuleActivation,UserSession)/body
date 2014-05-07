@@ -1,0 +1,23 @@
+{
+  verifyPermission(userSession);
+  DbSession dbSession=myBatis.openSession(false);
+  List<ActiveRuleChange> changes=Lists.newArrayList();
+  try {
+    RuleActivationContext context=contextFactory.create(activation.getKey(),dbSession);
+    ActiveRuleChange change;
+    if (context.activeRule() == null) {
+      change=new ActiveRuleChange(ActiveRuleChange.Type.ACTIVATED,activation.getKey());
+    }
+ else {
+      change=new ActiveRuleChange(ActiveRuleChange.Type.UPDATED,activation.getKey());
+    }
+    change.setSeverity(StringUtils.defaultIfEmpty(activation.getSeverity(),context.defaultSeverity()));
+    changes.add(change);
+    persist(changes,dbSession);
+    dbSession.commit();
+    return changes;
+  }
+  finally {
+    dbSession.close();
+  }
+}

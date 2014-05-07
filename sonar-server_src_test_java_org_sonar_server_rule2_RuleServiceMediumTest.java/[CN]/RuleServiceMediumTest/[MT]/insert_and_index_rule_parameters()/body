@@ -1,15 +1,14 @@
 {
-  DbSession dbSession=tester.get(MyBatis.class).openSession(false);
   RuleKey ruleKey=RuleKey.of("javascript","S001");
   RuleDto ruleDto=newRuleDto(ruleKey);
   dao.insert(ruleDto,dbSession);
   dbSession.commit();
-  RuleParamDto minParamDto=new RuleParamDto().setRuleId(ruleDto.getId()).setName("min").setType(RuleParamType.INTEGER.type()).setDefaultValue("2").setDescription("Minimum");
-  dao.insert(minParamDto,dbSession);
-  RuleParamDto maxParamDto=new RuleParamDto().setRuleId(ruleDto.getId()).setName("max").setType(RuleParamType.INTEGER.type()).setDefaultValue("10").setDescription("Maximum");
-  dao.insert(maxParamDto,dbSession);
+  RuleParamDto minParamDto=new RuleParamDto().setName("min").setType(RuleParamType.INTEGER.type()).setDefaultValue("2").setDescription("Minimum");
+  dao.addRuleParam(ruleDto,minParamDto,dbSession);
+  RuleParamDto maxParamDto=new RuleParamDto().setName("max").setType(RuleParamType.INTEGER.type()).setDefaultValue("10").setDescription("Maximum");
+  dao.addRuleParam(ruleDto,maxParamDto,dbSession);
   dbSession.commit();
-  List<RuleParamDto> persistedDtos=dao.selectParametersByRuleId(ruleDto.getId());
+  List<RuleParamDto> persistedDtos=dao.findRuleParamsByRuleKey(ruleKey,dbSession);
   assertThat(persistedDtos).hasSize(2);
   index.refresh();
   Rule hit=index.getByKey(ruleKey);
