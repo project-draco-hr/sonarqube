@@ -2,8 +2,8 @@
   ArrayList<ResolvedCondition> conditions=Lists.newArrayList(mockCondition(CoreMetrics.CLASSES,QualityGateConditionDto.OPERATOR_GREATER_THAN,null,"20"),mockCondition(CoreMetrics.COVERAGE,QualityGateConditionDto.OPERATOR_GREATER_THAN,null,"35.0"));
   when(qualityGate.conditions()).thenReturn(conditions);
   verifier.decorate(project,context);
-  verify(context).saveMeasure(argThat(hasLevel(measureClasses,Metric.Level.OK)));
-  verify(context).saveMeasure(argThat(hasLevel(measureCoverage,Metric.Level.OK)));
+  verify(index).updateMeasure(eq(project),argThat(hasLevel(measureClasses,Metric.Level.OK)));
+  verify(index).updateMeasure(eq(project),argThat(hasLevel(measureCoverage,Metric.Level.OK)));
   verify(context).saveMeasure(argThat(new IsMeasure(CoreMetrics.ALERT_STATUS,Metric.Level.OK.toString())));
   verify(context).saveMeasure(argThat(new IsMeasure(CoreMetrics.QUALITY_GATE_DETAILS,"{\"level\":\"OK\"," + "\"conditions\":" + "["+ "{\"metric\":\"classes\",\"op\":\"GT\",\"warning\":\"20\",\"actual\":\"20.0\",\"level\":\"OK\"},"+ "{\"metric\":\"coverage\",\"op\":\"GT\",\"warning\":\"35.0\",\"actual\":\"35.0\",\"level\":\"OK\"}"+ "]"+ "}")));
 }

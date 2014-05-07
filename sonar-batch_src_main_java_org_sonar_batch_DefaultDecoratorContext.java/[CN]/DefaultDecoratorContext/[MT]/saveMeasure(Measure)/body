@@ -1,30 +1,7 @@
 {
   checkReadOnly(SAVE_MEASURE_METHOD);
-  Metric metric=metricFinder.findByKey(measure.getMetricKey());
-  if (metric == null) {
-    throw new SonarException("Unknown metric: " + measure.getMetricKey());
-  }
-  measure.setMetric(metric);
   if (measurementFilters.accept(resource,measure)) {
-    List<Measure> metricMeasures=measuresByMetric.get(measure.getMetricKey());
-    boolean add=true;
-    if (metricMeasures != null) {
-      int index=metricMeasures.indexOf(measure);
-      if (index > -1) {
-        if (metricMeasures.get(index) == measure) {
-          add=false;
-        }
- else         if (measure.getMetric().equals(CoreMetrics.TESTS)) {
-          measuresByMetric.remove(measure.getMetric().getKey(),metricMeasures.get(index));
-        }
- else {
-          throw new SonarException("Can not add twice the same measure on " + resource + ": "+ measure);
-        }
-      }
-    }
-    if (add) {
-      measuresByMetric.put(measure.getMetricKey(),measure);
-    }
+    index.addMeasure(resource,measure);
   }
   return this;
 }
