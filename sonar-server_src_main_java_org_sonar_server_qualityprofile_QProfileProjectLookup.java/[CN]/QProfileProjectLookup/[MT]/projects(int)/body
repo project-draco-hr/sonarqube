@@ -3,8 +3,16 @@
   try {
     QualityProfileDto qualityProfile=qualityProfileDao.selectById(profileId,session);
     QProfileValidations.checkProfileIsNotNull(qualityProfile);
-    List<ComponentDto> componentDtos=qualityProfileDao.selectProjects(qualityProfile.getName(),QProfileOperations.PROFILE_PROPERTY_PREFIX + qualityProfile.getLanguage(),session);
-    return Lists.<Component>newArrayList(componentDtos);
+    Map<String,Component> componentsByKeys=Maps.newHashMap();
+    for (    Component component : qualityProfileDao.selectProjects(qualityProfile.getName(),QProfileOperations.PROFILE_PROPERTY_PREFIX + qualityProfile.getLanguage(),session)) {
+      componentsByKeys.put(component.key(),component);
+    }
+    UserSession userSession=UserSession.get();
+    List<Component> result=Lists.newArrayList();
+    for (    String key : authorizationDao.keepAuthorizedComponentKeys(componentsByKeys.keySet(),userSession.userId(),UserRole.USER)) {
+      result.add(componentsByKeys.get(key));
+    }
+    return result;
   }
   finally {
     MyBatis.closeQuietly(session);

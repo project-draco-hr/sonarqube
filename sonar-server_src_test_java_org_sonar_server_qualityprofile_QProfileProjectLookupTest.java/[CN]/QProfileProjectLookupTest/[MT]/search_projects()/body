@@ -1,6 +1,11 @@
 {
+  int userId=42;
+  MockUserSession.set().setUserId(userId);
   QualityProfileDto qualityProfile=new QualityProfileDto().setId(1).setName("My profile").setLanguage("java");
   when(qualityProfileDao.selectById(1,session)).thenReturn(qualityProfile);
-  when(qualityProfileDao.selectProjects("My profile","sonar.profile.java",session)).thenReturn(newArrayList(new ComponentDto().setId(1L).setKey("org.codehaus.sonar:sonar").setName("SonarQube")));
+  String key1="org.codehaus.sonar:sonar1";
+  String key2="org.codehaus.sonar:sonar2";
+  when(qualityProfileDao.selectProjects("My profile","sonar.profile.java",session)).thenReturn(newArrayList(new ComponentDto().setId(1L).setKey(key1).setName("SonarQube One"),new ComponentDto().setId(1L).setKey(key2).setName("SonarQube Two")));
+  when(authorizationDao.keepAuthorizedComponentKeys(anySet(),eq(userId),eq(UserRole.USER))).thenReturn(Sets.newHashSet(key1));
   assertThat(lookup.projects(1)).hasSize(1);
 }
