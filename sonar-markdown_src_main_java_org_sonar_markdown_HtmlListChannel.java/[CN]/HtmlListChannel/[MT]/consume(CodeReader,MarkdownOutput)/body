@@ -1,10 +1,19 @@
 {
   try {
-    if (code.getColumnPosition() == 0 && listElement.consume(code,output)) {
-      while (endOfLine.consume(code,output) && listElement.consume(code,output)) {
+    ListElementChannel currentChannel=null;
+    if (code.getColumnPosition() == 0) {
+      if (orderedListElement.consume(code,output)) {
+        currentChannel=orderedListElement;
       }
-      output.append("</ul>");
-      return true;
+ else       if (unorderedListElement.consume(code,output)) {
+        currentChannel=unorderedListElement;
+      }
+      if (currentChannel != null) {
+        while (endOfLine.consume(code,output) && currentChannel.consume(code,output)) {
+        }
+        output.append("</" + currentChannel.listElement + ">");
+        return true;
+      }
     }
     return false;
   }
