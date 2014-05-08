@@ -1,0 +1,12 @@
+{
+  system=mock(System2.class);
+  when(system.now()).thenReturn(date.getTime());
+  myBatis=getMyBatis();
+  ruleDao=new RuleDao();
+  ruleTagDao=new RuleTagDao(myBatis);
+  activeRuleDao=new ActiveRuleDao(new QualityProfileDao(myBatis),ruleDao);
+  ruleTagOperations=new RuleTagOperations(ruleTagDao,esRuleTags);
+  characteristicDao=new CharacteristicDao(myBatis);
+  task=new RegisterRules(new RuleDefinitionsLoader(mock(RuleRepositories.class),new RulesDefinition[]{new FakeRepository()}),profilesManager,myBatis,ruleDao,ruleTagOperations,activeRuleDao,characteristicDao,system);
+  session=myBatis.openSession(false);
+}

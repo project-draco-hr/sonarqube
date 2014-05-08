@@ -1,0 +1,23 @@
+{
+  Collection<RuleParamDto> paramDtos=buffer.paramsForRuleId(dto.getId());
+  Set<String> persistedParamKeys=Sets.newHashSet();
+  for (  RuleParamDto paramDto : paramDtos) {
+    RulesDefinition.Param paramDef=ruleDef.param(paramDto.getName());
+    if (paramDef == null) {
+      ruleDao.removeRuleParam(dto,paramDto,sqlSession);
+    }
+ else {
+      if (mergeParam(paramDto,paramDef)) {
+        ruleDao.updateRuleParam(dto,paramDto,sqlSession);
+      }
+      persistedParamKeys.add(paramDto.getName());
+    }
+  }
+  for (  RulesDefinition.Param param : ruleDef.params()) {
+    if (!persistedParamKeys.contains(param.key())) {
+      RuleParamDto paramDto=RuleParamDto.createFor(dto).setName(param.key()).setDescription(param.description()).setDefaultValue(param.defaultValue()).setType(param.type().toString());
+      ruleDao.addRuleParam(dto,paramDto,sqlSession);
+      buffer.add(paramDto);
+    }
+  }
+}

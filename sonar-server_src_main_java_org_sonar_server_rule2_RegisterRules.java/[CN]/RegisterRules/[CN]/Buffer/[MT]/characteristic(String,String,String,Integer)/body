@@ -1,0 +1,15 @@
+{
+  if (subCharacteristic == null) {
+    return null;
+  }
+  CharacteristicDto characteristicDto=findCharacteristic(subCharacteristic);
+  if (characteristicDto == null) {
+    if (overridingCharacteristicId == null) {
+      LOG.warn(String.format("Characteristic '%s' has not been found on rule '%s:%s'",subCharacteristic,repo,ruleKey));
+    }
+  }
+ else   if (characteristicDto.getParentId() == null) {
+    throw MessageException.of(String.format("Rule '%s:%s' cannot be linked on the root characteristic '%s'",repo,ruleKey,subCharacteristic));
+  }
+  return characteristicDto;
+}

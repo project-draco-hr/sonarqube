@@ -1,0 +1,17 @@
+{
+  TimeProfiler profiler=new TimeProfiler().start("Register rules");
+  DbSession sqlSession=myBatis.openSession(false);
+  try {
+    RulesDefinition.Context context=defLoader.load();
+    Buffer buffer=new Buffer(system.now());
+    selectRulesFromDb(buffer,sqlSession);
+    enableRuleDefinitions(context,buffer,sqlSession);
+    List<RuleDto> removedRules=processRemainingDbRules(buffer,sqlSession);
+    removeActiveRulesOnStillExistingRepositories(removedRules,context);
+    sqlSession.commit();
+  }
+  finally {
+    sqlSession.close();
+    profiler.stop();
+  }
+}

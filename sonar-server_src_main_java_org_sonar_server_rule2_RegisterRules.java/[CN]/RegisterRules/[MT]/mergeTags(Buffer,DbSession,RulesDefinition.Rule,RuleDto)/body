@@ -1,0 +1,22 @@
+{
+  Set<String> existingSystemTags=Sets.newHashSet();
+  Collection<String> tags=ImmutableList.copyOf(buffer.tagsForRuleId(dto.getId()));
+  Collection<String> systemTags=ImmutableList.copyOf(buffer.systemTagsForRuleId(dto.getId()));
+  for (  String tag : tags) {
+    if (!ruleDef.tags().contains(tag)) {
+      dto.getTags().remove(tag);
+      buffer.removeTag(tag,dto.getId());
+    }
+ else {
+      dto.getTags().add(tag);
+      existingSystemTags.add(tag);
+    }
+  }
+  for (  String tag : systemTags) {
+    if (ruleDef.tags().contains(tag)) {
+      dto.getSystemTags().add(tag);
+      existingSystemTags.add(tag);
+    }
+  }
+  ruleDao.update(dto,sqlSession);
+}
