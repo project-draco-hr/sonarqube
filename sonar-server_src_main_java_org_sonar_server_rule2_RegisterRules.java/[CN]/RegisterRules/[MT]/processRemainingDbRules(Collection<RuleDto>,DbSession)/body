@@ -1,0 +1,33 @@
+{
+  List<RuleDto> removedRules=newArrayList();
+  for (  RuleDto ruleDto : ruleDtos) {
+    boolean toBeRemoved=true;
+    if (ruleDto.getParentId() != null) {
+      RuleDto parent=ruleDao.getParent(ruleDto,session);
+      if (parent != null && !Rule.STATUS_REMOVED.equals(parent.getStatus())) {
+        ruleDto.setLanguage(parent.getLanguage());
+        ruleDto.setStatus(parent.getStatus());
+        ruleDto.setDefaultSubCharacteristicId(parent.getDefaultSubCharacteristicId());
+        ruleDto.setDefaultRemediationFunction(parent.getDefaultRemediationFunction());
+        ruleDto.setDefaultRemediationCoefficient(parent.getDefaultRemediationCoefficient());
+        ruleDto.setDefaultRemediationOffset(parent.getDefaultRemediationOffset());
+        ruleDto.setEffortToFixDescription(parent.getEffortToFixDescription());
+        ruleDao.update(ruleDto,session);
+        toBeRemoved=false;
+      }
+    }
+    if (toBeRemoved && !Rule.STATUS_REMOVED.equals(ruleDto.getStatus())) {
+      LOG.info(String.format("Disable rule %s",ruleDto.getKey()));
+      ruleDto.setStatus(Rule.STATUS_REMOVED);
+      ruleDto.setSystemTags(Collections.EMPTY_SET);
+      ruleDto.setTags(Collections.EMPTY_SET);
+    }
+    ruleDao.update(ruleDto,session);
+    removedRules.add(ruleDto);
+    if (removedRules.size() % 100 == 0) {
+      session.commit();
+    }
+  }
+  session.commit();
+  return removedRules;
+}

@@ -1,17 +1,38 @@
 {
   TimeProfiler profiler=new TimeProfiler().start("Register rules");
-  DbSession sqlSession=myBatis.openSession(false);
+  DbSession session=myBatis.openSession(false);
   try {
+    Map<RuleKey,RuleDto> allRules=getRulesByKey(session);
     RulesDefinition.Context context=defLoader.load();
-    Buffer buffer=new Buffer(system.now());
-    selectRulesFromDb(buffer,sqlSession);
-    enableRuleDefinitions(context,buffer,sqlSession);
-    List<RuleDto> removedRules=processRemainingDbRules(buffer,sqlSession);
-    removeActiveRulesOnStillExistingRepositories(removedRules,context);
-    sqlSession.commit();
+    for (    RulesDefinition.ExtendedRepository repoDef : getRepositories(context)) {
+      for (      RulesDefinition.Rule ruleDef : repoDef.rules()) {
+        RuleKey ruleKey=RuleKey.of(ruleDef.repository().key(),ruleDef.key());
+        RuleDto rule=allRules.containsKey(ruleKey) ? allRules.remove(ruleKey) : this.createRuleDto(ruleDef,session);
+        boolean executeUpdate=false;
+        if (mergeRule(ruleDef,rule)) {
+          executeUpdate=true;
+        }
+        if (rule.getSubCharacteristicId() != null) {
+          CharacteristicDto characteristicDto=characteristicDao.selectById(rule.getSubCharacteristicId(),session);
+          if (characteristicDto != null && mergeDebtDefinitions(ruleDef,rule,characteristicDto)) {
+            executeUpdate=true;
+          }
+        }
+        if (mergeTags(ruleDef,rule)) {
+          executeUpdate=true;
+        }
+        if (executeUpdate) {
+          ruleDao.update(rule,session);
+        }
+        mergeParams(ruleDef,rule,session);
+      }
+    }
+    List<RuleDto> activeRules=processRemainingDbRules(allRules.values(),session);
+    removeActiveRulesOnStillExistingRepositories(activeRules,context);
+    session.commit();
   }
   finally {
-    sqlSession.close();
+    session.close();
     profiler.stop();
   }
 }

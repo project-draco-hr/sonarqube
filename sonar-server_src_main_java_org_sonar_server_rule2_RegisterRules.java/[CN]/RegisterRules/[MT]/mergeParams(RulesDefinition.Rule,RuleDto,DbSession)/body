@@ -1,0 +1,22 @@
+{
+  List<RuleParamDto> paramDtos=ruleDao.findRuleParamsByRuleKey(rule.getKey(),session);
+  List<String> existingParamDtoNames=new ArrayList<String>();
+  for (  RuleParamDto paramDto : paramDtos) {
+    RulesDefinition.Param paramDef=ruleDef.param(paramDto.getName());
+    if (paramDef == null) {
+      ruleDao.removeRuleParam(rule,paramDto,session);
+    }
+ else {
+      if (mergeParam(paramDto,paramDef)) {
+        ruleDao.updateRuleParam(rule,paramDto,session);
+      }
+      existingParamDtoNames.add(paramDto.getName());
+    }
+  }
+  for (  RulesDefinition.Param param : ruleDef.params()) {
+    if (!existingParamDtoNames.contains(param.key())) {
+      RuleParamDto paramDto=RuleParamDto.createFor(rule).setName(param.key()).setDescription(param.description()).setDefaultValue(param.defaultValue()).setType(param.type().toString());
+      ruleDao.addRuleParam(rule,paramDto,session);
+    }
+  }
+}
