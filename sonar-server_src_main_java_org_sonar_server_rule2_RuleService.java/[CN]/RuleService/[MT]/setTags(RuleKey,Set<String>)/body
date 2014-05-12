@@ -1,0 +1,18 @@
+{
+  checkAdminPermission(UserSession.get());
+  DbSession dbSession=db.openSession(false);
+  try {
+    RuleDto rule=db.ruleDao().getByKey(ruleKey,dbSession);
+    if (rule == null) {
+      throw new NotFoundException(String.format("Rule %s not found",ruleKey));
+    }
+    boolean changed=RuleTagHelper.applyTags(rule,tags);
+    if (changed) {
+      db.ruleDao().update(rule,dbSession);
+      dbSession.commit();
+    }
+  }
+  finally {
+    dbSession.close();
+  }
+}

@@ -1,0 +1,15 @@
+{
+  for (  String tag : tags) {
+    RuleTagFormat.validate(tag);
+  }
+  Set<String> initialTags=rule.getTags();
+  final Set<String> systemTags=rule.getSystemTags();
+  Set<String> withoutSystemTags=Sets.filter(tags,new Predicate<String>(){
+    @Override public boolean apply(    @Nullable String input){
+      return input != null && !systemTags.contains(input);
+    }
+  }
+);
+  rule.setTags(withoutSystemTags);
+  return Sets.difference(initialTags,withoutSystemTags).size() > 0;
+}
