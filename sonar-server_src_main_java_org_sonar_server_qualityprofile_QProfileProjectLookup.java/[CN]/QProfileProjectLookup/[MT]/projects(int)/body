@@ -9,8 +9,11 @@
     }
     UserSession userSession=UserSession.get();
     List<Component> result=Lists.newArrayList();
-    for (    String key : authorizationDao.keepAuthorizedComponentKeys(componentsByKeys.keySet(),userSession.userId(),UserRole.USER)) {
-      result.add(componentsByKeys.get(key));
+    Collection<String> authorizedProjectKeys=authorizationDao.selectAuthorizedRootProjectsKeys(userSession.userId(),UserRole.USER);
+    for (    String key : componentsByKeys.keySet()) {
+      if (authorizedProjectKeys.contains(key)) {
+        result.add(componentsByKeys.get(key));
+      }
     }
     return result;
   }
