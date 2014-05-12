@@ -1,5 +1,5 @@
 {
-  json.name("scm").beginObject();
+  json.name("scm").beginArray();
   if (authorsData != null) {
     List<String> authors=splitLine(authorsData);
     List<String> dates=splitLine(datesDate);
@@ -15,7 +15,8 @@
       String formattedDate=DateUtils.formatDate(DateUtils.parseDateTime(date));
       if (line >= from && line <= to) {
         if (!started || !group || !isSameCommit(date,previousDate,author,previousAuthor)) {
-          json.name(Integer.toString(line)).beginArray();
+          json.beginArray();
+          json.value(line);
           json.value(author);
           json.value(formattedDate);
           json.endArray();
@@ -26,5 +27,5 @@
       previousDate=date;
     }
   }
-  json.endObject();
+  json.endArray();
 }
