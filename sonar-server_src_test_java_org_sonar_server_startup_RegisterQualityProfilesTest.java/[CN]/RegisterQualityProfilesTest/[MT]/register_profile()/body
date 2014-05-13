@@ -6,7 +6,7 @@
   QProfile profile=new QProfile();
   when(qProfileOperations.newProfile(eq("Default"),eq("java"),eq(true),any(UserSession.class),eq(session))).thenReturn(profile);
   registerQualityProfiles.start();
-  verify(qProfileBackup).restoreFromActiveRules(eq(profile),eq(rulesProfile),eq(session));
+  verify(qProfileBackup).restoreFromActiveRules(QualityProfileKey.of(eq(profile).name(),eq(profile).language()),eq(rulesProfile),eq(session));
   ArgumentCaptor<LoadedTemplateDto> templateCaptor=ArgumentCaptor.forClass(LoadedTemplateDto.class);
   verify(loadedTemplateDao).insert(templateCaptor.capture(),eq(session));
   assertThat(templateCaptor.getValue().getKey()).isEqualTo("java:Default");

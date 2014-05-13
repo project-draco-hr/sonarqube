@@ -1,0 +1,15 @@
+{
+  validatePermission(userSession);
+  DbSession session=myBatis.openSession(false);
+  try {
+    List<Integer> ruleIdsToActivate=rules.searchInactiveProfileRuleIds(query);
+    for (    Integer ruleId : ruleIdsToActivate) {
+      RuleDto rule=findRuleNotNull(ruleId,session);
+      activateRule(profileKey,rule.getKey(),rule.getSeverityString(),userSession,session);
+    }
+    return ruleIdsToActivate.size();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

@@ -1,0 +1,17 @@
+{
+  validatePermission(userSession);
+  validateSeverity(severity);
+  DbSession session=myBatis.openSession(false);
+  try {
+    ActiveRuleDto activeRule=findActiveRule(profileKey,ruleKey,session);
+    if (activeRule == null) {
+      activateRule(profileKey,ruleKey,severity,userSession,session);
+    }
+ else {
+      updateSeverity(activeRule,severity,userSession,session);
+    }
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

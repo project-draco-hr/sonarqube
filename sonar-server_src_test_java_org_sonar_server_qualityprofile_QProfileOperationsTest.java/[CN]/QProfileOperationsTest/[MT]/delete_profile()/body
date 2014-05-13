@@ -2,9 +2,8 @@
   when(qualityProfileDao.selectById(1,session)).thenReturn(new QualityProfileDto().setId(1).setName("Default").setLanguage("java"));
   when(profileLookup.isDeletable(any(QProfile.class),eq(session))).thenReturn(true);
   operations.deleteProfile(1,authorizedUserSession);
+  QProfile profile=new QProfile().setId(1).setName("Default").setLanguage("java");
   verify(session).commit();
-  verify(activeRuleDao).deleteParametersFromProfile(1,session);
-  verify(activeRuleDao).deleteFromProfile(1,session);
   verify(qualityProfileDao).delete(1,session);
   verify(propertiesDao).deleteProjectProperties("sonar.profile.java","Default",session);
   verify(esActiveRule).deleteActiveRulesFromProfile(1);

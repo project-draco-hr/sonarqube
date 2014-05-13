@@ -1,0 +1,17 @@
+{
+  for (  org.sonar.api.rules.ActiveRule activeRule : rulesProfile.getActiveRules()) {
+    RuleKey ruleKey=RuleKey.of(activeRule.getRepositoryKey(),activeRule.getRuleKey());
+    RuleDto rule=ruleDao.getByKey(ruleKey,session);
+    if (rule == null) {
+      throw new NotFoundException(String.format("Rule '%s' does not exists.",ruleKey));
+    }
+    ActiveRuleDto activeRuleDto=qProfileActiveRuleOperations.createActiveRule(profileKey,ruleKey,activeRule.getSeverity().name(),session);
+    for (    RuleParam param : activeRule.getRule().getParams()) {
+      String paramKey=param.getKey();
+      String value=activeRule.getParameter(param.getKey());
+      if (value != null) {
+        qProfileActiveRuleOperations.updateActiveRuleParam(activeRuleDto,paramKey,value,session);
+      }
+    }
+  }
+}

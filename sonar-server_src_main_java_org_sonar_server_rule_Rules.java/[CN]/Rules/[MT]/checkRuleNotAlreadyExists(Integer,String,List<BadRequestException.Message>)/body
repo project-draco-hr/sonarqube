@@ -1,7 +1,9 @@
 {
-  RuleDto existingRule=ruleDao.selectByName(name);
+  DbSession session=myBatis.openSession(false);
+  RuleDto existingRule=ruleDao.getByName(name,session);
   boolean isModifyingCurrentRule=updatingRuleId != null && existingRule != null && existingRule.getId().equals(updatingRuleId);
   if (!isModifyingCurrentRule && existingRule != null) {
     messages.add(BadRequestException.Message.ofL10n(Validation.IS_ALREADY_USED_MESSAGE,"Name"));
   }
+  session.close();
 }
