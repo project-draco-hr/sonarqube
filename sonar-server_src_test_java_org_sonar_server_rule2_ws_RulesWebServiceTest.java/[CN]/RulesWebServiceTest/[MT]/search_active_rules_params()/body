@@ -3,8 +3,12 @@
   tester.get(QualityProfileDao.class).insert(profile,session);
   RuleDto rule=newRuleDto(RuleKey.of(profile.getLanguage(),"S001"));
   ruleDao.insert(rule,session);
+  RuleParamDto param=RuleParamDto.createFor(rule).setDefaultValue("some value").setType("string").setDescription("My small description").setName("my_var");
+  ruleDao.addRuleParam(rule,param,session);
   ActiveRuleDto activeRule=newActiveRule(profile,rule);
   tester.get(ActiveRuleDao.class).insert(activeRule,session);
+  ActiveRuleParamDto activeRuleParam=ActiveRuleParamDto.createFor(param).setValue("The VALUE");
+  tester.get(ActiveRuleDao.class).addParam(activeRule,activeRuleParam,session);
   session.commit();
   tester.get(RuleService.class).refresh();
   MockUserSession.set();
