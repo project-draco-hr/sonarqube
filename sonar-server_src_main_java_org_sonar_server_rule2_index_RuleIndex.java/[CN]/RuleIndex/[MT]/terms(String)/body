@@ -1,0 +1,10 @@
+{
+  Set<String> tags=new HashSet<String>();
+  SearchRequestBuilder request=this.getClient().prepareSearch(this.getIndexName()).setQuery(QueryBuilders.matchAllQuery()).addFacet(FacetBuilders.termsFacet("tags").allTerms(false).fields(fields).global(true).size(Integer.MAX_VALUE));
+  SearchResponse esResponse=request.get();
+  TermsFacet termFacet=esResponse.getFacets().facet("tags");
+  for (  TermsFacet.Entry facetValue : termFacet.getEntries()) {
+    tags.add(facetValue.getTerm().string());
+  }
+  return tags;
+}

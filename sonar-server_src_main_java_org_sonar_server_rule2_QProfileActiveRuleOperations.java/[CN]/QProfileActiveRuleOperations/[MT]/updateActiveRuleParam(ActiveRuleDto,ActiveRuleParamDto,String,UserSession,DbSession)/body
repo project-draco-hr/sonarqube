@@ -1,0 +1,10 @@
+{
+  RuleParamDto ruleParam=findRuleParamNotNull(activeRule.getRulId(),activeRuleParam.getKey(),session);
+  validateParam(ruleParam,sanitizedValue);
+  String oldValue=activeRuleParam.getValue();
+  activeRuleParam.setValue(sanitizedValue);
+  activeRuleDao.updateParam(activeRule,activeRuleParam,session);
+  session.commit();
+  ProfilesManager.RuleInheritanceActions actions=profilesManager.ruleParamChanged(activeRule.getProfileId(),activeRule.getId(),activeRuleParam.getKey(),oldValue,sanitizedValue,getLoggedName(userSession));
+  reindexInheritanceResult(actions,session);
+}

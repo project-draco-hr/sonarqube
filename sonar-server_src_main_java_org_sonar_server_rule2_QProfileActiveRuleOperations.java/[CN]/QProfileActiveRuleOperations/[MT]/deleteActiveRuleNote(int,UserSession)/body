@@ -1,0 +1,17 @@
+{
+  validatePermission(userSession);
+  DbSession session=myBatis.openSession(false);
+  try {
+    ActiveRuleDto activeRule=findActiveRuleNotNull(activeRuleId,session);
+    activeRule.setNoteData(null);
+    activeRule.setNoteUserLogin(null);
+    activeRule.setNoteCreatedAt(null);
+    activeRule.setNoteUpdatedAt(null);
+    activeRuleDao.update(activeRule,session);
+    session.commit();
+    reindexActiveRule(activeRule,session);
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

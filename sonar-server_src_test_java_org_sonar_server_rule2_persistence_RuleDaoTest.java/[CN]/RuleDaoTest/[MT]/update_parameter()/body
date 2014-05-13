@@ -1,0 +1,11 @@
+{
+  setupData("update_parameter");
+  RuleDto rule1=dao.getById(1,session);
+  List<RuleParamDto> params=dao.findRuleParamsByRuleKey(rule1.getKey(),session);
+  assertThat(params).hasSize(1);
+  RuleParamDto param=Iterables.getFirst(params,null);
+  param.setName("format").setType("STRING").setDefaultValue("^[a-z]+(\\.[a-z][a-z0-9]*)*$").setDescription("Regular expression used to check the package names against.");
+  dao.updateRuleParam(rule1,param,session);
+  session.commit();
+  checkTables("update_parameter","rules_parameters");
+}

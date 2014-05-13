@@ -1,0 +1,37 @@
+{
+  SearchRequestBuilder esSearch=getClient().prepareSearch(this.getIndexName()).setIndices(this.getIndexName());
+  if (options.isFacet()) {
+    this.setFacets(esSearch);
+  }
+  if (query.getSortField() != null) {
+    FieldSortBuilder sort=SortBuilders.fieldSort(query.getSortField().field().key());
+    if (query.isAscendingSort()) {
+      sort.order(SortOrder.ASC);
+    }
+ else {
+      sort.order(SortOrder.DESC);
+    }
+    esSearch.addSort(sort);
+  }
+ else   if (query.getQueryText() != null && !query.getQueryText().isEmpty()) {
+    esSearch.addSort(SortBuilders.scoreSort());
+  }
+ else {
+    esSearch.addSort(RuleNormalizer.RuleField.UPDATED_AT.key(),SortOrder.DESC);
+  }
+  esSearch.setFrom(options.getOffset());
+  esSearch.setSize(options.getLimit());
+  if (options.getFieldsToReturn() != null && !options.getFieldsToReturn().isEmpty()) {
+    for (    String field : options.getFieldsToReturn()) {
+      esSearch.addField(field);
+    }
+  }
+ else {
+    for (    RuleNormalizer.RuleField field : RuleNormalizer.RuleField.values()) {
+      esSearch.addField(field.key());
+    }
+  }
+  esSearch.addField(RuleNormalizer.RuleField.KEY.key());
+  esSearch.addField(RuleNormalizer.RuleField.REPOSITORY.key());
+  return esSearch;
+}

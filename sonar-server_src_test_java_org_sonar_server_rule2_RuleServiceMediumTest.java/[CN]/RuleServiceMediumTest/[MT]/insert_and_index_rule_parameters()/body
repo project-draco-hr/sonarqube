@@ -8,7 +8,10 @@
   RuleParamDto maxParamDto=new RuleParamDto().setName("max").setType(RuleParamType.INTEGER.type()).setDefaultValue("10").setDescription("Maximum");
   dao.addRuleParam(ruleDto,maxParamDto,dbSession);
   dbSession.commit();
-  List<RuleParamDto> persistedDtos=dao.findRuleParamsByRuleKey(ruleKey,dbSession);
+  RuleDto theRule=dao.getByKey(ruleKey,dbSession);
+  assertThat(theRule.getCreatedAt()).isNotNull();
+  assertThat(theRule.getUpdatedAt()).isNotNull();
+  List<RuleParamDto> persistedDtos=dao.findRuleParamsByRuleKey(theRule.getKey(),dbSession);
   assertThat(persistedDtos).hasSize(2);
   index.refresh();
   Rule hit=index.getByKey(ruleKey);

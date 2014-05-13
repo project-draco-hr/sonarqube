@@ -1,0 +1,11 @@
+{
+  ProfilesManager.RuleInheritanceActions actions=new ProfilesManager.RuleInheritanceActions();
+  ActiveRuleDto parent=getParent(activeRule,session);
+  List<ActiveRuleParamDto> newParams=restoreActiveParametersFromActiveRuleParent(activeRule,parent,actions,userSession,session);
+  restoreSeverityFromActiveRuleParent(activeRule,parent,actions,userSession,session);
+  reindexInheritanceResult(actions,session);
+  activeRule.setInheritance(ActiveRuleDto.INHERITED);
+  activeRuleDao.update(activeRule,session);
+  session.commit();
+  reindexActiveRule(activeRule,newParams);
+}

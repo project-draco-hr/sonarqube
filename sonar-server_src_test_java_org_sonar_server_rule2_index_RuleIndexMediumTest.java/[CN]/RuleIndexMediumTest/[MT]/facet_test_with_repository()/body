@@ -1,0 +1,15 @@
+{
+  dao.insert(newRuleDto(RuleKey.of("javascript","S001")).setRuleKey("X001"),dbSession);
+  dao.insert(newRuleDto(RuleKey.of("cobol","S001")).setRuleKey("X001"),dbSession);
+  dao.insert(newRuleDto(RuleKey.of("php","S002")),dbSession);
+  dbSession.commit();
+  index.refresh();
+  RuleQuery query=new RuleQuery();
+  Result result=index.search(query,new QueryOptions().setFacet(false));
+  assertThat(result.getFacets()).isEmpty();
+  result=index.search(query,new QueryOptions().setFacet(true));
+  assertThat(result.getFacets()).isNotNull();
+  assertThat(result.getFacets()).hasSize(3);
+  assertThat(result.getFacet("Repositories").size()).isEqualTo(3);
+  assertThat(result.getFacetKeys("Repositories")).contains("javascript","cobol","php");
+}
