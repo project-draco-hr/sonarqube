@@ -1,0 +1,10 @@
+{
+  HttpRequestFactory requestFactory=new HttpRequestFactory(httpServer.url());
+  httpServer.stubResponseBody(Resources.toString(Resources.getResource(this.getClass(),"DefaultSourceClientTest/show_source.json"),Charsets.UTF_8));
+  SourceClient client=new DefaultSourceClient(requestFactory);
+  List<Source> sources=client.show("MyFile","20","25");
+  assertThat(httpServer.requestedPath()).isEqualTo("/api/sources/show?key=MyFile&from=20&to=25");
+  assertThat(sources).hasSize(6);
+  assertThat(sources.get(0).index()).isEqualTo(20);
+  assertThat(sources.get(0).line()).isEqualTo("<span class=\"k\">package </span>org.sonar.check;");
+}

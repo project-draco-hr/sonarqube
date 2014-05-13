@@ -1,0 +1,11 @@
+{
+  HttpRequestFactory requestFactory=new HttpRequestFactory(httpServer.url());
+  httpServer.stubResponseBody(Resources.toString(Resources.getResource(this.getClass(),"DefaultSourceClientTest/return_scm.json"),Charsets.UTF_8));
+  SourceClient client=new DefaultSourceClient(requestFactory);
+  List<Scm> result=client.scm("MyFile","1","3",true);
+  assertThat(httpServer.requestedPath()).isEqualTo("/api/sources/scm?key=MyFile&from=1&to=3&group_commits=true");
+  assertThat(result).hasSize(3);
+  assertThat(result.get(0).index()).isEqualTo(1);
+  assertThat(result.get(0).author()).isEqualTo("julien");
+  assertThat(result.get(0).date().getTime()).isEqualTo(1363129200000L);
+}

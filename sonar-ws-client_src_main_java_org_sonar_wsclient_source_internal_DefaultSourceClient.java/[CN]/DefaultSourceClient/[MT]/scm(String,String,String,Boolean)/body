@@ -1,0 +1,14 @@
+{
+  Map<String,Object> params=EncodingUtils.toMap("key",key,"from",from,"to",to);
+  params.put("group_commits",groupCommits);
+  String json=requestFactory.get("/api/sources/scm",params);
+  List<Scm> result=new ArrayList<Scm>();
+  Map jRoot=(Map)JSONValue.parse(json);
+  List<List> jsonResult=(List)jRoot.get("scm");
+  if (jsonResult != null) {
+    for (    List line : jsonResult) {
+      result.add(new DefaultScm(line));
+    }
+  }
+  return result;
+}
