@@ -1,16 +1,15 @@
 {
-  if (DdlUtils.supportsDialect(database.getDialect().getId()) && serverUpgradeStatus.isFreshInstall()) {
+  if (DdlUtils.supportsDialect(dbClient.database().getDialect().getId()) && serverUpgradeStatus.isFreshInstall()) {
     LoggerFactory.getLogger(getClass()).info("Create database");
-    SqlSession session=null;
+    SqlSession session=dbClient.openSession(false);
     Connection connection=null;
     try {
-      session=myBatis.openSession(false);
       connection=session.getConnection();
-      createSchema(connection,database.getDialect().getId());
+      createSchema(connection,dbClient.database().getDialect().getId());
       return true;
     }
   finally {
-      MyBatis.closeQuietly(session);
+      session.close();
       DbUtils.closeQuietly(connection);
     }
   }

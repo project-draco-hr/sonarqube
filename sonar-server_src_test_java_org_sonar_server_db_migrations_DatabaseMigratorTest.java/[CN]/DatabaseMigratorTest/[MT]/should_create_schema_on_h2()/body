@@ -1,12 +1,12 @@
 {
   Dialect supportedDialect=new H2();
-  when(database.getDialect()).thenReturn(supportedDialect);
+  when(dbClient.database().getDialect()).thenReturn(supportedDialect);
   Connection connection=mock(Connection.class);
   DbSession session=mock(DbSession.class);
   when(session.getConnection()).thenReturn(connection);
-  when(mybatis.openSession(false)).thenReturn(session);
+  when(dbClient.openSession(false)).thenReturn(session);
   when(serverUpgradeStatus.isFreshInstall()).thenReturn(true);
-  DatabaseMigrator databaseMigrator=new DatabaseMigrator(mybatis,database,migrations,serverUpgradeStatus,null){
+  DatabaseMigrator databaseMigrator=new DatabaseMigrator(dbClient,migrations,serverUpgradeStatus,null){
     @Override protected void createSchema(    Connection connection,    String dialectId){
     }
   }
