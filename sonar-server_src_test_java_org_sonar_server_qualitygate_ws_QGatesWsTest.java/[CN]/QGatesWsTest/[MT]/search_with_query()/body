@@ -1,0 +1,13 @@
+{
+  long gateId=12345L;
+  Association assoc=mock(Association.class);
+  when(assoc.hasMoreResults()).thenReturn(true);
+  List<ProjectQgateAssociation> projects=ImmutableList.of(new ProjectQgateAssociation().setId(42L).setName("Project One").setMember(false),new ProjectQgateAssociation().setId(24L).setName("Project Two").setMember(true));
+  when(assoc.projects()).thenReturn(projects);
+  when(projectFinder.find(any(ProjectQgateAssociationQuery.class))).thenReturn(assoc);
+  tester.newGetRequest("api/qualitygates","search").setParam("gateId",Long.toString(gateId)).setParam("query","Project").execute().assertJson("{'more':true,'results':[" + "{'id':42,'name':'Project One','selected':false}," + "{'id':24,'name':'Project Two','selected':true}"+ "]}");
+  ArgumentCaptor<ProjectQgateAssociationQuery> queryCaptor=ArgumentCaptor.forClass(ProjectQgateAssociationQuery.class);
+  verify(projectFinder).find(queryCaptor.capture());
+  ProjectQgateAssociationQuery query=queryCaptor.getValue();
+  assertThat(query.membership()).isEqualTo(ProjectQgateAssociationQuery.ANY);
+}
