@@ -1,0 +1,12 @@
+{
+  LOGGER.info("Register " + language + " profile: "+ name);
+  QProfile profile=qProfileLookup.profile(name,language,session);
+  if (profile != null) {
+    qProfileOperations.deleteProfile(profile,session);
+  }
+  profile=qProfileOperations.newProfile(name,language,true,UserSession.get(),session);
+  for (  RulesProfile currentRulesProfile : profiles) {
+    qProfileBackup.restoreFromActiveRules(QualityProfileKey.of(profile.name(),profile.language()),currentRulesProfile,session);
+  }
+  loadedTemplateDao.insert(new LoadedTemplateDto(templateKey(language,name),LoadedTemplateDto.QUALITY_PROFILE_TYPE),session);
+}
