@@ -1,0 +1,23 @@
+{
+  RulesProfile rulesProfile1=RulesProfile.create("Basic","java");
+  rulesProfile1.setDefaultProfile(true);
+  ProfileDefinition profileDefinition1=mock(ProfileDefinition.class);
+  when(profileDefinition1.createProfile(any(ValidationMessages.class))).thenReturn(rulesProfile1);
+  definitions.add(profileDefinition1);
+  RulesProfile rulesProfile2=RulesProfile.create("Default","java");
+  rulesProfile2.setDefaultProfile(true);
+  ProfileDefinition profileDefinition2=mock(ProfileDefinition.class);
+  when(profileDefinition2.createProfile(any(ValidationMessages.class))).thenReturn(rulesProfile2);
+  definitions.add(profileDefinition2);
+  try {
+    registerQualityProfiles.start();
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(SonarException.class);
+  }
+  verifyZeroInteractions(qProfileLookup);
+  verifyZeroInteractions(qProfileBackup);
+  verifyZeroInteractions(qProfileOperations);
+  verifyZeroInteractions(settings);
+}

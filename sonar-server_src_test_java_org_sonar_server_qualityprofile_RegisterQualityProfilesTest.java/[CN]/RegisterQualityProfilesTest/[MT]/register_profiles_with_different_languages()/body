@@ -1,0 +1,23 @@
+{
+  RulesProfile rulesProfile1=RulesProfile.create("Default","java");
+  ProfileDefinition profileDefinition1=mock(ProfileDefinition.class);
+  when(profileDefinition1.createProfile(any(ValidationMessages.class))).thenReturn(rulesProfile1);
+  definitions.add(profileDefinition1);
+  RulesProfile rulesProfile2=RulesProfile.create("Default","js");
+  ProfileDefinition profileDefinition2=mock(ProfileDefinition.class);
+  when(profileDefinition2.createProfile(any(ValidationMessages.class))).thenReturn(rulesProfile2);
+  definitions.add(profileDefinition2);
+  QProfile profile1=new QProfile();
+  when(qProfileOperations.newProfile(eq("Default"),eq("java"),eq(true),any(UserSession.class),eq(session))).thenReturn(profile1);
+  QProfile profile2=new QProfile();
+  when(qProfileOperations.newProfile(eq("Default"),eq("js"),eq(true),any(UserSession.class),eq(session))).thenReturn(profile2);
+  registerQualityProfiles.start();
+  verify(qProfileBackup).restoreFromActiveRules(QualityProfileKey.of(eq(profile1).name(),eq(profile1).language()),eq(rulesProfile1),eq(session));
+  verify(qProfileBackup).restoreFromActiveRules(QualityProfileKey.of(eq(profile2).name(),eq(profile2).language()),eq(rulesProfile2),eq(session));
+  verify(loadedTemplateDao,times(2)).insert(any(LoadedTemplateDto.class),eq(session));
+  verify(session).commit();
+  verify(settings).saveProperty("sonar.profile.java","Default");
+  verify(settings).saveProperty("sonar.profile.js","Default");
+  assertThat(defaultProfilesCache.byLanguage("java")).containsOnly("Default");
+  assertThat(defaultProfilesCache.byLanguage("js")).containsOnly("Default");
+}
