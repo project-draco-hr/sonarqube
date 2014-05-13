@@ -1,13 +1,13 @@
 {
   TimeProfiler profiler=new TimeProfiler().start("Register rules");
-  DbSession session=myBatis.openSession(false);
+  DbSession session=dbClient.openSession(false);
   try {
-    Map<RuleKey,RuleDto> allRules=getRulesByKey(session);
+    Map<RuleKey,RuleDto> allRules=loadRules(session);
     RulesDefinition.Context context=defLoader.load();
     for (    RulesDefinition.ExtendedRepository repoDef : getRepositories(context)) {
       for (      RulesDefinition.Rule ruleDef : repoDef.rules()) {
         RuleKey ruleKey=RuleKey.of(ruleDef.repository().key(),ruleDef.key());
-        RuleDto rule=allRules.containsKey(ruleKey) ? allRules.remove(ruleKey) : this.createRuleDto(ruleDef,session);
+        RuleDto rule=allRules.containsKey(ruleKey) ? allRules.remove(ruleKey) : createRuleDto(ruleDef,session);
         boolean executeUpdate=false;
         if (mergeRule(ruleDef,rule)) {
           executeUpdate=true;
@@ -22,10 +22,11 @@
           executeUpdate=true;
         }
         if (executeUpdate) {
-          ruleDao.update(rule,session);
+          dbClient.ruleDao().update(rule,session);
         }
         mergeParams(ruleDef,rule,session);
       }
+      session.commit();
     }
     List<RuleDto> activeRules=processRemainingDbRules(allRules.values(),session);
     removeActiveRulesOnStillExistingRepositories(activeRules,context);
