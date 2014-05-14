@@ -1,0 +1,9 @@
+{
+  thrown.expect(NotFoundException.class);
+  thrown.expectMessage("Component 'com.foo:Bar:BarFile.xoo' does not exist");
+  AuthorizationDao authorizationDao=mock(AuthorizationDao.class);
+  ResourceDao resourceDao=mock(ResourceDao.class);
+  UserSession session=new SpyUserSession("marius",authorizationDao,resourceDao).setUserId(1);
+  when(resourceDao.getRootProjectByComponentKey("com.foo:Bar:BarFile.xoo")).thenReturn(null);
+  session.checkComponentPermission(UserRole.USER,"com.foo:Bar:BarFile.xoo");
+}
