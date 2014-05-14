@@ -1,9 +1,9 @@
 {
   Preconditions.checkState(activeRule.getId() != null,"ActiveRule id is not yet persisted");
-  Preconditions.checkState(paramDto.getId() == null,"ActiveRuleParam is already persisted");
-  Preconditions.checkState(paramDto.getRulesParameterId() != null,"Rule param is not persisted");
-  paramDto.setActiveRuleId(activeRule.getId());
-  mapper(session).insertParameter(paramDto);
-  session.enqueue(new EmbeddedIndexAction<ActiveRuleKey>(this.getIndexType(),IndexAction.Method.INSERT,paramDto,activeRule.getKey()));
-  return paramDto;
+  Preconditions.checkState(activeRuleParam.getId() == null,"ActiveRuleParam is already persisted");
+  Preconditions.checkState(activeRuleParam.getRulesParameterId() != null,"Rule param is not persisted");
+  activeRuleParam.setActiveRuleId(activeRule.getId());
+  mapper(session).insertParameter(activeRuleParam);
+  this.enqueueInsert(activeRuleParam,activeRule.getKey(),session);
+  return activeRuleParam;
 }
