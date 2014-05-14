@@ -1,0 +1,35 @@
+{
+  WsTester tester=new WsTester(new RulesWebService(mock(SearchAction.class),mock(ShowAction.class),mock(TagsAction.class),mock(SetTagsAction.class),new AppAction(languages,ruleRepositories,i18n,debtModel,qProfiles)));
+  QProfile profile1=new QProfile().setName("Profile One").setLanguage("bf");
+  QProfile profile2=new QProfile().setName("Profile Two").setLanguage("bf").setParent("Profile One");
+  when(qProfiles.allProfiles()).thenReturn(ImmutableList.of(profile1,profile2));
+  Language brainfsck=mock(Language.class);
+  when(brainfsck.getKey()).thenReturn("bf");
+  when(brainfsck.getName()).thenReturn("Brainf*ck");
+  Language whitespace=mock(Language.class);
+  when(whitespace.getKey()).thenReturn("ws");
+  when(whitespace.getName()).thenReturn("Whitespace");
+  when(languages.all()).thenReturn(new Language[]{brainfsck,whitespace});
+  RuleRepositories.Repository repo1=mock(RuleRepositories.Repository.class);
+  when(repo1.key()).thenReturn("squid");
+  when(repo1.name()).thenReturn("SonarQube");
+  when(repo1.language()).thenReturn("bf");
+  RuleRepositories.Repository repo2=mock(RuleRepositories.Repository.class);
+  when(repo2.key()).thenReturn("squid");
+  when(repo2.name()).thenReturn("SonarQube");
+  when(repo2.language()).thenReturn("ws");
+  when(ruleRepositories.repositories()).thenReturn(ImmutableList.of(repo1,repo2));
+  when(i18n.message(isA(Locale.class),anyString(),anyString())).thenAnswer(new Answer<String>(){
+    @Override public String answer(    InvocationOnMock invocation) throws Throwable {
+      return (String)invocation.getArguments()[1];
+    }
+  }
+);
+  int parentId=42;
+  DefaultDebtCharacteristic char1=new DefaultDebtCharacteristic();
+  char1.setId(parentId).setKey("REUSABILITY").setName("Reusability");
+  DefaultDebtCharacteristic char2=new DefaultDebtCharacteristic();
+  char2.setId(24).setParentId(parentId).setKey("MODULARITY").setName("Modularity");
+  when(debtModel.allCharacteristics()).thenReturn(ImmutableList.<DebtCharacteristic>of(char1,char2));
+  tester.newGetRequest("api/rules2","app").execute().assertJson(this.getClass(),"app.json");
+}
