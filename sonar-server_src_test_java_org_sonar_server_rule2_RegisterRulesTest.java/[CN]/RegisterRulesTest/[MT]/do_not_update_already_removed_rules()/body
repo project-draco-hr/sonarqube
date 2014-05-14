@@ -1,0 +1,11 @@
+{
+  execute(new FakeRepositoryV1());
+  assertThat(dbClient.ruleDao().findAll(dbSession)).hasSize(2);
+  when(system.now()).thenReturn(DATE2.getTime());
+  execute(new FakeRepositoryV2());
+  when(system.now()).thenReturn(DATE3.getTime());
+  execute(new FakeRepositoryV2());
+  RuleDto rule2=dbClient.ruleDao().getByKey(RuleKey.of("fake","rule2"),dbSession);
+  assertThat(rule2.getStatus()).isEqualTo(RuleStatus.REMOVED.toString());
+  assertThat(rule2.getUpdatedAt()).isEqualTo(DATE2);
+}

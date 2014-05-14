@@ -16,18 +16,20 @@
         toBeRemoved=false;
       }
     }
-    if (toBeRemoved && !Rule.STATUS_REMOVED.equals(ruleDto.getStatus())) {
+    if (toBeRemoved && !RuleStatus.REMOVED.toString().equals(ruleDto.getStatus())) {
       LOG.info(String.format("Disable rule %s",ruleDto.getKey()));
       ruleDto.setStatus(Rule.STATUS_REMOVED);
       ruleDto.setSystemTags(Collections.EMPTY_SET);
       ruleDto.setTags(Collections.EMPTY_SET);
-    }
-    dbClient.ruleDao().update(ruleDto,session);
-    removedRules.add(ruleDto);
-    if (removedRules.size() % 100 == 0) {
-      session.commit();
+      dbClient.ruleDao().update(ruleDto,session);
+      removedRules.add(ruleDto);
+      if (removedRules.size() % 100 == 0) {
+        session.commit();
+      }
     }
   }
-  session.commit();
+  if (!removedRules.isEmpty()) {
+    session.commit();
+  }
   return removedRules;
 }
