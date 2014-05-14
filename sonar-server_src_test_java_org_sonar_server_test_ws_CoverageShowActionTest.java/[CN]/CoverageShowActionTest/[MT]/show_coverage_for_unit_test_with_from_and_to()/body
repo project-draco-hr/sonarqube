@@ -1,9 +1,9 @@
 {
   String fileKey="src/Foo.java";
-  when(coverageService.getHitsData(fileKey)).thenReturn("1=1;2=1;3=0;4=1;5=1");
-  when(coverageService.getTestCasesByLines(fileKey)).thenReturn(ImmutableMap.of(4,8,1,2));
-  when(coverageService.getConditionsData(fileKey)).thenReturn("2=3;3=2");
-  when(coverageService.getCoveredConditionsData(fileKey)).thenReturn("2=1;3=2");
-  WsTester.TestRequest request=tester.newGetRequest("api/coverage","show").setParam("key",fileKey).setParam("from","3").setParam("to","4");
+  when(coverageService.getHits(fileKey,CoverageService.TYPE.UT)).thenReturn(ImmutableMap.of(1,1,2,1,3,0,4,1,5,1));
+  when(coverageService.getTestCases(fileKey,CoverageService.TYPE.UT)).thenReturn(ImmutableMap.of(4,8,1,2));
+  when(coverageService.getConditions(fileKey,CoverageService.TYPE.UT)).thenReturn(ImmutableMap.of(2,3,3,2));
+  when(coverageService.getCoveredConditions(fileKey,CoverageService.TYPE.UT)).thenReturn(ImmutableMap.of(2,1,3,2));
+  WsTester.TestRequest request=tester.newGetRequest("api/coverage","show").setParam("key",fileKey).setParam("from","3").setParam("to","4").setParam("type","UT");
   request.execute().assertJson(getClass(),"show_coverage_with_from_and_to.json");
 }
