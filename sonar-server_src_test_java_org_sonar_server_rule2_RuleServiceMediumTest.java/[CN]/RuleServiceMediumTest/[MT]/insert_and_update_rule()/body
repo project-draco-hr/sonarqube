@@ -1,0 +1,17 @@
+{
+  RuleKey ruleKey=RuleKey.of("javascript","S001");
+  RuleDto ruleDto=newRuleDto(ruleKey).setTags(ImmutableSet.of("hello")).setName("first name");
+  dao.insert(ruleDto,dbSession);
+  dbSession.commit();
+  index.refresh();
+  Rule hit=index.getByKey(ruleKey);
+  assertThat(hit.tags()).containsExactly("hello");
+  assertThat(hit.name()).isEqualTo("first name");
+  ruleDto.setTags(ImmutableSet.of("world")).setName("second name");
+  dao.update(ruleDto,dbSession);
+  dbSession.commit();
+  index.refresh();
+  hit=index.getByKey(ruleKey);
+  assertThat(hit.tags()).containsExactly("world");
+  assertThat(hit.name()).isEqualTo("second name");
+}
