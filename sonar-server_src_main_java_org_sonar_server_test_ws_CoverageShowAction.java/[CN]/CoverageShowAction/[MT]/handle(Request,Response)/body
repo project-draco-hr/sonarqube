@@ -5,10 +5,15 @@
   int to=(Integer)ObjectUtils.defaultIfNull(request.paramAsInt("to"),Integer.MAX_VALUE);
   JsonWriter json=response.newJsonWriter().beginObject();
   String hits=coverageService.getHitsData(fileKey);
-  Map<Integer,Integer> testCasesByLines=coverageService.getTestCasesByLines(fileKey);
+  Map<Integer,Integer> testCases=coverageService.getTestCasesByLines(fileKey);
+  String conditions=coverageService.getConditionsData(fileKey);
+  String coveredConditions=coverageService.getCoveredConditionsData(fileKey);
   if (hits != null) {
     Map<Integer,Integer> hitsByLine=KeyValueFormat.parseIntInt(hits);
-    writeCoverage(fileKey,hitsByLine,testCasesByLines,from,to,json);
+    Map<Integer,Integer> testCasesByLine=testCases != null ? testCases : Maps.<Integer,Integer>newHashMap();
+    Map<Integer,Integer> conditionsByLine=conditions != null ? KeyValueFormat.parseIntInt(conditions) : Maps.<Integer,Integer>newHashMap();
+    Map<Integer,Integer> coveredConditionsByLine=coveredConditions != null ? KeyValueFormat.parseIntInt(coveredConditions) : Maps.<Integer,Integer>newHashMap();
+    writeCoverage(fileKey,hitsByLine,testCasesByLine,conditionsByLine,coveredConditionsByLine,from,to,json);
   }
   json.endObject().close();
 }
