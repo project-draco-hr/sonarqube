@@ -1,0 +1,25 @@
+{
+  UserSession userSession=UserSession.get();
+  checkAdminPermission(userSession);
+  DbSession dbSession=db.openSession(false);
+  try {
+    RuleDto rule=db.ruleDao().getNonNullByKey(ruleKey,dbSession);
+    if (StringUtils.isBlank(markdownNote)) {
+      rule.setNoteData(null);
+      rule.setNoteCreatedAt(null);
+      rule.setNoteUpdatedAt(null);
+      rule.setNoteUserLogin(null);
+    }
+ else {
+      rule.setNoteData(markdownNote);
+      rule.setNoteCreatedAt(rule.getNoteCreatedAt() != null ? rule.getNoteCreatedAt() : new Date());
+      rule.setNoteUpdatedAt(new Date());
+      rule.setNoteUserLogin(userSession.login());
+    }
+    db.ruleDao().update(rule,dbSession);
+    dbSession.commit();
+  }
+  finally {
+    dbSession.close();
+  }
+}

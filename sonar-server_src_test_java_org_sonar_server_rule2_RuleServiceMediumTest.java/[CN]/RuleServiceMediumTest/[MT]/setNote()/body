@@ -1,0 +1,22 @@
+{
+  MockUserSession.set().setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN).setLogin("marius");
+  RuleKey ruleKey=RuleKey.of("javascript","S001");
+  dao.insert(newRuleDto(ruleKey),dbSession);
+  dbSession.commit();
+  service.setNote(ruleKey,"my *note*");
+  RuleDto dto=dao.getNonNullByKey(ruleKey,dbSession);
+  assertThat(dto.getNoteData()).isEqualTo("my *note*");
+  assertThat(dto.getNoteCreatedAt()).isNotNull();
+  assertThat(dto.getNoteUpdatedAt()).isNotNull();
+  assertThat(dto.getNoteUserLogin()).isEqualTo("marius");
+  index.refresh();
+  Rule rule=index.getByKey(ruleKey);
+  service.setNote(ruleKey,null);
+  dto=dao.getNonNullByKey(ruleKey,dbSession);
+  assertThat(dto.getNoteData()).isNull();
+  assertThat(dto.getNoteCreatedAt()).isNull();
+  assertThat(dto.getNoteUpdatedAt()).isNull();
+  assertThat(dto.getNoteUserLogin()).isNull();
+  index.refresh();
+  rule=index.getByKey(ruleKey);
+}

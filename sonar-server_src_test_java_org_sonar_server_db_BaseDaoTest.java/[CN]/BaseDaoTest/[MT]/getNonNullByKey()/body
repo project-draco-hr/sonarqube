@@ -1,0 +1,14 @@
+{
+  BaseDao dao=mock(BaseDao.class);
+  FakeDto dto=new FakeDto("ki");
+  when(dao.doGetByKey("ki",dbSession)).thenReturn(dto);
+  when(dao.getNonNullByKey(anyString(),any(DbSession.class))).thenCallRealMethod();
+  assertThat(dao.getNonNullByKey("ki",dbSession)).isSameAs(dto);
+  try {
+    dao.getNonNullByKey("unknown",dbSession);
+    fail();
+  }
+ catch (  NotFoundException e) {
+    assertThat(e).hasMessage("Key 'unknown' not found");
+  }
+}
