@@ -1,0 +1,20 @@
+{
+  String fileKey=request.mandatoryParam(KEY);
+  UserSession.get().checkComponentPermission(UserRole.CODEVIEWER,fileKey);
+  JsonWriter json=response.newJsonWriter();
+  json.beginObject();
+  ComponentDto component=resourceDao.selectComponentByKey(fileKey);
+  if (component == null) {
+    throw new NotFoundException(String.format("Component '%s' does not exists.",fileKey));
+  }
+  json.prop("key",component.key());
+  json.prop("path",component.path());
+  json.prop("name",component.name());
+  json.prop("q",component.qualifier());
+  Component subProject=componentById(component.subProjectId());
+  json.prop("subProjectName",subProject != null ? subProject.longName() : null);
+  Component project=componentById(component.projectId());
+  json.prop("projectName",project != null ? project.longName() : null);
+  json.endObject();
+  json.close();
+}
