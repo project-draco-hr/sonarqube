@@ -1,0 +1,25 @@
+{
+  try {
+    String[] ids=new String[rules.size()];
+    BytesStream[] docs=new BytesStream[rules.size()];
+    int index=0;
+    TIME_PROFILER.start("Build rules documents");
+    for (    RuleDto rule : rules) {
+      ids[index]=rule.getId().toString();
+      CharacteristicDto effectiveSubCharacteristic=characteristicsById.get(rule.getSubCharacteristicId() != null ? rule.getSubCharacteristicId() : rule.getDefaultSubCharacteristicId());
+      CharacteristicDto effectiveCharacteristic=effectiveSubCharacteristic != null ? characteristicsById.get(effectiveSubCharacteristic.getParentId()) : null;
+      docs[index]=ruleDocument(rule,effectiveCharacteristic,effectiveSubCharacteristic,paramsByRule.get(rule.getId()));
+      index++;
+    }
+    TIME_PROFILER.stop();
+    if (!rules.isEmpty()) {
+      TIME_PROFILER.start("Index rules");
+      searchIndex.bulkIndex(INDEX_RULES,TYPE_RULE,ids,docs);
+      TIME_PROFILER.stop();
+    }
+    return ids;
+  }
+ catch (  IOException ioe) {
+    throw new IllegalStateException("Unable to index rules",ioe);
+  }
+}
