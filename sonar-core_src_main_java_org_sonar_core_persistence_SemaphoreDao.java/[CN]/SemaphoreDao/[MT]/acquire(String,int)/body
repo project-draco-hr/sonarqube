@@ -4,16 +4,17 @@
   SqlSession session=mybatis.openSession(false);
   try {
     SemaphoreMapper mapper=session.getMapper(SemaphoreMapper.class);
-    Date now=mapper.now();
-    SemaphoreDto semaphore=createDto(name,now,session);
+    Date dbNow=mapper.now();
+    SemaphoreDto semaphore=tryToInsert(name,dbNow,session);
+    boolean isAcquired;
     if (semaphore == null) {
       semaphore=selectSemaphore(name,session);
-      boolean isAcquired=acquireIfOutdated(name,maxAgeInSeconds,session,mapper);
-      return createLock(semaphore,session,isAcquired);
+      isAcquired=acquireIfOutdated(name,maxAgeInSeconds,session,mapper);
     }
  else {
-      return createLock(semaphore,session,true);
+      isAcquired=true;
     }
+    return createLock(semaphore,session,isAcquired);
   }
   finally {
     MyBatis.closeQuietly(session);
