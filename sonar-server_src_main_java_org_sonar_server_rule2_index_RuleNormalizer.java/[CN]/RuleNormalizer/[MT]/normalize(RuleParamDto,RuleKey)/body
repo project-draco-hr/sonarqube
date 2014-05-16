@@ -1,19 +1,9 @@
 {
-  try {
-    XContentBuilder document=jsonBuilder().startObject();
-    document.startObject(RuleField.PARAMS.key());
-    document.startObject(param.getName());
-    indexField(RuleParamField.NAME.key(),param.getName(),document);
-    indexField(RuleParamField.TYPE.key(),param.getType(),document);
-    indexField(RuleParamField.DESCRIPTION.key(),param.getDescription(),document);
-    indexField(RuleParamField.DEFAULT_VALUE.key(),param.getDefaultValue(),document);
-    document.endObject();
-    document.endObject();
-    UpdateRequest request=new UpdateRequest().doc(document);
-    request.docAsUpsert(true);
-    return request;
-  }
- catch (  Exception e) {
-    throw new IllegalStateException(String.format("Could not normalize Object (%s) for key %s",param.getClass().getSimpleName(),key.toString()),e);
-  }
+  Map<String,Object> newParam=new HashMap<String,Object>();
+  newParam.put("_id",param.getName());
+  newParam.put(RuleParamField.NAME.key(),param.getName());
+  newParam.put(RuleParamField.TYPE.key(),param.getType());
+  newParam.put(RuleParamField.DESCRIPTION.key(),param.getDescription());
+  newParam.put(RuleParamField.DEFAULT_VALUE.key(),param.getDefaultValue());
+  return this.nestedUpsert(RuleField.PARAMS.key(),param.getName(),newParam).id(key.toString());
 }

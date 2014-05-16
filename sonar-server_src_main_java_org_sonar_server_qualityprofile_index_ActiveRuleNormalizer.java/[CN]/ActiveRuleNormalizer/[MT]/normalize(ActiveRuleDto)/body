@@ -1,29 +1,22 @@
 {
-  try {
-    XContentBuilder document=jsonBuilder().startObject();
-    ActiveRuleKey key=rule.getKey();
-    if (key == null) {
-      throw new IllegalStateException("Cannot normalize ActiveRuleDto with null key");
-    }
-    document.startObject(RuleNormalizer.RuleField.ACTIVE.key());
-    document.startObject(key.toString());
-    indexField(ActiveRuleField.KEY.key(),rule.getKey(),document);
-    indexField(ActiveRuleField.INHERITANCE.key(),rule.getInheritance(),document);
-    indexField(ActiveRuleField.PROFILE_ID.key(),rule.getProfileId(),document);
-    indexField(ActiveRuleField.SEVERITY.key(),rule.getSeverityString(),document);
-    if (rule.getParentId() != null) {
-      DbSession session=db.openSession(false);
-      ActiveRuleDto dto=this.db.activeRuleDao().getById(rule.getParentId(),session);
-      session.close();
-      indexField(ActiveRuleField.PARENT_KEY.key(),dto.getKey().toString(),document);
-    }
-    document.endObject();
-    document.endObject();
-    UpdateRequest request=new UpdateRequest().doc(document);
-    request.docAsUpsert(true);
-    return request;
+  ActiveRuleKey key=rule.getKey();
+  if (key == null) {
+    throw new IllegalStateException("Cannot normalize ActiveRuleDto with null key");
   }
- catch (  Exception e) {
-    throw new IllegalStateException(String.format("Could not normalize Object with key %s",rule.getKey().toString()),e);
+  Map<String,Object> newRule=new HashMap<String,Object>();
+  newRule.put("_parent",key.ruleKey().toString());
+  newRule.put("ruleKey",key.ruleKey().toString());
+  newRule.put(ActiveRuleField.KEY.key(),key.toString());
+  newRule.put(ActiveRuleField.INHERITANCE.key(),rule.getInheritance());
+  newRule.put(ActiveRuleField.PROFILE_ID.key(),rule.getProfileId());
+  newRule.put(ActiveRuleField.SEVERITY.key(),rule.getSeverityString());
+  if (rule.getParentId() != null) {
+    DbSession session=db.openSession(false);
+    ActiveRuleDto dto=this.db.activeRuleDao().getById(rule.getParentId(),session);
+    session.close();
+    newRule.put(ActiveRuleField.PARENT_KEY.key(),dto.getKey().toString());
   }
+  Map<String,Object> upsert=new HashMap<String,Object>(newRule);
+  upsert.put(ActiveRuleField.PARAMS.key(),new ArrayList());
+  return new UpdateRequest().id(rule.getKey().toString()).parent(rule.getKey().ruleKey().toString()).doc(newRule).upsert(upsert);
 }

@@ -1,0 +1,28 @@
+{
+  RuleKey ruleKey=RuleKey.of("javascript","S001");
+  RuleDto ruleDto=newRuleDto(ruleKey).setTags(ImmutableSet.of("hello")).setName("first name");
+  dao.insert(ruleDto,dbSession);
+  dbSession.commit();
+  RuleParamDto minParamDto=new RuleParamDto().setName("min").setType(RuleParamType.INTEGER.type()).setDefaultValue("2").setDescription("Minimum");
+  dao.addRuleParam(ruleDto,minParamDto,dbSession);
+  RuleParamDto maxParamDto=new RuleParamDto().setName("max").setType(RuleParamType.INTEGER.type()).setDefaultValue("10").setDescription("Maximum");
+  dao.addRuleParam(ruleDto,maxParamDto,dbSession);
+  dbSession.commit();
+  index.refresh();
+  Rule hit=index.getByKey(ruleKey);
+  assertThat(hit.params()).hasSize(2);
+  RuleParam param=hit.params().get(0);
+  assertThat(param.key()).isEqualTo("min");
+  assertThat(param.defaultValue()).isEqualTo("2");
+  assertThat(param.description()).isEqualTo("Minimum");
+  minParamDto.setDefaultValue("0.5").setDescription("new description");
+  dao.updateRuleParam(ruleDto,minParamDto,dbSession);
+  dbSession.commit();
+  index.refresh();
+  hit=index.getByKey(ruleKey);
+  assertThat(hit.params()).hasSize(2);
+  param=hit.params().get(0);
+  assertThat(param.key()).isEqualTo("min");
+  assertThat(param.defaultValue()).isEqualTo("0.5");
+  assertThat(param.description()).isEqualTo("new description");
+}

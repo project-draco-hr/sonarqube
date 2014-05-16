@@ -1,0 +1,30 @@
+{
+  RuleKey ruleKey=RuleKey.of("javascript","S001");
+  dao.insert(newRuleDto(ruleKey),dbSession);
+  dbSession.commit();
+  RuleDto persistedDto=dao.getByKey(ruleKey,dbSession);
+  assertThat(persistedDto).isNotNull();
+  assertThat(persistedDto.getId()).isGreaterThanOrEqualTo(0);
+  assertThat(persistedDto.getRuleKey()).isEqualTo(ruleKey.rule());
+  assertThat(persistedDto.getLanguage()).isEqualTo("js");
+  assertThat(persistedDto.getTags()).containsOnly("tag1","tag2");
+  assertThat(persistedDto.getSystemTags()).containsOnly("systag1","systag2");
+  assertThat(persistedDto.getCreatedAt()).isNotNull();
+  assertThat(persistedDto.getUpdatedAt()).isNotNull();
+  index.refresh();
+  Rule hit=index.getByKey(ruleKey);
+  assertThat(hit).isNotNull();
+  assertThat(hit.key().repository()).isEqualTo(ruleKey.repository());
+  assertThat(hit.key().rule()).isEqualTo(ruleKey.rule());
+  assertThat(hit.language()).isEqualTo("js");
+  assertThat(hit.name()).isEqualTo("Rule S001");
+  assertThat(hit.htmlDescription()).isEqualTo("Description S001");
+  assertThat(hit.status()).isEqualTo(RuleStatus.READY);
+  assertThat(hit.createdAt()).isNotNull();
+  assertThat(hit.updatedAt()).isNotNull();
+  assertThat(hit.internalKey()).isEqualTo("InternalKeyS001");
+  assertThat(hit.severity()).isEqualTo("INFO");
+  assertThat(hit.template()).isFalse();
+  assertThat(hit.tags()).containsOnly("tag1","tag2");
+  assertThat(hit.systemTags()).containsOnly("systag1","systag2");
+}
