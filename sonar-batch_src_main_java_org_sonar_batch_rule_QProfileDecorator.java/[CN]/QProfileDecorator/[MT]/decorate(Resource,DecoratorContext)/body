@@ -1,0 +1,12 @@
+{
+  if (!ResourceUtils.isProject(resource)) {
+    return;
+  }
+  UsedQProfiles profiles=UsedQProfiles.empty();
+  for (  Measure childProfilesMeasure : context.getChildrenMeasures(CoreMetrics.PROFILES)) {
+    UsedQProfiles childProfiles=UsedQProfiles.fromJSON(childProfilesMeasure.getData());
+    profiles=profiles.merge(childProfiles);
+  }
+  Measure detailsMeasure=new Measure(CoreMetrics.PROFILES,profiles.toJSON());
+  context.saveMeasure(detailsMeasure);
+}

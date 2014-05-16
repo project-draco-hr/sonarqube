@@ -1,0 +1,9 @@
+{
+  Measure measureModuleA=new Measure(CoreMetrics.PROFILES,"[{\"id\":2,\"name\":\"Java Two\",\"version\":20,\"language\":\"java\"}]");
+  Measure measureModuleB=new Measure(CoreMetrics.PROFILES,"[{\"id\":3,\"name\":\"Php One\",\"version\":30,\"language\":\"php\"}]");
+  when(decoratorContext.getChildrenMeasures(CoreMetrics.PROFILES)).thenReturn(Arrays.asList(measureModuleA,measureModuleB));
+  when(project.getScope()).thenReturn(Scopes.PROJECT);
+  QProfileDecorator decorator=new QProfileDecorator();
+  decorator.decorate(project,decoratorContext);
+  verify(decoratorContext).saveMeasure(argThat(new IsMeasure(CoreMetrics.PROFILES,"[{\"id\":2,\"name\":\"Java Two\",\"version\":20,\"language\":\"java\"},{\"id\":3,\"name\":\"Php One\",\"version\":30,\"language\":\"php\"}]")));
+}

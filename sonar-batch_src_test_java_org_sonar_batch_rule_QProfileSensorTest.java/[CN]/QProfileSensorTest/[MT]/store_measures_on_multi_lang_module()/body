@@ -4,11 +4,9 @@
   when(moduleQProfiles.findByLanguage("java")).thenReturn(new ModuleQProfiles.QProfile(dao.selectById(2)));
   when(moduleQProfiles.findByLanguage("php")).thenReturn(new ModuleQProfiles.QProfile(dao.selectById(3)));
   when(moduleQProfiles.findByLanguage("abap")).thenReturn(null);
-  fs.addLanguages("java");
+  fs.addLanguages("java","php");
   QProfileSensor sensor=new QProfileSensor(moduleQProfiles,fs,dao);
   assertThat(sensor.shouldExecuteOnProject(project)).isTrue();
   sensor.analyse(project,sensorContext);
-  verify(sensorContext).saveMeasure(argThat(new IsMeasure(CoreMetrics.PROFILE,"Java Two")));
-  verify(sensorContext).saveMeasure(argThat(new IsMeasure(CoreMetrics.PROFILE_VERSION,20.0)));
-  verify(sensorContext).saveMeasure(argThat(new IsMeasure(CoreMetrics.PROFILES,"[{\"id\":2,\"name\":\"Java Two\",\"version\":20,\"language\":\"java\"}]")));
+  verify(sensorContext).saveMeasure(argThat(new IsMeasure(CoreMetrics.PROFILES,"[{\"id\":2,\"name\":\"Java Two\",\"version\":20,\"language\":\"java\"},{\"id\":3,\"name\":\"Php One\",\"version\":30,\"language\":\"php\"}]")));
 }
