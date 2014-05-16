@@ -1,5 +1,11 @@
 {
   options.filterFieldsToReturn(RuleIndex.PUBLIC_FIELDS);
   options.addFieldsToReturn(RuleNormalizer.RuleField.REPOSITORY.key(),RuleNormalizer.RuleField.KEY.key());
-  return index.search(query,options);
+  RuleResult result=index.search(query,options);
+  for (  Rule rule : result.getHits()) {
+    for (    ActiveRule activeRule : activeRuleIndex.findByRule(rule.key())) {
+      result.getActiveRules().put(rule.key().toString(),activeRule);
+    }
+  }
+  return result;
 }
