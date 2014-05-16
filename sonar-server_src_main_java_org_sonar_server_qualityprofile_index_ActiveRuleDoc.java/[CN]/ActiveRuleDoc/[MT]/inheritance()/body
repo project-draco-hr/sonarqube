@@ -1,9 +1,15 @@
 {
   String inheritance=(String)this.fields.get(ActiveRuleNormalizer.ActiveRuleField.INHERITANCE.key());
-  if (inheritance != null && !inheritance.isEmpty()) {
-    return Inheritance.valueOf(inheritance);
+  if (inheritance == null || inheritance.isEmpty()) {
+    return Inheritance.NONE;
+  }
+ else   if (inheritance.toLowerCase().indexOf("herit") > 0) {
+    return Inheritance.INHERIT;
+  }
+ else   if (inheritance.toLowerCase().indexOf("over") > 0) {
+    return Inheritance.OVERRIDE;
   }
  else {
-    return Inheritance.NONE;
+    throw new IllegalStateException("Value \"" + inheritance + "\" is not valid for rule's inheritance");
   }
 }

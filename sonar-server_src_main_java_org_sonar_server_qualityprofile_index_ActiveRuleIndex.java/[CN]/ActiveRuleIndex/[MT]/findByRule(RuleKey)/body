@@ -1,0 +1,9 @@
+{
+  SearchRequestBuilder request=getClient().prepareSearch(this.getIndexName()).setQuery(QueryBuilders.hasParentQuery(this.getParentType(),QueryBuilders.idsQuery(this.getParentType()).addIds(key.toString()))).setRouting(key.toString());
+  SearchResponse response=request.get();
+  List<ActiveRule> activeRules=new ArrayList<ActiveRule>();
+  for (  SearchHit hit : response.getHits()) {
+    activeRules.add(new ActiveRuleDoc(hit.getSource()));
+  }
+  return activeRules;
+}

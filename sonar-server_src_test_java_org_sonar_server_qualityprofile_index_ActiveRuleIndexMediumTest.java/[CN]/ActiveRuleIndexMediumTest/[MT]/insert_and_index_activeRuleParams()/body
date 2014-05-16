@@ -8,7 +8,7 @@
   dao.addRuleParam(ruleDto,minParam,dbSession);
   RuleParamDto maxParam=new RuleParamDto().setName("max").setType("STRING");
   dao.addRuleParam(ruleDto,maxParam,dbSession);
-  ActiveRuleDto activeRule=ActiveRuleDto.createFor(profileDto,ruleDto).setInheritance("inherited").setSeverity(Severity.BLOCKER);
+  ActiveRuleDto activeRule=ActiveRuleDto.createFor(profileDto,ruleDto).setInheritance(ActiveRule.Inheritance.INHERIT.name()).setSeverity(Severity.BLOCKER);
   activeRuleDao.insert(activeRule,dbSession);
   ActiveRuleParamDto activeRuleMinParam=ActiveRuleParamDto.createFor(minParam).setValue("minimum");
   activeRuleDao.addParam(activeRule,activeRuleMinParam,dbSession);
@@ -18,6 +18,9 @@
   List<ActiveRuleParamDto> persistedDtos=activeRuleDao.findParamsByActiveRule(activeRule,dbSession);
   assertThat(persistedDtos).hasSize(2);
   index.refresh();
-  RuleResult results=index.search(new RuleQuery(),new QueryOptions());
-  assertThat(results.getActiveRules().values()).hasSize(1);
+  ActiveRule rule=index.getByKey(activeRule.getKey());
+  assertThat(rule.params()).hasSize(2);
+  assertThat(rule.params().keySet()).containsOnly("min","max");
+  assertThat(rule.params().values()).containsOnly("minimum","maximum");
+  assertThat(rule.params().get("min")).isEqualTo("minimum");
 }
