@@ -1,22 +1,26 @@
 {
-  ActiveRuleKey key=rule.getKey();
-  if (key == null) {
-    throw new IllegalStateException("Cannot normalize ActiveRuleDto with null key");
-  }
+  ActiveRuleKey key=activeRuleDto.getKey();
+  Preconditions.checkArgument(key != null,"Cannot normalize ActiveRuleDto with null key");
   Map<String,Object> newRule=new HashMap<String,Object>();
   newRule.put("_parent",key.ruleKey().toString());
   newRule.put("ruleKey",key.ruleKey().toString());
   newRule.put(ActiveRuleField.KEY.key(),key.toString());
-  newRule.put(ActiveRuleField.INHERITANCE.key(),rule.getInheritance());
-  newRule.put(ActiveRuleField.PROFILE_ID.key(),rule.getProfileId());
-  newRule.put(ActiveRuleField.SEVERITY.key(),rule.getSeverityString());
-  if (rule.getParentId() != null) {
+  newRule.put(ActiveRuleField.INHERITANCE.key(),activeRuleDto.getInheritance());
+  newRule.put(ActiveRuleField.PROFILE_ID.key(),activeRuleDto.getProfileId());
+  newRule.put(ActiveRuleField.SEVERITY.key(),activeRuleDto.getSeverityString());
+  String parentKey=null;
+  if (activeRuleDto.getParentId() != null) {
     DbSession session=db.openSession(false);
-    ActiveRuleDto dto=this.db.activeRuleDao().getById(rule.getParentId(),session);
-    session.close();
-    newRule.put(ActiveRuleField.PARENT_KEY.key(),dto.getKey().toString());
+    try {
+      ActiveRuleDto parentDto=db.activeRuleDao().getById(activeRuleDto.getParentId(),session);
+      parentKey=parentDto.getKey().toString();
+    }
+  finally {
+      session.close();
+    }
   }
+  newRule.put(ActiveRuleField.PARENT_KEY.key(),parentKey);
   Map<String,Object> upsert=new HashMap<String,Object>(newRule);
   upsert.put(ActiveRuleField.PARAMS.key(),new ArrayList());
-  return new UpdateRequest().routing(key.ruleKey().toString()).id(rule.getKey().toString()).parent(rule.getKey().ruleKey().toString()).doc(newRule).upsert(upsert);
+  return new UpdateRequest().routing(key.ruleKey().toString()).id(activeRuleDto.getKey().toString()).parent(activeRuleDto.getKey().ruleKey().toString()).doc(newRule).upsert(upsert);
 }
