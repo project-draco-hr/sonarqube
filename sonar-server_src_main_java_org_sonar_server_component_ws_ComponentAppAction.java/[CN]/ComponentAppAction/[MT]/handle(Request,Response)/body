@@ -8,29 +8,23 @@
   if (component == null) {
     throw new NotFoundException(String.format("Component '%s' does not exists.",fileKey));
   }
-  List<PropertyDto> propertyDtos=propertiesDao.selectByQuery(PropertyQuery.builder().setKey("favourite").setComponentId(component.getId()).setUserId(userSession.userId()).build());
-  boolean isFavourite=propertyDtos.size() == 1;
-  json.prop("key",component.key());
-  json.prop("path",component.path());
-  json.prop("name",component.name());
-  json.prop("q",component.qualifier());
-  Component subProject=componentById(component.subProjectId());
-  json.prop("subProjectName",subProject != null ? subProject.longName() : null);
-  Component project=componentById(component.projectId());
-  json.prop("projectName",project != null ? project.longName() : null);
-  json.prop("fav",isFavourite);
-  json.name("measures").beginObject();
-  json.prop("fNcloc",formattedMeasure(fileKey,CoreMetrics.NCLOC));
-  json.prop("fCoverage",formattedMeasure(fileKey,CoreMetrics.COVERAGE));
-  json.prop("fDuplicationDensity",formattedMeasure(fileKey,CoreMetrics.DUPLICATED_LINES_DENSITY));
-  json.prop("fDebt",formattedMeasure(fileKey,CoreMetrics.TECHNICAL_DEBT));
-  json.prop("fIssues",formattedMeasure(fileKey,CoreMetrics.VIOLATIONS));
-  json.prop("fBlockerIssues",formattedMeasure(fileKey,CoreMetrics.BLOCKER_VIOLATIONS));
-  json.prop("fCriticalIssues",formattedMeasure(fileKey,CoreMetrics.CRITICAL_VIOLATIONS));
-  json.prop("fMajorIssues",formattedMeasure(fileKey,CoreMetrics.MAJOR_VIOLATIONS));
-  json.prop("fMinorIssues",formattedMeasure(fileKey,CoreMetrics.MINOR_VIOLATIONS));
-  json.prop("fInfoIssues",formattedMeasure(fileKey,CoreMetrics.INFO_VIOLATIONS));
-  json.endObject();
+  Long projectId=component.projectId();
+  Long subProjectId=component.subProjectId();
+  if (projectId != null && subProjectId != null) {
+    List<PropertyDto> propertyDtos=propertiesDao.selectByQuery(PropertyQuery.builder().setKey("favourite").setComponentId(component.getId()).setUserId(userSession.userId()).build());
+    boolean isFavourite=propertyDtos.size() == 1;
+    json.prop("key",component.key());
+    json.prop("path",component.path());
+    json.prop("name",component.name());
+    json.prop("q",component.qualifier());
+    Component subProject=componentById(subProjectId);
+    json.prop("subProjectName",subProject != null ? subProject.longName() : null);
+    Component project=componentById(projectId);
+    json.prop("projectName",project != null ? project.longName() : null);
+    json.prop("fav",isFavourite);
+    appendPeriods(json,projectId);
+    appendMeasures(json,fileKey);
+  }
   json.endObject();
   json.close();
 }
