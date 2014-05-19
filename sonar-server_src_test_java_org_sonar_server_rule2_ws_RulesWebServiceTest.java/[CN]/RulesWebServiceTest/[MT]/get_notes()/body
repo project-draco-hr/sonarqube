@@ -3,14 +3,11 @@
   tester.get(QualityProfileDao.class).insert(profile,session);
   RuleDto rule=newRuleDto(RuleKey.of(profile.getLanguage(),"S001")).setNoteData("Note1");
   ruleDao.insert(rule,session);
-  RuleDto rule2=newRuleDto(RuleKey.of(profile.getLanguage(),"S002")).setNoteData("Note2");
-  ruleDao.insert(rule2,session);
   session.commit();
   tester.get(RuleService.class).refresh();
   MockUserSession.set();
   WsTester.TestRequest request=wsTester.newGetRequest("api/rules","search");
-  request.setParam("f",RuleNormalizer.RuleField.NOTE.key());
   WsTester.Result result=request.execute();
   System.out.println("result.outputAsString() = " + result.outputAsString());
-  result.assertJson(this.getClass(),"get_tags.json");
+  result.assertJson(this.getClass(),"get_notes.json");
 }
