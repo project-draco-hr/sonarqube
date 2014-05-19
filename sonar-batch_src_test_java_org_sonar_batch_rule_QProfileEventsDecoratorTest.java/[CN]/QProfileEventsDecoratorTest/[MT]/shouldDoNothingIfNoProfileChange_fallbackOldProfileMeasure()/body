@@ -1,0 +1,9 @@
+{
+  mockTMWithDeprecatedProfileMeasures(2,"Java Two",20);
+  when(qualityProfileDao.selectById(20)).thenReturn(new QualityProfileDto().setLanguage("java"));
+  Measure newMeasure=new Measure(CoreMetrics.PROFILES,"[{\"id\":2,\"name\":\"Java Two\",\"version\":20,\"language\":\"java\"}]");
+  when(decoratorContext.getMeasure(CoreMetrics.PROFILES)).thenReturn(newMeasure);
+  when(languages.get("java")).thenReturn(Java.INSTANCE);
+  decorator.decorate(project,decoratorContext);
+  verify(decoratorContext,never()).createEvent(anyString(),anyString(),anyString(),any(Date.class));
+}
