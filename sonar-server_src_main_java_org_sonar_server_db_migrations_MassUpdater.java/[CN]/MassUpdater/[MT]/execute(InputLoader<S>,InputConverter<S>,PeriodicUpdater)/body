@@ -1,0 +1,61 @@
+{
+  long count=0;
+  Connection readConnection=null;
+  Statement stmt=null;
+  ResultSet rs=null;
+  Connection writeConnection=null;
+  PreparedStatement writeStatement=null;
+  PreparedStatement updateStatement=null;
+  try {
+    writeConnection=db.getDataSource().getConnection();
+    writeConnection.setAutoCommit(false);
+    writeStatement=writeConnection.prepareStatement(converter.updateSql());
+    readConnection=db.getDataSource().getConnection();
+    readConnection.setAutoCommit(false);
+    stmt=readConnection.createStatement(ResultSet.TYPE_FORWARD_ONLY,ResultSet.CONCUR_READ_ONLY);
+    if (db.getDialect().getId().equals(MySql.ID)) {
+      stmt.setFetchSize(Integer.MIN_VALUE);
+    }
+ else {
+      stmt.setFetchSize(groupSize);
+    }
+    rs=stmt.executeQuery(convertSelectSql(inputLoader.selectSql(),db));
+    int cursor=0;
+    while (rs.next()) {
+      if (converter.convert(inputLoader.load(rs),writeStatement)) {
+        writeStatement.addBatch();
+        writeStatement.clearParameters();
+        cursor++;
+        count++;
+      }
+      if (cursor == groupSize) {
+        writeStatement.executeBatch();
+        if (periodicUpdater != null) {
+          periodicUpdater.update(writeConnection);
+        }
+        writeConnection.commit();
+        cursor=0;
+      }
+    }
+    if (cursor > 0) {
+      writeStatement.executeBatch();
+      if (periodicUpdater != null) {
+        periodicUpdater.update(writeConnection);
+      }
+      writeConnection.commit();
+    }
+  }
+ catch (  SQLException e) {
+    SqlUtil.log(LOGGER,e);
+    throw processError(e);
+  }
+catch (  Exception e) {
+    throw processError(e);
+  }
+ finally {
+    DbUtils.closeQuietly(writeStatement);
+    DbUtils.closeQuietly(writeConnection);
+    DbUtils.closeQuietly(readConnection,stmt,rs);
+    LOGGER.info("{} rows have been updated",count);
+  }
+}
