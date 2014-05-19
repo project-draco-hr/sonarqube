@@ -11,6 +11,10 @@
   assertThat(dto.getNoteUserLogin()).isEqualTo("marius");
   index.refresh();
   Rule rule=index.getByKey(ruleKey);
+  assertThat(rule.markdownNote()).isEqualTo("my *note*");
+  assertThat(rule.noteCreatedAt()).isNotNull();
+  assertThat(rule.noteUpdatedAt()).isNotNull();
+  assertThat(rule.noteLogin()).isEqualTo("marius");
   service.setNote(ruleKey,null);
   dbSession.clearCache();
   dto=dao.getNonNullByKey(ruleKey,dbSession);
@@ -20,4 +24,8 @@
   assertThat(dto.getNoteUserLogin()).isNull();
   index.refresh();
   rule=index.getByKey(ruleKey);
+  assertThat(rule.markdownNote()).isNull();
+  assertThat(rule.noteCreatedAt()).isNull();
+  assertThat(rule.noteUpdatedAt()).isNull();
+  assertThat(rule.noteLogin()).isNull();
 }
