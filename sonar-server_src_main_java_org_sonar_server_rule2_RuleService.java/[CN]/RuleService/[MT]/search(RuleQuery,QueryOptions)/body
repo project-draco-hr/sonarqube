@@ -1,9 +1,23 @@
 {
   options.filterFieldsToReturn(RuleIndex.PUBLIC_FIELDS);
   RuleResult result=index.search(query,options);
-  for (  Rule rule : result.getHits()) {
-    for (    ActiveRule activeRule : activeRuleIndex.findByRule(rule.key())) {
-      result.getActiveRules().put(rule.key().toString(),activeRule);
+  if (query.getActivation() != null && !query.getActivation().isEmpty()) {
+    if (query.getActivation().equalsIgnoreCase("true")) {
+      for (      Rule rule : result.getHits()) {
+        if (query.getqProfileKey() == null) {
+          throw new IllegalStateException("\"activation=true\" requires a profile key!");
+        }
+        QualityProfileKey qualityProfileKey=QualityProfileKey.parse(query.getqProfileKey());
+        result.getActiveRules().put(rule.key().toString(),activeRuleIndex.getByRuleKeyAndProfileKey(rule.key(),qualityProfileKey));
+      }
+    }
+ else     if (query.getActivation().equalsIgnoreCase("all")) {
+      for (      Rule rule : result.getHits()) {
+        List<ActiveRule> activeRules=activeRuleIndex.findByRule(rule.key());
+        for (        ActiveRule activeRule : activeRules) {
+          result.getActiveRules().put(rule.key().toString(),activeRule);
+        }
+      }
     }
   }
   return result;
