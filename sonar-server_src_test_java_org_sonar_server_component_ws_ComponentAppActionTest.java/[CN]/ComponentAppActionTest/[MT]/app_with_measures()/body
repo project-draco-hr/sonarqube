@@ -1,0 +1,17 @@
+{
+  MockUserSession.set().addProjectPermissions(UserRole.CODEVIEWER,PROJECT_KEY).addComponent(COMPONENT_KEY,PROJECT_KEY);
+  addProjectSample();
+  addMeasure(CoreMetrics.NCLOC_KEY,200);
+  addMeasure(CoreMetrics.COVERAGE_KEY,95.4);
+  addMeasure(CoreMetrics.DUPLICATED_LINES_DENSITY_KEY,7.4);
+  addMeasure(CoreMetrics.VIOLATIONS_KEY,14);
+  addMeasure(CoreMetrics.BLOCKER_VIOLATIONS_KEY,1);
+  addMeasure(CoreMetrics.CRITICAL_VIOLATIONS_KEY,2);
+  addMeasure(CoreMetrics.MAJOR_VIOLATIONS_KEY,5);
+  addMeasure(CoreMetrics.MINOR_VIOLATIONS_KEY,4);
+  addMeasure(CoreMetrics.INFO_VIOLATIONS_KEY,2);
+  when(measureDao.findByComponentKeyAndMetricKey(COMPONENT_KEY,CoreMetrics.TECHNICAL_DEBT_KEY)).thenReturn(new MeasureDto().setValue(182.0));
+  when(durations.format(any(Locale.class),any(Duration.class),eq(Durations.DurationFormat.SHORT))).thenReturn("3h 2min");
+  WsTester.TestRequest request=tester.newGetRequest("api/components","app").setParam("key",COMPONENT_KEY);
+  request.execute().assertJson(getClass(),"app_with_measures.json");
+}
