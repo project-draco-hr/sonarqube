@@ -1,0 +1,16 @@
+{
+  for (  ActiveRuleChange change : changes) {
+    if (change.getType() == ActiveRuleChange.Type.ACTIVATED) {
+      ActiveRuleDto activeRule=ActiveRuleDto.createFor(context.profile(),context.rule()).setSeverity(change.getSeverity());
+      db.activeRuleDao().insert(activeRule,dbSession);
+    }
+ else     if (change.getType() == ActiveRuleChange.Type.DEACTIVATED) {
+      db.activeRuleDao().deleteByKey(change.getKey(),dbSession);
+    }
+ else     if (change.getType() == ActiveRuleChange.Type.UPDATED) {
+      ActiveRuleDto activeRule=context.activeRule();
+      activeRule.setSeverity(change.getSeverity());
+      db.activeRuleDao().update(activeRule,dbSession);
+    }
+  }
+}
