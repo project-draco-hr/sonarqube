@@ -1,9 +1,10 @@
 {
-  Rule rule=service.getByKey(RuleKey.parse(request.mandatoryParam("key")));
+  RuleKey key=RuleKey.parse(request.mandatoryParam(PARAM_KEY));
+  Rule rule=service.getByKey(key);
   if (rule == null) {
-    throw new NotFoundException("Rule not found");
+    throw new NotFoundException("Rule not found: " + key);
   }
-  JsonWriter json=response.newJsonWriter().beginObject().name("rule").beginObject();
-  writeRule(rule,json);
-  json.endObject().endObject().close();
+  JsonWriter json=response.newJsonWriter().beginObject().name("rule");
+  mapping.write((BaseDoc)rule,json);
+  json.endObject().close();
 }
