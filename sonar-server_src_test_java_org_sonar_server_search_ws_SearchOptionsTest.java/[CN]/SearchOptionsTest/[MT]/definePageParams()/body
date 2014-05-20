@@ -1,0 +1,19 @@
+{
+  WebService.Context context=new WebService.Context();
+  new WebService(){
+    @Override public void define(    Context context){
+      NewController newController=context.createController("api/foo");
+      NewAction action=newController.createAction("search").setHandler(mock(RequestHandler.class));
+      SearchOptions.definePageParams(action);
+      newController.done();
+    }
+  }
+.define(context);
+  WebService.Action searchAction=context.controller("api/foo").action("search");
+  WebService.Param page=searchAction.param("p");
+  assertThat(page).isNotNull();
+  assertThat(page.defaultValue()).isEqualTo("1");
+  WebService.Param pageSize=searchAction.param("ps");
+  assertThat(pageSize).isNotNull();
+  assertThat(pageSize.defaultValue()).isEqualTo("25");
+}

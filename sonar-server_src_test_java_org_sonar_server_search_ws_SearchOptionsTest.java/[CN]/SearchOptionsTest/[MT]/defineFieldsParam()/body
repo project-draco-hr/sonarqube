@@ -1,0 +1,17 @@
+{
+  WebService.Context context=new WebService.Context();
+  new WebService(){
+    @Override public void define(    Context context){
+      NewController newController=context.createController("api/foo");
+      NewAction action=newController.createAction("search").setHandler(mock(RequestHandler.class));
+      SearchOptions.defineFieldsParam(action,Lists.newArrayList("name","lang","severity"));
+      newController.done();
+    }
+  }
+.define(context);
+  WebService.Action searchAction=context.controller("api/foo").action("search");
+  WebService.Param param=searchAction.param("f");
+  assertThat(param).isNotNull();
+  assertThat(param.possibleValues()).containsOnly("name","lang","severity");
+  assertThat(param.exampleValue()).isEqualTo("name,lang");
+}

@@ -1,0 +1,15 @@
+{
+  SimpleGetRequest request=new SimpleGetRequest();
+  request.setParam("p","3");
+  request.setParam("ps","10");
+  request.setParam("f","name,repo");
+  request.setParam("severities","BLOCKER");
+  SearchOptions options=SearchOptions.create(request);
+  StringWriter json=new StringWriter();
+  JsonWriter jsonWriter=JsonWriter.of(json).beginObject();
+  Result result=mock(Result.class);
+  when(result.getTotal()).thenReturn(42L);
+  options.writeStatistics(jsonWriter,result);
+  jsonWriter.endObject().close();
+  JSONAssert.assertEquals("{\"total\": 42, \"p\": 3, \"ps\": 10}",json.toString(),true);
+}
