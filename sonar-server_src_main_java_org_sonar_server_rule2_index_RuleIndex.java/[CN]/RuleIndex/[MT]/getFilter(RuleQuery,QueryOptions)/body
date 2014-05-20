@@ -12,7 +12,18 @@
     }
     this.addTermFilter(RuleNormalizer.RuleField.STATUS.key(),stringStatus,fb);
   }
-  if ((query.getLanguages() != null && !query.getLanguages().isEmpty()) || (query.getRepositories() != null && !query.getRepositories().isEmpty()) || (query.getSeverities() != null && !query.getSeverities().isEmpty())|| (query.getTags() != null && !query.getTags().isEmpty())|| (query.getStatuses() != null && !query.getStatuses().isEmpty())|| (query.getKey() != null && !query.getKey().isEmpty())) {
+  if (query.getActivation() != null && !query.getActivation().isEmpty()) {
+    if (query.getActivation().equals("false")) {
+      fb.mustNot(FilterBuilders.hasChildFilter(new ActiveRuleIndexDefinition().getIndexType(),QueryBuilders.matchAllQuery()));
+    }
+ else     if (query.getActivation().equals("all")) {
+      fb.must(FilterBuilders.hasChildFilter(new ActiveRuleIndexDefinition().getIndexType(),QueryBuilders.matchAllQuery()));
+    }
+ else     if (query.getActivation().equals("true")) {
+      fb.must(FilterBuilders.hasChildFilter(new ActiveRuleIndexDefinition().getIndexType(),QueryBuilders.termQuery(ActiveRuleNormalizer.ActiveRuleField.PROFILE_KEY.key(),query.getQProfileKey())));
+    }
+  }
+  if ((query.getLanguages() != null && !query.getLanguages().isEmpty()) || (query.getRepositories() != null && !query.getRepositories().isEmpty()) || (query.getSeverities() != null && !query.getSeverities().isEmpty())|| (query.getTags() != null && !query.getTags().isEmpty())|| (query.getStatuses() != null && !query.getStatuses().isEmpty())|| (query.getKey() != null && !query.getKey().isEmpty())|| (query.getActivation() != null && !query.getActivation().isEmpty())) {
     return fb;
   }
  else {
