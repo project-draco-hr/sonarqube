@@ -1,5 +1,11 @@
 {
-  when(issueService.findSeveritiesByComponent(COMPONENT_KEY)).thenReturn(mock(Multiset.class));
-  when(issueService.findRulesByComponent(COMPONENT_KEY)).thenReturn(mock(RulesAggregation.class));
-  tester=new WsTester(new ComponentsWs(new ComponentAppAction(resourceDao,measureDao,propertiesDao,issueService,periods,durations,i18n)));
+  DbClient dbClient=mock(DbClient.class);
+  when(dbClient.openSession(false)).thenReturn(session);
+  when(dbClient.getDao(ResourceDao.class)).thenReturn(resourceDao);
+  when(dbClient.getDao(PropertiesDao.class)).thenReturn(propertiesDao);
+  when(dbClient.getDao(MeasureDao.class)).thenReturn(measureDao);
+  when(issueService.findSeveritiesByComponent(COMPONENT_KEY,session)).thenReturn(mock(Multiset.class));
+  when(issueService.findRulesByComponent(COMPONENT_KEY,session)).thenReturn(mock(RulesAggregation.class));
+  when(measureDao.findByComponentKeyAndMetricKeys(eq(COMPONENT_KEY),anyListOf(String.class),eq(session))).thenReturn(measures);
+  tester=new WsTester(new ComponentsWs(new ComponentAppAction(dbClient,issueService,periods,durations,i18n)));
 }

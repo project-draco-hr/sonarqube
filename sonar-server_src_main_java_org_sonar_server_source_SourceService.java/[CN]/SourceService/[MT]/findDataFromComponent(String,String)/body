@@ -1,7 +1,13 @@
 {
-  MeasureDto data=measureDao.findByComponentKeyAndMetricKey(fileKey,metricKey);
-  if (data != null) {
-    return data.getData();
+  DbSession session=myBatis.openSession(false);
+  try {
+    MeasureDto data=measureDao.getByKey(MeasureKey.of(fileKey,metricKey),session);
+    if (data != null) {
+      return data.getData();
+    }
+    return null;
   }
-  return null;
+  finally {
+    MyBatis.closeQuietly(session);
+  }
 }

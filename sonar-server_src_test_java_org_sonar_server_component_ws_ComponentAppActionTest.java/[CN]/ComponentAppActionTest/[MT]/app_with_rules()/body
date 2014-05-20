@@ -1,7 +1,7 @@
 {
-  MockUserSession.set().addProjectPermissions(UserRole.CODEVIEWER,PROJECT_KEY).addComponent(COMPONENT_KEY,PROJECT_KEY);
+  MockUserSession.set().addComponentPermission(UserRole.CODEVIEWER,PROJECT_KEY,COMPONENT_KEY);
   addProjectSample();
-  when(issueService.findRulesByComponent(COMPONENT_KEY)).thenReturn(new RulesAggregation().add(new RuleDto().setRuleKey("AvoidCycle").setRepositoryKey("squid").setName("Avoid Cycle")));
+  when(issueService.findRulesByComponent(COMPONENT_KEY,session)).thenReturn(new RulesAggregation().add(new RuleDto().setRuleKey("AvoidCycle").setRepositoryKey("squid").setName("Avoid Cycle")));
   WsTester.TestRequest request=tester.newGetRequest("api/components","app").setParam("key",COMPONENT_KEY);
   request.execute().assertJson(getClass(),"app_with_rules.json");
 }

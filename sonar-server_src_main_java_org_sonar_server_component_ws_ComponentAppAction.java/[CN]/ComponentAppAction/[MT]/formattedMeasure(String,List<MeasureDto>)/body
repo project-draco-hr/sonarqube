@@ -1,0 +1,22 @@
+{
+  MeasureDto measure=measureByMetricKey(metricKey,measures);
+  if (measure != null) {
+    Metric metric=CoreMetrics.getMetric(measure.getKey().metricKey());
+    Double value=measure.getValue();
+    if (value != null) {
+      if (metric.getType().equals(Metric.ValueType.FLOAT)) {
+        return i18n.formatDouble(UserSession.get().locale(),value);
+      }
+ else       if (metric.getType().equals(Metric.ValueType.INT)) {
+        return i18n.formatInteger(UserSession.get().locale(),value.intValue());
+      }
+ else       if (metric.getType().equals(Metric.ValueType.PERCENT)) {
+        return i18n.formatDouble(UserSession.get().locale(),value) + "%";
+      }
+ else       if (metric.getType().equals(Metric.ValueType.WORK_DUR)) {
+        return durations.format(UserSession.get().locale(),durations.create(value.longValue()),Durations.DurationFormat.SHORT);
+      }
+    }
+  }
+  return null;
+}

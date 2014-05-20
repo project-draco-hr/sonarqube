@@ -1,0 +1,17 @@
+{
+  json.name("periods").beginArray();
+  SnapshotDto snapshotDto=resourceDao.getLastSnapshotByResourceId(projectId,session);
+  if (snapshotDto != null) {
+    for (int i=1; i <= 5; i++) {
+      String mode=snapshotDto.getPeriodMode(i);
+      if (mode != null) {
+        Date periodDate=snapshotDto.getPeriodDate(i);
+        String label=periods.label(mode,snapshotDto.getPeriodModeParameter(i),periodDate);
+        if (label != null) {
+          json.beginArray().value(i).value(label).value(periodDate != null ? DateUtils.formatDateTime(periodDate) : null).endArray();
+        }
+      }
+    }
+  }
+  json.endArray();
+}
