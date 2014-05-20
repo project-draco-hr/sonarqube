@@ -1,0 +1,10 @@
+{
+  String componentKey="org.codehaus.sonar:sonar";
+  MockUserSession.set().setLogin("john").addComponentPermission(UserRole.CODEVIEWER,componentKey,componentKey);
+  ComponentDto file=new ComponentDto().setId(1L).setQualifier("TRK").setKey(componentKey).setName("SonarQube").setProjectId(1L);
+  when(componentDao.getByKey(componentKey,session)).thenReturn(file);
+  when(componentDao.getById(1L,session)).thenReturn(new ComponentDto().setId(1L).setLongName("SonarQube"));
+  when(propertiesDao.selectByQuery(any(PropertyQuery.class),eq(session))).thenReturn(newArrayList(new PropertyDto()));
+  WsTester.TestRequest request=tester.newGetRequest("api/components","app").setParam("key",componentKey);
+  request.execute().assertJson(getClass(),"app_without_sub_project.json");
+}

@@ -1,6 +1,12 @@
 {
   checkPermission(UserSession.get());
-  getNonNullQgate(qGateId);
-  checkNonNullProject(projectId);
-  propertiesDao.deleteProjectProperty(SONAR_QUALITYGATE_PROPERTY,projectId);
+  DbSession session=myBatis.openSession(false);
+  try {
+    getNonNullQgate(qGateId);
+    checkNonNullProject(projectId,session);
+    propertiesDao.deleteProjectProperty(SONAR_QUALITYGATE_PROPERTY,projectId);
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
 }

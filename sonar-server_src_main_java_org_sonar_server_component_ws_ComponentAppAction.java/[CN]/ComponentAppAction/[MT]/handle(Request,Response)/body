@@ -6,19 +6,15 @@
   json.beginObject();
   DbSession session=dbClient.openSession(false);
   try {
-    ComponentDto component=resourceDao.selectComponentByKey(fileKey,session);
+    ComponentDto component=dbClient.getDao(ComponentDao.class).getByKey(fileKey,session);
     if (component == null) {
       throw new NotFoundException(String.format("Component '%s' does not exists.",fileKey));
     }
-    Long projectId=component.projectId();
-    Long subProjectId=component.subProjectId();
-    if (projectId != null && subProjectId != null) {
-      appendComponent(json,component,projectId,subProjectId,userSession,session);
-      appendPermissions(json,component,userSession);
-      appendPeriods(json,projectId,session);
-      appendIssuesAggregation(json,component.key(),session);
-      appendMeasures(json,fileKey,session);
-    }
+    appendComponent(json,component,userSession,session);
+    appendPermissions(json,component,userSession);
+    appendPeriods(json,component.projectId(),session);
+    appendIssuesAggregation(json,component.key(),session);
+    appendMeasures(json,fileKey,session);
   }
   finally {
     MyBatis.closeQuietly(session);
