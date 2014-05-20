@@ -1,0 +1,18 @@
+{
+  QualityProfileKey qualityProfileKey=QualityProfileKey.of("Basic","xoo");
+  QualityProfileDao qualityProfileDao=serverTester.get(QualityProfileDao.class);
+  assertThat(qualityProfileDao.selectAll()).hasSize(1);
+  assertThat(qualityProfileDao.selectByNameAndLanguage(qualityProfileKey.name(),qualityProfileKey.lang())).isNotNull();
+  PropertiesDao propertiesDao=serverTester.get(PropertiesDao.class);
+  List<PropertyDto> xooDefault=propertiesDao.selectByQuery(PropertyQuery.builder().setKey("sonar.profile.xoo").build());
+  assertThat(xooDefault).hasSize(1);
+  assertThat(xooDefault.get(0).getValue()).isEqualTo("Basic");
+  ActiveRuleDao activeRuleDao=serverTester.get(ActiveRuleDao.class);
+  assertThat(activeRuleDao.findByProfileKey(qualityProfileKey,session)).hasSize(2);
+  RuleKey ruleKey=RuleKey.of("xoo","x1");
+  RuleDto rule=serverTester.get(RuleDao.class).getByKey(ruleKey,session);
+  ActiveRuleDto activeRule=activeRuleDao.getByKey(ActiveRuleKey.of(qualityProfileKey,ruleKey),session);
+  assertThat(activeRule.getKey().qProfile()).isEqualTo(qualityProfileKey);
+  assertThat(activeRule.getKey().ruleKey()).isEqualTo(rule.getKey());
+  assertThat(activeRule.getSeverityString()).isEqualToIgnoringCase("MAJOR");
+}

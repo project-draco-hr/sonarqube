@@ -1,7 +1,7 @@
 {
   TimeProfiler profiler=new TimeProfiler(LOGGER).start("Register Quality Profiles");
   sessionFactory.getSession().commit();
-  DbSession session=myBatis.openSession(false);
+  DbSession session=dbClient.openSession(false);
   try {
     ListMultimap<String,RulesProfile> profilesByLanguage=profilesByLanguage();
     for (    String language : profilesByLanguage.keySet()) {
@@ -17,7 +17,6 @@
       setDefault(language,profiles,session);
     }
     session.commit();
-    esActiveRule.bulkRegisterActiveRules();
   }
   finally {
     MyBatis.closeQuietly(session);

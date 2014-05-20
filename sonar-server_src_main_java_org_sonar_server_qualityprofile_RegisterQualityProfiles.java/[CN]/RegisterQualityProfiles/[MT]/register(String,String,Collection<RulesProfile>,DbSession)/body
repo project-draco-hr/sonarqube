@@ -1,12 +1,29 @@
 {
   LOGGER.info("Register " + language + " profile: "+ name);
-  QProfile profile=qProfileLookup.profile(name,language,session);
+  QualityProfileDto profile=dbClient.qualityProfileDao().selectByNameAndLanguage(name,language,session);
   if (profile != null) {
-    qProfileOperations.deleteProfile(profile,session);
+    dbClient.activeRuleDao().deleteByProfileKey(profile.getKey(),session);
+    dbClient.qualityProfileDao().delete(profile,session);
   }
-  profile=qProfileOperations.newProfile(name,language,true,UserSession.get(),session);
+  profile=newQualityProfileDto(name,language,session);
   for (  RulesProfile currentRulesProfile : profiles) {
-    qProfileBackup.restoreFromActiveRules(QualityProfileKey.of(profile.name(),profile.language()),currentRulesProfile,session);
+    for (    org.sonar.api.rules.ActiveRule activeRule : currentRulesProfile.getActiveRules()) {
+      RuleKey ruleKey=RuleKey.of(activeRule.getRepositoryKey(),activeRule.getRuleKey());
+      RuleDto rule=dbClient.ruleDao().getByKey(ruleKey,session);
+      if (rule == null) {
+        throw new NotFoundException(String.format("Rule '%s' does not exists.",ruleKey));
+      }
+      ActiveRuleDto activeRuleDto=dbClient.activeRuleDao().createActiveRule(profile.getKey(),ruleKey,activeRule.getSeverity().name(),session);
+      for (      ActiveRuleParam param : activeRule.getActiveRuleParams()) {
+        String paramKey=param.getKey();
+        String value=param.getValue();
+        ActiveRuleParamDto paramDto=dbClient.activeRuleDao().getParamsByActiveRuleAndKey(activeRuleDto,paramKey,session);
+        if (value != null && !paramDto.getValue().equals(value)) {
+          paramDto.setValue(value);
+          dbClient.activeRuleDao().updateParam(activeRuleDto,paramDto,session);
+        }
+      }
+    }
   }
-  loadedTemplateDao.insert(new LoadedTemplateDto(templateKey(language,name),LoadedTemplateDto.QUALITY_PROFILE_TYPE),session);
+  dbClient.getDao(LoadedTemplateDao.class).insert(new LoadedTemplateDto(templateKey(language,name),LoadedTemplateDto.QUALITY_PROFILE_TYPE),session);
 }
