@@ -13,19 +13,9 @@
     Long projectId=component.projectId();
     Long subProjectId=component.subProjectId();
     if (projectId != null && subProjectId != null) {
-      List<PropertyDto> propertyDtos=propertiesDao.selectByQuery(PropertyQuery.builder().setKey("favourite").setComponentId(component.getId()).setUserId(userSession.userId()).build(),session);
-      boolean isFavourite=propertyDtos.size() == 1;
-      json.prop("key",component.key());
-      json.prop("path",component.path());
-      json.prop("name",component.name());
-      json.prop("q",component.qualifier());
-      Component subProject=componentById(subProjectId,session);
-      json.prop("subProjectName",subProject != null ? subProject.longName() : null);
-      Component project=componentById(projectId,session);
-      json.prop("projectName",project != null ? project.longName() : null);
-      json.prop("fav",isFavourite);
+      appendComponent(json,component,projectId,subProjectId,userSession,session);
       appendPeriods(json,projectId,session);
-      appendRulesAggregation(json,component.key(),session);
+      appendIssuesAggregation(json,component.key(),session);
       appendMeasures(json,fileKey,session);
     }
   }
