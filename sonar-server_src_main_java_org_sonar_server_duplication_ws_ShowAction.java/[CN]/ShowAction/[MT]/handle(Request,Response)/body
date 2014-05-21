@@ -1,0 +1,14 @@
+{
+  String fileKey=request.mandatoryParam("key");
+  UserSession.get().checkComponentPermission(UserRole.CODEVIEWER,fileKey);
+  DbSession session=dbClient.openSession(false);
+  try {
+    JsonWriter json=response.newJsonWriter().beginObject();
+    String duplications=findDataFromComponent(fileKey,CoreMetrics.DUPLICATIONS_DATA_KEY,session);
+    duplicationsWriter.write(duplications,json,session);
+    json.endObject().close();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

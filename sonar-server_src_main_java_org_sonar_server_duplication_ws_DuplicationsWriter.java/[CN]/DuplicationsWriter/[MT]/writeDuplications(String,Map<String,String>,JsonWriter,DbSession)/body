@@ -1,0 +1,33 @@
+{
+  try {
+    SMInputFactory inputFactory=initStax();
+    SMHierarchicCursor root=inputFactory.rootElementCursor(new StringReader(duplicationsData));
+    root.advance();
+    SMInputCursor cursor=root.childElementCursor("g");
+    while (cursor.getNext() != null) {
+      json.beginObject().name("blocks").beginArray();
+      SMInputCursor bCursor=cursor.childElementCursor("b");
+      while (bCursor.getNext() != null) {
+        String from=bCursor.getAttrValue("s");
+        String size=bCursor.getAttrValue("l");
+        String componentKey=bCursor.getAttrValue("r");
+        if (from != null && size != null && componentKey != null) {
+          String ref=refByComponentKey.get(componentKey);
+          if (ref == null) {
+            ref=Integer.toString(refByComponentKey.size() + 1);
+            refByComponentKey.put(componentKey,Integer.toString(refByComponentKey.size() + 1));
+          }
+          json.beginObject();
+          json.prop("from",Integer.valueOf(from));
+          json.prop("size",Integer.valueOf(size));
+          json.prop("_ref",ref);
+          json.endObject();
+        }
+      }
+      json.endArray().endObject();
+    }
+  }
+ catch (  XMLStreamException e) {
+    throw new IllegalStateException("XML is not valid",e);
+  }
+}
