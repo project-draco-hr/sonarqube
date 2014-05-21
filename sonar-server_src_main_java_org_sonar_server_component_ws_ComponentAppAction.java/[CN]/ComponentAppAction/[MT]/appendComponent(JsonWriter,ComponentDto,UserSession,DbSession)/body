@@ -5,9 +5,10 @@
   json.prop("path",component.path());
   json.prop("name",component.name());
   json.prop("q",component.qualifier());
-  Component subProject=componentById(component.subProjectId(),session);
-  json.prop("subProjectName",subProject != null ? subProject.longName() : null);
-  Component project=componentById(component.projectId(),session);
+  ComponentDto subProject=(ComponentDto)componentById(component.subProjectId(),session);
+  ComponentDto project=(ComponentDto)componentById(component.projectId(),session);
+  boolean displaySubProjectLongName=subProject != null && !subProject.getId().equals(project.getId());
+  json.prop("subProjectName",displaySubProjectLongName ? subProject.longName() : null);
   json.prop("projectName",project.longName());
   json.prop("fav",isFavourite);
   json.prop("scmAvailable",sourceService.hasScmData(component.key(),session));
