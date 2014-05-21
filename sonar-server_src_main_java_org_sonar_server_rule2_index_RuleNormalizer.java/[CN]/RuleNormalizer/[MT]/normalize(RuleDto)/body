@@ -15,14 +15,19 @@
   update.put(RuleField.NOTE_LOGIN.key(),rule.getNoteUserLogin());
   update.put(RuleField.NOTE_CREATED_AT.key(),rule.getNoteCreatedAt());
   update.put(RuleField.NOTE_UPDATED_AT.key(),rule.getNoteUpdatedAt());
-  String subChar=null;
+  CharacteristicDto characteristic=null;
   if (rule.getDefaultSubCharacteristicId() != null) {
-    subChar=rule.getDefaultSubCharacteristicId().toString();
+    characteristic=db.getDao(CharacteristicDao.class).selectById(rule.getDefaultSubCharacteristicId());
   }
   if (rule.getSubCharacteristicId() != null) {
-    subChar=rule.getSubCharacteristicId().toString();
+    characteristic=db.getDao(CharacteristicDao.class).selectById(rule.getSubCharacteristicId());
   }
-  update.put(RuleField.SUB_CHARACTERISTIC.key(),subChar);
+  if (characteristic != null) {
+    update.put(RuleField.SUB_CHARACTERISTIC.key(),characteristic.getKey());
+    if (characteristic.getParentId() != null) {
+      update.put(RuleField.CHARACTERISTIC.key(),db.getDao(CharacteristicDao.class).selectById(characteristic.getParentId()).getKey());
+    }
+  }
   String dType=null, dCoefficient=null, dOffset=null;
   if (rule.getDefaultRemediationFunction() != null) {
     dType=rule.getDefaultRemediationFunction();
