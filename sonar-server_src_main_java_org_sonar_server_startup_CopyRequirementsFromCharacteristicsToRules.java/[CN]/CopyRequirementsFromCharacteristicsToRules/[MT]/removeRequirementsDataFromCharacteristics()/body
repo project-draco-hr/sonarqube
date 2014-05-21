@@ -1,16 +1,10 @@
 {
-  Connection connection=null;
-  Statement stmt=null;
+  DbSession dbSession=dbClient.openSession(false);
   try {
-    connection=db.getDataSource().getConnection();
-    stmt=connection.createStatement();
-    stmt.executeUpdate("DELETE FROM characteristics WHERE rule_id IS NOT NULL");
+    dbSession.getMapper(CharacteristicMapper.class).deleteRequirementsFromCharacteristicsTable();
+    dbSession.commit();
   }
- catch (  SQLException e) {
-    throw new IllegalStateException("Fail to remove requirements data from characteristics",e);
-  }
- finally {
-    DbUtils.closeQuietly(stmt);
-    DbUtils.closeQuietly(connection);
+  finally {
+    MyBatis.closeQuietly(dbSession);
   }
 }

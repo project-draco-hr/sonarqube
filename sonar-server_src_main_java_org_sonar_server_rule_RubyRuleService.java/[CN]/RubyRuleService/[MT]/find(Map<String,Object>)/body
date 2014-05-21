@@ -1,3 +1,15 @@
 {
-  return rules.find(RuleQuery.builder().searchQuery(Strings.emptyToNull((String)params.get("searchQuery"))).key(Strings.emptyToNull((String)params.get("key"))).languages(RubyUtils.toStrings(params.get("languages"))).repositories(RubyUtils.toStrings(params.get("repositories"))).severities(RubyUtils.toStrings(params.get("severities"))).statuses(RubyUtils.toStrings(params.get("statuses"))).tags(RubyUtils.toStrings(params.get("tags"))).debtCharacteristics(RubyUtils.toStrings(params.get("debtCharacteristics"))).hasDebtCharacteristic(RubyUtils.toBoolean(params.get("hasDebtCharacteristic"))).pageSize(RubyUtils.toInteger(params.get("pageSize"))).pageIndex(RubyUtils.toInteger(params.get("pageIndex"))).build());
+  org.sonar.server.rule2.index.RuleQuery query=service.newRuleQuery();
+  query.setQueryText(Strings.emptyToNull((String)params.get("searchQuery")));
+  query.setKey(Strings.emptyToNull((String)params.get("key")));
+  query.setLanguages(RubyUtils.toStrings(params.get("languages")));
+  query.setRepositories(RubyUtils.toStrings(params.get("repositories")));
+  query.setSeverities(RubyUtils.toStrings(params.get("severities")));
+  query.setStatuses(RubyUtils.toEnums(params.get("statuses"),RuleStatus.class));
+  query.setTags(RubyUtils.toStrings(params.get("tags")));
+  query.setDebtCharacteristics(RubyUtils.toStrings(params.get("debtCharacteristics")));
+  query.setHasDebtCharacteristic(RubyUtils.toBoolean(params.get("hasDebtCharacteristic")));
+  QueryOptions options=new QueryOptions();
+  RuleResult rules=service.search(query,options);
+  return new PagedResult<org.sonar.server.rule2.Rule>(rules.getRules(),PagingResult.create(options.getLimit(),1,rules.getTotal()));
 }

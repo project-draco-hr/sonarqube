@@ -1,0 +1,21 @@
+{
+  assertThat(RubyUtils.toEnums(null,RuleStatus.class)).isNull();
+  assertThat(RubyUtils.toEnums("",RuleStatus.class)).isEmpty();
+  assertThat(RubyUtils.toEnums("BETA",RuleStatus.class)).containsOnly(RuleStatus.BETA);
+  assertThat(RubyUtils.toEnums("BETA,READY",RuleStatus.class)).containsOnly(RuleStatus.BETA,RuleStatus.READY);
+  assertThat(RubyUtils.toEnums(asList("BETA","READY"),RuleStatus.class)).containsOnly(RuleStatus.BETA,RuleStatus.READY);
+  try {
+    RubyUtils.toEnums("xxx",RuleStatus.class);
+    fail();
+  }
+ catch (  IllegalArgumentException e) {
+    assertThat(e).hasMessage("No enum constant org.sonar.api.rule.RuleStatus.xxx");
+  }
+  try {
+    RubyUtils.toEnums(1,RuleStatus.class);
+    fail();
+  }
+ catch (  IllegalArgumentException e) {
+    assertThat(e).hasMessage("Unsupported type: class java.lang.Integer");
+  }
+}

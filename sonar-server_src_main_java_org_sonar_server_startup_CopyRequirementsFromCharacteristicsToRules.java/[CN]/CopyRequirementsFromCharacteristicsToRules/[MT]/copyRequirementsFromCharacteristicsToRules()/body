@@ -1,8 +1,21 @@
 {
-  List<RequirementDto> requirementDtos=requirementDao.selectRequirements();
-  final Multimap<Integer,RequirementDto> requirementsByRuleId=ArrayListMultimap.create();
-  for (  RequirementDto requirementDto : requirementDtos) {
-    requirementsByRuleId.put(requirementDto.getRuleId(),requirementDto);
+  DbSession dbSession=dbClient.openSession(true);
+  try {
+    List<RequirementDto> requirementDtos=dbClient.debtRequirementDao().selectRequirements(dbSession);
+    final Multimap<Integer,RequirementDto> requirementsByRuleId=ArrayListMultimap.create();
+    for (    RequirementDto requirementDto : requirementDtos) {
+      requirementsByRuleId.put(requirementDto.getRuleId(),requirementDto);
+    }
+    List<RuleDto> rules=dbClient.ruleDao().findAll(dbSession);
+    for (    RuleDto rule : rules) {
+      Collection<RequirementDto> requirementsForRule=requirementsByRuleId.get(rule.getId());
+      if (!requirementsForRule.isEmpty()) {
+        convert(rule,requirementsForRule,dbSession);
+      }
+    }
+    dbSession.commit();
   }
-  new MassUpdater(db).execute(new RuleInputLoader(),new RuleInputConvertor(requirementsByRuleId,system2));
+  finally {
+    MyBatis.closeQuietly(dbSession);
+  }
 }
