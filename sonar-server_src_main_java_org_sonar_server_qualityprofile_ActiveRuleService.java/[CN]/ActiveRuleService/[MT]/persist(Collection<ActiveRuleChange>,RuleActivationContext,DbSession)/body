@@ -1,16 +1,39 @@
 {
+  ActiveRuleDao dao=db.activeRuleDao();
   for (  ActiveRuleChange change : changes) {
     if (change.getType() == ActiveRuleChange.Type.ACTIVATED) {
-      ActiveRuleDto activeRule=ActiveRuleDto.createFor(context.profile(),context.rule()).setSeverity(change.getSeverity());
-      db.activeRuleDao().insert(activeRule,dbSession);
+      ActiveRuleDto activeRule=ActiveRuleDto.createFor(context.profile(),context.rule());
+      activeRule.setSeverity(change.getSeverity());
+      dao.insert(activeRule,dbSession);
+      for (      Map.Entry<String,String> param : change.getParameters().entrySet()) {
+        ActiveRuleParamDto paramDto=ActiveRuleParamDto.createFor(context.ruleParamsByKeys().get(param.getKey()));
+        paramDto.setValue(param.getValue());
+        dao.addParam(activeRule,paramDto,dbSession);
+      }
     }
  else     if (change.getType() == ActiveRuleChange.Type.DEACTIVATED) {
-      db.activeRuleDao().deleteByKey(change.getKey(),dbSession);
+      dao.deleteByKey(change.getKey(),dbSession);
     }
  else     if (change.getType() == ActiveRuleChange.Type.UPDATED) {
       ActiveRuleDto activeRule=context.activeRule();
       activeRule.setSeverity(change.getSeverity());
-      db.activeRuleDao().update(activeRule,dbSession);
+      dao.update(activeRule,dbSession);
+      for (      Map.Entry<String,String> param : change.getParameters().entrySet()) {
+        ActiveRuleParamDto activeRuleParamDto=context.activeRuleParamsAsMap().get(param.getKey());
+        if (activeRuleParamDto == null) {
+          activeRuleParamDto=ActiveRuleParamDto.createFor(context.ruleParamsByKeys().get(param.getKey()));
+          activeRuleParamDto.setValue(param.getValue());
+          dao.addParam(activeRule,activeRuleParamDto,dbSession);
+        }
+ else {
+          activeRuleParamDto.setValue(param.getValue());
+          dao.updateParam(activeRule,activeRuleParamDto,dbSession);
+        }
+      }
+      for (      ActiveRuleParamDto activeRuleParamDto : context.activeRuleParams()) {
+        if (!change.getParameters().containsKey(activeRuleParamDto.getKey())) {
+        }
+      }
     }
   }
 }

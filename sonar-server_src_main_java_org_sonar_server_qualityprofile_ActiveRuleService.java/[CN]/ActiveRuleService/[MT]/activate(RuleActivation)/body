@@ -12,6 +12,11 @@
       change=new ActiveRuleChange(ActiveRuleChange.Type.UPDATED,activation.getKey());
     }
     change.setSeverity(StringUtils.defaultIfEmpty(activation.getSeverity(),context.defaultSeverity()));
+    for (    RuleParamDto ruleParamDto : context.ruleParams()) {
+      String value=activation.getParameters().get(ruleParamDto.getName());
+      verifyParam(ruleParamDto,value);
+      change.setParameter(ruleParamDto.getName(),StringUtils.defaultIfEmpty(value,ruleParamDto.getDefaultValue()));
+    }
     changes.add(change);
     persist(changes,context,dbSession);
     dbSession.commit();

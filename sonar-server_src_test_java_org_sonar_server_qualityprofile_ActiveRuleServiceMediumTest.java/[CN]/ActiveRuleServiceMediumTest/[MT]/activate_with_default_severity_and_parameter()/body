@@ -1,24 +1,19 @@
 {
   grantPermission();
   RuleActivation activation=new RuleActivation(ActiveRuleKey.of(profileKey,RuleKey.of("xoo","x1")));
-  activation.setSeverity(Severity.BLOCKER);
   service.activate(activation);
-  RuleActivation update=new RuleActivation(ActiveRuleKey.of(profileKey,RuleKey.of("xoo","x1")));
-  update.setSeverity(Severity.CRITICAL);
-  update.setParameter("max","42");
-  service.activate(update);
   List<ActiveRuleDto> activeRuleDtos=dbClient.activeRuleDao().findByProfileKey(profileKey,dbSession);
   assertThat(activeRuleDtos).hasSize(1);
-  assertThat(activeRuleDtos.get(0).getSeverityString()).isEqualTo(Severity.CRITICAL);
+  assertThat(activeRuleDtos.get(0).getSeverityString()).isEqualTo(Severity.MINOR);
   assertThat(activeRuleDtos.get(0).getInheritance()).isNull();
   List<ActiveRuleParamDto> params=dbClient.activeRuleDao().findParamsByActiveRule(activeRuleDtos.get(0),dbSession);
   assertThat(params).hasSize(1);
-  assertThat(params.get(0).getValue()).isEqualTo("42");
+  assertThat(params.get(0).getValue()).isEqualTo("10");
   index.refresh();
   ActiveRule activeRule=index.getByKey(activation.getKey());
   assertThat(activeRule).isNotNull();
-  assertThat(activeRule.severity()).isEqualTo(Severity.CRITICAL);
+  assertThat(activeRule.severity()).isEqualTo(Severity.MINOR);
   assertThat(activeRule.inheritance()).isEqualTo(ActiveRule.Inheritance.NONE);
   assertThat(activeRule.params()).hasSize(1);
-  assertThat(activeRule.params().get("max")).isEqualTo("42");
+  assertThat(activeRule.params().get("max")).isEqualTo("10");
 }

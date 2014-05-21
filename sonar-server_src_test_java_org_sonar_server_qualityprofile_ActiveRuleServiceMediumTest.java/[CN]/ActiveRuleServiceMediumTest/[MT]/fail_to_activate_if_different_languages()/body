@@ -1,2 +1,12 @@
 {
+  grantPermission();
+  RuleActivation activation=new RuleActivation(ActiveRuleKey.of(profileKey,RuleKey.of("squid","j1")));
+  try {
+    service.activate(activation);
+    fail();
+  }
+ catch (  IllegalArgumentException e) {
+    assertThat(e).hasMessage("Rule squid:j1 and profile MyProfile:xoo have different languages");
+    verifyZeroActiveRules(activation);
+  }
 }
