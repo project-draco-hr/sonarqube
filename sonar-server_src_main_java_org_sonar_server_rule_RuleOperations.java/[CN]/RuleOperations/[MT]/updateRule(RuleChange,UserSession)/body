@@ -1,15 +1,15 @@
 {
   checkPermission(userSession);
-  DbSession session=myBatis.openSession(false);
+  DbSession session=dbClient.openSession(false);
   try {
-    RuleDto ruleDto=ruleDao.selectByKey(ruleChange.ruleKey(),session);
+    RuleDto ruleDto=dbClient.ruleDao().getByKey(ruleChange.ruleKey(),session);
     if (ruleDto == null) {
       throw new NotFoundException(String.format("Unknown rule '%s'",ruleChange.ruleKey()));
     }
     String subCharacteristicKey=ruleChange.debtCharacteristicKey();
     CharacteristicDto subCharacteristic=null;
     if (!Strings.isNullOrEmpty(subCharacteristicKey)) {
-      subCharacteristic=characteristicDao.selectByKey(subCharacteristicKey,session);
+      subCharacteristic=dbClient.debtCharacteristicDao().selectByKey(subCharacteristicKey,session);
       if (subCharacteristic == null) {
         throw new NotFoundException(String.format("Unknown sub characteristic '%s'",ruleChange.debtCharacteristicKey()));
       }
@@ -17,7 +17,6 @@
     boolean needUpdate=updateRule(ruleDto,subCharacteristic,ruleChange.debtRemediationFunction(),ruleChange.debtRemediationCoefficient(),ruleChange.debtRemediationOffset(),new Date(system.now()),session);
     if (needUpdate) {
       session.commit();
-      reindexRule(ruleDto,session);
     }
   }
  catch (  IllegalArgumentException e) {

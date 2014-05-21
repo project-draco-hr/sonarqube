@@ -1,9 +1,9 @@
 {
   checkPermission();
-  SqlSession session=mybatis.openSession(false);
+  DbSession session=dbClient.openSession(false);
   try {
     DebtModel debtModel=new DebtModel();
-    List<CharacteristicDto> characteristicDtos=dao.selectEnabledCharacteristics(session);
+    List<CharacteristicDto> characteristicDtos=dbClient.debtCharacteristicDao().selectEnabledCharacteristics(session);
     for (    CharacteristicDto characteristicDto : characteristicDtos) {
       if (characteristicDto.getParentId() == null) {
         debtModel.addRootCharacteristic(toDebtCharacteristic(characteristicDto));
@@ -13,7 +13,7 @@
       }
     }
     List<RuleDebt> rules=newArrayList();
-    for (    RuleDto rule : ruleDao.selectEnablesAndNonManual(session)) {
+    for (    RuleDto rule : dbClient.ruleDao().selectEnabledAndNonManual(session)) {
       if (languageKey == null || languageKey.equals(rule.getLanguage())) {
         RuleDebt ruleDebt=toRuleDebt(rule,debtModel);
         if (ruleDebt != null) {

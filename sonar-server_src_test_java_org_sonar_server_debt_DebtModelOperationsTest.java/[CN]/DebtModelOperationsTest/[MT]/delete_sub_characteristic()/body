@@ -1,7 +1,7 @@
 {
   DbSession batchSession=mock(DbSession.class);
-  when(mybatis.openSession(true)).thenReturn(batchSession);
-  when(ruleDao.selectBySubCharacteristicId(2,batchSession)).thenReturn(newArrayList(new RuleDto().setSubCharacteristicId(2).setRemediationFunction(DebtRemediationFunction.Type.LINEAR_OFFSET.toString()).setRemediationCoefficient("2h").setRemediationOffset("5min").setDefaultSubCharacteristicId(10).setDefaultRemediationFunction(DebtRemediationFunction.Type.LINEAR_OFFSET.toString()).setDefaultRemediationCoefficient("4h").setDefaultRemediationOffset("15min")));
+  when(dbClient.openSession(true)).thenReturn(batchSession);
+  when(ruleDao.findRulesByDebtSubCharacteristicId(2,batchSession)).thenReturn(newArrayList(new RuleDto().setSubCharacteristicId(2).setRemediationFunction(DebtRemediationFunction.Type.LINEAR_OFFSET.toString()).setRemediationCoefficient("2h").setRemediationOffset("5min").setDefaultSubCharacteristicId(10).setDefaultRemediationFunction(DebtRemediationFunction.Type.LINEAR_OFFSET.toString()).setDefaultRemediationCoefficient("4h").setDefaultRemediationOffset("15min")));
   when(dao.selectById(2,batchSession)).thenReturn(subCharacteristicDto);
   service.delete(2);
   verify(ruleDao).update(ruleCaptor.capture(),eq(batchSession));
@@ -20,5 +20,4 @@
   assertThat(characteristicDto.getId()).isEqualTo(2);
   assertThat(characteristicDto.isEnabled()).isFalse();
   assertThat(characteristicDto.getUpdatedAt()).isEqualTo(now);
-  verify(ruleRegistry).reindex(ruleCaptor.getAllValues(),batchSession);
 }

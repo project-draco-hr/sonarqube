@@ -1,9 +1,8 @@
 {
   RuleDto dto=new RuleDto().setId(1).setRepositoryKey("squid").setRuleKey("UselessImportCheck").setSubCharacteristicId(-1);
   RuleKey ruleKey=RuleKey.of("squid","UselessImportCheck");
-  when(ruleDao.selectByKey(ruleKey,session)).thenReturn(dto);
+  when(ruleDao.getByKey(ruleKey,session)).thenReturn(dto);
   operations.updateRule(new RuleChange().setRuleKey(ruleKey).setDebtCharacteristicKey(null),authorizedUserSession);
   verify(ruleDao,never()).update(any(RuleDto.class),eq(session));
   verify(session,never()).commit();
-  verify(ruleRegistry,never()).reindex(any(RuleDto.class),eq(session));
 }

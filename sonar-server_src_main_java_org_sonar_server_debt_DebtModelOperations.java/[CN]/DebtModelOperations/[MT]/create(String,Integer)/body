@@ -1,6 +1,6 @@
 {
   checkPermission();
-  SqlSession session=mybatis.openSession(false);
+  SqlSession session=dbClient.openSession(false);
   try {
     checkNotAlreadyExists(name,session);
     CharacteristicDto newCharacteristic=new CharacteristicDto().setKey(name.toUpperCase().replace(" ","_")).setName(name).setEnabled(true).setCreatedAt(new Date(system2.now()));
@@ -12,9 +12,9 @@
       newCharacteristic.setParentId(parent.getId());
     }
  else {
-      newCharacteristic.setOrder(dao.selectMaxCharacteristicOrder(session) + 1);
+      newCharacteristic.setOrder(dbClient.debtCharacteristicDao().selectMaxCharacteristicOrder(session) + 1);
     }
-    dao.insert(newCharacteristic,session);
+    dbClient.debtCharacteristicDao().insert(newCharacteristic,session);
     session.commit();
     return toCharacteristic(newCharacteristic);
   }

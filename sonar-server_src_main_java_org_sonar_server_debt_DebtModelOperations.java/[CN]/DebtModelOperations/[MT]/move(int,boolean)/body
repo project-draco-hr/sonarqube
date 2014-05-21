@@ -1,6 +1,6 @@
 {
   checkPermission();
-  SqlSession session=mybatis.openSession(false);
+  SqlSession session=dbClient.openSession(false);
   try {
     final CharacteristicDto dto=findCharacteristic(characteristicId,session);
     if (dto.getParentId() != null) {
@@ -14,10 +14,10 @@
     int nextOrder=getOrder(dtoToSwitchOrderWith);
     dtoToSwitchOrderWith.setOrder(currentOrder);
     dtoToSwitchOrderWith.setUpdatedAt(new Date(system2.now()));
-    dao.update(dtoToSwitchOrderWith,session);
+    dbClient.debtCharacteristicDao().update(dtoToSwitchOrderWith,session);
     dto.setOrder(nextOrder);
     dto.setUpdatedAt(new Date(system2.now()));
-    dao.update(dto,session);
+    dbClient.debtCharacteristicDao().update(dto,session);
     session.commit();
     return toCharacteristic(dto);
   }

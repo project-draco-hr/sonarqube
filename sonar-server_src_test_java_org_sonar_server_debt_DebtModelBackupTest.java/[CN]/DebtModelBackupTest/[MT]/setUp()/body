@@ -11,8 +11,10 @@
     }
   }
 ).when(dao).insert(any(CharacteristicDto.class),any(DbSession.class));
-  when(myBatis.openSession(false)).thenReturn(session);
+  when(dbClient.openSession(false)).thenReturn(session);
+  when(dbClient.ruleDao()).thenReturn(ruleDao);
+  when(dbClient.debtCharacteristicDao()).thenReturn(dao);
   Reader defaultModelReader=mock(Reader.class);
   when(debtModelPluginRepository.createReaderForXMLFile("technical-debt")).thenReturn(defaultModelReader);
-  debtModelBackup=new DebtModelBackup(myBatis,dao,ruleDao,debtModelOperations,ruleOperations,debtModelPluginRepository,characteristicsXMLImporter,rulesXMLImporter,debtModelXMLExporter,ruleRegistry,defLoader,system2);
+  debtModelBackup=new DebtModelBackup(dbClient,debtModelOperations,ruleOperations,debtModelPluginRepository,characteristicsXMLImporter,rulesXMLImporter,debtModelXMLExporter,defLoader,system2);
 }

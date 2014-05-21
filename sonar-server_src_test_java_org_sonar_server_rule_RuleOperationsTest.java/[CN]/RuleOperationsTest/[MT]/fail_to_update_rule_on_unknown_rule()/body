@@ -1,6 +1,6 @@
 {
   RuleKey ruleKey=RuleKey.of("squid","UselessImportCheck");
-  when(ruleDao.selectByKey(ruleKey,session)).thenReturn(null);
+  when(ruleDao.getByKey(ruleKey,session)).thenReturn(null);
   try {
     operations.updateRule(new RuleChange().setRuleKey(ruleKey).setDebtCharacteristicKey("COMPILER").setDebtRemediationFunction("LINEAR_OFFSET").setDebtRemediationCoefficient("2h").setDebtRemediationOffset("20min"),authorizedUserSession);
   }
@@ -9,5 +9,4 @@
   }
   verify(ruleDao,never()).update(any(RuleDto.class),eq(session));
   verify(session,never()).commit();
-  verify(ruleRegistry,never()).reindex(any(RuleDto.class),eq(session));
 }

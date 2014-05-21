@@ -1,15 +1,15 @@
 {
   MyBatis myBatis=db.myBatis();
-  RuleDao ruleDao=mock(RuleDao.class);
-  ActiveRuleDao activeRuleDao=mock(ActiveRuleDao.class);
-  QualityProfileDao qualityProfileDao=mock(QualityProfileDao.class);
+  RuleDao ruleDao=new RuleDao();
+  QualityProfileDao qualityProfileDao=new QualityProfileDao(myBatis);
+  ActiveRuleDao activeRuleDao=new ActiveRuleDao(qualityProfileDao,ruleDao);
   DbClient client=new DbClient(db.database(),myBatis,ruleDao,activeRuleDao,qualityProfileDao);
   assertThat(client.database()).isSameAs(db.database());
   DbSession dbSession=client.openSession(true);
   assertThat(dbSession).isNotNull();
   assertThat(dbSession.getConnection().isClosed()).isFalse();
   dbSession.close();
-  assertThat(client.getDao(qualityProfileDao.getClass())).isSameAs(qualityProfileDao);
-  assertThat(client.getDao(activeRuleDao.getClass())).isSameAs(activeRuleDao);
-  assertThat(client.getDao(ruleDao.getClass())).isSameAs(ruleDao);
+  assertThat(client.qualityProfileDao()).isSameAs(qualityProfileDao);
+  assertThat(client.activeRuleDao()).isSameAs(activeRuleDao);
+  assertThat(client.ruleDao()).isSameAs(ruleDao);
 }

@@ -1,7 +1,7 @@
 {
   RuleDto dto=new RuleDto().setId(1).setRepositoryKey("squid").setRuleKey("UselessImportCheck").setSubCharacteristicId(2).setRemediationFunction("CONSTANT_ISSUE").setRemediationOffset("10min");
   RuleKey ruleKey=RuleKey.of("squid","UselessImportCheck");
-  when(ruleDao.selectByKey(ruleKey,session)).thenReturn(dto);
+  when(ruleDao.getByKey(ruleKey,session)).thenReturn(dto);
   when(characteristicDao.selectByKey("COMPILER",session)).thenReturn(null);
   try {
     operations.updateRule(new RuleChange().setRuleKey(ruleKey).setDebtCharacteristicKey("COMPILER").setDebtRemediationFunction("LINEAR_OFFSET").setDebtRemediationCoefficient("2h").setDebtRemediationOffset("20min"),authorizedUserSession);
@@ -11,5 +11,4 @@
   }
   verify(ruleDao,never()).update(any(RuleDto.class),eq(session));
   verify(session,never()).commit();
-  verify(ruleRegistry,never()).reindex(any(RuleDto.class),eq(session));
 }
