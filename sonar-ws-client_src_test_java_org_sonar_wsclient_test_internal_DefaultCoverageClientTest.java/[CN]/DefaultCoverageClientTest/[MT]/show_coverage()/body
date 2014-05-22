@@ -1,0 +1,13 @@
+{
+  HttpRequestFactory requestFactory=new HttpRequestFactory(httpServer.url());
+  httpServer.stubResponseBody(Resources.toString(Resources.getResource(this.getClass(),"DefaultCoverageClientTest/show_coverage.json"),Charsets.UTF_8));
+  CoverageClient client=new DefaultCoverageClient(requestFactory);
+  List<Coverage> coverage=client.show(CoverageShowQuery.create().setKey("MyFile").setFrom("20").setTo("25").setType("UT"));
+  assertThat(httpServer.requestedPath()).isEqualTo("/api/coverage/show?key=MyFile&from=20&to=25&type=UT");
+  assertThat(coverage).hasSize(3);
+  assertThat(coverage.get(0).lineIndex()).isEqualTo(49);
+  assertThat(coverage.get(0).isCovered()).isTrue();
+  assertThat(coverage.get(0).tests()).isEqualTo(14);
+  assertThat(coverage.get(0).branches()).isEqualTo(3);
+  assertThat(coverage.get(0).coveredBranches()).isEqualTo(2);
+}
