@@ -13,18 +13,52 @@
     }
   }
  else   if (actions.size() > 1) {
-    CountDownLatch latch=new CountDownLatch(actions.size());
+    Map<String,Integer> itemOffset=new HashMap<String,Integer>();
+    ArrayListMultimap<String,IndexAction> itemActions=ArrayListMultimap.create();
+    List<IndexAction> embeddedActions=new LinkedList<IndexAction>();
+    for (    IndexAction action : actions) {
+      if (EmbeddedIndexAction.class.isAssignableFrom(action.getClass())) {
+        embeddedActions.add(action);
+      }
+ else {
+        String actionKey=action.getKey();
+        Integer offset=0;
+        if (!itemOffset.containsKey(actionKey)) {
+          itemOffset.put(actionKey,offset);
+          itemActions.put(actionKey,action);
+        }
+ else {
+          offset=itemOffset.get(actionKey);
+          if (KeyIndexAction.class.isAssignableFrom(action.getClass())) {
+            itemOffset.put(actionKey,0);
+            itemActions.get(actionKey).set(0,action);
+          }
+ else {
+            itemActions.get(actionKey).set(offset,action);
+          }
+        }
+      }
+    }
     try {
-      for (      IndexAction action : actions) {
-        action.setLatch(latch);
+      Multimap<String,IndexAction> itemBulks=makeBulkByType(itemActions);
+      CountDownLatch itemLatch=new CountDownLatch(itemBulks.size());
+      for (      IndexAction action : itemBulks.values()) {
+        action.setLatch(itemLatch);
         this.offer(action,1000,TimeUnit.SECONDS);
       }
-      latch.await(1500,TimeUnit.MILLISECONDS);
+      itemLatch.await(1500,TimeUnit.MILLISECONDS);
+      Multimap<String,IndexAction> embeddedBulks=makeBulkByType(itemActions);
+      CountDownLatch embeddedLatch=new CountDownLatch(embeddedBulks.size());
+      for (      IndexAction action : embeddedBulks.values()) {
+        action.setLatch(embeddedLatch);
+        this.offer(action,1000,TimeUnit.SECONDS);
+      }
+      embeddedLatch.await(1500,TimeUnit.MILLISECONDS);
       Set<String> refreshedIndexes=new HashSet<String>();
       for (      IndexAction action : actions) {
-        if (!refreshedIndexes.contains(action.getIndexType())) {
+        if (action.getIndex() != null && !refreshedIndexes.contains(action.getIndex().getIndexName())) {
           action.getIndex().refresh();
-          refreshedIndexes.add(action.getIndexType());
+          refreshedIndexes.add(action.getIndex().getIndexName());
         }
       }
     }
