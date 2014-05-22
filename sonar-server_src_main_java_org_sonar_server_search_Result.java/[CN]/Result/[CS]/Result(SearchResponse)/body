@@ -1,19 +1,17 @@
 {
   this.hits=new ArrayList<K>();
-  this.facets=new HashMap<String,List<FacetValue>>();
+  this.facets=LinkedListMultimap.create();
   this.total=(int)response.getHits().totalHits();
   this.timeInMillis=response.getTookInMillis();
   for (  SearchHit hit : response.getHits()) {
     this.hits.add(getSearchResult(hit.getSource()));
   }
-  if (response.getFacets() != null && !response.getFacets().facets().isEmpty()) {
-    for (    Facet facet : response.getFacets().facets()) {
-      TermsFacet termFacet=(TermsFacet)facet;
-      List<FacetValue> facetValues=new ArrayList<FacetValue>();
-      for (      TermsFacet.Entry facetValue : termFacet.getEntries()) {
-        facetValues.add(new FacetValue<Integer>(facetValue.getTerm().string(),facetValue.getCount()));
+  if (response.getAggregations() != null) {
+    for (    Map.Entry<String,Aggregation> facet : response.getAggregations().asMap().entrySet()) {
+      Terms aggregation=(Terms)facet.getValue();
+      for (      Terms.Bucket value : aggregation.getBuckets()) {
+        this.facets.put(facet.getKey(),new FacetValue(value.getKey(),(int)value.getDocCount()));
       }
-      this.facets.put(facet.getName(),facetValues);
     }
   }
 }
