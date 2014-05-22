@@ -1,0 +1,35 @@
+{
+  if (actions.size() == 1) {
+    CountDownLatch latch=new CountDownLatch(1);
+    IndexAction action=actions.get(0);
+    action.setLatch(latch);
+    try {
+      this.offer(action,1000,TimeUnit.SECONDS);
+      latch.await(1500,TimeUnit.MILLISECONDS);
+      action.getIndex().refresh();
+    }
+ catch (    InterruptedException e) {
+      throw new IllegalStateException("ES update has been interrupted",e);
+    }
+  }
+ else   if (actions.size() > 1) {
+    CountDownLatch latch=new CountDownLatch(actions.size());
+    try {
+      for (      IndexAction action : actions) {
+        action.setLatch(latch);
+        this.offer(action,1000,TimeUnit.SECONDS);
+      }
+      latch.await(1500,TimeUnit.MILLISECONDS);
+      Set<String> refreshedIndexes=new HashSet<String>();
+      for (      IndexAction action : actions) {
+        if (!refreshedIndexes.contains(action.getIndexType())) {
+          action.getIndex().refresh();
+          refreshedIndexes.add(action.getIndexType());
+        }
+      }
+    }
+ catch (    InterruptedException e) {
+      throw new IllegalStateException("ES update has been interrupted",e);
+    }
+  }
+}
