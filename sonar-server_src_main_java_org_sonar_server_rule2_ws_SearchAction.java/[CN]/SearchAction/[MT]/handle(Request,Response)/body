@@ -1,13 +1,17 @@
 {
   RuleQuery query=createRuleQuery(request);
   SearchOptions searchOptions=SearchOptions.create(request);
-  RuleResult results=service.search(query,mapping.newQueryOptions(searchOptions));
+  QueryOptions queryOptions=mapping.newQueryOptions(searchOptions);
+  queryOptions.setFacet(request.mandatoryParamAsBoolean(PARAM_FACETS));
+  RuleResult results=service.search(query,queryOptions);
   JsonWriter json=response.newJsonWriter().beginObject();
   searchOptions.writeStatistics(json,results);
   writeRules(results,json,searchOptions);
   if (searchOptions.hasField("actives")) {
     writeActiveRules(results,json);
   }
-  json.endObject();
-  json.close();
+  if (queryOptions.isFacet()) {
+    writeFacets(results,json);
+  }
+  json.endObject().close();
 }

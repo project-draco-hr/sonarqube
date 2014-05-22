@@ -1,0 +1,19 @@
+{
+  dao.insert(newRuleDto(RuleKey.of("javascript","S001")).setRuleKey("X001"),dbSession);
+  dao.insert(newRuleDto(RuleKey.of("php","S001")),dbSession);
+  dao.insert(newRuleDto(RuleKey.of("javascript","S002")).setRuleKey("X002"),dbSession);
+  dbSession.commit();
+  index.refresh();
+  RuleQuery query=new RuleQuery();
+  Result result=index.search(query,new QueryOptions().setFacet(false));
+  assertThat(result.getFacets()).isEmpty();
+  result=index.search(query,new QueryOptions().setFacet(true));
+  assertThat(result.getFacets()).isNotNull();
+  assertThat(result.getFacets()).hasSize(3);
+  List<FacetValue> repoFacets=result.getFacet("repositories");
+  assertThat(repoFacets).hasSize(2);
+  assertThat(repoFacets.get(0).getKey()).isEqualTo("javascript");
+  assertThat(repoFacets.get(0).getValue()).isEqualTo(2);
+  assertThat(repoFacets.get(1).getKey()).isEqualTo("php");
+  assertThat(repoFacets.get(1).getValue()).isEqualTo(1);
+}
