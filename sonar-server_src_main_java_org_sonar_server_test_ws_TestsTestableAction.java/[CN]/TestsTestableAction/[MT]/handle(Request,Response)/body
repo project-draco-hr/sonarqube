@@ -1,0 +1,14 @@
+{
+  String fileKey=request.mandatoryParam(KEY);
+  UserSession.get().checkComponentPermission(UserRole.CODEVIEWER,fileKey);
+  int line=request.mandatoryParamAsInt(LINE);
+  Testable testable=snapshotPerspectives.as(MutableTestable.class,fileKey);
+  if (testable != null) {
+    JsonWriter json=response.newJsonWriter().beginObject();
+    Map<String,Integer> refByTestPlan=newHashMap();
+    Map<String,Component> componentsByKey=newHashMap();
+    writeTests(testable,line,refByTestPlan,componentsByKey,json);
+    writeFiles(refByTestPlan,componentsByKey,json);
+    json.endObject().close();
+  }
+}

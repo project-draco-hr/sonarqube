@@ -1,0 +1,8 @@
+{
+  MockUserSession.set().addComponentPermission(UserRole.CODEVIEWER,"SonarQube",FILE_KEY);
+  TestCase testCase1=testCase("test1",TestCase.Status.OK,10L,"org.foo.BarTest.java","src/test/java/org/foo/BarTest.java");
+  TestCase testCase2=testCase("test2",TestCase.Status.ERROR,97L,"org.foo.FileTest.java","src/test/java/org/foo/FileTest.java");
+  when(testable.testCasesOfLine(10)).thenReturn(newArrayList(testCase1,testCase2));
+  WsTester.TestRequest request=tester.newGetRequest("api/tests","testable").setParam("key",FILE_KEY).setParam("line","10");
+  request.execute().assertJson(getClass(),"testable.json");
+}
