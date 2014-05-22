@@ -1,10 +1,11 @@
 {
   Set<String> tags=new HashSet<String>();
-  SearchRequestBuilder request=this.getClient().prepareSearch(this.getIndexName()).setQuery(QueryBuilders.matchAllQuery()).addFacet(FacetBuilders.termsFacet("tags").allTerms(false).fields(fields).global(true).size(Integer.MAX_VALUE));
+  String key="_ref";
+  SearchRequestBuilder request=this.getClient().prepareSearch(this.getIndexName()).setQuery(QueryBuilders.matchAllQuery()).addAggregation(AggregationBuilders.terms(key).field(fields).size(Integer.MAX_VALUE).minDocCount(1));
   SearchResponse esResponse=request.get();
-  TermsFacet termFacet=esResponse.getFacets().facet("tags");
-  for (  TermsFacet.Entry facetValue : termFacet.getEntries()) {
-    tags.add(facetValue.getTerm().string());
+  Terms aggregation=(Terms)esResponse.getAggregations().get(key);
+  for (  Terms.Bucket value : aggregation.getBuckets()) {
+    tags.add(value.getKey());
   }
   return tags;
 }
