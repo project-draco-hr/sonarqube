@@ -14,19 +14,14 @@
   dbClient.activeRuleDao().insert(ActiveRuleDto.createFor(qualityProfileDto1,rule2).setSeverity("BLOCKER"),dbSession);
   dbSession.commit();
   RuleResult result;
-  result=index.search(new RuleQuery().setActivation("all"),new QueryOptions());
+  result=index.search(new RuleQuery().setActivation(true),new QueryOptions());
   assertThat(result.getHits()).hasSize(2);
-  result=index.search(new RuleQuery().setActivation("false"),new QueryOptions());
+  result=index.search(new RuleQuery().setActivation(false),new QueryOptions());
   assertThat(result.getHits()).hasSize(1);
   assertThat(result.getHits().get(0).name()).isEqualTo(rule3.getName());
-  try {
-    index.search(new RuleQuery().setActivation("true"),new QueryOptions());
-    fail();
-  }
- catch (  IllegalStateException e) {
-    assertThat(e).hasMessage("qProfile is required when \"activation=true\"");
-  }
-  result=index.search(new RuleQuery().setActivation("true").setQProfileKey(qualityProfileDto2.getKey().toString()),new QueryOptions());
+  index.search(new RuleQuery().setActivation(false).setQProfileKey(qualityProfileDto2.getKey().toString()),new QueryOptions());
+  assertThat(result.getRules()).hasSize(1);
+  result=index.search(new RuleQuery().setActivation(true).setQProfileKey(qualityProfileDto2.getKey().toString()),new QueryOptions());
   assertThat(result.getRules()).hasSize(1);
   assertThat(result.getHits().get(0).name()).isEqualTo(rule1.getName());
 }

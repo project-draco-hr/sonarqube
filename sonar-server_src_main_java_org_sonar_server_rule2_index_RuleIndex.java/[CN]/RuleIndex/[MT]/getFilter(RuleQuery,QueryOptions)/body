@@ -13,21 +13,23 @@
     }
     this.addTermFilter(RuleNormalizer.RuleField.STATUS.key(),stringStatus,fb);
   }
-  if (query.getActivation() != null && !query.getActivation().isEmpty()) {
-    if (query.getActivation().equals("false")) {
-      fb.mustNot(FilterBuilders.hasChildFilter(new ActiveRuleIndexDefinition().getIndexType(),QueryBuilders.matchAllQuery()));
-    }
- else     if (query.getActivation().equals("all")) {
+  if (query.getActivation() == Boolean.TRUE) {
+    if (query.getQProfileKey() == null) {
       fb.must(FilterBuilders.hasChildFilter(new ActiveRuleIndexDefinition().getIndexType(),QueryBuilders.matchAllQuery()));
     }
- else     if (query.getActivation().equals("true")) {
-      if (query.getQProfileKey() == null || query.getQProfileKey().isEmpty()) {
-        throw new IllegalStateException("qProfile is required when \"activation=true\"");
-      }
+ else {
       fb.must(FilterBuilders.hasChildFilter(new ActiveRuleIndexDefinition().getIndexType(),QueryBuilders.termQuery(ActiveRuleNormalizer.ActiveRuleField.PROFILE_KEY.key(),query.getQProfileKey())));
     }
   }
-  if ((query.getLanguages() != null && !query.getLanguages().isEmpty()) || (query.getRepositories() != null && !query.getRepositories().isEmpty()) || (query.getSeverities() != null && !query.getSeverities().isEmpty())|| (query.getTags() != null && !query.getTags().isEmpty())|| (query.getStatuses() != null && !query.getStatuses().isEmpty())|| (query.getKey() != null && !query.getKey().isEmpty())|| (query.getDebtCharacteristics() != null && !query.getDebtCharacteristics().isEmpty())|| (query.getActivation() != null && !query.getActivation().isEmpty())) {
+ else   if (query.getActivation() == Boolean.FALSE) {
+    if (query.getQProfileKey() == null) {
+      fb.mustNot(FilterBuilders.hasChildFilter(new ActiveRuleIndexDefinition().getIndexType(),QueryBuilders.matchAllQuery()));
+    }
+ else {
+      fb.mustNot(FilterBuilders.hasChildFilter(new ActiveRuleIndexDefinition().getIndexType(),QueryBuilders.termQuery(ActiveRuleNormalizer.ActiveRuleField.PROFILE_KEY.key(),query.getQProfileKey())));
+    }
+  }
+  if ((query.getLanguages() != null && !query.getLanguages().isEmpty()) || (query.getRepositories() != null && !query.getRepositories().isEmpty()) || (query.getSeverities() != null && !query.getSeverities().isEmpty())|| (query.getTags() != null && !query.getTags().isEmpty())|| (query.getStatuses() != null && !query.getStatuses().isEmpty())|| (query.getKey() != null && !query.getKey().isEmpty())|| (query.getDebtCharacteristics() != null && !query.getDebtCharacteristics().isEmpty())|| (query.getActivation() != null)) {
     return fb;
   }
  else {

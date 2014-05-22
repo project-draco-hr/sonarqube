@@ -1,0 +1,18 @@
+{
+  json.name("actives").beginObject();
+  if (query.getQProfileKey() != null) {
+    QualityProfileKey profileKey=QualityProfileKey.parse(query.getQProfileKey());
+    for (    Rule rule : rules) {
+      ActiveRule activeRule=service.getByKey(ActiveRuleKey.of(profileKey,rule.key()));
+      if (activeRule != null) {
+        writeActiveRules(rule.key(),Arrays.asList(activeRule),json);
+      }
+    }
+  }
+ else {
+    for (    Rule rule : rules) {
+      writeActiveRules(rule.key(),service.findByRuleKey(rule.key()),json);
+    }
+  }
+  json.endObject();
+}
