@@ -1,0 +1,11 @@
+{
+  tester=new ServerTester().addComponents(XooRulesDefinition.class,XooProfileDefinition.class);
+  tester.start();
+  dbSession=dbClient().openSession(false);
+  String templateKey=RegisterQualityProfiles.templateKey(QualityProfileKey.of("Basic","xoo"));
+  dbClient().loadedTemplateDao().delete(dbSession,LoadedTemplateDto.QUALITY_PROFILE_TYPE,templateKey);
+  dbSession.commit();
+  assertThat(dbClient().loadedTemplateDao().countByTypeAndKey(LoadedTemplateDto.QUALITY_PROFILE_TYPE,templateKey,dbSession)).isEqualTo(0);
+  dbSession.close();
+  tester.get(Platform.class).restart();
+}
