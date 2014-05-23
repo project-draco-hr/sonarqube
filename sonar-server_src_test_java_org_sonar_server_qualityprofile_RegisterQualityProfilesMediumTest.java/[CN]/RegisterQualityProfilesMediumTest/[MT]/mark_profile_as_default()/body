@@ -1,0 +1,9 @@
+{
+  tester=new ServerTester().addComponents(new SimpleProfileDefinition("one",false),new SimpleProfileDefinition("two",true));
+  tester.start();
+  dbSession=dbClient().openSession(false);
+  PropertiesDao propertiesDao=dbClient().propertiesDao();
+  List<PropertyDto> props=propertiesDao.selectByQuery(PropertyQuery.builder().setKey("sonar.profile.xoo").build(),dbSession);
+  assertThat(props).hasSize(1);
+  assertThat(props.get(0).getValue()).isEqualTo("two");
+}
