@@ -1,6 +1,6 @@
 {
   checkPermission(userSession);
-  SqlSession session=myBatis.openSession(false);
+  DbSession session=myBatis.openSession(false);
   try {
     QualityProfileDto profile=findNotNull(profileId,session);
     QualityProfileDto parentProfile=null;
@@ -13,7 +13,7 @@
     String newParentName=parentProfile != null ? parentProfile.getName() : null;
     ProfilesManager.RuleInheritanceActions actions=profilesManager.profileParentChanged(profile.getId(),newParentName,userSession.name());
     profile.setParent(newParentName);
-    dao.update(profile,session);
+    dao.update(session,profile);
     session.commit();
   }
   finally {

@@ -1,0 +1,24 @@
+{
+  QualityProfileDto profile1=QualityProfileDto.createFor("p1","java");
+  QualityProfileDto profile2=QualityProfileDto.createFor("p2","java");
+  qualityProfileDao.insert(dbSession,profile1);
+  qualityProfileDao.insert(dbSession,profile2);
+  RuleDto ruleDto=newRuleDto(RuleKey.of("javascript","S001"));
+  dao.insert(ruleDto,dbSession);
+  RuleDto ruleDto2=newRuleDto(RuleKey.of("javascript","S002"));
+  dao.insert(ruleDto2,dbSession);
+  ActiveRuleDto find1=ActiveRuleDto.createFor(profile1,ruleDto).setInheritance(ActiveRule.Inheritance.INHERIT.name()).setSeverity(Severity.BLOCKER);
+  ActiveRuleDto find2=ActiveRuleDto.createFor(profile2,ruleDto).setInheritance(ActiveRule.Inheritance.INHERIT.name()).setSeverity(Severity.BLOCKER);
+  ActiveRuleDto notFound=ActiveRuleDto.createFor(profile2,ruleDto2).setInheritance(ActiveRule.Inheritance.INHERIT.name()).setSeverity(Severity.BLOCKER);
+  activeRuleDao.insert(find1,dbSession);
+  activeRuleDao.insert(find2,dbSession);
+  activeRuleDao.insert(notFound,dbSession);
+  dbSession.commit();
+  List<ActiveRuleDto> persistedDtos=activeRuleDao.findByRule(ruleDto,dbSession);
+  assertThat(persistedDtos).hasSize(2);
+  persistedDtos=activeRuleDao.findByRule(ruleDto2,dbSession);
+  assertThat(persistedDtos).hasSize(1);
+  Collection<ActiveRule> hits=index.findByRule(RuleKey.of("javascript","S001"));
+  assertThat(hits).isNotNull();
+  assertThat(hits).hasSize(2);
+}
