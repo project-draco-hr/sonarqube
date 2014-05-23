@@ -1,0 +1,21 @@
+{
+  QualityProfileKey qualityProfileKey=QualityProfileKey.of("Basic","xoo");
+  QualityProfileDao qualityProfileDao=dbClient.qualityProfileDao();
+  assertThat(qualityProfileDao.findAll(session)).hasSize(1);
+  assertThat(qualityProfileDao.getByKey(qualityProfileKey,session)).isNotNull();
+  PropertiesDao propertiesDao=dbClient.propertiesDao();
+  List<PropertyDto> xooDefault=propertiesDao.selectByQuery(PropertyQuery.builder().setKey("sonar.profile.xoo").build(),session);
+  assertThat(xooDefault).hasSize(1);
+  assertThat(xooDefault.get(0).getValue()).isEqualTo("Basic");
+  ActiveRuleDao activeRuleDao=dbClient.activeRuleDao();
+  assertThat(activeRuleDao.findByProfileKey(qualityProfileKey,session)).hasSize(2);
+  RuleKey ruleKey=RuleKey.of("xoo","x1");
+  ActiveRuleDto activeRule=activeRuleDao.getByKey(ActiveRuleKey.of(qualityProfileKey,ruleKey),session);
+  assertThat(activeRule.getKey().qProfile()).isEqualTo(qualityProfileKey);
+  assertThat(activeRule.getKey().ruleKey()).isEqualTo(ruleKey);
+  assertThat(activeRule.getSeverityString()).isEqualTo(Severity.CRITICAL);
+  Map<String,ActiveRuleParamDto> params=ActiveRuleParamDto.groupByKey(activeRuleDao.findParamsByActiveRule(activeRule,session));
+  assertThat(params).hasSize(2);
+  assertThat(params.get("acceptWhitespace").getValue()).isEqualTo("true");
+  assertThat(params.get("max").getValue()).isEqualTo("10");
+}

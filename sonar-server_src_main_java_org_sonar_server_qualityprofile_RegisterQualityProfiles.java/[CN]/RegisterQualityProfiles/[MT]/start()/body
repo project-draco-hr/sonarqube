@@ -1,6 +1,5 @@
 {
   TimeProfiler profiler=new TimeProfiler(LOGGER).start("Register Quality Profiles");
-  sessionFactory.getSession().commit();
   DbSession session=dbClient.openSession(false);
   try {
     ListMultimap<String,RulesProfile> profilesByLanguage=profilesByLanguage();
@@ -8,11 +7,12 @@
       List<RulesProfile> profiles=profilesByLanguage.get(language);
       verifyLanguage(language,profiles);
       for (      Map.Entry<String,Collection<RulesProfile>> entry : profilesByName(profiles).entrySet()) {
-        String name=entry.getKey();
-        if (shouldRegister(language,name,session)) {
-          register(language,name,entry.getValue(),session);
+        String profileName=entry.getKey();
+        QualityProfileKey profileKey=QualityProfileKey.of(profileName,language);
+        if (shouldRegister(profileKey,session)) {
+          register(profileKey,entry.getValue(),session);
         }
-        defaultProfilesCache.put(language,name);
+        defaultProfilesCache.put(language,profileName);
       }
       setDefault(language,profiles,session);
     }
