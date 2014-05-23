@@ -1,0 +1,13 @@
+{
+  QualityProfileDto profile1=QualityProfileDto.createFor("p1","java");
+  dbClient.qualityProfileDao().insert(dbSession,profile1);
+  RuleDto rule1=RuleDto.createFor(RuleKey.of("java","r1")).setSeverity(Severity.MAJOR);
+  dbClient.ruleDao().insert(rule1,dbSession);
+  ActiveRuleDto activeRule=ActiveRuleDto.createFor(profile1,rule1).setSeverity("BLOCKER");
+  dbClient.activeRuleDao().insert(activeRule,dbSession);
+  dbSession.commit();
+  tester.clearIndexes();
+  assertThat(index.getByKey(activeRule.getKey())).isNull();
+  dbClient.activeRuleDao().synchronizeAfter(0,dbSession);
+  assertThat(index.getByKey(activeRule.getKey())).isNotNull();
+}

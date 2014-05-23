@@ -1,9 +1,14 @@
 {
-  DbSession dbSession=db().openSession(false);
+  DbSession dbSession=db.openSession(false);
+  List<UpdateRequest> requests=new ArrayList<UpdateRequest>();
   try {
-    return normalize(db().ruleDao().getByKey(key,dbSession));
+    requests.addAll(normalize(db.ruleDao().getByKey(key,dbSession)));
+    for (    RuleParamDto param : db.ruleDao().findRuleParamsByRuleKey(key,dbSession)) {
+      requests.addAll(normalize(param,key));
+    }
   }
   finally {
     dbSession.close();
   }
+  return requests;
 }
