@@ -4,11 +4,11 @@
   dbClient.qualityProfileDao().insert(dbSession,profile1,profile2);
   RuleDto rule1=RuleDto.createFor(RuleKey.of("java","r1")).setSeverity(Severity.MAJOR);
   RuleDto rule2=RuleDto.createFor(RuleKey.of("java","r2")).setSeverity(Severity.MAJOR);
-  dbClient.ruleDao().insert(rule1,dbSession);
-  dbClient.ruleDao().insert(rule2,dbSession);
-  dbClient.activeRuleDao().insert(ActiveRuleDto.createFor(profile1,rule1).setSeverity(Severity.MINOR),dbSession);
-  dbClient.activeRuleDao().insert(ActiveRuleDto.createFor(profile1,rule2).setSeverity(Severity.BLOCKER),dbSession);
-  dbClient.activeRuleDao().insert(ActiveRuleDto.createFor(profile2,rule2).setSeverity(Severity.CRITICAL),dbSession);
+  dbClient.ruleDao().insert(dbSession,rule1);
+  dbClient.ruleDao().insert(dbSession,rule2);
+  dbClient.activeRuleDao().insert(dbSession,ActiveRuleDto.createFor(profile1,rule1).setSeverity(Severity.MINOR));
+  dbClient.activeRuleDao().insert(dbSession,ActiveRuleDto.createFor(profile1,rule2).setSeverity(Severity.BLOCKER));
+  dbClient.activeRuleDao().insert(dbSession,ActiveRuleDto.createFor(profile2,rule2).setSeverity(Severity.CRITICAL));
   dbSession.commit();
   List<ActiveRule> activeRules=service.findByRuleKey(RuleKey.of("java","r1"));
   assertThat(activeRules).hasSize(1);
