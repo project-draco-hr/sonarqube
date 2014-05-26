@@ -4,9 +4,9 @@
   try {
     ListMultimap<String,RulesProfile> profilesByLanguage=profilesByLanguage();
     for (    String language : profilesByLanguage.keySet()) {
-      List<RulesProfile> profiles=profilesByLanguage.get(language);
-      verifyLanguage(language,profiles);
-      for (      Map.Entry<String,Collection<RulesProfile>> entry : profilesByName(profiles).entrySet()) {
+      List<RulesProfile> profileDefs=profilesByLanguage.get(language);
+      verifyLanguage(language,profileDefs);
+      for (      Map.Entry<String,Collection<RulesProfile>> entry : profilesByName(profileDefs).entrySet()) {
         String profileName=entry.getKey();
         QualityProfileKey profileKey=QualityProfileKey.of(profileName,language);
         if (shouldRegister(profileKey,session)) {
@@ -14,7 +14,7 @@
         }
         defaultProfilesCache.put(language,profileName);
       }
-      setDefault(language,profiles,session);
+      setDefault(language,profileDefs,session);
     }
     session.commit();
   }
