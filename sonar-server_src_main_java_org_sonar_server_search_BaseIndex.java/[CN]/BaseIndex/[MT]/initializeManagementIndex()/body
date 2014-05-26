@@ -1,0 +1,8 @@
+{
+  LOG.info("Setup of Management Index for ES");
+  String index=indexDefinition.getManagementIndex();
+  IndicesExistsResponse indexExistsResponse=getClient().admin().indices().prepareExists(index).execute().actionGet();
+  if (!indexExistsResponse.isExists()) {
+    getClient().admin().indices().prepareCreate(index).setSettings(ImmutableSettings.builder().put("mapper.dynamic",true).put("number_of_replicas",1).put("number_of_shards",1).build()).get();
+  }
+}
