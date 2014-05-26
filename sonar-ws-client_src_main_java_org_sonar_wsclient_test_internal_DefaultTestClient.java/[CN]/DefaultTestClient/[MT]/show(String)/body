@@ -1,0 +1,27 @@
+{
+  Map<String,Object> params=EncodingUtils.toMap("key",testPlanKey);
+  String jsonResult=requestFactory.get("/api/tests/show",params);
+  List<TestCase> testCases=new ArrayList<TestCase>();
+  Map jRoot=(Map)JSONValue.parse(jsonResult);
+  List<Map> maps=(List)jRoot.get("tests");
+  if (maps != null) {
+    for (    final Map json : maps) {
+      testCases.add(new TestCase(){
+        @Override public String name(){
+          return JsonUtils.getString(json,"name");
+        }
+        @Override public String status(){
+          return JsonUtils.getString(json,"status");
+        }
+        @Override public Long durationInMs(){
+          return JsonUtils.getLong(json,"durationInMs");
+        }
+        @Override public Integer coveredLines(){
+          return JsonUtils.getInteger(json,"coveredLines");
+        }
+      }
+);
+    }
+  }
+  return testCases;
+}

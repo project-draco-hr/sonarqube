@@ -1,0 +1,24 @@
+{
+  Map<String,Object> params=EncodingUtils.toMap("key",testPlanKey,"test",testCase);
+  String jsonResult=requestFactory.get("/api/tests/plan",params);
+  List<CoveredFile> files=new ArrayList<CoveredFile>();
+  Map jRoot=(Map)JSONValue.parse(jsonResult);
+  List<Map> maps=(List)jRoot.get("files");
+  if (maps != null) {
+    for (    final Map json : maps) {
+      files.add(new CoveredFile(){
+        @Override public String key(){
+          return JsonUtils.getString(json,"key");
+        }
+        @Override public String longName(){
+          return JsonUtils.getString(json,"longName");
+        }
+        @Override public Integer coveredLines(){
+          return JsonUtils.getInteger(json,"coveredLines");
+        }
+      }
+);
+    }
+  }
+  return files;
+}

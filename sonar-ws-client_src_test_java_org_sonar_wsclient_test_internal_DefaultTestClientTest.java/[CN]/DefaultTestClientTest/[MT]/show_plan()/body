@@ -1,0 +1,12 @@
+{
+  HttpRequestFactory requestFactory=new HttpRequestFactory(httpServer.url());
+  httpServer.stubResponseBody(Resources.toString(Resources.getResource(this.getClass(),"DefaultTestClientTest/show_plan.json"),Charsets.UTF_8));
+  TestClient client=new DefaultTestClient(requestFactory);
+  List<CoveredFile> files=client.plan("MyTestFile","find_by_params");
+  assertThat(httpServer.requestedPath()).isEqualTo("/api/tests/plan?key=MyTestFile&test=find_by_params");
+  assertThat(files).hasSize(2);
+  CoveredFile file=files.get(0);
+  assertThat(file.key()).isEqualTo("org.codehaus.sonar:sonar-server:src/main/java/org/sonar/server/paging/PagedResult.java");
+  assertThat(file.longName()).isEqualTo("src/main/java/org/sonar/server/paging/PagedResult.java");
+  assertThat(file.coveredLines()).isEqualTo(5);
+}

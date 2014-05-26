@@ -1,0 +1,12 @@
+{
+  HttpRequestFactory requestFactory=new HttpRequestFactory(httpServer.url());
+  httpServer.stubResponseBody(Resources.toString(Resources.getResource(this.getClass(),"DefaultTestClientTest/show_test_case.json"),Charsets.UTF_8));
+  TestClient client=new DefaultTestClient(requestFactory);
+  List<TestCase> tests=client.show("MyTestFile");
+  assertThat(httpServer.requestedPath()).isEqualTo("/api/tests/show?key=MyTestFile");
+  assertThat(tests).hasSize(2);
+  assertThat(tests.get(0).name()).isEqualTo("find_by_params");
+  assertThat(tests.get(0).status()).isEqualTo("OK");
+  assertThat(tests.get(0).durationInMs()).isEqualTo(10L);
+  assertThat(tests.get(0).coveredLines()).isEqualTo(89);
+}
