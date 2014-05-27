@@ -1,0 +1,17 @@
+{
+  QualityProfileDto profile=getProfile("java");
+  RuleDto rule=getRule("php","toto");
+  session.commit();
+  assertThat(dbClient.activeRuleDao().findByProfileKey(profile.getKey(),session)).isEmpty();
+  try {
+    WsTester.TestRequest request=wsTester.newGetRequest(API_ENDPOINT,API_RULE_ACTIVATE_METHOD);
+    request.setParam(RuleActivationActions.PROFILE_KEY,profile.getKey().toString());
+    request.setParam(RuleActivationActions.RULE_KEY,rule.getKey().toString());
+    WsTester.Result result=request.execute();
+    session.commit();
+    fail();
+  }
+ catch (  IllegalArgumentException e) {
+    assertThat(e.getMessage()).isEqualTo("Rule blah:toto and profile test:java have different languages");
+  }
+}

@@ -1,0 +1,16 @@
+{
+  QualityProfileDto java=getProfile("java");
+  QualityProfileDto php=getProfile("php");
+  RuleDto rule0=getRule(java.getLanguage(),"toto");
+  RuleDto rule1=getRule(java.getLanguage(),"tata");
+  RuleDto rule2=getRule(php.getLanguage(),"hello");
+  RuleDto rule3=getRule(php.getLanguage(),"world");
+  session.commit();
+  assertThat(dbClient.activeRuleDao().findByProfileKey(php.getKey(),session)).isEmpty();
+  WsTester.TestRequest request=wsTester.newGetRequest(API_ENDPOINT,API_BULK_RULE_ACTIVATE_METHOD);
+  request.setParam(RuleActivationActions.PROFILE_KEY,php.getKey().toString());
+  request.setParam(SearchAction.PARAM_LANGUAGES,"php");
+  WsTester.Result result=request.execute();
+  session.commit();
+  assertThat(dbClient.activeRuleDao().findByProfileKey(php.getKey(),session)).hasSize(2);
+}

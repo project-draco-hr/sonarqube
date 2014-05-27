@@ -1,0 +1,12 @@
+{
+  QualityProfileDto profile=getProfile("java");
+  RuleDto rule=getRule(profile.getLanguage(),"toto");
+  session.commit();
+  assertThat(dbClient.activeRuleDao().findByProfileKey(profile.getKey(),session)).isEmpty();
+  WsTester.TestRequest request=wsTester.newGetRequest(API_ENDPOINT,API_RULE_ACTIVATE_METHOD);
+  request.setParam(RuleActivationActions.PROFILE_KEY,profile.getKey().toString());
+  request.setParam(RuleActivationActions.RULE_KEY,rule.getKey().toString());
+  WsTester.Result result=request.execute();
+  session.commit();
+  assertThat(dbClient.activeRuleDao().findByProfileKey(profile.getKey(),session)).hasSize(1);
+}
