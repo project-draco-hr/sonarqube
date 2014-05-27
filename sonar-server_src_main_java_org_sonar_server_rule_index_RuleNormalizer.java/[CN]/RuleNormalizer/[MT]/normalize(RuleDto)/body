@@ -1,20 +1,20 @@
 {
   Map<String,Object> update=new HashMap<String,Object>();
-  update.put(RuleField.KEY.key(),rule.getKey().toString());
-  update.put(RuleField.REPOSITORY.key(),rule.getRepositoryKey());
-  update.put(RuleField.NAME.key(),rule.getName());
-  update.put(RuleField.CREATED_AT.key(),rule.getCreatedAt());
-  update.put(RuleField.UPDATED_AT.key(),rule.getUpdatedAt());
-  update.put(RuleField.HTML_DESCRIPTION.key(),rule.getDescription());
-  update.put(RuleField.SEVERITY.key(),rule.getSeverityString());
-  update.put(RuleField.STATUS.key(),rule.getStatus());
-  update.put(RuleField.LANGUAGE.key(),rule.getLanguage());
-  update.put(RuleField.INTERNAL_KEY.key(),rule.getConfigKey());
-  update.put(RuleField.TEMPLATE.key(),rule.getCardinality() == Cardinality.MULTIPLE);
-  update.put(RuleField.NOTE.key(),rule.getNoteData());
-  update.put(RuleField.NOTE_LOGIN.key(),rule.getNoteUserLogin());
-  update.put(RuleField.NOTE_CREATED_AT.key(),rule.getNoteCreatedAt());
-  update.put(RuleField.NOTE_UPDATED_AT.key(),rule.getNoteUpdatedAt());
+  update.put(RuleField.KEY.field(),rule.getKey().toString());
+  update.put(RuleField.REPOSITORY.field(),rule.getRepositoryKey());
+  update.put(RuleField.NAME.field(),rule.getName());
+  update.put(RuleField.CREATED_AT.field(),rule.getCreatedAt());
+  update.put(RuleField.UPDATED_AT.field(),rule.getUpdatedAt());
+  update.put(RuleField.HTML_DESCRIPTION.field(),rule.getDescription());
+  update.put(RuleField.SEVERITY.field(),rule.getSeverityString());
+  update.put(RuleField.STATUS.field(),rule.getStatus());
+  update.put(RuleField.LANGUAGE.field(),rule.getLanguage());
+  update.put(RuleField.INTERNAL_KEY.field(),rule.getConfigKey());
+  update.put(RuleField.TEMPLATE.field(),rule.getCardinality() == Cardinality.MULTIPLE);
+  update.put(RuleField.NOTE.field(),rule.getNoteData());
+  update.put(RuleField.NOTE_LOGIN.field(),rule.getNoteUserLogin());
+  update.put(RuleField.NOTE_CREATED_AT.field(),rule.getNoteCreatedAt());
+  update.put(RuleField.NOTE_UPDATED_AT.field(),rule.getNoteUpdatedAt());
   CharacteristicDto characteristic=null;
   if (rule.getDefaultSubCharacteristicId() != null) {
     characteristic=db.debtCharacteristicDao().selectById(rule.getDefaultSubCharacteristicId());
@@ -22,15 +22,15 @@
   if (rule.getSubCharacteristicId() != null) {
     characteristic=db.debtCharacteristicDao().selectById(rule.getSubCharacteristicId());
   }
-  if (characteristic != null) {
-    update.put(RuleField.SUB_CHARACTERISTIC.key(),characteristic.getKey());
+  if (characteristic != null && characteristic.getId() != -1) {
+    update.put(RuleField.SUB_CHARACTERISTIC.field(),characteristic.getKey());
     if (characteristic.getParentId() != null) {
-      update.put(RuleField.CHARACTERISTIC.key(),db.debtCharacteristicDao().selectById(characteristic.getParentId()).getKey());
+      update.put(RuleField.CHARACTERISTIC.field(),db.debtCharacteristicDao().selectById(characteristic.getParentId()).getKey());
     }
   }
  else {
-    update.put(RuleField.CHARACTERISTIC.key(),null);
-    update.put(RuleField.SUB_CHARACTERISTIC.key(),null);
+    update.put(RuleField.CHARACTERISTIC.field(),null);
+    update.put(RuleField.SUB_CHARACTERISTIC.field(),null);
   }
   String dType=null, dCoefficient=null, dOffset=null;
   if (rule.getDefaultRemediationFunction() != null) {
@@ -43,14 +43,14 @@
     dCoefficient=rule.getRemediationCoefficient();
     dOffset=rule.getRemediationOffset();
   }
-  update.put(RuleField.DEBT_FUNCTION_TYPE.key(),dType);
-  update.put(RuleField.DEBT_FUNCTION_COEFFICIENT.key(),dCoefficient);
-  update.put(RuleField.DEBT_FUNCTION_OFFSET.key(),dOffset);
-  update.put(RuleField.TAGS.key(),rule.getTags());
-  update.put(RuleField.SYSTEM_TAGS.key(),rule.getSystemTags());
-  update.put(RuleField._TAGS.key(),Sets.union(rule.getSystemTags(),rule.getTags()));
+  update.put(RuleField.DEBT_FUNCTION_TYPE.field(),dType);
+  update.put(RuleField.DEBT_FUNCTION_COEFFICIENT.field(),dCoefficient);
+  update.put(RuleField.DEBT_FUNCTION_OFFSET.field(),dOffset);
+  update.put(RuleField.TAGS.field(),rule.getTags());
+  update.put(RuleField.SYSTEM_TAGS.field(),rule.getSystemTags());
+  update.put(RuleField._TAGS.field(),Sets.union(rule.getSystemTags(),rule.getTags()));
   Map<String,Object> upsert=new HashMap<String,Object>(update);
-  upsert.put(RuleField.KEY.key(),rule.getKey().toString());
-  upsert.put(RuleField.PARAMS.key(),new ArrayList<String>());
+  upsert.put(RuleField.KEY.field(),rule.getKey().toString());
+  upsert.put(RuleField.PARAMS.field(),new ArrayList<String>());
   return ImmutableList.of(new UpdateRequest().doc(update).upsert(upsert));
 }

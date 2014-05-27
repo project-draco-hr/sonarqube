@@ -4,7 +4,7 @@
     this.setFacets(esSearch);
   }
   if (query.getSortField() != null) {
-    FieldSortBuilder sort=SortBuilders.fieldSort(query.getSortField().field().key());
+    FieldSortBuilder sort=SortBuilders.fieldSort(query.getSortField().field());
     if (query.isAscendingSort()) {
       sort.order(SortOrder.ASC);
     }
@@ -17,8 +17,8 @@
     esSearch.addSort(SortBuilders.scoreSort());
   }
  else {
-    esSearch.addSort(RuleNormalizer.RuleField.UPDATED_AT.key(),SortOrder.DESC);
-    esSearch.addSort(RuleNormalizer.RuleField.KEY.key(),SortOrder.ASC);
+    esSearch.addSort(RuleNormalizer.RuleField.UPDATED_AT.field(),SortOrder.DESC);
+    esSearch.addSort(RuleNormalizer.RuleField.KEY.field(),SortOrder.ASC);
   }
   esSearch.setFrom(options.getOffset());
   esSearch.setSize(options.getLimit());
@@ -29,10 +29,12 @@
         fields.add(fieldToReturn);
       }
     }
-    fields.add(RuleNormalizer.RuleField.KEY.key());
+    fields.add(RuleNormalizer.RuleField.KEY.field());
   }
  else {
-    fields=RuleNormalizer.RuleField.ALL_KEYS;
+    for (    IndexField indexField : RuleNormalizer.RuleField.ALL_FIELDS) {
+      fields.add(indexField.field());
+    }
   }
   esSearch.setFetchSource(fields.toArray(new String[fields.size()]),null);
   return esSearch;
