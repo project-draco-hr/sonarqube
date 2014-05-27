@@ -1,0 +1,18 @@
+{
+  verifyPermission(UserSession.get());
+  RuleIndex ruleIndex=index.get(RuleIndex.class);
+  DbSession dbSession=db.openSession(false);
+  try {
+    RuleResult result=ruleIndex.search(ruleQuery,QueryOptions.DEFAULT.setOffset(0).setLimit(Integer.MAX_VALUE).setFieldsToReturn(ImmutableSet.of("")));
+    for (    Rule rule : result.getHits()) {
+      ActiveRuleKey key=ActiveRuleKey.of(profile,rule.key());
+      RuleActivation activation=new RuleActivation(key);
+      activation.setSeverity(rule.severity());
+      this.activate(activation,dbSession);
+    }
+    dbSession.commit();
+  }
+  finally {
+    dbSession.close();
+  }
+}
