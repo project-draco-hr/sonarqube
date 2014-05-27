@@ -1,0 +1,18 @@
+{
+  QualityProfileDto profile=getProfile("java");
+  QualityProfileDto php=getProfile("php");
+  RuleDto rule0=getRule(profile.getLanguage(),"toto1");
+  RuleDto rule1=getRule(profile.getLanguage(),"toto2");
+  getActiveRule(rule0,profile);
+  getActiveRule(rule1,profile);
+  getActiveRule(rule0,php);
+  getActiveRule(rule1,php);
+  session.commit();
+  assertThat(dbClient.activeRuleDao().findByProfileKey(profile.getKey(),session)).hasSize(2);
+  WsTester.TestRequest request=wsTester.newGetRequest(API_ENDPOINT,API_BULK_RULE_DEACTIVATE_METHOD);
+  request.setParam(RuleActivationActions.PROFILE_KEY,profile.getKey().toString());
+  WsTester.Result result=request.execute();
+  session.clearCache();
+  assertThat(dbClient.activeRuleDao().findByProfileKey(profile.getKey(),session)).hasSize(0);
+  assertThat(dbClient.activeRuleDao().findByProfileKey(php.getKey(),session)).hasSize(2);
+}

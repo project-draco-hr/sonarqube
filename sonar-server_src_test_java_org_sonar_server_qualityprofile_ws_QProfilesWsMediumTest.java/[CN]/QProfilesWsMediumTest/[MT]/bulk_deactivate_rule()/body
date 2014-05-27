@@ -1,0 +1,18 @@
+{
+  QualityProfileDto profile=getProfile("java");
+  RuleDto rule0=getRule(profile.getLanguage(),"toto1");
+  RuleDto rule1=getRule(profile.getLanguage(),"toto2");
+  RuleDto rule2=getRule(profile.getLanguage(),"toto3");
+  RuleDto rule3=getRule(profile.getLanguage(),"toto4");
+  getActiveRule(rule0,profile);
+  getActiveRule(rule2,profile);
+  getActiveRule(rule3,profile);
+  getActiveRule(rule1,profile);
+  session.commit();
+  assertThat(dbClient.activeRuleDao().findByProfileKey(profile.getKey(),session)).hasSize(4);
+  WsTester.TestRequest request=wsTester.newGetRequest(API_ENDPOINT,API_BULK_RULE_DEACTIVATE_METHOD);
+  request.setParam(RuleActivationActions.PROFILE_KEY,profile.getKey().toString());
+  WsTester.Result result=request.execute();
+  session.clearCache();
+  assertThat(dbClient.activeRuleDao().findByProfileKey(profile.getKey(),session)).isEmpty();
+}
