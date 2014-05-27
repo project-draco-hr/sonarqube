@@ -1,16 +1,20 @@
 {
   verifyPermission(UserSession.get());
   RuleIndex ruleIndex=index.get(RuleIndex.class);
+  Multimap<String,String> results=ArrayListMultimap.create();
   DbSession dbSession=db.openSession(false);
   try {
     RuleResult result=ruleIndex.search(ruleQuery,QueryOptions.DEFAULT.setOffset(0).setLimit(Integer.MAX_VALUE).setFieldsToReturn(ImmutableSet.of("")));
     for (    Rule rule : result.getHits()) {
       ActiveRuleKey key=ActiveRuleKey.of(profile,rule.key());
-      this.deactivate(key,dbSession);
+      for (      ActiveRuleChange deActive : this.deactivate(key,dbSession)) {
+        results.put("deactivated",deActive.getKey().ruleKey().toString());
+      }
     }
     dbSession.commit();
   }
   finally {
     dbSession.close();
   }
+  return results;
 }
