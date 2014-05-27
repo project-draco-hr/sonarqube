@@ -3,12 +3,12 @@
   dao.insert(dbSession,newRuleDto(RuleKey.of("java","S002")).setName("ABC"));
   dao.insert(dbSession,newRuleDto(RuleKey.of("java","S003")).setName("FGH"));
   dbSession.commit();
-  RuleQuery query=new RuleQuery().setSortField(RuleQuery.SortField.NAME);
+  RuleQuery query=new RuleQuery().setSortField(RuleNormalizer.RuleField.NAME);
   Result<Rule> results=index.search(query,new QueryOptions());
   assertThat(results.getHits()).hasSize(3);
   assertThat(Iterables.getFirst(results.getHits(),null).key().rule()).isEqualTo("S002");
   assertThat(Iterables.getLast(results.getHits(),null).key().rule()).isEqualTo("S003");
-  query=new RuleQuery().setSortField(RuleQuery.SortField.NAME).setAscendingSort(false);
+  query=new RuleQuery().setSortField(RuleNormalizer.RuleField.NAME).setAscendingSort(false);
   results=index.search(query,new QueryOptions());
   assertThat(results.getHits()).hasSize(3);
   assertThat(Iterables.getFirst(results.getHits(),null).key().rule()).isEqualTo("S003");
