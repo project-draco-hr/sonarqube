@@ -3,9 +3,11 @@
   UserSession.get().checkComponentPermission(UserRole.CODEVIEWER,fileKey);
   DbSession session=dbClient.openSession(false);
   try {
+    ComponentDto component=findComponent(fileKey,session);
     JsonWriter json=response.newJsonWriter().beginObject();
     String duplications=findDataFromComponent(fileKey,CoreMetrics.DUPLICATIONS_DATA_KEY,session);
-    duplicationsWriter.write(duplications,json,session);
+    List<DuplicationsParser.Block> blocks=parser.parse(component,duplications,session);
+    duplicationsWriter.write(blocks,json,session);
     json.endObject().close();
   }
   finally {

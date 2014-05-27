@@ -1,9 +1,14 @@
 {
   String componentKey="src/Foo.java";
   MockUserSession.set().addComponentPermission(UserRole.CODEVIEWER,"org.codehaus.sonar:sonar",componentKey);
+  ComponentDto componentDto=new ComponentDto().setId(10L);
+  when(componentDao.getByKey(session,componentKey)).thenReturn(componentDto);
+  String data="{duplications}";
   MeasureKey measureKey=MeasureKey.of(componentKey,CoreMetrics.DUPLICATIONS_DATA_KEY);
   when(measureDao.getByKey(session,measureKey)).thenReturn(MeasureDto.createFor(measureKey).setTextValue("{duplications}"));
+  List<DuplicationsParser.Block> blocks=newArrayList(new DuplicationsParser.Block(newArrayList(new DuplicationsParser.Duplication(componentDto,1,2))));
+  when(parser.parse(componentDto,data,session)).thenReturn(blocks);
   WsTester.TestRequest request=tester.newGetRequest("api/duplications","show").setParam("key",componentKey);
   request.execute();
-  verify(duplicationsWriter).write(eq("{duplications}"),any(JsonWriter.class),eq(session));
+  verify(duplicationsWriter).write(eq(blocks),any(JsonWriter.class),eq(session));
 }

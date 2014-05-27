@@ -1,0 +1,31 @@
+{
+  Map<String,ComponentDto> componentsByKey=newHashMap();
+  List<Block> blocks=newArrayList();
+  if (duplicationsData != null) {
+    try {
+      SMInputFactory inputFactory=initStax();
+      SMHierarchicCursor root=inputFactory.rootElementCursor(new StringReader(duplicationsData));
+      root.advance();
+      SMInputCursor cursor=root.childElementCursor("g");
+      while (cursor.getNext() != null) {
+        List<Duplication> duplications=newArrayList();
+        SMInputCursor bCursor=cursor.childElementCursor("b");
+        while (bCursor.getNext() != null) {
+          String from=bCursor.getAttrValue("s");
+          String size=bCursor.getAttrValue("l");
+          String componentKey=bCursor.getAttrValue("r");
+          if (from != null && size != null && componentKey != null) {
+            duplications.add(createDuplication(componentsByKey,from,size,componentKey,session));
+          }
+        }
+        Collections.sort(duplications,new DuplicationComparator(component));
+        blocks.add(new Block(duplications));
+      }
+      Collections.sort(blocks,new BlockComparator());
+    }
+ catch (    XMLStreamException e) {
+      throw new IllegalStateException("XML is not valid",e);
+    }
+  }
+  return blocks;
+}
