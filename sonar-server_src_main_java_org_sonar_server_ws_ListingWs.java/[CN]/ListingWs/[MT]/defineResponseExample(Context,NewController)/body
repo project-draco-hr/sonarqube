@@ -2,7 +2,11 @@
   NewAction action=controller.createAction("response_example").setDescription("Display web service response example").setSince("4.4").setHandler(new RequestHandler(){
     @Override public void handle(    Request request,    Response response) throws Exception {
       Controller controller=context.controller(request.mandatoryParam("controller"));
-      Action action=controller.action(request.mandatoryParam("action"));
+      String actionKey=request.mandatoryParam("action");
+      Action action=controller.action(actionKey);
+      if (action == null) {
+        throw new IllegalArgumentException("Action does not exist: " + actionKey);
+      }
       handleResponseExample(action,response);
     }
   }
