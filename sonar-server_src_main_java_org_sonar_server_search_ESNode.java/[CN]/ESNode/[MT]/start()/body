@@ -20,7 +20,7 @@ initRestConsole(esSettings);
 initNetwork(esSettings);
 node=NodeBuilder.nodeBuilder().settings(esSettings).node();
 node.start();
-if (node.client().admin().cluster().prepareHealth().setWaitForYellowStatus().get().getStatus() == ClusterHealthStatus.RED) {
+if (node.client().admin().cluster().prepareHealth().setWaitForYellowStatus().setTimeout(healthTimeout).get().getStatus() == ClusterHealthStatus.RED) {
 throw new IllegalStateException(String.format("Elasticsearch index is corrupt, please delete directory '%s/%s' and relaunch the SonarQube server.",fileSystem.getHomeDir().getAbsolutePath(),DATA_DIR));
 }
 addIndexTemplates();
