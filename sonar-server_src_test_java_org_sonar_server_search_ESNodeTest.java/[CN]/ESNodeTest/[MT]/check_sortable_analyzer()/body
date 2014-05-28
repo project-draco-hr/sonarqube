@@ -1,0 +1,8 @@
+{
+  ESNode node=new ESNode(fs,new Settings());
+  node.start();
+  node.client().admin().indices().prepareCreate("polop").addMapping("type1","{\"type1\": {\"properties\": {\"value\": {\"type\": \"string\"}}}}").execute().actionGet();
+  node.client().admin().cluster().prepareHealth("polop").setWaitForYellowStatus().get(TimeValue.timeValueMillis(1000));
+  assertThat(node.client().admin().indices().prepareAnalyze("polop","This Is A Wonderful Text").setAnalyzer("sortable").get().getTokens().get(0).getTerm()).isEqualTo("this is a ");
+  node.stop();
+}

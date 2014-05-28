@@ -1,0 +1,11 @@
+{
+  ESNode node=new ESNode(fs,new Settings());
+  node.start();
+  node.client().admin().indices().prepareCreate("polop").addMapping("type1","{\"type1\": {\"properties\": {\"value\": {\"type\": \"string\"}}}}").execute().actionGet();
+  node.client().admin().cluster().prepareHealth("polop").setWaitForYellowStatus().get(TimeValue.timeValueMillis(1000));
+  AnalyzeResponse response=node.client().admin().indices().prepareAnalyze("polop","he.llo w@rl#d").setAnalyzer("index_grams").get();
+  assertThat(response.getTokens()).hasSize(10);
+  assertThat(response.getTokens().get(0).getTerm()).isEqualTo("he");
+  assertThat(response.getTokens().get(7).getTerm()).isEqualTo("w@rl");
+  node.stop();
+}
