@@ -1,0 +1,20 @@
+{
+  if (extraFields != null) {
+    if (extraFields.contains("actions")) {
+      actionsWriter.writeActions(issue,json);
+    }
+    if (extraFields.contains("transitions")) {
+      actionsWriter.writeTransitions(issue,json);
+    }
+    String assignee=issue.assignee();
+    if (extraFields.contains("assigneeName") && assignee != null) {
+      User user=result.user(assignee);
+      json.prop("assigneeName",user != null ? user.name() : null);
+    }
+    String actionPlanKey=issue.actionPlanKey();
+    if (extraFields.contains("actionPlanName") && actionPlanKey != null) {
+      ActionPlan actionPlan=result.actionPlan(issue);
+      json.prop("actionPlanName",actionPlan != null ? actionPlan.name() : null);
+    }
+  }
+}

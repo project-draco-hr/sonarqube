@@ -1,6 +1,6 @@
 {
   String issueKey=request.mandatoryParam("key");
-  IssueQueryResult queryResult=issueFinder.find(IssueQuery.builder().issueKeys(Arrays.asList(issueKey)).build());
+  IssueQueryResult queryResult=issueFinder.find(IssueQuery.builder().requiredRole(UserRole.USER).issueKeys(Arrays.asList(issueKey)).build());
   if (queryResult.issues().size() != 1) {
     throw new NotFoundException("Issue not found: " + issueKey);
   }
@@ -8,8 +8,8 @@
   JsonWriter json=response.newJsonWriter();
   json.beginObject().name("issue").beginObject();
   writeIssue(queryResult,issue,json);
-  writeTransitions(issue,json);
-  writeActions(issue,json);
+  actionsWriter.writeActions(issue,json);
+  actionsWriter.writeTransitions(issue,json);
   writeComments(queryResult,issue,json);
   writeChangelog(issue,json);
   json.endObject().endObject().close();
