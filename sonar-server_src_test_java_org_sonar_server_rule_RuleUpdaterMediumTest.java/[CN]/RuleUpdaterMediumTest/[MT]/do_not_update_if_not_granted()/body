@@ -1,0 +1,13 @@
+{
+  MockUserSession.set().setGlobalPermissions(GlobalPermissions.SCAN_EXECUTION);
+  db.ruleDao().insert(dbSession,RuleTesting.newDto(RULE_KEY).setTags(Sets.newHashSet("security")).setSystemTags(Sets.newHashSet("java8","javadoc")));
+  dbSession.commit();
+  RuleUpdater updater=new RuleUpdater(tester.get(DbClient.class),system);
+  RuleUpdate update=new RuleUpdate(RULE_KEY).setMarkdownNote("my *note*");
+  try {
+    updater.update(update,UserSession.get());
+    fail();
+  }
+ catch (  UnauthorizedException e) {
+  }
+}

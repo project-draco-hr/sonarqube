@@ -1,11 +1,13 @@
 {
-  RuleKey rule1=RuleKey.of("javascript","S001");
-  dao.insert(dbSession,newRuleDto(rule1).setTags(Sets.newHashSet("security")).setSystemTags(Sets.newHashSet("java-coding","stephane.gamard@sonarsource.com")));
-  RuleKey rule2=RuleKey.of("java","S001");
-  dao.insert(dbSession,newRuleDto(rule2).setTags(Sets.newHashSet("mytag")).setSystemTags(Sets.newHashSet("")));
+  RuleKey key1=RuleKey.of("javascript","S001");
+  dao.insert(dbSession,RuleTesting.newDto(key1).setTags(Sets.newHashSet("tag1")).setSystemTags(Sets.newHashSet("sys1","sys2")));
+  RuleKey key2=RuleKey.of("java","S001");
+  dao.insert(dbSession,RuleTesting.newDto(key2).setTags(Sets.newHashSet("tag2")).setSystemTags(Collections.<String>emptySet()));
   dbSession.commit();
-  Set<String> tags=index.terms(RuleNormalizer.RuleField._TAGS.field());
-  assertThat(tags).containsOnly("java-coding","security","stephane.gamard@sonarsource.com","mytag");
+  Set<String> tags=service.listTags();
+  assertThat(tags).containsOnly("tag1","tag2","sys1","sys2");
+  tags=index.terms(RuleNormalizer.RuleField.TAGS.field());
+  assertThat(tags).containsOnly("tag1","tag2");
   tags=index.terms(RuleNormalizer.RuleField.SYSTEM_TAGS.field());
-  assertThat(tags).containsOnly("java-coding","stephane.gamard@sonarsource.com");
+  assertThat(tags).containsOnly("sys1","sys2");
 }

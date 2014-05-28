@@ -4,7 +4,7 @@
     boolean toBeRemoved=true;
     if (ruleDto.getParentId() != null) {
       RuleDto parent=dbClient.ruleDao().getParent(ruleDto,session);
-      if (parent != null && !Rule.STATUS_REMOVED.equals(parent.getStatus())) {
+      if (parent != null && RuleStatus.REMOVED != parent.getStatus()) {
         ruleDto.setLanguage(parent.getLanguage());
         ruleDto.setStatus(parent.getStatus());
         ruleDto.setDefaultSubCharacteristicId(parent.getDefaultSubCharacteristicId());
@@ -16,9 +16,9 @@
         toBeRemoved=false;
       }
     }
-    if (toBeRemoved && !RuleStatus.REMOVED.toString().equals(ruleDto.getStatus())) {
+    if (toBeRemoved && RuleStatus.REMOVED != ruleDto.getStatus()) {
       LOG.info(String.format("Disable rule %s",ruleDto.getKey()));
-      ruleDto.setStatus(Rule.STATUS_REMOVED);
+      ruleDto.setStatus(RuleStatus.REMOVED);
       ruleDto.setSystemTags(Collections.<String>emptySet());
       ruleDto.setTags(Collections.<String>emptySet());
       dbClient.ruleDao().update(session,ruleDto);
