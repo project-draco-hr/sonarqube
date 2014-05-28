@@ -1,13 +1,13 @@
 {
   QualityProfileDto profileDto=new QualityProfileDto().setName("myprofile").setLanguage("java");
-  qualityProfileDao.insert(dbSession,profileDto);
+  db.qualityProfileDao().insert(dbSession,profileDto);
   RuleKey ruleKey=RuleKey.of("javascript","S001");
   RuleDto ruleDto=newRuleDto(ruleKey);
-  dao.insert(dbSession,ruleDto);
+  db.ruleDao().insert(dbSession,ruleDto);
   ActiveRuleDto activeRule=ActiveRuleDto.createFor(profileDto,ruleDto).setInheritance(ActiveRule.Inheritance.INHERIT.name()).setSeverity(Severity.BLOCKER);
-  activeRuleDao.insert(dbSession,activeRule);
+  db.activeRuleDao().insert(dbSession,activeRule);
   dbSession.commit();
-  List<ActiveRuleDto> persistedDtos=activeRuleDao.findByRule(ruleDto,dbSession);
+  List<ActiveRuleDto> persistedDtos=db.activeRuleDao().findByRule(ruleDto,dbSession);
   assertThat(persistedDtos).hasSize(1);
   ActiveRule hit=index.getByKey(activeRule.getKey());
   assertThat(hit).isNotNull();

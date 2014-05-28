@@ -1,0 +1,18 @@
+{
+  userSession.checkLoggedIn();
+  userSession.checkGlobalPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN);
+  if (update.isEmpty()) {
+    return false;
+  }
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    Context context=newContext(update);
+    apply(update,context,userSession);
+    dbClient.ruleDao().update(dbSession,context.rule);
+    dbSession.commit();
+    return true;
+  }
+  finally {
+    dbSession.close();
+  }
+}

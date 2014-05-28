@@ -1,0 +1,17 @@
+{
+  grantPermission();
+  insertDebtCharacteristics(dbSession);
+  db.ruleDao().insert(dbSession,RuleTests.newDto(RULE_KEY).setDefaultSubCharacteristicId(hardReliabilityId).setDefaultRemediationFunction(DebtRemediationFunction.Type.LINEAR.name()).setDefaultRemediationCoefficient("1d").setDefaultRemediationOffset("5min").setSubCharacteristicId(softReliabilityId).setRemediationFunction(DebtRemediationFunction.Type.CONSTANT_ISSUE.name()).setRemediationCoefficient(null).setRemediationOffset("1min"));
+  dbSession.commit();
+  RuleUpdate update=new RuleUpdate(RULE_KEY).setDebtSubCharacteristic(null);
+  updater.update(update,UserSession.get());
+  dbSession.clearCache();
+  RuleDto rule=db.ruleDao().getByKey(dbSession,RULE_KEY);
+  assertThat(rule.getSubCharacteristicId()).isEqualTo(-1);
+  assertThat(rule.getRemediationFunction()).isNull();
+  assertThat(rule.getRemediationCoefficient()).isNull();
+  assertThat(rule.getRemediationOffset()).isNull();
+  Rule indexedRule=tester.get(RuleIndex.class).getByKey(RULE_KEY);
+  assertThat(indexedRule.debtCharacteristicKey()).isNull();
+  assertThat(indexedRule.debtSubCharacteristicKey()).isNull();
+}
