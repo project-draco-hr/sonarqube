@@ -9,7 +9,22 @@
   query.setTags(RubyUtils.toStrings(params.get("tags")));
   query.setDebtCharacteristics(RubyUtils.toStrings(params.get("debtCharacteristics")));
   query.setHasDebtCharacteristic(RubyUtils.toBoolean(params.get("hasDebtCharacteristic")));
+  query.setSortField(RuleNormalizer.RuleField.NAME);
   QueryOptions options=new QueryOptions();
-  RuleResult rules=service.search(query,options);
-  return new PagedResult<org.sonar.server.rule.Rule>(rules.getRules(),PagingResult.create(options.getLimit(),1,rules.getTotal()));
+  options.setLimit(QueryOptions.MAX_LIMIT);
+  List<Rule> rules=Lists.newArrayList();
+  boolean more=true;
+  int offset=0;
+  while (more) {
+    options.setOffset(offset);
+    RuleResult result=service.search(query,options);
+    rules.addAll(result.getRules());
+    if (result.getHits().size() < QueryOptions.MAX_LIMIT) {
+      more=false;
+    }
+ else {
+      offset+=QueryOptions.MAX_LIMIT;
+    }
+  }
+  return new PagedResult<org.sonar.server.rule.Rule>(rules,PagingResult.create(rules.size(),1,rules.size()));
 }
