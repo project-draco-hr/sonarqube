@@ -3,12 +3,12 @@
   RuleDto rule0=getRule(profile.getLanguage(),"toto").setCardinality(Cardinality.MULTIPLE);
   RuleDto rule1=getRule(profile.getLanguage(),"tata");
   session.commit();
-  assertThat(dbClient.activeRuleDao().findByProfileKey(profile.getKey(),session)).isEmpty();
+  assertThat(db.activeRuleDao().findByProfileKey(profile.getKey(),session)).isEmpty();
   WsTester.TestRequest request=wsTester.newGetRequest(API_ENDPOINT,API_BULK_RULE_ACTIVATE_METHOD);
   request.setParam(RuleActivationActions.PROFILE_KEY,profile.getKey().toString());
   request.setParam(SearchAction.PARAM_LANGUAGES,"java");
   WsTester.Result result=request.execute();
   session.clearCache();
   result.assertJson("{\"ignored\":[{\"key\":\"blah:toto\"}],\"activated\":[{\"key\":\"blah:tata\"}]}");
-  assertThat(dbClient.activeRuleDao().findByProfileKey(profile.getKey(),session)).hasSize(1);
+  assertThat(db.activeRuleDao().findByProfileKey(profile.getKey(),session)).hasSize(1);
 }
