@@ -3,25 +3,25 @@
   Preconditions.checkArgument(key != null,"Cannot normalize ActiveRuleDto with null key");
   Map<String,Object> newRule=new HashMap<String,Object>();
   newRule.put("_parent",key.ruleKey().toString());
-  newRule.put(ActiveRuleField.RULE_KEY.key(),key.ruleKey().toString());
-  newRule.put(ActiveRuleField.KEY.key(),key.toString());
-  newRule.put(ActiveRuleField.INHERITANCE.key(),activeRuleDto.getInheritance());
-  newRule.put(ActiveRuleField.SEVERITY.key(),activeRuleDto.getSeverityString());
+  newRule.put(ActiveRuleField.RULE_KEY.field(),key.ruleKey().toString());
+  newRule.put(ActiveRuleField.KEY.field(),key.toString());
+  newRule.put(ActiveRuleField.INHERITANCE.field(),activeRuleDto.getInheritance());
+  newRule.put(ActiveRuleField.SEVERITY.field(),activeRuleDto.getSeverityString());
   DbSession session=db.openSession(false);
   try {
     QualityProfileDto profile=db.qualityProfileDao().selectById(activeRuleDto.getProfileId());
-    newRule.put(ActiveRuleField.PROFILE_KEY.key(),profile.getKey().toString());
+    newRule.put(ActiveRuleField.PROFILE_KEY.field(),profile.getKey().toString());
     String parentKey=null;
     if (activeRuleDto.getParentId() != null) {
       ActiveRuleDto parentDto=db.activeRuleDao().getById(activeRuleDto.getParentId(),session);
       parentKey=parentDto.getKey().toString();
     }
-    newRule.put(ActiveRuleField.PARENT_KEY.key(),parentKey);
+    newRule.put(ActiveRuleField.PARENT_KEY.field(),parentKey);
   }
   finally {
     session.close();
   }
   Map<String,Object> upsert=new HashMap<String,Object>(newRule);
-  upsert.put(ActiveRuleField.PARAMS.key(),new ArrayList());
+  upsert.put(ActiveRuleField.PARAMS.field(),new ArrayList());
   return ImmutableList.of(new UpdateRequest().routing(key.ruleKey().toString()).id(activeRuleDto.getKey().toString()).parent(activeRuleDto.getKey().ruleKey().toString()).doc(newRule).upsert(upsert));
 }
