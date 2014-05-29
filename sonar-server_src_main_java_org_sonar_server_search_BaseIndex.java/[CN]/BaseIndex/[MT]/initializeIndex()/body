@@ -7,13 +7,8 @@
       LOG.info("Setup of {} for type {}",this.getIndexName(),this.getIndexType());
       getClient().admin().indices().prepareCreate(index).setSettings(getIndexSettings()).execute().actionGet();
     }
-    Map<String,Object> mapping=new HashMap<String,Object>();
-    mapping.put("dynamic",false);
-    mapping.put("_id",mapKey());
-    mapping.put("properties",mapProperties());
-    LOG.debug("Index Mapping {}",mapping.get("properties"));
     LOG.info("Update of index {} for type {}",this.getIndexName(),this.getIndexType());
-    getClient().admin().indices().preparePutMapping(index).setType(getIndexType()).setIgnoreConflicts(true).setSource(mapping).get();
+    getClient().admin().indices().preparePutMapping(index).setType(getIndexType()).setIgnoreConflicts(true).setSource(mapDomain()).get();
   }
  catch (  Exception e) {
     throw new IllegalStateException("Invalid configuration for index " + this.getIndexName(),e);
