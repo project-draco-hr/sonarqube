@@ -8,13 +8,13 @@
   assertThat(qualityProfileDao.getByKey(qualityProfileKey,dbSession)).isNotNull();
   verifyProperty("sonar.profile.xoo","Basic");
   ActiveRuleDao activeRuleDao=dbClient().activeRuleDao();
-  assertThat(activeRuleDao.findByProfileKey(qualityProfileKey,dbSession)).hasSize(2);
+  assertThat(activeRuleDao.findByProfileKey(dbSession,qualityProfileKey)).hasSize(2);
   RuleKey ruleKey=RuleKey.of("xoo","x1");
-  ActiveRuleDto activeRule=activeRuleDao.getByKey(dbSession,ActiveRuleKey.of(qualityProfileKey,ruleKey));
+  ActiveRuleDto activeRule=activeRuleDao.getNullableByKey(dbSession,ActiveRuleKey.of(qualityProfileKey,ruleKey));
   assertThat(activeRule.getKey().qProfile()).isEqualTo(qualityProfileKey);
   assertThat(activeRule.getKey().ruleKey()).isEqualTo(ruleKey);
   assertThat(activeRule.getSeverityString()).isEqualTo(Severity.CRITICAL);
-  Map<String,ActiveRuleParamDto> params=ActiveRuleParamDto.groupByKey(activeRuleDao.findParamsByActiveRule(activeRule,dbSession));
+  Map<String,ActiveRuleParamDto> params=ActiveRuleParamDto.groupByKey(activeRuleDao.findParamsByActiveRule(dbSession,activeRule));
   assertThat(params).hasSize(2);
   assertThat(params.get("acceptWhitespace").getValue()).isEqualTo("true");
   assertThat(params.get("max").getValue()).isEqualTo("10");

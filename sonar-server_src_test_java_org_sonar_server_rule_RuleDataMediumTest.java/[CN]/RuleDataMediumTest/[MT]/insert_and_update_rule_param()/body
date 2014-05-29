@@ -4,9 +4,9 @@
   dao.insert(dbSession,ruleDto);
   dbSession.commit();
   RuleParamDto minParamDto=new RuleParamDto().setName("min").setType(RuleParamType.INTEGER.type()).setDefaultValue("2").setDescription("Minimum");
-  dao.addRuleParam(ruleDto,minParamDto,dbSession);
+  dao.addRuleParam(dbSession,ruleDto,minParamDto);
   RuleParamDto maxParamDto=new RuleParamDto().setName("max").setType(RuleParamType.INTEGER.type()).setDefaultValue("10").setDescription("Maximum");
-  dao.addRuleParam(ruleDto,maxParamDto,dbSession);
+  dao.addRuleParam(dbSession,ruleDto,maxParamDto);
   dbSession.commit();
   Rule hit=index.getByKey(ruleKey);
   assertThat(hit.params()).hasSize(2);
@@ -15,7 +15,7 @@
   assertThat(param.defaultValue()).isEqualTo("2");
   assertThat(param.description()).isEqualTo("Minimum");
   minParamDto.setDefaultValue("0.5").setDescription("new description");
-  dao.updateRuleParam(ruleDto,minParamDto,dbSession);
+  dao.updateRuleParam(dbSession,ruleDto,minParamDto);
   dbSession.commit();
   hit=index.getByKey(ruleKey);
   assertThat(hit.params()).hasSize(2);

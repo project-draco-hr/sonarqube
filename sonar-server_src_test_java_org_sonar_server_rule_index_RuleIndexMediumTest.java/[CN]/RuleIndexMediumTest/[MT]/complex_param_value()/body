@@ -5,11 +5,11 @@
   RuleDto rule=newRuleDto(RuleKey.of("java","S001"));
   dao.insert(dbSession,rule);
   RuleParamDto param=RuleParamDto.createFor(rule).setName("testing").setType("STRING").setDefaultValue(value);
-  dao.addRuleParam(rule,param,dbSession);
+  dao.addRuleParam(dbSession,rule,param);
   ActiveRuleDto activeRule=ActiveRuleDto.createFor(profile,rule).setSeverity("BLOCKER");
   ActiveRuleParamDto activeRuleParam=ActiveRuleParamDto.createFor(param);
   dbClient.activeRuleDao().insert(dbSession,activeRule);
-  dbClient.activeRuleDao().addParam(activeRule,activeRuleParam,dbSession);
+  dbClient.activeRuleDao().addParam(dbSession,activeRule,activeRuleParam);
   dbSession.commit();
   assertThat(index.getByKey(rule.getKey()).params().get(0).defaultValue()).isEqualTo(value);
 }

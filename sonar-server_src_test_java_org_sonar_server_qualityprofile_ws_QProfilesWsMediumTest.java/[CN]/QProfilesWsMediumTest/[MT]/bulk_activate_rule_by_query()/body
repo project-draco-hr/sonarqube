@@ -5,17 +5,17 @@
   RuleDto rule2=getRule(profile.getLanguage(),"hello");
   RuleDto rule3=getRule(profile.getLanguage(),"world");
   session.commit();
-  assertThat(db.activeRuleDao().findByProfileKey(profile.getKey(),session)).isEmpty();
+  assertThat(db.activeRuleDao().findByProfileKey(session,profile.getKey())).isEmpty();
   WsTester.TestRequest request=wsTester.newGetRequest(API_ENDPOINT,API_BULK_RULE_ACTIVATE_METHOD);
   request.setParam(RuleActivationActions.PROFILE_KEY,profile.getKey().toString());
   request.setParam(SearchOptions.PARAM_TEXT_QUERY,"php");
   WsTester.Result result=request.execute();
   session.clearCache();
-  assertThat(db.activeRuleDao().findByProfileKey(profile.getKey(),session)).hasSize(0);
+  assertThat(db.activeRuleDao().findByProfileKey(session,profile.getKey())).hasSize(0);
   request=wsTester.newGetRequest(API_ENDPOINT,API_BULK_RULE_ACTIVATE_METHOD);
   request.setParam(RuleActivationActions.PROFILE_KEY,profile.getKey().toString());
   request.setParam(SearchOptions.PARAM_TEXT_QUERY,"world");
   result=request.execute();
   session.commit();
-  assertThat(db.activeRuleDao().findByProfileKey(profile.getKey(),session)).hasSize(1);
+  assertThat(db.activeRuleDao().findByProfileKey(session,profile.getKey())).hasSize(1);
 }

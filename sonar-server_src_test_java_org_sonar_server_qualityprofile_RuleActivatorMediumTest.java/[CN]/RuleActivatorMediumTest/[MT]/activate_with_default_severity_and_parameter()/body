@@ -2,11 +2,11 @@
   grantPermission();
   RuleActivation activation=new RuleActivation(ActiveRuleKey.of(PROFILE_KEY,RuleKey.of("xoo","x1")));
   ruleActivator.activate(activation);
-  List<ActiveRuleDto> activeRuleDtos=db.activeRuleDao().findByProfileKey(PROFILE_KEY,dbSession);
+  List<ActiveRuleDto> activeRuleDtos=db.activeRuleDao().findByProfileKey(dbSession,PROFILE_KEY);
   assertThat(activeRuleDtos).hasSize(1);
   assertThat(activeRuleDtos.get(0).getSeverityString()).isEqualTo(Severity.MINOR);
   assertThat(activeRuleDtos.get(0).getInheritance()).isNull();
-  List<ActiveRuleParamDto> params=db.activeRuleDao().findParamsByActiveRule(activeRuleDtos.get(0),dbSession);
+  List<ActiveRuleParamDto> params=db.activeRuleDao().findParamsByActiveRule(dbSession,activeRuleDtos.get(0));
   assertThat(params).hasSize(1);
   assertThat(params.get(0).getValue()).isEqualTo("10");
   ActiveRule activeRule=index.getByKey(activation.getKey());
