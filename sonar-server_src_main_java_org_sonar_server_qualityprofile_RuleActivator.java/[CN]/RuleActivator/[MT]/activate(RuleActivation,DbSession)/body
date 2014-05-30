@@ -1,7 +1,6 @@
 {
-  List<ActiveRuleChange> changes=Lists.newArrayList();
   RuleActivationContext context=contextFactory.create(activation.getKey(),dbSession);
-  System.out.println("Activation for key: " + activation.getKey() + " -- Inheritance: "+ ((context.activeRule() == null) ? "" : context.activeRule().getInheritance())+ " -- activate by inheritance: "+ activation.isCascade());
+  List<ActiveRuleChange> changes=Lists.newArrayList();
   ActiveRuleChange change=null;
   if (context.activeRule() == null) {
     change=new ActiveRuleChange(ActiveRuleChange.Type.ACTIVATED,activation.getKey());
@@ -25,8 +24,7 @@
     change.setParameter(ruleParamDto.getName(),StringUtils.defaultIfEmpty(value,ruleParamDto.getDefaultValue()));
   }
   changes.add(change);
-  ActiveRuleDto activeRule=persist(change,context,dbSession);
-  System.out.println("-- activated  key: " + activation.getKey() + " -- Inheritance: "+ activeRule.getInheritance());
+  persist(change,context,dbSession);
   changes.addAll(cascadeActivation(dbSession,activation));
   return changes;
 }
