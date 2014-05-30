@@ -14,21 +14,21 @@
     }
     this.addTermFilter(fb,RuleNormalizer.RuleField.STATUS.field(),stringStatus);
   }
-  if (query.getActivation() == Boolean.TRUE) {
-    if (query.getQProfileKey() == null) {
-      fb.must(FilterBuilders.hasChildFilter(IndexDefinition.ACTIVE_RULE.getIndexType(),QueryBuilders.matchAllQuery()));
-    }
+  BoolFilterBuilder childrenFilter=FilterBuilders.boolFilter();
+  this.addTermFilter(childrenFilter,ActiveRuleNormalizer.ActiveRuleField.PROFILE_KEY.field(),query.getQProfileKey());
+  this.addTermFilter(childrenFilter,ActiveRuleNormalizer.ActiveRuleField.INHERITANCE.field(),query.getInheritance());
+  QueryBuilder childQuery;
+  if (childrenFilter.hasClauses()) {
+    childQuery=QueryBuilders.constantScoreQuery(childrenFilter);
+  }
  else {
-      fb.must(FilterBuilders.hasChildFilter(IndexDefinition.ACTIVE_RULE.getIndexType(),QueryBuilders.termQuery(ActiveRuleNormalizer.ActiveRuleField.PROFILE_KEY.field(),query.getQProfileKey())));
-    }
+    childQuery=QueryBuilders.matchAllQuery();
+  }
+  if (query.getActivation() == Boolean.TRUE) {
+    fb.must(FilterBuilders.hasChildFilter(IndexDefinition.ACTIVE_RULE.getIndexType(),childQuery));
   }
  else   if (query.getActivation() == Boolean.FALSE) {
-    if (query.getQProfileKey() == null) {
-      fb.mustNot(FilterBuilders.hasChildFilter(IndexDefinition.ACTIVE_RULE.getIndexType(),QueryBuilders.matchAllQuery()));
-    }
- else {
-      fb.mustNot(FilterBuilders.hasChildFilter(IndexDefinition.ACTIVE_RULE.getIndexType(),QueryBuilders.termQuery(ActiveRuleNormalizer.ActiveRuleField.PROFILE_KEY.field(),query.getQProfileKey())));
-    }
+    fb.mustNot(FilterBuilders.hasChildFilter(IndexDefinition.ACTIVE_RULE.getIndexType(),childQuery));
   }
   return fb;
 }
