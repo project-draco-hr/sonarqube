@@ -3,18 +3,11 @@
   DbSession dbSession=db.openSession(false);
   List<ActiveRuleChange> changes=Lists.newArrayList();
   try {
-    RuleActivationContext context=contextFactory.create(key,dbSession);
-    ActiveRuleChange change;
-    if (context.activeRule() == null) {
-      return changes;
-    }
-    change=new ActiveRuleChange(ActiveRuleChange.Type.DEACTIVATED,key);
-    changes.add(change);
-    persist(changes,context,dbSession);
+    changes.addAll(this.deactivate(key,dbSession));
     dbSession.commit();
-    return changes;
   }
   finally {
     dbSession.close();
   }
+  return changes;
 }

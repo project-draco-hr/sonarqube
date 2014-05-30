@@ -1,0 +1,20 @@
+{
+  List<ActiveRuleChange> changes=Lists.newArrayList();
+  RuleActivationContext context=contextFactory.create(key,dbSession);
+  ActiveRuleChange change=null;
+  if (context.activeRule() == null) {
+    return changes;
+  }
+ else   if (!isCascade && (context.activeRule().isInherited() || context.activeRule().doesOverride())) {
+    throw new IllegalStateException("Cannot deactivate inherited rule '" + key.ruleKey() + "'");
+  }
+  change=new ActiveRuleChange(ActiveRuleChange.Type.DEACTIVATED,key);
+  changes.add(change);
+  persist(change,context,dbSession);
+  List<QualityProfileDto> profiles=db.qualityProfileDao().findByParentKey(dbSession,key.qProfile());
+  for (  QualityProfileDto profile : profiles) {
+    ActiveRuleKey activeRuleKey=ActiveRuleKey.of(profile.getKey(),key.ruleKey());
+    changes.addAll(cascadeDeactivation(activeRuleKey,dbSession,true));
+  }
+  return changes;
+}

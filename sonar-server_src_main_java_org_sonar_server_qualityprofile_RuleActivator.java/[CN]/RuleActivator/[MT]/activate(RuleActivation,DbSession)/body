@@ -1,12 +1,22 @@
 {
   List<ActiveRuleChange> changes=Lists.newArrayList();
   RuleActivationContext context=contextFactory.create(activation.getKey(),dbSession);
-  ActiveRuleChange change;
+  System.out.println("Activation for key: " + activation.getKey() + " -- Inheritance: "+ ((context.activeRule() == null) ? "" : context.activeRule().getInheritance())+ " -- activate by inheritance: "+ activation.isCascade());
+  ActiveRuleChange change=null;
   if (context.activeRule() == null) {
     change=new ActiveRuleChange(ActiveRuleChange.Type.ACTIVATED,activation.getKey());
+    if (activation.isCascade()) {
+      change.setInheritance(ActiveRule.Inheritance.INHERITED);
+    }
   }
  else {
+    if (activation.isCascade() && context.activeRule().doesOverride()) {
+      return changes;
+    }
     change=new ActiveRuleChange(ActiveRuleChange.Type.UPDATED,activation.getKey());
+    if (!activation.isCascade() && context.parentProfile() != null) {
+      change.setInheritance(ActiveRule.Inheritance.OVERRIDES);
+    }
   }
   change.setSeverity(StringUtils.defaultIfEmpty(activation.getSeverity(),context.defaultSeverity()));
   for (  RuleParamDto ruleParamDto : context.ruleParams()) {
@@ -15,6 +25,8 @@
     change.setParameter(ruleParamDto.getName(),StringUtils.defaultIfEmpty(value,ruleParamDto.getDefaultValue()));
   }
   changes.add(change);
-  persist(changes,context,dbSession);
+  ActiveRuleDto activeRule=persist(change,context,dbSession);
+  System.out.println("-- activated  key: " + activation.getKey() + " -- Inheritance: "+ activeRule.getInheritance());
+  changes.addAll(cascadeActivation(dbSession,activation));
   return changes;
 }

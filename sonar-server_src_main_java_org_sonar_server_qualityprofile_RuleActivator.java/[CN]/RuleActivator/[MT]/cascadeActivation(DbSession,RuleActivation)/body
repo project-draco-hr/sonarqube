@@ -1,0 +1,9 @@
+{
+  List<ActiveRuleChange> changes=Lists.newArrayList();
+  List<QualityProfileDto> profiles=db.qualityProfileDao().findByParentKey(session,activation.getKey().qProfile());
+  for (  QualityProfileDto profile : profiles) {
+    ActiveRuleKey activeRuleKey=ActiveRuleKey.of(profile.getKey(),activation.getKey().ruleKey());
+    changes.addAll(this.activate(new RuleActivation(activeRuleKey).isCascade(true).setParameters(activation.getParameters()).setSeverity(activation.getSeverity()),session));
+  }
+  return changes;
+}
