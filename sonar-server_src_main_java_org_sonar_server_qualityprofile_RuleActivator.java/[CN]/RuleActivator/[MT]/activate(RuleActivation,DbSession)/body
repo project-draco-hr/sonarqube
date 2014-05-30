@@ -9,12 +9,17 @@
     }
   }
  else {
-    if (activation.isCascade() && context.activeRule().doesOverride()) {
-      return changes;
-    }
     change=new ActiveRuleChange(ActiveRuleChange.Type.UPDATED,activation.getKey());
-    if (!activation.isCascade() && context.parentProfile() != null) {
-      change.setInheritance(ActiveRule.Inheritance.OVERRIDES);
+    if (activation.isReset()) {
+      change.setInheritance(ActiveRule.Inheritance.INHERITED);
+    }
+ else {
+      if (activation.isCascade() && context.activeRule().doesOverride()) {
+        return changes;
+      }
+      if (!activation.isCascade() && context.parentProfile() != null) {
+        change.setInheritance(ActiveRule.Inheritance.OVERRIDES);
+      }
     }
   }
   change.setSeverity(StringUtils.defaultIfEmpty(activation.getSeverity(),context.defaultSeverity()));
