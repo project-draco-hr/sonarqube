@@ -1,0 +1,14 @@
+{
+  dao.insert(dbSession,newRuleDto(RuleKey.of("java","S001")));
+  dbSession.commit();
+  Thread.sleep(1000);
+  Date since=new Date();
+  dao.insert(dbSession,newRuleDto(RuleKey.of("java","S002")));
+  dbSession.commit();
+  assertThat(index.search(new RuleQuery(),QueryOptions.DEFAULT).getHits()).hasSize(2);
+  RuleQuery availableSinceQuery=new RuleQuery().setAvailableSince(since);
+  List<Rule> hits=index.search(availableSinceQuery,QueryOptions.DEFAULT).getHits();
+  assertThat(hits).hasSize(1);
+  RuleQuery availableSinceNowQuery=new RuleQuery().setAvailableSince(new Date());
+  assertThat(index.search(availableSinceNowQuery,QueryOptions.DEFAULT).getHits()).hasSize(0);
+}

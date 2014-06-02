@@ -1,0 +1,22 @@
+{
+  ruleDao.insert(session,newRuleDto(RuleKey.of("java","S002")));
+  ;
+  ruleDao.insert(session,newRuleDto(RuleKey.of("java","S001")));
+  session.commit();
+  Date since=new Date();
+  MockUserSession.set();
+  WsTester.TestRequest request=tester.wsTester().newGetRequest(API_ENDPOINT,API_SEARCH_METHOD);
+  request.setParam(SearchOptions.PARAM_FIELDS,"");
+  request.setParam(SearchAction.PARAM_AVAILABLE_SINCE,DateUtils.formatDate(since));
+  WsTester.Result result=request.execute();
+  result.assertJson("{\"total\":2,\"p\":1,\"ps\":10,\"rules\":[{\"key\":\"java:S001\"},{\"key\":\"java:S002\"}]}");
+  Calendar c=Calendar.getInstance();
+  c.setTime(since);
+  c.add(Calendar.DATE,1);
+  MockUserSession.set();
+  request=tester.wsTester().newGetRequest(API_ENDPOINT,API_SEARCH_METHOD);
+  request.setParam(SearchOptions.PARAM_FIELDS,"");
+  request.setParam(SearchAction.PARAM_AVAILABLE_SINCE,DateUtils.formatDate(c.getTime()));
+  result=request.execute();
+  result.assertJson("{\"total\":0,\"p\":1,\"ps\":10,\"rules\":[]}");
+}
