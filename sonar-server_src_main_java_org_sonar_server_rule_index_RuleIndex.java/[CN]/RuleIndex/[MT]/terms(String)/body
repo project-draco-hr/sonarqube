@@ -4,8 +4,10 @@
   SearchRequestBuilder request=this.getClient().prepareSearch(this.getIndexName()).setQuery(QueryBuilders.matchAllQuery()).addAggregation(AggregationBuilders.terms(key).field(fields).size(Integer.MAX_VALUE).minDocCount(1));
   SearchResponse esResponse=request.get();
   Terms aggregation=esResponse.getAggregations().get(key);
-  for (  Terms.Bucket value : aggregation.getBuckets()) {
-    tags.add(value.getKey());
+  if (aggregation != null) {
+    for (    Terms.Bucket value : aggregation.getBuckets()) {
+      tags.add(value.getKey());
+    }
   }
   return tags;
 }
