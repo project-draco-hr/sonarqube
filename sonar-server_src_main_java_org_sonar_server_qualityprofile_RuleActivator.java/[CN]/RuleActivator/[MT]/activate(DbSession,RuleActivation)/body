@@ -1,7 +1,7 @@
 {
   RuleActivationContext context=contextFactory.create(activation.getKey(),dbSession);
   List<ActiveRuleChange> changes=Lists.newArrayList();
-  ActiveRuleChange change=null;
+  ActiveRuleChange change;
   if (context.activeRule() == null) {
     change=new ActiveRuleChange(ActiveRuleChange.Type.ACTIVATED,activation.getKey());
     if (activation.isCascade()) {
@@ -10,21 +10,16 @@
   }
  else {
     change=new ActiveRuleChange(ActiveRuleChange.Type.UPDATED,activation.getKey());
-    if (activation.isReset()) {
-      change.setInheritance(ActiveRule.Inheritance.INHERITED);
+    if (activation.isCascade() && context.activeRule().doesOverride()) {
+      return changes;
     }
- else {
-      if (activation.isCascade() && context.activeRule().doesOverride()) {
-        return changes;
-      }
-      if (!activation.isCascade() && context.parentProfile() != null) {
-        change.setInheritance(ActiveRule.Inheritance.OVERRIDES);
-      }
+    if (!activation.isCascade() && context.parentProfile() != null) {
+      change.setInheritance(activation.isReset() ? ActiveRule.Inheritance.INHERITED : ActiveRule.Inheritance.OVERRIDES);
     }
   }
   change.setSeverity(StringUtils.defaultIfEmpty(activation.getSeverity(),context.defaultSeverity()));
   for (  RuleParamDto ruleParamDto : context.ruleParams()) {
-    String value=activation.getParameters().get(ruleParamDto.getName());
+    String value=StringUtils.defaultIfEmpty(activation.getParameters().get(ruleParamDto.getName()),context.defaultParam(ruleParamDto.getName()));
     verifyParam(ruleParamDto,value);
     change.setParameter(ruleParamDto.getName(),StringUtils.defaultIfEmpty(value,ruleParamDto.getDefaultValue()));
   }

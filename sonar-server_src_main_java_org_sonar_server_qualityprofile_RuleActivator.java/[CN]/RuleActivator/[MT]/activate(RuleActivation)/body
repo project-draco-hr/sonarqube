@@ -1,16 +1,15 @@
 {
   verifyPermission(UserSession.get());
   DbSession dbSession=db.openSession(false);
-  List<ActiveRuleChange> changes=Lists.newArrayList();
   try {
-    changes.addAll(activate(activation,dbSession));
+    List<ActiveRuleChange> changes=activate(dbSession,activation);
     if (!changes.isEmpty()) {
       dbSession.commit();
       previewCache.reportGlobalModification();
     }
+    return changes;
   }
   finally {
     dbSession.close();
   }
-  return changes;
 }
