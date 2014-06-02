@@ -1,6 +1,6 @@
 {
   MockUserSession.set().addComponentPermission(UserRole.CODEVIEWER,PROJECT_KEY,COMPONENT_KEY);
-  addProjectSample();
+  addComponent();
   addMeasure(CoreMetrics.NCLOC_KEY,200);
   addMeasure(CoreMetrics.COVERAGE_KEY,95.4);
   addMeasure(CoreMetrics.DUPLICATED_LINES_DENSITY_KEY,7.4);
@@ -14,4 +14,6 @@
   when(durations.format(any(Locale.class),any(Duration.class),eq(Durations.DurationFormat.SHORT))).thenReturn("3h 2min");
   WsTester.TestRequest request=tester.newGetRequest("api/components","app").setParam("key",COMPONENT_KEY);
   request.execute().assertJson(getClass(),"app_with_measures.json");
+  verify(measureDao).findByComponentKeyAndMetricKeys(eq(COMPONENT_KEY),measureKeysCaptor.capture(),eq(session));
+  assertThat(measureKeysCaptor.getValue()).contains(CoreMetrics.NCLOC_KEY,CoreMetrics.COVERAGE_KEY,CoreMetrics.DUPLICATED_LINES_DENSITY_KEY,CoreMetrics.TECHNICAL_DEBT_KEY,CoreMetrics.VIOLATIONS_KEY,CoreMetrics.BLOCKER_VIOLATIONS_KEY,CoreMetrics.CRITICAL_VIOLATIONS_KEY,CoreMetrics.MAJOR_VIOLATIONS_KEY,CoreMetrics.MINOR_VIOLATIONS_KEY,CoreMetrics.INFO_VIOLATIONS_KEY);
 }
