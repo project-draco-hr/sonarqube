@@ -1,0 +1,21 @@
+{
+  XmlWriter xml=XmlWriter.of(writer).declaration();
+  xml.begin("profile");
+  xml.prop("name",profile.getName());
+  xml.prop("language",profile.getLanguage());
+  xml.begin("rules");
+  for (  ActiveRule activeRule : activeRules) {
+    xml.begin("rule");
+    xml.prop("repositoryKey",activeRule.key().ruleKey().repository());
+    xml.prop("key",activeRule.key().ruleKey().rule());
+    xml.prop("priority",activeRule.severity());
+    xml.begin("parameters");
+    for (    Map.Entry<String,String> param : activeRule.params().entrySet()) {
+      xml.begin("parameter").prop("key",param.getKey()).prop("value",param.getValue()).end();
+    }
+    xml.end("parameters");
+    xml.end("rule");
+  }
+  xml.end("rules");
+  xml.end("profile").close();
+}

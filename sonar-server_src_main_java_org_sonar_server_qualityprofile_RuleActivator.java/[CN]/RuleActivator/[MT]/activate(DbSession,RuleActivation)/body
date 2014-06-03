@@ -4,7 +4,7 @@
   ActiveRuleChange change;
   if (context.activeRule() == null) {
     change=new ActiveRuleChange(ActiveRuleChange.Type.ACTIVATED,activation.getKey());
-    if (activation.isCascade()) {
+    if (activation.isCascade() || context.isSameAsParent(activation)) {
       change.setInheritance(ActiveRule.Inheritance.INHERITED);
     }
   }
@@ -14,7 +14,7 @@
       return changes;
     }
     if (!activation.isCascade() && context.parentProfile() != null) {
-      change.setInheritance(activation.isReset() ? ActiveRule.Inheritance.INHERITED : ActiveRule.Inheritance.OVERRIDES);
+      change.setInheritance(context.isSameAsParent(activation) ? ActiveRule.Inheritance.INHERITED : ActiveRule.Inheritance.OVERRIDES);
     }
   }
   change.setSeverity(StringUtils.defaultIfEmpty(activation.getSeverity(),context.defaultSeverity()));

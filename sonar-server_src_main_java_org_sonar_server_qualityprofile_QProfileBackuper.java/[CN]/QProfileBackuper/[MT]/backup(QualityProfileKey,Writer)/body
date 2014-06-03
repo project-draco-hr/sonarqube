@@ -1,0 +1,14 @@
+{
+  DbSession dbSession=db.openSession(false);
+  try {
+    QualityProfileDto profile=db.qualityProfileDao().getByKey(key,dbSession);
+    if (profile == null) {
+      throw new IllegalArgumentException("Quality profile does not exist: " + key);
+    }
+    List<ActiveRule> activeRules=index.get(ActiveRuleIndex.class).findByProfile(key);
+    writeXml(writer,profile,activeRules);
+  }
+  finally {
+    dbSession.close();
+  }
+}

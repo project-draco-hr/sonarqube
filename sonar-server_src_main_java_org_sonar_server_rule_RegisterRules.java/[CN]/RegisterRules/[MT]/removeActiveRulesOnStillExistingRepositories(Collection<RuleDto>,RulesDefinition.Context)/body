@@ -7,7 +7,10 @@
 ));
   for (  RuleDto rule : removedRules) {
     if (repositoryKeys.contains(rule.getRepositoryKey())) {
-      profilesManager.removeActivatedRules(rule.getId());
+      List<ActiveRule> activeRules=profileService.findActiveRulesByRule(rule.getKey());
+      for (      ActiveRule activeRule : activeRules) {
+        profileService.deactivate(activeRule.key());
+      }
     }
   }
 }

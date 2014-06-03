@@ -1,0 +1,26 @@
+{
+  try {
+    String profileLang=null, profileName=null;
+    SMInputFactory inputFactory=initStax();
+    SMHierarchicCursor rootC=inputFactory.rootElementCursor(reader);
+    rootC.advance();
+    SMInputCursor cursor=rootC.childElementCursor();
+    while (cursor.getNext() != null) {
+      String nodeName=cursor.getLocalName();
+      if (StringUtils.equals("name",nodeName)) {
+        profileName=StringUtils.trim(cursor.collectDescendantText(false));
+      }
+ else       if (StringUtils.equals("language",nodeName)) {
+        profileLang=StringUtils.trim(cursor.collectDescendantText(false));
+      }
+ else       if (StringUtils.equals("rules",nodeName)) {
+        QualityProfileKey profileKey=QualityProfileKey.of(profileName,profileLang);
+        SMInputCursor rulesCursor=cursor.childElementCursor("rule");
+        doRestore(rulesCursor,profileKey);
+      }
+    }
+  }
+ catch (  XMLStreamException e) {
+    throw new IllegalStateException("Fail to restore Quality profile backup",e);
+  }
+}

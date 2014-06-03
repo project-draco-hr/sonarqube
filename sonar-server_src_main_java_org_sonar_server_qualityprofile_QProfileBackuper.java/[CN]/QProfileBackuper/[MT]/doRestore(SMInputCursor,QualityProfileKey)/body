@@ -1,0 +1,48 @@
+{
+  Set<RuleKey> rulesToDeactivate=Sets.newHashSet();
+  DbSession dbSession=db.openSession(false);
+  try {
+    if (db.qualityProfileDao().getByKey(profileKey,dbSession) == null) {
+      db.qualityProfileDao().insert(dbSession,QualityProfileDto.createFor(profileKey));
+    }
+ else {
+      for (      ActiveRuleDto activeRuleDto : db.activeRuleDao().findByProfileKey(dbSession,profileKey)) {
+        rulesToDeactivate.add(activeRuleDto.getKey().ruleKey());
+      }
+    }
+    while (rulesCursor.getNext() != null) {
+      SMInputCursor ruleCursor=rulesCursor.childElementCursor();
+      String repositoryKey=null, key=null, severity=null;
+      Map<String,String> parameters=Maps.newHashMap();
+      while (ruleCursor.getNext() != null) {
+        String nodeName=ruleCursor.getLocalName();
+        if (StringUtils.equals("repositoryKey",nodeName)) {
+          repositoryKey=StringUtils.trim(ruleCursor.collectDescendantText(false));
+        }
+ else         if (StringUtils.equals("key",nodeName)) {
+          key=StringUtils.trim(ruleCursor.collectDescendantText(false));
+        }
+ else         if (StringUtils.equals("priority",nodeName)) {
+          severity=StringUtils.trim(ruleCursor.collectDescendantText(false));
+        }
+ else         if (StringUtils.equals("parameters",nodeName)) {
+          SMInputCursor propsCursor=ruleCursor.childElementCursor("parameter");
+          readParameters(propsCursor,parameters);
+        }
+      }
+      RuleKey ruleKey=RuleKey.of(repositoryKey,key);
+      RuleActivation activation=new RuleActivation(ActiveRuleKey.of(profileKey,ruleKey));
+      activation.setSeverity(severity);
+      activation.setParameters(parameters);
+      activator.activate(dbSession,activation);
+      rulesToDeactivate.remove(ruleKey);
+    }
+    for (    RuleKey ruleKey : rulesToDeactivate) {
+      activator.deactivate(ActiveRuleKey.of(profileKey,ruleKey),dbSession);
+    }
+    dbSession.commit();
+  }
+  finally {
+    dbSession.close();
+  }
+}

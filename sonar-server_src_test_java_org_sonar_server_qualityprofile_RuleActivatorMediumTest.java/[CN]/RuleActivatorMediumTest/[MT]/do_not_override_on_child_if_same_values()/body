@@ -1,0 +1,16 @@
+{
+  createChildProfiles();
+  RuleActivation activation=new RuleActivation(ActiveRuleKey.of(XOO_PROFILE_KEY,XOO_RULE_1));
+  activation.setSeverity(Severity.INFO);
+  activation.setParameter("max","7");
+  ruleActivator.activate(activation);
+  verifyOneActiveRule(XOO_PROFILE_KEY,Severity.INFO,null,ImmutableMap.of("max","7"));
+  verifyOneActiveRule(XOO_CHILD_PROFILE_KEY,Severity.INFO,ActiveRuleDto.INHERITED,ImmutableMap.of("max","7"));
+  activation=new RuleActivation(ActiveRuleKey.of(XOO_CHILD_PROFILE_KEY,XOO_RULE_1));
+  activation.setSeverity(Severity.INFO);
+  activation.setParameter("max","7");
+  ruleActivator.activate(activation);
+  dbSession.clearCache();
+  verifyOneActiveRule(XOO_PROFILE_KEY,Severity.INFO,null,ImmutableMap.of("max","7"));
+  verifyOneActiveRule(XOO_CHILD_PROFILE_KEY,Severity.INFO,ActiveRuleDto.INHERITED,ImmutableMap.of("max","7"));
+}
