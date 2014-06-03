@@ -1,0 +1,15 @@
+{
+  QualityProfileDto profile=getProfile("java");
+  RuleDto rule0=getRule(profile.getLanguage(),"toto");
+  RuleDto rule1=getRule(profile.getLanguage(),"tata");
+  session.commit();
+  assertThat(db.activeRuleDao().findByProfileKey(session,profile.getKey())).isEmpty();
+  assertThat(db.activeRuleDao().findByProfileKey(session,profile.getKey())).hasSize(0);
+  assertThat(tester.get(RuleIndex.class).search(new RuleQuery().setSeverities(ImmutableSet.of("BLOCKER")),QueryOptions.DEFAULT).getHits()).hasSize(2);
+  WsTester.TestRequest request=wsTester.newGetRequest(QProfilesWs.API_ENDPOINT,BulkRuleActivationActions.BULK_ACTIVATE_ACTION);
+  request.setParam(RuleActivationActions.PROFILE_KEY,profile.getKey().toString());
+  request.setParam(RuleActivationActions.SEVERITY,"MINOR");
+  request.execute();
+  session.clearCache();
+  assertThat(tester.get(ActiveRuleIndex.class).findByRule(rule0.getKey()).get(0).severity()).isEqualTo("MINOR");
+}
