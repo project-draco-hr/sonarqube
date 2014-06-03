@@ -1,56 +1,70 @@
 {
-  Map<String,Object> update=new HashMap<String,Object>();
-  update.put(RuleField.KEY.field(),rule.getKey().toString());
-  update.put(RuleField.REPOSITORY.field(),rule.getRepositoryKey());
-  update.put(RuleField.NAME.field(),rule.getName());
-  update.put(RuleField.CREATED_AT.field(),rule.getCreatedAt());
-  update.put(RuleField.UPDATED_AT.field(),rule.getUpdatedAt());
-  update.put(RuleField.HTML_DESCRIPTION.field(),rule.getDescription());
-  update.put(RuleField.SEVERITY.field(),rule.getSeverityString());
-  update.put(RuleField.STATUS.field(),rule.getStatus().name());
-  update.put(RuleField.LANGUAGE.field(),rule.getLanguage());
-  update.put(RuleField.INTERNAL_KEY.field(),rule.getConfigKey());
-  update.put(RuleField.TEMPLATE.field(),rule.getCardinality() == Cardinality.MULTIPLE);
-  update.put(RuleField.NOTE.field(),rule.getNoteData());
-  update.put(RuleField.NOTE_LOGIN.field(),rule.getNoteUserLogin());
-  update.put(RuleField.NOTE_CREATED_AT.field(),rule.getNoteCreatedAt());
-  update.put(RuleField.NOTE_UPDATED_AT.field(),rule.getNoteUpdatedAt());
-  CharacteristicDto characteristic=null;
-  if (rule.getDefaultSubCharacteristicId() != null) {
-    characteristic=db.debtCharacteristicDao().selectById(rule.getDefaultSubCharacteristicId());
-  }
-  if (rule.getSubCharacteristicId() != null) {
-    characteristic=db.debtCharacteristicDao().selectById(rule.getSubCharacteristicId());
-  }
-  if (characteristic != null && characteristic.getId() != -1) {
-    update.put(RuleField.SUB_CHARACTERISTIC.field(),characteristic.getKey());
-    if (characteristic.getParentId() != null) {
-      update.put(RuleField.CHARACTERISTIC.field(),db.debtCharacteristicDao().selectById(characteristic.getParentId()).getKey());
+  DbSession session=db.openSession(false);
+  try {
+    Map<String,Object> update=new HashMap<String,Object>();
+    update.put(RuleField.KEY.field(),rule.getKey().toString());
+    update.put(RuleField.REPOSITORY.field(),rule.getRepositoryKey());
+    update.put(RuleField.NAME.field(),rule.getName());
+    update.put(RuleField.CREATED_AT.field(),rule.getCreatedAt());
+    update.put(RuleField.UPDATED_AT.field(),rule.getUpdatedAt());
+    update.put(RuleField.HTML_DESCRIPTION.field(),rule.getDescription());
+    update.put(RuleField.SEVERITY.field(),rule.getSeverityString());
+    update.put(RuleField.STATUS.field(),rule.getStatus().name());
+    update.put(RuleField.LANGUAGE.field(),rule.getLanguage());
+    update.put(RuleField.INTERNAL_KEY.field(),rule.getConfigKey());
+    update.put(RuleField.TEMPLATE.field(),rule.getCardinality() == Cardinality.MULTIPLE);
+    update.put(RuleField.NOTE.field(),rule.getNoteData());
+    update.put(RuleField.NOTE_LOGIN.field(),rule.getNoteUserLogin());
+    update.put(RuleField.NOTE_CREATED_AT.field(),rule.getNoteCreatedAt());
+    update.put(RuleField.NOTE_UPDATED_AT.field(),rule.getNoteUpdatedAt());
+    Integer parentId=rule.getParentId();
+    if (parentId != null) {
+      RuleDto templateRule=db.ruleDao().getById(session,parentId);
+      update.put(RuleField.TEMPLATE_KEY.field(),templateRule.getKey().toString());
     }
-  }
  else {
-    update.put(RuleField.CHARACTERISTIC.field(),null);
-    update.put(RuleField.SUB_CHARACTERISTIC.field(),null);
+      update.put(RuleField.TEMPLATE_KEY.field(),null);
+    }
+    CharacteristicDto characteristic=null;
+    if (rule.getDefaultSubCharacteristicId() != null) {
+      characteristic=db.debtCharacteristicDao().selectById(rule.getDefaultSubCharacteristicId(),session);
+    }
+    if (rule.getSubCharacteristicId() != null) {
+      characteristic=db.debtCharacteristicDao().selectById(rule.getSubCharacteristicId(),session);
+    }
+    if (characteristic != null && characteristic.getId() != -1) {
+      update.put(RuleField.SUB_CHARACTERISTIC.field(),characteristic.getKey());
+      if (characteristic.getParentId() != null) {
+        update.put(RuleField.CHARACTERISTIC.field(),db.debtCharacteristicDao().selectById(characteristic.getParentId(),session).getKey());
+      }
+    }
+ else {
+      update.put(RuleField.CHARACTERISTIC.field(),null);
+      update.put(RuleField.SUB_CHARACTERISTIC.field(),null);
+    }
+    String dType=null, dCoefficient=null, dOffset=null;
+    if (rule.getDefaultRemediationFunction() != null) {
+      dType=rule.getDefaultRemediationFunction();
+      dCoefficient=rule.getDefaultRemediationCoefficient();
+      dOffset=rule.getDefaultRemediationOffset();
+    }
+    if (rule.getRemediationFunction() != null) {
+      dType=rule.getRemediationFunction();
+      dCoefficient=rule.getRemediationCoefficient();
+      dOffset=rule.getRemediationOffset();
+    }
+    update.put(RuleField.DEBT_FUNCTION_TYPE.field(),dType);
+    update.put(RuleField.DEBT_FUNCTION_COEFFICIENT.field(),dCoefficient);
+    update.put(RuleField.DEBT_FUNCTION_OFFSET.field(),dOffset);
+    update.put(RuleField.TAGS.field(),rule.getTags());
+    update.put(RuleField.SYSTEM_TAGS.field(),rule.getSystemTags());
+    update.put(RuleField._TAGS.field(),Sets.union(rule.getSystemTags(),rule.getTags()));
+    Map<String,Object> upsert=new HashMap<String,Object>(update);
+    upsert.put(RuleField.KEY.field(),rule.getKey().toString());
+    upsert.put(RuleField.PARAMS.field(),new ArrayList<String>());
+    return ImmutableList.of(new UpdateRequest().doc(update).upsert(upsert));
   }
-  String dType=null, dCoefficient=null, dOffset=null;
-  if (rule.getDefaultRemediationFunction() != null) {
-    dType=rule.getDefaultRemediationFunction();
-    dCoefficient=rule.getDefaultRemediationCoefficient();
-    dOffset=rule.getDefaultRemediationOffset();
+  finally {
+    session.close();
   }
-  if (rule.getRemediationFunction() != null) {
-    dType=rule.getRemediationFunction();
-    dCoefficient=rule.getRemediationCoefficient();
-    dOffset=rule.getRemediationOffset();
-  }
-  update.put(RuleField.DEBT_FUNCTION_TYPE.field(),dType);
-  update.put(RuleField.DEBT_FUNCTION_COEFFICIENT.field(),dCoefficient);
-  update.put(RuleField.DEBT_FUNCTION_OFFSET.field(),dOffset);
-  update.put(RuleField.TAGS.field(),rule.getTags());
-  update.put(RuleField.SYSTEM_TAGS.field(),rule.getSystemTags());
-  update.put(RuleField._TAGS.field(),Sets.union(rule.getSystemTags(),rule.getTags()));
-  Map<String,Object> upsert=new HashMap<String,Object>(update);
-  upsert.put(RuleField.KEY.field(),rule.getKey().toString());
-  upsert.put(RuleField.PARAMS.field(),new ArrayList<String>());
-  return ImmutableList.of(new UpdateRequest().doc(update).upsert(upsert));
 }
