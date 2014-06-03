@@ -1,16 +1,16 @@
 {
   RuleDto rule=db.ruleDao().getNullableByKey(dbSession,ruleKey);
   if (rule == null) {
-    throw new IllegalArgumentException("Rule not found: " + ruleKey);
+    throw new BadRequestException("Rule not found: " + ruleKey);
   }
   if (RuleStatus.REMOVED == rule.getStatus()) {
-    throw new IllegalArgumentException("Rule was removed: " + ruleKey);
+    throw new BadRequestException("Rule was removed: " + ruleKey);
   }
   if (Cardinality.MULTIPLE.equals(rule.getCardinality())) {
-    throw new IllegalArgumentException("Rule template can't be activated on a Quality profile: " + ruleKey);
+    throw new BadRequestException("Rule template can't be activated on a Quality profile: " + ruleKey);
   }
   if (Rule.MANUAL_REPOSITORY_KEY.equals(rule.getRepositoryKey())) {
-    throw new IllegalArgumentException("Manual rule can't be activated on a Quality profile: " + ruleKey);
+    throw new BadRequestException("Manual rule can't be activated on a Quality profile: " + ruleKey);
   }
   context.setRule(rule);
   context.setRuleParams(db.ruleDao().findRuleParamsByRuleKey(dbSession,rule.getKey()));

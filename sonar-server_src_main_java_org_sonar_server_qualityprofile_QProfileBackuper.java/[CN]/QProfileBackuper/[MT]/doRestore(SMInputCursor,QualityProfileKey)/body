@@ -34,7 +34,12 @@
       RuleActivation activation=new RuleActivation(ActiveRuleKey.of(profileKey,ruleKey));
       activation.setSeverity(severity);
       activation.setParameters(parameters);
-      activator.activate(dbSession,activation);
+      try {
+        activator.activate(dbSession,activation);
+      }
+ catch (      BadRequestException e) {
+        LoggerFactory.getLogger(getClass()).warn(e.getMessage());
+      }
       rulesToDeactivate.remove(ruleKey);
     }
     for (    RuleKey ruleKey : rulesToDeactivate) {

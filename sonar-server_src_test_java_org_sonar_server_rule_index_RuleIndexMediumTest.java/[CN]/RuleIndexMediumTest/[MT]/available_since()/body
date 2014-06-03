@@ -5,13 +5,13 @@
   Date since=new Date();
   dao.insert(dbSession,newRuleDto(RuleKey.of("java","S002")));
   dbSession.commit();
-  assertThat(index.search(new RuleQuery(),QueryOptions.DEFAULT).getHits()).hasSize(2);
+  assertThat(index.search(new RuleQuery(),new QueryOptions()).getHits()).hasSize(2);
   RuleQuery availableSinceQuery=new RuleQuery().setAvailableSince(since);
-  List<Rule> hits=index.search(availableSinceQuery,QueryOptions.DEFAULT).getHits();
+  List<Rule> hits=index.search(availableSinceQuery,new QueryOptions()).getHits();
   assertThat(hits).hasSize(1);
   Calendar c=Calendar.getInstance();
   c.setTime(since);
   c.add(Calendar.DATE,1);
   RuleQuery availableSinceNowQuery=new RuleQuery().setAvailableSince(c.getTime());
-  assertThat(index.search(availableSinceNowQuery,QueryOptions.DEFAULT).getHits()).hasSize(0);
+  assertThat(index.search(availableSinceNowQuery,new QueryOptions()).getHits()).hasSize(0);
 }
