@@ -1,0 +1,20 @@
+{
+  dao.insert(dbSession,newRuleDto(RuleKey.of("java","S001")).setCardinality(Cardinality.SINGLE));
+  dao.insert(dbSession,newRuleDto(RuleKey.of("java","S002")).setCardinality(Cardinality.MULTIPLE));
+  dbSession.commit();
+  RuleQuery query=new RuleQuery();
+  Result<Rule> results=index.search(query,new QueryOptions());
+  assertThat(results.getHits()).hasSize(2);
+  query=new RuleQuery().setIsTemplate(true);
+  results=index.search(query,new QueryOptions());
+  assertThat(results.getHits()).hasSize(1);
+  assertThat(Iterables.getFirst(results.getHits(),null).key().rule()).isEqualTo("S002");
+  assertThat(Iterables.getFirst(results.getHits(),null).template()).isTrue();
+  query=new RuleQuery().setIsTemplate(false);
+  results=index.search(query,new QueryOptions());
+  assertThat(results.getHits()).hasSize(1);
+  assertThat(Iterables.getFirst(results.getHits(),null).template()).isFalse();
+  assertThat(Iterables.getFirst(results.getHits(),null).key().rule()).isEqualTo("S001");
+  query=new RuleQuery().setIsTemplate(null);
+  assertThat(index.search(query,new QueryOptions()).getHits()).hasSize(2);
+}
