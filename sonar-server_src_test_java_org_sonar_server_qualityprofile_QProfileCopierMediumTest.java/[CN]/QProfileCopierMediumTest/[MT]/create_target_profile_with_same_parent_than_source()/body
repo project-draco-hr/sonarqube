@@ -1,0 +1,13 @@
+{
+  db.qualityProfileDao().insert(dbSession,QualityProfileDto.createFor(XOO_CHILD_1).setParent(XOO_PROFILE_1.name()));
+  dbSession.commit();
+  RuleActivation activation=new RuleActivation(ActiveRuleKey.of(XOO_PROFILE_1,XOO_RULE_1));
+  activation.setSeverity(Severity.BLOCKER);
+  activation.setParameter("max","7");
+  ruleActivator.activate(activation);
+  dbSession.clearCache();
+  copier.copy(XOO_CHILD_1,XOO_PROFILE_2);
+  verifyOneActiveRule(XOO_PROFILE_2,Severity.BLOCKER,ActiveRuleDto.INHERITED,ImmutableMap.of("max","7"));
+  QualityProfileDto profile2Dto=db.qualityProfileDao().getByKey(XOO_PROFILE_2,dbSession);
+  assertThat(profile2Dto.getParent()).isEqualTo(XOO_PROFILE_1.name());
+}

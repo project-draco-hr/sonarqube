@@ -1,0 +1,19 @@
+{
+  RuleActivation activation=new RuleActivation(ActiveRuleKey.of(XOO_PROFILE_1,XOO_RULE_1));
+  activation.setSeverity(Severity.BLOCKER);
+  activation.setParameter("max","7");
+  ruleActivator.activate(activation);
+  db.qualityProfileDao().insert(dbSession,QualityProfileDto.createFor(XOO_PROFILE_2));
+  activation=new RuleActivation(ActiveRuleKey.of(XOO_PROFILE_2,XOO_RULE_1));
+  activation.setSeverity(Severity.CRITICAL);
+  activation.setParameter("max","20");
+  ruleActivator.activate(dbSession,activation);
+  dbSession.commit();
+  activation=new RuleActivation(ActiveRuleKey.of(XOO_PROFILE_2,XOO_RULE_2));
+  activation.setSeverity(Severity.CRITICAL);
+  ruleActivator.activate(dbSession,activation);
+  dbSession.commit();
+  dbSession.clearCache();
+  copier.copy(XOO_PROFILE_1,XOO_PROFILE_2);
+  verifyOneActiveRule(XOO_PROFILE_2,Severity.BLOCKER,null,ImmutableMap.of("max","7"));
+}
