@@ -3,7 +3,10 @@
   List<ActiveRuleChange> changes=Lists.newArrayList();
   try {
     changes.addAll(this.deactivate(key,dbSession));
-    dbSession.commit();
+    if (!changes.isEmpty()) {
+      log.write(dbSession,changes);
+      dbSession.commit();
+    }
   }
   finally {
     dbSession.close();
