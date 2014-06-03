@@ -1,0 +1,11 @@
+{
+  ActiveRuleKey ruleKey=ActiveRuleKey.of(QualityProfileKey.of("name","java"),RuleKey.of("repository","S001"));
+  ActiveRuleChange ruleChange=new ActiveRuleChange(ActiveRuleChange.Type.ACTIVATED,ruleKey).setInheritance(ActiveRule.Inheritance.INHERITED);
+  LogDto log=new LogDto("SYSTEM_USER",ruleChange);
+  dao.insert(session,log);
+  LogDto newDto=dao.getByKey(session,log.getKey());
+  assertThat(newDto.getAuthor()).isEqualTo(log.getAuthor());
+  ActiveRuleChange loggedRuleChange=newDto.getActivity();
+  assertThat(loggedRuleChange.getKey()).isEqualTo(ruleKey);
+  assertThat(ruleChange.getInheritance()).isEqualTo(ActiveRule.Inheritance.INHERITED);
+}
