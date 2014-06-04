@@ -26,6 +26,10 @@
   changes.add(change);
   persist(change,context,dbSession);
   changes.addAll(cascadeActivation(dbSession,activation));
-  log.write(dbSession,changes);
+  if (!changes.isEmpty()) {
+    log.write(dbSession,changes);
+    dbSession.commit();
+    previewCache.reportGlobalModification();
+  }
   return changes;
 }
