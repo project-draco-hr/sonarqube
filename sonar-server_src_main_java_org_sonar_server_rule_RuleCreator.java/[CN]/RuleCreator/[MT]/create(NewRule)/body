@@ -1,0 +1,22 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    RuleKey templateKey=newRule.templateKey();
+    if (templateKey != null) {
+      RuleDto templateRule=dbClient.ruleDao().getByKey(dbSession,newRule.templateKey());
+      if (templateRule == null) {
+        throw new IllegalArgumentException("Template rule does not exists: " + templateKey.toString());
+      }
+      if (!Cardinality.MULTIPLE.equals(templateRule.getCardinality())) {
+        throw new IllegalArgumentException("This rule is not a template rule: " + templateKey.toString());
+      }
+      RuleKey customRuleKey=createCustomRule(newRule,templateRule,dbSession);
+      dbSession.commit();
+      return index.getByKey(customRuleKey);
+    }
+    throw new IllegalArgumentException("Not supported");
+  }
+  finally {
+    dbSession.close();
+  }
+}

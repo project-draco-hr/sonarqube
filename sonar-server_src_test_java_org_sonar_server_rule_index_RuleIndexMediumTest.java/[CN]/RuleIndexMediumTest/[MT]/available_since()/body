@@ -9,9 +9,7 @@
   RuleQuery availableSinceQuery=new RuleQuery().setAvailableSince(since);
   List<Rule> hits=index.search(availableSinceQuery,new QueryOptions()).getHits();
   assertThat(hits).hasSize(1);
-  Calendar c=Calendar.getInstance();
-  c.setTime(since);
-  c.add(Calendar.DATE,1);
-  RuleQuery availableSinceNowQuery=new RuleQuery().setAvailableSince(c.getTime());
+  assertThat(hits.get(0).key()).isEqualTo(RuleKey.of("java","S002"));
+  RuleQuery availableSinceNowQuery=new RuleQuery().setAvailableSince(DateUtils.addDays(since,1));
   assertThat(index.search(availableSinceNowQuery,new QueryOptions()).getHits()).hasSize(0);
 }

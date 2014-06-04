@@ -1,0 +1,13 @@
+{
+  MockUserSession.set().setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN).setLogin("me");
+  RuleKey key=RuleKey.of("java","S001");
+  dao.insert(dbSession,RuleTesting.newDto(key));
+  dbSession.commit();
+  RuleUpdate update=new RuleUpdate(key);
+  update.setMarkdownNote("my *note*");
+  service.update(update);
+  dbSession.clearCache();
+  RuleDto rule=dao.getNullableByKey(dbSession,key);
+  assertThat(rule.getNoteData()).isEqualTo("my *note*");
+  assertThat(rule.getNoteUserLogin()).isEqualTo("me");
+}
