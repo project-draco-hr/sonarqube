@@ -1,0 +1,44 @@
+{
+  Map<String,Object> params=EncodingUtils.toMap("key",fileKey);
+  params.put("line",line);
+  String jsonResult=requestFactory.get("/api/tests/test_cases",params);
+  Map jRoot=(Map)JSONValue.parse(jsonResult);
+  final DefaultTestableTestCases testableTestCases=new DefaultTestableTestCases();
+  Map<String,Map> jsonFiles=(Map)jRoot.get("files");
+  if (jsonFiles != null) {
+    for (    Map.Entry<String,Map> entry : jsonFiles.entrySet()) {
+      String ref=entry.getKey();
+      final Map file=entry.getValue();
+      if (ref != null && file != null) {
+        testableTestCases.addFile(ref,new TestableTestCases.File(){
+          @Override public String key(){
+            return JsonUtils.getString(file,"key");
+          }
+          @Override public String longName(){
+            return JsonUtils.getString(file,"longName");
+          }
+        }
+);
+      }
+    }
+  }
+  List<Map> tests=(List)jRoot.get("tests");
+  if (tests != null) {
+    for (    final Map json : tests) {
+      final String fileRef=JsonUtils.getString(json,"_ref");
+      testableTestCases.addTest(fileRef,new TestableTestCases.TestCase(){
+        @Override public String name(){
+          return JsonUtils.getString(json,"name");
+        }
+        @Override public String status(){
+          return JsonUtils.getString(json,"status");
+        }
+        @Override public Long durationInMs(){
+          return JsonUtils.getLong(json,"durationInMs");
+        }
+      }
+);
+    }
+  }
+  return testableTestCases;
+}
