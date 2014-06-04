@@ -1,23 +1,33 @@
 {
-  Map<String,Object> source=XContentMapValues.nodeMapValue(ctx.get("_source"),"source from context");
-  Object fieldValue=source.get(field);
-  if (fieldValue == null) {
-    source.put(field,value);
-  }
- else   if (!XContentMapValues.isArray(fieldValue)) {
-    source.put(field,ImmutableSet.of(fieldValue,value));
-  }
- else {
-    Collection items=((Collection)fieldValue);
-    for (    Object item : items) {
-      Map<String,Object> fields=(Map<String,Object>)item;
-      String itemIdValue=XContentMapValues.nodeStringValue(fields.get(idField),null);
-      if (itemIdValue != null && itemIdValue.equals(idValue)) {
-        items.remove(item);
-      }
+  try {
+    Map<String,Object> source=XContentMapValues.nodeMapValue(ctx.get("_source"),"source from context");
+    Object fieldValue=source.get(field);
+    if (fieldValue == null) {
+      source.put(field,value);
     }
-    items.add(value);
-    source.put(field,items);
+ else     if (!XContentMapValues.isArray(fieldValue)) {
+      source.put(field,ImmutableSet.of(fieldValue,value));
+    }
+ else {
+      Collection items=((Collection)fieldValue);
+      Object target=null;
+      for (      Object item : items) {
+        Map<String,Object> fields=(Map<String,Object>)item;
+        String itemIdValue=XContentMapValues.nodeStringValue(fields.get(idField),null);
+        if (itemIdValue != null && itemIdValue.equals(idValue)) {
+          target=item;
+          break;
+        }
+      }
+      if (target != null) {
+        items.remove(target);
+      }
+      items.add(value);
+      source.put(field,items);
+    }
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("failed to execute listUpdate script",e);
   }
   return null;
 }
