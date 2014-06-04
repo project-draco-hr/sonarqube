@@ -1,12 +1,18 @@
 {
-  Locale locale=UserSession.get().locale();
-  String localeParam=request.param("locale");
-  if (localeParam != null) {
-    locale=LocaleUtils.toLocale(localeParam);
+  Date timestamp=request.paramAsDateTime("ts");
+  if (timestamp != null && timestamp.after(server.getStartedAt())) {
+    response.stream().setStatus(HttpURLConnection.HTTP_NOT_MODIFIED).output().close();
   }
-  JsonWriter json=response.newJsonWriter().beginObject();
-  for (  String messageKey : i18n.getPropertyKeys()) {
-    json.prop(messageKey,i18n.message(locale,messageKey,messageKey));
+ else {
+    Locale locale=UserSession.get().locale();
+    String localeParam=request.param("locale");
+    if (localeParam != null) {
+      locale=LocaleUtils.toLocale(localeParam);
+    }
+    JsonWriter json=response.newJsonWriter().beginObject();
+    for (    String messageKey : i18n.getPropertyKeys()) {
+      json.prop(messageKey,i18n.message(locale,messageKey,messageKey));
+    }
+    json.endObject().close();
   }
-  json.endObject().close();
 }
