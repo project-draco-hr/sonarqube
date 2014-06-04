@@ -1,0 +1,22 @@
+{
+  Map<String,Object> source=XContentMapValues.nodeMapValue(ctx.get("_source"),"source from context");
+  Object fieldValue=source.get(field);
+  if (fieldValue == null) {
+    source.put(field,value);
+  }
+ else   if (!XContentMapValues.isArray(fieldValue)) {
+    source.put(field,ImmutableSet.of(fieldValue,value));
+  }
+ else {
+    Collection items=((Collection)fieldValue);
+    for (    Object item : items) {
+      String idValue=XContentMapValues.nodeStringValue(item,null);
+      if (idValue != null && idValue.equals(id)) {
+        items.remove(item);
+      }
+    }
+    items.add(value);
+    source.put(field,items);
+  }
+  return null;
+}
