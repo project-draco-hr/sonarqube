@@ -1,19 +1,23 @@
 {
-  RuleKey key=RuleKey.of("java","S001");
-  RuleDto templateRule=dao.insert(dbSession,RuleTesting.newDto(key).setCardinality(Cardinality.MULTIPLE).setLanguage("java"));
-  RuleParamDto ruleParamDto=RuleParamDto.createFor(templateRule).setName("regex").setType("STRING").setDescription("Reg ex").setDefaultValue(".*");
-  dao.addRuleParam(dbSession,templateRule,ruleParamDto);
-  dbSession.commit();
-  NewRule newRule=new NewRule().setTemplateKey(key).setName("My custom").setHtmlDescription("Some description").setSeverity(Severity.MAJOR).setStatus(RuleStatus.READY).setParams(newArrayList(new NewRuleParam("regex").setDefaultValue("a.*")));
-  Rule result=creator.create(newRule);
+  RuleDto templateRule=createTemplateRule();
+  NewRule newRule=new NewRule().setTemplateKey(templateRule.getKey()).setName("My custom").setHtmlDescription("Some description").setSeverity(Severity.MAJOR).setStatus(RuleStatus.READY).setParams(newArrayList(new NewRuleParam("regex").setDefaultValue("a.*")));
+  RuleKey customRuleKey=creator.create(newRule);
   dbSession.clearCache();
-  RuleDto rule=db.ruleDao().getNullableByKey(dbSession,result.key());
+  RuleDto rule=db.ruleDao().getNullableByKey(dbSession,customRuleKey);
   assertThat(rule).isNotNull();
   assertThat(rule.getName()).isEqualTo("My custom");
   assertThat(rule.getDescription()).isEqualTo("Some description");
   assertThat(rule.getSeverityString()).isEqualTo("MAJOR");
   assertThat(rule.getStatus()).isEqualTo(RuleStatus.READY);
   assertThat(rule.getLanguage()).isEqualTo("java");
-  List<RuleParamDto> params=db.ruleDao().findRuleParamsByRuleKey(dbSession,result.key());
+  assertThat(rule.getConfigKey()).isEqualTo("S001");
+  assertThat(rule.getDefaultSubCharacteristicId()).isEqualTo(1);
+  assertThat(rule.getDefaultRemediationFunction()).isEqualTo("LINEAR_OFFSET");
+  assertThat(rule.getDefaultRemediationCoefficient()).isEqualTo("1h");
+  assertThat(rule.getDefaultRemediationOffset()).isEqualTo("5min");
+  assertThat(rule.getEffortToFixDescription()).isEqualTo("desc");
+  assertThat(rule.getTags()).containsOnly("usertag1","usertag2");
+  assertThat(rule.getSystemTags()).containsOnly("tag1","tag4");
+  List<RuleParamDto> params=db.ruleDao().findRuleParamsByRuleKey(dbSession,customRuleKey);
   assertThat(params).hasSize(1);
 }
