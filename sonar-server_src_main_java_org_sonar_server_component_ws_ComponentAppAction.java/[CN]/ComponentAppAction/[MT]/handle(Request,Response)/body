@@ -1,5 +1,5 @@
 {
-  String fileKey=request.mandatoryParam(KEY);
+  String fileKey=request.mandatoryParam(PARAM_KEY);
   UserSession userSession=UserSession.get();
   JsonWriter json=response.newJsonWriter();
   json.beginObject();
@@ -10,11 +10,16 @@
       throw new NotFoundException(String.format("Component '%s' does not exists.",fileKey));
     }
     userSession.checkComponentPermission(UserRole.USER,fileKey);
+    List<Period> periodList=periods(component.projectId(),session);
+    Integer periodIndex=request.paramAsInt(PARAM_PERIOD);
+    Date periodDate=periodDate(periodIndex,periodList);
+    RulesAggregation rulesAggregation=issueService.findRulesByComponent(component.key(),periodDate,session);
+    Multiset<String> severitiesAggregation=issueService.findSeveritiesByComponent(component.key(),periodDate,session);
     appendComponent(json,component,userSession,session);
     appendPermissions(json,component,userSession);
-    appendPeriods(json,component.projectId(),session);
-    appendIssuesAggregation(json,component.key(),session);
-    appendMeasures(json,component,session);
+    appendPeriods(json,periodList);
+    appendIssuesAggregation(json,rulesAggregation,severitiesAggregation,session);
+    appendMeasures(json,component,severitiesAggregation,periodIndex,session);
     appendExtensions(json,component,userSession);
   }
   finally {

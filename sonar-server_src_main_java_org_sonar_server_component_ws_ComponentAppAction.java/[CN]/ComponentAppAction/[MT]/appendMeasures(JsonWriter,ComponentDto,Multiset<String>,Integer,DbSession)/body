@@ -1,0 +1,15 @@
+{
+  json.name("measures").beginObject();
+  String fileKey=component.getKey();
+  List<MeasureDto> measures=dbClient.measureDao().findByComponentKeyAndMetricKeys(fileKey,newArrayList(CoreMetrics.NCLOC_KEY,CoreMetrics.COVERAGE_KEY,CoreMetrics.DUPLICATED_LINES_DENSITY_KEY,CoreMetrics.TECHNICAL_DEBT_KEY,CoreMetrics.TESTS_KEY),session);
+  json.prop("fNcloc",formatMeasure(CoreMetrics.NCLOC_KEY,measures,periodIndex));
+  json.prop("fCoverage",formatMeasure(CoreMetrics.COVERAGE_KEY,measures,periodIndex));
+  json.prop("fDuplicationDensity",formatMeasure(CoreMetrics.DUPLICATED_LINES_DENSITY_KEY,measures,periodIndex));
+  json.prop("fDebt",formatMeasure(CoreMetrics.TECHNICAL_DEBT_KEY,measures,periodIndex));
+  json.prop("fTests",formatMeasure(CoreMetrics.TESTS_KEY,measures,periodIndex));
+  json.prop("fIssues",i18n.formatInteger(UserSession.get().locale(),severitiesAggregation.size()));
+  for (  String severity : severitiesAggregation.elementSet()) {
+    json.prop("f" + Strings.capitalize(severity.toLowerCase()) + "Issues",i18n.formatInteger(UserSession.get().locale(),severitiesAggregation.count(severity)));
+  }
+  json.endObject();
+}
