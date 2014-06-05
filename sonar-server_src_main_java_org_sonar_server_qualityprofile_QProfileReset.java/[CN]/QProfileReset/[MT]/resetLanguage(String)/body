@@ -1,0 +1,18 @@
+{
+  ListMultimap<String,RulesProfile> profilesByName=loadDefinitionsGroupedByName(language);
+  for (  Map.Entry<String,Collection<RulesProfile>> entry : profilesByName.asMap().entrySet()) {
+    QualityProfileKey profileKey=QualityProfileKey.of(entry.getKey(),language);
+    List<RuleActivation> activations=Lists.newArrayList();
+    for (    RulesProfile def : entry.getValue()) {
+      for (      ActiveRule activeRule : def.getActiveRules()) {
+        RuleActivation activation=new RuleActivation(ActiveRuleKey.of(profileKey,RuleKey.of(activeRule.getRepositoryKey(),activeRule.getRuleKey())));
+        activation.setSeverity(activeRule.getSeverity().name());
+        for (        ActiveRuleParam param : activeRule.getActiveRuleParams()) {
+          activation.setParameter(param.getParamKey(),param.getValue());
+        }
+        activations.add(activation);
+      }
+    }
+    reset(profileKey,activations);
+  }
+}

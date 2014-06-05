@@ -1,0 +1,13 @@
+{
+  db.qualityProfileDao().insert(dbSession,QualityProfileDto.createFor(XOO_PROFILE_KEY),QualityProfileDto.createFor(XOO_CHILD_PROFILE_KEY).setParent(XOO_PROFILE_KEY.name()));
+  dbSession.commit();
+  RuleActivation activation=new RuleActivation(ActiveRuleKey.of(XOO_PROFILE_KEY,RuleKey.of("xoo","x1")));
+  activation.setSeverity(Severity.INFO);
+  activation.setParameter("max","10");
+  tester.get(RuleActivator.class).activate(dbSession,activation);
+  dbSession.commit();
+  dbSession.clearCache();
+  tester.get(QProfileBackuper.class).restore(new StringReader(Resources.toString(getClass().getResource("QProfileBackuperMediumTest/keep_other_inherited_rules.xml"),Charsets.UTF_8)),XOO_CHILD_PROFILE_KEY);
+  List<ActiveRule> activeRules=tester.get(QProfileService.class).findActiveRulesByProfile(XOO_CHILD_PROFILE_KEY);
+  assertThat(activeRules).hasSize(2);
+}

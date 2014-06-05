@@ -1,0 +1,32 @@
+{
+  Set<RuleKey> rulesToDeactivate=Sets.newHashSet();
+  DbSession dbSession=db.openSession(false);
+  try {
+    if (db.qualityProfileDao().getByKey(dbSession,profileKey) == null) {
+      db.qualityProfileDao().insert(dbSession,QualityProfileDto.createFor(profileKey));
+    }
+ else {
+      for (      ActiveRuleDto activeRuleDto : db.activeRuleDao().findByProfileKey(dbSession,profileKey)) {
+        if (activeRuleDto.getInheritance() == null) {
+          rulesToDeactivate.add(activeRuleDto.getKey().ruleKey());
+        }
+      }
+    }
+    for (    RuleActivation activation : activations) {
+      try {
+        activator.activate(dbSession,activation);
+        rulesToDeactivate.remove(activation.getKey().ruleKey());
+      }
+ catch (      BadRequestException e) {
+        LoggerFactory.getLogger(getClass()).warn(e.getMessage());
+      }
+    }
+    for (    RuleKey ruleKey : rulesToDeactivate) {
+      activator.deactivate(dbSession,ActiveRuleKey.of(profileKey,ruleKey));
+    }
+    dbSession.commit();
+  }
+  finally {
+    dbSession.close();
+  }
+}
