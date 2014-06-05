@@ -1,0 +1,13 @@
+{
+  WsTester.TestRequest request=tester.newGetRequest("api/rules","create").setParam("template_key","java:S001").setParam("name","My custom rule").setParam("html_description","Description").setParam("severity","MAJOR").setParam("status","BETA").setParam("params","key=value");
+  request.execute();
+  verify(ruleService).create(newRuleCaptor.capture());
+  NewRule newRule=newRuleCaptor.getValue();
+  assertThat(newRule.templateKey()).isEqualTo(RuleKey.of("java","S001"));
+  assertThat(newRule.name()).isEqualTo("My custom rule");
+  assertThat(newRule.htmlDescription()).isEqualTo("Description");
+  assertThat(newRule.severity()).isEqualTo("MAJOR");
+  assertThat(newRule.status()).isEqualTo(RuleStatus.BETA);
+  assertThat(newRule.params()).hasSize(1);
+  assertThat(newRule.params().get("key")).isEqualTo("value");
+}
