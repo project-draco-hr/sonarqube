@@ -2,11 +2,17 @@
   try {
     Map<String,Object> source=XContentMapValues.nodeMapValue(ctx.get("_source"),"source from context");
     Object fieldValue=source.get(field);
-    if (fieldValue == null) {
+    if (fieldValue == null && value != null) {
       source.put(field,value);
     }
- else     if (!XContentMapValues.isArray(fieldValue)) {
-      source.put(field,ImmutableSet.of(fieldValue,value));
+ else     if (!XContentMapValues.isArray(fieldValue) && value != null) {
+      Map currentFieldValue=XContentMapValues.nodeMapValue(fieldValue,"current FieldValue");
+      if (XContentMapValues.nodeStringValue(currentFieldValue.get(idField),null).equals(idValue)) {
+        source.put(field,value);
+      }
+ else {
+        source.put(field,ImmutableSet.of(fieldValue,value));
+      }
     }
  else {
       Collection items=((Collection)fieldValue);
@@ -22,7 +28,9 @@
       if (target != null) {
         items.remove(target);
       }
-      items.add(value);
+      if (value != null) {
+        items.add(value);
+      }
       source.put(field,items);
     }
   }

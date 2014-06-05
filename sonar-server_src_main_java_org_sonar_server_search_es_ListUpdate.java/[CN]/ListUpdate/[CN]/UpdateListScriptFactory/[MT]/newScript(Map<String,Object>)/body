@@ -2,7 +2,7 @@
   String idField=XContentMapValues.nodeStringValue(params.get(ID_FIELD),null);
   String idValue=XContentMapValues.nodeStringValue(params.get(ID_VALUE),null);
   String field=XContentMapValues.nodeStringValue(params.get(FIELD),null);
-  Map value=XContentMapValues.nodeMapValue(params.get(VALUE),"Update item");
+  Map value=null;
   if (idField == null) {
     throw new IllegalStateException("Missing '" + ID_FIELD + "' parameter");
   }
@@ -12,8 +12,11 @@
   if (field == null) {
     throw new IllegalStateException("Missing '" + FIELD + "' parameter");
   }
-  if (value == null) {
-    throw new IllegalStateException("Missing '" + VALUE + "' parameter");
+  if (params.containsKey(VALUE)) {
+    Object obj=params.get(VALUE);
+    if (obj != null) {
+      value=XContentMapValues.nodeMapValue(params.get(VALUE),"Update item");
+    }
   }
   return new ListUpdate(idField,idValue,field,value);
 }
