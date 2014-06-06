@@ -1,0 +1,15 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    RuleDto rule=dbClient.ruleDao().getByKey(dbSession,ruleKey);
+    if (rule.getParentId() == null) {
+      throw new IllegalStateException("Only custom rules can be deleted");
+    }
+    rule.setStatus(RuleStatus.REMOVED);
+    dbClient.ruleDao().update(dbSession,rule);
+    dbSession.commit();
+  }
+  finally {
+    dbSession.close();
+  }
+}
