@@ -1,0 +1,19 @@
+{
+  insertDebtCharacteristics(dbSession);
+  RuleDto ruledto=db.ruleDao().insert(dbSession,RuleTesting.newDto(RULE_KEY).setName("Old name").setDescription("Old description").setSeverity("MINOR").setStatus(RuleStatus.BETA));
+  RuleParamDto ruleParamDto=RuleParamDto.createFor(ruledto).setName("regex").setType("STRING").setDescription("Reg ex").setDefaultValue(".*");
+  db.ruleDao().addRuleParam(dbSession,ruledto,ruleParamDto);
+  dbSession.commit();
+  RuleUpdate update=RuleUpdate.createForCustomRule(RULE_KEY).setName("New name").setHtmlDescription("New description").setSeverity("MAJOR").setStatus(RuleStatus.READY).setParameters(ImmutableMap.of("regex","a.*"));
+  updater.update(update,UserSession.get());
+  dbSession.clearCache();
+  RuleDto rule=db.ruleDao().getNullableByKey(dbSession,RULE_KEY);
+  assertThat(rule.getName()).isEqualTo("New name");
+  assertThat(rule.getDescription()).isEqualTo("New description");
+  assertThat(rule.getSeverityString()).isEqualTo("MAJOR");
+  assertThat(rule.getStatus()).isEqualTo(RuleStatus.READY);
+  List<RuleParamDto> params=db.ruleDao().findRuleParamsByRuleKey(dbSession,RULE_KEY);
+  assertThat(params).hasSize(1);
+  RuleParamDto param=params.get(0);
+  assertThat(param.getDefaultValue()).isEqualTo("a.*");
+}
