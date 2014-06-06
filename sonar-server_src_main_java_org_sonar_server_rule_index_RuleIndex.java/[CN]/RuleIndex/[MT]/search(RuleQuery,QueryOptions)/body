@@ -1,5 +1,5 @@
 {
-  StopWatch profile=profiling.start("es",Profiling.Level.FULL);
+  StopWatch profile=profiling.start("es",Profiling.Level.BASIC);
   SearchRequestBuilder esSearch=getClient().prepareSearch(this.getIndexName()).setTypes(this.getIndexType()).setIndices(this.getIndexName());
   if (options.isScroll()) {
     esSearch.setSearchType(SearchType.SCAN);
@@ -13,7 +13,7 @@
   QueryBuilder qb=this.getQuery(query,options);
   esSearch.setQuery(QueryBuilders.filteredQuery(qb,fb));
   SearchResponse esResult=esSearch.get();
-  profile.stop("query: {}\nresult:{}",esSearch,esResult);
+  profile.stop("query: " + esSearch + "\nresult:"+ esResult);
   if (options.isScroll()) {
     return new RuleResult(this,esResult);
   }

@@ -2,8 +2,7 @@
   if (query.getQueryText() != null && !query.getQueryText().isEmpty()) {
     BoolQueryBuilder qb=QueryBuilders.boolQuery();
     String queryString=query.getQueryText();
-    qb.should(this.phraseQuery(RuleNormalizer.RuleField.NAME,queryString,20f));
-    qb.should(this.phraseQuery(RuleNormalizer.RuleField.HTML_DESCRIPTION,queryString,3f));
+    qb.should(QueryBuilders.queryString(query.getQueryText()).field(RuleNormalizer.RuleField.NAME.field() + "." + IndexField.SEARCH_WORDS_SUFFIX,20f).field(RuleNormalizer.RuleField.HTML_DESCRIPTION.field() + "." + IndexField.SEARCH_WORDS_SUFFIX,3f).enablePositionIncrements(true).defaultOperator(QueryStringQueryBuilder.Operator.AND).fuzziness(Fuzziness.ONE).autoGeneratePhraseQueries(true).lenient(false).useDisMax(true).boost(20f));
     qb.should(this.termQuery(RuleNormalizer.RuleField.KEY,queryString,15f));
     qb.should(this.termQuery(RuleNormalizer.RuleField._KEY,queryString,35f));
     qb.should(this.termQuery(RuleNormalizer.RuleField.LANGUAGE,queryString,3f));
