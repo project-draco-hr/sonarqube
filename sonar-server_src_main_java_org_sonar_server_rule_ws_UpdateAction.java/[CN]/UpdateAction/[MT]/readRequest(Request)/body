@@ -1,8 +1,28 @@
 {
   RuleKey key=RuleKey.parse(request.mandatoryParam(PARAM_KEY));
-  RuleUpdate update=new RuleUpdate(key);
+  RuleUpdate update=createRuleUpdate(key);
   readTags(request,update);
   readMarkdownNote(request,update);
   readDebt(request,update);
+  String name=request.param(PARAM_NAME);
+  if (!Strings.isNullOrEmpty(name)) {
+    update.setName(name);
+  }
+  String description=request.param(PARAM_DESCRIPTION);
+  if (!Strings.isNullOrEmpty(description)) {
+    update.setHtmlDescription(description);
+  }
+  String severity=request.param(PARAM_SEVERITY);
+  if (!Strings.isNullOrEmpty(severity)) {
+    update.setSeverity(severity);
+  }
+  String status=request.param(PARAM_STATUS);
+  if (!Strings.isNullOrEmpty(status)) {
+    update.setStatus(RuleStatus.valueOf(status));
+  }
+  String params=request.param(PARAMS);
+  if (!Strings.isNullOrEmpty(params)) {
+    update.setParameters(KeyValueFormat.parse(params));
+  }
   return update;
 }

@@ -1,0 +1,12 @@
+{
+  MockUserSession.set().setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN).setLogin("me");
+  RuleDto templateRule=ruleDao.insert(session,RuleTesting.newDto(RuleKey.of("java","S001")).setCardinality(Cardinality.MULTIPLE));
+  RuleParamDto param=RuleParamDto.createFor(templateRule).setName("regex").setType("STRING").setDescription("Reg ex").setDefaultValue(".*");
+  ruleDao.addRuleParam(session,templateRule,param);
+  session.commit();
+  NewRule newRule=new NewRule().setTemplateKey(templateRule.getKey()).setName("Old custom").setHtmlDescription("Old description").setSeverity(Severity.MINOR).setStatus(RuleStatus.BETA).setParameters(ImmutableMap.of("regex","a"));
+  RuleKey customRuleKey=ruleService.create(newRule);
+  session.clearCache();
+  WsTester.TestRequest request=wsTester.newGetRequest("api/rules","update").setParam("key",customRuleKey.toString()).setParam("name","My custom rule").setParam("html_description","Description").setParam("severity","MAJOR").setParam("status","BETA").setParam("params","regex=a.*");
+  request.execute().assertJson(getClass(),"update_custom_rule.json",false);
+}
