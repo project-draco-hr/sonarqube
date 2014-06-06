@@ -1,0 +1,18 @@
+{
+  MockUserSession.set().setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN).setLogin("me");
+  QualityProfileKey profileKey=QualityProfileKey.of("P1","xoo");
+  db.qualityProfileDao().insert(dbSession,QualityProfileDto.createFor(profileKey));
+  dbSession.commit();
+  dbSession.clearCache();
+  ActiveRuleKey activeRuleKey=ActiveRuleKey.of(profileKey,RuleKey.of("xoo","x1"));
+  RuleActivation activation=new RuleActivation(activeRuleKey);
+  tester.get(QProfileService.class).activate(activation);
+  dbSession.clearCache();
+  includeX1=false;
+  includeX2=true;
+  tester.get(Platform.class).restart();
+  dbSession.clearCache();
+  assertThat(db.ruleDao().getByKey(dbSession,RuleKey.of("xoo","x1")).getStatus()).isEqualTo(RuleStatus.REMOVED);
+  assertThat(db.ruleDao().getByKey(dbSession,RuleKey.of("xoo","x2")).getStatus()).isEqualTo(RuleStatus.READY);
+  assertThat(db.activeRuleDao().findByProfileKey(dbSession,profileKey)).hasSize(0);
+}

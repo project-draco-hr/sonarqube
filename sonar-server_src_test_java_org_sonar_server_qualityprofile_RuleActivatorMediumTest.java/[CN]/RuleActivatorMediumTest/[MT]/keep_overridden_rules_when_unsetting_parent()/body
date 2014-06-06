@@ -1,0 +1,21 @@
+{
+  RuleActivation activation=new RuleActivation(ActiveRuleKey.of(XOO_PROFILE_KEY,XOO_RULE_1));
+  activation.setSeverity("MAJOR");
+  ruleActivator.activate(activation);
+  verifyOneActiveRule(XOO_PROFILE_KEY,XOO_RULE_1,Severity.MAJOR,null,ImmutableMap.of("max","10"));
+  QualityProfileKey childKey=QualityProfileKey.of("newChild","xoo");
+  db.qualityProfileDao().insert(dbSession,QualityProfileDto.createFor(childKey));
+  dbSession.commit();
+  dbSession.clearCache();
+  ruleActivator.setParent(childKey,XOO_PROFILE_KEY);
+  verifyOneActiveRule(childKey,XOO_RULE_1,Severity.MAJOR,ActiveRuleDto.INHERITED,ImmutableMap.of("max","10"));
+  activation=new RuleActivation(ActiveRuleKey.of(childKey,XOO_RULE_1));
+  activation.setSeverity("BLOCKER").setParameter("max","333");
+  ruleActivator.activate(activation);
+  dbSession.clearCache();
+  verifyOneActiveRule(childKey,XOO_RULE_1,Severity.BLOCKER,ActiveRuleDto.OVERRIDES,ImmutableMap.of("max","333"));
+  ruleActivator.setParent(childKey,null);
+  dbSession.clearCache();
+  assertThat(db.qualityProfileDao().getByKey(dbSession,childKey).getParentKey()).isNull();
+  verifyOneActiveRule(childKey,XOO_RULE_1,Severity.BLOCKER,null,ImmutableMap.of("max","333"));
+}

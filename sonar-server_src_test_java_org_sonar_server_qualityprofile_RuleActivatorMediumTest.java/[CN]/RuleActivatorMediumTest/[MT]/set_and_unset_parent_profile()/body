@@ -1,0 +1,22 @@
+{
+  RuleActivation activation=new RuleActivation(ActiveRuleKey.of(XOO_PROFILE_KEY,XOO_RULE_1));
+  activation.setSeverity("MAJOR");
+  ruleActivator.activate(activation);
+  verifyOneActiveRule(XOO_PROFILE_KEY,XOO_RULE_1,Severity.MAJOR,null,ImmutableMap.of("max","10"));
+  QualityProfileKey childKey=QualityProfileKey.of("newChild","xoo");
+  db.qualityProfileDao().insert(dbSession,QualityProfileDto.createFor(childKey));
+  activation=new RuleActivation(ActiveRuleKey.of(childKey,XOO_RULE_2));
+  activation.setSeverity("MAJOR");
+  ruleActivator.activate(dbSession,activation);
+  dbSession.commit();
+  dbSession.clearCache();
+  ruleActivator.setParent(childKey,XOO_PROFILE_KEY);
+  assertThat(db.qualityProfileDao().getByKey(dbSession,childKey).getParentKey()).isEqualTo(XOO_PROFILE_KEY);
+  verifyHasActiveRule(ActiveRuleKey.of(childKey,XOO_RULE_1),Severity.MAJOR,ActiveRuleDto.INHERITED,ImmutableMap.of("max","10"));
+  verifyHasActiveRule(ActiveRuleKey.of(childKey,XOO_RULE_2),Severity.MAJOR,null,Collections.<String,String>emptyMap());
+  dbSession.clearCache();
+  ruleActivator.setParent(childKey,null);
+  assertThat(countActiveRules(childKey)).isEqualTo(1);
+  assertThat(db.qualityProfileDao().getByKey(dbSession,childKey).getParentKey()).isNull();
+  verifyHasActiveRule(ActiveRuleKey.of(childKey,XOO_RULE_2),Severity.MAJOR,null,Collections.<String,String>emptyMap());
+}

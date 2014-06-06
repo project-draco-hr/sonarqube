@@ -3,7 +3,13 @@
     profileDto.setParent(null);
     db.qualityProfileDao().update(dbSession,profileDto);
     for (    ActiveRuleDto activeRule : db.activeRuleDao().findByProfileKey(dbSession,profileDto.getKey())) {
-      deactivate(dbSession,activeRule.getKey());
+      if (ActiveRuleDto.INHERITED.equals(activeRule.getInheritance())) {
+        deactivate(dbSession,activeRule.getKey(),true);
+      }
+ else       if (ActiveRuleDto.OVERRIDES.equals(activeRule.getInheritance())) {
+        activeRule.setInheritance(null);
+        db.activeRuleDao().update(dbSession,activeRule);
+      }
     }
   }
 }

@@ -1,0 +1,34 @@
+{
+  boolean found=false;
+  List<ActiveRuleDto> activeRuleDtos=db.activeRuleDao().findByProfileKey(dbSession,activeRuleKey.qProfile());
+  for (  ActiveRuleDto activeRuleDto : activeRuleDtos) {
+    if (activeRuleDto.getKey().equals(activeRuleKey)) {
+      found=true;
+      assertThat(activeRuleDto.getSeverityString()).isEqualTo(expectedSeverity);
+      assertThat(activeRuleDto.getInheritance()).isEqualTo(expectedInheritance);
+      List<ActiveRuleParamDto> paramDtos=db.activeRuleDao().findParamsByActiveRuleKey(dbSession,activeRuleDto.getKey());
+      assertThat(paramDtos).hasSize(expectedParams.size());
+      for (      Map.Entry<String,String> entry : expectedParams.entrySet()) {
+        ActiveRuleParamDto paramDto=db.activeRuleDao().getParamByKeyAndName(activeRuleDto.getKey(),entry.getKey(),dbSession);
+        assertThat(paramDto).isNotNull();
+        assertThat(paramDto.getValue()).isEqualTo(entry.getValue());
+      }
+    }
+  }
+  assertThat(found).as("Rule is not activated in db").isTrue();
+  List<ActiveRule> activeRules=index.findByProfile(activeRuleKey.qProfile());
+  found=false;
+  for (  ActiveRule activeRule : activeRules) {
+    if (activeRule.key().equals(activeRuleKey)) {
+      found=true;
+      assertThat(activeRule.severity()).isEqualTo(expectedSeverity);
+      assertThat(activeRule.inheritance()).isEqualTo(expectedInheritance == null ? ActiveRule.Inheritance.NONE : ActiveRule.Inheritance.valueOf(expectedInheritance));
+      assertThat(activeRule.params()).hasSize(expectedParams.size());
+      for (      Map.Entry<String,String> entry : expectedParams.entrySet()) {
+        String value=activeRule.params().get(entry.getKey());
+        assertThat(value).isEqualTo(entry.getValue());
+      }
+    }
+  }
+  assertThat(found).as("Rule is not activated in index").isTrue();
+}

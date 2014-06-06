@@ -1,0 +1,12 @@
+{
+  ActiveRuleKey key=ActiveRuleKey.of(XOO_PROFILE_KEY,XOO_RULE_1);
+  RuleActivation activation=new RuleActivation(key);
+  ruleActivator.activate(activation);
+  RuleDto rule=db.ruleDao().getByKey(dbSession,XOO_RULE_1);
+  rule.setStatus(RuleStatus.REMOVED);
+  db.ruleDao().update(dbSession,rule);
+  dbSession.commit();
+  dbSession.clearCache();
+  ruleActivator.deactivate(key);
+  verifyZeroActiveRules(XOO_PROFILE_KEY);
+}
