@@ -3,8 +3,10 @@
   Multimap<String,String> results=ArrayListMultimap.create();
   DbSession dbSession=db.openSession(false);
   try {
-    RuleResult result=ruleIndex.search(ruleQuery,new QueryOptions().setMaxLimit().setFieldsToReturn(ImmutableSet.of(RuleNormalizer.RuleField.IS_TEMPLATE.field())));
-    for (    Rule rule : result.getHits()) {
+    RuleResult result=ruleIndex.search(ruleQuery,new QueryOptions().setScroll(true).setFieldsToReturn(ImmutableSet.of(RuleNormalizer.RuleField.IS_TEMPLATE.field())));
+    Iterator<Rule> rules=result.scroll();
+    while (rules.hasNext()) {
+      Rule rule=rules.next();
       if (!rule.isTemplate()) {
         ActiveRuleKey key=ActiveRuleKey.of(profileKey,rule.key());
         RuleActivation activation=new RuleActivation(key);
