@@ -1,0 +1,15 @@
+{
+  dao.insert(dbSession,newRuleDto(RuleKey.of("javascript","S001")));
+  dao.insert(dbSession,newRuleDto(RuleKey.of("java","S002")));
+  dbSession.commit();
+  Result results=index.search(new RuleQuery(),new QueryOptions().setScroll(true));
+  assertThat(results.getTotal()).isEqualTo(2);
+  assertThat(results.getHits()).hasSize(0);
+  Iterator<Rule> it=results.scroll();
+  int count=0;
+  while (it.hasNext()) {
+    count++;
+    it.next();
+  }
+  assertThat(count).isEqualTo(2);
+}

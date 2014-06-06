@@ -1,0 +1,19 @@
+{
+  if (query.getSortField() != null) {
+    FieldSortBuilder sort=SortBuilders.fieldSort(query.getSortField().sortField());
+    if (query.isAscendingSort()) {
+      sort.order(SortOrder.ASC);
+    }
+ else {
+      sort.order(SortOrder.DESC);
+    }
+    esSearch.addSort(sort);
+  }
+ else   if (query.getQueryText() != null && !query.getQueryText().isEmpty()) {
+    esSearch.addSort(SortBuilders.scoreSort());
+  }
+ else {
+    esSearch.addSort(RuleNormalizer.RuleField.UPDATED_AT.sortField(),SortOrder.DESC);
+    esSearch.addSort(RuleNormalizer.RuleField.KEY.sortField(),SortOrder.ASC);
+  }
+}
