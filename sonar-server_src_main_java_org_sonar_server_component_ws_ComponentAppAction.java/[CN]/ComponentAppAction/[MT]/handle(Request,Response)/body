@@ -15,11 +15,13 @@
     Date periodDate=periodDate(periodIndex,periodList);
     RulesAggregation rulesAggregation=issueService.findRulesByComponent(component.key(),periodDate,session);
     Multiset<String> severitiesAggregation=issueService.findSeveritiesByComponent(component.key(),periodDate,session);
+    Map<String,MeasureDto> measuresByMetricKey=measuresByMetricKey(component,session);
     appendComponent(json,component,userSession,session);
     appendPermissions(json,component,userSession);
     appendPeriods(json,periodList);
-    appendIssuesAggregation(json,rulesAggregation,severitiesAggregation,session);
-    appendMeasures(json,component,severitiesAggregation,periodIndex,session);
+    appendIssuesAggregation(json,rulesAggregation,severitiesAggregation);
+    appendMeasures(json,measuresByMetricKey,severitiesAggregation,periodIndex);
+    appendTabs(json,measuresByMetricKey);
     appendExtensions(json,component,userSession);
   }
   finally {
