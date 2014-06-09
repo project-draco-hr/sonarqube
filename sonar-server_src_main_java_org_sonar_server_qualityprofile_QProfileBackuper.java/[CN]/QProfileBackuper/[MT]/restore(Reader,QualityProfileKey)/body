@@ -1,6 +1,8 @@
 {
   try {
     String profileLang=null, profileName=null;
+    List<RuleActivation> ruleActivations=Lists.newArrayList();
+    QualityProfileKey targetKey;
     SMInputFactory inputFactory=initStax();
     SMHierarchicCursor rootC=inputFactory.rootElementCursor(reader);
     rootC.advance();
@@ -17,11 +19,13 @@
         profileLang=StringUtils.trim(cursor.collectDescendantText(false));
       }
  else       if (StringUtils.equals("rules",nodeName)) {
-        QualityProfileKey targetKey=(QualityProfileKey)ObjectUtils.defaultIfNull(profileKey,QualityProfileKey.of(profileName,profileLang));
+        targetKey=(QualityProfileKey)ObjectUtils.defaultIfNull(profileKey,QualityProfileKey.of(profileName,profileLang));
         SMInputCursor rulesCursor=cursor.childElementCursor("rule");
-        doRestore(rulesCursor,targetKey);
+        ruleActivations=parseRuleActivations(rulesCursor,targetKey);
       }
     }
+    targetKey=(QualityProfileKey)ObjectUtils.defaultIfNull(profileKey,QualityProfileKey.of(profileName,profileLang));
+    reset.reset(targetKey,ruleActivations);
   }
  catch (  XMLStreamException e) {
     throw new IllegalStateException("Fail to restore Quality profile backup",e);
