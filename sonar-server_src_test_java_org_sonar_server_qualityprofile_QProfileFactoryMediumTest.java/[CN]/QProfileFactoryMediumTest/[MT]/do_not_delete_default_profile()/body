@@ -1,0 +1,14 @@
+{
+  db.qualityProfileDao().insert(dbSession,QualityProfileDto.createFor(XOO_PROFILE_1));
+  tester.get(QProfileFactory.class).setDefault(dbSession,XOO_PROFILE_1);
+  dbSession.commit();
+  dbSession.clearCache();
+  try {
+    tester.get(QProfileFactory.class).delete(XOO_PROFILE_1);
+    fail();
+  }
+ catch (  BadRequestException e) {
+    assertThat(e).hasMessage("The profile marked as default can not be deleted: P1:xoo");
+    assertThat(db.qualityProfileDao().findAll(dbSession)).hasSize(1);
+  }
+}
