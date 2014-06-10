@@ -7,6 +7,9 @@
   this.addTermFilter(fb,RuleNormalizer.RuleField.SEVERITY.field(),query.getSeverities());
   this.addTermFilter(fb,RuleNormalizer.RuleField.KEY.field(),query.getKey());
   this.addTermFilter(fb,RuleNormalizer.RuleField._TAGS.field(),query.getTags());
+  if (query.getHasDebtCharacteristic() != null && query.getHasDebtCharacteristic()) {
+    fb.must(FilterBuilders.existsFilter(RuleNormalizer.RuleField.SUB_CHARACTERISTIC.field()));
+  }
   if (query.getAvailableSince() != null) {
     fb.must(FilterBuilders.rangeFilter(RuleNormalizer.RuleField.CREATED_AT.field()).gte(query.getAvailableSince()));
   }
