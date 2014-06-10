@@ -1,0 +1,19 @@
+{
+  final String testKey="message";
+  final String testValue="hello world";
+  service.write(dbSession,Log.Type.ACTIVE_RULE,new Loggable(){
+    @Override public Map<String,String> getDetails(){
+      return ImmutableMap.of(testKey,testValue);
+    }
+    @Override public Integer getExecutionTime(){
+      return 12;
+    }
+  }
+);
+  dbSession.commit();
+  assertThat(index.findAll().getTotal()).isEqualTo(1);
+  Log log=Iterables.getFirst(index.findAll().getHits(),null);
+  assertThat(log).isNotNull();
+  assertThat(log.details().get(testKey)).isEqualTo(testValue);
+  assertThat(log.executionTime()).isEqualTo(12);
+}

@@ -5,14 +5,15 @@
     @Override public Map<String,String> getDetails(){
       return ImmutableMap.of(testKey,testValue);
     }
-    @Override public Long getExecutionTime(){
-      return 12L;
+    @Override public Integer getExecutionTime(){
+      return 12;
     }
   }
 ).setAuthor("jUnit").setType(Log.Type.ACTIVE_RULE);
   dao.insert(session,log);
   LogDto newDto=dao.getByKey(session,log.getKey());
   assertThat(newDto.getAuthor()).isEqualTo(log.getAuthor());
+  assertThat(newDto.getExecutionTime()).isEqualTo(12);
   assertThat(newDto.getData()).isNotNull();
   Map<String,String> details=KeyValueFormat.parse(newDto.getData());
   assertThat(details.get(testKey)).isEqualTo(testValue);
