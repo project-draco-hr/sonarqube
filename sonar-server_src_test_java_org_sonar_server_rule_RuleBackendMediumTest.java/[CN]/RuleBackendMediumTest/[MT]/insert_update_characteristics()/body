@@ -1,8 +1,8 @@
 {
-  CharacteristicDto char1=DebtTesting.newCharacteristicDto("c1").setEnabled(true).setName("char1");
+  CharacteristicDto char1=DebtTesting.newCharacteristicDto("c1");
   db.debtCharacteristicDao().insert(char1,dbSession);
   dbSession.commit();
-  CharacteristicDto char11=DebtTesting.newCharacteristicDto("c11").setEnabled(true).setName("char11").setParentId(char1.getId());
+  CharacteristicDto char11=DebtTesting.newCharacteristicDto("c11").setParentId(char1.getId());
   db.debtCharacteristicDao().insert(char11,dbSession);
   RuleKey ruleKey=RuleKey.of("test","r1");
   RuleDto ruleDto=newRuleDto(ruleKey).setDefaultSubCharacteristicId(char11.getId());
@@ -15,9 +15,9 @@
   Rule rule=index.getByKey(ruleKey);
   assertThat(rule.debtCharacteristicKey()).isEqualTo(char1.getKey());
   assertThat(rule.debtSubCharacteristicKey()).isEqualTo(char11.getKey());
-  CharacteristicDto char2=new CharacteristicDto().setEnabled(true).setKey("c2").setName("char2");
+  CharacteristicDto char2=DebtTesting.newCharacteristicDto("c2");
   db.debtCharacteristicDao().insert(char2,dbSession);
-  CharacteristicDto char21=new CharacteristicDto().setEnabled(true).setKey("c21").setName("char21").setParentId(char2.getId());
+  CharacteristicDto char21=DebtTesting.newCharacteristicDto("c21").setParentId(char2.getId());
   db.debtCharacteristicDao().insert(char21,dbSession);
   ruleDto.setSubCharacteristicId(char21.getId());
   dao.update(dbSession,ruleDto);
