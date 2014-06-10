@@ -1,0 +1,15 @@
+{
+  SearchRequestBuilder esSearch=getClient().prepareSearch(this.getIndexName()).setTypes(this.getIndexType()).setIndices(this.getIndexName());
+  esSearch.setQuery(QueryBuilders.matchAllQuery());
+  if (options.isScroll()) {
+    esSearch.setSearchType(SearchType.SCAN);
+    esSearch.setScroll(TimeValue.timeValueMinutes(3));
+  }
+  SearchResponse esResult=esSearch.get();
+  if (options.isScroll()) {
+    return new LogResult(this,esResult);
+  }
+ else {
+    return new LogResult(esResult);
+  }
+}
