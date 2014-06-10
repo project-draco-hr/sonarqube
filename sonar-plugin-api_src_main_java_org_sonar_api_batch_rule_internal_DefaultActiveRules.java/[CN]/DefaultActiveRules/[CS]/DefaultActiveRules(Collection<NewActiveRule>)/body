@@ -1,8 +1,13 @@
 {
-  ImmutableListMultimap.Builder<String,ActiveRule> builder=ImmutableListMultimap.builder();
+  ImmutableListMultimap.Builder<String,ActiveRule> repoBuilder=ImmutableListMultimap.builder();
+  ImmutableListMultimap.Builder<String,ActiveRule> langBuilder=ImmutableListMultimap.builder();
   for (  NewActiveRule newAR : newActiveRules) {
     DefaultActiveRule ar=new DefaultActiveRule(newAR);
-    builder.put(ar.ruleKey().repository(),ar);
+    repoBuilder.put(ar.ruleKey().repository(),ar);
+    if (ar.language() != null) {
+      langBuilder.put(ar.language(),ar);
+    }
   }
-  activeRulesByRepository=builder.build();
+  activeRulesByRepository=repoBuilder.build();
+  activeRulesByLanguage=langBuilder.build();
 }
