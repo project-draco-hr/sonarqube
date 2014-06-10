@@ -1,19 +1,22 @@
 {
-  insertDebtCharacteristics(dbSession);
-  RuleDto ruledto=db.ruleDao().insert(dbSession,RuleTesting.newDto(RULE_KEY).setName("Old name").setDescription("Old description").setSeverity("MINOR").setStatus(RuleStatus.BETA));
-  RuleParamDto ruleParamDto=RuleParamDto.createFor(ruledto).setName("regex").setType("STRING").setDescription("Reg ex").setDefaultValue(".*");
-  db.ruleDao().addRuleParam(dbSession,ruledto,ruleParamDto);
+  RuleDto templateRule=RuleTesting.newTemplateRule(RuleKey.of("java","S001"));
+  ruleDao.insert(dbSession,templateRule);
+  RuleParamDto templateRuleParam=RuleParamDto.createFor(templateRule).setName("regex").setType("STRING").setDescription("Reg ex").setDefaultValue(".*");
+  ruleDao.addRuleParam(dbSession,templateRule,templateRuleParam);
+  RuleDto customRule=RuleTesting.newCustomRule(templateRule).setName("Old name").setDescription("Old description").setSeverity(Severity.MINOR).setStatus(RuleStatus.BETA);
+  ruleDao.insert(dbSession,customRule);
+  ruleDao.addRuleParam(dbSession,customRule,templateRuleParam.setDefaultValue("a.*"));
   dbSession.commit();
-  RuleUpdate update=RuleUpdate.createForCustomRule(RULE_KEY).setName("New name").setHtmlDescription("New description").setSeverity("MAJOR").setStatus(RuleStatus.READY).setParameters(ImmutableMap.of("regex","a.*"));
+  RuleUpdate update=RuleUpdate.createForCustomRule(customRule.getKey()).setName("New name").setHtmlDescription("New description").setSeverity("MAJOR").setStatus(RuleStatus.READY).setParameters(ImmutableMap.of("regex","b.*"));
   updater.update(update,UserSession.get());
   dbSession.clearCache();
-  RuleDto rule=db.ruleDao().getNullableByKey(dbSession,RULE_KEY);
-  assertThat(rule.getName()).isEqualTo("New name");
-  assertThat(rule.getDescription()).isEqualTo("New description");
-  assertThat(rule.getSeverityString()).isEqualTo("MAJOR");
-  assertThat(rule.getStatus()).isEqualTo(RuleStatus.READY);
-  List<RuleParamDto> params=db.ruleDao().findRuleParamsByRuleKey(dbSession,RULE_KEY);
-  assertThat(params).hasSize(1);
-  RuleParamDto param=params.get(0);
-  assertThat(param.getDefaultValue()).isEqualTo("a.*");
+  Rule customRuleReloaded=ruleIndex.getByKey(customRule.getKey());
+  assertThat(customRuleReloaded).isNotNull();
+  assertThat(customRuleReloaded.name()).isEqualTo("New name");
+  assertThat(customRuleReloaded.htmlDescription()).isEqualTo("New description");
+  assertThat(customRuleReloaded.severity()).isEqualTo("MAJOR");
+  assertThat(customRuleReloaded.status()).isEqualTo(RuleStatus.READY);
+  assertThat(customRuleReloaded.params()).hasSize(1);
+  RuleParam param=customRuleReloaded.params().get(0);
+  assertThat(param.defaultValue()).isEqualTo("b.*");
 }

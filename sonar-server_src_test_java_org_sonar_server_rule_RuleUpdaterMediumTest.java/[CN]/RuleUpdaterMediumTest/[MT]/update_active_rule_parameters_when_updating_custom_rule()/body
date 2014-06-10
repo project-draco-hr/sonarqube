@@ -1,0 +1,20 @@
+{
+  RuleDto templateRule=RuleTesting.newTemplateRule(RuleKey.of("java","S001")).setLanguage("xoo");
+  ruleDao.insert(dbSession,templateRule);
+  RuleParamDto templateRuleParam=RuleParamDto.createFor(templateRule).setName("regex").setType("STRING").setDescription("Reg ex").setDefaultValue(".*");
+  ruleDao.addRuleParam(dbSession,templateRule,templateRuleParam);
+  RuleDto customRule=RuleTesting.newCustomRule(templateRule).setSeverity(Severity.MAJOR).setLanguage("xoo");
+  ruleDao.insert(dbSession,customRule);
+  ruleDao.addRuleParam(dbSession,customRule,templateRuleParam.setDefaultValue("a.*"));
+  QualityProfileKey qualityProfileKey=QualityProfileKey.of("P1","xoo");
+  QualityProfileDto profileDto=QualityProfileDto.createFor(qualityProfileKey);
+  db.qualityProfileDao().insert(dbSession,profileDto);
+  dbSession.commit();
+  tester.get(RuleActivator.class).activate(new RuleActivation(ActiveRuleKey.of(profileDto.getKey(),customRule.getKey())).setSeverity(Severity.BLOCKER));
+  dbSession.clearCache();
+  RuleUpdate update=RuleUpdate.createForCustomRule(customRule.getKey()).setParameters(ImmutableMap.of("regex","b.*"));
+  updater.update(update,UserSession.get());
+  ActiveRule activeRule=tester.get(ActiveRuleIndex.class).getByKey(ActiveRuleKey.of(qualityProfileKey,customRule.getKey()));
+  assertThat(activeRule.params().get("regex")).isEqualTo("b.*");
+  assertThat(activeRule.severity()).isEqualTo(Severity.BLOCKER);
+}
