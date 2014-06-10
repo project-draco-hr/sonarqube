@@ -1,11 +1,17 @@
 {
   RuleKey templateRuleKey=RuleKey.of("java","S001");
-  dao.insert(dbSession,RuleTesting.newDto(templateRuleKey).setCardinality(Cardinality.MULTIPLE));
+  dao.insert(dbSession,RuleTesting.newDto(templateRuleKey).setCardinality(Cardinality.MULTIPLE).setLanguage("xoo"));
   dbSession.commit();
   NewRule newRule=new NewRule().setTemplateKey(templateRuleKey).setName("My custom").setHtmlDescription("Some description").setSeverity(Severity.MAJOR).setStatus(RuleStatus.READY).setParameters(ImmutableMap.of("regex","a.*"));
   RuleKey customRuleKey=creator.create(newRule);
+  QualityProfileDto profileDto=QualityProfileDto.createFor(QualityProfileKey.of("P1","xoo"));
+  db.qualityProfileDao().insert(dbSession,profileDto);
+  dbSession.commit();
+  tester.get(RuleActivator.class).activate(new RuleActivation(ActiveRuleKey.of(profileDto.getKey(),customRuleKey)).setSeverity(Severity.BLOCKER));
   deleter.delete(customRuleKey);
   Rule customRuleReloaded=index.getByKey(customRuleKey);
   assertThat(customRuleReloaded).isNotNull();
   assertThat(customRuleReloaded.status()).isEqualTo(RuleStatus.REMOVED);
+  List<ActiveRule> activeRules=tester.get(ActiveRuleIndex.class).findByProfile(profileDto.getKey());
+  assertThat(activeRules).isEmpty();
 }
