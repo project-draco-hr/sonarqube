@@ -2,19 +2,27 @@
   DbSession dbSession=dbClient.openSession(true);
   try {
     List<Map<String,Object>> requirementDtos=dbSession.getMapper(CharacteristicMapper.class).selectDeprecatedRequirements();
-    final Multimap<Number,RequirementDto> requirementsByRuleId=ArrayListMultimap.create();
-    for (    Map<String,Object> map : requirementDtos) {
-      RequirementDto requirementDto=new RequirementDto(map);
-      requirementsByRuleId.put(requirementDto.getRuleId(),requirementDto);
+    if (requirementDtos.isEmpty()) {
+      LOGGER.info("No requirement will be copied",requirementDtos);
     }
-    List<RuleDto> rules=dbClient.ruleDao().findAll(dbSession);
-    for (    RuleDto rule : rules) {
-      Collection<RequirementDto> requirementsForRule=requirementsByRuleId.get(rule.getId());
-      if (!requirementsForRule.isEmpty()) {
-        convert(rule,requirementsForRule,dbSession);
+ else {
+      int requirementCopied=0;
+      final Multimap<Number,RequirementDto> requirementsByRuleId=ArrayListMultimap.create();
+      for (      Map<String,Object> map : requirementDtos) {
+        RequirementDto requirementDto=new RequirementDto(map);
+        requirementsByRuleId.put(requirementDto.getRuleId(),requirementDto);
       }
+      List<RuleDto> rules=dbClient.ruleDao().findAll(dbSession);
+      for (      RuleDto rule : rules) {
+        Collection<RequirementDto> requirementsForRule=requirementsByRuleId.get(rule.getId());
+        if (!requirementsForRule.isEmpty()) {
+          convert(rule,requirementsForRule,dbSession);
+          requirementCopied++;
+        }
+      }
+      dbSession.commit();
+      LOGGER.info("{} requirements have been found, {} have be copied",requirementDtos.size(),requirementCopied);
     }
-    dbSession.commit();
   }
   finally {
     MyBatis.closeQuietly(dbSession);
