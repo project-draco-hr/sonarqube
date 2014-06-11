@@ -3,30 +3,37 @@
   context.verifyForActivation();
   List<ActiveRuleChange> changes=Lists.newArrayList();
   ActiveRuleChange change;
+  boolean stopPropagation=false;
   if (context.activeRule() == null) {
     change=new ActiveRuleChange(ActiveRuleChange.Type.ACTIVATED,activation.getKey());
     if (activation.isCascade() || context.isSameAsParent(activation)) {
       change.setInheritance(ActiveRule.Inheritance.INHERITED);
     }
+    applySeverityAndParamToChange(activation,context,change);
   }
  else {
-    change=new ActiveRuleChange(ActiveRuleChange.Type.UPDATED,activation.getKey());
     if (activation.isCascade() && context.activeRule().doesOverride()) {
       return changes;
     }
-    if (!activation.isCascade() && context.parentProfile() != null) {
-      change.setInheritance(context.isSameAsParent(activation) ? ActiveRule.Inheritance.INHERITED : ActiveRule.Inheritance.OVERRIDES);
+    change=new ActiveRuleChange(ActiveRuleChange.Type.UPDATED,activation.getKey());
+    if (activation.isCascade() && context.activeRule().getInheritance() == null) {
+      change.setInheritance(ActiveRule.Inheritance.OVERRIDES);
+      change.setSeverity(context.activeRule().getSeverityString());
+      change.setParameters(context.activeRuleParamsAsStringMap());
+      stopPropagation=true;
     }
-  }
-  change.setSeverity(StringUtils.defaultIfEmpty(activation.getSeverity(),context.defaultSeverity()));
-  for (  RuleParamDto ruleParamDto : context.ruleParams()) {
-    String value=StringUtils.defaultIfEmpty(activation.getParameters().get(ruleParamDto.getName()),context.defaultParam(ruleParamDto.getName()));
-    verifyParam(ruleParamDto,value);
-    change.setParameter(ruleParamDto.getName(),StringUtils.defaultIfEmpty(value,ruleParamDto.getDefaultValue()));
+ else {
+      applySeverityAndParamToChange(activation,context,change);
+      if (!activation.isCascade() && context.parentProfile() != null) {
+        change.setInheritance(context.isSameAsParent(activation) ? ActiveRule.Inheritance.INHERITED : ActiveRule.Inheritance.OVERRIDES);
+      }
+    }
   }
   changes.add(change);
   persist(change,context,dbSession);
-  changes.addAll(cascadeActivation(dbSession,activation));
+  if (!stopPropagation) {
+    changes.addAll(cascadeActivation(dbSession,activation));
+  }
   if (!changes.isEmpty()) {
     log.write(dbSession,Log.Type.ACTIVE_RULE,changes);
     dbSession.commit();
