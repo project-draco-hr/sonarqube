@@ -3,12 +3,14 @@
   try {
     RuleKey templateKey=newRule.templateKey();
     if (templateKey != null) {
-      RuleDto templateRule=dbClient.ruleDao().getByKey(dbSession,newRule.templateKey());
+      RuleDto templateRule=dbClient.ruleDao().getByKey(dbSession,templateKey);
       if (!Cardinality.MULTIPLE.equals(templateRule.getCardinality())) {
         throw new IllegalArgumentException("This rule is not a template rule: " + templateKey.toString());
       }
       validateRule(newRule);
-      RuleKey customRuleKey=createCustomRule(newRule,templateRule,dbSession);
+      RuleKey customRuleKey=RuleKey.of(templateRule.getRepositoryKey(),newRule.ruleKey());
+      checkRuleKeyUnicity(customRuleKey,dbSession);
+      createCustomRule(customRuleKey,newRule,templateRule,dbSession);
       dbSession.commit();
       return customRuleKey;
     }
