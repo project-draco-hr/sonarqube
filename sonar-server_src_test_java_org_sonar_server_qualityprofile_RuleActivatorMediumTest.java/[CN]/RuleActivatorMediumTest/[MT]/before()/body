@@ -7,11 +7,15 @@
   RuleDto javaRule=RuleTesting.newDto(RuleKey.of("squid","j1")).setSeverity("MAJOR").setLanguage("java");
   RuleDto xooRule1=RuleTesting.newDto(XOO_RULE_1).setSeverity("MINOR").setLanguage("xoo");
   RuleDto xooRule2=RuleTesting.newDto(XOO_RULE_2).setLanguage("xoo");
-  RuleDto xooTemplateRule1=RuleTesting.newDto(RuleKey.of("xoo","template1")).setSeverity("MINOR").setLanguage("xoo").setCardinality(Cardinality.MULTIPLE);
+  RuleDto xooTemplateRule1=RuleTesting.newTemplateRule(TEMPLATE_RULE_KEY).setSeverity("MINOR").setLanguage("xoo");
   RuleDto manualRule=RuleTesting.newDto(MANUAL_RULE_KEY);
   db.ruleDao().insert(dbSession,javaRule,xooRule1,xooRule2,xooTemplateRule1,manualRule);
   db.ruleDao().addRuleParam(dbSession,xooRule1,RuleParamDto.createFor(xooRule1).setName("max").setDefaultValue("10").setType(RuleParamType.INTEGER.type()));
   db.ruleDao().addRuleParam(dbSession,xooRule1,RuleParamDto.createFor(xooRule1).setName("min").setType(RuleParamType.INTEGER.type()));
+  db.ruleDao().addRuleParam(dbSession,xooTemplateRule1,RuleParamDto.createFor(xooTemplateRule1).setName("format").setType(RuleParamType.STRING.type()));
+  RuleDto xooCustomRule1=RuleTesting.newCustomRule(xooTemplateRule1).setRuleKey(CUSTOM_RULE_KEY.rule()).setSeverity("MINOR").setLanguage("xoo");
+  db.ruleDao().insert(dbSession,xooCustomRule1);
+  db.ruleDao().addRuleParam(dbSession,xooTemplateRule1,RuleParamDto.createFor(xooTemplateRule1).setName("format").setDefaultValue("txt").setType(RuleParamType.STRING.type()));
   db.qualityProfileDao().insert(dbSession,QualityProfileDto.createFor(XOO_PROFILE_KEY));
   dbSession.commit();
   dbSession.clearCache();
