@@ -1,8 +1,10 @@
 {
-  ActiveRuleChange change=new ActiveRuleChange().setInheritance(ActiveRule.Inheritance.INHERITED).setSeverity("BLOCKER").setParameter("param1","value1");
+  ActiveRuleKey key=ActiveRuleKey.of(QualityProfileKey.of("profile","java"),RuleKey.of("repository","rule"));
+  ActiveRuleChange change=ActiveRuleChange.createFor(ActiveRuleChange.Type.ACTIVATED,key).setInheritance(ActiveRule.Inheritance.INHERITED).setSeverity("BLOCKER").setParameter("param1","value1");
   service.write(dbSession,Log.Type.ACTIVE_RULE,change);
   dbSession.commit();
   assertThat(index.findAll().getHits()).hasSize(1);
   Log log=Iterables.getFirst(index.findAll().getHits(),null);
   assertThat(log).isNotNull();
+  assertThat(log.details().get("key")).isEqualTo(key.toString());
 }
