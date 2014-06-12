@@ -1,9 +1,12 @@
 {
   try {
     long t0=System.currentTimeMillis();
-    List<UpdateRequest> request=normalizer.normalize(item);
+    List<UpdateRequest> requests=normalizer.normalize(item);
+    for (    DTO additionalItem : items) {
+      requests.addAll(normalizer.normalize(additionalItem));
+    }
     long t1=System.currentTimeMillis();
-    this.updateDocument(request,item.getKey());
+    this.updateDocument(requests,item.getKey());
     long t2=System.currentTimeMillis();
     LOG.debug("UPSERT [dto] time:{}ms ({}ms normalize, {}ms elastic)",t2 - t0,t1 - t0,t2 - t1);
   }

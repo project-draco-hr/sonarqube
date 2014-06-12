@@ -1,4 +1,8 @@
 {
   LOG.debug("DELETE NESTED _id:{} in index {}",key,this.getIndexName());
-  this.updateDocument(this.normalizer.deleteNested(object,key),key);
+  List<UpdateRequest> requests=this.normalizer.deleteNested(object,key);
+  for (  Object additionalObject : objects) {
+    requests.addAll(this.normalizer.deleteNested(additionalObject,key));
+  }
+  this.updateDocument(requests,key);
 }
