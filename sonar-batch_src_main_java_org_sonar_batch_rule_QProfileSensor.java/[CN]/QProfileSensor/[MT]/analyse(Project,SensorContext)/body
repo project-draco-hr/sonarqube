@@ -1,7 +1,7 @@
 {
-  List<ModuleQProfiles.QProfile> profiles=Lists.newArrayList();
+  List<QProfileWithId> profiles=Lists.newArrayList();
   for (  String language : fs.languages()) {
-    ModuleQProfiles.QProfile qProfile=moduleQProfiles.findByLanguage(language);
+    QProfileWithId qProfile=(QProfileWithId)moduleQProfiles.findByLanguage(language);
     if (qProfile != null) {
       dao.updateUsedColumn(qProfile.id(),true);
       profiles.add(qProfile);
@@ -11,7 +11,7 @@
   Measure detailsMeasure=new Measure(CoreMetrics.QUALITY_PROFILES,used.toJSON());
   context.saveMeasure(detailsMeasure);
   if (profiles.size() == 1) {
-    ModuleQProfiles.QProfile qProfile=profiles.get(0);
+    QProfileWithId qProfile=profiles.get(0);
     Measure measure=new Measure(CoreMetrics.PROFILE,qProfile.name()).setValue((double)qProfile.id());
     Measure measureVersion=new Measure(CoreMetrics.PROFILE_VERSION,qProfile.version().doubleValue());
     context.saveMeasure(measure);

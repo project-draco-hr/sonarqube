@@ -1,0 +1,25 @@
+{
+  doPreloadFiles();
+  if (predicate instanceof RelativePathPredicate) {
+    return cache.inputFile((RelativePathPredicate)predicate);
+  }
+  Iterable<InputFile> files=inputFiles(predicate);
+  Iterator<InputFile> iterator=files.iterator();
+  if (!iterator.hasNext()) {
+    return null;
+  }
+  InputFile first=iterator.next();
+  if (!iterator.hasNext()) {
+    return first;
+  }
+  StringBuilder sb=new StringBuilder();
+  sb.append("expected one element but was: <" + first);
+  for (int i=0; i < 4 && iterator.hasNext(); i++) {
+    sb.append(", " + iterator.next());
+  }
+  if (iterator.hasNext()) {
+    sb.append(", ...");
+  }
+  sb.append('>');
+  throw new IllegalArgumentException(sb.toString());
+}
