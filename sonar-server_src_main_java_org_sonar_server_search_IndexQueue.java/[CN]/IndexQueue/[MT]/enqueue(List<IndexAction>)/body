@@ -1,12 +1,27 @@
 {
+  int bcount=0;
+  int ecount=0;
+  List<String> refreshes=Lists.newArrayList();
+  Set<String> types=Sets.newHashSet();
+  long all_start=System.currentTimeMillis();
+  long indexTime;
+  long refreshTime;
+  long embeddedTime;
   if (actions.size() == 1) {
     CountDownLatch latch=new CountDownLatch(1);
     IndexAction action=actions.get(0);
     action.setLatch(latch);
     try {
+      indexTime=System.currentTimeMillis();
       this.offer(action,1000,TimeUnit.SECONDS);
-      latch.await(1500,TimeUnit.MILLISECONDS);
+      latch.await(1000,TimeUnit.MILLISECONDS);
+      bcount++;
+      indexTime=System.currentTimeMillis() - indexTime;
+      refreshTime=System.currentTimeMillis();
       action.getIndex().refresh();
+      refreshTime=System.currentTimeMillis() - refreshTime;
+      refreshes.add(action.getIndex().getIndexName());
+      types.add(action.getPayloadClass().getSimpleName());
     }
  catch (    InterruptedException e) {
       throw new IllegalStateException("ES update has been interrupted",e);
@@ -42,27 +57,39 @@
     try {
       Multimap<String,IndexAction> itemBulks=makeBulkByType(itemActions);
       CountDownLatch itemLatch=new CountDownLatch(itemBulks.size());
+      indexTime=System.currentTimeMillis();
       for (      IndexAction action : itemBulks.values()) {
         action.setLatch(itemLatch);
         this.offer(action,1000,TimeUnit.SECONDS);
+        types.add(action.getPayloadClass().getSimpleName());
+        bcount++;
       }
-      itemLatch.await(1500,TimeUnit.MILLISECONDS);
+      itemLatch.await(2000,TimeUnit.MILLISECONDS);
+      indexTime=System.currentTimeMillis() - indexTime;
       CountDownLatch embeddedLatch=new CountDownLatch(embeddedActions.size());
+      embeddedTime=System.currentTimeMillis();
       for (      IndexAction action : embeddedActions) {
         action.setLatch(embeddedLatch);
         this.offer(action,1000,TimeUnit.SECONDS);
+        types.add(action.getPayloadClass().getSimpleName());
+        ecount++;
       }
       embeddedLatch.await(1500,TimeUnit.MILLISECONDS);
+      embeddedTime=System.currentTimeMillis() - embeddedTime;
       Set<String> refreshedIndexes=new HashSet<String>();
+      refreshTime=System.currentTimeMillis();
       for (      IndexAction action : actions) {
         if (action.getIndex() != null && !refreshedIndexes.contains(action.getIndex().getIndexName())) {
-          action.getIndex().refresh();
           refreshedIndexes.add(action.getIndex().getIndexName());
+          action.getIndex().refresh();
+          refreshes.add(action.getIndex().getIndexName());
         }
       }
+      refreshTime=System.currentTimeMillis() - refreshTime;
     }
  catch (    InterruptedException e) {
       throw new IllegalStateException("ES update has been interrupted",e);
     }
+    LOGGER.debug("INDEX - time:{}ms ({}ms index, {}ms embedded, {}ms refresh)\ttypes:[{}],\tbulk:{}\tembedded:{}\trefresh:[{}]",(System.currentTimeMillis() - all_start),indexTime,embeddedTime,refreshTime,StringUtils.join(types,","),bcount,ecount,StringUtils.join(refreshes,","));
   }
 }
