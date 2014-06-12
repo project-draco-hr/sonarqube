@@ -1,5 +1,6 @@
 {
   final ComponentContainer startupContainer=pico.createChild();
+  startupContainer.addSingleton(IndexSynchronizer.class);
   startupContainer.addSingleton(GwtPublisher.class);
   startupContainer.addSingleton(RegisterMetrics.class);
   startupContainer.addSingleton(RegisterQualityGates.class);
@@ -18,6 +19,7 @@
   startupContainer.addSingleton(CopyRequirementsFromCharacteristicsToRules.class);
   DoPrivileged.execute(new DoPrivileged.Task(){
     @Override protected void doPrivileged(){
+      startupContainer.getComponentsByType(IndexSynchronizer.class).get(0).execute();
       startupContainer.startComponents();
       startupContainer.getComponentByType(ServerLifecycleNotifier.class).notifyStart();
     }
