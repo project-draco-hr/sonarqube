@@ -1,20 +1,19 @@
 {
   DbSession dbSession=dbClient.openSession(true);
   try {
-    List<Map<String,Object>> requirementDtos=dbSession.getMapper(CharacteristicMapper.class).selectDeprecatedRequirements();
+    List<RequirementMigrationDto> requirementDtos=dbSession.getMapper(CharacteristicMapper.class).selectDeprecatedRequirements();
     if (requirementDtos.isEmpty()) {
       LOGGER.info("No requirement will be copied",requirementDtos);
     }
  else {
       int requirementCopied=0;
-      final Multimap<Number,RequirementDto> requirementsByRuleId=ArrayListMultimap.create();
-      for (      Map<String,Object> map : requirementDtos) {
-        RequirementDto requirementDto=new RequirementDto(map);
+      final Multimap<Integer,RequirementMigrationDto> requirementsByRuleId=ArrayListMultimap.create();
+      for (      RequirementMigrationDto requirementDto : requirementDtos) {
         requirementsByRuleId.put(requirementDto.getRuleId(),requirementDto);
       }
       List<RuleDto> rules=dbClient.ruleDao().findAll(dbSession);
       for (      RuleDto rule : rules) {
-        Collection<RequirementDto> requirementsForRule=requirementsByRuleId.get(rule.getId());
+        Collection<RequirementMigrationDto> requirementsForRule=requirementsByRuleId.get(rule.getId());
         if (!requirementsForRule.isEmpty()) {
           convert(rule,requirementsForRule,dbSession);
           requirementCopied++;
