@@ -1,22 +1,22 @@
 {
+  BulkChangeResult result=new BulkChangeResult();
   RuleIndex ruleIndex=index.get(RuleIndex.class);
-  Multimap<String,String> results=ArrayListMultimap.create();
   DbSession dbSession=db.openSession(false);
   try {
-    RuleResult result=ruleIndex.search(ruleQuery,new QueryOptions().setScroll(true).setFieldsToReturn(ImmutableSet.of(RuleNormalizer.RuleField.IS_TEMPLATE.field())));
-    Iterator<Rule> rules=result.scroll();
+    RuleResult ruleSearchResult=ruleIndex.search(ruleQuery,new QueryOptions().setScroll(true));
+    Iterator<Rule> rules=ruleSearchResult.scroll();
     while (rules.hasNext()) {
       Rule rule=rules.next();
-      if (!rule.isTemplate()) {
+      try {
         ActiveRuleKey key=ActiveRuleKey.of(profileKey,rule.key());
         RuleActivation activation=new RuleActivation(key);
         activation.setSeverity(severity);
-        for (        ActiveRuleChange active : activate(dbSession,activation)) {
-          results.put(ACTIVATED,active.getKey().ruleKey().toString());
-        }
+        List<ActiveRuleChange> changes=activate(dbSession,activation);
+        result.addChanges(changes);
+        result.incrementSucceeded();
       }
- else {
-        results.put(IGNORED,rule.key().toString());
+ catch (      BadRequestException e) {
+        result.incrementFailed();
       }
     }
     dbSession.commit();
@@ -24,5 +24,5 @@
   finally {
     dbSession.close();
   }
-  return results;
+  return result;
 }

@@ -1,4 +1,5 @@
 {
+  BulkChangeResult result=new BulkChangeResult();
   Set<RuleKey> rulesToDeactivate=Sets.newHashSet();
   DbSession dbSession=db.openSession(false);
   try {
@@ -14,17 +15,24 @@
     }
     for (    RuleActivation activation : activations) {
       try {
-        activator.activate(dbSession,activation);
+        List<ActiveRuleChange> changes=activator.activate(dbSession,activation);
         rulesToDeactivate.remove(activation.getKey().ruleKey());
+        result.incrementSucceeded();
+        result.addChanges(changes);
       }
  catch (      BadRequestException e) {
-        LoggerFactory.getLogger(getClass()).warn(e.getMessage());
+        result.incrementFailed();
       }
     }
     for (    RuleKey ruleKey : rulesToDeactivate) {
-      activator.deactivate(dbSession,ActiveRuleKey.of(profileKey,ruleKey));
+      try {
+        activator.deactivate(dbSession,ActiveRuleKey.of(profileKey,ruleKey));
+      }
+ catch (      BadRequestException e) {
+      }
     }
     dbSession.commit();
+    return result;
   }
   finally {
     dbSession.close();
