@@ -1,0 +1,12 @@
+{
+  List<QualityProfileKey> keys=Lists.newArrayList();
+  for (  QualityProfileDto profile : this.findAll()) {
+    keys.add(profile.getKey());
+  }
+  Multimap<QualityProfileKey,FacetValue> stats=ArrayListMultimap.create();
+  Collection<FacetValue> profilesStats=index.get(ActiveRuleIndex.class).getStatsByProfileKey(keys);
+  for (  FacetValue profileStat : profilesStats) {
+    stats.put(QualityProfileKey.parse(profileStat.getKey()),profileStat);
+  }
+  return stats;
+}

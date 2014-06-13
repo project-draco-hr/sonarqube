@@ -1,0 +1,13 @@
+{
+  Multimap<String,FacetValue> stats=ArrayListMultimap.create();
+  if (aggregations != null) {
+    for (    Aggregation aggregation : aggregations.asList()) {
+      for (      Terms.Bucket value : ((Terms)aggregation).getBuckets()) {
+        FacetValue facetValue=new FacetValue(value.getKey(),(int)value.getDocCount());
+        facetValue.setSubFacets(processAggregations(value.getAggregations()));
+        stats.put(aggregation.getName(),facetValue);
+      }
+    }
+  }
+  return stats;
+}
