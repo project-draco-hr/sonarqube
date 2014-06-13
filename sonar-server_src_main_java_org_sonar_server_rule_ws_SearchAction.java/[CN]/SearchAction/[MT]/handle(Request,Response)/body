@@ -3,12 +3,12 @@
   SearchOptions searchOptions=SearchOptions.create(request);
   QueryOptions queryOptions=mapping.newQueryOptions(searchOptions);
   queryOptions.setFacet(request.mandatoryParamAsBoolean(PARAM_FACETS));
-  RuleResult results=ruleService.search(query,queryOptions);
+  Result<Rule> results=ruleService.search(query,queryOptions);
   JsonWriter json=response.newJsonWriter().beginObject();
   searchOptions.writeStatistics(json,results);
   writeRules(results,json,searchOptions);
   if (searchOptions.hasField("actives")) {
-    activeRuleCompleter.completeSearch(query,results.getRules(),json);
+    activeRuleCompleter.completeSearch(query,results.getHits(),json);
   }
   if (queryOptions.isFacet()) {
     writeFacets(results,json);
