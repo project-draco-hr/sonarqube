@@ -1,9 +1,11 @@
 {
   change.setSeverity(StringUtils.defaultIfEmpty(activation.getSeverity(),context.defaultSeverity()));
-  verifyParametersAreNotSetOnCustomRule(context,activation,change);
   for (  RuleParamDto ruleParamDto : context.ruleParams()) {
-    String value=StringUtils.defaultIfEmpty(activation.getParameters().get(ruleParamDto.getName()),context.defaultParam(ruleParamDto.getName()));
-    verifyParam(ruleParamDto,value);
+    String value=null;
+    if (context.rule().getTemplateId() == null) {
+      value=StringUtils.defaultIfEmpty(activation.getParameters().get(ruleParamDto.getName()),context.defaultParam(ruleParamDto.getName()));
+      verifyParam(ruleParamDto,value);
+    }
     change.setParameter(ruleParamDto.getName(),StringUtils.defaultIfEmpty(value,ruleParamDto.getDefaultValue()));
   }
 }
