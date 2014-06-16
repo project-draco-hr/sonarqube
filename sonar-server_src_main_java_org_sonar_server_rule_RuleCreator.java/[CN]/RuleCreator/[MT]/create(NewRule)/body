@@ -7,14 +7,21 @@
       if (!templateRule.isTemplate()) {
         throw new IllegalArgumentException("This rule is not a template rule: " + templateKey.toString());
       }
-      validateRule(newRule);
+      validateCustomRule(newRule);
       RuleKey customRuleKey=RuleKey.of(templateRule.getRepositoryKey(),newRule.ruleKey());
       checkRuleKeyUnicity(customRuleKey,dbSession);
       createCustomRule(customRuleKey,newRule,templateRule,dbSession);
       dbSession.commit();
       return customRuleKey;
     }
-    throw new IllegalArgumentException("Not supported");
+ else {
+      validateManualRule(newRule);
+      RuleKey customRuleKey=RuleKey.of(RuleDoc.MANUAL_REPOSITORY,newRule.ruleKey());
+      checkRuleKeyUnicity(customRuleKey,dbSession);
+      createManualRule(customRuleKey,newRule,dbSession);
+      dbSession.commit();
+      return customRuleKey;
+    }
   }
   finally {
     dbSession.close();

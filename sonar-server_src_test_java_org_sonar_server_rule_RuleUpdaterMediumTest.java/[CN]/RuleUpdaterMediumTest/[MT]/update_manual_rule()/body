@@ -1,0 +1,13 @@
+{
+  RuleDto manualRule=RuleTesting.newManualRule("My manual").setName("Old name").setDescription("Old description").setSeverity(Severity.INFO);
+  ruleDao.insert(dbSession,manualRule);
+  dbSession.commit();
+  RuleUpdate update=RuleUpdate.createForManualRule(manualRule.getKey()).setName("New name").setHtmlDescription("New description").setSeverity(Severity.CRITICAL);
+  updater.update(update,UserSession.get());
+  dbSession.clearCache();
+  Rule manualRuleReloaded=ruleIndex.getByKey(manualRule.getKey());
+  assertThat(manualRuleReloaded).isNotNull();
+  assertThat(manualRuleReloaded.name()).isEqualTo("New name");
+  assertThat(manualRuleReloaded.htmlDescription()).isEqualTo("New description");
+  assertThat(manualRuleReloaded.severity()).isEqualTo(Severity.CRITICAL);
+}

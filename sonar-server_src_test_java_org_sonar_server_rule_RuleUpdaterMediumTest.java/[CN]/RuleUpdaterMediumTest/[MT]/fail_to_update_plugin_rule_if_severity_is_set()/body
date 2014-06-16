@@ -1,0 +1,12 @@
+{
+  RuleDto ruleDto=RuleTesting.newDto(RuleKey.of("squid","S01"));
+  ruleDao.insert(dbSession,ruleDto);
+  dbSession.commit();
+  try {
+    RuleUpdate.createForPluginRule(ruleDto.getKey()).setSeverity(Severity.CRITICAL);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalStateException.class).hasMessage("Not a custom or a manual rule");
+  }
+}
