@@ -6,16 +6,16 @@
     action.handler().handle(request,response);
   }
  catch (  IllegalArgumentException e) {
-    sendError(400,e.getMessage(),response);
+    sendErrors(response,400,new Errors().add(Message.of(e.getMessage())));
   }
 catch (  BadRequestException e) {
-    sendError(e,response);
+    sendErrors(response,400,e.errors());
   }
 catch (  ServerException e) {
-    sendError(e.httpCode(),message(e.getMessage(),e.l10nKey(),e.l10nParams()),response);
+    sendErrors(response,e.httpCode(),new Errors().add(Message.of(e.getMessage())));
   }
 catch (  Exception e) {
     LoggerFactory.getLogger(getClass()).error("Fail to process request " + request,e);
-    sendError(500,e.getMessage(),response);
+    sendErrors(response,500,new Errors().add(Message.of(e.getMessage())));
   }
 }
