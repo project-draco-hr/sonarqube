@@ -28,37 +28,22 @@
     }
   }
  else   if (actions.size() > 1) {
-    Map<String,Integer> itemOffset=new HashMap<String,Integer>();
-    ArrayListMultimap<String,IndexAction> itemActions=ArrayListMultimap.create();
-    List<IndexAction> embeddedActions=new LinkedList<IndexAction>();
+    Long purgeStart=System.currentTimeMillis();
+    List<IndexAction> itemActions=Lists.newArrayList();
+    List<IndexAction> embeddedActions=Lists.newArrayList();
     for (    IndexAction action : actions) {
       if (action.getClass().isAssignableFrom(EmbeddedIndexAction.class)) {
         embeddedActions.add(action);
       }
  else {
-        String actionKey=action.getKey();
-        Integer offset=0;
-        if (!itemOffset.containsKey(actionKey)) {
-          itemOffset.put(actionKey,offset);
-          itemActions.put(actionKey,action);
-        }
- else {
-          offset=itemOffset.get(actionKey);
-          if (action.getClass().isAssignableFrom(KeyIndexAction.class)) {
-            itemOffset.put(actionKey,0);
-            itemActions.get(actionKey).set(0,action);
-          }
- else {
-            itemActions.get(actionKey).set(offset,action);
-          }
-        }
+        itemActions.add(action);
       }
     }
+    LOGGER.debug("INDEX - compressed {} items into {} in {}ms,",actions.size(),itemActions.size() + embeddedActions.size(),System.currentTimeMillis() - purgeStart);
     try {
-      Multimap<String,IndexAction> itemBulks=makeBulkByType(itemActions);
-      CountDownLatch itemLatch=new CountDownLatch(itemBulks.size());
+      CountDownLatch itemLatch=new CountDownLatch(itemActions.size());
       indexTime=System.currentTimeMillis();
-      for (      IndexAction action : itemBulks.values()) {
+      for (      IndexAction action : itemActions) {
         action.setLatch(itemLatch);
         this.offer(action,1000,TimeUnit.SECONDS);
         types.add(action.getPayloadClass().getSimpleName());

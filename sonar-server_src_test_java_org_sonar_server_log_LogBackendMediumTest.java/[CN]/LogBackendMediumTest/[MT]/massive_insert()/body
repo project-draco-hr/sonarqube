@@ -1,10 +1,18 @@
 {
   assertThat(dao.findAll(dbSession)).hasSize(0);
-  int max=20;
+  int max=200;
   final String testValue="hello world";
   for (int i=0; i < max; i++) {
     service.write(dbSession,Log.Type.ACTIVE_RULE,testValue + "_" + i);
   }
   dbSession.commit();
   assertThat(dao.findAll(dbSession)).hasSize(max);
+  assertThat(index.findAll().getHits()).hasSize(max);
+  int count=0;
+  Iterator<Log> logs=index.search(new LogQuery(),new QueryOptions().setScroll(true)).scroll();
+  while (logs.hasNext()) {
+    logs.next();
+    count++;
+  }
+  assertThat(count).isEqualTo(max);
 }
