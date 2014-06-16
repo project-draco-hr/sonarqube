@@ -1,0 +1,19 @@
+{
+  String key="CUSTOM_RULE";
+  RuleDto templateRule=createTemplateRule();
+  RuleDto rule=dao.insert(dbSession,RuleTesting.newCustomRule(templateRule).setRuleKey(key).setStatus(RuleStatus.REMOVED).setName("Old name").setDescription("Old description").setSeverity(Severity.INFO));
+  dao.addRuleParam(dbSession,rule,dao.findRuleParamsByRuleKey(dbSession,templateRule.getKey()).get(0).setDefaultValue("a.*"));
+  dbSession.commit();
+  dbSession.clearCache();
+  NewRule newRule=NewRule.createForCustomRule(key,templateRule.getKey()).setName("New name").setHtmlDescription("New description").setSeverity(Severity.MAJOR).setStatus(RuleStatus.READY).setParameters(ImmutableMap.of("regex","c.*"));
+  RuleKey customRuleKey=creator.create(newRule);
+  dbSession.clearCache();
+  Rule result=ruleIndex.getByKey(customRuleKey);
+  assertThat(result.key()).isEqualTo(RuleKey.of("java",key));
+  assertThat(result.status()).isEqualTo(RuleStatus.READY);
+  assertThat(result.name()).isEqualTo("Old name");
+  assertThat(result.htmlDescription()).isEqualTo("Old description");
+  assertThat(result.severity()).isEqualTo(Severity.INFO);
+  assertThat(result.param("regex").defaultValue()).isEqualTo("a.*");
+  assertThat(db.ruleDao().getByKey(dbSession,result.key()).getId()).isEqualTo(rule.getId());
+}
