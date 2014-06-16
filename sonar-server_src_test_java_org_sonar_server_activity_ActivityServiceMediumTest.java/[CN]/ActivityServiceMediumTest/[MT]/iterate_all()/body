@@ -1,0 +1,19 @@
+{
+  int max=QueryOptions.DEFAULT_LIMIT + 3;
+  final String testValue="hello world";
+  for (int i=0; i < max; i++) {
+    service.write(dbSession,Activity.Type.ACTIVE_RULE,testValue + "_" + i);
+  }
+  dbSession.commit();
+  assertThat(dao.findAll(dbSession)).hasSize(max);
+  Result<Activity> result=index.search(service.newActivityQuery(),new QueryOptions().setScroll(true));
+  assertThat(result.getTotal()).isEqualTo(max);
+  assertThat(result.getHits()).hasSize(0);
+  int count=0;
+  Iterator<Activity> logIterator=result.scroll();
+  while (logIterator.hasNext()) {
+    count++;
+    logIterator.next();
+  }
+  assertThat(count).isEqualTo(max);
+}
