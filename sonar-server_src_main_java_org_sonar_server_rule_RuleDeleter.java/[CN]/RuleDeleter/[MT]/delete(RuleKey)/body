@@ -2,10 +2,12 @@
   DbSession dbSession=dbClient.openSession(false);
   try {
     RuleDto rule=dbClient.ruleDao().getByKey(dbSession,ruleKey);
-    if (rule.getTemplateId() == null) {
-      throw new IllegalStateException("Only custom rules can be deleted");
+    if (rule.getTemplateId() == null && !rule.getRepositoryKey().equals(RuleDoc.MANUAL_REPOSITORY)) {
+      throw new IllegalStateException("Only custom rules and manual rules can be deleted");
     }
-    ruleActivator.deactivate(dbSession,rule);
+    if (rule.getTemplateId() != null) {
+      ruleActivator.deactivate(dbSession,rule);
+    }
     rule.setStatus(RuleStatus.REMOVED);
     dbClient.ruleDao().update(dbSession,rule);
     dbSession.commit();
