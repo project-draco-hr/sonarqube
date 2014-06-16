@@ -24,13 +24,18 @@
     }
  else {
       applySeverityAndParamToChange(activation,context,change);
-      if (!activation.isCascade() && context.parentProfile() != null) {
+      if (!activation.isCascade() && context.parentActiveRule() != null) {
         change.setInheritance(context.isSameAsParent(activation) ? ActiveRule.Inheritance.INHERITED : ActiveRule.Inheritance.OVERRIDES);
       }
     }
+    if (context.isSame(change)) {
+      change=null;
+    }
   }
-  changes.add(change);
-  persist(change,context,dbSession);
+  if (change != null) {
+    changes.add(change);
+    persist(change,context,dbSession);
+  }
   if (!stopPropagation) {
     changes.addAll(cascadeActivation(dbSession,activation));
   }
