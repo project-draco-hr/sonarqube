@@ -1,0 +1,23 @@
+{
+  db.prepareDbUnit(getClass(),"ignore_null_rows.xml");
+  new MassUpdater(db.database()).execute(new MassUpdater.InputLoader<Row>(){
+    @Override public String selectSql(){
+      return "SELECT i.id FROM issues i";
+    }
+    @Override public Row load(    ResultSet rs) throws SQLException {
+      return null;
+    }
+  }
+,new MassUpdater.InputConverter<Row>(){
+    @Override public String updateSql(){
+      return "UPDATE issues SET severity=? WHERE id=?";
+    }
+    @Override public boolean convert(    Row row,    PreparedStatement updateStatement) throws SQLException {
+      updateStatement.setString(1,"BLOCKER");
+      updateStatement.setLong(2,row.id);
+      return true;
+    }
+  }
+);
+  db.assertDbUnit(getClass(),"ignore_null_rows.xml","issues");
+}

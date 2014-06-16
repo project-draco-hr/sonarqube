@@ -21,7 +21,11 @@
     rs=stmt.executeQuery(convertSelectSql(inputLoader.selectSql(),db));
     int cursor=0;
     while (rs.next()) {
-      if (converter.convert(inputLoader.load(rs),writeStatement)) {
+      S row=inputLoader.load(rs);
+      if (row == null) {
+        continue;
+      }
+      if (converter.convert(row,writeStatement)) {
         writeStatement.addBatch();
         writeStatement.clearParameters();
         cursor++;
