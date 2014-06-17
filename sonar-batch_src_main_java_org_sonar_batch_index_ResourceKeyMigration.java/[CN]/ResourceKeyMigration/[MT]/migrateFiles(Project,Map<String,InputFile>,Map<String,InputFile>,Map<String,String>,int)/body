@@ -1,6 +1,7 @@
 {
   StringBuilder hql=newResourceQuery().append(" and scope = '").append(Scopes.FILE).append("' order by qualifier, key");
-  List<ResourceModel> resources=session.createQuery(hql.toString()).setParameter("rootId",moduleId).getResultList();
+  Map<String,ResourceModel> disabledResourceByKey=loadDisabledResources(moduleId,hql);
+  List<ResourceModel> resources=loadEnabledResources(moduleId,hql);
   for (  ResourceModel resourceModel : resources) {
     String oldEffectiveKey=resourceModel.getKey();
     boolean isTest=Qualifiers.UNIT_TEST_FILE.equals(resourceModel.getQualifier());
@@ -24,7 +25,7 @@
  else       if (!parentNewKey.equals(deprecatedDirectoryKeyMapper.get(parentOldKey))) {
         logger.warn("Directory with key " + parentOldKey + " matches both "+ deprecatedDirectoryKeyMapper.get(parentOldKey)+ " and "+ parentNewKey+ ". First match is arbitrary chosen.");
       }
-      updateKey(resourceModel,newEffectiveKey);
+      updateKey(resourceModel,newEffectiveKey,disabledResourceByKey);
       resourceModel.setDeprecatedKey(oldEffectiveKey);
       logger.info(COMPONENT_CHANGED_TO,oldEffectiveKey,newEffectiveKey);
     }
