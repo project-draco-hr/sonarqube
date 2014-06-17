@@ -1,0 +1,10 @@
+{
+  MockUserSession.set().setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN).setLogin("me");
+  RuleDto deprecatedXooRule=RuleTesting.newDto(RuleKey.of("xoo","deprecated1")).setSeverity("MINOR").setLanguage("xoo").setStatus(RuleStatus.DEPRECATED);
+  db.ruleDao().insert(dbSession,deprecatedXooRule);
+  dbSession.commit();
+  service.activate(new RuleActivation(ActiveRuleKey.of(XOO_PROFILE_1,deprecatedXooRule.getKey())).setSeverity("BLOCKER"));
+  service.activate(new RuleActivation(ActiveRuleKey.of(XOO_PROFILE_1,XOO_RULE_1)).setSeverity("BLOCKER"));
+  dbSession.commit();
+  assertThat(service.countDeprecatedActiveRulesByProfile(XOO_PROFILE_1)).isEqualTo(1);
+}
