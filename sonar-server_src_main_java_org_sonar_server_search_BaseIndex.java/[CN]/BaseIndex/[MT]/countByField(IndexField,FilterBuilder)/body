@@ -1,0 +1,8 @@
+{
+  Map<String,Long> counts=new HashMap<String,Long>();
+  Terms values=getClient().prepareSearch(this.getIndexName()).setTypes(this.getIndexType()).setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),filter)).setSize(0).addAggregation(AggregationBuilders.terms(indexField.field()).field(indexField.field()).order(Terms.Order.count(false)).size(Integer.MAX_VALUE).minDocCount(0)).get().getAggregations().get(indexField.field());
+  for (  Terms.Bucket value : values.getBuckets()) {
+    counts.put(value.getKey(),value.getDocCount());
+  }
+  return counts;
+}
