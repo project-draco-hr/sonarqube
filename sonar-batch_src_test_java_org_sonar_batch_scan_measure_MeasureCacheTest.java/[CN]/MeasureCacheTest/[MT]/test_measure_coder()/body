@@ -1,0 +1,34 @@
+{
+  MeasureCache cache=new MeasureCache(caches,metricFinder,techDebtModel);
+  Resource file1=new File("foo/bar/File1.txt").setEffectiveKey("struts:foo/bar/File1.txt");
+  Measure measure=new Measure(CoreMetrics.NCLOC,1.786,5);
+  cache.put(file1,measure);
+  Measure savedMeasure=cache.byResource(file1).iterator().next();
+  assertThat(EqualsBuilder.reflectionEquals(measure,savedMeasure)).isTrue();
+  measure=new Measure(CoreMetrics.NCLOC);
+  measure.setData("data");
+  measure.setAlertStatus(Level.ERROR);
+  measure.setAlertText("alert");
+  Characteristic c=mock(Characteristic.class);
+  when(c.id()).thenReturn(1);
+  when(techDebtModel.characteristicById(1)).thenReturn(c);
+  measure.setCharacteristic(c);
+  measure.setDate(new Date());
+  measure.setDescription("description");
+  measure.setPersistenceMode(null);
+  measure.setPersonId(3);
+  Requirement r=mock(Requirement.class);
+  when(r.id()).thenReturn(7);
+  when(techDebtModel.requirementsById(7)).thenReturn(r);
+  measure.setRequirement(r);
+  measure.setTendency(4);
+  measure.setUrl("http://foo");
+  measure.setVariation1(11.0);
+  measure.setVariation2(12.0);
+  measure.setVariation3(13.0);
+  measure.setVariation4(14.0);
+  measure.setVariation5(15.0);
+  cache.put(file1,measure);
+  savedMeasure=cache.byResource(file1).iterator().next();
+  assertThat(EqualsBuilder.reflectionEquals(measure,savedMeasure)).isTrue();
+}
