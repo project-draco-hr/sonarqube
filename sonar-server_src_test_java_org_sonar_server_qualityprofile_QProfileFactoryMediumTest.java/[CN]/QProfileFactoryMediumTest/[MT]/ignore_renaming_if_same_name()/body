@@ -1,0 +1,11 @@
+{
+  QualityProfileDto dto=factory.create(dbSession,new QProfileName("xoo","P1"));
+  dbSession.commit();
+  dbSession.clearCache();
+  String key=dto.getKey();
+  assertThat(factory.rename(key,"P1")).isFalse();
+  dbSession.clearCache();
+  QualityProfileDto reloaded=db.qualityProfileDao().getByKey(dbSession,dto.getKee());
+  assertThat(reloaded.getKey()).isEqualTo(key);
+  assertThat(reloaded.getName()).isEqualTo("P1");
+}

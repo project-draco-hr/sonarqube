@@ -1,10 +1,10 @@
 {
-  QualityProfileDto profile=newQualityProfile().setName("p1");
+  QualityProfileDto profile=QProfileTesting.newXooP1();
   tester.get(QualityProfileDao.class).insert(session,profile);
-  QualityProfileDto profile2=newQualityProfile().setName("p2");
+  QualityProfileDto profile2=QProfileTesting.newXooP2();
   tester.get(QualityProfileDao.class).insert(session,profile2);
   session.commit();
-  RuleDto rule=newRuleDto(RuleKey.of(profile.getLanguage(),"S001"));
+  RuleDto rule=RuleTesting.newXooX1();
   ruleDao.insert(session,rule);
   ActiveRuleDto activeRule=newActiveRule(profile,rule);
   tester.get(ActiveRuleDao.class).insert(session,activeRule);
@@ -13,9 +13,9 @@
   session.commit();
   MockUserSession.set();
   WsTester.TestRequest request=tester.wsTester().newGetRequest(API_ENDPOINT,API_SEARCH_METHOD);
-  request.setParam(SearchOptions.PARAM_TEXT_QUERY,"S001");
+  request.setParam(SearchOptions.PARAM_TEXT_QUERY,"x1");
   request.setParam(SearchAction.PARAM_ACTIVATION,"true");
-  request.setParam(SearchAction.PARAM_QPROFILE,profile2.getKey().toString());
+  request.setParam(SearchAction.PARAM_QPROFILE,profile2.getKey());
   request.setParam(SearchOptions.PARAM_FIELDS,"");
   WsTester.Result result=request.execute();
   result.assertJson(this.getClass(),"search_profile_active_rules.json");

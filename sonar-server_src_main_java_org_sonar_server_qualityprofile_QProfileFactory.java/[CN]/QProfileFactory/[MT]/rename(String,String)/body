@@ -1,0 +1,23 @@
+{
+  Verifications.check(StringUtils.isNotBlank(newName),"Name must be set");
+  Verifications.check(newName.length() < 100,String.format("Name is too long (>%d characters)",100));
+  DbSession dbSession=db.openSession(false);
+  try {
+    QualityProfileDto profile=db.qualityProfileDao().getNonNullByKey(dbSession,key);
+    if (!StringUtils.equals(newName,profile.getName())) {
+      if (db.qualityProfileDao().getByNameAndLanguage(newName,profile.getLanguage(),dbSession) != null) {
+        throw new BadRequestException("Quality profile already exists: " + newName);
+      }
+      String previousName=profile.getName();
+      profile.setName(newName);
+      db.qualityProfileDao().update(dbSession,profile);
+      db.propertiesDao().updateProperties(PROFILE_PROPERTY_PREFIX + profile.getLanguage(),previousName,newName,dbSession);
+      dbSession.commit();
+      return true;
+    }
+    return false;
+  }
+  finally {
+    dbSession.close();
+  }
+}

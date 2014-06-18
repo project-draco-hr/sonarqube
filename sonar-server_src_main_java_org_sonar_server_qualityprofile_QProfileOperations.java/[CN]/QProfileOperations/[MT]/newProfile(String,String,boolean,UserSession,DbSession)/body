@@ -1,3 +1,9 @@
 {
-  return newProfile(name,language,null,failIfAlreadyExists,userSession,session);
+  checkPermission(userSession);
+  if (failIfAlreadyExists) {
+    checkNotAlreadyExists(name,language,session);
+  }
+  QualityProfileDto dto=new QualityProfileDto().setName(name).setLanguage(language);
+  db.qualityProfileDao().insert(session,dto);
+  return QProfile.from(dto);
 }

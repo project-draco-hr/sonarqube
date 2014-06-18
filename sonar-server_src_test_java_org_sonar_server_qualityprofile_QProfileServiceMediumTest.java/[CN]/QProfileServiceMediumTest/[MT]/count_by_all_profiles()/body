@@ -1,10 +1,10 @@
 {
   MockUserSession.set().setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN).setLogin("me");
-  service.activate(new RuleActivation(ActiveRuleKey.of(XOO_PROFILE_1,XOO_RULE_1)).setSeverity("BLOCKER"));
-  service.activate(new RuleActivation(ActiveRuleKey.of(XOO_PROFILE_2,XOO_RULE_1)).setSeverity("BLOCKER"));
-  dbSession.commit();
-  Map<QualityProfileKey,Long> counts=service.countAllActiveRules();
+  service.activate(XOO_P1_KEY,new RuleActivation(RuleTesting.XOO_X1).setSeverity("BLOCKER"));
+  service.activate(XOO_P2_KEY,new RuleActivation(RuleTesting.XOO_X1).setSeverity("BLOCKER"));
+  dbSession.clearCache();
+  Map<String,Long> counts=service.countAllActiveRules();
   assertThat(counts).hasSize(2);
-  assertThat(counts.keySet()).containsOnly(XOO_PROFILE_1,XOO_PROFILE_2);
+  assertThat(counts.keySet()).containsOnly(XOO_P1_KEY,XOO_P2_KEY);
   assertThat(counts.values()).containsOnly(1L,1L);
 }

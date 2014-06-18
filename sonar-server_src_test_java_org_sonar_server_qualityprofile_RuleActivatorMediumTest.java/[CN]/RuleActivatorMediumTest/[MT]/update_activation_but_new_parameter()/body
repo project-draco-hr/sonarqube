@@ -1,17 +1,17 @@
 {
-  ActiveRuleKey activeRuleKey=ActiveRuleKey.of(XOO_PROFILE_KEY,XOO_RULE_1);
-  RuleActivation activation=new RuleActivation(activeRuleKey);
+  ActiveRuleKey activeRuleKey=ActiveRuleKey.of(XOO_P1_KEY,RuleTesting.XOO_X1);
+  RuleActivation activation=new RuleActivation(RuleTesting.XOO_X1);
   activation.setSeverity(Severity.BLOCKER);
-  ruleActivator.activate(activation);
+  activate(activation,XOO_P1_KEY);
   assertThat(db.activeRuleDao().getParamByKeyAndName(activeRuleKey,"max",dbSession)).isNotNull();
   db.activeRuleDao().removeParamByKeyAndName(dbSession,activeRuleKey,"max");
   dbSession.commit();
   assertThat(db.activeRuleDao().getParamByKeyAndName(activeRuleKey,"max",dbSession)).isNull();
   dbSession.clearCache();
-  RuleActivation update=new RuleActivation(ActiveRuleKey.of(XOO_PROFILE_KEY,XOO_RULE_1));
+  RuleActivation update=new RuleActivation(RuleTesting.XOO_X1);
   update.setSeverity(Severity.CRITICAL);
   update.setParameter("max","42");
-  ruleActivator.activate(update);
-  assertThat(countActiveRules(XOO_PROFILE_KEY)).isEqualTo(1);
+  activate(update,XOO_P1_KEY);
+  assertThat(countActiveRules(XOO_P1_KEY)).isEqualTo(1);
   verifyHasActiveRule(activeRuleKey,Severity.CRITICAL,null,ImmutableMap.of("max","42"));
 }

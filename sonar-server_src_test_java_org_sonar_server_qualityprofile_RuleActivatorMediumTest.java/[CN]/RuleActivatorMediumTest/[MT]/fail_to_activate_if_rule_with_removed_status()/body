@@ -1,16 +1,16 @@
 {
-  RuleDto ruleDto=db.ruleDao().getByKey(dbSession,XOO_RULE_1);
+  RuleDto ruleDto=db.ruleDao().getByKey(dbSession,RuleTesting.XOO_X1);
   ruleDto.setStatus(RuleStatus.REMOVED);
   db.ruleDao().update(dbSession,ruleDto);
   dbSession.commit();
   dbSession.clearCache();
-  RuleActivation activation=new RuleActivation(ActiveRuleKey.of(XOO_PROFILE_KEY,XOO_RULE_1));
+  RuleActivation activation=new RuleActivation(RuleTesting.XOO_X1);
   try {
-    ruleActivator.activate(activation);
+    activate(activation,XOO_P1_KEY);
     fail();
   }
  catch (  BadRequestException e) {
     assertThat(e).hasMessage("Rule was removed: xoo:x1");
-    verifyZeroActiveRules(XOO_PROFILE_KEY);
+    verifyZeroActiveRules(XOO_P1_KEY);
   }
 }

@@ -1,20 +1,11 @@
 {
-  List<QProfileWithId> profiles=Lists.newArrayList();
+  UsedQProfiles used=new UsedQProfiles();
   for (  String language : fs.languages()) {
-    QProfileWithId qProfile=(QProfileWithId)moduleQProfiles.findByLanguage(language);
-    if (qProfile != null) {
-      dao.updateUsedColumn(qProfile.id(),true);
-      profiles.add(qProfile);
+    QProfile profile=moduleQProfiles.findByLanguage(language);
+    if (profile != null) {
+      used.add(profile);
     }
   }
-  UsedQProfiles used=UsedQProfiles.fromProfiles(profiles);
-  Measure detailsMeasure=new Measure(CoreMetrics.QUALITY_PROFILES,used.toJSON());
+  Measure detailsMeasure=new Measure(CoreMetrics.QUALITY_PROFILES,used.toJson());
   context.saveMeasure(detailsMeasure);
-  if (profiles.size() == 1) {
-    QProfileWithId qProfile=profiles.get(0);
-    Measure measure=new Measure(CoreMetrics.PROFILE,qProfile.name()).setValue((double)qProfile.id());
-    Measure measureVersion=new Measure(CoreMetrics.PROFILE_VERSION,qProfile.version().doubleValue());
-    context.saveMeasure(measure);
-    context.saveMeasure(measureVersion);
-  }
 }

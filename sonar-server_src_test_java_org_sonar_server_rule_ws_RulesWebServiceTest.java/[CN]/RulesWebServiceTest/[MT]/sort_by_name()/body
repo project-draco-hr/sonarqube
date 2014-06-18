@@ -1,19 +1,19 @@
 {
-  ruleDao.insert(session,newRuleDto(RuleKey.of("java","S002")).setName("Dodgy - Consider returning a zero length array rather than null "));
-  ruleDao.insert(session,newRuleDto(RuleKey.of("java","S001")).setName("Bad practice - Creates an empty zip file entry"));
-  ruleDao.insert(session,newRuleDto(RuleKey.of("java","S003")).setName("XPath rule"));
+  ruleDao.insert(session,RuleTesting.newXooX1().setName("Dodgy - Consider returning a zero length array rather than null "));
+  ruleDao.insert(session,RuleTesting.newXooX2().setName("Bad practice - Creates an empty zip file entry"));
+  ruleDao.insert(session,RuleTesting.newXooX3().setName("XPath rule"));
   session.commit();
   MockUserSession.set();
   WsTester.TestRequest request=tester.wsTester().newGetRequest(API_ENDPOINT,API_SEARCH_METHOD);
   request.setParam(SearchOptions.PARAM_FIELDS,"");
   request.setParam(SearchOptions.PARAM_SORT,"name");
-  request.setParam(SearchOptions.PARAM_ASCENDING,Boolean.TRUE.toString());
+  request.setParam(SearchOptions.PARAM_ASCENDING,"true");
   WsTester.Result result=request.execute();
-  result.assertJson("{\"total\":3,\"p\":1,\"ps\":10,\"rules\":[{\"key\":\"java:S001\"},{\"key\":\"java:S002\"},{\"key\":\"java:S003\"}]}");
+  result.assertJson("{\"total\":3,\"p\":1,\"ps\":10,\"rules\":[{\"key\":\"xoo:x2\"},{\"key\":\"xoo:x1\"},{\"key\":\"xoo:x3\"}]}");
   request=tester.wsTester().newGetRequest(API_ENDPOINT,API_SEARCH_METHOD);
   request.setParam(SearchOptions.PARAM_FIELDS,"");
   request.setParam(SearchOptions.PARAM_SORT,RuleNormalizer.RuleField.NAME.field());
-  request.setParam(SearchOptions.PARAM_ASCENDING,Boolean.FALSE.toString());
+  request.setParam(SearchOptions.PARAM_ASCENDING,"false");
   result=request.execute();
-  result.assertJson("{\"total\":3,\"p\":1,\"ps\":10,\"rules\":[{\"key\":\"java:S003\"},{\"key\":\"java:S002\"},{\"key\":\"java:S001\"}]}");
+  result.assertJson("{\"total\":3,\"p\":1,\"ps\":10,\"rules\":[{\"key\":\"xoo:x3\"},{\"key\":\"xoo:x1\"},{\"key\":\"xoo:x2\"}]}");
 }

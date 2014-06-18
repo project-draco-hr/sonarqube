@@ -1,14 +1,13 @@
 {
-  ActiveRuleKey activeRuleKey=ActiveRuleKey.of(XOO_PROFILE_KEY,XOO_RULE_1);
-  RuleActivation activation=new RuleActivation(activeRuleKey);
+  RuleActivation activation=new RuleActivation(RuleTesting.XOO_X1);
   activation.setSeverity(Severity.BLOCKER);
-  ruleActivator.activate(activation);
-  RuleActivation update=new RuleActivation(activeRuleKey);
+  activate(activation,XOO_P1_KEY);
+  RuleActivation update=new RuleActivation(RuleTesting.XOO_X1);
   update.setSeverity(Severity.CRITICAL);
   update.setParameter("max","42");
-  List<ActiveRuleChange> changes=ruleActivator.activate(update);
-  assertThat(countActiveRules(XOO_PROFILE_KEY)).isEqualTo(1);
-  verifyHasActiveRule(activeRuleKey,Severity.CRITICAL,null,ImmutableMap.of("max","42"));
+  List<ActiveRuleChange> changes=activate(update,XOO_P1_KEY);
+  assertThat(countActiveRules(XOO_P1_KEY)).isEqualTo(1);
+  verifyHasActiveRule(ActiveRuleKey.of(XOO_P1_KEY,RuleTesting.XOO_X1),Severity.CRITICAL,null,ImmutableMap.of("max","42"));
   assertThat(changes).hasSize(1);
   assertThat(changes.get(0).getType()).isEqualTo(ActiveRuleChange.Type.UPDATED);
 }

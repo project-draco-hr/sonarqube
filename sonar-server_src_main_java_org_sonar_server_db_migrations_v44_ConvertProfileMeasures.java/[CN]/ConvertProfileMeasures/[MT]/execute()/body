@@ -1,0 +1,27 @@
+{
+  DbSession session=db.openSession(false);
+  try {
+    int i=0;
+    QualityProfileMapper profileMapper=session.getMapper(QualityProfileMapper.class);
+    Migration44Mapper migrationMapper=session.getMapper(Migration44Mapper.class);
+    for (    ProfileMeasure profileMeasure : migrationMapper.selectProfileMeasures()) {
+      int version=migrationMapper.selectProfileVersion(profileMeasure.getSnapshotId());
+      QualityProfileDto profile=profileMapper.selectById(profileMeasure.getProfileId());
+      Date date=migrationMapper.selectProfileVersionDate(profileMeasure.getProfileId(),version);
+      if (profile != null && date != null) {
+        StringWriter writer=new StringWriter();
+        JsonWriter json=JsonWriter.of(writer);
+        json.beginArray().beginObject().prop("key",profile.getKee()).prop("language",profile.getLanguage()).prop("name",profile.getName()).prop("updatedAt",DateUtils.formatDateTime(date)).endObject().endArray().close();
+        migrationMapper.updateProfileMeasure(profileMeasure.getId(),writer.toString());
+        if (i % 100 == 0) {
+          session.commit();
+          i++;
+        }
+      }
+    }
+    session.commit();
+  }
+  finally {
+    session.close();
+  }
+}

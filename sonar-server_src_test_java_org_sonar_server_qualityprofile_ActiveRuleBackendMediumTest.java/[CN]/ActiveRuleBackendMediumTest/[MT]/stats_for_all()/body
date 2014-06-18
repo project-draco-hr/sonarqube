@@ -1,14 +1,14 @@
 {
-  QualityProfileDto profileDto1=QualityProfileDto.createFor("p1","java");
-  QualityProfileDto profileDto2=QualityProfileDto.createFor("p2","java");
+  QualityProfileDto profileDto1=QProfileTesting.newXooP1();
+  QualityProfileDto profileDto2=QProfileTesting.newXooP2();
   db.qualityProfileDao().insert(dbSession,profileDto1,profileDto2);
-  RuleDto ruleDto1=newRuleDto(RuleKey.of("javascript","S001"));
-  RuleDto ruleDto2=newRuleDto(RuleKey.of("javascript","S002"));
+  RuleDto ruleDto1=newRuleDto(RuleTesting.XOO_X1);
+  RuleDto ruleDto2=newRuleDto(RuleTesting.XOO_X2);
   db.ruleDao().insert(dbSession,ruleDto1,ruleDto2);
   db.activeRuleDao().insert(dbSession,ActiveRuleDto.createFor(profileDto1,ruleDto1).setInheritance(ActiveRule.Inheritance.INHERITED.name()).setSeverity(Severity.BLOCKER),ActiveRuleDto.createFor(profileDto2,ruleDto1).setInheritance(ActiveRule.Inheritance.INHERITED.name()).setSeverity(Severity.MINOR),ActiveRuleDto.createFor(profileDto1,ruleDto2).setInheritance(ActiveRule.Inheritance.OVERRIDES.name()).setSeverity(Severity.MAJOR),ActiveRuleDto.createFor(profileDto2,ruleDto2).setInheritance(ActiveRule.Inheritance.INHERITED.name()).setSeverity(Severity.BLOCKER));
   dbSession.commit();
   dbSession.clearCache();
   assertThat(index.countAll()).isEqualTo(4);
-  Map<QualityProfileKey,Multimap<String,FacetValue>> stats=index.getStatsByProfileKeys(ImmutableList.of(profileDto1.getKey(),profileDto2.getKey()));
+  Map<String,Multimap<String,FacetValue>> stats=index.getStatsByProfileKeys(ImmutableList.of(profileDto1.getKey(),profileDto2.getKey()));
   assertThat(stats).hasSize(2);
 }

@@ -1,13 +1,14 @@
 {
-  QualityProfileDto profileDto=QualityProfileDto.createFor("P1","java");
+  QualityProfileDto profileDto=QProfileTesting.newXooP1();
   db.qualityProfileDao().insert(dbSession,profileDto);
   for (int i=0; i < 100; i++) {
-    RuleDto rule=newRuleDto(RuleKey.of("javascript","S00" + i));
+    RuleDto rule=newRuleDto(RuleKey.of("xoo","S00" + i));
     db.ruleDao().insert(dbSession,rule);
     ActiveRuleDto activeRule=ActiveRuleDto.createFor(profileDto,rule).setSeverity(Severity.MAJOR);
     db.activeRuleDao().insert(dbSession,activeRule);
   }
   dbSession.commit();
+  dbSession.clearCache();
   Collection<ActiveRule> activeRules=index.findByProfile(profileDto.getKey());
   assertThat(activeRules).hasSize(100);
 }

@@ -1,0 +1,16 @@
+{
+  QualityProfileDto profile=db.qualityProfileDao().getNonNullByKey(session,key);
+  List<QualityProfileDto> descendants=db.qualityProfileDao().findDescendants(session,key);
+  if (!force) {
+    QualityProfileDto defaultProfile=getDefault(session,profile.getLanguage());
+    checkNotDefault(defaultProfile,profile);
+    for (    QualityProfileDto descendant : descendants) {
+      checkNotDefault(defaultProfile,descendant);
+    }
+  }
+  for (  QualityProfileDto descendant : Lists.reverse(descendants)) {
+    doDelete(session,descendant);
+  }
+  doDelete(session,profile);
+  previewCache.reportGlobalModification(session);
+}

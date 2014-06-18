@@ -1,0 +1,21 @@
+{
+  LOGGER.info("Register profile " + name);
+  QualityProfileDto profileDto=dbClient.qualityProfileDao().getByNameAndLanguage(name.getName(),name.getLanguage(),session);
+  if (profileDto != null) {
+    profileFactory.delete(session,profileDto.getKey(),true);
+  }
+  profileFactory.create(session,name);
+  for (  RulesProfile profile : profiles) {
+    for (    org.sonar.api.rules.ActiveRule activeRule : profile.getActiveRules()) {
+      RuleKey ruleKey=RuleKey.of(activeRule.getRepositoryKey(),activeRule.getRuleKey());
+      RuleActivation activation=new RuleActivation(ruleKey);
+      activation.setSeverity(activeRule.getSeverity() != null ? activeRule.getSeverity().name() : null);
+      for (      ActiveRuleParam param : activeRule.getActiveRuleParams()) {
+        activation.setParameter(param.getKey(),param.getValue());
+      }
+      ruleActivator.activate(session,activation,name);
+    }
+  }
+  LoadedTemplateDto template=new LoadedTemplateDto(templateKey(name),LoadedTemplateDto.QUALITY_PROFILE_TYPE);
+  dbClient.loadedTemplateDao().insert(template,session);
+}

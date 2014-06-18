@@ -11,11 +11,12 @@
   ruleDao.insert(dbSession,customRule);
   ruleDao.addRuleParam(dbSession,customRule,templateRuleParam1.setDefaultValue("a.*"));
   ruleDao.addRuleParam(dbSession,customRule,templateRuleParam2.setDefaultValue("txt"));
-  QualityProfileKey qualityProfileKey=QualityProfileKey.of("P1","xoo");
-  QualityProfileDto profileDto=QualityProfileDto.createFor(qualityProfileKey);
+  QualityProfileDto profileDto=QProfileTesting.newXooP1();
   db.qualityProfileDao().insert(dbSession,profileDto);
   dbSession.commit();
-  tester.get(RuleActivator.class).activate(new RuleActivation(ActiveRuleKey.of(profileDto.getKey(),customRule.getKey())).setSeverity(Severity.BLOCKER));
+  RuleActivation activation=new RuleActivation(customRule.getKey()).setSeverity(Severity.BLOCKER);
+  tester.get(RuleActivator.class).activate(dbSession,activation,QProfileTesting.XOO_P1_NAME);
+  dbSession.commit();
   dbSession.clearCache();
   RuleUpdate update=RuleUpdate.createForCustomRule(customRule.getKey()).setParameters(ImmutableMap.of("regex","b.*","message","a message"));
   updater.update(update,UserSession.get());
@@ -29,7 +30,7 @@
   assertThat(customRuleReloaded.param("format")).isNull();
   RuleParam param=customRuleReloaded.params().get(0);
   assertThat(param.defaultValue()).isEqualTo("b.*");
-  ActiveRule activeRule=tester.get(ActiveRuleIndex.class).getByKey(ActiveRuleKey.of(qualityProfileKey,customRule.getKey()));
+  ActiveRule activeRule=tester.get(ActiveRuleIndex.class).getByKey(ActiveRuleKey.of(profileDto.getKey(),customRule.getKey()));
   assertThat(activeRule.params()).hasSize(2);
   assertThat(activeRule.params().get("regex")).isEqualTo("b.*");
   assertThat(activeRule.params().get("format")).isNull();

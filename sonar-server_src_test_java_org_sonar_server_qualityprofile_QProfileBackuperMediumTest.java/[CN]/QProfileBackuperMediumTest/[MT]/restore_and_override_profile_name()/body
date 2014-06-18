@@ -1,8 +1,9 @@
 {
-  QualityProfileKey targetKey=QualityProfileKey.of("newName","xoo");
-  tester.get(QProfileBackuper.class).restore(new StringReader(Resources.toString(getClass().getResource("QProfileBackuperMediumTest/restore.xml"),Charsets.UTF_8)),targetKey);
-  List<ActiveRule> activeRules=tester.get(QProfileService.class).findActiveRulesByProfile(XOO_PROFILE_KEY);
+  tester.get(QProfileBackuper.class).restore(new StringReader(Resources.toString(getClass().getResource("QProfileBackuperMediumTest/restore.xml"),Charsets.UTF_8)),QProfileTesting.XOO_P3_NAME);
+  List<ActiveRule> activeRules=tester.get(QProfileService.class).findActiveRulesByProfile(QProfileTesting.XOO_P1_KEY);
   assertThat(activeRules).hasSize(0);
-  activeRules=tester.get(QProfileService.class).findActiveRulesByProfile(targetKey);
+  QualityProfileDto target=db.qualityProfileDao().getByNameAndLanguage("P3","xoo");
+  assertThat(target).isNotNull();
+  activeRules=tester.get(QProfileService.class).findActiveRulesByProfile(target.getKey());
   assertThat(activeRules).hasSize(1);
 }

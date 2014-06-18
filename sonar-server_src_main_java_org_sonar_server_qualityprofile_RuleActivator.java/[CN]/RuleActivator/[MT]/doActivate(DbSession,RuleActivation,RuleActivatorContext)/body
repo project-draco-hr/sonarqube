@@ -1,0 +1,46 @@
+{
+  context.verifyForActivation();
+  List<ActiveRuleChange> changes=Lists.newArrayList();
+  ActiveRuleChange change;
+  boolean stopPropagation=false;
+  if (context.activeRule() == null) {
+    change=ActiveRuleChange.createFor(ActiveRuleChange.Type.ACTIVATED,context.activeRuleKey());
+    if (activation.isCascade() || context.isSameAsParent(activation)) {
+      change.setInheritance(ActiveRule.Inheritance.INHERITED);
+    }
+    applySeverityAndParamToChange(activation,context,change);
+  }
+ else {
+    if (activation.isCascade() && context.activeRule().doesOverride()) {
+      return changes;
+    }
+    change=ActiveRuleChange.createFor(ActiveRuleChange.Type.UPDATED,context.activeRuleKey());
+    if (activation.isCascade() && context.activeRule().getInheritance() == null) {
+      change.setInheritance(ActiveRule.Inheritance.OVERRIDES);
+      change.setSeverity(context.activeRule().getSeverityString());
+      change.setParameters(context.activeRuleParamsAsStringMap());
+      stopPropagation=true;
+    }
+ else {
+      applySeverityAndParamToChange(activation,context,change);
+      if (!activation.isCascade() && context.parentActiveRule() != null) {
+        change.setInheritance(context.isSameAsParent(activation) ? ActiveRule.Inheritance.INHERITED : ActiveRule.Inheritance.OVERRIDES);
+      }
+    }
+    if (context.isSame(change)) {
+      change=null;
+    }
+  }
+  if (change != null) {
+    changes.add(change);
+    persist(change,context,dbSession);
+  }
+  if (!stopPropagation) {
+    changes.addAll(cascadeActivation(dbSession,activation,context.profile().getKey()));
+  }
+  if (!changes.isEmpty()) {
+    log.write(dbSession,Activity.Type.QPROFILE,changes);
+    previewCache.reportGlobalModification(dbSession);
+  }
+  return changes;
+}

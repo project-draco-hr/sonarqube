@@ -3,8 +3,8 @@
   RuleDto deprecatedXooRule=RuleTesting.newDto(RuleKey.of("xoo","deprecated1")).setSeverity("MINOR").setLanguage("xoo").setStatus(RuleStatus.DEPRECATED);
   db.ruleDao().insert(dbSession,deprecatedXooRule);
   dbSession.commit();
-  service.activate(new RuleActivation(ActiveRuleKey.of(XOO_PROFILE_1,deprecatedXooRule.getKey())).setSeverity("BLOCKER"));
-  service.activate(new RuleActivation(ActiveRuleKey.of(XOO_PROFILE_1,XOO_RULE_1)).setSeverity("BLOCKER"));
+  service.activate(XOO_P1_KEY,new RuleActivation(deprecatedXooRule.getKey()).setSeverity("BLOCKER"));
+  service.activate(XOO_P1_KEY,new RuleActivation(RuleTesting.XOO_X1).setSeverity("BLOCKER"));
   dbSession.commit();
-  assertThat(service.countDeprecatedActiveRulesByProfile(XOO_PROFILE_1)).isEqualTo(1);
+  assertThat(service.countDeprecatedActiveRulesByProfile(XOO_P1_KEY)).isEqualTo(1);
 }

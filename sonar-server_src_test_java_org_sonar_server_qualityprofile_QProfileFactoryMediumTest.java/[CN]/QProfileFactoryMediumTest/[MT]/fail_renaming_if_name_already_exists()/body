@@ -1,0 +1,13 @@
+{
+  QualityProfileDto p1=factory.create(dbSession,new QProfileName("xoo","P1"));
+  QualityProfileDto p2=factory.create(dbSession,new QProfileName("xoo","P2"));
+  dbSession.commit();
+  dbSession.clearCache();
+  try {
+    factory.rename(p1.getKey(),"P2");
+    fail();
+  }
+ catch (  BadRequestException e) {
+    assertThat(e).hasMessage("Quality profile already exists: P2");
+  }
+}

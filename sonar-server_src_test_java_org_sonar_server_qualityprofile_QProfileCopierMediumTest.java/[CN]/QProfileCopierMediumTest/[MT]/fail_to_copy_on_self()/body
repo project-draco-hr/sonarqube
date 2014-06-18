@@ -1,13 +1,15 @@
 {
-  RuleActivation activation=new RuleActivation(ActiveRuleKey.of(XOO_PROFILE_1,XOO_RULE_1));
+  RuleActivation activation=new RuleActivation(RuleTesting.XOO_X1);
   activation.setSeverity(Severity.BLOCKER);
   activation.setParameter("max","7");
-  ruleActivator.activate(activation);
+  ruleActivator.activate(dbSession,activation,QProfileTesting.XOO_P1_KEY);
+  dbSession.commit();
+  dbSession.clearCache();
   try {
-    copier.copy(XOO_PROFILE_1,XOO_PROFILE_1);
+    copier.copyToName(QProfileTesting.XOO_P1_KEY,QProfileTesting.XOO_P1_NAME.getName());
     fail();
   }
  catch (  IllegalArgumentException e) {
-    assertThat(e).hasMessage("Source and target profiles are equal: P1:xoo");
+    assertThat(e).hasMessage("Source and target profiles are equal: P1");
   }
 }

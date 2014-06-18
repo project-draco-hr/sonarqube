@@ -1,0 +1,17 @@
+{
+  RuleActivation activation=new RuleActivation(RuleTesting.XOO_X1).setSeverity("MAJOR");
+  activate(activation,XOO_P1_KEY);
+  activation=new RuleActivation(RuleTesting.XOO_X2).setSeverity("MAJOR");
+  activate(activation,XOO_P1_KEY);
+  db.qualityProfileDao().insert(dbSession,QProfileTesting.newXooP2());
+  RuleDto rule=db.ruleDao().getByKey(dbSession,RuleTesting.XOO_X1);
+  rule.setStatus(RuleStatus.REMOVED);
+  db.ruleDao().update(dbSession,rule);
+  dbSession.commit();
+  dbSession.clearCache();
+  ruleActivator.setParent(XOO_P2_KEY,XOO_P1_KEY);
+  dbSession.clearCache();
+  assertThat(db.qualityProfileDao().getByKey(dbSession,XOO_P2_KEY).getParentKee()).isEqualTo(XOO_P1_KEY);
+  assertThat(countActiveRules(XOO_P2_KEY)).isEqualTo(1);
+  verifyHasActiveRule(ActiveRuleKey.of(XOO_P2_KEY,RuleTesting.XOO_X2),Severity.MAJOR,ActiveRuleDto.INHERITED,Collections.<String,String>emptyMap());
+}

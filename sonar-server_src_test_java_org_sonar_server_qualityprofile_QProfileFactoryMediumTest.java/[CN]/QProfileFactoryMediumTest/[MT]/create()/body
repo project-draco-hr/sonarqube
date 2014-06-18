@@ -1,0 +1,16 @@
+{
+  QualityProfileDto dto=factory.create(dbSession,new QProfileName("xoo","P1"));
+  dbSession.commit();
+  dbSession.clearCache();
+  assertThat(dto.getKey()).startsWith("xoo-p1-");
+  assertThat(dto.getName()).isEqualTo("P1");
+  assertThat(dto.getLanguage()).isEqualTo("xoo");
+  assertThat(dto.getId()).isNotNull();
+  dto=db.qualityProfileDao().getByNameAndLanguage("P1","xoo",dbSession);
+  assertThat(dto.getLanguage()).isEqualTo("xoo");
+  assertThat(dto.getName()).isEqualTo("P1");
+  assertThat(dto.getKey()).startsWith("xoo-p1");
+  assertThat(dto.getId()).isNotNull();
+  assertThat(dto.getParentKee()).isNull();
+  assertThat(db.qualityProfileDao().findAll(dbSession)).hasSize(1);
+}

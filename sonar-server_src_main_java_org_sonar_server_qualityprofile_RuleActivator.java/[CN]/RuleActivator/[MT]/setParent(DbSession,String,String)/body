@@ -1,0 +1,23 @@
+{
+  QualityProfileDto profile=db.qualityProfileDao().getNonNullByKey(dbSession,profileKey);
+  if (parentKey == null) {
+    removeParent(dbSession,profile);
+  }
+ else   if (profile.getParentKee() == null || !profile.getParentKee().equals(parentKey)) {
+    QualityProfileDto parentProfile=db.qualityProfileDao().getNonNullByKey(dbSession,parentKey);
+    if (isDescendant(dbSession,profile,parentProfile)) {
+      throw new BadRequestException(String.format("Descendant profile '%s' can not be selected as parent of '%s'",parentKey,profileKey));
+    }
+    removeParent(dbSession,profile);
+    profile.setParentKee(parentKey);
+    db.qualityProfileDao().update(dbSession,profile);
+    for (    ActiveRuleDto parentActiveRule : db.activeRuleDao().findByProfileKey(dbSession,parentKey)) {
+      try {
+        RuleActivation activation=new RuleActivation(parentActiveRule.getKey().ruleKey());
+        activate(dbSession,activation,profileKey);
+      }
+ catch (      BadRequestException e) {
+      }
+    }
+  }
+}

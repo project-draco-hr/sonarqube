@@ -1,12 +1,10 @@
 {
-  setupData("shared");
-  QualityProfileDao dao=new QualityProfileDao(getMyBatis());
-  when(moduleQProfiles.findByLanguage("java")).thenReturn(new QProfileWithId(2,"Java Two","java",20));
-  when(moduleQProfiles.findByLanguage("php")).thenReturn(new QProfileWithId(3,"Php One","php",30));
+  when(moduleQProfiles.findByLanguage("java")).thenReturn(new QProfile("java-two","Java Two","java"));
+  when(moduleQProfiles.findByLanguage("php")).thenReturn(new QProfile("php-one","Php One","php"));
   when(moduleQProfiles.findByLanguage("abap")).thenReturn(null);
   fs.addLanguages("java","php");
-  QProfileSensor sensor=new QProfileSensor(moduleQProfiles,fs,dao);
+  QProfileSensor sensor=new QProfileSensor(moduleQProfiles,fs);
   assertThat(sensor.shouldExecuteOnProject(project)).isTrue();
   sensor.analyse(project,sensorContext);
-  verify(sensorContext).saveMeasure(argThat(new IsMeasure(CoreMetrics.QUALITY_PROFILES,"[{\"id\":2,\"name\":\"Java Two\",\"version\":20,\"language\":\"java\"},{\"id\":3,\"name\":\"Php One\",\"version\":30,\"language\":\"php\"}]")));
+  verify(sensorContext).saveMeasure(argThat(new IsMeasure(CoreMetrics.QUALITY_PROFILES,"[{\"key\":\"java-two\",\"language\":\"java\",\"name\":\"Java Two\"},{\"key\":\"php-one\",\"language\":\"php\",\"name\":\"Php One\"}]")));
 }

@@ -1,15 +1,15 @@
 {
-  QualityProfileDto profile=QualityProfileDto.createFor("parent","java");
-  QualityProfileDto subProfile=QualityProfileDto.createFor("child","java").setParent(profile.getName());
+  QualityProfileDto profile=QProfileTesting.newXooP1();
+  QualityProfileDto subProfile=QProfileTesting.newXooP2().setParentKee(QProfileTesting.XOO_P1_KEY);
   db.qualityProfileDao().insert(session,profile,subProfile);
-  RuleDto rule=getRule(profile.getLanguage(),"rule");
+  RuleDto rule=createRule(profile.getLanguage(),"rule");
   ActiveRuleDto active1=ActiveRuleDto.createFor(profile,rule).setSeverity(rule.getSeverityString());
   ActiveRuleDto active2=ActiveRuleDto.createFor(subProfile,rule).setSeverity("MINOR");
   db.activeRuleDao().insert(session,active1,active2);
   session.commit();
   assertThat(db.activeRuleDao().getByKey(session,active2.getKey()).getSeverityString()).isEqualTo("MINOR");
   WsTester.TestRequest request=wsTester.newGetRequest(QProfilesWs.API_ENDPOINT,RuleActivationActions.ACTIVATE_ACTION);
-  request.setParam(RuleActivationActions.PROFILE_KEY,subProfile.getKey().toString());
+  request.setParam(RuleActivationActions.PROFILE_KEY,subProfile.getKey());
   request.setParam(RuleActivationActions.RULE_KEY,rule.getKey().toString());
   request.execute();
   session.clearCache();

@@ -1,12 +1,13 @@
 {
-  RuleDto templateRule=RuleTesting.newTemplateRule(RuleKey.of("java","S001")).setLanguage("xoo");
+  RuleDto templateRule=RuleTesting.newTemplateRule(RuleKey.of("xoo","T1")).setLanguage("xoo");
   dao.insert(dbSession,templateRule);
   RuleDto customRule=RuleTesting.newCustomRule(templateRule).setLanguage("xoo");
   dao.insert(dbSession,customRule);
-  QualityProfileDto profileDto=QualityProfileDto.createFor(QualityProfileKey.of("P1","xoo"));
+  QualityProfileDto profileDto=QProfileTesting.newXooP1();
   db.qualityProfileDao().insert(dbSession,profileDto);
   dbSession.commit();
-  tester.get(RuleActivator.class).activate(new RuleActivation(ActiveRuleKey.of(profileDto.getKey(),customRule.getKey())).setSeverity(Severity.BLOCKER));
+  dbSession.clearCache();
+  activate(new RuleActivation(customRule.getKey()).setSeverity(Severity.BLOCKER),QProfileTesting.XOO_P1_KEY);
   deleter.delete(customRule.getKey());
   Rule customRuleReloaded=index.getByKey(customRule.getKey());
   assertThat(customRuleReloaded).isNotNull();

@@ -1,13 +1,13 @@
 {
   initRules();
-  db.qualityProfileDao().insert(dbSession,QualityProfileDto.createFor(XOO_PROFILE_1));
-  tester.get(RuleActivator.class).activate(dbSession,new RuleActivation(ActiveRuleKey.of(XOO_PROFILE_1,XOO_RULE_1)));
+  db.qualityProfileDao().insert(dbSession,QProfileTesting.newXooP1());
+  tester.get(RuleActivator.class).activate(dbSession,new RuleActivation(RuleTesting.XOO_X1),XOO_P1_KEY);
   dbSession.commit();
   dbSession.clearCache();
-  tester.get(QProfileFactory.class).delete(XOO_PROFILE_1);
+  factory.delete(XOO_P1_KEY);
   dbSession.clearCache();
   assertThat(db.qualityProfileDao().findAll(dbSession)).isEmpty();
   assertThat(db.activeRuleDao().findAll(dbSession)).isEmpty();
   assertThat(db.activeRuleDao().findAllParams(dbSession)).isEmpty();
-  assertThat(index.get(ActiveRuleIndex.class).findByProfile(XOO_PROFILE_1)).isEmpty();
+  assertThat(index.get(ActiveRuleIndex.class).findByProfile(XOO_P1_KEY)).isEmpty();
 }

@@ -1,0 +1,9 @@
+{
+  SearchRequestBuilder request=getClient().prepareSearch(getIndexName()).setQuery(QueryBuilders.termQuery(ActiveRuleNormalizer.ActiveRuleField.PROFILE_KEY.field(),key)).setRouting(key).setSize(Integer.MAX_VALUE);
+  SearchResponse response=request.get();
+  List<ActiveRule> activeRules=new ArrayList<ActiveRule>();
+  for (  SearchHit hit : response.getHits()) {
+    activeRules.add(toDoc(hit.getSource()));
+  }
+  return activeRules;
+}

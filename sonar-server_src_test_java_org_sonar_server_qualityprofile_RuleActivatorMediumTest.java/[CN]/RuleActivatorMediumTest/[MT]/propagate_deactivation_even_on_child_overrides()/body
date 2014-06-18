@@ -1,23 +1,22 @@
 {
   createChildProfiles();
-  RuleActivation activation=new RuleActivation(ActiveRuleKey.of(XOO_PROFILE_KEY,XOO_RULE_1));
+  RuleActivation activation=new RuleActivation(RuleTesting.XOO_X1);
   activation.setSeverity(Severity.INFO);
   activation.setParameter("max","7");
-  ruleActivator.activate(activation);
-  verifyOneActiveRule(XOO_PROFILE_KEY,XOO_RULE_1,Severity.INFO,null,ImmutableMap.of("max","7"));
-  verifyOneActiveRule(XOO_CHILD_PROFILE_KEY,XOO_RULE_1,Severity.INFO,ActiveRuleDto.INHERITED,ImmutableMap.of("max","7"));
-  verifyOneActiveRule(XOO_GRAND_CHILD_PROFILE_KEY,XOO_RULE_1,Severity.INFO,ActiveRuleDto.INHERITED,ImmutableMap.of("max","7"));
-  activation=new RuleActivation(ActiveRuleKey.of(XOO_CHILD_PROFILE_KEY,XOO_RULE_1));
+  activate(activation,XOO_P1_KEY);
+  verifyOneActiveRule(XOO_P1_KEY,RuleTesting.XOO_X1,Severity.INFO,null,ImmutableMap.of("max","7"));
+  verifyOneActiveRule(XOO_P2_KEY,RuleTesting.XOO_X1,Severity.INFO,ActiveRuleDto.INHERITED,ImmutableMap.of("max","7"));
+  verifyOneActiveRule(XOO_P3_KEY,RuleTesting.XOO_X1,Severity.INFO,ActiveRuleDto.INHERITED,ImmutableMap.of("max","7"));
+  activation=new RuleActivation(RuleTesting.XOO_X1);
   activation.setSeverity(Severity.BLOCKER);
   activation.setParameter("max","8");
-  ruleActivator.activate(activation);
+  activate(activation,XOO_P2_KEY);
+  verifyOneActiveRule(XOO_P1_KEY,RuleTesting.XOO_X1,Severity.INFO,null,ImmutableMap.of("max","7"));
+  verifyOneActiveRule(XOO_P2_KEY,RuleTesting.XOO_X1,Severity.BLOCKER,ActiveRuleDto.OVERRIDES,ImmutableMap.of("max","8"));
+  verifyOneActiveRule(XOO_P3_KEY,RuleTesting.XOO_X1,Severity.BLOCKER,ActiveRuleDto.INHERITED,ImmutableMap.of("max","8"));
+  ruleActivator.deactivate(ActiveRuleKey.of(XOO_P1_KEY,RuleTesting.XOO_X1));
   dbSession.clearCache();
-  verifyOneActiveRule(XOO_PROFILE_KEY,XOO_RULE_1,Severity.INFO,null,ImmutableMap.of("max","7"));
-  verifyOneActiveRule(XOO_CHILD_PROFILE_KEY,XOO_RULE_1,Severity.BLOCKER,ActiveRuleDto.OVERRIDES,ImmutableMap.of("max","8"));
-  verifyOneActiveRule(XOO_GRAND_CHILD_PROFILE_KEY,XOO_RULE_1,Severity.BLOCKER,ActiveRuleDto.INHERITED,ImmutableMap.of("max","8"));
-  ruleActivator.deactivate(ActiveRuleKey.of(XOO_PROFILE_KEY,XOO_RULE_1));
-  dbSession.clearCache();
-  verifyZeroActiveRules(XOO_PROFILE_KEY);
-  verifyZeroActiveRules(XOO_CHILD_PROFILE_KEY);
-  verifyZeroActiveRules(XOO_GRAND_CHILD_PROFILE_KEY);
+  verifyZeroActiveRules(XOO_P1_KEY);
+  verifyZeroActiveRules(XOO_P2_KEY);
+  verifyZeroActiveRules(XOO_P3_KEY);
 }

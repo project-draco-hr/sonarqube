@@ -1,0 +1,19 @@
+{
+  DbSession dbSession=db.openSession(false);
+  try {
+    QualityProfileDto fromProfile=db.qualityProfileDao().getNonNullByKey(dbSession,fromProfileKey);
+    QProfileName toProfileName=new QProfileName(fromProfile.getLanguage(),toName);
+    verify(fromProfile,toProfileName);
+    QualityProfileDto toProfile=db.qualityProfileDao().getByNameAndLanguage(toProfileName.getName(),toProfileName.getLanguage(),dbSession);
+    if (toProfile == null) {
+      toProfile=factory.create(dbSession,toProfileName);
+      toProfile.setParentKee(fromProfile.getParentKee());
+      db.qualityProfileDao().update(dbSession,toProfile);
+      dbSession.commit();
+    }
+    return toProfileName;
+  }
+  finally {
+    dbSession.close();
+  }
+}

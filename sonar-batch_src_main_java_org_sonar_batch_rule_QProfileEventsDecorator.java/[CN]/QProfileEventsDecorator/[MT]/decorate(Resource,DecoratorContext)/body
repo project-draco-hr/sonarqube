@@ -2,49 +2,24 @@
   if (!Qualifiers.isProject(resource,true)) {
     return;
   }
-  Measure profilesMeasure=context.getMeasure(CoreMetrics.QUALITY_PROFILES);
-  UsedQProfiles currentProfiles=UsedQProfiles.fromJSON(profilesMeasure.getData());
-  UsedQProfiles pastProfiles;
-  Measure pastProfilesMeasure=getPreviousMeasure(resource,CoreMetrics.QUALITY_PROFILES);
-  if (pastProfilesMeasure != null) {
-    pastProfiles=UsedQProfiles.fromJSON(pastProfilesMeasure.getData());
+  Measure currentMeasure=context.getMeasure(CoreMetrics.QUALITY_PROFILES);
+  Map<String,QProfile> currentProfiles=UsedQProfiles.fromJson(currentMeasure.getData()).profilesByKey();
+  Map<String,QProfile> previousProfiles=Maps.newHashMap();
+  Measure previousMeasure=getPreviousMeasure(resource,CoreMetrics.QUALITY_PROFILES);
+  if (previousMeasure != null && previousMeasure.getData() != null) {
+    previousProfiles=UsedQProfiles.fromJson(previousMeasure.getData()).profilesByKey();
   }
- else {
-    Measure pastProfileMeasure=getPreviousMeasure(resource,CoreMetrics.PROFILE);
-    if (pastProfileMeasure == null) {
-      return;
-    }
-    int pastProfileId=pastProfileMeasure.getIntValue();
-    String pastProfileName=pastProfileMeasure.getData();
-    QualityProfileDto pastProfile=qualityProfileDao.selectById(pastProfileId);
-    String pastProfileLanguage="unknow";
-    if (pastProfile != null) {
-      pastProfileLanguage=pastProfile.getLanguage();
-    }
-    Measure pastProfileVersionMeasure=getPreviousMeasure(resource,CoreMetrics.PROFILE_VERSION);
-    final int pastProfileVersion;
-    if (pastProfileVersionMeasure == null) {
-      pastProfileVersion=1;
-    }
- else {
-      pastProfileVersion=pastProfileVersionMeasure.getIntValue();
-    }
-    pastProfiles=UsedQProfiles.fromProfiles(new QProfileWithId(pastProfileId,pastProfileName,pastProfileLanguage,pastProfileVersion));
-  }
-  Map<Integer,QProfileWithId> pastProfilesById=Maps.newHashMap(pastProfiles.profilesById());
-  for (  QProfileWithId profile : currentProfiles.profilesById().values()) {
-    if (pastProfilesById.containsKey(profile.id())) {
-      QProfileWithId pastProfile=pastProfilesById.get(profile.id());
-      if (pastProfile.version() < profile.version()) {
-        usedProfile(context,profile);
-      }
-      pastProfilesById.remove(profile.id());
+  for (  QProfile profile : currentProfiles.values()) {
+    QProfile previousProfile=previousProfiles.get(profile.key());
+    if (previousProfile != null) {
     }
  else {
       usedProfile(context,profile);
     }
   }
-  for (  QProfileWithId profile : pastProfilesById.values()) {
-    stopUsedProfile(context,profile);
+  for (  QProfile previousProfile : previousProfiles.values()) {
+    if (!currentProfiles.containsKey(previousProfile.key())) {
+      stopUsedProfile(context,previousProfile);
+    }
   }
 }

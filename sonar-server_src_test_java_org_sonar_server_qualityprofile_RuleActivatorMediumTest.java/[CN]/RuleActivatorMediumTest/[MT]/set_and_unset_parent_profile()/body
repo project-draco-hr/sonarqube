@@ -1,22 +1,20 @@
 {
-  RuleActivation activation=new RuleActivation(ActiveRuleKey.of(XOO_PROFILE_KEY,XOO_RULE_1));
+  RuleActivation activation=new RuleActivation(RuleTesting.XOO_X1);
   activation.setSeverity("MAJOR");
-  ruleActivator.activate(activation);
-  verifyOneActiveRule(XOO_PROFILE_KEY,XOO_RULE_1,Severity.MAJOR,null,ImmutableMap.of("max","10"));
-  QualityProfileKey childKey=QualityProfileKey.of("newChild","xoo");
-  db.qualityProfileDao().insert(dbSession,QualityProfileDto.createFor(childKey));
-  activation=new RuleActivation(ActiveRuleKey.of(childKey,XOO_RULE_2));
+  activate(activation,XOO_P1_KEY);
+  verifyOneActiveRule(XOO_P1_KEY,RuleTesting.XOO_X1,Severity.MAJOR,null,ImmutableMap.of("max","10"));
+  db.qualityProfileDao().insert(dbSession,QProfileTesting.newXooP2());
+  activation=new RuleActivation(RuleTesting.XOO_X2);
   activation.setSeverity("MAJOR");
-  ruleActivator.activate(dbSession,activation);
-  dbSession.commit();
+  activate(activation,XOO_P2_KEY);
+  ruleActivator.setParent(XOO_P2_KEY,XOO_P1_KEY);
   dbSession.clearCache();
-  ruleActivator.setParent(childKey,XOO_PROFILE_KEY);
-  assertThat(db.qualityProfileDao().getByKey(dbSession,childKey).getParentKey()).isEqualTo(XOO_PROFILE_KEY);
-  verifyHasActiveRule(ActiveRuleKey.of(childKey,XOO_RULE_1),Severity.MAJOR,ActiveRuleDto.INHERITED,ImmutableMap.of("max","10"));
-  verifyHasActiveRule(ActiveRuleKey.of(childKey,XOO_RULE_2),Severity.MAJOR,null,Collections.<String,String>emptyMap());
+  assertThat(db.qualityProfileDao().getByKey(dbSession,XOO_P2_KEY).getParentKee()).isEqualTo(XOO_P1_KEY);
+  verifyHasActiveRule(ActiveRuleKey.of(XOO_P2_KEY,RuleTesting.XOO_X1),Severity.MAJOR,ActiveRuleDto.INHERITED,ImmutableMap.of("max","10"));
+  verifyHasActiveRule(ActiveRuleKey.of(XOO_P2_KEY,RuleTesting.XOO_X2),Severity.MAJOR,null,Collections.<String,String>emptyMap());
   dbSession.clearCache();
-  ruleActivator.setParent(childKey,null);
-  assertThat(countActiveRules(childKey)).isEqualTo(1);
-  assertThat(db.qualityProfileDao().getByKey(dbSession,childKey).getParentKey()).isNull();
-  verifyHasActiveRule(ActiveRuleKey.of(childKey,XOO_RULE_2),Severity.MAJOR,null,Collections.<String,String>emptyMap());
+  ruleActivator.setParent(XOO_P2_KEY,null);
+  assertThat(countActiveRules(XOO_P2_KEY)).isEqualTo(1);
+  assertThat(db.qualityProfileDao().getByKey(dbSession,XOO_P2_KEY).getParentKee()).isNull();
+  verifyHasActiveRule(ActiveRuleKey.of(XOO_P2_KEY,RuleTesting.XOO_X2),Severity.MAJOR,null,Collections.<String,String>emptyMap());
 }

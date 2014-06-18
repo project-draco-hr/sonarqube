@@ -1,13 +1,13 @@
 {
-  db.qualityProfileDao().insert(dbSession,QualityProfileDto.createFor(XOO_PROFILE_KEY));
-  RuleActivation activation=new RuleActivation(ActiveRuleKey.of(XOO_PROFILE_KEY,RuleKey.of("xoo","x1")));
+  db.qualityProfileDao().insert(dbSession,QProfileTesting.newXooP1());
+  RuleActivation activation=new RuleActivation(RuleTesting.XOO_X1);
   activation.setSeverity(Severity.BLOCKER);
   activation.setParameter("max","7");
-  tester.get(RuleActivator.class).activate(dbSession,activation);
+  tester.get(RuleActivator.class).activate(dbSession,activation,QProfileTesting.XOO_P1_NAME);
   dbSession.commit();
   dbSession.clearCache();
   StringWriter output=new StringWriter();
-  tester.get(QProfileBackuper.class).backup(XOO_PROFILE_KEY,output);
+  tester.get(QProfileBackuper.class).backup(QProfileTesting.XOO_P1_KEY,output);
   XMLUnit.setIgnoreWhitespace(true);
   Diff diff=XMLUnit.compareXML(output.toString(),Resources.toString(getClass().getResource("QProfileBackuperMediumTest/expected-backup.xml"),Charsets.UTF_8));
   assertThat(diff.identical()).as(diff.toString()).isTrue();

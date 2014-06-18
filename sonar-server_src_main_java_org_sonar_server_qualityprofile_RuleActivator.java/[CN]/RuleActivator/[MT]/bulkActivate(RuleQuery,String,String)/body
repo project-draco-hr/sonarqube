@@ -1,0 +1,28 @@
+{
+  BulkChangeResult result=new BulkChangeResult();
+  RuleIndex ruleIndex=index.get(RuleIndex.class);
+  DbSession dbSession=db.openSession(false);
+  try {
+    Result<Rule> ruleSearchResult=ruleIndex.search(ruleQuery,new QueryOptions().setScroll(true));
+    Iterator<Rule> rules=ruleSearchResult.scroll();
+    while (rules.hasNext()) {
+      Rule rule=rules.next();
+      try {
+        RuleActivation activation=new RuleActivation(rule.key());
+        activation.setSeverity(severity);
+        List<ActiveRuleChange> changes=activate(dbSession,activation,profileKey);
+        result.addChanges(changes);
+        result.incrementSucceeded();
+      }
+ catch (      BadRequestException e) {
+        result.incrementFailed();
+        result.getErrors().add(e.errors());
+      }
+    }
+    dbSession.commit();
+  }
+  finally {
+    dbSession.close();
+  }
+  return result;
+}

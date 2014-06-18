@@ -1,6 +1,8 @@
 {
   tester.get(QProfileBackuper.class).restore(new StringReader(Resources.toString(getClass().getResource("QProfileBackuperMediumTest/restore.xml"),Charsets.UTF_8)),null);
-  List<ActiveRule> activeRules=tester.get(QProfileService.class).findActiveRulesByProfile(XOO_PROFILE_KEY);
+  QualityProfileDto profile=db.qualityProfileDao().getByNameAndLanguage("P1","xoo");
+  assertThat(profile).isNotNull();
+  List<ActiveRule> activeRules=tester.get(QProfileService.class).findActiveRulesByProfile(profile.getKey());
   assertThat(activeRules).hasSize(1);
   assertThat(activeRules.get(0).severity()).isEqualTo("BLOCKER");
   assertThat(activeRules.get(0).inheritance()).isEqualTo(ActiveRule.Inheritance.NONE);

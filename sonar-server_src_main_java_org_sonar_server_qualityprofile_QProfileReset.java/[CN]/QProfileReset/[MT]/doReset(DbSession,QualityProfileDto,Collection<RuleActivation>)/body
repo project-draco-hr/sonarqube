@@ -1,0 +1,30 @@
+{
+  Preconditions.checkNotNull(profile.getId(),"Quality profile must be persisted");
+  BulkChangeResult result=new BulkChangeResult();
+  Set<RuleKey> ruleToBeDeactivated=Sets.newHashSet();
+  for (  ActiveRuleDto activeRuleDto : db.activeRuleDao().findByProfileKey(dbSession,profile.getKee())) {
+    if (activeRuleDto.getInheritance() == null) {
+      ruleToBeDeactivated.add(activeRuleDto.getKey().ruleKey());
+    }
+  }
+  for (  RuleActivation activation : activations) {
+    try {
+      List<ActiveRuleChange> changes=activator.activate(dbSession,activation,profile.getKey());
+      ruleToBeDeactivated.remove(activation.getRuleKey());
+      result.incrementSucceeded();
+      result.addChanges(changes);
+    }
+ catch (    BadRequestException e) {
+      result.incrementFailed();
+      result.getErrors().add(e.errors());
+    }
+  }
+  for (  RuleKey ruleKey : ruleToBeDeactivated) {
+    try {
+      activator.deactivate(dbSession,ActiveRuleKey.of(profile.getKee(),ruleKey));
+    }
+ catch (    BadRequestException e) {
+    }
+  }
+  return result;
+}
