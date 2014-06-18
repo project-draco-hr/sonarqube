@@ -1,0 +1,27 @@
+{
+  try {
+    Connection connection=db.database().getDataSource().getConnection();
+    ResultSet result=connection.createStatement().executeQuery(sql);
+    result.next();
+    int currentId=result.getInt("id");
+    Date currentTimeStamp=result.getTimestamp(CREATED_AT);
+    String currentAuthor=getAuthor(result);
+    ActiveRuleChange ruleChange=newActiveRuleChance(type,result);
+    processRuleChange(ruleChange,result);
+    while (result.next()) {
+      int id=result.getInt("id");
+      if (id != currentId) {
+        saveActiveRuleChange(ruleChange,currentAuthor,currentTimeStamp);
+        currentId=id;
+        currentTimeStamp=result.getTimestamp(CREATED_AT);
+        currentAuthor=getAuthor(result);
+        ruleChange=newActiveRuleChance(type,result);
+      }
+      processRuleChange(ruleChange,result);
+    }
+    saveActiveRuleChange(ruleChange,currentAuthor,currentTimeStamp);
+  }
+ catch (  Exception e) {
+    e.printStackTrace();
+  }
+}
