@@ -1,0 +1,15 @@
+{
+  RuleDto templateRule=RuleTesting.newTemplateRule(RuleKey.of("java","S001"));
+  ruleDao.insert(dbSession,templateRule);
+  RuleDto customRule=RuleTesting.newCustomRule(templateRule);
+  ruleDao.insert(dbSession,customRule);
+  dbSession.commit();
+  RuleUpdate update=RuleUpdate.createForCustomRule(customRule.getKey()).setName("New name").setHtmlDescription("");
+  try {
+    updater.update(update,UserSession.get());
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("The description is missing");
+  }
+}
