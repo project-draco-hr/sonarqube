@@ -1,0 +1,11 @@
+{
+  if (!descriptor.languages().isEmpty() || !descriptor.types().isEmpty()) {
+    FilePredicate langPredicate=descriptor.languages().isEmpty() ? fs.predicates().all() : fs.predicates().hasLanguages(descriptor.languages());
+    FilePredicate typePredicate=descriptor.types().isEmpty() ? fs.predicates().all() : fs.predicates().none();
+    for (    InputFile.Type type : descriptor.types()) {
+      typePredicate=fs.predicates().or(typePredicate,fs.predicates().hasType(type));
+    }
+    return fs.hasFiles(fs.predicates().and(langPredicate,typePredicate));
+  }
+  return true;
+}
