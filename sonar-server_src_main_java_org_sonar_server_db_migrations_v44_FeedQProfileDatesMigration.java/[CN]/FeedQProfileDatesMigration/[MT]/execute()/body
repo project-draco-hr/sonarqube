@@ -1,0 +1,22 @@
+{
+  DbSession session=db.openSession(false);
+  try {
+    Date now=new Date(system.now());
+    int i=0;
+    QualityProfileMapper profileMapper=session.getMapper(QualityProfileMapper.class);
+    Migration44Mapper migrationMapper=session.getMapper(Migration44Mapper.class);
+    for (    QualityProfileDto profile : profileMapper.selectAll()) {
+      Date createdAt=migrationMapper.selectProfileCreatedAt(profile.getId());
+      Date updatedAt=migrationMapper.selectProfileUpdatedAt(profile.getId());
+      migrationMapper.updateProfileDates(profile.getId(),(Date)ObjectUtils.defaultIfNull(createdAt,now),(Date)ObjectUtils.defaultIfNull(updatedAt,now));
+      if (i % 100 == 0) {
+        session.commit();
+        i++;
+      }
+    }
+    session.commit();
+  }
+  finally {
+    session.close();
+  }
+}
