@@ -1,0 +1,11 @@
+{
+  List<QProfileActivity> results=Lists.newArrayList();
+  OrFilterBuilder activityFilter=FilterBuilders.orFilter();
+  for (  String profileKey : query.getQprofileKeys()) {
+    activityFilter.add(FilterBuilders.termFilter("details.profileKey",profileKey));
+  }
+  for (  SearchHit hit : index.get(ActivityIndex.class).search(query,options,activityFilter).getHits().getHits()) {
+    QProfileActivity profileActivity=new QProfileActivity(hit.getSource());
+  }
+  return results;
+}
