@@ -6,16 +6,7 @@
     typeFilter.add(FilterBuilders.termFilter(ActivityNormalizer.LogFields.TYPE.field(),type));
   }
   filter.add(typeFilter);
-  if (query.getSince() != null || query.getTo() != null) {
-    RangeFilterBuilder dateFilter=FilterBuilders.rangeFilter(ActivityNormalizer.LogFields.CREATED_AT.field());
-    if (query.getSince() != null) {
-      dateFilter.from(query.getSince());
-    }
-    if (query.getTo() != null) {
-      dateFilter.to(query.getTo());
-    }
-    filter.add(dateFilter);
-  }
+  filter.add(FilterBuilders.rangeFilter(ActivityNormalizer.LogFields.CREATED_AT.field()).from(query.getSince()).to(query.getTo()));
   esSearch.setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),filter));
   if (options.isScroll()) {
     esSearch.setSearchType(SearchType.SCAN);
