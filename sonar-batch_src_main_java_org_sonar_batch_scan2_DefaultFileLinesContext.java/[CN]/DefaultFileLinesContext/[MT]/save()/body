@@ -1,0 +1,15 @@
+{
+  for (  Map.Entry<String,Map<Integer,Object>> entry : map.entrySet()) {
+    String metricKey=entry.getKey();
+    Metric metric=metricFinder.findByKey(metricKey);
+    if (metric == null) {
+      throw new IllegalStateException("Unable to find metric with key: " + metricKey);
+    }
+    Map<Integer,Object> lines=entry.getValue();
+    if (shouldSave(lines)) {
+      String data=KeyValueFormat.format(lines);
+      measureCache.put(projectKey,ComponentKeys.createEffectiveKey(projectKey,inputFile),new DefaultAnalyzerMeasureBuilder<String>().forMetric(metric).onFile(inputFile).withValue(data).build());
+      entry.setValue(ImmutableMap.copyOf(lines));
+    }
+  }
+}

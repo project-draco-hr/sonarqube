@@ -1,0 +1,22 @@
+{
+  File measuresFile=new File(exportDir,"measures.json");
+  FileWriter measureWriter=null;
+  try {
+    measureWriter=new FileWriter(measuresFile);
+    JsonWriter jsonWriter=JsonWriter.of(measureWriter);
+    jsonWriter.beginObject().name("measures").beginArray();
+    for (    AnalyzerMeasure<?> measure : measureCache.byModule(def.getKey())) {
+      jsonWriter.beginObject().prop("metricKey",measure.metric().key());
+      if (measure.inputFile() != null) {
+        jsonWriter.prop("filePath",measure.inputFile().relativePath());
+      }
+      jsonWriter.prop("value",String.valueOf(measure.value())).endObject();
+    }
+    jsonWriter.endArray().endObject().close();
+  }
+ catch (  IOException e) {
+  }
+ finally {
+    IOUtils.closeQuietly(measureWriter);
+  }
+}
