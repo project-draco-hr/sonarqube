@@ -1,6 +1,10 @@
 {
-  assertThat(BundleSynchronizedMatcher.getBundleFileInputStream("myPlugin_fr.properties")).isNotNull();
-  thrown.expect(AssertionError.class);
-  thrown.expectMessage("File 'unexistingBundle.properties' does not exist in '/org/sonar/l10n/'.");
-  BundleSynchronizedMatcher.getBundleFileInputStream("unexistingBundle.properties");
+  assertThat(BundleSynchronizedMatcher.getBundleFileInputStream("myPlugin_fr.properties"),notNullValue());
+  try {
+    BundleSynchronizedMatcher.getBundleFileInputStream("unexistingBundle.properties");
+    fail();
+  }
+ catch (  AssertionError e) {
+    assertThat(e.getMessage(),startsWith("File 'unexistingBundle.properties' does not exist in '/org/sonar/l10n/'."));
+  }
 }
