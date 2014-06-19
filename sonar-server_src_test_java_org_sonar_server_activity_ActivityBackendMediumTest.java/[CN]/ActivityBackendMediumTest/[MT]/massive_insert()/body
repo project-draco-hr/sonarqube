@@ -9,7 +9,8 @@
   assertThat(dao.findAll(dbSession)).hasSize(max);
   assertThat(index.findAll().getHits()).hasSize(max);
   int count=0;
-  Iterator<Activity> logs=index.search(new ActivityQuery(),new QueryOptions().setScroll(true)).scroll();
+  SearchResponse result=index.search(new ActivityQuery(),new QueryOptions().setScroll(true));
+  Iterator<Activity> logs=new Result<Activity>(index,result).scroll();
   while (logs.hasNext()) {
     logs.next();
     count++;

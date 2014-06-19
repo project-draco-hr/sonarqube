@@ -2,7 +2,8 @@
   service.write(dbSession,Activity.Type.QPROFILE,getActivity());
   dbSession.commit();
   assertThat(index.findAll().getTotal()).isEqualTo(1);
-  Result<Activity> result=index.search(service.newActivityQuery(),new QueryOptions());
-  assertThat(result.getTotal()).isEqualTo(1L);
-  assertThat(result.getHits().get(0).details().get(test_key)).isEqualTo(test_value);
+  SearchResponse result=index.search(service.newActivityQuery(),new QueryOptions());
+  assertThat(result.getHits().getTotalHits()).isEqualTo(1L);
+  Result<Activity> activityResult=new Result<Activity>(index,result);
+  assertThat(activityResult.getHits().get(0).details().get(test_key)).isEqualTo(test_value);
 }

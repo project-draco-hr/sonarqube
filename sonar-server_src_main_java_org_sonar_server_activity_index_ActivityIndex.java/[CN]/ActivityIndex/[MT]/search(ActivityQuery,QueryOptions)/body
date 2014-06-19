@@ -1,17 +1,3 @@
 {
-  SearchRequestBuilder esSearch=getClient().prepareSearch(this.getIndexName()).setTypes(this.getIndexType()).setIndices(this.getIndexName());
-  AndFilterBuilder filter=FilterBuilders.andFilter();
-  OrFilterBuilder typeFilter=FilterBuilders.orFilter();
-  for (  Activity.Type type : query.getTypes()) {
-    typeFilter.add(FilterBuilders.termFilter(ActivityNormalizer.LogFields.TYPE.field(),type));
-  }
-  filter.add(typeFilter);
-  filter.add(FilterBuilders.rangeFilter(ActivityNormalizer.LogFields.CREATED_AT.field()).from(query.getSince()).to(query.getTo()));
-  esSearch.setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),filter));
-  if (options.isScroll()) {
-    esSearch.setSearchType(SearchType.SCAN);
-    esSearch.setScroll(TimeValue.timeValueMinutes(3));
-  }
-  SearchResponse esResult=esSearch.get();
-  return new Result<Activity>(this,esResult);
+  return this.search(query,options,null);
 }
