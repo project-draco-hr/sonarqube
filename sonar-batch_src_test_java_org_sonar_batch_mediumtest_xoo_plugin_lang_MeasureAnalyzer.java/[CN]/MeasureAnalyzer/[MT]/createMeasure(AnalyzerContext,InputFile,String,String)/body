@@ -1,0 +1,38 @@
+{
+  Metric metric=metricFinder.findByKey(metricKey);
+  AnalyzerMeasureBuilder<Serializable> builder=context.measureBuilder().forMetric(metric).onFile(xooFile);
+switch (metric.getType()) {
+case BOOL:
+    builder.withValue(Boolean.parseBoolean(value));
+  break;
+case INT:
+case MILLISEC:
+builder.withValue(Integer.valueOf(value));
+break;
+case FLOAT:
+case PERCENT:
+case RATING:
+builder.withValue(Double.valueOf(value));
+break;
+case STRING:
+case LEVEL:
+case DATA:
+case DISTRIB:
+builder.withValue(value);
+break;
+case WORK_DUR:
+builder.withValue(Long.valueOf(value));
+break;
+default :
+if (metric.isNumericType()) {
+builder.withValue(Double.valueOf(value));
+}
+ else if (metric.isDataType()) {
+builder.withValue(value);
+}
+ else {
+throw new UnsupportedOperationException("Unsupported type :" + metric.getType());
+}
+}
+return builder.build();
+}

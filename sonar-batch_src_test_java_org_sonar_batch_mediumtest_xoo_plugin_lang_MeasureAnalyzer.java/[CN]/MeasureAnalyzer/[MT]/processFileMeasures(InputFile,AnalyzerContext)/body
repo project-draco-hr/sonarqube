@@ -1,0 +1,31 @@
+{
+  File ioFile=inputFile.file();
+  File measureFile=new File(ioFile.getParentFile(),ioFile.getName() + MEASURES_EXTENSION);
+  if (measureFile.exists()) {
+    XooConstants.LOG.debug("Processing " + measureFile.getAbsolutePath());
+    try {
+      List<String> lines=FileUtils.readLines(measureFile,context.fileSystem().encoding().name());
+      int lineNumber=0;
+      for (      String line : lines) {
+        lineNumber++;
+        if (StringUtils.isBlank(line)) {
+          continue;
+        }
+        if (line.startsWith("#")) {
+          continue;
+        }
+        try {
+          String metricKey=StringUtils.substringBefore(line,":");
+          String value=line.substring(metricKey.length() + 1);
+          context.addMeasure(createMeasure(context,inputFile,metricKey,value));
+        }
+ catch (        Exception e) {
+          throw new IllegalStateException("Error processing line " + lineNumber + " of file "+ measureFile.getAbsolutePath(),e);
+        }
+      }
+    }
+ catch (    IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+}

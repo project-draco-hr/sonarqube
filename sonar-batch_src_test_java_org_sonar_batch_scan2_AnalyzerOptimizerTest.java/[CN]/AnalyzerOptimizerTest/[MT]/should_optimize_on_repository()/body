@@ -1,10 +1,10 @@
 {
   DefaultAnalyzerDescriptor descriptor=new DefaultAnalyzerDescriptor().createIssuesForRuleRepositories("squid");
   assertThat(optimizer.shouldExecute(descriptor)).isFalse();
-  ActiveRules activeRules=new ActiveRulesBuilder().activate(RuleKey.of("repo1","foo")).end().build();
+  ActiveRules activeRules=new ActiveRulesBuilder().create(RuleKey.of("repo1","foo")).activate().build();
   optimizer=new AnalyzerOptimizer(fs,activeRules);
   assertThat(optimizer.shouldExecute(descriptor)).isFalse();
-  activeRules=new ActiveRulesBuilder().activate(RuleKey.of("repo1","foo")).end().activate(RuleKey.of("squid","rule")).end().build();
+  activeRules=new ActiveRulesBuilder().create(RuleKey.of("repo1","foo")).activate().create(RuleKey.of("squid","rule")).activate().build();
   optimizer=new AnalyzerOptimizer(fs,activeRules);
   assertThat(optimizer.shouldExecute(descriptor)).isTrue();
 }
