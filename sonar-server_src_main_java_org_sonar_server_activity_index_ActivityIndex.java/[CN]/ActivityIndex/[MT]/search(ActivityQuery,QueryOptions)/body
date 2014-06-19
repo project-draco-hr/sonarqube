@@ -1,6 +1,10 @@
 {
   SearchRequestBuilder esSearch=getClient().prepareSearch(this.getIndexName()).setTypes(this.getIndexType()).setIndices(this.getIndexName());
-  esSearch.setQuery(QueryBuilders.matchAllQuery());
+  OrFilterBuilder filter=FilterBuilders.orFilter();
+  for (  Activity.Type type : query.getTypes()) {
+    filter.add(FilterBuilders.termFilter(ActivityNormalizer.LogFields.TYPE.field(),type));
+  }
+  esSearch.setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),filter));
   if (options.isScroll()) {
     esSearch.setSearchType(SearchType.SCAN);
     esSearch.setScroll(TimeValue.timeValueMinutes(3));
