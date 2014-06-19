@@ -4,8 +4,10 @@
   for (  String profileKey : query.getQprofileKeys()) {
     activityFilter.add(FilterBuilders.termFilter("details.profileKey",profileKey));
   }
-  for (  SearchHit hit : index.get(ActivityIndex.class).search(query,options,activityFilter).getHits().getHits()) {
+  SearchResponse response=index.get(ActivityIndex.class).search(query,options,activityFilter);
+  for (  SearchHit hit : response.getHits().getHits()) {
     QProfileActivity profileActivity=new QProfileActivity(hit.getSource());
+    results.add(profileActivity);
   }
   return results;
 }
