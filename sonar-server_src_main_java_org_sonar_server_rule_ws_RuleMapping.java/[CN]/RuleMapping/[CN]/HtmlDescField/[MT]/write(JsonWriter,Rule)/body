@@ -1,6 +1,13 @@
 {
   String html=rule.htmlDescription();
   if (html != null) {
-    json.prop("htmlDesc",macroInterpreter.interpret(html));
+    if (rule.isManual() || rule.templateKey() != null) {
+      String desc=StringEscapeUtils.escapeHtml(html);
+      desc=desc.replaceAll("\\n","<br/>");
+      json.prop("htmlDesc",desc);
+    }
+ else {
+      json.prop("htmlDesc",macroInterpreter.interpret(html));
+    }
   }
 }

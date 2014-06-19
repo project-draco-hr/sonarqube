@@ -1,0 +1,10 @@
+{
+  MockUserSession.set().setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN).setLogin("me");
+  RuleDto templateRule=ruleDao.insert(session,RuleTesting.newTemplateRule(RuleKey.of("java","S001")));
+  session.commit();
+  NewRule customRule=NewRule.createForCustomRule("MY_CUSTOM",templateRule.getKey()).setName("My custom").setSeverity(Severity.MINOR).setStatus(RuleStatus.READY).setHtmlDescription("<div>line1\nline2</div>");
+  RuleKey customRuleKey=ruleService.create(customRule);
+  session.clearCache();
+  WsTester.TestRequest request=wsTester.newGetRequest("api/rules","show").setParam("key",customRuleKey.toString());
+  request.execute().assertJson(getClass(),"encode_html_description_of_custom_rule.json",false);
+}
