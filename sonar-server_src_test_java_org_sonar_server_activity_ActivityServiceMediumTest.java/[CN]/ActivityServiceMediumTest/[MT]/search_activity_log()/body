@@ -1,0 +1,16 @@
+{
+  final String value="world";
+  final String key="hello";
+  ActivityLog activity=new ActivityLog(){
+    @Override public Map<String,String> getDetails(){
+      return ImmutableMap.of(key,value);
+    }
+  }
+;
+  service.write(dbSession,Activity.Type.ACTIVE_RULE,activity);
+  dbSession.commit();
+  assertThat(index.findAll().getTotal()).isEqualTo(1);
+  Result<Activity> result=index.search(service.newActivityQuery(),new QueryOptions());
+  assertThat(result.getTotal()).isEqualTo(1L);
+  assertThat(result.getHits().get(0).details().get(key)).isEqualTo(value);
+}
