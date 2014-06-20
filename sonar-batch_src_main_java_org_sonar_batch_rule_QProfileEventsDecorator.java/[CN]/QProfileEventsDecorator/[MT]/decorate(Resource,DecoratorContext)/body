@@ -2,13 +2,13 @@
   if (!Qualifiers.isProject(resource,true)) {
     return;
   }
+  Measure previousMeasure=getPreviousMeasure(resource,CoreMetrics.QUALITY_PROFILES);
+  if (previousMeasure == null || previousMeasure.getData() == null) {
+    return;
+  }
+  Map<String,QProfile> previousProfiles=UsedQProfiles.fromJson(previousMeasure.getData()).profilesByKey();
   Measure currentMeasure=context.getMeasure(CoreMetrics.QUALITY_PROFILES);
   Map<String,QProfile> currentProfiles=UsedQProfiles.fromJson(currentMeasure.getData()).profilesByKey();
-  Map<String,QProfile> previousProfiles=Maps.newHashMap();
-  Measure previousMeasure=getPreviousMeasure(resource,CoreMetrics.QUALITY_PROFILES);
-  if (previousMeasure != null && previousMeasure.getData() != null) {
-    previousProfiles=UsedQProfiles.fromJson(previousMeasure.getData()).profilesByKey();
-  }
   for (  QProfile profile : currentProfiles.values()) {
     QProfile previousProfile=previousProfiles.get(profile.key());
     if (previousProfile != null) {
