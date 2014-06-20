@@ -1,8 +1,11 @@
 {
   setupData("shouldSelectPurgeableSnapshots");
   List<PurgeableSnapshotDto> snapshots=dao.selectPurgeableSnapshots(1L);
-  assertThat(snapshots,hasItem(new SnapshotMatcher(1L,true,false)));
-  assertThat(snapshots,hasItem(new SnapshotMatcher(4L,false,false)));
-  assertThat(snapshots,hasItem(new SnapshotMatcher(5L,false,true)));
-  assertThat(snapshots.size(),is(3));
+  assertThat(snapshots).hasSize(3);
+  assertThat(getById(snapshots,1L).isLast()).isTrue();
+  assertThat(getById(snapshots,1L).hasEvents()).isFalse();
+  assertThat(getById(snapshots,4L).isLast()).isFalse();
+  assertThat(getById(snapshots,4L).hasEvents()).isFalse();
+  assertThat(getById(snapshots,5L).isLast()).isFalse();
+  assertThat(getById(snapshots,5L).hasEvents()).isTrue();
 }
