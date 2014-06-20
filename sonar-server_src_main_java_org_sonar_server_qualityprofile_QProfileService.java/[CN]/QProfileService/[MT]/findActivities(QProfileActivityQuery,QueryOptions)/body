@@ -1,13 +1,27 @@
 {
   List<QProfileActivity> results=Lists.newArrayList();
-  OrFilterBuilder activityFilter=FilterBuilders.orFilter();
-  for (  String profileKey : query.getQprofileKeys()) {
-    activityFilter.add(FilterBuilders.termFilter("details.profileKey",profileKey));
+  DbSession session=db.openSession(false);
+  try {
+    OrFilterBuilder activityFilter=FilterBuilders.orFilter();
+    for (    String profileKey : query.getQprofileKeys()) {
+      activityFilter.add(FilterBuilders.termFilter("details.profileKey",profileKey));
+    }
+    SearchResponse response=index.get(ActivityIndex.class).search(query,options,activityFilter);
+    for (    SearchHit hit : response.getHits().getHits()) {
+      QProfileActivity profileActivity=new QProfileActivity(hit.getSource());
+      profileActivity.ruleName(db.ruleDao().getByKey(session,profileActivity.ruleKey()).getName());
+      UserDto user=db.userDao().selectActiveUserByLogin(profileActivity.login(),session);
+      if (user != null) {
+        profileActivity.authorName(user.getName());
+      }
+ else {
+        profileActivity.authorName(profileActivity.login());
+      }
+      results.add(profileActivity);
+    }
+    return results;
   }
-  SearchResponse response=index.get(ActivityIndex.class).search(query,options,activityFilter);
-  for (  SearchHit hit : response.getHits().getHits()) {
-    QProfileActivity profileActivity=new QProfileActivity(hit.getSource());
-    results.add(profileActivity);
+  finally {
+    session.close();
   }
-  return results;
 }

@@ -1,4 +1,6 @@
 {
+  MockUserSession.set().setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN).setLogin("me");
+  RuleDto rule=db.ruleDao().getByKey(dbSession,RuleTesting.XOO_X1);
   tester.get(ActivityService.class).write(dbSession,Activity.Type.QPROFILE,ActiveRuleChange.createFor(ActiveRuleChange.Type.ACTIVATED,ActiveRuleKey.of(XOO_P1_KEY,RuleTesting.XOO_X1)).setSeverity(Severity.MAJOR).setParameter("max","10"));
   dbSession.commit();
   List<QProfileActivity> activities=service.findActivities(new QProfileActivityQuery(),new QueryOptions());
@@ -10,4 +12,6 @@
   assertThat(activity.profileKey()).isEqualTo(XOO_P1_KEY);
   assertThat(activity.parameters().get("max")).isEqualTo("10");
   assertThat(activity.severity()).isEqualTo(Severity.MAJOR);
+  assertThat(activity.ruleName()).isEqualTo(rule.getName());
+  assertThat(activity.authorName()).isEqualTo("me");
 }
