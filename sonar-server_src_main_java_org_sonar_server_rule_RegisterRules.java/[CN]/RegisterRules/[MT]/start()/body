@@ -3,6 +3,7 @@
   DbSession session=dbClient.openSession(false);
   try {
     Map<RuleKey,RuleDto> allRules=loadRules(session);
+    Map<String,CharacteristicDto> allCharacteristics=loadCharacteristics(session);
     RulesDefinition.Context context=defLoader.load();
     for (    RulesDefinition.ExtendedRepository repoDef : getRepositories(context)) {
       for (      RulesDefinition.Rule ruleDef : repoDef.rules()) {
@@ -12,11 +13,9 @@
         if (mergeRule(ruleDef,rule)) {
           executeUpdate=true;
         }
-        if (rule.getSubCharacteristicId() != null) {
-          CharacteristicDto characteristicDto=characteristicDao.selectById(rule.getSubCharacteristicId(),session);
-          if (characteristicDto != null && mergeDebtDefinitions(ruleDef,rule,characteristicDto)) {
-            executeUpdate=true;
-          }
+        CharacteristicDto subCharacteristic=characteristic(ruleDef,rule.getSubCharacteristicId(),allCharacteristics);
+        if (mergeDebtDefinitions(ruleDef,rule,subCharacteristic)) {
+          executeUpdate=true;
         }
         if (mergeTags(ruleDef,rule)) {
           executeUpdate=true;

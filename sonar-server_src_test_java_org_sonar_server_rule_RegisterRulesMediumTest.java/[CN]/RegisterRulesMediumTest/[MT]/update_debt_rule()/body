@@ -1,0 +1,14 @@
+{
+  verifyRulesInDb();
+  RuleIndex index=tester.get(RuleIndex.class);
+  RuleDto ruleDto=db.ruleDao().getByKey(dbSession,RuleTesting.XOO_X1);
+  db.ruleDao().update(dbSession,ruleDto.setDefaultSubCharacteristicId(123456).setDefaultRemediationFunction("LINEAR_OFFSET").setDefaultRemediationCoefficient("2h").setDefaultRemediationOffset("35min"));
+  dbSession.commit();
+  dbSession.clearCache();
+  tester.get(Platform.class).executeStartupTasks();
+  Rule ruleReloaded=index.getByKey(RuleTesting.XOO_X1);
+  assertThat(ruleReloaded.debtSubCharacteristicKey()).isEqualTo(RulesDefinition.SubCharacteristics.INTEGRATION_TESTABILITY);
+  assertThat(ruleReloaded.debtRemediationFunction().type()).isEqualTo(DebtRemediationFunction.Type.LINEAR_OFFSET);
+  assertThat(ruleReloaded.debtRemediationFunction().coefficient()).isEqualTo("1h");
+  assertThat(ruleReloaded.debtRemediationFunction().offset()).isEqualTo("30min");
+}
