@@ -1,5 +1,7 @@
 {
-  MockUserSession.set().setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN).setLogin("me");
+  MockUserSession.set().setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN).setLogin("david");
+  UserDto user=new UserDto().setLogin("david").setName("David").setEmail("dav@id.com").setCreatedAt(new Date()).setUpdatedAt(new Date());
+  db.userDao().insert(dbSession,user);
   RuleDto rule=db.ruleDao().getByKey(dbSession,RuleTesting.XOO_X1);
   tester.get(ActivityService.class).write(dbSession,Activity.Type.QPROFILE,ActiveRuleChange.createFor(ActiveRuleChange.Type.ACTIVATED,ActiveRuleKey.of(XOO_P1_KEY,RuleTesting.XOO_X1)).setSeverity(Severity.MAJOR).setParameter("max","10"));
   dbSession.commit();
@@ -12,8 +14,8 @@
   assertThat(activity.profileKey()).isEqualTo(XOO_P1_KEY);
   assertThat(activity.severity()).isEqualTo(Severity.MAJOR);
   assertThat(activity.ruleName()).isEqualTo(rule.getName());
-  assertThat(activity.login()).isEqualTo("me");
-  assertThat(activity.authorName()).isNull();
+  assertThat(activity.login()).isEqualTo("david");
+  assertThat(activity.authorName()).isEqualTo("David");
   assertThat(activity.parameters()).hasSize(1);
   assertThat(activity.parameters().get("max")).isEqualTo("10");
 }
