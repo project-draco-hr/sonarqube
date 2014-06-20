@@ -8,7 +8,13 @@
     Characteristic characteristic=measure.getCharacteristic();
     Integer characteristicId=characteristic != null ? characteristic.id() : null;
     Integer personId=measure.getPersonId();
-    Integer ruleId=measure instanceof RuleMeasure ? ruleFinder.findByKey(((RuleMeasure)measure).ruleKey()).getId() : null;
+    Integer ruleId=null;
+    if (measure instanceof RuleMeasure) {
+      Rule rule=ruleFinder.findByKey(((RuleMeasure)measure).ruleKey());
+      if (rule != null) {
+        ruleId=rule.getId();
+      }
+    }
     Object[] pastMeasure=pastMeasuresByKey.get(new MeasureKey(metricId,characteristicId,personId,ruleId));
     if (updateVariation(measure,pastMeasure,index)) {
       context.saveMeasure(measure);

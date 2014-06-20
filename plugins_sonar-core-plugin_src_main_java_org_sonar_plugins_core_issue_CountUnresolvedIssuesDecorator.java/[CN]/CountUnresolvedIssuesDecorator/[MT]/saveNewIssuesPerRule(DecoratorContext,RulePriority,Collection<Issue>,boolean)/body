@@ -20,12 +20,11 @@
       }
     }
     for (    RuleKey ruleKey : ruleKeys) {
-      Rule rule=rulefinder.findByKey(ruleKey);
-      RuleMeasure measure=RuleMeasure.createForRule(metric,rule,null);
+      RuleMeasure measure=RuleMeasure.createForRule(metric,ruleKey,null);
       measure.setSeverity(severity);
       for (      Period period : timeMachineConfiguration.periods()) {
         int variationIndex=period.getIndex();
-        double sum=MeasureUtils.sumOnVariation(true,variationIndex,childMeasuresPerRuleKeys.get(rule.ruleKey())) + countIssues(issuesPerRuleKeys.get(rule.ruleKey()),period);
+        double sum=MeasureUtils.sumOnVariation(true,variationIndex,childMeasuresPerRuleKeys.get(ruleKey)) + countIssues(issuesPerRuleKeys.get(ruleKey),period);
         measure.setVariation(variationIndex,sum);
       }
       context.saveMeasure(measure);
