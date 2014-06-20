@@ -4,7 +4,7 @@
   try {
     OrFilterBuilder activityFilter=FilterBuilders.orFilter();
     for (    String profileKey : query.getQprofileKeys()) {
-      activityFilter.add(FilterBuilders.termFilter("details.profileKey",profileKey));
+      activityFilter.add(FilterBuilders.nestedFilter("details",QueryBuilders.matchQuery("details.profileKey",profileKey)));
     }
     SearchResponse response=index.get(ActivityIndex.class).search(query,options,activityFilter);
     for (    SearchHit hit : response.getHits().getHits()) {
