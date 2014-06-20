@@ -6,9 +6,6 @@
   Connection writeConnection=null;
   PreparedStatement writeStatement=null;
   try {
-    writeConnection=db.getDataSource().getConnection();
-    writeConnection.setAutoCommit(false);
-    writeStatement=writeConnection.prepareStatement(converter.updateSql());
     readConnection=db.getDataSource().getConnection();
     readConnection.setAutoCommit(false);
     stmt=initStatement(readConnection);
@@ -18,6 +15,11 @@
       S row=inputLoader.load(rs);
       if (row == null) {
         continue;
+      }
+      if (writeConnection == null) {
+        writeConnection=db.getDataSource().getConnection();
+        writeConnection.setAutoCommit(false);
+        writeStatement=writeConnection.prepareStatement(converter.updateSql());
       }
       if (converter.convert(row,writeStatement)) {
         writeStatement.addBatch();
