@@ -1,0 +1,9 @@
+{
+  InputFile file=new DefaultInputFile("src/Foo.php");
+  ArgumentCaptor<Measure> argumentCaptor=ArgumentCaptor.forClass(Measure.class);
+  when(sensorContext.saveMeasure(eq(file),argumentCaptor.capture())).thenReturn(null);
+  adaptor.addMeasure(new DefaultAnalyzerMeasureBuilder().onFile(file).forMetric(CoreMetrics.NCLOC).withValue(10).build());
+  Measure m=argumentCaptor.getValue();
+  assertThat(m.getValue()).isEqualTo(10.0);
+  assertThat(m.getMetric()).isEqualTo(CoreMetrics.NCLOC);
+}
