@@ -35,6 +35,12 @@ throw new UnsupportedOperationException("Unsupported type :" + m.getType());
 }
 }
 if (measure.inputFile() != null) {
+Formula formula=measure.metric() instanceof org.sonar.api.measures.Metric ? ((org.sonar.api.measures.Metric)measure.metric()).getFormula() : null;
+if (formula instanceof SumChildDistributionFormula) {
+if (!Scopes.isHigherThanOrEquals(Scopes.FILE,((SumChildDistributionFormula)formula).getMinimumScopeToPersist())) {
+measureToSave.setPersistenceMode(PersistenceMode.MEMORY);
+}
+}
 sensorContext.saveMeasure(measure.inputFile(),measureToSave);
 }
  else {
