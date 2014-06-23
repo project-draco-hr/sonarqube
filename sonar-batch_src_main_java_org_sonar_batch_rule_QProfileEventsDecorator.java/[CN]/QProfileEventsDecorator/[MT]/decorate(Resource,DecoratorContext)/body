@@ -10,16 +10,19 @@
   Measure currentMeasure=context.getMeasure(CoreMetrics.QUALITY_PROFILES);
   Map<String,QProfile> currentProfiles=UsedQProfiles.fromJson(currentMeasure.getData()).profilesByKey();
   for (  QProfile profile : currentProfiles.values()) {
-    QProfile previousProfile=previousProfiles.get(profile.key());
+    QProfile previousProfile=previousProfiles.get(profile.getKey());
     if (previousProfile != null) {
+      if (profile.getRulesUpdatedAt().after(previousProfile.getRulesUpdatedAt())) {
+        markAsUsed(context,profile);
+      }
     }
  else {
-      usedProfile(context,profile);
+      markAsUsed(context,profile);
     }
   }
   for (  QProfile previousProfile : previousProfiles.values()) {
-    if (!currentProfiles.containsKey(previousProfile.key())) {
-      stopUsedProfile(context,previousProfile);
+    if (!currentProfiles.containsKey(previousProfile.getKey())) {
+      markAsUnused(context,previousProfile);
     }
   }
 }
