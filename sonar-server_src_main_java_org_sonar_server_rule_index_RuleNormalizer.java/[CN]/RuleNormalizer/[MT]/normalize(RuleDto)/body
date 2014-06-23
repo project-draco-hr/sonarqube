@@ -29,8 +29,11 @@
       update.put(RuleField.TEMPLATE_KEY.field(),null);
     }
     CharacteristicDto characteristic=null;
+    CharacteristicDto defaultCharacteristic=null;
     if (rule.getDefaultSubCharacteristicId() != null) {
       characteristic=db.debtCharacteristicDao().selectById(rule.getDefaultSubCharacteristicId(),session);
+      defaultCharacteristic=characteristic;
+      update.put(RuleField.DEFAULT_SUB_CHARACTERISTIC.field(),defaultCharacteristic.getKey());
     }
     if (rule.getSubCharacteristicId() != null) {
       characteristic=db.debtCharacteristicDao().selectById(rule.getSubCharacteristicId(),session);
@@ -38,7 +41,14 @@
     if (characteristic != null && characteristic.getId() != -1) {
       update.put(RuleField.SUB_CHARACTERISTIC.field(),characteristic.getKey());
       if (characteristic.getParentId() != null) {
-        update.put(RuleField.CHARACTERISTIC.field(),db.debtCharacteristicDao().selectById(characteristic.getParentId(),session).getKey());
+        CharacteristicDto parentCharacteristic=db.debtCharacteristicDao().selectById(characteristic.getParentId(),session);
+        update.put(RuleField.CHARACTERISTIC.field(),parentCharacteristic.getKey());
+        if (characteristic.getId() == defaultCharacteristic.getId()) {
+          update.put(RuleField.DEFAULT_CHARACTERISTIC.field(),parentCharacteristic.getKey());
+        }
+ else {
+          update.put(RuleField.DEFAULT_CHARACTERISTIC.field(),db.debtCharacteristicDao().selectById(defaultCharacteristic.getParentId(),session).getKey());
+        }
       }
     }
  else {
