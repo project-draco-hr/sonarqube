@@ -1,7 +1,19 @@
 {
   verifyRulesInDb();
-  RuleIndex index=tester.get(RuleIndex.class);
   Result<Rule> searchResult=index.search(new RuleQuery(),new QueryOptions());
   assertThat(searchResult.getTotal()).isEqualTo(3);
   assertThat(searchResult.getHits()).hasSize(3);
+  Rule rule=index.getByKey(RuleTesting.XOO_X1);
+  assertThat(rule.severity()).isEqualTo(Severity.MINOR);
+  assertThat(rule.name()).isEqualTo("x1 name");
+  assertThat(rule.htmlDescription()).isEqualTo("x1 desc");
+  assertThat(rule.systemTags()).contains("tag1");
+  assertThat(rule.params()).hasSize(1);
+  assertThat(rule.param("acceptWhitespace").type()).isEqualTo(RuleParamType.BOOLEAN);
+  assertThat(rule.param("acceptWhitespace").defaultValue()).isEqualTo("false");
+  assertThat(rule.param("acceptWhitespace").description()).isEqualTo("Accept whitespaces on the line");
+  assertThat(rule.debtSubCharacteristicKey()).isEqualTo(RulesDefinition.SubCharacteristics.INTEGRATION_TESTABILITY);
+  assertThat(rule.debtRemediationFunction().type()).isEqualTo(DebtRemediationFunction.Type.LINEAR_OFFSET);
+  assertThat(rule.debtRemediationFunction().coefficient()).isEqualTo("1h");
+  assertThat(rule.debtRemediationFunction().offset()).isEqualTo("30min");
 }

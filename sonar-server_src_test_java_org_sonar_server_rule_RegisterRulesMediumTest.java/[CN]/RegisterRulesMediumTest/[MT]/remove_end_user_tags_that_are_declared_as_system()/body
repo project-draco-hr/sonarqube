@@ -1,0 +1,18 @@
+{
+  verifyRulesInDb();
+  Rule rule=index.getByKey(RuleTesting.XOO_X1);
+  assertThat(rule.systemTags()).contains("tag1");
+  assertThat(rule.tags()).isEmpty();
+  tester.get(RuleUpdater.class).update(RuleUpdate.createForPluginRule(rule.key()).setTags(newHashSet("tag2")),UserSession.get());
+  dbSession.clearCache();
+  Rule ruleUpdated=index.getByKey(RuleTesting.XOO_X1);
+  assertThat(ruleUpdated.systemTags()).contains("tag1");
+  assertThat(ruleUpdated.tags()).contains("tag2");
+  rulesDefinition.includeX1=false;
+  rulesDefinition.includeX1bis=true;
+  tester.get(Platform.class).executeStartupTasks();
+  dbSession.clearCache();
+  Rule ruleReloaded=index.getByKey(RuleTesting.XOO_X1);
+  assertThat(ruleReloaded.systemTags()).contains("tag1","tag2");
+  assertThat(ruleUpdated.tags()).isEmpty();
+}

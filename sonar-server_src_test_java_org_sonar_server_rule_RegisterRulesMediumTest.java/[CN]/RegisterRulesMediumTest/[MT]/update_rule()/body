@@ -1,0 +1,22 @@
+{
+  verifyRulesInDb();
+  rulesDefinition.includeX1=false;
+  rulesDefinition.includeX1bis=true;
+  tester.get(Platform.class).executeStartupTasks();
+  Rule rule=index.getByKey(RuleTesting.XOO_X1);
+  assertThat(rule.severity()).isEqualTo(Severity.INFO);
+  assertThat(rule.name()).isEqualTo("x1 name updated");
+  assertThat(rule.htmlDescription()).isEqualTo("x1 desc updated");
+  assertThat(rule.systemTags()).contains("tag1","tag2");
+  assertThat(rule.params()).hasSize(2);
+  assertThat(rule.param("acceptWhitespace").type()).isEqualTo(RuleParamType.BOOLEAN);
+  assertThat(rule.param("acceptWhitespace").defaultValue()).isEqualTo("true");
+  assertThat(rule.param("acceptWhitespace").description()).isEqualTo("Accept whitespaces on the line updated");
+  assertThat(rule.param("format").type()).isEqualTo(RuleParamType.TEXT);
+  assertThat(rule.param("format").defaultValue()).isEqualTo("txt");
+  assertThat(rule.param("format").description()).isEqualTo("Format");
+  assertThat(rule.debtSubCharacteristicKey()).isEqualTo(RulesDefinition.SubCharacteristics.INSTRUCTION_RELIABILITY);
+  assertThat(rule.debtRemediationFunction().type()).isEqualTo(DebtRemediationFunction.Type.LINEAR);
+  assertThat(rule.debtRemediationFunction().coefficient()).isEqualTo("2h");
+  assertThat(rule.debtRemediationFunction().offset()).isNull();
+}
