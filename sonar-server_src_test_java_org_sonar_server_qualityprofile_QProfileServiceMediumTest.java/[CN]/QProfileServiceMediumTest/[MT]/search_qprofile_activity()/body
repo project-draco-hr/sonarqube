@@ -5,9 +5,9 @@
   RuleDto rule=db.ruleDao().getByKey(dbSession,RuleTesting.XOO_X1);
   tester.get(ActivityService.class).write(dbSession,Activity.Type.QPROFILE,ActiveRuleChange.createFor(ActiveRuleChange.Type.ACTIVATED,ActiveRuleKey.of(XOO_P1_KEY,RuleTesting.XOO_X1)).setSeverity(Severity.MAJOR).setParameter("max","10"));
   dbSession.commit();
-  List<QProfileActivity> activities=service.findActivities(new QProfileActivityQuery(),new QueryOptions());
-  assertThat(activities).hasSize(1);
-  QProfileActivity activity=activities.get(0);
+  Result<QProfileActivity> activities=service.searchActivities(new QProfileActivityQuery(),new QueryOptions());
+  assertThat(activities.getHits()).hasSize(1);
+  QProfileActivity activity=activities.getHits().get(0);
   assertThat(activity.type()).isEqualTo(Activity.Type.QPROFILE);
   assertThat(activity.action()).isEqualTo(ActiveRuleChange.Type.ACTIVATED.name());
   assertThat(activity.ruleKey()).isEqualTo(RuleTesting.XOO_X1);

@@ -1,0 +1,21 @@
+{
+  QProfileActivityQuery query=new QProfileActivityQuery();
+  QueryOptions queryOptions=new QueryOptions().setMaxLimit();
+  List<String> profileKeys=RubyUtils.toStrings(params.get("profileKeys"));
+  if (profileKeys != null) {
+    query.setQprofileKeys(profileKeys);
+  }
+  Date since=RubyUtils.toDate(params.get("since"));
+  if (since != null) {
+    query.setSince(since);
+  }
+  Date to=RubyUtils.toDate(params.get("to"));
+  if (to != null) {
+    query.setTo(to);
+  }
+  Integer page=RubyUtils.toInteger(params.get("p"));
+  int pageIndex=page != null ? page : 1;
+  queryOptions.setPage(pageIndex,50);
+  Result<QProfileActivity> result=service.searchActivities(query,queryOptions);
+  return new QProfileActivityResult(result.getHits(),Paging.create(queryOptions.getLimit(),pageIndex,Long.valueOf(result.getTotal()).intValue()));
+}

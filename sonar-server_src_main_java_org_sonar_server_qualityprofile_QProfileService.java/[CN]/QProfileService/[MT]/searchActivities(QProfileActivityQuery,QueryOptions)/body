@@ -1,5 +1,4 @@
 {
-  List<QProfileActivity> results=Lists.newArrayList();
   DbSession session=db.openSession(false);
   try {
     OrFilterBuilder activityFilter=FilterBuilders.orFilter();
@@ -7,15 +6,16 @@
       activityFilter.add(FilterBuilders.nestedFilter("details",QueryBuilders.matchQuery("details.profileKey",profileKey)));
     }
     SearchResponse response=index.get(ActivityIndex.class).search(query,options,activityFilter);
+    Result<QProfileActivity> result=new Result<QProfileActivity>(response);
     for (    SearchHit hit : response.getHits().getHits()) {
       QProfileActivity profileActivity=new QProfileActivity(hit.getSource());
       RuleDto ruleDto=db.ruleDao().getNullableByKey(session,profileActivity.ruleKey());
       profileActivity.ruleName(ruleDto != null ? ruleDto.getName() : null);
       UserDto user=db.userDao().selectActiveUserByLogin(profileActivity.login(),session);
       profileActivity.authorName(user != null ? user.getName() : null);
-      results.add(profileActivity);
+      result.getHits().add(profileActivity);
     }
-    return results;
+    return result;
   }
   finally {
     session.close();
