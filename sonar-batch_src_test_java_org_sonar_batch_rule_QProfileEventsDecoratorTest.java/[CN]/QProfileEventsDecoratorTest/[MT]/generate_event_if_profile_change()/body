@@ -5,5 +5,13 @@
   when(decoratorContext.getMeasure(CoreMetrics.QUALITY_PROFILES)).thenReturn(newMeasure);
   when(languages.get("java")).thenReturn(Java.INSTANCE);
   decorator.decorate(project,decoratorContext);
-  verify(decoratorContext).createEvent(eq("Use Java One (Java)"),eq("Java One used for Java"),same(Event.CATEGORY_PROFILE),any(Date.class));
+  verify(persistenceManager).saveEvent(any(Resource.class),argThat(new BaseMatcher<Event>(){
+    @Override public void describeTo(    Description description){
+    }
+    @Override public boolean matches(    Object item){
+      Event event=(Event)item;
+      return event.getCategory().equals(Event.CATEGORY_PROFILE) && "Changes in 'Java One' (Java)".equals(event.getName()) && "from=2014-01-15T12:00:00+0000;key=J1;to=2014-02-20T12:00:00+0000".equals(event.getData());
+    }
+  }
+));
 }
