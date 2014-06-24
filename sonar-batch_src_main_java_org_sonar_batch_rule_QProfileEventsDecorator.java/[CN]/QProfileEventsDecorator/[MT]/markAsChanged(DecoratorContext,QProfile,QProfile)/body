@@ -2,7 +2,9 @@
   Event event=new Event();
   event.setName(String.format("Changes in %s",profileLabel(profile)));
   event.setCategory(Event.CATEGORY_PROFILE);
-  String data=KeyValueFormat.format(ImmutableSortedMap.of("key",profile.getKey(),"from",UtcDateUtils.formatDateTime(previousProfile.getRulesUpdatedAt()),"to",UtcDateUtils.formatDateTime(profile.getRulesUpdatedAt())));
+  Date from=previousProfile.getRulesUpdatedAt();
+  from=DateUtils.addSeconds(from,1);
+  String data=KeyValueFormat.format(ImmutableSortedMap.of("key",profile.getKey(),"from",UtcDateUtils.formatDateTime(from),"to",UtcDateUtils.formatDateTime(profile.getRulesUpdatedAt())));
   event.setData(data);
   persistenceManager.saveEvent(context.getResource(),event);
 }
