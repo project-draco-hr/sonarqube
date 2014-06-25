@@ -5,15 +5,11 @@
   RuleUpdate update=RuleUpdate.createForPluginRule(RULE_KEY).setDebtSubCharacteristic(RuleUpdate.DEFAULT_DEBT_CHARACTERISTIC);
   updater.update(update,UserSession.get());
   dbSession.clearCache();
-  RuleDto rule=ruleDao.getNullableByKey(dbSession,RULE_KEY);
-  assertThat(rule.getSubCharacteristicId()).isNull();
-  assertThat(rule.getRemediationFunction()).isNull();
-  assertThat(rule.getRemediationCoefficient()).isNull();
-  assertThat(rule.getRemediationOffset()).isNull();
   Rule indexedRule=tester.get(RuleIndex.class).getByKey(RULE_KEY);
   assertThat(indexedRule.debtCharacteristicKey()).isEqualTo("RELIABILITY");
   assertThat(indexedRule.debtSubCharacteristicKey()).isEqualTo("HARD_RELIABILITY");
   assertThat(indexedRule.debtRemediationFunction().type()).isEqualTo(DebtRemediationFunction.Type.LINEAR);
   assertThat(indexedRule.debtRemediationFunction().coefficient()).isEqualTo("1d");
   assertThat(indexedRule.debtRemediationFunction().offset()).isEqualTo("5min");
+  assertThat(indexedRule.debtOverloaded()).isFalse();
 }
