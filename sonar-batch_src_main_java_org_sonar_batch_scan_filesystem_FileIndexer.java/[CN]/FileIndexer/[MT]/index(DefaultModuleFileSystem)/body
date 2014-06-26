@@ -5,6 +5,7 @@
   LOG.info("Index files");
   exclusionFilters.prepare();
   Progress progress=new Progress(fileCache.byModule(fileSystem.moduleKey()));
+  executor=Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
   InputFileBuilder inputFileBuilder=inputFileBuilderFactory.create(fileSystem);
   if (!fileSystem.sourceFiles().isEmpty() || !fileSystem.testFiles().isEmpty()) {
     indexFiles(inputFileBuilder,fileSystem,progress,fileSystem.sourceFiles(),InputFile.Type.MAIN);
@@ -17,6 +18,16 @@
     for (    File testDir : fileSystem.testDirs()) {
       indexDirectory(inputFileBuilder,fileSystem,progress,testDir,InputFile.Type.TEST);
     }
+  }
+  executor.shutdown();
+  try {
+    executor.awaitTermination(10,TimeUnit.SECONDS);
+  }
+ catch (  InterruptedException e) {
+    throw new IllegalStateException("FileIndexer was interrupted",e);
+  }
+  for (  InputFile indexed : progress.indexed) {
+    fileSystem.add(indexed);
   }
   for (  InputFile removed : progress.removed) {
     fileCache.remove(fileSystem.moduleKey(),removed);

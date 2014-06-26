@@ -1,7 +1,12 @@
 {
-  InputFile completedFile=inputFileBuilder.complete(inputFile,type);
-  if (completedFile != null && accept(completedFile)) {
-    fs.add(completedFile);
-    status.markAsIndexed(completedFile);
+  Runnable worker=new Runnable(){
+    @Override public void run(){
+      InputFile completedFile=inputFileBuilder.complete(inputFile,type);
+      if (completedFile != null && accept(completedFile)) {
+        status.markAsIndexed(completedFile);
+      }
+    }
   }
+;
+  executor.execute(worker);
 }
