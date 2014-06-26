@@ -1,13 +1,9 @@
 {
-  RuleKey readyKey=RuleKey.of("javascript","S001");
-  RuleDto readyDto=RuleTesting.newDto(readyKey).setStatus(RuleStatus.READY);
-  RuleKey removedKey=RuleKey.of("javascript","S002");
-  RuleDto removedDto=RuleTesting.newDto(removedKey).setStatus(RuleStatus.REMOVED);
-  dao.insert(dbSession,readyDto,removedDto);
+  dao.insert(dbSession,RuleTesting.newXooX1(),RuleTesting.newXooX2().setStatus(RuleStatus.REMOVED));
   dbSession.commit();
   assertThat(dao.findAll(dbSession)).hasSize(2);
-  assertThat(index.getByKey(removedKey)).isNotNull();
+  assertThat(index.getByKey(RuleTesting.XOO_X2)).isNotNull();
   List<Rule> rules=index.search(new RuleQuery(),new QueryOptions()).getHits();
   assertThat(rules).hasSize(1);
-  assertThat(rules.get(0).key()).isEqualTo(readyKey);
+  assertThat(rules.get(0).key()).isEqualTo(RuleTesting.XOO_X1);
 }
