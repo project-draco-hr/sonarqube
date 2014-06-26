@@ -1,0 +1,23 @@
+{
+  db.prepareDbUnit(getClass(),"feed_keys.xml");
+  migration.execute();
+  QualityProfileDao dao=new QualityProfileDao(db.myBatis(),mock(System2.class));
+  QualityProfileDto parentProfile=dao.getById(10);
+  assertThat(parentProfile.getKey()).startsWith("java-sonar-way-");
+  assertThat(parentProfile.getName()).isEqualTo("Sonar Way");
+  assertThat(parentProfile.getLanguage()).isEqualTo("java");
+  assertThat(parentProfile.getParentKee()).isNull();
+  QualityProfileDto differentCaseProfile=dao.getById(11);
+  assertThat(differentCaseProfile.getKey()).startsWith("java-sonar-way-").isNotEqualTo(parentProfile.getKey());
+  assertThat(differentCaseProfile.getName()).isEqualTo("Sonar way");
+  assertThat(differentCaseProfile.getParentKee()).isNull();
+  QualityProfileDto childProfile=dao.getById(12);
+  assertThat(childProfile.getKey()).startsWith("java-child-");
+  assertThat(childProfile.getName()).isEqualTo("Child");
+  assertThat(childProfile.getParentKee()).isEqualTo(parentProfile.getKey());
+  QualityProfileDto phpProfile=dao.getById(13);
+  assertThat(phpProfile.getKey()).startsWith("php-sonar-way-");
+  assertThat(phpProfile.getName()).isEqualTo("Sonar Way");
+  assertThat(phpProfile.getLanguage()).isEqualTo("php");
+  assertThat(phpProfile.getParentKee()).isNull();
+}
