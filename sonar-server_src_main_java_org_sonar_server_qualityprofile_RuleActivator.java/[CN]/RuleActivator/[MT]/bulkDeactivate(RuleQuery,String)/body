@@ -3,14 +3,22 @@
   try {
     RuleIndex ruleIndex=index.get(RuleIndex.class);
     BulkChangeResult result=new BulkChangeResult();
-    Result<Rule> ruleSearchResult=ruleIndex.search(ruleQuery,new QueryOptions().setScroll(true));
+    Result<Rule> ruleSearchResult=ruleIndex.search(ruleQuery,new QueryOptions().setScroll(true).setFieldsToReturn(Arrays.asList(RuleNormalizer.RuleField.KEY.field())));
     Iterator<Rule> rules=ruleSearchResult.scroll();
     while (rules.hasNext()) {
-      Rule rule=rules.next();
-      ActiveRuleKey key=ActiveRuleKey.of(profile,rule.key());
-      List<ActiveRuleChange> changes=deactivate(dbSession,key);
-      result.addChanges(changes);
-      result.incrementSucceeded();
+      try {
+        Rule rule=rules.next();
+        ActiveRuleKey key=ActiveRuleKey.of(profile,rule.key());
+        List<ActiveRuleChange> changes=deactivate(dbSession,key);
+        result.addChanges(changes);
+        if (!changes.isEmpty()) {
+          result.incrementSucceeded();
+        }
+      }
+ catch (      BadRequestException e) {
+        result.incrementFailed();
+        result.getErrors().add(e.errors());
+      }
     }
     dbSession.commit();
     return result;

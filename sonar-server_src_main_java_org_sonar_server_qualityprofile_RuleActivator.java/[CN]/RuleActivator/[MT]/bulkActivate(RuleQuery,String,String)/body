@@ -3,7 +3,7 @@
   RuleIndex ruleIndex=index.get(RuleIndex.class);
   DbSession dbSession=db.openSession(false);
   try {
-    Result<Rule> ruleSearchResult=ruleIndex.search(ruleQuery,new QueryOptions().setScroll(true));
+    Result<Rule> ruleSearchResult=ruleIndex.search(ruleQuery,new QueryOptions().setScroll(true).setFieldsToReturn(Arrays.asList(RuleNormalizer.RuleField.KEY.field())));
     Iterator<Rule> rules=ruleSearchResult.scroll();
     while (rules.hasNext()) {
       Rule rule=rules.next();
@@ -12,7 +12,9 @@
         activation.setSeverity(severity);
         List<ActiveRuleChange> changes=activate(dbSession,activation,profileKey);
         result.addChanges(changes);
-        result.incrementSucceeded();
+        if (!changes.isEmpty()) {
+          result.incrementSucceeded();
+        }
       }
  catch (      BadRequestException e) {
         result.incrementFailed();

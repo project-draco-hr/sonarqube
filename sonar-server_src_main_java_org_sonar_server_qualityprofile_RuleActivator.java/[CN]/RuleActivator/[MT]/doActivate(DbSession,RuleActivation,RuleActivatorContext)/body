@@ -4,11 +4,14 @@
   ActiveRuleChange change;
   boolean stopPropagation=false;
   if (context.activeRule() == null) {
+    if (activation.isReset()) {
+      return changes;
+    }
     change=ActiveRuleChange.createFor(ActiveRuleChange.Type.ACTIVATED,context.activeRuleKey());
-    if (activation.isCascade() || context.isSameAsParent(activation)) {
+    applySeverityAndParamToChange(activation,context,change);
+    if (activation.isCascade() || context.isSameAsParent(change)) {
       change.setInheritance(ActiveRule.Inheritance.INHERITED);
     }
-    applySeverityAndParamToChange(activation,context,change);
   }
  else {
     if (activation.isCascade() && context.activeRule().doesOverride()) {
@@ -17,14 +20,14 @@
     change=ActiveRuleChange.createFor(ActiveRuleChange.Type.UPDATED,context.activeRuleKey());
     if (activation.isCascade() && context.activeRule().getInheritance() == null) {
       change.setInheritance(ActiveRule.Inheritance.OVERRIDES);
-      change.setSeverity(context.activeRule().getSeverityString());
+      change.setSeverity(context.currentSeverity());
       change.setParameters(context.activeRuleParamsAsStringMap());
       stopPropagation=true;
     }
  else {
       applySeverityAndParamToChange(activation,context,change);
       if (!activation.isCascade() && context.parentActiveRule() != null) {
-        change.setInheritance(context.isSameAsParent(activation) ? ActiveRule.Inheritance.INHERITED : ActiveRule.Inheritance.OVERRIDES);
+        change.setInheritance(context.isSameAsParent(change) ? ActiveRule.Inheritance.INHERITED : ActiveRule.Inheritance.OVERRIDES);
       }
     }
     if (context.isSame(change)) {

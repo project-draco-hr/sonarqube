@@ -1,11 +1,23 @@
 {
-  change.setSeverity(StringUtils.defaultIfEmpty(activation.getSeverity(),context.defaultSeverity()));
-  for (  RuleParamDto ruleParamDto : context.ruleParams()) {
-    String value=null;
-    if (context.rule().getTemplateId() == null) {
-      value=StringUtils.defaultIfEmpty(activation.getParameters().get(ruleParamDto.getName()),context.defaultParam(ruleParamDto.getName()));
-      verifyParam(ruleParamDto,value);
+  if (request.isReset()) {
+    change.setSeverity(firstNonEmpty(context.parentSeverity(),context.defaultSeverity()));
+    for (    RuleParamDto ruleParamDto : context.ruleParams()) {
+      String paramKey=ruleParamDto.getName();
+      change.setParameter(paramKey,validateParam(ruleParamDto,firstNonEmpty(context.parentParamValue(paramKey),context.defaultParamValue(paramKey))));
     }
-    change.setParameter(ruleParamDto.getName(),StringUtils.defaultIfEmpty(value,ruleParamDto.getDefaultValue()));
+  }
+ else   if (context.activeRule() != null) {
+    change.setSeverity(firstNonEmpty(request.getSeverity(),context.currentSeverity(),context.parentSeverity(),context.defaultSeverity()));
+    for (    RuleParamDto ruleParamDto : context.ruleParams()) {
+      String paramKey=ruleParamDto.getName();
+      change.setParameter(paramKey,validateParam(ruleParamDto,firstNonEmpty(context.requestParamValue(request,paramKey),context.currentParamValue(paramKey),context.parentParamValue(paramKey),context.defaultParamValue(paramKey))));
+    }
+  }
+ else   if (context.activeRule() == null) {
+    change.setSeverity(firstNonEmpty(request.getSeverity(),context.parentSeverity(),context.defaultSeverity()));
+    for (    RuleParamDto ruleParamDto : context.ruleParams()) {
+      String paramKey=ruleParamDto.getName();
+      change.setParameter(paramKey,validateParam(ruleParamDto,firstNonEmpty(context.requestParamValue(request,paramKey),context.parentParamValue(paramKey),context.defaultParamValue(paramKey))));
+    }
   }
 }
