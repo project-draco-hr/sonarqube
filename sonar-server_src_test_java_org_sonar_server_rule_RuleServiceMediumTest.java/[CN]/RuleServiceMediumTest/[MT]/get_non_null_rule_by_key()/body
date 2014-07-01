@@ -4,7 +4,12 @@
   dao.insert(dbSession,RuleTesting.newDto(key));
   dbSession.commit();
   dbSession.clearCache();
-  Rule rule=service.getByKey(key);
-  assertThat(rule).isNotNull();
-  assertThat(service.getByKey(RuleKey.of("un","known"))).isNull();
+  assertThat(service.getNonNullByKey(key)).isNotNull();
+  try {
+    service.getNonNullByKey(RuleKey.of("un","known"));
+    fail();
+  }
+ catch (  NotFoundException e) {
+    assertThat(e).hasMessage("Rule not found: un:known");
+  }
 }
