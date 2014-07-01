@@ -8,18 +8,20 @@
   this.addTermFilter(fb,RuleNormalizer.RuleField.SEVERITY.field(),query.getSeverities());
   this.addTermFilter(fb,RuleNormalizer.RuleField.KEY.field(),query.getKey());
   this.addTermFilter(fb,RuleNormalizer.RuleField._TAGS.field(),query.getTags());
-  if (query.getDebtCharacteristics() != null && !query.getDebtCharacteristics().isEmpty()) {
-    fb.must(FilterBuilders.orFilter(FilterBuilders.andFilter(FilterBuilders.notFilter(FilterBuilders.termsFilter(RuleNormalizer.RuleField.SUB_CHARACTERISTIC.field(),DebtCharacteristic.NONE)),FilterBuilders.orFilter(FilterBuilders.termsFilter(RuleNormalizer.RuleField.SUB_CHARACTERISTIC.field(),query.getDebtCharacteristics()),FilterBuilders.termsFilter(RuleNormalizer.RuleField.CHARACTERISTIC.field(),query.getDebtCharacteristics()))),FilterBuilders.andFilter(FilterBuilders.orFilter(FilterBuilders.termsFilter(RuleNormalizer.RuleField.SUB_CHARACTERISTIC.field(),""),FilterBuilders.notFilter(FilterBuilders.existsFilter(RuleNormalizer.RuleField.SUB_CHARACTERISTIC.field()))),FilterBuilders.orFilter(FilterBuilders.termsFilter(RuleNormalizer.RuleField.DEFAULT_SUB_CHARACTERISTIC.field(),query.getDebtCharacteristics()),FilterBuilders.termsFilter(RuleNormalizer.RuleField.DEFAULT_CHARACTERISTIC.field(),query.getDebtCharacteristics())))));
+  Collection<String> characteristics=query.getDebtCharacteristics();
+  if (characteristics != null && !characteristics.isEmpty()) {
+    fb.must(FilterBuilders.orFilter(FilterBuilders.andFilter(FilterBuilders.notFilter(FilterBuilders.termsFilter(RuleNormalizer.RuleField.SUB_CHARACTERISTIC.field(),DebtCharacteristic.NONE)),FilterBuilders.orFilter(FilterBuilders.termsFilter(RuleNormalizer.RuleField.SUB_CHARACTERISTIC.field(),characteristics),FilterBuilders.termsFilter(RuleNormalizer.RuleField.CHARACTERISTIC.field(),characteristics))),FilterBuilders.andFilter(FilterBuilders.orFilter(FilterBuilders.termsFilter(RuleNormalizer.RuleField.SUB_CHARACTERISTIC.field(),""),FilterBuilders.notFilter(FilterBuilders.existsFilter(RuleNormalizer.RuleField.SUB_CHARACTERISTIC.field()))),FilterBuilders.orFilter(FilterBuilders.termsFilter(RuleNormalizer.RuleField.DEFAULT_SUB_CHARACTERISTIC.field(),characteristics),FilterBuilders.termsFilter(RuleNormalizer.RuleField.DEFAULT_CHARACTERISTIC.field(),characteristics)))));
   }
-  if (query.getHasDebtCharacteristic() != null && query.getHasDebtCharacteristic()) {
+  if (Boolean.TRUE.equals(query.getHasDebtCharacteristic())) {
     fb.must(FilterBuilders.existsFilter(RuleNormalizer.RuleField.SUB_CHARACTERISTIC.field()));
   }
   if (query.getAvailableSince() != null) {
     fb.must(FilterBuilders.rangeFilter(RuleNormalizer.RuleField.CREATED_AT.field()).gte(query.getAvailableSince()));
   }
-  if (query.getStatuses() != null && !query.getStatuses().isEmpty()) {
+  Collection<RuleStatus> statuses=query.getStatuses();
+  if (statuses != null && !statuses.isEmpty()) {
     Collection<String> stringStatus=new ArrayList<String>();
-    for (    RuleStatus status : query.getStatuses()) {
+    for (    RuleStatus status : statuses) {
       stringStatus.add(status.name());
     }
     this.addTermFilter(fb,RuleNormalizer.RuleField.STATUS.field(),stringStatus);
