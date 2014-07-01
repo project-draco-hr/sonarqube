@@ -3,7 +3,8 @@
   List<ActiveRuleChange> changes=Lists.newArrayList();
   ActiveRuleChange change;
   boolean stopPropagation=false;
-  if (context.activeRule() == null) {
+  ActiveRuleDto activeRule=context.activeRule();
+  if (activeRule == null) {
     if (activation.isReset()) {
       return changes;
     }
@@ -14,11 +15,11 @@
     }
   }
  else {
-    if (activation.isCascade() && context.activeRule().doesOverride()) {
+    if (activation.isCascade() && activeRule.doesOverride()) {
       return changes;
     }
     change=ActiveRuleChange.createFor(ActiveRuleChange.Type.UPDATED,context.activeRuleKey());
-    if (activation.isCascade() && context.activeRule().getInheritance() == null) {
+    if (activation.isCascade() && activeRule.getInheritance() == null) {
       change.setInheritance(ActiveRule.Inheritance.OVERRIDES);
       change.setSeverity(context.currentSeverity());
       change.setParameters(context.activeRuleParamsAsStringMap());
