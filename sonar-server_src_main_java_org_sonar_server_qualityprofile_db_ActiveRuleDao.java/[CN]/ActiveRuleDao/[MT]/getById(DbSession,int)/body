@@ -1,7 +1,12 @@
 {
   ActiveRuleDto activeRule=mapper(session).selectById(activeRuleId);
   if (activeRule != null) {
-    activeRule.setKey(ActiveRuleKey.of(profileDao.getById(activeRule.getProfileId(),session).getKey(),ruleDao.getById(session,activeRule.getRulId()).getKey()));
+    QualityProfileDto profile=profileDao.getById(activeRule.getProfileId(),session);
+    RuleDto rule=ruleDao.getById(session,activeRule.getRulId());
+    if (profile != null && rule != null) {
+      activeRule.setKey(ActiveRuleKey.of(profile.getKey(),rule.getKey()));
+      return activeRule;
+    }
   }
-  return activeRule;
+  return null;
 }

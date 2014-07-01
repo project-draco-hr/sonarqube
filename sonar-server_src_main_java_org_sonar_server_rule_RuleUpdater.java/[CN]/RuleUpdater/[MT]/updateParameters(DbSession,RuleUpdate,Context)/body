@@ -2,6 +2,9 @@
   if (update.isChangeParameters() && update.isCustomRule()) {
     RuleDto customRule=context.rule;
     RuleDto templateRule=dbClient.ruleDao().getTemplate(customRule,dbSession);
+    if (templateRule == null) {
+      throw new IllegalStateException(String.format("Template %s of rule %s does not exist",customRule.getTemplateId(),customRule.getKey()));
+    }
     List<RuleParamDto> templateRuleParams=dbClient.ruleDao().findRuleParamsByRuleKey(dbSession,templateRule.getKey());
     List<String> paramKeys=new ArrayList<String>();
     Multimap<RuleDto,ActiveRuleDto> activeRules=ArrayListMultimap.create();
