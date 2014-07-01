@@ -1,0 +1,28 @@
+{
+  for (  RuleParamDto ruleParamDto : dbClient.ruleDao().findRuleParamsByRuleKey(dbSession,update.getRuleKey())) {
+    String key=ruleParamDto.getName();
+    String value=update.parameter(key);
+    if (!Strings.isNullOrEmpty(value)) {
+      ruleParamDto.setDefaultValue(value);
+      dbClient.ruleDao().updateRuleParam(dbSession,customRule,ruleParamDto);
+      for (      ActiveRuleDto activeRuleDto : activeRules.get(customRule)) {
+        for (        ActiveRuleParamDto activeRuleParamDto : activeRuleParams.get(activeRuleDto)) {
+          if (activeRuleParamDto.getKey().equals(key)) {
+            dbClient.activeRuleDao().updateParam(dbSession,activeRuleDto,activeRuleParamDto.setValue(value));
+          }
+        }
+      }
+    }
+ else {
+      dbClient.ruleDao().removeRuleParam(dbSession,customRule,ruleParamDto);
+      for (      ActiveRuleDto activeRuleDto : activeRules.get(customRule)) {
+        for (        ActiveRuleParamDto activeRuleParamDto : activeRuleParams.get(activeRuleDto)) {
+          if (activeRuleParamDto.getKey().equals(key)) {
+            dbClient.activeRuleDao().deleteParam(dbSession,activeRuleDto,activeRuleParamDto);
+          }
+        }
+      }
+    }
+    paramKeys.add(key);
+  }
+}
