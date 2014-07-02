@@ -38,12 +38,11 @@
     update.put(RuleField.DEFAULT_SUB_CHARACTERISTIC.field(),null);
     Integer defaultSubCharacteristicId=rule.getDefaultSubCharacteristicId();
     if (defaultSubCharacteristicId != null) {
-      CharacteristicDto characteristic, subCharacteristic=null;
-      subCharacteristic=db.debtCharacteristicDao().selectById(defaultSubCharacteristicId,session);
+      CharacteristicDto subCharacteristic=db.debtCharacteristicDao().selectById(defaultSubCharacteristicId,session);
       if (subCharacteristic != null) {
         Integer characteristicId=subCharacteristic.getParentId();
         if (characteristicId != null) {
-          characteristic=db.debtCharacteristicDao().selectById(characteristicId);
+          CharacteristicDto characteristic=db.debtCharacteristicDao().selectById(characteristicId);
           if (characteristic != null) {
             update.put(RuleField.DEFAULT_CHARACTERISTIC.field(),characteristic.getKey());
             update.put(RuleField.DEFAULT_SUB_CHARACTERISTIC.field(),subCharacteristic.getKey());
@@ -58,14 +57,15 @@
         update.put(RuleField.SUB_CHARACTERISTIC.field(),DebtCharacteristic.NONE);
       }
  else {
-        CharacteristicDto characteristic, subCharacteristic=null;
-        subCharacteristic=db.debtCharacteristicDao().selectById(subCharacteristicId,session);
-        Integer characteristicId=subCharacteristic.getParentId();
-        if (characteristicId != null) {
-          characteristic=db.debtCharacteristicDao().selectById(characteristicId);
-          if (characteristic != null) {
-            update.put(RuleField.CHARACTERISTIC.field(),characteristic.getKey());
-            update.put(RuleField.SUB_CHARACTERISTIC.field(),subCharacteristic.getKey());
+        CharacteristicDto subCharacteristic=db.debtCharacteristicDao().selectById(subCharacteristicId,session);
+        if (subCharacteristic != null) {
+          Integer characteristicId=subCharacteristic.getParentId();
+          if (characteristicId != null) {
+            CharacteristicDto characteristic=db.debtCharacteristicDao().selectById(characteristicId);
+            if (characteristic != null) {
+              update.put(RuleField.CHARACTERISTIC.field(),characteristic.getKey());
+              update.put(RuleField.SUB_CHARACTERISTIC.field(),subCharacteristic.getKey());
+            }
           }
         }
       }
