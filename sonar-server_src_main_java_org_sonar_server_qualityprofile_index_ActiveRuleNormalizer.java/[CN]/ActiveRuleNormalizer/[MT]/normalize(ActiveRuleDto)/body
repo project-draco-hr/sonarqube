@@ -10,12 +10,17 @@
   DbSession session=db.openSession(false);
   try {
     QualityProfileDto profile=db.qualityProfileDao().getById(activeRuleDto.getProfileId(),session);
+    if (profile == null) {
+      throw new IllegalStateException("Profile is null : " + activeRuleDto.getProfileId());
+    }
     newRule.put(ActiveRuleField.PROFILE_KEY.field(),profile.getKey());
     String parentKey=null;
     Integer parentId=activeRuleDto.getParentId();
     if (parentId != null) {
       ActiveRuleDto parentDto=db.activeRuleDao().getById(session,parentId);
-      parentKey=parentDto.getKey().toString();
+      if (parentDto != null) {
+        parentKey=parentDto.getKey().toString();
+      }
     }
     newRule.put(ActiveRuleField.PARENT_KEY.field(),parentKey);
   }

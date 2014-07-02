@@ -42,16 +42,18 @@
       subCharacteristic=db.debtCharacteristicDao().selectById(defaultSubCharacteristicId,session);
       if (subCharacteristic != null) {
         Integer characteristicId=subCharacteristic.getParentId();
-        characteristic=db.debtCharacteristicDao().selectById(characteristicId);
-        if (characteristic != null) {
-          update.put(RuleField.DEFAULT_CHARACTERISTIC.field(),characteristic.getKey());
-          update.put(RuleField.DEFAULT_SUB_CHARACTERISTIC.field(),subCharacteristic.getKey());
+        if (characteristicId != null) {
+          characteristic=db.debtCharacteristicDao().selectById(characteristicId);
+          if (characteristic != null) {
+            update.put(RuleField.DEFAULT_CHARACTERISTIC.field(),characteristic.getKey());
+            update.put(RuleField.DEFAULT_SUB_CHARACTERISTIC.field(),subCharacteristic.getKey());
+          }
         }
       }
     }
     Integer subCharacteristicId=rule.getSubCharacteristicId();
     if (subCharacteristicId != null) {
-      if (subCharacteristicId == -1) {
+      if (subCharacteristicId.equals(-1)) {
         update.put(RuleField.CHARACTERISTIC.field(),DebtCharacteristic.NONE);
         update.put(RuleField.SUB_CHARACTERISTIC.field(),DebtCharacteristic.NONE);
       }
