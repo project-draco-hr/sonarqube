@@ -16,6 +16,8 @@
   db.activeRuleDao().synchronizeAfter(dbSession,beginning);
   assertThat(index.getByKey(activeRule.getKey())).isNotNull();
   tester.clearIndexes();
+  Date before=index.getLastSynchronization();
   tester.get(Platform.class).executeStartupTasks();
   assertThat(index.getByKey(activeRule.getKey())).isNotNull();
+  assertThat(before.before(index.getLastSynchronization())).isTrue();
 }
