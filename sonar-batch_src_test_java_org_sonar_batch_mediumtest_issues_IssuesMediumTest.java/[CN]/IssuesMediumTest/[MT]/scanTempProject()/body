@@ -1,0 +1,21 @@
+{
+  File baseDir=temp.newFolder();
+  File srcDir=new File(baseDir,"src");
+  srcDir.mkdir();
+  File xooFile=new File(srcDir,"sample.xoo");
+  File xooMeasureFile=new File(srcDir,"sample.xoo.measures");
+  FileUtils.write(xooFile,"Sample xoo\ncontent");
+  FileUtils.write(xooMeasureFile,"lines:20");
+  TaskResult result=tester.newTask().properties(ImmutableMap.<String,String>builder().put("sonar.task","scan").put("sonar.projectBaseDir",baseDir.getAbsolutePath()).put("sonar.projectKey","com.foo.project").put("sonar.projectName","Foo Project").put("sonar.projectVersion","1.0-SNAPSHOT").put("sonar.projectDescription","Description of Foo Project").put("sonar.sources","src").build()).start();
+  assertThat(result.issues()).hasSize(20);
+  boolean foundIssueAtLine1=false;
+  for (  AnalyzerIssue issue : result.issues()) {
+    if (issue.line() == 1) {
+      foundIssueAtLine1=true;
+      assertThat(issue.inputFile()).isEqualTo(new DefaultInputFile("src/sample.xoo"));
+      assertThat(issue.message()).isEqualTo("This issue is generated on each line");
+      assertThat(issue.effortToFix()).isNull();
+    }
+  }
+  assertThat(foundIssueAtLine1).isTrue();
+}
