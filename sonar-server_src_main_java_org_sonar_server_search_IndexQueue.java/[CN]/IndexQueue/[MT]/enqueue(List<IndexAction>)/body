@@ -17,10 +17,13 @@
       latch.await(1000,TimeUnit.MILLISECONDS);
       bcount++;
       indexTime=System.currentTimeMillis() - indexTime;
-      refreshTime=System.currentTimeMillis();
-      action.getIndex().refresh();
-      refreshTime=System.currentTimeMillis() - refreshTime;
-      refreshes.add(action.getIndex().getIndexName());
+      Index<?,?,?> index=action.getIndex();
+      if (index != null) {
+        refreshTime=System.currentTimeMillis();
+        index.refresh();
+        refreshTime=System.currentTimeMillis() - refreshTime;
+        refreshes.add(action.getIndex().getIndexName());
+      }
       types.add(action.getPayloadClass().getSimpleName());
     }
  catch (    InterruptedException e) {
