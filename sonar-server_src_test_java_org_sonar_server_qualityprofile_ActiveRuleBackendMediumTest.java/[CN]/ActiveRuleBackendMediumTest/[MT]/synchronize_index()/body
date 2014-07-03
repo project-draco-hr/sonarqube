@@ -1,4 +1,5 @@
 {
+  Date beginning=new Date();
   QualityProfileDto profile1=QProfileTesting.newXooP1();
   db.qualityProfileDao().insert(dbSession,profile1);
   RuleDto rule1=RuleDto.createFor(RuleTesting.XOO_X1).setSeverity(Severity.MAJOR);
@@ -8,6 +9,13 @@
   dbSession.commit();
   tester.clearIndexes();
   assertThat(index.getByKey(activeRule.getKey())).isNull();
-  db.activeRuleDao().synchronizeAfter(dbSession,new Date());
+  db.activeRuleDao().synchronizeAfter(dbSession,new Date(0L));
+  assertThat(index.getByKey(activeRule.getKey())).isNotNull();
+  tester.clearIndexes();
+  assertThat(index.getByKey(activeRule.getKey())).isNull();
+  db.activeRuleDao().synchronizeAfter(dbSession,beginning);
+  assertThat(index.getByKey(activeRule.getKey())).isNotNull();
+  tester.clearIndexes();
+  tester.get(Platform.class).executeStartupTasks();
   assertThat(index.getByKey(activeRule.getKey())).isNotNull();
 }
