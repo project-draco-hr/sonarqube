@@ -1,7 +1,10 @@
 {
   Date date;
   try {
-    date=getClient().prepareSearch(this.getIndexName()).setTypes(this.getIndexType()).setQuery(QueryBuilders.matchAllQuery()).setSize(1).addField(BaseNormalizer.UPDATED_AT_FIELD).addSort(BaseNormalizer.UPDATED_AT_FIELD,SortOrder.DESC).get().getHits().getAt(0).field(BaseNormalizer.UPDATED_AT_FIELD).getValue();
+    SearchRequestBuilder request=getClient().prepareSearch(this.getIndexName()).setTypes(this.getIndexType()).setQuery(QueryBuilders.matchAllQuery()).setSize(0).addAggregation(AggregationBuilders.max("latest").field(BaseNormalizer.UPDATED_AT_FIELD));
+    SearchResponse response=request.get();
+    Max max=(Max)response.getAggregations().get("latest");
+    return new DateTime(Double.valueOf(max.getValue()).longValue()).toDate();
   }
  catch (  Exception e) {
     date=new Date(0L);
