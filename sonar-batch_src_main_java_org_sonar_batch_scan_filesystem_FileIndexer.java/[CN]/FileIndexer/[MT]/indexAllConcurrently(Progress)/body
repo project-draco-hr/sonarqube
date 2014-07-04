@@ -1,0 +1,22 @@
+{
+  ExecutorService executor=Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+  try {
+    List<Future<Void>> all=executor.invokeAll(progress.indexingTasks);
+    for (    Future<Void> future : all) {
+      future.get();
+    }
+  }
+ catch (  InterruptedException e) {
+    throw new IllegalStateException("FileIndexer was interrupted",e);
+  }
+catch (  ExecutionException e) {
+    Throwable cause=e.getCause();
+    if (cause instanceof RuntimeException) {
+      throw (RuntimeException)cause;
+    }
+ else {
+      throw new IllegalStateException("Error during file indexing",e);
+    }
+  }
+  executor.shutdown();
+}

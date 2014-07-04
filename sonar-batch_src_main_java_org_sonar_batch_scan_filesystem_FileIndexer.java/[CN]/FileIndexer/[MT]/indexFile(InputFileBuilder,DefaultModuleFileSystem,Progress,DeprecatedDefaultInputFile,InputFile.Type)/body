@@ -1,12 +1,13 @@
 {
-  Runnable worker=new Runnable(){
-    @Override public void run(){
+  Callable<Void> task=new Callable<Void>(){
+    @Override public Void call() throws Exception {
       InputFile completedFile=inputFileBuilder.complete(inputFile,type);
       if (completedFile != null && accept(completedFile)) {
-        status.markAsIndexed(completedFile);
+        status.markAsIndexed(inputFile);
       }
+      return null;
     }
   }
 ;
-  executor.execute(worker);
+  status.planForIndexing(task);
 }
