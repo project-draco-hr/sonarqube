@@ -13,8 +13,10 @@
     action.setLatch(latch);
     try {
       indexTime=System.currentTimeMillis();
-      this.offer(action,1000,TimeUnit.SECONDS);
-      latch.await(1000,TimeUnit.MILLISECONDS);
+      this.offer(action,TIMEOUT,TimeUnit.SECONDS);
+      if (!latch.await(TIMEOUT,TimeUnit.MILLISECONDS)) {
+        throw new IllegalStateException("ES update could not be completed within: " + TIMEOUT + "ms");
+      }
       bcount++;
       indexTime=System.currentTimeMillis() - indexTime;
       Index<?,?,?> index=action.getIndex();
@@ -48,21 +50,25 @@
       indexTime=System.currentTimeMillis();
       for (      IndexAction action : itemActions) {
         action.setLatch(itemLatch);
-        this.offer(action,1000,TimeUnit.SECONDS);
+        this.offer(action,TIMEOUT,TimeUnit.SECONDS);
         types.add(action.getPayloadClass().getSimpleName());
         bcount++;
       }
-      itemLatch.await(2000,TimeUnit.MILLISECONDS);
+      if (!itemLatch.await(TIMEOUT,TimeUnit.MILLISECONDS)) {
+        throw new IllegalStateException("ES update could not be completed within: " + TIMEOUT + "ms");
+      }
       indexTime=System.currentTimeMillis() - indexTime;
       CountDownLatch embeddedLatch=new CountDownLatch(embeddedActions.size());
       embeddedTime=System.currentTimeMillis();
       for (      IndexAction action : embeddedActions) {
         action.setLatch(embeddedLatch);
-        this.offer(action,1000,TimeUnit.SECONDS);
+        this.offer(action,TIMEOUT,TimeUnit.SECONDS);
         types.add(action.getPayloadClass().getSimpleName());
         ecount++;
       }
-      embeddedLatch.await(1500,TimeUnit.MILLISECONDS);
+      if (!embeddedLatch.await(TIMEOUT,TimeUnit.MILLISECONDS)) {
+        throw new IllegalStateException("ES embedded update could not be completed within: " + TIMEOUT + "ms");
+      }
       embeddedTime=System.currentTimeMillis() - embeddedTime;
       Set<String> refreshedIndexes=new HashSet<String>();
       refreshTime=System.currentTimeMillis();
