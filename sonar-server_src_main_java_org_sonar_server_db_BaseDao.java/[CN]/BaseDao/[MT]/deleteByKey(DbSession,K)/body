@@ -1,7 +1,12 @@
 {
   Preconditions.checkNotNull(key,"Missing key");
-  doDeleteByKey(session,key);
-  if (hasIndex()) {
-    session.enqueue(new KeyIndexAction<K>(getIndexType(),IndexAction.Method.DELETE,key));
+  try {
+    doDeleteByKey(session,key);
+    if (hasIndex()) {
+      session.enqueue(new KeyIndexAction<K>(getIndexType(),IndexAction.Method.DELETE,key));
+    }
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Fail to delete item from db: " + key,e);
   }
 }

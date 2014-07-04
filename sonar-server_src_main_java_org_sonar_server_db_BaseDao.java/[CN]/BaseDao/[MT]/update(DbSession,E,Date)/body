@@ -1,7 +1,12 @@
 {
-  item.setUpdatedAt(now);
-  doUpdate(session,item);
-  if (hasIndex()) {
-    session.enqueue(new DtoIndexAction<E>(getIndexType(),IndexAction.Method.UPSERT,item));
+  try {
+    item.setUpdatedAt(now);
+    doUpdate(session,item);
+    if (hasIndex()) {
+      session.enqueue(new DtoIndexAction<E>(getIndexType(),IndexAction.Method.UPSERT,item));
+    }
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Fail to update item in db: " + item,e);
   }
 }

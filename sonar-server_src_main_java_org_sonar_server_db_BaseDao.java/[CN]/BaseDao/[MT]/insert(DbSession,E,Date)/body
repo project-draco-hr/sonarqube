@@ -3,8 +3,13 @@
     item.setCreatedAt(now);
   }
   item.setUpdatedAt(now);
-  doInsert(session,item);
-  if (hasIndex()) {
-    session.enqueue(new DtoIndexAction<E>(getIndexType(),IndexAction.Method.UPSERT,item));
+  try {
+    doInsert(session,item);
+    if (hasIndex()) {
+      session.enqueue(new DtoIndexAction<E>(getIndexType(),IndexAction.Method.UPSERT,item));
+    }
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Fail to insert item in db: " + item,e.getCause());
   }
 }
