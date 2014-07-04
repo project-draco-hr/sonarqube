@@ -11,7 +11,9 @@
   indexFiles(fileSystem,progress,inputFileBuilder,fileSystem.tests(),InputFile.Type.TEST);
   executor.shutdown();
   try {
-    executor.awaitTermination(10,TimeUnit.SECONDS);
+    while (!executor.awaitTermination(10,TimeUnit.SECONDS)) {
+      LOG.debug("{} files indexed...",progress.count());
+    }
   }
  catch (  InterruptedException e) {
     throw new IllegalStateException("FileIndexer was interrupted",e);
