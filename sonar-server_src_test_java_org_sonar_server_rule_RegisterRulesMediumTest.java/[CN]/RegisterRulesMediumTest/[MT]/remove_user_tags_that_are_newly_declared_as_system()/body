@@ -1,0 +1,25 @@
+{
+  register(new Rules(){
+    @Override public void init(    RulesDefinition.NewRepository repository){
+      repository.createRule("x1").setName("x1 name").setHtmlDescription("x1 desc").setTags("tag1");
+    }
+  }
+);
+  Rule rule=index.getByKey(RuleTesting.XOO_X1);
+  assertThat(rule.systemTags()).containsOnly("tag1");
+  assertThat(rule.tags()).isEmpty();
+  TESTER.get(RuleUpdater.class).update(RuleUpdate.createForPluginRule(RuleTesting.XOO_X1).setTags(newHashSet("tag2")),UserSession.get());
+  dbSession.clearCache();
+  rule=index.getByKey(RuleTesting.XOO_X1);
+  assertThat(rule.systemTags()).containsOnly("tag1");
+  assertThat(rule.tags()).containsOnly("tag2");
+  register(new Rules(){
+    @Override public void init(    RulesDefinition.NewRepository repository){
+      repository.createRule("x1").setName("x1 name").setHtmlDescription("x1 desc").setTags("tag1","tag2");
+    }
+  }
+);
+  rule=index.getByKey(RuleTesting.XOO_X1);
+  assertThat(rule.systemTags()).containsOnly("tag1","tag2");
+  assertThat(rule.tags()).isEmpty();
+}

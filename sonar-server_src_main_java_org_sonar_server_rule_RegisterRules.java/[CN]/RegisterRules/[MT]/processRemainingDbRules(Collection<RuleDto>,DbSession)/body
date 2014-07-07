@@ -1,30 +1,25 @@
 {
+  List<RuleDto> customRules=newArrayList();
   List<RuleDto> removedRules=newArrayList();
-  for (  RuleDto ruleDto : ruleDtos) {
-    boolean toBeRemoved=true;
-    if (ruleDto.getTemplateId() != null) {
-      RuleDto template=dbClient.ruleDao().getTemplate(ruleDto,session);
-      if (template != null && RuleStatus.REMOVED != template.getStatus()) {
-        if (updateCustomRuleFromTemplateRule(ruleDto,template)) {
-          dbClient.ruleDao().update(session,ruleDto);
-        }
-        toBeRemoved=false;
-      }
+  for (  RuleDto rule : existingRules) {
+    if (rule.getTemplateId() != null) {
+      customRules.add(rule);
     }
-    if (toBeRemoved && RuleStatus.REMOVED != ruleDto.getStatus()) {
-      LOG.info(String.format("Disable rule %s",ruleDto.getKey()));
-      ruleDto.setStatus(RuleStatus.REMOVED);
-      ruleDto.setSystemTags(Collections.<String>emptySet());
-      ruleDto.setTags(Collections.<String>emptySet());
-      dbClient.ruleDao().update(session,ruleDto);
-      removedRules.add(ruleDto);
-      if (removedRules.size() % 100 == 0) {
-        session.commit();
-      }
+ else     if (rule.getStatus() != RuleStatus.REMOVED) {
+      removeRule(session,removedRules,rule);
     }
   }
-  if (!removedRules.isEmpty()) {
-    session.commit();
+  for (  RuleDto customRule : customRules) {
+    RuleDto template=dbClient.ruleDao().getTemplate(customRule,session);
+    if (template != null && template.getStatus() != RuleStatus.REMOVED) {
+      if (updateCustomRuleFromTemplateRule(customRule,template)) {
+        dbClient.ruleDao().update(session,customRule);
+      }
+    }
+ else {
+      removeRule(session,removedRules,customRule);
+    }
   }
+  session.commit();
   return removedRules;
 }

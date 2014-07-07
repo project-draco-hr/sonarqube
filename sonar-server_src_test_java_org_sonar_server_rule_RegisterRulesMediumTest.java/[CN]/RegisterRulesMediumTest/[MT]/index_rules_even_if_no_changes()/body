@@ -1,0 +1,16 @@
+{
+  Rules rules=new Rules(){
+    @Override public void init(    RulesDefinition.NewRepository repository){
+      repository.createRule("x1").setName("x1 name").setHtmlDescription("x1 desc");
+    }
+  }
+;
+  register(rules);
+  TESTER.clearIndexes();
+  register(rules);
+  Result<Rule> searchResult=index.search(new RuleQuery(),new QueryOptions());
+  searchResult=index.search(new RuleQuery().setKey("xoo:x1"),new QueryOptions());
+  assertThat(searchResult.getTotal()).isEqualTo(1);
+  assertThat(searchResult.getHits()).hasSize(1);
+  assertThat(searchResult.getHits().get(0).key()).isEqualTo(RuleKey.of("xoo","x1"));
+}

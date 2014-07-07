@@ -1,0 +1,15 @@
+{
+  Rules rules=new Rules(){
+    @Override public void init(    RulesDefinition.NewRepository repository){
+      repository.createRule("T1").setName("template1 name").setHtmlDescription("template1 desc").setSeverity(Severity.MAJOR).setTemplate(true).createParam("format").setDefaultValue("csv").setType(RuleParamType.STRING).setDescription("format parameter");
+    }
+  }
+;
+  register(rules);
+  Rule template=index.getByKey(RuleKey.of("xoo","T1"));
+  RuleKey customRuleKey=TESTER.get(RuleCreator.class).create(NewRule.createForCustomRule("CUSTOM_RULE",template.key()).setName("My custom").setHtmlDescription("Some description").setSeverity(Severity.MAJOR).setStatus(RuleStatus.READY).setParameters(ImmutableMap.of("format","txt")));
+  Date updatedAt=index.getByKey(customRuleKey).updatedAt();
+  register(rules);
+  Rule customRuleReloaded=index.getByKey(customRuleKey);
+  assertThat(customRuleReloaded.updatedAt()).isEqualTo(updatedAt);
+}

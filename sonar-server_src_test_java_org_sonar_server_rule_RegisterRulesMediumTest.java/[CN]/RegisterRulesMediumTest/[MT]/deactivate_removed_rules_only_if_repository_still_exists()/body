@@ -1,15 +1,22 @@
 {
+  register(new Rules(){
+    @Override public void init(    RulesDefinition.NewRepository repository){
+      repository.createRule("x1").setName("x1 name").setHtmlDescription("x1 desc");
+    }
+  }
+);
   MockUserSession.set().setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN).setLogin("me");
   db.qualityProfileDao().insert(dbSession,QProfileTesting.newXooP1());
   dbSession.commit();
   dbSession.clearCache();
   RuleActivation activation=new RuleActivation(RuleTesting.XOO_X1);
-  tester.get(QProfileService.class).activate(QProfileTesting.XOO_P1_KEY,activation);
-  dbSession.clearCache();
-  rulesDefinition.includeX1=false;
-  rulesDefinition.includeX2=true;
-  tester.get(Platform.class).executeStartupTasks();
-  dbSession.clearCache();
+  TESTER.get(QProfileService.class).activate(QProfileTesting.XOO_P1_KEY,activation);
+  register(new Rules(){
+    @Override public void init(    RulesDefinition.NewRepository repository){
+      repository.createRule("x2").setName("x2 name").setHtmlDescription("x2 desc");
+    }
+  }
+);
   assertThat(db.ruleDao().getByKey(dbSession,RuleKey.of("xoo","x1")).getStatus()).isEqualTo(RuleStatus.REMOVED);
   assertThat(db.ruleDao().getByKey(dbSession,RuleKey.of("xoo","x2")).getStatus()).isEqualTo(RuleStatus.READY);
   assertThat(db.activeRuleDao().findByProfileKey(dbSession,QProfileTesting.XOO_P1_KEY)).hasSize(0);

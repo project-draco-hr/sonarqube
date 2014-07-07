@@ -1,0 +1,19 @@
+{
+  Rules rules=new Rules(){
+    @Override public void init(    RulesDefinition.NewRepository repository){
+      repository.createRule("x1").setName("x1 name").setHtmlDescription("x1 desc");
+    }
+  }
+;
+  register(rules);
+  register(null);
+  RuleDto rule=db.ruleDao().getByKey(dbSession,RuleTesting.XOO_X1);
+  assertThat(rule.getStatus()).isEqualTo(RuleStatus.REMOVED);
+  Rule indexedRule=index.getByKey(RuleTesting.XOO_X1);
+  assertThat(indexedRule.status()).isEqualTo(RuleStatus.REMOVED);
+  register(rules);
+  rule=db.ruleDao().getByKey(dbSession,RuleTesting.XOO_X1);
+  assertThat(rule.getStatus()).isEqualTo(RuleStatus.READY);
+  indexedRule=index.getByKey(RuleTesting.XOO_X1);
+  assertThat(indexedRule.status()).isEqualTo(RuleStatus.READY);
+}
