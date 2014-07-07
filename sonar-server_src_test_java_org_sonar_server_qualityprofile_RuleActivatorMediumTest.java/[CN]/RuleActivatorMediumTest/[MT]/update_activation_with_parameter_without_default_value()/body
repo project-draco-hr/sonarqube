@@ -1,0 +1,12 @@
+{
+  RuleActivation activation=new RuleActivation(RuleTesting.XOO_X1);
+  activation.setSeverity(Severity.BLOCKER);
+  activate(activation,XOO_P1_KEY);
+  RuleActivation update=new RuleActivation(RuleTesting.XOO_X1);
+  update.setParameter("min","42");
+  List<ActiveRuleChange> changes=activate(update,XOO_P1_KEY);
+  assertThat(countActiveRules(XOO_P1_KEY)).isEqualTo(1);
+  verifyHasActiveRule(ActiveRuleKey.of(XOO_P1_KEY,RuleTesting.XOO_X1),Severity.BLOCKER,null,ImmutableMap.of("min","42"));
+  assertThat(changes).hasSize(1);
+  assertThat(changes.get(0).getType()).isEqualTo(ActiveRuleChange.Type.UPDATED);
+}
