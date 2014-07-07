@@ -1,0 +1,31 @@
+{
+  register(new Rules(){
+    @Override public void init(    RulesDefinition.NewRepository repository){
+      RulesDefinition.NewRule x1Rule=repository.createRule("x1").setName("x1 name").setHtmlDescription("x1 desc");
+      x1Rule.createParam("min").setType(RuleParamType.INTEGER).setDefaultValue("5");
+      x1Rule.createParam("format").setType(RuleParamType.STRING);
+    }
+  }
+);
+  MockUserSession.set().setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN).setLogin("me");
+  db.qualityProfileDao().insert(dbSession,QProfileTesting.newXooP1());
+  dbSession.commit();
+  dbSession.clearCache();
+  RuleActivation activation=new RuleActivation(RuleTesting.XOO_X1);
+  activation.setParameter("format","txt");
+  TESTER.get(QProfileService.class).activate(QProfileTesting.XOO_P1_KEY,activation);
+  register(new Rules(){
+    @Override public void init(    RulesDefinition.NewRepository repository){
+      RulesDefinition.NewRule x1Rule=repository.createRule("x1").setName("x1 name").setHtmlDescription("x1 desc");
+      x1Rule.createParam("min").setType(RuleParamType.INTEGER).setDefaultValue("6");
+      x1Rule.createParam("format2").setType(RuleParamType.STRING);
+      x1Rule.createParam("max").setType(RuleParamType.INTEGER).setDefaultValue("10");
+    }
+  }
+);
+  ActiveRule activeRule=activeRuleIndex.getByKey(ActiveRuleKey.of(QProfileTesting.XOO_P1_KEY,RuleTesting.XOO_X1));
+  Map<String,String> params=activeRule.params();
+  assertThat(params).hasSize(2);
+  assertThat(params.get("min")).isEqualTo("5");
+  assertThat(params.get("max")).isEqualTo("10");
+}
