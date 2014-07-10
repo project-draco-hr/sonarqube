@@ -1,7 +1,7 @@
 {
   final ExecutorService executor=Executors.newFixedThreadPool(2);
   final MonitorService monitor=new MonitorService(systemAvailableSocket());
-  final ProcessWrapper elasticsearch=null;
+  final ProcessWrapper elasticsearch=new ProcessWrapper("org.sonar.search.ElasticSearch",new String[]{"/Volumes/data/sonar/sonarqube/server/sonar-search/target/sonar-search-4.5-SNAPSHOT.jar"},ImmutableMap.of("esPort","9200","esHome","/Volumes/data/sonar/sonarqube/server/sonar-search/target/"),"ES",monitor.getMonitoringPort());
   monitor.register(elasticsearch);
   Runtime.getRuntime().addShutdownHook(new Thread(){
     @Override public void run(){
@@ -20,5 +20,6 @@
   LOGGER.info("Starting Child processes...");
   executor.submit(elasticsearch);
   monitor.run();
-  executor.shutdown();
+  LOGGER.warn("Shutting down the node...");
+  executor.shutdownNow();
 }
