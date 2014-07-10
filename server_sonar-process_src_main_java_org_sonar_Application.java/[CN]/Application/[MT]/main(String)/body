@@ -1,21 +1,24 @@
 {
   final ExecutorService executor=Executors.newFixedThreadPool(2);
-  final Launcher sonarQube=new Launcher("SQ",systemAvailableSocket());
-  final Launcher elasticsearch=new Launcher("ES",systemAvailableSocket());
+  final MonitorService monitor=new MonitorService(systemAvailableSocket());
+  final ProcessWrapper elasticsearch=null;
+  monitor.register(elasticsearch);
   Runtime.getRuntime().addShutdownHook(new Thread(){
     @Override public void run(){
       LOGGER.info("Shutting down sonar Node");
-      sonarQube.interrupt();
       elasticsearch.interrupt();
-      executor.shutdownNow();
+      executor.shutdown();
+      try {
+        executor.awaitTermination(10L,TimeUnit.SECONDS);
+      }
+ catch (      InterruptedException e) {
+        LOGGER.warn("Executing terminated",e);
+      }
     }
   }
 );
-  LOGGER.info("Starting SQ Node...");
-  executor.submit(sonarQube);
-  LOGGER.info("Starting ES Node...");
+  LOGGER.info("Starting Child processes...");
   executor.submit(elasticsearch);
-  while (!executor.isTerminated()) {
-    Thread.sleep(1000);
-  }
+  monitor.run();
+  executor.shutdown();
 }

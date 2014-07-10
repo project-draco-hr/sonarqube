@@ -1,0 +1,27 @@
+{
+  LOGGER.info("Launching Monitoring Thread");
+  long time=System.currentTimeMillis();
+  while (!currentThread().isInterrupted()) {
+    DatagramPacket packet=new DatagramPacket(new byte[1024],1024);
+    try {
+      socket.setSoTimeout(200);
+      socket.receive(packet);
+      time=System.currentTimeMillis();
+      String message=new String(packet.getData());
+      long lastTime=processesPing.get(message);
+      processesPing.put(message,time);
+      LOGGER.info("{} last seen since {}ms",message,(time - lastTime));
+    }
+ catch (    Exception e) {
+    }
+    if (!checkAllProcessPing(time)) {
+      break;
+    }
+  }
+  LOGGER.info("Some app has not been pinging");
+  for (  Thread process : processes.values()) {
+    if (!process.isInterrupted()) {
+      process.interrupt();
+    }
+  }
+}
