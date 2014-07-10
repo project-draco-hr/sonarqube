@@ -1,9 +1,17 @@
 {
-  super();
-  addIndexStringField("type",ActivityNormalizer.LogFields.TYPE.field());
-  addIndexStringField("action",ActivityNormalizer.LogFields.ACTION.field());
-  addIndexDatetimeField("createdAt",ActivityNormalizer.LogFields.CREATED_AT.field());
-  addIndexStringField("login",ActivityNormalizer.LogFields.LOGIN.field());
-  addIndexStringField("message",ActivityNormalizer.LogFields.MESSAGE.field());
-  addField("details",new DetailField());
+  map("type",ActivityNormalizer.LogFields.TYPE.field());
+  map("action",ActivityNormalizer.LogFields.ACTION.field());
+  mapDateTime("createdAt",ActivityNormalizer.LogFields.CREATED_AT.field());
+  map("login",ActivityNormalizer.LogFields.LOGIN.field());
+  map("message",ActivityNormalizer.LogFields.MESSAGE.field());
+  map("details",new IndexMapper<ActivityDoc,Object>(ActivityNormalizer.LogFields.DETAILS.field()){
+    @Override public void write(    JsonWriter json,    ActivityDoc activity,    Object context){
+      json.name("details").beginObject();
+      for (      Map.Entry<String,String> detail : activity.details().entrySet()) {
+        json.prop(detail.getKey(),detail.getValue());
+      }
+      json.endObject();
+    }
+  }
+);
 }
