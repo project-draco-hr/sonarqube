@@ -1,0 +1,26 @@
+{
+  System.out.println("LOGGER = " + env.rootDir().getAbsolutePath());
+  final ExecutorService executor=Executors.newFixedThreadPool(2);
+  final MonitorService monitor=new MonitorService(systemAvailableSocket());
+  final ProcessWrapper elasticsearch=new ProcessWrapper("org.sonar.search.ElasticSearch",new String[]{env.rootDir().getAbsolutePath() + "/lib/search/sonar-search-4.5-SNAPSHOT.jar"},ImmutableMap.of("esPort","9200","esHome",env.rootDir().getAbsolutePath()),"ES",monitor.getMonitoringPort());
+  monitor.register(elasticsearch);
+  Runtime.getRuntime().addShutdownHook(new Thread(){
+    @Override public void run(){
+      LOGGER.info("Shutting down sonar Node");
+      elasticsearch.interrupt();
+      executor.shutdown();
+      try {
+        executor.awaitTermination(10L,TimeUnit.SECONDS);
+      }
+ catch (      InterruptedException e) {
+        LOGGER.warn("Executing terminated",e);
+      }
+    }
+  }
+);
+  LOGGER.info("Starting Child processes...");
+  executor.submit(elasticsearch);
+  monitor.run();
+  LOGGER.warn("Shutting down the node...");
+  executor.shutdownNow();
+}
