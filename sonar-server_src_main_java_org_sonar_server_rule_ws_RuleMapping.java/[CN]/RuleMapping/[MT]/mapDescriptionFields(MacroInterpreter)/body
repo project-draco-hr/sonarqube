@@ -1,0 +1,29 @@
+{
+  map("htmlDesc",new Mapper<RuleDoc,RuleMappingContext>(){
+    @Override public void write(    JsonWriter json,    RuleDoc rule,    RuleMappingContext context){
+      String html=rule.htmlDescription();
+      if (html != null) {
+        if (rule.isManual() || rule.templateKey() != null) {
+          String desc=StringEscapeUtils.escapeHtml(html);
+          desc=desc.replaceAll("\\n","<br/>");
+          json.prop("htmlDesc",desc);
+        }
+ else {
+          json.prop("htmlDesc",macroInterpreter.interpret(html));
+        }
+      }
+    }
+  }
+);
+  map("noteLogin",RuleNormalizer.RuleField.NOTE_LOGIN.field());
+  map("mdNote",RuleNormalizer.RuleField.NOTE.field());
+  map("htmlNote",new IndexMapper<RuleDoc,RuleMappingContext>(RuleNormalizer.RuleField.NOTE.field()){
+    @Override public void write(    JsonWriter json,    RuleDoc rule,    RuleMappingContext context){
+      String markdownNote=rule.markdownNote();
+      if (markdownNote != null) {
+        json.prop("htmlNote",macroInterpreter.interpret(Markdown.convertToHtml(markdownNote)));
+      }
+    }
+  }
+);
+}
