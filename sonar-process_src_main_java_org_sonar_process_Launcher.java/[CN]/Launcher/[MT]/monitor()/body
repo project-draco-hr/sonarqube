@@ -1,19 +1,19 @@
 {
   long ping=Long.MAX_VALUE;
-  try {
-    while (true) {
-      LOGGER.info("My heart is beating");
-      DatagramPacket packet=new DatagramPacket(new byte[1024],1024);
+  while (true) {
+    LOGGER.info("My heart is beating");
+    DatagramPacket packet=new DatagramPacket(new byte[1024],1024);
+    try {
+      socket.setSoTimeout(3000);
       socket.receive(packet);
-      long newPing=System.currentTimeMillis();
-      String message=new String(packet.getData(),0,0,packet.getLength());
-      LOGGER.info("{} last seen since {}ms",message,(newPing - ping));
-      if ((newPing - ping) > 3000) {
-      }
-      ping=newPing;
     }
-  }
- catch (  IOException e) {
-    throw new IllegalStateException("Launcher Thread for " + name + " could not communicate to socket",e);
+ catch (    Exception e) {
+    }
+    long newPing=System.currentTimeMillis();
+    String message=new String(packet.getData(),0,0,packet.getLength());
+    LOGGER.info("{} last seen since {}ms",message,(newPing - ping));
+    if ((newPing - ping) > 3000) {
+    }
+    ping=newPing;
   }
 }
