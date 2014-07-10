@@ -1,7 +1,8 @@
 {
   final ExecutorService executor=Executors.newFixedThreadPool(2);
   final MonitorService monitor=new MonitorService(systemAvailableSocket());
-  final ProcessWrapper elasticsearch=new ProcessWrapper("org.sonar.search.ElasticSearch",new String[]{env.rootDir().getAbsolutePath() + "/lib/search/sonar-search-4.5-SNAPSHOT.jar"},ImmutableMap.of("esPort",Integer.toString(NetworkUtils.freePort()),"esHome",env.rootDir().getAbsolutePath()),"ES",monitor.getMonitoringPort());
+  final String esPort=Integer.toString(NetworkUtils.freePort());
+  final ProcessWrapper elasticsearch=new ProcessWrapper("org.sonar.search.ElasticSearch",new String[]{env.rootDir().getAbsolutePath() + "/lib/search/sonar-search-4.5-SNAPSHOT.jar"},ImmutableMap.of("esPort",esPort,"esHome",env.rootDir().getAbsolutePath()),"ES",monitor.getMonitoringPort());
   monitor.register(elasticsearch);
   Runtime.getRuntime().addShutdownHook(new Thread(){
     @Override public void run(){
