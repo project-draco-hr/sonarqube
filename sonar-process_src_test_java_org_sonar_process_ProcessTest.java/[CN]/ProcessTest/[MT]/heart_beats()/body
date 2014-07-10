@@ -1,16 +1,21 @@
 {
-  DatagramSocket socket=new DatagramSocket(0);
-  Process test=testProcess("test",socket);
+  Properties properties=new Properties();
+  properties.setProperty(Process.NAME_PROPERTY,"test");
+  properties.setProperty(Process.HEARTBEAT_PROPERTY,Integer.toString(socket.getLocalPort()));
+  Process test=testProcess(properties);
+  assertThat(test).isNotNull();
   int ping=0;
-  while (ping < 3) {
+  int loop=0;
+  while (loop < 3) {
     DatagramPacket packet=new DatagramPacket(new byte[1024],1024);
     try {
-      socket.setSoTimeout(200);
+      socket.setSoTimeout(2000);
       socket.receive(packet);
+      ping++;
     }
  catch (    Exception e) {
     }
-    ping++;
+    loop++;
   }
-  socket.close();
+  assertThat(ping).isEqualTo(loop);
 }

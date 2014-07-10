@@ -1,5 +1,11 @@
 {
   DatagramPacket packet=new DatagramPacket(new byte[1024],1024);
-  socket.receive(packet);
+  try {
+    socket.setSoTimeout(1200);
+    socket.receive(packet);
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Did not get a heartbeat");
+  }
   assertThat(packet.getData()).isNotNull();
 }
