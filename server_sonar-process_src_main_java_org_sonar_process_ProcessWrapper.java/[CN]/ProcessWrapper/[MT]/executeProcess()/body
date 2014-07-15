@@ -1,0 +1,18 @@
+{
+  ProcessBuilder processBuilder=new ProcessBuilder("java","-Dcom.sun.management.jmxremote","-Dcom.sun.management.jmxremote.port=" + port,"-Dcom.sun.management.jmxremote.authenticate=false","-Dcom.sun.management.jmxremote.ssl=false","-cp",StringUtils.join(classPath,":"),className);
+  processBuilder.environment().putAll(properties);
+  processBuilder.environment().put(Process.NAME_PROPERTY,this.getName());
+  processBuilder.environment().put(Process.PORT_PROPERTY,Integer.toString(port));
+  System.out.println("processBuilder.toString(); = " + processBuilder.toString());
+  try {
+    java.lang.Process process=processBuilder.start();
+    errorGobbler=new StreamGobbler(process.getErrorStream(),this.getName() + "-ERROR");
+    outputGobbler=new StreamGobbler(process.getInputStream(),this.getName());
+    outputGobbler.start();
+    errorGobbler.start();
+    return process;
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Io Exception in ProcessWrapper",e);
+  }
+}
