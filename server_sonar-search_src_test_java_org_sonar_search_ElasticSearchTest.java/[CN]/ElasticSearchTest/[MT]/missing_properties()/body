@@ -1,23 +1,23 @@
 {
-  ServerSocket socket=new ServerSocket(0);
-  Integer port=socket.getLocalPort();
-  socket.close();
   Properties properties=new Properties();
   properties.setProperty(Process.NAME_PROPERTY,"ES");
-  properties.setProperty(Process.HEARTBEAT_PROPERTY,Integer.toString(socket.getLocalPort()));
+  properties.setProperty(Process.PORT_PROPERTY,Integer.toString(freePort));
   try {
-    new ElasticSearch(Props.create(properties));
+    elasticSearch=new ElasticSearch(Props.create(properties));
   }
  catch (  Exception e) {
     assertThat(e.getMessage()).isEqualTo(ElasticSearch.MISSING_ES_HOME);
   }
   properties.setProperty(ElasticSearch.ES_HOME_PROPERTY,tempDirectory.getAbsolutePath());
   try {
-    new ElasticSearch(Props.create(properties));
+    resetMBeanServer();
+    elasticSearch=new ElasticSearch(Props.create(properties));
   }
  catch (  Exception e) {
     assertThat(e.getMessage()).isEqualTo(ElasticSearch.MISSING_ES_PORT);
   }
-  properties.setProperty(ElasticSearch.ES_PORT_PROPERTY,Integer.toString(port));
-  assertThat(new ElasticSearch(Props.create(properties))).isNotNull();
+  resetMBeanServer();
+  properties.setProperty(ElasticSearch.ES_PORT_PROPERTY,Integer.toString(freeESPort));
+  elasticSearch=new ElasticSearch(Props.create(properties));
+  assertThat(elasticSearch).isNotNull();
 }

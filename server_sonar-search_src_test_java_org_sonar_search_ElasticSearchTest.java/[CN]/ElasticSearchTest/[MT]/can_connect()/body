@@ -1,17 +1,28 @@
 {
-  int port=new DatagramSocket(0).getLocalPort();
   Properties properties=new Properties();
   properties.setProperty(Process.NAME_PROPERTY,"ES");
-  properties.setProperty(Process.HEARTBEAT_PROPERTY,Integer.toString(socket.getLocalPort()));
   properties.setProperty(ElasticSearch.ES_HOME_PROPERTY,tempDirectory.getAbsolutePath());
-  properties.setProperty(ElasticSearch.ES_PORT_PROPERTY,Integer.toString(port));
+  properties.setProperty(ElasticSearch.ES_PORT_PROPERTY,Integer.toString(freeESPort));
   elasticSearch=new ElasticSearch(Props.create(properties));
-  assertHeartBeat();
+  new Thread(new Runnable(){
+    @Override public void run(){
+      elasticSearch.start();
+    }
+  }
+).start();
+  assertThat(elasticSearch.isReady()).isFalse();
+  while (!elasticSearch.isReady()) {
+    try {
+      Thread.sleep(200);
+    }
+ catch (    InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
   Settings settings=ImmutableSettings.settingsBuilder().put("cluster.name","sonarqube").build();
-  TransportClient client=new TransportClient(settings).addTransportAddress(new InetSocketTransportAddress("localhost",port));
+  TransportClient client=new TransportClient(settings).addTransportAddress(new InetSocketTransportAddress("localhost",freeESPort));
   assertThat(client.admin().cluster().prepareClusterStats().get().getStatus()).isEqualTo(ClusterHealthStatus.GREEN);
-  assertHeartBeat();
-  elasticSearch.shutdown();
+  elasticSearch.stop();
   try {
     client.admin().cluster().prepareClusterStats().get().getStatus();
     fail();
