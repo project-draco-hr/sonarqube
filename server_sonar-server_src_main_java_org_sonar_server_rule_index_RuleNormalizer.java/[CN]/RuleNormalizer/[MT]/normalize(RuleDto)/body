@@ -98,9 +98,8 @@
     update.put(RuleField.TAGS.field(),rule.getTags());
     update.put(RuleField.SYSTEM_TAGS.field(),rule.getSystemTags());
     update.put(RuleField._TAGS.field(),Sets.union(rule.getSystemTags(),rule.getTags()));
-    Map<String,Object> upsert=new HashMap<String,Object>(update);
+    Map<String,Object> upsert=getUpsertFor(RuleField.ALL_FIELDS,update);
     upsert.put(RuleField.KEY.field(),rule.getKey().toString());
-    upsert.put(RuleField.PARAMS.field(),new ArrayList<String>());
     return ImmutableList.of(new UpdateRequest().replicationType(ReplicationType.ASYNC).consistencyLevel(WriteConsistencyLevel.QUORUM).id(rule.getKey().toString()).doc(update).upsert(upsert));
   }
   finally {
