@@ -1,0 +1,27 @@
+{
+  SMInputFactory inputFactory=initStax();
+  try {
+    SMHierarchicCursor root=inputFactory.rootElementCursor(new StringReader(data));
+    root.advance();
+    SMInputCursor cursor=root.childElementCursor();
+    json.name("tests").beginArray();
+    while (cursor.getNext() != null) {
+      json.beginObject();
+      json.prop("name",cursor.getAttrValue("name"));
+      json.prop("status",cursor.getAttrValue("status").toUpperCase());
+      json.prop("durationInMs",cursor.getAttrValue("time"));
+      SMInputCursor errorCursor=cursor.childElementCursor();
+      if (errorCursor.getNext() != null) {
+        json.prop("message",errorCursor.getAttrValue("message"));
+        SMInputCursor stackTraceCursor=cursor.childElementCursor();
+        if (stackTraceCursor.getNext() != null) {
+        }
+      }
+      json.endObject();
+    }
+    json.endArray();
+  }
+ catch (  XMLStreamException e) {
+    throw new IllegalStateException("XML is not valid: " + e.getMessage(),e);
+  }
+}
