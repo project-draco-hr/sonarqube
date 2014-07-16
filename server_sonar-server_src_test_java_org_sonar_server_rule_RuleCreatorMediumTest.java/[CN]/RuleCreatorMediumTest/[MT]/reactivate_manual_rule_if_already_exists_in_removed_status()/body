@@ -3,14 +3,14 @@
   RuleDto rule=dao.insert(dbSession,RuleTesting.newManualRule(key).setStatus(RuleStatus.REMOVED).setName("Old name").setDescription("Old description").setSeverity(Severity.INFO));
   dbSession.commit();
   dbSession.clearCache();
-  NewRule newRule=NewRule.createForManualRule(key).setName("New name").setHtmlDescription("New description");
+  NewRule newRule=NewRule.createForManualRule(key).setName("New name").setMarkdownDescription("New description");
   RuleKey ruleKey=creator.create(newRule);
   dbSession.clearCache();
   Rule result=ruleIndex.getByKey(ruleKey);
   assertThat(result.key()).isEqualTo(RuleKey.of("manual",key));
   assertThat(result.status()).isEqualTo(RuleStatus.READY);
   assertThat(result.name()).isEqualTo("Old name");
-  assertThat(result.htmlDescription()).isEqualTo("Old description");
+  assertThat(result.markdownDescription()).isEqualTo("Old description");
   assertThat(result.severity()).isEqualTo(Severity.INFO);
   assertThat(db.ruleDao().getByKey(dbSession,result.key()).getId()).isEqualTo(rule.getId());
 }

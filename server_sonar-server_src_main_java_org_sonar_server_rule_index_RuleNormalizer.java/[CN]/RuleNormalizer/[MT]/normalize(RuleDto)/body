@@ -10,7 +10,14 @@
     update.put(RuleField.NAME.field(),rule.getName());
     update.put(RuleField.CREATED_AT.field(),rule.getCreatedAt());
     update.put(RuleField.UPDATED_AT.field(),rule.getUpdatedAt());
-    update.put(RuleField.HTML_DESCRIPTION.field(),rule.getDescription());
+    if (RuleDto.Format.HTML.equals(rule.getDescriptionFormat())) {
+      update.put(RuleField.HTML_DESCRIPTION.field(),rule.getDescription());
+      update.put(RuleField.MARKDOWN_DESCRIPTION.field(),null);
+    }
+ else {
+      update.put(RuleField.HTML_DESCRIPTION.field(),rule.getDescription() == null ? null : Markdown.convertToHtml(rule.getDescription()));
+      update.put(RuleField.MARKDOWN_DESCRIPTION.field(),rule.getDescription());
+    }
     update.put(RuleField.FIX_DESCRIPTION.field(),rule.getEffortToFixDescription());
     update.put(RuleField.SEVERITY.field(),rule.getSeverityString());
     RuleStatus status=rule.getStatus();
