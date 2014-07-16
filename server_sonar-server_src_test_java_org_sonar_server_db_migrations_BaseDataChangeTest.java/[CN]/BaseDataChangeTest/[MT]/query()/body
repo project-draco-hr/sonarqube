@@ -1,0 +1,11 @@
+{
+  db.prepareDbUnit(getClass(),"persons.xml");
+  final List<Long> ids=new ArrayList<Long>();
+  new BaseDataChange(db.database()){
+    @Override public void execute(    Context context) throws SQLException {
+      ids.addAll(context.prepareSelect("select id from persons order by id desc").query(Select.LONG_READER));
+    }
+  }
+.execute();
+  assertThat(ids).containsExactly(3L,2L,1L);
+}

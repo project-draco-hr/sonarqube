@@ -1,0 +1,23 @@
+{
+  db.prepareDbUnit(getClass(),"persons.xml");
+  BaseDataChange change=new BaseDataChange(db.database()){
+    @Override public void execute(    Context context) throws SQLException {
+      MassUpdate massUpdate=context.prepareMassUpdate();
+      massUpdate.select("select id from persons where id>=?").setLong(1,2L);
+      massUpdate.execute(new MassUpdate.Handler(){
+        @Override public boolean handle(        Select.Row row,        SqlStatement update) throws SQLException {
+          return false;
+        }
+      }
+);
+    }
+  }
+;
+  try {
+    change.execute();
+    fail();
+  }
+ catch (  IllegalStateException e) {
+    assertThat(e).hasMessage("SELECT or UPDATE requests are not defined");
+  }
+}

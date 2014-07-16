@@ -1,0 +1,17 @@
+{
+  if (select == null || update == null) {
+    throw new IllegalStateException("SELECT or UPDATE requests are not defined");
+  }
+  select.scroll(new Select.RowHandler(){
+    @Override public void handle(    Select.Row row) throws SQLException {
+      if (handler.handle(row,update)) {
+        update.addBatch();
+      }
+    }
+  }
+);
+  if (((UpsertImpl)update).getBatchCount() > 0L) {
+    update.execute().commit();
+  }
+  update.close();
+}

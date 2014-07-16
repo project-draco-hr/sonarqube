@@ -1,0 +1,16 @@
+{
+  db.prepareDbUnit(getClass(),"persons.xml");
+  final List<Long> ids=new ArrayList<Long>();
+  BaseDataChange change=new BaseDataChange(db.database()){
+    @Override public void execute(    Context context) throws SQLException {
+      ids.addAll(context.prepareSelect("select id from persons where id>=?").query(Select.LONG_READER));
+    }
+  }
+;
+  try {
+    change.execute();
+    fail();
+  }
+ catch (  SQLException e) {
+  }
+}

@@ -1,0 +1,20 @@
+{
+  db.prepareDbUnit(getClass(),"persons.xml");
+  new BaseDataChange(db.database()){
+    @Override public void execute(    Context context) throws SQLException {
+      MassUpdate massUpdate=context.prepareMassUpdate();
+      massUpdate.select("select id from persons where id>=?").setLong(1,2L);
+      massUpdate.update("update persons set login=?, age=? where id=?");
+      massUpdate.execute(new MassUpdate.Handler(){
+        @Override public boolean handle(        Select.Row row,        SqlStatement update) throws SQLException {
+          long id=row.getLong(1);
+          update.setString(1,"login" + id).setInt(2,10 + (int)id).setLong(3,id);
+          return true;
+        }
+      }
+);
+    }
+  }
+.execute();
+  db.assertDbUnit(getClass(),"mass-update-result.xml","persons");
+}

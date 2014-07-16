@@ -1,0 +1,13 @@
+{
+  db.prepareDbUnit(getClass(),"persons.xml");
+  new BaseDataChange(db.database()){
+    @Override public void execute(    Context context) throws SQLException {
+      Upsert upsert=context.prepareUpsert("insert into persons(id,login,age,enabled) values (?,?,?,?)");
+      upsert.setLong(1,10L).setString(2,"kurt").setInt(3,27).setBoolean(4,true).addBatch();
+      upsert.setLong(1,11L).setString(2,"courtney").setInt(3,25).setBoolean(4,false).addBatch();
+      upsert.execute().commit().close();
+    }
+  }
+.execute();
+  db.assertDbUnit(getClass(),"batch-insert-result.xml","persons");
+}

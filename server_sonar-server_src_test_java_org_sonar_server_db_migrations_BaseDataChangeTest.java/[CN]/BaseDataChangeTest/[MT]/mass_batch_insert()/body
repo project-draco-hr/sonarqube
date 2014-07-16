@@ -1,0 +1,15 @@
+{
+  db.executeUpdateSql("truncate table persons");
+  final int count=BatchSession.MAX_BATCH_SIZE + 10;
+  new BaseDataChange(db.database()){
+    @Override public void execute(    Context context) throws SQLException {
+      Upsert upsert=context.prepareUpsert("insert into persons(id,login,age,enabled) values (?,?,?,?)");
+      for (int i=0; i < count; i++) {
+        upsert.setLong(1,10L + i).setString(2,"login" + i).setInt(3,10 + i).setBoolean(4,true).addBatch();
+      }
+      upsert.execute().commit().close();
+    }
+  }
+.execute();
+  assertThat(db.count("select count(id) from persons")).isEqualTo(count);
+}
