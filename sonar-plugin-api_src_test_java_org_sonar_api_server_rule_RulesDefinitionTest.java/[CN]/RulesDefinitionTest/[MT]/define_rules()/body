@@ -1,7 +1,7 @@
 {
   RulesDefinition.NewRepository newRepo=context.createRepository("findbugs","java");
   newRepo.createRule("NPE").setName("Detect NPE").setHtmlDescription("Detect <code>java.lang.NullPointerException</code>").setSeverity(Severity.BLOCKER).setInternalKey("/something").setStatus(RuleStatus.BETA).setTags("one","two").addTags("two","three","four");
-  newRepo.createRule("ABC").setName("ABC").setHtmlDescription("ABC");
+  newRepo.createRule("ABC").setName("ABC").setMarkdownDescription("ABC");
   newRepo.done();
   RulesDefinition.Repository repo=context.repository("findbugs");
   assertThat(repo.rules()).hasSize(2);
@@ -10,6 +10,7 @@
   assertThat(rule.name()).isEqualTo("Detect NPE");
   assertThat(rule.severity()).isEqualTo(Severity.BLOCKER);
   assertThat(rule.htmlDescription()).isEqualTo("Detect <code>java.lang.NullPointerException</code>");
+  assertThat(rule.markdownDescription()).isNull();
   assertThat(rule.tags()).containsOnly("one","two","three","four");
   assertThat(rule.params()).isEmpty();
   assertThat(rule.internalKey()).isEqualTo("/something");
@@ -18,6 +19,8 @@
   assertThat(rule.toString()).isEqualTo("[repository=findbugs, key=NPE]");
   assertThat(rule.repository()).isSameAs(repo);
   RulesDefinition.Rule otherRule=repo.rule("ABC");
+  assertThat(otherRule.htmlDescription()).isNull();
+  assertThat(otherRule.markdownDescription()).isEqualTo("ABC");
   assertThat(rule).isEqualTo(rule).isNotEqualTo(otherRule).isNotEqualTo("NPE").isNotEqualTo(null);
   assertThat(rule.hashCode()).isEqualTo(rule.hashCode());
 }
