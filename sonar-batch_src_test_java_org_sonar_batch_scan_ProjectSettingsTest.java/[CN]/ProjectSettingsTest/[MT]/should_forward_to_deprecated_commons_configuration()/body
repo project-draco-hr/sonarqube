@@ -1,0 +1,12 @@
+{
+  when(settingsRef.projectSettings("struts")).thenReturn(ImmutableMap.of("sonar.cpd.cross","true","sonar.java.coveragePlugin","jacoco"));
+  ProjectSettings batchSettings=new ProjectSettings(new ProjectReactor(project),bootstrapProps,new PropertyDefinitions(),settingsRef,deprecatedConf,mode);
+  assertThat(deprecatedConf.getString("sonar.cpd.cross")).isEqualTo("true");
+  assertThat(deprecatedConf.getString("sonar.java.coveragePlugin")).isEqualTo("jacoco");
+  batchSettings.removeProperty("sonar.cpd.cross");
+  assertThat(deprecatedConf.getString("sonar.cpd.cross")).isNull();
+  assertThat(deprecatedConf.getString("sonar.java.coveragePlugin")).isEqualTo("jacoco");
+  batchSettings.clear();
+  assertThat(deprecatedConf.getString("sonar.cpd.cross")).isNull();
+  assertThat(deprecatedConf.getString("sonar.java.coveragePlugin")).isNull();
+}
