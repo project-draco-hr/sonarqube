@@ -3,9 +3,9 @@
   final int count=BatchSession.MAX_BATCH_SIZE + 10;
   new BaseDataChange(db.database()){
     @Override public void execute(    Context context) throws SQLException {
-      Upsert upsert=context.prepareUpsert("insert into persons(id,login,age,enabled) values (?,?,?,?)");
+      Upsert upsert=context.prepareUpsert("insert into persons(id,login,age,enabled,coeff) values (?,?,?,?,?)");
       for (int i=0; i < count; i++) {
-        upsert.setLong(1,10L + i).setString(2,"login" + i).setInt(3,10 + i).setBoolean(4,true).addBatch();
+        upsert.setLong(1,10L + i).setString(2,"login" + i).setInt(3,10 + i).setBoolean(4,true).setDouble(4,i + 0.5).addBatch();
       }
       upsert.execute().commit().close();
     }
