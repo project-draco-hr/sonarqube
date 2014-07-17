@@ -1,13 +1,14 @@
 {
   projectBootstrapper=mock(ProjectBootstrapper.class);
+  bootstrapProperties=new BootstrapProperties(Collections.<String,String>emptyMap());
+  AnalysisMode analysisMode=new AnalysisMode(bootstrapProperties);
   when(projectBootstrapper.bootstrap()).thenReturn(new ProjectReactor(ProjectDefinition.create()));
-  settings=new Settings();
+  settings=new GlobalSettings(bootstrapProperties,new PropertyDefinitions(),mock(SettingsReferential.class),new PropertiesConfiguration(),analysisMode);
   parentContainer=new ComponentContainer();
   parentContainer.add(settings);
   parentContainer.add(System2.INSTANCE);
-  bootstrapProperties=new BootstrapProperties(Collections.<String,String>emptyMap());
   parentContainer.add(bootstrapProperties);
-  parentContainer.add(new AnalysisMode(bootstrapProperties));
+  parentContainer.add(analysisMode);
   parentContainer.add(new PropertiesConfiguration());
   parentContainer.add(mock(SettingsReferential.class));
   container=new ProjectScanContainer(parentContainer);
