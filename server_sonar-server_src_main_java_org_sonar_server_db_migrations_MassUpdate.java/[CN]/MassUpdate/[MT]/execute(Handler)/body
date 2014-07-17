@@ -2,16 +2,25 @@
   if (select == null || update == null) {
     throw new IllegalStateException("SELECT or UPDATE requests are not defined");
   }
-  select.scroll(new Select.RowHandler(){
-    @Override public void handle(    Select.Row row) throws SQLException {
-      if (handler.handle(row,update)) {
-        update.addBatch();
+  Timer timer=new Timer("Db Migration Progress");
+  timer.schedule(progressTask,ProgressTask.PERIOD_MS,ProgressTask.PERIOD_MS);
+  try {
+    select.scroll(new Select.RowHandler(){
+      @Override public void handle(      Select.Row row) throws SQLException {
+        if (handler.handle(row,update)) {
+          update.addBatch();
+        }
+        counter.getAndIncrement();
       }
     }
-  }
 );
-  if (((UpsertImpl)update).getBatchCount() > 0L) {
-    update.execute().commit();
+    if (((UpsertImpl)update).getBatchCount() > 0L) {
+      update.execute().commit();
+    }
+    update.close();
   }
-  update.close();
+  finally {
+    timer.cancel();
+    timer.purge();
+  }
 }
