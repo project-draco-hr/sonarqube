@@ -1,11 +1,14 @@
 {
   db.prepareDbUnit(getClass(),"persons.xml");
-  final List<Long> ids=new ArrayList<Long>();
+  final AtomicBoolean executed=new AtomicBoolean(false);
   new BaseDataChange(db.database()){
     @Override public void execute(    Context context) throws SQLException {
-      ids.addAll(context.prepareSelect("select id from persons order by id desc").list(Select.RowReader.LONG));
+      assertThat(context.prepareSelect("select id from persons order by id desc").list(Select.LONG_READER)).containsExactly(3L,2L,1L);
+      assertThat(context.prepareSelect("select id from persons where id=?").setLong(1,2L).get(Select.LONG_READER)).isEqualTo(2L);
+      assertThat(context.prepareSelect("select id from persons where id=?").setLong(1,12345L).get(Select.LONG_READER)).isNull();
+      executed.set(true);
     }
   }
 .execute();
-  assertThat(ids).containsExactly(3L,2L,1L);
+  assertThat(executed.get()).isTrue();
 }
