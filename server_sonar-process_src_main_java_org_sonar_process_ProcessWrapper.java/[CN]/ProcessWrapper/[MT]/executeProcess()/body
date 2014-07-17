@@ -3,6 +3,13 @@
   processBuilder.environment().putAll(properties);
   processBuilder.environment().put(Process.NAME_PROPERTY,this.getName());
   processBuilder.environment().put(Process.PORT_PROPERTY,Integer.toString(port));
+  File workDirectory=new File(workDir);
+  if (!workDirectory.exists()) {
+    throw new IllegalStateException("Work directory does not exist.");
+  }
+ else {
+    processBuilder.directory(FileUtils.getFile(workDir));
+  }
   try {
     java.lang.Process process=processBuilder.start();
     errorGobbler=new StreamGobbler(process.getErrorStream(),this.getName() + "-ERROR");
