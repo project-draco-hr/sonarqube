@@ -1,0 +1,20 @@
+{
+  LOGGER.trace("Process[{}]::stop() START",name);
+  Runtime.getRuntime().removeShutdownHook(shutdownHook);
+  Thread terminating=new Thread(new Runnable(){
+    @Override public void run(){
+      shutdown();
+    }
+  }
+);
+  terminating.start();
+  if (waitForTermination) {
+    try {
+      terminating.join();
+    }
+ catch (    InterruptedException e) {
+      throw new IllegalStateException("Could not terminate process",e);
+    }
+  }
+  LOGGER.trace("Process[{}]::stop() END",name);
+}

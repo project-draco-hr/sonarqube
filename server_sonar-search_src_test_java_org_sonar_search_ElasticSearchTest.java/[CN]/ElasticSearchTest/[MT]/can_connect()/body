@@ -1,5 +1,6 @@
 {
   Properties properties=new Properties();
+  properties.setProperty(Process.SONAR_HOME,FileUtils.getTempDirectoryPath());
   properties.setProperty(Process.NAME_PROPERTY,"ES");
   properties.setProperty(ElasticSearch.ES_HOME_PROPERTY,tempDirectory.getAbsolutePath());
   properties.setProperty(ElasticSearch.ES_PORT_PROPERTY,Integer.toString(freeESPort));
@@ -22,7 +23,7 @@
   Settings settings=ImmutableSettings.settingsBuilder().put("cluster.name","sonarqube").build();
   TransportClient client=new TransportClient(settings).addTransportAddress(new InetSocketTransportAddress("localhost",freeESPort));
   assertThat(client.admin().cluster().prepareClusterStats().get().getStatus()).isEqualTo(ClusterHealthStatus.GREEN);
-  elasticSearch.terminate();
+  elasticSearch.terminate(true);
   try {
     client.admin().cluster().prepareClusterStats().get().getStatus();
     fail();
