@@ -1,0 +1,32 @@
+{
+  Exception exception=null;
+  for (int i=0; i < 10; i++) {
+    try {
+      Thread.sleep(1000);
+    }
+ catch (    InterruptedException e) {
+      throw new IllegalStateException("Could not connect to JMX server",e);
+    }
+    LOGGER.info("Try #{} to connect to JMX server for process '{}'",i,name);
+    try {
+      String protocol="rmi";
+      String path="/jndi/rmi://" + InetAddress.getLocalHost().getHostName() + ":"+ port+ "/jmxrmi";
+      JMXServiceURL jmxUrl=new JMXServiceURL(protocol,InetAddress.getLocalHost().getHostName(),port,path);
+      JMXConnector jmxConnector=JMXConnectorFactory.connect(jmxUrl,null);
+      MBeanServerConnection mBeanServer=jmxConnector.getMBeanServerConnection();
+      ProcessMXBean bean=JMX.newMBeanProxy(mBeanServer,Process.objectNameFor(name),ProcessMXBean.class);
+      LOGGER.info("ProcessWrapper::waitForJMX -- Connected to JMX Server with URL: {}",jmxUrl.toString());
+      return bean;
+    }
+ catch (    MalformedURLException e) {
+      throw new IllegalStateException("JMXUrl is not valid",e);
+    }
+catch (    UnknownHostException e) {
+      throw new IllegalStateException("Could not get hostname",e);
+    }
+catch (    IOException e) {
+      exception=e;
+    }
+  }
+  throw new IllegalStateException("Could not connect to JMX service",exception);
+}

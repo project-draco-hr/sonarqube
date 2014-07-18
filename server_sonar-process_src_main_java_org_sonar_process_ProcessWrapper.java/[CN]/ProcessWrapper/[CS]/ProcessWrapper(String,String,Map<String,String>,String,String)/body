@@ -1,51 +1,12 @@
 {
+  super(name);
   this.port=NetworkUtils.freePort();
   LOGGER.info("Creating Process for '{}' with workDir: '{}' and monitoring port: {}",name,workDir,port);
   this.workDir=workDir;
-  this.name=name;
   this.className=className;
   this.classPath=classPath;
   this.properties=properties;
+  processThread=this;
   this.process=executeProcess();
-  new Thread(new Runnable(){
-    @Override public void run(){
-      try {
-        process.waitFor();
-      }
- catch (      InterruptedException e) {
-        e.printStackTrace();
-      }
- finally {
-        waitUntilFinish(outputGobbler);
-        waitUntilFinish(errorGobbler);
-      }
-      LOGGER.warn("Process '{}' Unexpectedly finished. Node should shutdown.",name);
-    }
-  }
-).start();
-  try {
-    Thread.sleep(2000);
-  }
- catch (  InterruptedException e) {
-    e.printStackTrace();
-  }
-  JMXServiceURL jmxUrl=null;
-  try {
-    String protocol="rmi";
-    String path="/jndi/rmi://" + InetAddress.getLocalHost().getHostName() + ":"+ port+ "/jmxrmi";
-    jmxUrl=new JMXServiceURL(protocol,InetAddress.getLocalHost().getHostName(),port,path);
-    JMXConnector jmxConnector=JMXConnectorFactory.connect(jmxUrl,null);
-    mBeanServer=jmxConnector.getMBeanServerConnection();
-    processMXBean=JMX.newMBeanProxy(mBeanServer,Process.objectNameFor(name),ProcessMXBean.class);
-  }
- catch (  MalformedURLException e) {
-    throw new IllegalStateException("JMXUrl '" + jmxUrl + "'is not valid",e);
-  }
-catch (  UnknownHostException e) {
-    throw new IllegalStateException("Could not get hostname",e);
-  }
-catch (  IOException e) {
-    throw new IllegalStateException("Could not connect to JMX service",e);
-  }
-  pingTask=monitor.scheduleWithFixedDelay(pinging,0,3,TimeUnit.SECONDS);
+  processMXBean=waitForJMX(name,port);
 }

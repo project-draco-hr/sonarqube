@@ -1,0 +1,22 @@
+{
+  LOGGER.trace("Monitor::run() START");
+  boolean everythingOK=true;
+  while (everythingOK) {
+    for (    ProcessWrapper process : processes) {
+      if (!processIsValid(process)) {
+        LOGGER.warn("Monitor::run() -- Process '{}' is not valid. Exiting monitor",process.getName());
+        everythingOK=false;
+        break;
+      }
+    }
+    try {
+      Thread.sleep(1000);
+    }
+ catch (    InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+  watch.cancel(true);
+  monitor.shutdownNow();
+  LOGGER.trace("Monitor::run() END");
+}
