@@ -1,8 +1,12 @@
 {
   LOGGER.info("ProcessWrapper::executeProcess() START");
-  String separator=System.getProperty("file.separator");
-  String path=System.getProperty("java.home") + separator + "bin"+ separator+ "java";
-  ProcessBuilder processBuilder=new ProcessBuilder(path,"-Dcom.sun.management.jmxremote","-Dcom.sun.management.jmxremote.port=" + port,"-Dcom.sun.management.jmxremote.authenticate=false","-Dcom.sun.management.jmxremote.ssl=false","-cp",StringUtils.join(classPath,separator),className);
+  ProcessBuilder processBuilder=new ProcessBuilder();
+  processBuilder.command().add(getJavaCommand());
+  processBuilder.command().add(getJavaOptions());
+  processBuilder.command().addAll(getJMXOptions());
+  processBuilder.command().addAll(getClassPath());
+  processBuilder.command().add(className);
+  processBuilder.command().add(getPropertyFile());
   processBuilder.environment().putAll(properties);
   processBuilder.environment().put(Process.SONAR_HOME,workDir);
   processBuilder.environment().put(Process.NAME_PROPERTY,this.getName());
