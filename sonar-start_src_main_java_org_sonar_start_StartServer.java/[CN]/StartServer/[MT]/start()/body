@@ -1,6 +1,13 @@
 {
+  Properties sonarProperties=new Properties();
+  try {
+    sonarProperties.load(new FileReader(env.getConfFile()));
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Could not read properties from env",e);
+  }
   String workingDirectory=env.rootDir().getAbsolutePath();
-  elasticsearch=new ProcessWrapper(env.rootDir().getAbsolutePath(),"org.sonar.search.ElasticSearch",ImmutableMap.of("esDebug",properties.containsKey("esDebug") ? properties.get("esDebug") : "false","esPort",esPort,"esHome",env.rootDir().getAbsolutePath()),"ES",env.rootDir().getAbsolutePath() + "/lib/search/sonar-search-4.5-SNAPSHOT.jar");
+  elasticsearch=new ProcessWrapper(env.rootDir().getAbsolutePath(),sonarProperties.getProperty("sonar.es.java_opts"),"org.sonar.search.ElasticSearch",ImmutableMap.of("esDebug",properties.containsKey("esDebug") ? properties.get("esDebug") : "false","esPort",esPort,"esHome",env.rootDir().getAbsolutePath()),"ES",env.rootDir().getAbsolutePath() + "/lib/search/sonar-search-4.5-SNAPSHOT.jar");
   monitor.registerProcess(elasticsearch);
   monitor.start();
   try {

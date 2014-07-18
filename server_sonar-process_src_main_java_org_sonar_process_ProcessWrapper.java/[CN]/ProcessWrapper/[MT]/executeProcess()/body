@@ -2,18 +2,13 @@
   LOGGER.info("ProcessWrapper::executeProcess() START");
   ProcessBuilder processBuilder=new ProcessBuilder();
   processBuilder.command().add(getJavaCommand());
-  String javaOptions=getJavaOptions();
-  if (!StringUtils.isEmpty(javaOptions)) {
-    processBuilder.command().add(getJavaOptions());
+  if (!StringUtils.isEmpty(javaOpts)) {
+    processBuilder.command().add(javaOpts);
   }
   processBuilder.command().addAll(getJMXOptions());
   processBuilder.command().addAll(getClassPath());
   processBuilder.command().add(className);
   processBuilder.command().add(getPropertyFile());
-  processBuilder.environment().putAll(properties);
-  processBuilder.environment().put(Process.SONAR_HOME,workDir);
-  processBuilder.environment().put(Process.NAME_PROPERTY,this.getName());
-  processBuilder.environment().put(Process.PORT_PROPERTY,Integer.toString(port));
   File workDirectory=new File(workDir);
   if (!workDirectory.exists()) {
     throw new IllegalStateException("Work directory does not exist.");
