@@ -1,9 +1,9 @@
 {
   ESNode node=new ESNode(fs,new Settings());
   node.start();
-  node.client().admin().indices().prepareCreate("polop").addMapping("type1","{\"type1\": {\"properties\": {\"value\": {\"type\": \"string\"}}}}").execute().actionGet();
-  node.client().admin().cluster().prepareHealth("polop").setWaitForYellowStatus().get(TimeValue.timeValueMillis(1000));
-  AnalyzeResponse response=node.client().admin().indices().prepareAnalyze("polop","/temp/65236/test path/MyFile.java").setAnalyzer("path_analyzer").get();
+  node.client().admin().indices().prepareCreate("path").addMapping("type1","{\"type1\": {\"properties\": {\"value\": {\"type\": \"string\"}}}}").execute().actionGet();
+  node.client().admin().cluster().prepareHealth("path").setWaitForYellowStatus().get(TimeValue.timeValueMillis(1000));
+  AnalyzeResponse response=node.client().admin().indices().prepareAnalyze("path","/temp/65236/test path/MyFile.java").setAnalyzer("path_analyzer").get();
   assertThat(response.getTokens()).hasSize(4);
   assertThat(response.getTokens().get(0).getTerm()).isEqualTo("/temp");
   assertThat(response.getTokens().get(1).getTerm()).isEqualTo("/temp/65236");
