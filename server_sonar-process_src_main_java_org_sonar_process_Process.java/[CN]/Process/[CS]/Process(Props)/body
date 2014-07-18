@@ -1,29 +1,4 @@
 {
-  validateSonarHome(props);
   this.props=props;
-  this.name=props.of(NAME_PROPERTY,null);
-  this.port=props.intOf(PORT_PROPERTY);
-  if (StringUtils.isEmpty(this.name)) {
-    throw new IllegalStateException(MISSING_NAME_ARGUMENT);
-  }
-  MBeanServer mbeanServer=ManagementFactory.getPlatformMBeanServer();
-  try {
-    mbeanServer.registerMBean(this,this.getObjectName());
-  }
- catch (  InstanceAlreadyExistsException e) {
-    throw new IllegalStateException("Process already exists in current JVM",e);
-  }
-catch (  MBeanRegistrationException e) {
-    throw new IllegalStateException("Could not register process as MBean",e);
-  }
-catch (  NotCompliantMBeanException e) {
-    throw new IllegalStateException("Process is not a compliant MBean",e);
-  }
-  shutdownHook=new Thread(new Runnable(){
-    @Override public void run(){
-      Process.this.shutdown();
-    }
-  }
-);
-  Runtime.getRuntime().addShutdownHook(shutdownHook);
+  init();
 }
