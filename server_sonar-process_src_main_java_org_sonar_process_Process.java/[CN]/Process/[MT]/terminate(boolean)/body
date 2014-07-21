@@ -1,20 +1,14 @@
 {
-  LOGGER.trace("Process[{}]::stop() START",name);
+  LOGGER.trace("Process[{}]::terminate() START",name);
   Runtime.getRuntime().removeShutdownHook(shutdownHook);
-  Thread terminating=new Thread(new Runnable(){
-    @Override public void run(){
-      shutdown();
-    }
-  }
-);
-  terminating.start();
+  shutdownHook.start();
   if (waitForTermination) {
     try {
-      terminating.join();
+      shutdownHook.join();
     }
  catch (    InterruptedException e) {
-      throw new IllegalStateException("Could not terminate process",e);
+      e.printStackTrace();
     }
   }
-  LOGGER.trace("Process[{}]::stop() END",name);
+  LOGGER.trace("Process[{}]::terminate() END",name);
 }
