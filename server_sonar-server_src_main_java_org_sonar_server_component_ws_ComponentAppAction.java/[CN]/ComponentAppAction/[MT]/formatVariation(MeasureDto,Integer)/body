@@ -1,0 +1,19 @@
+{
+  if (measure != null) {
+    Double variation=measure.getVariation(periodIndex);
+    if (variation != null) {
+      Metric metric=CoreMetrics.getMetric(measure.getKey().metricKey());
+      Metric.ValueType metricType=metric.getType();
+      if (metricType.equals(Metric.ValueType.FLOAT) || metricType.equals(Metric.ValueType.PERCENT)) {
+        return i18n.formatDouble(UserSession.get().locale(),variation);
+      }
+      if (metricType.equals(Metric.ValueType.INT)) {
+        return i18n.formatInteger(UserSession.get().locale(),variation.intValue());
+      }
+      if (metricType.equals(Metric.ValueType.WORK_DUR)) {
+        return durations.format(UserSession.get().locale(),durations.create(variation.longValue()),Durations.DurationFormat.SHORT);
+      }
+    }
+  }
+  return null;
+}
