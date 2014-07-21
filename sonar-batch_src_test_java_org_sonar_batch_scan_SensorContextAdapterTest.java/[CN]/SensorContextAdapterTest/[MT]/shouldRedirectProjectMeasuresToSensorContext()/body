@@ -1,0 +1,12 @@
+{
+  Measure<Integer> measure=adaptor.getMeasure(CoreMetrics.NCLOC_KEY);
+  assertThat(measure).isNull();
+  when(sensorContext.getMeasure(CoreMetrics.NCLOC)).thenReturn(new org.sonar.api.measures.Measure<Integer>(CoreMetrics.NCLOC,10.0));
+  measure=adaptor.getMeasure(CoreMetrics.NCLOC);
+  assertThat(measure.metric()).isEqualTo(CoreMetrics.NCLOC);
+  assertThat(measure.inputFile()).isNull();
+  assertThat(measure.value()).isEqualTo(10);
+  thrown.expect(IllegalStateException.class);
+  thrown.expectMessage("Unknow metric with key: lines");
+  adaptor.getMeasure(CoreMetrics.LINES);
+}

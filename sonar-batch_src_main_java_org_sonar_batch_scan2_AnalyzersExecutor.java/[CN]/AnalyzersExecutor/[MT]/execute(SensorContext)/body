@@ -1,0 +1,13 @@
+{
+  Collection<Sensor> analyzers=selector.select(Sensor.class,null,true,null);
+  for (  Sensor analyzer : analyzers) {
+    DefaultSensorDescriptor descriptor=new DefaultSensorDescriptor();
+    analyzer.describe(descriptor);
+    if (!optimizer.shouldExecute(descriptor)) {
+      LOG.debug("Analyzer skipped: " + descriptor.name());
+      continue;
+    }
+    LOG.info("Execute analyzer: " + descriptor.name());
+    executeSensor(context,analyzer);
+  }
+}
