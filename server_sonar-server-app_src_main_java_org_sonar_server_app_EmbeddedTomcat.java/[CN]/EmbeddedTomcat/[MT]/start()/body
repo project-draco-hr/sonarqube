@@ -1,0 +1,27 @@
+{
+  if (tomcat != null || hook != null) {
+    throw new IllegalStateException("Server is already started");
+  }
+  try {
+    System.setProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH","true");
+    System.setProperty("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE","true");
+    tomcat=new Tomcat();
+    String basedir=env.freshDir(TEMP_RELATIVE_PATH).getCanonicalPath();
+    tomcat.setBaseDir(basedir);
+    tomcat.getHost().setAppBase(basedir);
+    tomcat.getHost().setAutoDeploy(false);
+    tomcat.getHost().setCreateDirs(false);
+    tomcat.getHost().setDeployOnStartup(true);
+    Logging.configure(tomcat,env,env.props());
+    Connectors.configure(tomcat,env.props());
+    Webapp.configure(tomcat,env,env.props());
+    tomcat.start();
+    addShutdownHook();
+    ready=true;
+    tomcat.getServer().await();
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Fail to start web server",e);
+  }
+  stop();
+}

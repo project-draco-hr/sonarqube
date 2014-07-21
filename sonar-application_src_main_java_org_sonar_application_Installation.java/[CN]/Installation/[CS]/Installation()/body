@@ -1,0 +1,29 @@
+{
+  File appJar=new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
+  homeDir=appJar.getParentFile().getParentFile();
+  Properties p=new Properties();
+  File propsFile=new File(homeDir,"conf/sonar.properties");
+  if (propsFile.exists()) {
+    FileReader reader=new FileReader(propsFile);
+    try {
+      p.load(reader);
+    }
+  finally {
+      IOUtils.closeQuietly(reader);
+    }
+  }
+  p.putAll(System.getenv());
+  p.putAll(System.getProperties());
+  p=ConfigurationUtils.interpolateEnvVariables(p);
+  for (  Map.Entry<Object,Object> entry : p.entrySet()) {
+    Object val=entry.getValue();
+    if (val != null) {
+      this.props.put(entry.getKey().toString(),val.toString());
+    }
+  }
+  props.put("sonar.path.home",homeDir.getAbsolutePath());
+  this.dataDir=existingDir("sonar.path.data","data");
+  this.tempDir=freshDir("sonar.path.temp","temp");
+  this.logsDir=existingDir("sonar.path.logs","logs");
+  this.webDir=existingDir("sonar.path.web","web");
+}

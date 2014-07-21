@@ -1,0 +1,31 @@
+{
+  Installation installation=new Installation();
+  String esPort=installation.prop("sonar.es.node.port",null);
+  if (esPort == null) {
+    esPort=String.valueOf(NetworkUtils.freePort());
+    installation.setProp("sonar.es.node.port",esPort);
+  }
+  installation.setProp("sonar.es.type","TRANSPORT");
+  shutdownHook=new Thread(new Runnable(){
+    @Override public void run(){
+      monitor.interrupt();
+      terminateAndWait(elasticsearch);
+      terminateAndWait(server);
+    }
+  }
+);
+  Runtime.getRuntime().addShutdownHook(shutdownHook);
+  elasticsearch=new ProcessWrapper(installation.homeDir().getAbsolutePath(),installation.prop("sonar.es.javaOpts","-server -Xmx256m -Xms128m -Xss256k -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly"),"org.sonar.search.ElasticSearch",installation.props(),"ES",installation.starPath("lib/search"));
+  server=new ProcessWrapper(installation.homeDir().getAbsolutePath(),installation.prop("sonar.web.javaOpts","-Xmx768m -server -XX:MaxPermSize=160m -Djava.awt.headless=true -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8 -Djruby.management.enabled=false"),"org.sonar.server.app.ServerProcess",installation.props(),"SQ",installation.starPath("lib"));
+  monitor=new Monitor();
+  monitor.registerProcess(elasticsearch);
+  monitor.registerProcess(server);
+  monitor.start();
+  try {
+    monitor.join();
+  }
+ catch (  InterruptedException e) {
+    stop(true);
+  }
+  stop(true);
+}
