@@ -1,0 +1,40 @@
+{
+  Map<Long,ComponentDto> projectsById=newHashMap();
+  Map<Long,ComponentDto> subProjectsById=newHashMap();
+  for (  Map.Entry<String,String> entry : refByComponentKey.entrySet()) {
+    String componentKey=entry.getKey();
+    String ref=entry.getValue();
+    ComponentDto file=componentDao.getNullableByKey(session,componentKey);
+    if (file != null) {
+      json.name(ref).beginObject();
+      json.prop("key",file.key());
+      json.prop("name",file.longName());
+      Long projectId=file.projectId();
+      ComponentDto project=projectsById.get(file.projectId());
+      if (project == null && projectId != null) {
+        project=componentDao.getById(projectId,session);
+        if (project != null) {
+          projectsById.put(projectId,project);
+        }
+      }
+      Long subProjectId=file.subProjectId();
+      ComponentDto subProject=subProjectsById.get(subProjectId);
+      if (subProject == null && subProjectId != null) {
+        subProject=componentDao.getById(subProjectId,session);
+        if (subProject != null) {
+          subProjectsById.put(subProject.getId(),subProject);
+        }
+      }
+      if (project != null) {
+        json.prop("project",project.key());
+        json.prop("projectName",project.longName());
+        boolean displaySubProject=subProject != null && !subProject.getId().equals(project.getId());
+        if (displaySubProject) {
+          json.prop("subProject",subProject.key());
+          json.prop("subProjectName",subProject.longName());
+        }
+      }
+      json.endObject();
+    }
+  }
+}
