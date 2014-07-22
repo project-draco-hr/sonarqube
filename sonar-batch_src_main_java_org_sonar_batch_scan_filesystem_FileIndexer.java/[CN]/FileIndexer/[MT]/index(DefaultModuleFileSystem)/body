@@ -4,7 +4,7 @@
   }
   LOG.info("Index files");
   exclusionFilters.prepare();
-  Progress progress=new Progress(fileCache.filesByModule(fileSystem.moduleKey()));
+  Progress progress=new Progress(fileCache.filesByModule(fileSystem.moduleKey()),fileCache.dirsByModule(fileSystem.moduleKey()));
   InputFileBuilder inputFileBuilder=inputFileBuilderFactory.create(fileSystem);
   indexFiles(fileSystem,progress,inputFileBuilder,fileSystem.sources(),InputFile.Type.MAIN);
   indexFiles(fileSystem,progress,inputFileBuilder,fileSystem.tests(),InputFile.Type.TEST);
@@ -12,7 +12,13 @@
   for (  InputFile indexed : progress.indexed) {
     fileSystem.add(indexed);
   }
+  for (  InputDir indexed : progress.indexedDir) {
+    fileSystem.add(indexed);
+  }
   for (  InputFile removed : progress.removed) {
+    fileCache.remove(fileSystem.moduleKey(),removed);
+  }
+  for (  InputDir removed : progress.removedDir) {
     fileCache.remove(fileSystem.moduleKey(),removed);
   }
   LOG.info(String.format("%d files indexed",progress.count()));

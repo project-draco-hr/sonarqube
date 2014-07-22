@@ -1,12 +1,20 @@
 {
   Resource r;
-  InputFile inputFile=issue.inputFile();
-  if (inputFile != null) {
-    r=File.create(inputFile.relativePath());
+  InputPath inputPath=issue.inputPath();
+  if (inputPath != null) {
+    if (inputPath instanceof InputDir) {
+      r=Directory.create(inputPath.relativePath());
+    }
+ else {
+      r=File.create(inputPath.relativePath());
+    }
   }
  else {
     r=project;
   }
   Issuable issuable=perspectives.as(Issuable.class,r);
+  if (issuable == null) {
+    return false;
+  }
   return issuable.addIssue(toDefaultIssue(project.getKey(),r.getKey(),issue));
 }

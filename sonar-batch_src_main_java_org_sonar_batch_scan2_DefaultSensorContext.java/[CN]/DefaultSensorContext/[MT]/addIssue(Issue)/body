@@ -1,0 +1,24 @@
+{
+  String resourceKey;
+  if (issue.inputPath() != null) {
+    resourceKey=ComponentKeys.createEffectiveKey(def.getKey(),issue.inputPath());
+  }
+ else {
+    resourceKey=def.getKey();
+  }
+  RuleKey ruleKey=issue.ruleKey();
+  Rule rule=null;
+  ActiveRule activeRule=activeRules.find(ruleKey);
+  if (activeRule == null) {
+    return false;
+  }
+  if (Strings.isNullOrEmpty(issue.message())) {
+    throw MessageException.of(String.format("The rule '%s' has no name and the related issue has no message.",ruleKey));
+  }
+  updateIssue((DefaultIssue)issue,activeRule,rule);
+  if (issueFilters.accept(SensorContextAdaptor.toDefaultIssue(def.getKey(),resourceKey,issue),null)) {
+    issueCache.put(def.getKey(),resourceKey,(DefaultIssue)issue);
+    return true;
+  }
+  return false;
+}

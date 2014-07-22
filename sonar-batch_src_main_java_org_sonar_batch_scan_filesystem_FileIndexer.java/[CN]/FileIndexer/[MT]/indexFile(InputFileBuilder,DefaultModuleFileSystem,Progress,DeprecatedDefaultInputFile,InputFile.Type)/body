@@ -4,6 +4,13 @@
       InputFile completedFile=inputFileBuilder.complete(inputFile,type);
       if (completedFile != null && accept(completedFile)) {
         status.markAsIndexed(inputFile);
+        File parentDir=inputFile.file().getParentFile();
+        String relativePath=new PathResolver().relativePath(fs.baseDir(),parentDir);
+        if (relativePath != null) {
+          DefaultInputDir inputDir=new DefaultInputDir(relativePath);
+          inputDir.setFile(parentDir);
+          status.markAsIndexed(inputDir);
+        }
       }
       return null;
     }
