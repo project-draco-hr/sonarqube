@@ -1,11 +1,12 @@
 {
+  UserSession userSession=UserSession.get();
+  boolean hasScanPerm=userSession.hasGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
+  boolean hasDryRunPerm=userSession.hasGlobalPermission(GlobalPermissions.DRY_RUN_EXECUTION);
   DbSession session=dbClient.openSession(false);
   try {
     GlobalReferentials ref=new GlobalReferentials();
-    for (    MetricDto metric : dbClient.metricDao().findEnabled(session)) {
-      Boolean optimizedBestValue=metric.isOptimizedBestValue();
-      ref.metrics().add(new org.sonar.batch.protocol.input.Metric(metric.getId(),metric.getKey(),metric.getValueType(),metric.getDescription(),metric.getDirection(),metric.getName(),metric.isQualitative(),metric.isUserManaged(),metric.getWorstValue(),metric.getBestValue(),optimizedBestValue != null ? optimizedBestValue : false));
-    }
+    addMetrics(ref,session);
+    addSettings(ref,hasScanPerm,hasDryRunPerm);
     response.stream().setMediaType(MimeTypes.JSON);
     IOUtils.write(ref.toJson(),response.stream().output());
   }
