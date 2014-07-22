@@ -16,12 +16,16 @@
     for (    ActiveRule activeRule : activeRules) {
       upsert.setLong(1,activeRule.id).setLong(2,ruleParameter.id).setString(3,ruleParameter.defaultValue).setString(4,ruleParameter.name).addBatch();
     }
-    upsert.execute().commit().close();
+    if (!activeRules.isEmpty()) {
+      upsert.execute().commit().close();
+    }
     upsert=context.prepareUpsert("update active_rules set updated_at=? where id=?");
     Date now=new Date(system.now());
     for (    ActiveRule activeRule : activeRules) {
       upsert.setDate(1,now).setLong(2,activeRule.id).addBatch();
     }
-    upsert.execute().commit().close();
+    if (!activeRules.isEmpty()) {
+      upsert.execute().commit().close();
+    }
   }
 }
