@@ -1,27 +1,17 @@
 {
   initLogging();
-  IndexProperties.ES_TYPE type=settings.hasKey(IndexProperties.TYPE) ? IndexProperties.ES_TYPE.valueOf(settings.getString(IndexProperties.TYPE)) : IndexProperties.ES_TYPE.DATA;
+  String typeValue=settings.getString(IndexProperties.TYPE);
+  IndexProperties.ES_TYPE type=typeValue != null ? IndexProperties.ES_TYPE.valueOf(typeValue) : IndexProperties.ES_TYPE.DATA;
   ImmutableSettings.Builder esSettings=ImmutableSettings.settingsBuilder().put("index.merge.policy.max_merge_at_once","200").put("index.merge.policy.segments_per_tier","200").put("indices.store.throttle.type","merge").put("indices.store.throttle.max_bytes_per_sec","200mb").put("script.default_lang","native").put("script.native." + ListUpdate.NAME + ".type",UpdateListScriptFactory.class.getName()).put("cluster.name",settings.getString(IndexProperties.CLUSTER_NAME));
   initAnalysis(esSettings);
   if (IndexProperties.ES_TYPE.TRANSPORT.equals(type)) {
-    client=new TransportClient(esSettings).addTransportAddress(new InetSocketTransportAddress("localhost",settings.getInt(IndexProperties.NODE_PORT)));
+    initRemoteClient(esSettings);
   }
  else {
-    if (IndexProperties.ES_TYPE.MEMORY.equals(type)) {
-      initMemoryES(esSettings);
-    }
- else     if (IndexProperties.ES_TYPE.DATA.equals(type)) {
-      initDataES(esSettings);
-    }
-    initDirs(esSettings);
-    initRestConsole(esSettings);
-    initNetwork(esSettings);
-    node=NodeBuilder.nodeBuilder().settings(esSettings).node();
-    node.start();
-    client=node.client();
+    initLocalClient(type,esSettings);
   }
   if (client.admin().cluster().prepareHealth().setWaitForYellowStatus().setTimeout(healthTimeout).get().getStatus() == ClusterHealthStatus.RED) {
-    throw new IllegalStateException(String.format("Elasticsearch index is corrupt, please delete directory '%s/%s' and relaunch the SonarQube server.",fileSystem.getHomeDir().getAbsolutePath(),DATA_DIR));
+    throw MessageException.of(String.format("Elasticsearch index is corrupt, please delete directory '%s' " + "and relaunch the SonarQube server.",esDataDir()));
   }
   addIndexTemplates();
   LOG.info("Elasticsearch started");
