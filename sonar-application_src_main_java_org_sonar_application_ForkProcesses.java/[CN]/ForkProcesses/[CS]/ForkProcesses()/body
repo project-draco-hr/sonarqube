@@ -5,6 +5,10 @@
     esPort=String.valueOf(NetworkUtils.freePort());
     installation.setProp("sonar.es.node.port",esPort);
   }
+  String esCluster=installation.prop("sonar.es.cluster.name",null);
+  if (esCluster == null) {
+    installation.setProp("sonar.es.cluster.name","sonarqube");
+  }
   installation.setProp("sonar.es.type","TRANSPORT");
   shutdownHook=new Thread(new Runnable(){
     @Override public void run(){
@@ -15,10 +19,10 @@
   }
 );
   Runtime.getRuntime().addShutdownHook(shutdownHook);
-  elasticsearch=new ProcessWrapper(installation.homeDir().getAbsolutePath(),installation.prop("sonar.es.javaOpts","-server -Xmx256m -Xms128m -Xss256k -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly"),"org.sonar.search.ElasticSearch",installation.props(),"ES",installation.starPath("lib/search"));
-  server=new ProcessWrapper(installation.homeDir().getAbsolutePath(),installation.prop("sonar.web.javaOpts","-Xmx768m -server -XX:MaxPermSize=160m -Djava.awt.headless=true -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8 -Djruby.management.enabled=false"),"org.sonar.server.app.ServerProcess",installation.props(),"SQ",installation.starPath("lib"));
   monitor=new Monitor();
+  elasticsearch=new ProcessWrapper(installation.homeDir().getAbsolutePath(),installation.prop("sonar.es.javaOpts","-server -Xmx256m -Xms128m -Xss256k -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly"),"org.sonar.search.ElasticSearch",installation.props(),"ES",installation.starPath("lib/search"));
   monitor.registerProcess(elasticsearch);
+  server=new ProcessWrapper(installation.homeDir().getAbsolutePath(),installation.prop("sonar.web.javaOpts","-Xmx768m -server -XX:MaxPermSize=160m -Djava.awt.headless=true -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8 -Djruby.management.enabled=false"),"org.sonar.server.app.ServerProcess",installation.props(),"SQ",installation.starPath("lib"));
   monitor.registerProcess(server);
   monitor.start();
   try {
