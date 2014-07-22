@@ -1,0 +1,15 @@
+{
+  DbSession session=dbClient.openSession(false);
+  try {
+    GlobalReferentials ref=new GlobalReferentials();
+    for (    MetricDto metric : dbClient.metricDao().findEnabled(session)) {
+      Boolean optimizedBestValue=metric.isOptimizedBestValue();
+      ref.metrics().add(new org.sonar.batch.protocol.input.Metric(metric.getId(),metric.getKey(),metric.getValueType(),metric.getDescription(),metric.getDirection(),metric.getName(),metric.isQualitative(),metric.isUserManaged(),metric.getWorstValue(),metric.getBestValue(),optimizedBestValue != null ? optimizedBestValue : false));
+    }
+    response.stream().setMediaType(MimeTypes.JSON);
+    IOUtils.write(ref.toJson(),response.stream().output());
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}
