@@ -9,6 +9,7 @@
   ProcessBuilder processBuilder=new ProcessBuilder();
   processBuilder.command(command);
   processBuilder.directory(workDir);
+  processBuilder.environment().putAll(envProperties);
   try {
     LOGGER.debug("ProcessWrapper::executeProcess() -- Starting process with command '{}'",StringUtils.join(command," "));
     process=processBuilder.start();
@@ -18,6 +19,7 @@
     outputGobbler.start();
     errorGobbler.start();
     processMXBean=waitForJMX();
+    return this;
   }
  catch (  IOException e) {
     throw new IllegalStateException("Fail to start process: " + StringUtils.join(command," "),e);

@@ -1,0 +1,27 @@
+{
+  Properties p=new Properties();
+  File propsFile=new File(homeDir,"conf/sonar.properties");
+  if (propsFile.exists()) {
+    FileReader reader=new FileReader(propsFile);
+    try {
+      p.load(reader);
+    }
+  finally {
+      IOUtils.closeQuietly(reader);
+    }
+  }
+ else {
+    LOG.info("Configuration file not found: " + propsFile.getAbsolutePath());
+  }
+  p.putAll(System.getenv());
+  p.putAll(System.getProperties());
+  p=ConfigurationUtils.interpolateEnvVariables(p);
+  Map<String,String> result=new HashMap<String,String>();
+  for (  Map.Entry<Object,Object> entry : p.entrySet()) {
+    Object val=entry.getValue();
+    if (val != null) {
+      result.put(entry.getKey().toString(),val.toString());
+    }
+  }
+  return result;
+}
