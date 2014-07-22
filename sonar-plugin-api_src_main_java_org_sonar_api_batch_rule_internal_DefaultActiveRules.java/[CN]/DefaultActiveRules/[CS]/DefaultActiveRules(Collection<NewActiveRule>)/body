@@ -7,6 +7,15 @@
     if (ar.language() != null) {
       langBuilder.put(ar.language(),ar);
     }
+    if (!activeRulesByRepositoryAndKey.containsKey(ar.ruleKey().repository())) {
+      activeRulesByRepositoryAndKey.put(ar.ruleKey().repository(),new HashMap<String,ActiveRule>());
+      activeRulesByRepositoryAndInternalKey.put(ar.ruleKey().repository(),new HashMap<String,ActiveRule>());
+    }
+    activeRulesByRepositoryAndKey.get(ar.ruleKey().repository()).put(ar.ruleKey().rule(),ar);
+    String internalKey=ar.internalKey();
+    if (internalKey != null) {
+      activeRulesByRepositoryAndInternalKey.get(ar.ruleKey().repository()).put(internalKey,ar);
+    }
   }
   activeRulesByRepository=repoBuilder.build();
   activeRulesByLanguage=langBuilder.build();
