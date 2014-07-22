@@ -1,0 +1,19 @@
+{
+  InputPathCache cache=new InputPathCache(caches);
+  DefaultInputFile fooFile=new DefaultInputFile("src/main/java/Foo.java").setFile(temp.newFile("Foo.java"));
+  cache.put("struts",fooFile);
+  cache.put("struts-core",new DeprecatedDefaultInputFile("src/main/java/Bar.java").setFile(temp.newFile("Bar.java")));
+  assertThat(cache.getFile("struts","src/main/java/Foo.java").relativePath()).isEqualTo("src/main/java/Foo.java");
+  assertThat(cache.filesByModule("struts")).hasSize(1);
+  assertThat(cache.filesByModule("struts-core")).hasSize(1);
+  assertThat(cache.all()).hasSize(2);
+  for (  InputFile inputFile : cache.all()) {
+    assertThat(inputFile.relativePath()).startsWith("src/main/java/");
+  }
+  cache.remove("struts",fooFile);
+  assertThat(cache.all()).hasSize(1);
+  cache.removeModule("struts");
+  assertThat(cache.filesByModule("struts")).hasSize(0);
+  assertThat(cache.filesByModule("struts-core")).hasSize(1);
+  assertThat(cache.all()).hasSize(1);
+}

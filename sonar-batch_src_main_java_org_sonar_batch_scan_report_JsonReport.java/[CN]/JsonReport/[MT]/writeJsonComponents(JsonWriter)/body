@@ -1,9 +1,17 @@
 {
   json.name("components").beginArray();
   writeJsonModuleComponents(json,rootModule);
-  for (  InputFile inputFile : fileCache.all()) {
-    String key=((DeprecatedDefaultInputFile)inputFile).key();
-    json.beginObject().prop("key",key).prop("path",inputFile.relativePath()).prop("moduleKey",StringUtils.substringBeforeLast(key,":")).prop("status",inputFile.status().name()).endObject();
+  for (  InputPath inputPath : fileCache.all()) {
+    if (inputPath instanceof InputFile) {
+      InputFile inputFile=(InputFile)inputPath;
+      String key=((DefaultInputFile)inputFile).key();
+      json.beginObject().prop("key",key).prop("path",inputFile.relativePath()).prop("moduleKey",StringUtils.substringBeforeLast(key,":")).prop("status",inputFile.status().name()).endObject();
+    }
+ else {
+      InputDir inputDir=(InputDir)inputPath;
+      String key=((DefaultInputDir)inputDir).key();
+      json.beginObject().prop("key",key).prop("path",inputDir.relativePath()).prop("moduleKey",StringUtils.substringBeforeLast(key,":")).endObject();
+    }
   }
   json.endArray();
 }
