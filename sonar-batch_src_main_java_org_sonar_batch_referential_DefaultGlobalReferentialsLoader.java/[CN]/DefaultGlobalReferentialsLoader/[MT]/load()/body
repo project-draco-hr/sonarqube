@@ -1,10 +1,9 @@
 {
-  GlobalReferentials ref=new GlobalReferentials();
-  for (  Metric m : sessionFactory.getSession().getResults(Metric.class,ENABLED,true)) {
-    Boolean optimizedBestValue=m.isOptimizedBestValue();
-    Boolean qualitative=m.getQualitative();
-    Boolean userManaged=m.getUserManaged();
-    ref.metrics().add(new org.sonar.batch.protocol.input.Metric(m.getId(),m.getKey(),m.getType().name(),m.getDescription(),m.getDirection(),m.getName(),qualitative != null ? m.getQualitative() : false,userManaged != null ? m.getUserManaged() : false,m.getWorstValue(),m.getBestValue(),optimizedBestValue != null ? optimizedBestValue : false));
+  InputSupplier<InputStream> jsonStream=serverClient.doRequest(BATCH_GLOBAL_URL,null);
+  try {
+    return GlobalReferentials.fromJson(new InputStreamReader(jsonStream.getInput(),Charsets.UTF_8));
   }
-  return ref;
+ catch (  IOException e) {
+    throw new IllegalStateException("Unable to load global referentials",e);
+  }
 }
