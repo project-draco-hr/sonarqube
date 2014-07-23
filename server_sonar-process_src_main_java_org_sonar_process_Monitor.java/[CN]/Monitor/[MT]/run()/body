@@ -1,24 +1,24 @@
 {
-  LOGGER.trace("Monitor::run() START");
+  LOGGER.debug("Monitor::run() START");
   boolean everythingOK=true;
-  while (everythingOK) {
-    for (    ProcessWrapper process : processes) {
-      if (!processIsValid(process)) {
-        LOGGER.warn("Monitor::run() -- Process '{}' is not valid. Exiting monitor",process.getName());
-        everythingOK=false;
-        break;
+  try {
+    while (everythingOK) {
+      for (      ProcessWrapper process : processes) {
+        if (!processIsValid(process)) {
+          LOGGER.warn("Monitor::run() -- Process '{}' is not valid. Exiting monitor",process.getName());
+          everythingOK=false;
+          break;
+        }
       }
-    }
-    try {
-      Thread.sleep(1000);
-    }
- catch (    InterruptedException e) {
-      LOGGER.warn("Monitoring thread has been interrupted. Closing");
-      watch.cancel(true);
-      monitor.shutdownNow();
+      Thread.sleep(3000L);
     }
   }
-  watch.cancel(true);
-  monitor.shutdownNow();
-  LOGGER.trace("Monitor::run() END");
+ catch (  InterruptedException e) {
+    LOGGER.info("Monitoring thread is interrupted.");
+  }
+ finally {
+    watch.cancel(true);
+    monitor.shutdownNow();
+  }
+  LOGGER.debug("Monitor::run() END");
 }
