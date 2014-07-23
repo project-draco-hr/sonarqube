@@ -1,8 +1,6 @@
 {
   MockUserSession.set().setLogin("john").setGlobalPermissions();
-  settings.setProperty("foo","bar");
-  settings.setProperty("foo.secured","1234");
-  settings.setProperty("foo.license.secured","5678");
+  when(propertiesDao.selectGlobalProperties(session)).thenReturn(newArrayList(new PropertyDto().setKey("foo").setValue("bar"),new PropertyDto().setKey("foo.secured").setValue("1234"),new PropertyDto().setKey("foo.license.secured").setValue("5678")));
   WsTester.TestRequest request=tester.newGetRequest("batch","global");
   request.execute().assertJson(getClass(),"return_no_secured_settings_without_scan_and_preview_permission.json");
 }

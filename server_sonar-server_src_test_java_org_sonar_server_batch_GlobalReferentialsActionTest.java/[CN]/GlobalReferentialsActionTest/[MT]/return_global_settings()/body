@@ -1,8 +1,6 @@
 {
   MockUserSession.set().setLogin("john").setGlobalPermissions(GlobalPermissions.SCAN_EXECUTION,GlobalPermissions.DRY_RUN_EXECUTION);
-  settings.setProperty("foo","bar");
-  settings.setProperty("foo.secured","1234");
-  settings.setProperty("foo.license.secured","5678");
+  when(propertiesDao.selectGlobalProperties(session)).thenReturn(newArrayList(new PropertyDto().setKey("foo").setValue("bar"),new PropertyDto().setKey("foo.secured").setValue("1234"),new PropertyDto().setKey("foo.license.secured").setValue("5678")));
   WsTester.TestRequest request=tester.newGetRequest("batch","global");
   request.execute().assertJson(getClass(),"return_global_settings.json");
 }
