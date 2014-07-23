@@ -7,15 +7,14 @@
     resourceKey=def.getKey();
   }
   RuleKey ruleKey=issue.ruleKey();
-  Rule rule=null;
   ActiveRule activeRule=activeRules.find(ruleKey);
   if (activeRule == null) {
     return false;
   }
-  if (Strings.isNullOrEmpty(issue.message())) {
+  if (Strings.isNullOrEmpty(activeRule.name()) && Strings.isNullOrEmpty(issue.message())) {
     throw MessageException.of(String.format("The rule '%s' has no name and the related issue has no message.",ruleKey));
   }
-  updateIssue((DefaultIssue)issue,activeRule,rule);
+  updateIssue((DefaultIssue)issue,activeRule);
   if (issueFilters.accept(SensorContextAdaptor.toDefaultIssue(def.getKey(),resourceKey,issue),null)) {
     issueCache.put(def.getKey(),resourceKey,(DefaultIssue)issue);
     return true;
