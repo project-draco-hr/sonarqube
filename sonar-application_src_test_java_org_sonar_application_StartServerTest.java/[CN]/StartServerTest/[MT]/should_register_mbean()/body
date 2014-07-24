@@ -6,6 +6,16 @@
   assertThat(server).isNotNull();
   ObjectName serverObjectName=Process.objectNameFor(StartServer.PROCESS_NAME);
   assertThat(mbeanServer.isRegistered(serverObjectName)).isTrue();
-  ObjectInstance serverMXBean=mbeanServer.getObjectInstance(serverObjectName);
-  System.out.println("serverMXBean.getClassName() = " + serverMXBean.getClassName());
+  Long now=System.currentTimeMillis();
+  Long ping=(Long)mbeanServer.invoke(serverObjectName,ProcessMXBean.PING,null,null);
+  assertThat(ping).isNotNull();
+  assertThat(ping - now).isLessThanOrEqualTo(3000L);
+  mbeanServer.invoke(serverObjectName,ProcessMXBean.TERMINATE,null,null);
+  try {
+    mbeanServer.invoke(serverObjectName,"xoxo",null,null);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e.getMessage()).isEqualTo("No such operation: xoxo");
+  }
 }
