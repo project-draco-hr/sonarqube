@@ -1,5 +1,11 @@
 {
-  boolean fsCondition=fsCondition(descriptor);
-  boolean activeRulesCondition=activeRulesCondition(descriptor);
-  return fsCondition && activeRulesCondition;
+  if (!fsCondition(descriptor)) {
+    LOG.debug("'{}' skipped because there is no related file in current project",descriptor.name());
+    return false;
+  }
+  if (!activeRulesCondition(descriptor)) {
+    LOG.debug("'{}' skipped because there is no related rule activated in the quality profile",descriptor.name());
+    return false;
+  }
+  return true;
 }
