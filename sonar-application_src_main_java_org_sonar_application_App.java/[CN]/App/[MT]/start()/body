@@ -1,18 +1,19 @@
 {
+  Logger logger=LoggerFactory.getLogger(getClass());
+  logger.info("Starting Elasticsearch");
   elasticsearch=new ProcessWrapper("ES").setWorkDir(installation.homeDir()).setJmxPort(Integer.parseInt(installation.prop(DefaultSettings.ES_JMX_PORT_KEY))).addJavaOpts(installation.prop(DefaultSettings.ES_JAVA_OPTS_KEY)).addJavaOpts(String.format("-Djava.io.tmpdir=%s",installation.tempDir().getAbsolutePath())).addJavaOpts(String.format("-D%s=%s",DefaultSettings.PATH_LOGS_KEY,installation.logsDir().getAbsolutePath())).setClassName("org.sonar.search.ElasticSearch").setProperties(installation.props().cryptedProperties()).addClasspath(installation.starPath("lib/common")).addClasspath(installation.starPath("lib/search")).execute();
   monitor.registerProcess(elasticsearch);
+  logger.info("Starting HTTP server");
   server=new ProcessWrapper("SQ").setWorkDir(installation.homeDir()).setJmxPort(Integer.parseInt(installation.prop(DefaultSettings.WEB_JMX_PORT_KEY))).addJavaOpts(installation.prop(DefaultSettings.WEB_JAVA_OPTS_KEY)).addJavaOpts(DefaultSettings.WEB_JAVA_OPTS_APPENDED_VAL).addJavaOpts(String.format("-Djava.io.tmpdir=%s",installation.tempDir().getAbsolutePath())).addJavaOpts(String.format("-D%s=%s",DefaultSettings.PATH_LOGS_KEY,installation.logsDir().getAbsolutePath())).setClassName("org.sonar.server.app.ServerProcess").setProperties(installation.props().cryptedProperties()).addClasspath(installation.starPath("extensions/jdbc-driver/mysql")).addClasspath(installation.starPath("extensions/jdbc-driver/mssql")).addClasspath(installation.starPath("extensions/jdbc-driver/oracle")).addClasspath(installation.starPath("extensions/jdbc-driver/postgresql")).addClasspath(installation.starPath("lib/common")).addClasspath(installation.starPath("lib/server")).execute();
   monitor.registerProcess(server);
+  logger.info("HTTP server is Ready");
   monitor.start();
   try {
-    try {
-      monitor.join();
-    }
- catch (    InterruptedException e) {
-      LOGGER.info("Monitor interrupted. Shutting down...");
-    }
+    monitor.join();
   }
-  finally {
+ catch (  InterruptedException e) {
+  }
+ finally {
     terminate();
   }
 }
