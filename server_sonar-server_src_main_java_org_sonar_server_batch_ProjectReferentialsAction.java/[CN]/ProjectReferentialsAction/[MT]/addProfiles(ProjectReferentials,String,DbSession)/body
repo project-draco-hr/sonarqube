@@ -1,0 +1,11 @@
+{
+  for (  Language language : languages.all()) {
+    String languageKey=language.getKey();
+    QualityProfileDto qualityProfileDto=qProfileFactory.getByProjectAndLanguage(session,projectKey,languageKey);
+    qualityProfileDto=qualityProfileDto != null ? qualityProfileDto : qProfileFactory.getDefault(session,languageKey);
+    if (qualityProfileDto != null) {
+      QProfile profile=new QProfile(qualityProfileDto.getKey(),qualityProfileDto.getName(),qualityProfileDto.getLanguage(),UtcDateUtils.parseDateTime(qualityProfileDto.getRulesUpdatedAt()));
+      ref.addQProfile(profile);
+    }
+  }
+}
