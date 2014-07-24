@@ -1,0 +1,8 @@
+{
+  ComponentDataCache cache=mock(ComponentDataCache.class);
+  DefaultHighlightingBuilder highlightable=new DefaultHighlightingBuilder("myComponent",cache);
+  highlightable.highlight(0,10,TypeOfText.KEYWORD).highlight(20,30,TypeOfText.CPP_DOC).done();
+  ArgumentCaptor<SyntaxHighlightingData> argCaptor=ArgumentCaptor.forClass(SyntaxHighlightingData.class);
+  verify(cache).setData(eq("myComponent"),eq(SnapshotDataTypes.SYNTAX_HIGHLIGHTING),argCaptor.capture());
+  assertThat(argCaptor.getValue().writeString()).isEqualTo("0,10,k;20,30,cppd;");
+}

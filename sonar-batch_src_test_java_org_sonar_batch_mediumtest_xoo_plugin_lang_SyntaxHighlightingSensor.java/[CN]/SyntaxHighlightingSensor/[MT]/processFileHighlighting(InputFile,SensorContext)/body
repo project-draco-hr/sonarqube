@@ -1,0 +1,35 @@
+{
+  File ioFile=inputFile.file();
+  File highlightingFile=new File(ioFile.getParentFile(),ioFile.getName() + HIGHLIGHTING_EXTENSION);
+  if (highlightingFile.exists()) {
+    XooConstants.LOG.debug("Processing " + highlightingFile.getAbsolutePath());
+    try {
+      List<String> lines=FileUtils.readLines(highlightingFile,context.fileSystem().encoding().name());
+      int lineNumber=0;
+      HighlightingBuilder highlightingBuilder=context.highlightingBuilder(inputFile);
+      for (      String line : lines) {
+        lineNumber++;
+        if (StringUtils.isBlank(line)) {
+          continue;
+        }
+        if (line.startsWith("#")) {
+          continue;
+        }
+        try {
+          Iterator<String> split=Splitter.on(":").split(line).iterator();
+          int startOffset=Integer.parseInt(split.next());
+          int endOffset=Integer.parseInt(split.next());
+          HighlightingBuilder.TypeOfText type=HighlightingBuilder.TypeOfText.forCssClass(split.next());
+          highlightingBuilder.highlight(startOffset,endOffset,type);
+        }
+ catch (        Exception e) {
+          throw new IllegalStateException("Error processing line " + lineNumber + " of file "+ highlightingFile.getAbsolutePath(),e);
+        }
+      }
+      highlightingBuilder.done();
+    }
+ catch (    IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+}

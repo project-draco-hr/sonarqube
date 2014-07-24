@@ -1,4 +1,5 @@
 {
+  LOG.info("Store analysis results in memory for later assertions in medium test");
   for (  Issue issue : container.getComponentByType(AnalyzerIssueCache.class).all()) {
     issues.add(issue);
   }
@@ -12,6 +13,13 @@
     }
  else {
       inputDirs.add((InputDir)inputPath);
+    }
+  }
+  ComponentDataCache componentDataCache=container.getComponentByType(ComponentDataCache.class);
+  for (  InputFile file : inputFiles) {
+    SyntaxHighlightingData highlighting=componentDataCache.getData(((DefaultInputFile)file).key(),SnapshotDataTypes.SYNTAX_HIGHLIGHTING);
+    if (highlighting != null) {
+      highlightingPerFile.put(file,highlighting);
     }
   }
 }
