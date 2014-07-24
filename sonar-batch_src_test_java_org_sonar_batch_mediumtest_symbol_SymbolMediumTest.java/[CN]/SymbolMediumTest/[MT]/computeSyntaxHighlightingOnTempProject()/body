@@ -1,0 +1,12 @@
+{
+  File baseDir=temp.newFolder();
+  File srcDir=new File(baseDir,"src");
+  srcDir.mkdir();
+  File xooFile=new File(srcDir,"sample.xoo");
+  File xooSymbolFile=new File(srcDir,"sample.xoo.symbol");
+  FileUtils.write(xooFile,"Sample xoo\ncontent\nanother xoo");
+  FileUtils.write(xooSymbolFile,"7,10,27");
+  TaskResult result=tester.newTask().properties(ImmutableMap.<String,String>builder().put("sonar.task","scan").put("sonar.projectBaseDir",baseDir.getAbsolutePath()).put("sonar.projectKey","com.foo.project").put("sonar.projectName","Foo Project").put("sonar.projectVersion","1.0-SNAPSHOT").put("sonar.projectDescription","Description of Foo Project").put("sonar.sources","src").build()).start();
+  InputFile file=result.inputFiles().get(0);
+  assertThat(result.symbolReferencesFor(file,7,10)).containsOnly(7,27);
+}
