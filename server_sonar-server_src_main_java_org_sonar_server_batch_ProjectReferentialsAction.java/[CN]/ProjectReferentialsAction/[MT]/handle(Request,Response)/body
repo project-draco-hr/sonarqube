@@ -1,0 +1,16 @@
+{
+  UserSession userSession=UserSession.get();
+  boolean hasScanPerm=userSession.hasGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
+  DbSession session=dbClient.openSession(false);
+  try {
+    ProjectReferentials ref=new ProjectReferentials();
+    String projectKey=request.mandatoryParam(PARAM_KEY);
+    addSettings(ref,projectKey,hasScanPerm,session);
+    addProfiles(ref,projectKey,session);
+    response.stream().setMediaType(MimeTypes.JSON);
+    IOUtils.write(ref.toJson(),response.stream().output());
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}
