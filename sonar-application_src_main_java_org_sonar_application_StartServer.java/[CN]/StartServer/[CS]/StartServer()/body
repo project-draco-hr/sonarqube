@@ -1,24 +1,3 @@
 {
-  Installation installation=new Installation();
-  Thread shutdownHook=new Thread(new Runnable(){
-    @Override public void run(){
-      LOGGER.info("JVM Shutdown start");
-      stop();
-      LOGGER.info("JVM Shutdown end");
-    }
-  }
-);
-  Runtime.getRuntime().addShutdownHook(shutdownHook);
-  monitor=new Monitor();
-  elasticsearch=new ProcessWrapper("ES").setWorkDir(installation.homeDir()).setJmxPort(Integer.parseInt(installation.prop(DefaultSettings.ES_JMX_PORT_KEY))).addJavaOpts(installation.prop(DefaultSettings.ES_JAVA_OPTS_KEY)).addJavaOpts("-Djava.io.tmpdir=" + installation.tempDir().getAbsolutePath()).addJavaOpts("-Dsonar.path.logs=" + installation.logsDir().getAbsolutePath()).setClassName("org.sonar.search.ElasticSearch").setProperties(installation.props().cryptedProperties()).addClasspath(installation.starPath("lib/common")).addClasspath(installation.starPath("lib/search")).execute();
-  monitor.registerProcess(elasticsearch);
-  server=new ProcessWrapper("SQ").setWorkDir(installation.homeDir()).setJmxPort(Integer.parseInt(installation.prop(DefaultSettings.WEB_JMX_PORT_KEY))).addJavaOpts(installation.prop(DefaultSettings.WEB_JAVA_OPTS_KEY)).addJavaOpts(DefaultSettings.WEB_JAVA_OPTS_APPENDED_VAL).addJavaOpts("-Djava.io.tmpdir=" + installation.tempDir().getAbsolutePath()).addJavaOpts("-Dsonar.path.logs=" + installation.logsDir().getAbsolutePath()).setClassName("org.sonar.server.app.ServerProcess").setProperties(installation.props().cryptedProperties()).addClasspath(installation.starPath("extensions/jdbc-driver/mysql")).addClasspath(installation.starPath("extensions/jdbc-driver/mssql")).addClasspath(installation.starPath("extensions/jdbc-driver/oracle")).addClasspath(installation.starPath("extensions/jdbc-driver/postgresql")).addClasspath(installation.starPath("lib/common")).addClasspath(installation.starPath("lib/server")).execute();
-  monitor.registerProcess(server);
-  monitor.start();
-  try {
-    monitor.join();
-  }
-  finally {
-    stop();
-  }
+  this(new Installation());
 }

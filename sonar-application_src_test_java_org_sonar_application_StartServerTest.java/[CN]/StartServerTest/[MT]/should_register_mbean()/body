@@ -1,0 +1,11 @@
+{
+  Installation installation=mock(Installation.class);
+  when(installation.detectHomeDir()).thenReturn(sonarHome.getRoot());
+  MBeanServer mbeanServer=ManagementFactory.getPlatformMBeanServer();
+  StartServer server=new StartServer(installation);
+  assertThat(server).isNotNull();
+  ObjectName serverObjectName=Process.objectNameFor(StartServer.PROCESS_NAME);
+  assertThat(mbeanServer.isRegistered(serverObjectName)).isTrue();
+  ObjectInstance serverMXBean=mbeanServer.getObjectInstance(serverObjectName);
+  System.out.println("serverMXBean.getClassName() = " + serverMXBean.getClassName());
+}

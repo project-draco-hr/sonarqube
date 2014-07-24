@@ -1,0 +1,26 @@
+{
+  this.installation=installation;
+  Thread shutdownHook=new Thread(new Runnable(){
+    @Override public void run(){
+      LOGGER.info("JVM Shutdown start");
+      terminate();
+      LOGGER.info("JVM Shutdown end");
+    }
+  }
+);
+  Runtime.getRuntime().addShutdownHook(shutdownHook);
+  MBeanServer mbeanServer=ManagementFactory.getPlatformMBeanServer();
+  try {
+    mbeanServer.registerMBean(this,Process.objectNameFor(PROCESS_NAME));
+  }
+ catch (  InstanceAlreadyExistsException e) {
+    throw new IllegalStateException("Process already exists in current JVM",e);
+  }
+catch (  MBeanRegistrationException e) {
+    throw new IllegalStateException("Could not register process as MBean",e);
+  }
+catch (  NotCompliantMBeanException e) {
+    throw new IllegalStateException("Process is not a compliant MBean",e);
+  }
+  monitor=new Monitor();
+}
