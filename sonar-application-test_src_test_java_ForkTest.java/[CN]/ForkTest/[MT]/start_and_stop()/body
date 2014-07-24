@@ -1,0 +1,14 @@
+{
+  OrchestratorBuilder builder=Orchestrator.builderEnv();
+  orchestrator=builder.build();
+  orchestrator.start();
+  String json=orchestrator.getServer().wsClient().get("/api/rules/search",Collections.<String,Object>emptyMap());
+  assertThat(json).startsWith("{").endsWith("}");
+  orchestrator.stop();
+  try {
+    orchestrator.getServer().wsClient().get("/api/rules/search",Collections.<String,Object>emptyMap());
+    fail("Server is not stopped");
+  }
+ catch (  Exception e) {
+  }
+}
