@@ -1,0 +1,11 @@
+{
+  String[] cpdExclusions=context.settings().getStringArray(CoreProperties.CPD_EXCLUSIONS);
+  FilePredicates p=context.fileSystem().predicates();
+  List<InputFile> sourceFiles=Lists.newArrayList(context.fileSystem().inputFiles(p.and(p.hasType(InputFile.Type.MAIN),p.hasLanguage(Xoo.KEY),p.doesNotMatchPathPatterns(cpdExclusions))));
+  if (sourceFiles.isEmpty()) {
+    return;
+  }
+  for (  InputFile file : sourceFiles) {
+    computeTokens(file,context);
+  }
+}

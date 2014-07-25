@@ -1,0 +1,31 @@
+{
+  if (duplications == null || Iterables.isEmpty(duplications)) {
+    return;
+  }
+  Set<Integer> duplicatedLines=new HashSet<Integer>();
+  int duplicatedBlocks=0;
+  for (  CloneGroup clone : duplications) {
+    ClonePart origin=clone.getOriginPart();
+    for (    ClonePart part : clone.getCloneParts()) {
+      if (part.getResourceId().equals(origin.getResourceId())) {
+        duplicatedBlocks++;
+        for (int duplicatedLine=part.getStartLine(); duplicatedLine < part.getStartLine() + part.getLines(); duplicatedLine++) {
+          duplicatedLines.add(duplicatedLine);
+        }
+      }
+    }
+  }
+  context.addMeasure(context.<Integer>measureBuilder().forMetric(CoreMetrics.DUPLICATED_FILES).onFile(inputFile).withValue(1).build());
+  context.addMeasure(context.<Integer>measureBuilder().forMetric(CoreMetrics.DUPLICATED_LINES).onFile(inputFile).withValue(duplicatedLines.size()).build());
+  context.addMeasure(context.<Integer>measureBuilder().forMetric(CoreMetrics.DUPLICATED_BLOCKS).onFile(inputFile).withValue(duplicatedBlocks).build());
+  DuplicationBuilder builder=context.duplicationBuilder(inputFile);
+  for (  CloneGroup duplication : duplications) {
+    builder.originBlock(duplication.getOriginPart().getStartLine(),duplication.getOriginPart().getEndLine());
+    for (    ClonePart part : duplication.getCloneParts()) {
+      if (!part.equals(duplication.getOriginPart())) {
+        ((DefaultDuplicationBuilder)builder).isDuplicatedBy(part.getResourceId(),part.getStartLine(),part.getEndLine());
+      }
+    }
+  }
+  builder.done();
+}

@@ -1,11 +1,14 @@
 {
   boolean crossProject=false;
-  if (settings.getBoolean(CoreProperties.CPD_CROSS_RPOJECT)) {
-    if (settings.getBoolean(CoreProperties.DRY_RUN)) {
-      logger.info("Cross-project analysis disabled. Not supported on dry runs.");
+  if (settings.getBoolean(CoreProperties.CPD_CROSS_PROJECT)) {
+    if (mode.isPreview()) {
+      logger.info("Cross-project analysis disabled. Not supported in preview mode.");
     }
- else     if (StringUtils.isNotBlank(project.getBranch())) {
+ else     if (StringUtils.isNotBlank(settings.getString(CoreProperties.PROJECT_BRANCH_PROPERTY))) {
       logger.info("Cross-project analysis disabled. Not supported on project branches.");
+    }
+ else     if (project == null) {
+      logger.info("Cross-project analysis disabled. Not supported in new sensor mode.");
     }
  else {
       logger.info("Cross-project analysis enabled");
