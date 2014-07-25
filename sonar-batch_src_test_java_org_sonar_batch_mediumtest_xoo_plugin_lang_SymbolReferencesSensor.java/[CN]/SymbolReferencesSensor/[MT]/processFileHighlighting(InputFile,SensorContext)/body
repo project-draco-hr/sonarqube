@@ -1,0 +1,37 @@
+{
+  File ioFile=inputFile.file();
+  File symbolFile=new File(ioFile.getParentFile(),ioFile.getName() + SYMBOL_EXTENSION);
+  if (symbolFile.exists()) {
+    XooConstants.LOG.debug("Processing " + symbolFile.getAbsolutePath());
+    try {
+      List<String> lines=FileUtils.readLines(symbolFile,context.fileSystem().encoding().name());
+      int lineNumber=0;
+      SymbolTableBuilder symbolTableBuilder=context.symbolTableBuilder(inputFile);
+      for (      String line : lines) {
+        lineNumber++;
+        if (StringUtils.isBlank(line)) {
+          continue;
+        }
+        if (line.startsWith("#")) {
+          continue;
+        }
+        try {
+          Iterator<String> split=Splitter.on(",").split(line).iterator();
+          int startOffset=Integer.parseInt(split.next());
+          int endOffset=Integer.parseInt(split.next());
+          Symbol s=symbolTableBuilder.newSymbol(startOffset,endOffset);
+          while (split.hasNext()) {
+            symbolTableBuilder.newReference(s,Integer.parseInt(split.next()));
+          }
+        }
+ catch (        Exception e) {
+          throw new IllegalStateException("Error processing line " + lineNumber + " of file "+ symbolFile.getAbsolutePath(),e);
+        }
+      }
+      symbolTableBuilder.done();
+    }
+ catch (    IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+}
