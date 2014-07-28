@@ -1,0 +1,20 @@
+{
+  FileUtils.forceMkdir(webDir);
+  FileUtils.forceMkdir(logsDir);
+  File dataDir=new File(homeDir,"data");
+  try {
+    new Installation(new SystemChecks(),homeDir,new Properties());
+    fail();
+  }
+ catch (  IllegalStateException e) {
+    assertThat(e.getMessage()).startsWith("Property 'sonar.path.data' is not valid, directory does not exist: " + dataDir.getAbsolutePath());
+  }
+  try {
+    FileUtils.touch(dataDir);
+    new Installation(new SystemChecks(),homeDir,new Properties());
+    fail();
+  }
+ catch (  IllegalStateException e) {
+    assertThat(e.getMessage()).startsWith("Property 'sonar.path.data' is not valid, not a directory: " + dataDir.getAbsolutePath());
+  }
+}
