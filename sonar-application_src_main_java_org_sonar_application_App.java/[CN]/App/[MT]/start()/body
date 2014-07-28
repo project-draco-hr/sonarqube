@@ -1,12 +1,13 @@
 {
-  LOGGER.info("Starting search server");
+  Logger logger=LoggerFactory.getLogger(getClass());
+  logger.info("Starting search server");
   elasticsearch=new ProcessWrapper(SONAR_SEARCH_PROCESS).setWorkDir(installation.homeDir()).setJmxPort(Integer.parseInt(installation.prop(DefaultSettings.ES_JMX_PORT_KEY))).addJavaOpts(installation.prop(DefaultSettings.ES_JAVA_OPTS_KEY)).addJavaOpts(String.format("-Djava.io.tmpdir=%s",installation.tempDir().getAbsolutePath())).addJavaOpts(String.format("-D%s=%s",DefaultSettings.PATH_LOGS_KEY,installation.logsDir().getAbsolutePath())).setClassName("org.sonar.search.ElasticSearch").setProperties(installation.props().cryptedProperties()).addClasspath(installation.starPath("lib/common")).addClasspath(installation.starPath("lib/search")).execute();
   monitor.registerProcess(elasticsearch);
-  LOGGER.info("Search server is ready");
-  LOGGER.info("Starting web server");
+  logger.info("Search server is ready");
+  logger.info("Starting web server");
   server=new ProcessWrapper(SONAR_WEB_PROCESS).setWorkDir(installation.homeDir()).setJmxPort(Integer.parseInt(installation.prop(DefaultSettings.WEB_JMX_PORT_KEY))).addJavaOpts(installation.prop(DefaultSettings.WEB_JAVA_OPTS_KEY)).addJavaOpts(DefaultSettings.WEB_JAVA_OPTS_APPENDED_VAL).addJavaOpts(String.format("-Djava.io.tmpdir=%s",installation.tempDir().getAbsolutePath())).addJavaOpts(String.format("-D%s=%s",DefaultSettings.PATH_LOGS_KEY,installation.logsDir().getAbsolutePath())).setClassName("org.sonar.server.app.ServerProcess").setProperties(installation.props().cryptedProperties()).addClasspath(installation.starPath("extensions/jdbc-driver/mysql")).addClasspath(installation.starPath("extensions/jdbc-driver/mssql")).addClasspath(installation.starPath("extensions/jdbc-driver/oracle")).addClasspath(installation.starPath("extensions/jdbc-driver/postgresql")).addClasspath(installation.starPath("lib/common")).addClasspath(installation.starPath("lib/server")).execute();
   monitor.registerProcess(server);
-  LOGGER.info("Web server is ready");
+  logger.info("Web server is ready");
   monitor.start();
   try {
     monitor.join();
