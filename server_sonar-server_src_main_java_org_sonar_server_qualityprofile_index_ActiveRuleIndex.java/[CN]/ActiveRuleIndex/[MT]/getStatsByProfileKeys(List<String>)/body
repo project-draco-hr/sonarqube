@@ -1,6 +1,10 @@
 {
+  StopWatch fullProfile=profiling.start("es",Profiling.Level.FULL);
+  StopWatch basicProfile=profiling.start("es",Profiling.Level.BASIC);
   SearchRequestBuilder request=getClient().prepareSearch(this.getIndexName()).setQuery(QueryBuilders.filteredQuery(QueryBuilders.termsQuery(ActiveRuleNormalizer.ActiveRuleField.PROFILE_KEY.field(),keys),FilterBuilders.boolFilter().mustNot(FilterBuilders.hasParentFilter(this.getParentType(),FilterBuilders.termFilter(RuleNormalizer.RuleField.STATUS.field(),RuleStatus.REMOVED.name()))))).addAggregation(AggregationBuilders.terms(ActiveRuleNormalizer.ActiveRuleField.PROFILE_KEY.field()).field(ActiveRuleNormalizer.ActiveRuleField.PROFILE_KEY.field()).subAggregation(AggregationBuilders.terms(ActiveRuleNormalizer.ActiveRuleField.INHERITANCE.field()).field(ActiveRuleNormalizer.ActiveRuleField.INHERITANCE.field())).subAggregation(AggregationBuilders.terms(ActiveRuleNormalizer.ActiveRuleField.SEVERITY.field()).field(ActiveRuleNormalizer.ActiveRuleField.SEVERITY.field())).subAggregation(AggregationBuilders.count("countActiveRules"))).setSize(0).setTypes(this.getIndexType());
+  basicProfile.stop(request.toString());
   SearchResponse response=request.get();
+  fullProfile.stop(response.toString());
   Map<String,Multimap<String,FacetValue>> stats=new HashMap<String,Multimap<String,FacetValue>>();
   Aggregation aggregation=response.getAggregations().get(ActiveRuleNormalizer.ActiveRuleField.PROFILE_KEY.field());
   for (  Terms.Bucket value : ((Terms)aggregation).getBuckets()) {
