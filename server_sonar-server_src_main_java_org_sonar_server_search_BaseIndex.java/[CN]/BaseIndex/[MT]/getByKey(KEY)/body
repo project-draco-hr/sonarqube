@@ -1,10 +1,6 @@
 {
-  StopWatch fullProfile=profiling.start("es",Profiling.Level.FULL);
-  StopWatch basicProfile=profiling.start("es",Profiling.Level.BASIC);
   GetRequestBuilder request=getClient().prepareGet().setType(this.getIndexType()).setIndex(this.getIndexName()).setId(this.getKeyValue(key)).setRouting(this.getKeyValue(key));
-  basicProfile.stop(request.toString());
-  GetResponse response=request.get();
-  fullProfile.stop(response.toString());
+  GetResponse response=node.execute(request);
   if (response.isExists()) {
     return toDoc(response.getSource());
   }

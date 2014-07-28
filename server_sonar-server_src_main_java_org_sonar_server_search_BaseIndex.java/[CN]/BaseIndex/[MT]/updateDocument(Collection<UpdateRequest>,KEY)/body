@@ -1,6 +1,4 @@
 {
-  StopWatch fullProfile=profiling.start("es",Profiling.Level.FULL);
-  StopWatch basicProfile=profiling.start("es",Profiling.Level.BASIC);
   LOG.debug("UPDATE _id:{} in index {}",key,this.getIndexName());
   BulkRequestBuilder bulkRequest=getClient().prepareBulk();
   for (  UpdateRequest request : requests) {
@@ -11,7 +9,5 @@
       bulkRequest.add(request.id(this.getKeyValue(key)).index(this.getIndexName()).type(this.getIndexType()));
     }
   }
-  basicProfile.stop(bulkRequest.toString());
-  BulkResponse response=bulkRequest.get();
-  fullProfile.stop(response.toString());
+  BulkResponse response=node.execute(bulkRequest);
 }

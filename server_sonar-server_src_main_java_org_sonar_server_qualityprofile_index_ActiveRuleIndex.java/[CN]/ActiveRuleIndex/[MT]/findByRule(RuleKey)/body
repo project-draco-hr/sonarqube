@@ -1,10 +1,6 @@
 {
-  StopWatch fullProfile=profiling.start("es",Profiling.Level.FULL);
-  StopWatch basicProfile=profiling.start("es",Profiling.Level.BASIC);
   SearchRequestBuilder request=getClient().prepareSearch(this.getIndexName()).setQuery(QueryBuilders.hasParentQuery(this.getParentType(),QueryBuilders.idsQuery(this.getParentType()).addIds(key.toString()))).setRouting(key.toString()).setSize(Integer.MAX_VALUE);
-  basicProfile.stop(request.toString());
-  SearchResponse response=request.get();
-  fullProfile.stop(response.toString());
+  SearchResponse response=node.execute(request);
   List<ActiveRule> activeRules=new ArrayList<ActiveRule>();
   for (  SearchHit hit : response.getHits()) {
     activeRules.add(toDoc(hit.getSource()));

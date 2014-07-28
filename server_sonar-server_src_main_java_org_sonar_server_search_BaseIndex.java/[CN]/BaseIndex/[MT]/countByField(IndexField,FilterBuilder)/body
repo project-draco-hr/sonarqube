@@ -1,11 +1,7 @@
 {
-  StopWatch fullProfile=profiling.start("es",Profiling.Level.FULL);
-  StopWatch basicProfile=profiling.start("es",Profiling.Level.BASIC);
   Map<String,Long> counts=new HashMap<String,Long>();
   SearchRequestBuilder request=getClient().prepareSearch(this.getIndexName()).setTypes(this.getIndexType()).setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),filter)).setSize(0).addAggregation(AggregationBuilders.terms(indexField.field()).field(indexField.field()).order(Terms.Order.count(false)).size(Integer.MAX_VALUE).minDocCount(0));
-  basicProfile.stop(request.toString());
-  SearchResponse response=request.get();
-  fullProfile.stop(response.toString());
+  SearchResponse response=node.execute(request);
   Terms values=response.getAggregations().get(indexField.field());
   for (  Terms.Bucket value : values.getBuckets()) {
     counts.put(value.getKey(),value.getDocCount());

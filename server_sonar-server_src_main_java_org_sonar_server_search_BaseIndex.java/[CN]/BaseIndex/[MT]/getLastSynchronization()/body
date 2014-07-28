@@ -1,11 +1,7 @@
 {
-  StopWatch fullProfile=profiling.start("es",Profiling.Level.FULL);
-  StopWatch basicProfile=profiling.start("es",Profiling.Level.BASIC);
   Date date;
   SearchRequestBuilder request=getClient().prepareSearch(this.getIndexName()).setTypes(this.getIndexType()).setQuery(QueryBuilders.matchAllQuery()).setSize(0).addAggregation(AggregationBuilders.max("latest").field(BaseNormalizer.UPDATED_AT_FIELD));
-  basicProfile.stop(request.toString());
-  SearchResponse response=request.get();
-  fullProfile.stop(response.toString());
+  SearchResponse response=node.execute(request);
   Max max=(Max)response.getAggregations().get("latest");
   if (max.getValue() > 0) {
     date=new DateTime(Double.valueOf(max.getValue()).longValue()).toDate();

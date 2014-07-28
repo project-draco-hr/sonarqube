@@ -1,6 +1,4 @@
 {
-  StopWatch fullProfile=profiling.start("es",Profiling.Level.FULL);
-  StopWatch basicProfile=profiling.start("es",Profiling.Level.BASIC);
   SearchRequestBuilder esSearch=getClient().prepareSearch(this.getIndexName()).setTypes(this.getIndexType()).setIndices(this.getIndexName());
   esSearch.setFrom(options.getOffset());
   esSearch.setSize(options.getLimit());
@@ -20,8 +18,6 @@
     esSearch.setSearchType(SearchType.SCAN);
     esSearch.setScroll(TimeValue.timeValueMinutes(3));
   }
-  basicProfile.stop(esSearch.toString());
-  SearchResponse response=esSearch.get();
-  fullProfile.stop(response.toString());
+  SearchResponse response=node.execute(esSearch);
   return response;
 }
