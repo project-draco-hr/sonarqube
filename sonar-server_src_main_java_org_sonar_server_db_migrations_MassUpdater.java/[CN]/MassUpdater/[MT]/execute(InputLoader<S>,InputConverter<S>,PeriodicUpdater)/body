@@ -1,14 +1,17 @@
 {
   long count=0;
   Connection readConnection=null, writeConnection=null;
-  Statement stmt=null;
+  PreparedStatement stmt=null;
   ResultSet rs=null;
   PreparedStatement writeStatement=null;
   try {
     readConnection=db.getDataSource().getConnection();
     readConnection.setAutoCommit(false);
-    stmt=initStatement(readConnection);
-    rs=stmt.executeQuery(convertSelectSql(inputLoader.selectSql(),db));
+    if (readConnection.getMetaData().supportsTransactionIsolationLevel(Connection.TRANSACTION_READ_UNCOMMITTED)) {
+      readConnection.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+    }
+    stmt=initStatement(convertSelectSql(inputLoader.selectSql(),db),readConnection);
+    rs=stmt.executeQuery();
     int cursor=0;
     while (rs.next()) {
       S row=inputLoader.load(rs);
@@ -27,12 +30,12 @@
         count++;
       }
       if (cursor == groupSize) {
-        commit(writeConnection,writeStatement,periodicUpdater);
+        commit(writeStatement,periodicUpdater);
         cursor=0;
       }
     }
     if (cursor > 0) {
-      commit(writeConnection,writeStatement,periodicUpdater);
+      commit(writeStatement,periodicUpdater);
     }
   }
  catch (  SQLException e) {
