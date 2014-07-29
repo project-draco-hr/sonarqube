@@ -1,5 +1,6 @@
 {
-  SearchResponse response=getClient().prepareSearch(this.getIndexName()).setTypes(this.getIndexType()).setQuery(QueryBuilders.termsQuery(RuleNormalizer.RuleField.ID.field(),ids)).get();
+  SearchRequestBuilder request=getClient().prepareSearch(this.getIndexName()).setTypes(this.getIndexType()).setQuery(QueryBuilders.termsQuery(RuleNormalizer.RuleField.ID.field(),ids));
+  SearchResponse response=node.execute(request);
   List<Rule> rules=newArrayList();
   for (  SearchHit hit : response.getHits()) {
     rules.add(toDoc(hit.getSource()));
