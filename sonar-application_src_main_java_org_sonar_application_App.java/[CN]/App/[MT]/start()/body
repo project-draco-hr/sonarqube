@@ -6,13 +6,13 @@
     if (elasticsearch.execute()) {
       monitor.registerProcess(elasticsearch);
       if (elasticsearch.waitForReady()) {
-        logger.info("Search server is ready");
+        logger.info("search server is up");
         server=new ProcessWrapper(JmxUtils.WEB_SERVER_NAME).setWorkDir(installation.homeDir()).setJmxPort(Integer.parseInt(installation.prop(DefaultSettings.WEB_JMX_PORT_KEY))).addJavaOpts(installation.prop(DefaultSettings.WEB_JAVA_OPTS_KEY)).addJavaOpts(DefaultSettings.WEB_JAVA_OPTS_APPENDED_VAL).addJavaOpts(String.format("-Djava.io.tmpdir=%s",installation.tempDir().getAbsolutePath())).addJavaOpts(String.format("-Dsonar.path.logs=%s",installation.logsDir().getAbsolutePath())).setClassName("org.sonar.server.app.WebServer").setProperties(installation.props().encryptedProperties()).addClasspath(installation.starPath("extensions/jdbc-driver/mysql")).addClasspath(installation.starPath("extensions/jdbc-driver/mssql")).addClasspath(installation.starPath("extensions/jdbc-driver/oracle")).addClasspath(installation.starPath("extensions/jdbc-driver/postgresql")).addClasspath(installation.starPath("lib/common")).addClasspath(installation.starPath("lib/server"));
         if (server.execute()) {
           monitor.registerProcess(server);
           if (server.waitForReady()) {
             success=true;
-            logger.info("Web server is ready");
+            logger.info("web server is up");
             monitor.join();
           }
         }

@@ -1,5 +1,6 @@
 {
   if (processMXBean != null && process != null) {
+    LOGGER.info("{} stopping",getName());
     ScheduledExecutorService killer=Executors.newScheduledThreadPool(1);
     try {
       Runnable killerTask=new Runnable(){
@@ -11,10 +12,9 @@
       ScheduledFuture killerFuture=killer.schedule(killerTask,30,TimeUnit.SECONDS);
       processMXBean.terminate();
       killerFuture.cancel(true);
-      LOGGER.info("{} process stopped",getName());
+      LOGGER.info("{} stopped",getName());
     }
  catch (    Exception ignored) {
-      ignored.printStackTrace();
     }
  finally {
       killer.shutdownNow();
