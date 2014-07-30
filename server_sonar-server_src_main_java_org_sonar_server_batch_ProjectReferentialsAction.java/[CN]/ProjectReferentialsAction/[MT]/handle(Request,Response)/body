@@ -3,11 +3,16 @@
   boolean hasScanPerm=userSession.hasGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
   DbSession session=dbClient.openSession(false);
   try {
-    ProjectReferentials ref=new ProjectReferentials();
-    String projectKey=request.mandatoryParam(PARAM_KEY);
+    String projectOrModuleKey=request.mandatoryParam(PARAM_KEY);
     String profileName=request.param(PARAM_PROFILE);
-    addSettings(ref,projectKey,hasScanPerm,session);
-    addProfiles(ref,projectKey,profileName,session);
+    ProjectReferentials ref=new ProjectReferentials();
+    ComponentDto module=dbClient.componentDao().getByKey(session,projectOrModuleKey);
+    ComponentDto project=!module.qualifier().equals(Qualifiers.PROJECT) ? dbClient.componentDao().getRootProjectByKey(projectOrModuleKey,session) : module;
+    if (!project.key().equals(module.key())) {
+      addSettings(ref,module.getKey(),getSettingsFromParentModules(module.key(),hasScanPerm,session));
+    }
+    addSettingsToChildrenModules(ref,projectOrModuleKey,Maps.<String,String>newHashMap(),hasScanPerm,session);
+    addProfiles(ref,project.key(),profileName,session);
     addActiveRules(ref);
     response.stream().setMediaType(MimeTypes.JSON);
     IOUtils.write(ref.toJson(),response.stream().output());
