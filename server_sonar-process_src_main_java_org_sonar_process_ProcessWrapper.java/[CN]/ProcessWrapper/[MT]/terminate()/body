@@ -1,13 +1,28 @@
 {
   if (processMXBean != null) {
-    LOGGER.info("Stopping {} process",getName());
-    processMXBean.terminate();
+    ScheduledExecutorService killer=Executors.newScheduledThreadPool(1);
     try {
-      this.join();
+      Runnable killerTask=new Runnable(){
+        @Override public void run(){
+          ProcessUtils.destroyQuietly(process);
+        }
+      }
+;
+      ScheduledFuture killerFuture=killer.schedule(killerTask,30,TimeUnit.SECONDS);
+      LOGGER.info("Stopping {} process",getName());
+      processMXBean.terminate();
+      killerFuture.cancel(true);
+      processMXBean=null;
+      LOGGER.info("{} process stopped",getName());
     }
- catch (    InterruptedException e) {
+ catch (    Exception e) {
+      LOGGER.warn("Failed to terminate " + getName(),e);
     }
-    processMXBean=null;
-    LOGGER.info("{} process stopped",getName());
+ finally {
+      killer.shutdownNow();
+    }
+  }
+ else {
+    ProcessUtils.destroyQuietly(process);
   }
 }

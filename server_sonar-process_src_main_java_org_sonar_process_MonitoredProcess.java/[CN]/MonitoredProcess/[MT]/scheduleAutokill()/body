@@ -1,0 +1,14 @@
+{
+  final Runnable breakOnMissingPing=new Runnable(){
+    @Override public void run(){
+      long time=System.currentTimeMillis();
+      if (time - lastPing > AUTOKILL_TIMEOUT_MS) {
+        terminate();
+      }
+    }
+  }
+;
+  lastPing=System.currentTimeMillis();
+  monitor=Executors.newScheduledThreadPool(1);
+  pingTask=monitor.scheduleWithFixedDelay(breakOnMissingPing,AUTOKILL_CHECK_DELAY_MS,AUTOKILL_CHECK_DELAY_MS,TimeUnit.MILLISECONDS);
+}

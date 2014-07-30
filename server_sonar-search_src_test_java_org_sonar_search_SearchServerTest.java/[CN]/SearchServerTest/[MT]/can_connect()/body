@@ -1,0 +1,38 @@
+{
+  Properties properties=new Properties();
+  properties.setProperty(MonitoredProcess.NAME_PROPERTY,"ES");
+  properties.setProperty("sonar.path.data",tempDirectory.getAbsolutePath());
+  properties.setProperty("sonar.path.logs",tempDirectory.getAbsolutePath());
+  properties.setProperty(SearchServer.ES_PORT_PROPERTY,Integer.toString(freeESPort));
+  properties.setProperty(SearchServer.ES_CLUSTER_PROPERTY,"sonarqube");
+  searchServer=new SearchServer(new Props(properties));
+  new Thread(new Runnable(){
+    @Override public void run(){
+      searchServer.start();
+    }
+  }
+).start();
+  assertThat(searchServer.isReady()).isFalse();
+  int count=0;
+  while (!searchServer.isReady() && count < 100) {
+    try {
+      Thread.sleep(500);
+    }
+ catch (    InterruptedException e) {
+      e.printStackTrace();
+    }
+    count++;
+  }
+  assertThat(count).isLessThan(100);
+  Settings settings=ImmutableSettings.settingsBuilder().put("cluster.name","sonarqube").build();
+  TransportClient client=new TransportClient(settings).addTransportAddress(new InetSocketTransportAddress("localhost",freeESPort));
+  assertThat(client.admin().cluster().prepareClusterStats().get().getStatus()).isEqualTo(ClusterHealthStatus.GREEN);
+  searchServer.terminate();
+  try {
+    client.admin().cluster().prepareClusterStats().get().getStatus();
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e.getMessage()).isEqualTo("No node available");
+  }
+}

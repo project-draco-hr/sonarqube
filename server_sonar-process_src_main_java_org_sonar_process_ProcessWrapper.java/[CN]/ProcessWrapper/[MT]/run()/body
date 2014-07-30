@@ -1,14 +1,16 @@
 {
   try {
-    process.waitFor();
+    if (ProcessUtils.isAlive(process)) {
+      process.waitFor();
+    }
   }
- catch (  InterruptedException e) {
+ catch (  Exception e) {
     LOGGER.info("ProcessThread has been interrupted. Killing process.");
   }
  finally {
     waitUntilFinish(outputGobbler);
     waitUntilFinish(errorGobbler);
-    closeStreams(process);
+    ProcessUtils.closeStreams(process);
     FileUtils.deleteQuietly(propertiesFile);
     processMXBean=null;
   }
