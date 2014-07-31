@@ -1,0 +1,55 @@
+{
+  String[] cpdExclusions=settings.getStringArray(CoreProperties.CPD_EXCLUSIONS);
+  logExclusions(cpdExclusions,LOG);
+  FilePredicates p=fs.predicates();
+  List<InputFile> sourceFiles=Lists.newArrayList(fs.inputFiles(p.and(p.hasType(InputFile.Type.MAIN),p.hasLanguage(languageKey),p.doesNotMatchPathPatterns(cpdExclusions))));
+  if (sourceFiles.isEmpty()) {
+    return;
+  }
+  CpdMapping mapping=mappings.getMapping(languageKey);
+  SonarDuplicationsIndex index=indexFactory.create(project,languageKey);
+  TokenizerBridge bridge=null;
+  if (mapping != null) {
+    bridge=new TokenizerBridge(mapping.getTokenizer(),fs.encoding().name(),getBlockSize(languageKey));
+  }
+  for (  InputFile inputFile : sourceFiles) {
+    LOG.debug("Populating index from {}",inputFile);
+    String resourceEffectiveKey=((DeprecatedDefaultInputFile)inputFile).key();
+    FileBlocks fileBlocks=duplicationCache.byComponent(resourceEffectiveKey);
+    if (fileBlocks != null) {
+      index.insert(inputFile,fileBlocks.blocks());
+    }
+ else     if (bridge != null) {
+      List<Block> blocks2=bridge.chunk(resourceEffectiveKey,inputFile.file());
+      index.insert(inputFile,blocks2);
+    }
+  }
+  Predicate<CloneGroup> minimumTokensPredicate=DuplicationPredicates.numberOfUnitsNotLessThan(getMinimumTokens(languageKey));
+  ExecutorService executorService=Executors.newSingleThreadExecutor();
+  try {
+    for (    InputFile inputFile : sourceFiles) {
+      LOG.debug("Detection of duplications for {}",inputFile);
+      String resourceEffectiveKey=((DeprecatedDefaultInputFile)inputFile).key();
+      Collection<Block> fileBlocks=index.getByInputFile(inputFile,resourceEffectiveKey);
+      Iterable<CloneGroup> filtered;
+      try {
+        List<CloneGroup> duplications=executorService.submit(new JavaCpdEngine.Task(index,fileBlocks)).get(TIMEOUT,TimeUnit.SECONDS);
+        filtered=Iterables.filter(duplications,minimumTokensPredicate);
+      }
+ catch (      TimeoutException e) {
+        filtered=null;
+        LOG.warn("Timeout during detection of duplications for " + inputFile,e);
+      }
+catch (      InterruptedException e) {
+        throw new SonarException("Fail during detection of duplication for " + inputFile,e);
+      }
+catch (      ExecutionException e) {
+        throw new SonarException("Fail during detection of duplication for " + inputFile,e);
+      }
+      JavaCpdEngine.save(context,inputFile,filtered);
+    }
+  }
+  finally {
+    executorService.shutdown();
+  }
+}

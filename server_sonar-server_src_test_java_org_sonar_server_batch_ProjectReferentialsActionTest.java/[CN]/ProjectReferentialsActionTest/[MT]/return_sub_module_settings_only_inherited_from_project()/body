@@ -1,0 +1,9 @@
+{
+  MockUserSession.set().setLogin("john").setGlobalPermissions(GlobalPermissions.SCAN_EXECUTION,GlobalPermissions.DRY_RUN_EXECUTION);
+  when(componentDao.getRootProjectByKey(subModule.key(),session)).thenReturn(project);
+  when(componentDao.getParentModuleByKey(module.key(),session)).thenReturn(project);
+  when(componentDao.getParentModuleByKey(subModule.key(),session)).thenReturn(module);
+  when(propertiesDao.selectProjectProperties(project.key(),session)).thenReturn(newArrayList(new PropertyDto().setKey("sonar.jira.project.key").setValue("SONAR"),new PropertyDto().setKey("sonar.jira.login.secured").setValue("john"),new PropertyDto().setKey("sonar.coverage.exclusions").setValue("**/*.java")));
+  WsTester.TestRequest request=tester.newGetRequest("batch","project").setParam("key",subModule.key());
+  request.execute().assertJson(getClass(),"return_sub_module_settings_inherited_from_project.json");
+}

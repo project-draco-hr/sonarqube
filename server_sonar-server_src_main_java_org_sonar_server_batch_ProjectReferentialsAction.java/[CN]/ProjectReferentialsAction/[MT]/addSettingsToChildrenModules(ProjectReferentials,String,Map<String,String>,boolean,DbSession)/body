@@ -1,0 +1,8 @@
+{
+  parentProperties.putAll(getPropertiesMap(propertiesDao.selectProjectProperties(projectKey,session),hasScanPerm));
+  addSettings(ref,projectKey,parentProperties);
+  for (  ComponentDto module : dbClient.componentDao().findModulesByProject(projectKey,session)) {
+    addSettings(ref,module.key(),parentProperties);
+    addSettingsToChildrenModules(ref,module.key(),parentProperties,hasScanPerm,session);
+  }
+}

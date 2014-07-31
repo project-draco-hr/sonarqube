@@ -2,7 +2,14 @@
   DbClient dbClient=mock(DbClient.class);
   when(dbClient.openSession(false)).thenReturn(session);
   when(dbClient.componentDao()).thenReturn(componentDao);
+  project=new ComponentDto().setKey("org.codehaus.sonar:sonar").setQualifier(Qualifiers.PROJECT);
+  module=new ComponentDto().setKey("org.codehaus.sonar:sonar-server").setQualifier(Qualifiers.MODULE);
+  subModule=new ComponentDto().setKey("org.codehaus.sonar:sonar-server-dao").setQualifier(Qualifiers.MODULE);
+  when(componentDao.getNullableByKey(session,project.key())).thenReturn(project);
+  when(componentDao.getNullableByKey(session,module.key())).thenReturn(module);
+  when(componentDao.getNullableByKey(session,subModule.key())).thenReturn(subModule);
   when(language.getKey()).thenReturn("java");
   when(languages.all()).thenReturn(new Language[]{language});
+  when(qProfileFactory.getDefault(session,"java")).thenReturn(QualityProfileDto.createFor("abcd").setName("Default").setLanguage("java").setRulesUpdatedAt("2014-01-14T14:00:00+0200"));
   tester=new WsTester(new BatchWs(mock(BatchIndex.class),mock(GlobalReferentialsAction.class),new ProjectReferentialsAction(dbClient,propertiesDao,qProfileFactory,qProfileLoader,ruleService,languages)));
 }

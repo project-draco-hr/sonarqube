@@ -1,0 +1,10 @@
+{
+  DuplicationCache cache=new DuplicationCache(caches);
+  DuplicationGroup group1=new DuplicationGroup(new DuplicationGroup.Block("foo",1,2)).addDuplicate(new DuplicationGroup.Block("foo",1,2)).addDuplicate(new DuplicationGroup.Block("foo2",12,22)).addDuplicate(new DuplicationGroup.Block("foo3",13,23));
+  DuplicationGroup group2=new DuplicationGroup(new DuplicationGroup.Block("2foo",1,2)).addDuplicate(new DuplicationGroup.Block("2foo",1,2)).addDuplicate(new DuplicationGroup.Block("2foo2",12,22)).addDuplicate(new DuplicationGroup.Block("2foo3",13,23));
+  assertThat(cache.entries()).hasSize(0);
+  cache.put("foo",new ArrayList<DuplicationGroup>(Arrays.asList(group1,group2)));
+  assertThat(cache.entries()).hasSize(1);
+  ArrayList<DuplicationGroup> entry=cache.byComponent("foo");
+  assertThat(entry.get(0).originBlock().resourceKey()).isEqualTo("foo");
+}

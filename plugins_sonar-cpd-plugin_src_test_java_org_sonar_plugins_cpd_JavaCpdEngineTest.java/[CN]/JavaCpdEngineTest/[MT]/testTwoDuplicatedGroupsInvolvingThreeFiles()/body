@@ -1,0 +1,13 @@
+{
+  List<CloneGroup> groups=Arrays.asList(newCloneGroup(new ClonePart("key1",0,5,204),new ClonePart("key2",0,15,214)),newCloneGroup(new ClonePart("key1",0,15,214),new ClonePart("key3",0,15,214)));
+  JavaCpdEngine.save(context,inputFile,groups);
+  verify(context).addMeasure(new DefaultMeasureBuilder().forMetric(CoreMetrics.DUPLICATED_FILES).onFile(inputFile).withValue(1).build());
+  verify(context).addMeasure(new DefaultMeasureBuilder().forMetric(CoreMetrics.DUPLICATED_BLOCKS).onFile(inputFile).withValue(2).build());
+  verify(context).addMeasure(new DefaultMeasureBuilder().forMetric(CoreMetrics.DUPLICATED_LINES).onFile(inputFile).withValue(210).build());
+  InOrder inOrder=Mockito.inOrder(duplicationBuilder);
+  inOrder.verify(duplicationBuilder).originBlock(5,204);
+  inOrder.verify(duplicationBuilder).isDuplicatedBy("key2",15,214);
+  inOrder.verify(duplicationBuilder).originBlock(15,214);
+  inOrder.verify(duplicationBuilder).isDuplicatedBy("key3",15,214);
+  inOrder.verify(duplicationBuilder).done();
+}
