@@ -6,13 +6,17 @@
     String projectOrModuleKey=request.mandatoryParam(PARAM_KEY);
     String profileName=request.param(PARAM_PROFILE);
     ProjectReferentials ref=new ProjectReferentials();
-    ComponentDto module=dbClient.componentDao().getByKey(session,projectOrModuleKey);
-    ComponentDto project=!module.qualifier().equals(Qualifiers.PROJECT) ? dbClient.componentDao().getRootProjectByKey(projectOrModuleKey,session) : module;
-    if (!project.key().equals(module.key())) {
-      addSettings(ref,module.getKey(),getSettingsFromParentModules(module.key(),hasScanPerm,session));
+    String projectKey=null;
+    ComponentDto module=dbClient.componentDao().getNullableByKey(session,projectOrModuleKey);
+    if (module != null) {
+      ComponentDto project=!module.qualifier().equals(Qualifiers.PROJECT) ? dbClient.componentDao().getRootProjectByKey(projectOrModuleKey,session) : module;
+      if (!project.key().equals(module.key())) {
+        addSettings(ref,module.getKey(),getSettingsFromParentModules(module.key(),hasScanPerm,session));
+      }
+      projectKey=project.key();
+      addSettingsToChildrenModules(ref,projectOrModuleKey,Maps.<String,String>newHashMap(),hasScanPerm,session);
     }
-    addSettingsToChildrenModules(ref,projectOrModuleKey,Maps.<String,String>newHashMap(),hasScanPerm,session);
-    addProfiles(ref,project.key(),profileName,session);
+    addProfiles(ref,projectKey,profileName,session);
     addActiveRules(ref);
     response.stream().setMediaType(MimeTypes.JSON);
     IOUtils.write(ref.toJson(),response.stream().output());
