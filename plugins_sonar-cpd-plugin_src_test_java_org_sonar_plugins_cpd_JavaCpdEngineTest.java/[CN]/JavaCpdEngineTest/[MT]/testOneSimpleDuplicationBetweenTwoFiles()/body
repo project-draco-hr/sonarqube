@@ -1,6 +1,7 @@
 {
+  inputFile.setLines(300);
   List<CloneGroup> groups=Arrays.asList(newCloneGroup(new ClonePart("key1",0,5,204),new ClonePart("key2",0,15,214)));
-  JavaCpdEngine.save(context,inputFile,groups);
+  JavaCpdEngine.save(context,inputFile,groups,contextFactory);
   verify(context).addMeasure(new DefaultMeasureBuilder().forMetric(CoreMetrics.DUPLICATED_FILES).onFile(inputFile).withValue(1).build());
   verify(context).addMeasure(new DefaultMeasureBuilder().forMetric(CoreMetrics.DUPLICATED_BLOCKS).onFile(inputFile).withValue(1).build());
   verify(context).addMeasure(new DefaultMeasureBuilder().forMetric(CoreMetrics.DUPLICATED_LINES).onFile(inputFile).withValue(200).build());
@@ -8,4 +9,9 @@
   inOrder.verify(duplicationBuilder).originBlock(5,204);
   inOrder.verify(duplicationBuilder).isDuplicatedBy("key2",15,214);
   inOrder.verify(duplicationBuilder).done();
+  verify(linesContext).setIntValue(CoreMetrics.DUPLICATION_LINES_DATA_KEY,1,0);
+  verify(linesContext).setIntValue(CoreMetrics.DUPLICATION_LINES_DATA_KEY,4,0);
+  verify(linesContext).setIntValue(CoreMetrics.DUPLICATION_LINES_DATA_KEY,5,1);
+  verify(linesContext).setIntValue(CoreMetrics.DUPLICATION_LINES_DATA_KEY,204,1);
+  verify(linesContext).setIntValue(CoreMetrics.DUPLICATION_LINES_DATA_KEY,205,0);
 }
