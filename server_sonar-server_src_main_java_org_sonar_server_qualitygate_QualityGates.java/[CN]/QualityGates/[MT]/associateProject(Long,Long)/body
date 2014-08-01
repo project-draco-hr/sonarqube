@@ -1,9 +1,9 @@
 {
-  checkPermission(UserSession.get());
   DbSession session=myBatis.openSession(false);
   try {
     getNonNullQgate(qGateId);
-    checkNonNullProject(projectId,session);
+    ComponentDto project=componentDao.getById(projectId,session);
+    checkPermission(UserSession.get(),project.key());
     propertiesDao.setProperty(new PropertyDto().setKey(SONAR_QUALITYGATE_PROPERTY).setResourceId(projectId).setValue(qGateId.toString()));
   }
   finally {
