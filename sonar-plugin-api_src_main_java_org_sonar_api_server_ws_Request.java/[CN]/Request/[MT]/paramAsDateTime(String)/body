@@ -1,7 +1,17 @@
 {
   String s=param(key);
   if (s != null) {
-    return DateUtils.parseDateTime(s);
+    try {
+      return DateUtils.parseDateTime(s);
+    }
+ catch (    SonarException notDateTime) {
+      try {
+        return DateUtils.parseDate(s);
+      }
+ catch (      SonarException notDateEither) {
+        throw new SonarException(String.format("'%s' cannot be parsed as either a date or date+time",s));
+      }
+    }
   }
   return null;
 }
