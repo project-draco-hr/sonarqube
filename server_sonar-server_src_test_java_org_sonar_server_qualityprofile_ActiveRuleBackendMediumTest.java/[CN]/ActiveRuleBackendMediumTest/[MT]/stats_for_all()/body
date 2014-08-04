@@ -8,7 +8,7 @@
   db.activeRuleDao().insert(dbSession,ActiveRuleDto.createFor(profileDto1,ruleDto1).setInheritance(ActiveRule.Inheritance.INHERITED.name()).setSeverity(Severity.BLOCKER),ActiveRuleDto.createFor(profileDto2,ruleDto1).setInheritance(ActiveRule.Inheritance.INHERITED.name()).setSeverity(Severity.MINOR),ActiveRuleDto.createFor(profileDto1,ruleDto2).setInheritance(ActiveRule.Inheritance.OVERRIDES.name()).setSeverity(Severity.MAJOR),ActiveRuleDto.createFor(profileDto2,ruleDto2).setInheritance(ActiveRule.Inheritance.INHERITED.name()).setSeverity(Severity.BLOCKER));
   dbSession.commit();
   dbSession.clearCache();
-  assertThat(index.countAll()).isEqualTo(4);
-  Map<String,Multimap<String,FacetValue>> stats=index.getStatsByProfileKeys(ImmutableList.of(profileDto1.getKey(),profileDto2.getKey()));
+  assertThat(index.get(ActiveRuleIndex.class).countAll()).isEqualTo(4);
+  Map<String,Multimap<String,FacetValue>> stats=index.get(ActiveRuleIndex.class).getStatsByProfileKeys(ImmutableList.of(profileDto1.getKey(),profileDto2.getKey()));
   assertThat(stats).hasSize(2);
 }
