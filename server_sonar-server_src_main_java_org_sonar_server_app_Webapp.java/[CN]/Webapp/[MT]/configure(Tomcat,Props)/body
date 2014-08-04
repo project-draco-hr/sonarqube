@@ -1,6 +1,11 @@
 {
   try {
-    String webDir=props.of("sonar.path.web");
+    String webDir=props.of("sonar.web.dev.sources");
+    boolean dev=true;
+    if (StringUtils.isEmpty(webDir)) {
+      webDir=new File(props.of("sonar.path.home"),"web").getAbsolutePath();
+      dev=false;
+    }
     LoggerFactory.getLogger(Webapp.class).info("Webapp directory: " + webDir);
     StandardContext context=(StandardContext)tomcat.addWebapp(getContextPath(props),webDir);
     context.setClearReferencesHttpClientKeepAliveThread(false);
@@ -19,14 +24,14 @@
     context.setXmlNamespaceAware(false);
     context.setUseNaming(false);
     context.setDelegate(true);
+    context.setJarScanner(new NullJarScanner());
     for (    Map.Entry<Object,Object> entry : props.encryptedProperties().entrySet()) {
       String key=entry.getKey().toString();
       if (key.startsWith("sonar.")) {
         context.addParameter(key,entry.getValue().toString());
       }
     }
-    configureRailsMode(props,context);
-    context.setJarScanner(new NullJarScanner());
+    configureRails(props,context,dev);
     return context;
   }
  catch (  Exception e) {
