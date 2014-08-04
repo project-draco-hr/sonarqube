@@ -1,12 +1,21 @@
 {
   StopWatch basicProfile=profiling.start("search",Profiling.Level.BASIC);
   StopWatch fullProfile=profiling.start("search",Profiling.Level.FULL);
-  ListenableActionFuture acc=action.execute();
+  ListenableActionFuture acc=request.execute();
   try {
-    if (profiling.isProfilingEnabled(Profiling.Level.BASIC)) {
-      basicProfile.stop("ES Request: %s",action.toString().replaceAll("\n",""));
-    }
     K response=(K)acc.get();
+    if (profiling.isProfilingEnabled(Profiling.Level.BASIC)) {
+      if (ToXContent.class.isAssignableFrom(request.getClass())) {
+        XContentBuilder debugResponse=XContentFactory.jsonBuilder();
+        debugResponse.startObject();
+        ((ToXContent)request).toXContent(debugResponse,ToXContent.EMPTY_PARAMS);
+        debugResponse.endObject();
+        fullProfile.stop("ES Request: %s",debugResponse.string());
+      }
+ else {
+        fullProfile.stop("ES Request: %s",request.toString().replaceAll("\n",""));
+      }
+    }
     if (profiling.isProfilingEnabled(Profiling.Level.FULL)) {
       if (ToXContent.class.isAssignableFrom(response.getClass())) {
         XContentBuilder debugResponse=XContentFactory.jsonBuilder();
