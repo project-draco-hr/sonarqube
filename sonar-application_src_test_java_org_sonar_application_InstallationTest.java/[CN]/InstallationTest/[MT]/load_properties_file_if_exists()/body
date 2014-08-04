@@ -1,8 +1,11 @@
 {
-  FileUtils.write(new File(homeDir,"conf/sonar.properties"),"sonar.jdbc.username=angela");
+  FileUtils.write(new File(homeDir,"conf/sonar.properties"),"sonar.jdbc.username=angela\nsonar.origin=file");
   FileUtils.forceMkdir(dataDir);
   FileUtils.forceMkdir(webDir);
   FileUtils.forceMkdir(logsDir);
-  Installation installation=new Installation(new MinimumViableEnvironment(),homeDir,new Properties());
+  Properties rawProperties=new Properties();
+  rawProperties.setProperty("sonar.origin","raw");
+  Installation installation=new Installation(rawProperties,mock(MinimumViableEnvironment.class),homeDir);
   assertThat(installation.prop("sonar.jdbc.username")).isEqualTo("angela");
+  assertThat(installation.prop("sonar.origin")).isEqualTo("raw");
 }
