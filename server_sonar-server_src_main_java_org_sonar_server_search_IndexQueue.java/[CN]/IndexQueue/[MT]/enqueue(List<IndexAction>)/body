@@ -33,6 +33,7 @@
     }
   }
  else   if (actions.size() > 1) {
+    StopWatch basicProfile=profiling.start("search",Profiling.Level.BASIC);
     Long purgeStart=System.currentTimeMillis();
     List<IndexAction> itemActions=Lists.newArrayList();
     List<IndexAction> embeddedActions=Lists.newArrayList();
@@ -84,6 +85,6 @@
  catch (    InterruptedException e) {
       throw new IllegalStateException("ES update has been interrupted",e);
     }
-    LOGGER.debug("INDEX - time:{}ms ({}ms index, {}ms embedded, {}ms refresh)\ttypes:[{}],\tbulk:{}\tembedded:{}\trefresh:[{}]",(System.currentTimeMillis() - all_start),indexTime,embeddedTime,refreshTime,StringUtils.join(types,","),bcount,ecount,StringUtils.join(refreshes,","));
+    basicProfile.stop("INDEX - time:%sms (%sms index, %sms embedded, %sms refresh)\ttypes:[%s],\tbulk:%s\tembedded:%s\trefresh:[%s]",(System.currentTimeMillis() - all_start),indexTime,embeddedTime,refreshTime,StringUtils.join(types,","),bcount,ecount,StringUtils.join(refreshes,","));
   }
 }
