@@ -1,7 +1,17 @@
 {
-  SqlSession session=mybatis.openSession(false);
+  DbSession session=mybatis.openSession(false);
   try {
-    return session.getMapper(ResourceMapper.class).selectRootProjectByComponentKey(componentKey);
+    ResourceDto component=getResource(ResourceQuery.create().setKey(componentKey),session);
+    if (component != null) {
+      Long rootId=component.getRootId();
+      if (rootId != null) {
+        return getParentModuleByComponentId(rootId,session);
+      }
+ else {
+        return component;
+      }
+    }
+    return null;
   }
   finally {
     MyBatis.closeQuietly(session);
