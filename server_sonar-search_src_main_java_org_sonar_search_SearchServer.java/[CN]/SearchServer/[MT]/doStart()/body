@@ -1,4 +1,13 @@
 {
+  if (StringUtils.isEmpty(props.of("sonar.path.home"))) {
+    throw new IllegalStateException("Required property 'sonar.path.home' is not set");
+  }
+  if (StringUtils.isEmpty(props.of(ES_CLUSTER_PROPERTY))) {
+    throw new IllegalStateException("Required property '" + ES_CLUSTER_PROPERTY + "' is not set");
+  }
+  if (props.intOf(ES_PORT_PROPERTY) == null) {
+    throw new IllegalStateException("Required property '" + ES_PORT_PROPERTY + "' is not set");
+  }
   String homeDir=props.of("sonar.path.home");
   String dataDir=props.of("sonar.path.data",homeDir + "/data");
   String logDir=props.of("sonar.path.logs",homeDir + "/logs");
@@ -6,18 +15,20 @@
   Integer port=props.intOf(ES_PORT_PROPERTY);
   String clusterName=props.of(ES_CLUSTER_PROPERTY);
   LoggerFactory.getLogger(SearchServer.class).info("Starting ES[{}] on port: {}",clusterName,port);
-  ImmutableSettings.Builder esSettings=ImmutableSettings.settingsBuilder().put("discovery.zen.ping.multicast.enabled","false").put("index.merge.policy.max_merge_at_once","200").put("index.merge.policy.segments_per_tier","200").put("index.number_of_shards","1").put("index.number_of_replicas","0").put("index.store.type","mmapfs").put("indices.store.throttle.type","merge").put("indices.store.throttle.max_bytes_per_sec","200mb").put("script.default_lang","native").put("script.native." + ListUpdate.NAME + ".type",ListUpdate.UpdateListScriptFactory.class.getName()).put("cluster.name",clusterName).put("node.name","sonarqube-" + System.currentTimeMillis()).put("transport.tcp.port",port).put("path.data",new File(dataDir,"es").getAbsolutePath()).put("path.work",new File(tempDir).getAbsolutePath()).put("path.logs",new File(logDir).getAbsolutePath());
+  ImmutableSettings.Builder esSettings=ImmutableSettings.settingsBuilder().put("discovery.zen.ping.multicast.enabled","false").put("index.merge.policy.max_merge_at_once","200").put("index.merge.policy.segments_per_tier","200").put("index.number_of_shards","1").put("index.number_of_replicas","0").put("index.store.type","mmapfs").put("indices.store.throttle.type","merge").put("indices.store.throttle.max_bytes_per_sec","200mb").put("script.default_lang","native").put("script.native." + ListUpdate.NAME + ".type",ListUpdate.UpdateListScriptFactory.class.getName()).put("transport.tcp.port",port).put("path.data",new File(dataDir,"es").getAbsolutePath()).put("path.work",new File(tempDir).getAbsolutePath()).put("path.logs",new File(logDir).getAbsolutePath());
   if (StringUtils.isNotEmpty(props.of(ES_CLUSTER_INNET,null))) {
+    LoggerFactory.getLogger(SearchServer.class).info("Joining ES cluster at: {}",props.of(ES_CLUSTER_INNET));
     esSettings.put("discovery.zen.ping.unicast.hosts",props.of(ES_CLUSTER_INNET));
     esSettings.put("discovery.zen.minimum_master_nodes","2");
   }
+  esSettings.put("cluster.name",clusterName);
+  try {
+    esSettings.put("node.name",InetAddress.getLocalHost().getHostName());
+  }
+ catch (  Exception e) {
+    esSettings.put("node.name","sq-" + System.currentTimeMillis());
+  }
   initAnalysis(esSettings);
-  if (props.booleanOf(ES_DEBUG_PROPERTY,false)) {
-    esSettings.put("http.enabled",true).put("http.port",9200);
-  }
- else {
-    esSettings.put("http.enabled",false);
-  }
   node=NodeBuilder.nodeBuilder().settings(esSettings).build().start();
   while (node != null && !node.isClosed()) {
     try {
