@@ -1,5 +1,4 @@
 {
-  System.out.println("installation = " + installation.prop(SONAR_CLUSTER_MASTER,null));
   try {
     Logger logger=LoggerFactory.getLogger(getClass());
     monitor.start();
@@ -8,7 +7,7 @@
       monitor.registerProcess(elasticsearch);
       if (elasticsearch.waitForReady()) {
         logger.info("search server is up");
-        if (StringUtils.isEmpty(installation.prop(SONAR_CLUSTER_MASTER,null))) {
+        if (StringUtils.isEmpty(installation.prop(DefaultSettings.SONAR_CLUSTER_MASTER,null))) {
           server=new ProcessWrapper(JmxUtils.WEB_SERVER_NAME).setWorkDir(installation.homeDir()).setJmxPort(Integer.parseInt(installation.prop(DefaultSettings.WEB_JMX_PORT_KEY))).addJavaOpts(installation.prop(DefaultSettings.WEB_JAVA_OPTS_KEY)).addJavaOpts(String.format("-Djava.io.tmpdir=%s",installation.tempDir().getAbsolutePath())).addJavaOpts(String.format("-Dsonar.path.logs=%s",installation.logsDir().getAbsolutePath())).setClassName("org.sonar.server.app.WebServer").addProperties(installation.props().rawProperties()).addClasspath(installation.starPath("extensions/jdbc-driver/mysql")).addClasspath(installation.starPath("extensions/jdbc-driver/mssql")).addClasspath(installation.starPath("extensions/jdbc-driver/oracle")).addClasspath(installation.starPath("extensions/jdbc-driver/postgresql")).addClasspath(installation.starPath("lib/common")).addClasspath(installation.starPath("lib/server"));
           if (server.execute()) {
             monitor.registerProcess(server);
