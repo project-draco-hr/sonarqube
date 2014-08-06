@@ -1,0 +1,17 @@
+{
+  FileUtils.forceMkdir(dataDir);
+  FileUtils.forceMkdir(webDir);
+  FileUtils.forceMkdir(logsDir);
+  Properties rawProperties=new Properties();
+  rawProperties.setProperty("foo","bar");
+  Props props=new PropsBuilder(rawProperties,jdbcSettings,homeDir).build();
+  assertThat(props.fileOf("sonar.path.logs")).isEqualTo(logsDir);
+  assertThat(props.fileOf("sonar.path.home")).isEqualTo(homeDir);
+  File tempDir=props.fileOf("sonar.path.temp");
+  assertThat(tempDir).isDirectory().exists();
+  assertThat(tempDir.getName()).isEqualTo("temp");
+  assertThat(tempDir.getParentFile()).isEqualTo(homeDir);
+  assertThat(props.of("foo")).isEqualTo("bar");
+  assertThat(props.of("unknown")).isNull();
+  assertThat(props.intOf("sonar.search.port")).isEqualTo(9001);
+}

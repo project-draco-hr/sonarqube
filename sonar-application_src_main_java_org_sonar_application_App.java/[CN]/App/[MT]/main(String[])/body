@@ -1,8 +1,11 @@
 {
-  Installation installation=Installation.parseArguments(args);
-  new AppLogging().configure(installation);
-  App app=new App(installation);
-  app.start();
+  new MinimumViableSystem().check();
+  CommandLineParser cli=new CommandLineParser();
+  Properties rawProperties=cli.parseArguments(args);
+  Props props=new PropsBuilder(rawProperties,new JdbcSettings()).build();
+  new ProcessLogging().configure(props,"/org/sonar/application/logback.xml");
+  App app=new App();
+  app.start(props);
   LoggerFactory.getLogger(App.class).info("stopped");
   System.exit(app.isSuccess() ? 0 : 1);
 }

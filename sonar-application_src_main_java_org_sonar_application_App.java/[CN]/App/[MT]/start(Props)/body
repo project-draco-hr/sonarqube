@@ -1,0 +1,37 @@
+{
+  try {
+    Logger logger=LoggerFactory.getLogger(getClass());
+    monitor.start();
+    File homeDir=props.fileOf("sonar.path.home");
+    String tempDir=props.of("sonar.path.temp");
+    elasticsearch=new ProcessWrapper(JmxUtils.SEARCH_SERVER_NAME).setWorkDir(homeDir).setJmxPort(props.intOf(DefaultSettings.SEARCH_JMX_PORT)).addJavaOpts(props.of(DefaultSettings.SEARCH_JAVA_OPTS)).addJavaOpts(String.format("-Djava.io.tmpdir=%s",tempDir)).setClassName("org.sonar.search.SearchServer").addProperties(props.rawProperties()).addProperty(DefaultSettings.SONAR_NODE_NAME,props.of(DefaultSettings.SONAR_NODE_NAME,DefaultSettings.getNonSetNodeName())).addClasspath(starPath(homeDir,"lib/common")).addClasspath(starPath(homeDir,"lib/search"));
+    if (elasticsearch.execute()) {
+      monitor.registerProcess(elasticsearch);
+      if (elasticsearch.waitForReady()) {
+        logger.info("search server is up");
+        if (StringUtils.isEmpty(props.of(DefaultSettings.CLUSTER_MASTER,null))) {
+          server=new ProcessWrapper(JmxUtils.WEB_SERVER_NAME).setWorkDir(homeDir).setJmxPort(props.intOf(DefaultSettings.WEB_JMX_PORT)).addJavaOpts(props.of(DefaultSettings.WEB_JAVA_OPTS)).addJavaOpts(String.format("-Djava.io.tmpdir=%s",tempDir)).addJavaOpts(String.format("-Dsonar.path.logs=%s",props.of("sonar.path.logs"))).setClassName("org.sonar.server.app.WebServer").addProperties(props.rawProperties()).addProperty(DefaultSettings.SONAR_NODE_NAME,props.of(DefaultSettings.SONAR_NODE_NAME,DefaultSettings.getNonSetNodeName())).addClasspath(starPath(homeDir,"lib/common")).addClasspath(starPath(homeDir,"lib/server"));
+          String driverPath=props.of(JdbcSettings.PROPERTY_DRIVER_PATH);
+          if (driverPath != null) {
+            server.addClasspath(driverPath);
+          }
+          if (server.execute()) {
+            monitor.registerProcess(server);
+            if (server.waitForReady()) {
+              success=true;
+              logger.info("web server is up");
+              monitor.join();
+            }
+          }
+        }
+ else {
+          success=true;
+          monitor.join();
+        }
+      }
+    }
+  }
+  finally {
+    terminate();
+  }
+}

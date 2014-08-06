@@ -1,0 +1,13 @@
+{
+  Properties p=parser.argumentsToProperties(new String[]{"-Dsonar.foo=bar","-Dsonar.whitespace=foo bar"});
+  assertThat(p).hasSize(2);
+  assertThat(p.getProperty("sonar.foo")).isEqualTo("bar");
+  assertThat(p.getProperty("sonar.whitespace")).isEqualTo("foo bar");
+  try {
+    parser.argumentsToProperties(new String[]{"-Dsonar.foo=bar","sonar.bad=true"});
+    fail();
+  }
+ catch (  IllegalArgumentException e) {
+    assertThat(e).hasMessage("Command-line argument must start with -D, for example -Dsonar.jdbc.username=sonar. Got: sonar.bad=true");
+  }
+}

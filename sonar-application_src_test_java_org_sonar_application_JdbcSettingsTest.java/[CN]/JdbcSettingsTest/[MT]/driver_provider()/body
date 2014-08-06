@@ -1,0 +1,18 @@
+{
+  assertThat(settings.driverProvider("jdbc:oracle:thin:@localhost/XE")).isEqualTo(JdbcSettings.Provider.oracle);
+  assertThat(settings.driverProvider("jdbc:mysql://localhost:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance")).isEqualTo(JdbcSettings.Provider.mysql);
+  try {
+    settings.driverProvider("jdbc:sqlserver://localhost");
+    fail();
+  }
+ catch (  MessageException e) {
+    assertThat(e).hasMessage("Unsupported JDBC driver provider: sqlserver. Accepted values are [h2, jtds, mysql, oracle, postgresql]");
+  }
+  try {
+    settings.driverProvider("oracle:thin:@localhost/XE");
+    fail();
+  }
+ catch (  MessageException e) {
+    assertThat(e).hasMessage("Bad format of JDBC URL: oracle:thin:@localhost/XE");
+  }
+}

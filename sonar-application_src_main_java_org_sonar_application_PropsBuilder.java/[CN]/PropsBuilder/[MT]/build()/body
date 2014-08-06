@@ -1,0 +1,14 @@
+{
+  Properties p=loadPropertiesFile(homeDir);
+  p.putAll(rawProperties);
+  p.setProperty("sonar.path.home",homeDir.getAbsolutePath());
+  p=ConfigurationUtils.interpolateVariables(p,System.getenv());
+  Props props=new Props(p);
+  DefaultSettings.init(props);
+  initExistingDir(props,"sonar.path.data","data");
+  initExistingDir(props,"sonar.path.web","web");
+  initExistingDir(props,"sonar.path.logs","logs");
+  initTempDir(props);
+  jdbcSettings.checkAndComplete(homeDir,props);
+  return props;
+}
