@@ -1,0 +1,15 @@
+{
+  NodeHealth health=new NodeHealth();
+  ClusterStatsResponse clusterStatsResponse=client().admin().cluster().prepareClusterStats().get();
+  health.setClusterAvailable(clusterStatsResponse.getStatus() != ClusterHealthStatus.RED);
+  ClusterStatsNodes nodesStats=clusterStatsResponse.getNodesStats();
+  health.setJvmHeapMax(nodesStats.getJvm().getHeapMax().bytes());
+  health.setJvmHeapUsed(nodesStats.getJvm().getHeapUsed().bytes());
+  health.setFsTotal(nodesStats.getFs().getTotal().bytes());
+  health.setFsAvailable(nodesStats.getFs().getAvailable().bytes());
+  health.setJvmThreads(nodesStats.getJvm().getThreads());
+  health.setProcessCpuPercent(nodesStats.getProcess().getCpuPercent());
+  health.setOpenFiles(nodesStats.getProcess().getAvgOpenFileDescriptors());
+  health.setJvmUptimeMillis(nodesStats.getJvm().getMaxUpTime().getMillis());
+  return health;
+}
