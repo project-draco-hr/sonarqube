@@ -22,11 +22,16 @@
     esSettings.put("discovery.zen.minimum_master_nodes",new Double(nodes.size() / 2.0).intValue() + 1);
   }
   esSettings.put("cluster.name",clusterName);
-  try {
-    esSettings.put("node.name",InetAddress.getLocalHost().getHostName());
+  if (props.contains(SONAR_NODE_NAME)) {
+    esSettings.put("node.name",props.of(SONAR_NODE_NAME));
   }
- catch (  Exception e) {
-    esSettings.put("node.name","sq-" + System.currentTimeMillis());
+ else {
+    try {
+      esSettings.put("node.name",InetAddress.getLocalHost().getHostName());
+    }
+ catch (    Exception e) {
+      esSettings.put("node.name","sq-" + System.currentTimeMillis());
+    }
   }
   initAnalysis(esSettings);
   node=NodeBuilder.nodeBuilder().settings(esSettings).build().start();
