@@ -1,6 +1,8 @@
 {
   IndexStat stat=new IndexStat();
-  stat.setDocumentCount(getClient().prepareCount(this.getIndexName()).setQuery(QueryBuilders.matchAllQuery()).get().getCount());
+  CountRequestBuilder countRequest=getClient().prepareCount(this.getIndexName()).setTypes(this.getIndexType()).setQuery(QueryBuilders.matchAllQuery());
+  CountResponse response=node.execute(countRequest);
+  stat.setDocumentCount(response.getCount());
   stat.setLastUpdate(getLastSynchronization());
   return stat;
 }
