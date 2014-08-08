@@ -1,0 +1,18 @@
+{
+  String loopbackAddress=localAddress();
+  String path="/jndi/rmi://" + loopbackAddress + ":"+ jmxPort+ "/jmxrmi";
+  JMXServiceURL jmxUrl=new JMXServiceURL("rmi",loopbackAddress,jmxPort,path);
+  for (int i=0; i < 5; i++) {
+    try {
+      Thread.sleep(1000L);
+      LOGGER.debug("Try #{} to connect to JMX server for process '{}'",i,processName);
+      JMXConnector jmxConnector=JMXConnectorFactory.connect(jmxUrl,null);
+      MBeanServerConnection mBeanServer=jmxConnector.getMBeanServerConnection();
+      ProcessMXBean bean=JMX.newMBeanProxy(mBeanServer,JmxUtils.objectName(processName),ProcessMXBean.class);
+      return bean;
+    }
+ catch (    Exception ignored) {
+    }
+  }
+  return null;
+}

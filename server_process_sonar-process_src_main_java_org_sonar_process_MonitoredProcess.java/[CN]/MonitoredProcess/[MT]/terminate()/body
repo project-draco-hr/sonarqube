@@ -1,0 +1,19 @@
+{
+  if (monitor != null) {
+    Logger logger=LoggerFactory.getLogger(getClass());
+    logger.debug("Process[{}] terminating",name);
+    monitor.shutdownNow();
+    monitor=null;
+    if (pingTask != null) {
+      pingTask.cancel(true);
+      pingTask=null;
+    }
+    try {
+      doTerminate();
+    }
+ catch (    Exception e) {
+      LoggerFactory.getLogger(getClass()).error("Fail to terminate " + name,e);
+    }
+    logger.debug("Process[{}] terminated",name);
+  }
+}

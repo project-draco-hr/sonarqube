@@ -1,0 +1,30 @@
+{
+  List<String> command=new ArrayList<String>();
+  try {
+    command.add(buildJavaCommand());
+    command.addAll(javaOpts);
+    command.addAll(buildJMXOptions());
+    command.addAll(buildClasspath());
+    command.add(className);
+    command.add(buildPropertiesFile().getAbsolutePath());
+    ProcessBuilder processBuilder=new ProcessBuilder();
+    processBuilder.command(command);
+    processBuilder.directory(workDir);
+    processBuilder.environment().putAll(envProperties);
+    LOGGER.info("starting {}: {}",getName(),StringUtils.join(command," "));
+    process=processBuilder.start();
+    errorGobbler=new StreamGobbler(process.getErrorStream(),this.getName() + "-ERROR");
+    outputGobbler=new StreamGobbler(process.getInputStream(),this.getName());
+    outputGobbler.start();
+    errorGobbler.start();
+    processMXBean=waitForJMX();
+    if (processMXBean == null) {
+      terminate();
+      return false;
+    }
+    return true;
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Fail to start command: " + StringUtils.join(command," "),e);
+  }
+}
