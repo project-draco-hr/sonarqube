@@ -1,0 +1,15 @@
+{
+  UserSession.get().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+  DbSession session=myBatis.openSession(false);
+  try {
+    GroupDto group=userDao.selectGroupByName(groupName,session);
+    if (group == null) {
+      throw new NotFoundException("Group does not exists : " + groupName);
+    }
+    permissionTemplateDao.removeByGroup(group.getId(),session);
+    session.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}
