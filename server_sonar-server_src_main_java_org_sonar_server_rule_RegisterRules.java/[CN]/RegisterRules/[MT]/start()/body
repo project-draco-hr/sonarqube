@@ -6,26 +6,28 @@
     Map<String,CharacteristicDto> allCharacteristics=loadCharacteristics(session);
     RulesDefinition.Context context=defLoader.load();
     for (    RulesDefinition.ExtendedRepository repoDef : getRepositories(context)) {
-      for (      RulesDefinition.Rule ruleDef : repoDef.rules()) {
-        RuleKey ruleKey=RuleKey.of(ruleDef.repository().key(),ruleDef.key());
-        RuleDto rule=allRules.containsKey(ruleKey) ? allRules.remove(ruleKey) : createRuleDto(ruleDef,session);
-        boolean executeUpdate=false;
-        if (mergeRule(ruleDef,rule)) {
-          executeUpdate=true;
+      if (languages.get(repoDef.language()) != null) {
+        for (        RulesDefinition.Rule ruleDef : repoDef.rules()) {
+          RuleKey ruleKey=RuleKey.of(ruleDef.repository().key(),ruleDef.key());
+          RuleDto rule=allRules.containsKey(ruleKey) ? allRules.remove(ruleKey) : createRuleDto(ruleDef,session);
+          boolean executeUpdate=false;
+          if (mergeRule(ruleDef,rule)) {
+            executeUpdate=true;
+          }
+          CharacteristicDto subCharacteristic=characteristic(ruleDef,rule.getSubCharacteristicId(),allCharacteristics);
+          if (mergeDebtDefinitions(ruleDef,rule,subCharacteristic)) {
+            executeUpdate=true;
+          }
+          if (mergeTags(ruleDef,rule)) {
+            executeUpdate=true;
+          }
+          if (executeUpdate) {
+            dbClient.ruleDao().update(session,rule);
+          }
+          mergeParams(ruleDef,rule,session);
         }
-        CharacteristicDto subCharacteristic=characteristic(ruleDef,rule.getSubCharacteristicId(),allCharacteristics);
-        if (mergeDebtDefinitions(ruleDef,rule,subCharacteristic)) {
-          executeUpdate=true;
-        }
-        if (mergeTags(ruleDef,rule)) {
-          executeUpdate=true;
-        }
-        if (executeUpdate) {
-          dbClient.ruleDao().update(session,rule);
-        }
-        mergeParams(ruleDef,rule,session);
+        session.commit();
       }
-      session.commit();
     }
     List<RuleDto> activeRules=processRemainingDbRules(allRules.values(),session);
     removeActiveRulesOnStillExistingRepositories(session,activeRules,context);
