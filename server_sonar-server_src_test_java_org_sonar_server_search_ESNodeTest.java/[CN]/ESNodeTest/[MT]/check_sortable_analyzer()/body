@@ -1,8 +1,0 @@
-{
-  ESNode node=new ESNode(settings);
-  node.start();
-  node.client().admin().indices().prepareCreate("sort").addMapping("type1","{\"type1\": {\"properties\": {\"value\": {\"type\": \"string\"}}}}").execute().actionGet();
-  node.client().admin().cluster().prepareHealth("sort").setWaitForYellowStatus().get(TimeValue.timeValueMillis(1000));
-  assertThat(node.client().admin().indices().prepareAnalyze("sort","This Is A Wonderful Text").setAnalyzer("sortable").get().getTokens().get(0).getTerm()).isEqualTo("this is a ");
-  node.stop();
-}
