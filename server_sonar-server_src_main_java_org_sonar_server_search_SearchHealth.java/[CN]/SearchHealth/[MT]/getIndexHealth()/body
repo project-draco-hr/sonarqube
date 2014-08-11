@@ -6,8 +6,8 @@
     newIndexHealth.name=index.getIndexName() + "/" + index.getIndexType();
     newIndexHealth.documentCount=indexStat.getDocumentCount();
     newIndexHealth.lastSync=indexStat.getLastUpdate();
-    IndicesStatsRequestBuilder statRequest=node.client().admin().indices().prepareStats(index.getIndexName()).setTypes(index.getIndexType());
-    IndicesStatsResponse indicesStatsResponse=node.execute(statRequest);
+    IndicesStatsRequestBuilder statRequest=searchClient.admin().indices().prepareStats(index.getIndexName()).setTypes(index.getIndexType());
+    IndicesStatsResponse indicesStatsResponse=searchClient.execute(statRequest);
     newIndexHealth.segmentCount=indicesStatsResponse.getTotal().getSegments().getCount();
     newIndexHealth.pendingDeletion=indicesStatsResponse.getTotal().getDocs().getDeleted();
     builder.put(newIndexHealth.name,newIndexHealth);

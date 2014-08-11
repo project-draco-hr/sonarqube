@@ -1,6 +1,6 @@
 {
   LOG.debug("UPDATE _id:{} in index {}",key,this.getIndexName());
-  BulkRequestBuilder bulkRequest=getClient().prepareBulk();
+  BulkRequestBuilder bulkRequest=client.prepareBulk();
   for (  UpdateRequest request : requests) {
     if (request.id() == null || request.id().isEmpty()) {
       bulkRequest.add(new IndexRequest().source(request.doc().sourceAsMap()).type(this.getIndexType()).index(this.getIndexName()));
@@ -9,5 +9,5 @@
       bulkRequest.add(request.id(this.getKeyValue(key)).index(this.getIndexName()).type(this.getIndexType()));
     }
   }
-  BulkResponse response=node.execute(bulkRequest);
+  BulkResponse response=client.execute(bulkRequest);
 }

@@ -1,7 +1,7 @@
 {
   Date date;
-  SearchRequestBuilder request=getClient().prepareSearch(this.getIndexName()).setTypes(this.getIndexType()).setQuery(QueryBuilders.matchAllQuery()).setSize(0).addAggregation(AggregationBuilders.max("latest").field(BaseNormalizer.UPDATED_AT_FIELD));
-  SearchResponse response=node.execute(request);
+  SearchRequestBuilder request=client.prepareSearch(this.getIndexName()).setTypes(this.getIndexType()).setQuery(QueryBuilders.matchAllQuery()).setSize(0).addAggregation(AggregationBuilders.max("latest").field(BaseNormalizer.UPDATED_AT_FIELD));
+  SearchResponse response=client.execute(request);
   Max max=(Max)response.getAggregations().get("latest");
   if (max.getValue() > 0) {
     date=new DateTime(Double.valueOf(max.getValue()).longValue()).toDate();

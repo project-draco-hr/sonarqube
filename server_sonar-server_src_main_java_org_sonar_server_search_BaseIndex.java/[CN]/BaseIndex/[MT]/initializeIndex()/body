@@ -1,13 +1,13 @@
 {
   String index=this.getIndexName();
-  IndicesExistsResponse indexExistsResponse=getClient().admin().indices().prepareExists(index).execute().actionGet();
+  IndicesExistsResponse indexExistsResponse=client.admin().indices().prepareExists(index).execute().actionGet();
   try {
     if (!indexExistsResponse.isExists()) {
       LOG.debug("Setup of {} for type {}",this.getIndexName(),this.getIndexType());
-      getClient().admin().indices().prepareCreate(index).setSettings(getIndexSettings()).execute().actionGet();
+      client.admin().indices().prepareCreate(index).setSettings(getIndexSettings()).execute().actionGet();
     }
     LOG.debug("Update of index {} for type {}",this.getIndexName(),this.getIndexType());
-    getClient().admin().indices().preparePutMapping(index).setType(getIndexType()).setIgnoreConflicts(true).setSource(mapDomain()).get();
+    client.admin().indices().preparePutMapping(index).setType(getIndexType()).setIgnoreConflicts(true).setSource(mapDomain()).get();
   }
  catch (  Exception e) {
     throw new IllegalStateException("Invalid configuration for index " + this.getIndexName(),e);
