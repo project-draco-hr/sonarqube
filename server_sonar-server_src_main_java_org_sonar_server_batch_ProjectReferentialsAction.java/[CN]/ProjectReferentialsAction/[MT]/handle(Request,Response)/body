@@ -7,14 +7,19 @@
     String profileName=request.param(PARAM_PROFILE);
     ProjectReferentials ref=new ProjectReferentials();
     String projectKey=null;
-    ComponentDto module=dbClient.componentDao().getNullableByKey(session,projectOrModuleKey);
+    AuthorizedComponentDto module=dbClient.componentDao().getNullableAuthorizedComponentByKey(projectOrModuleKey,session);
     if (module != null) {
-      ComponentDto project=!module.qualifier().equals(Qualifiers.PROJECT) ? dbClient.componentDao().getRootProjectByKey(projectOrModuleKey,session) : module;
-      if (!project.key().equals(module.key())) {
-        addSettings(ref,module.getKey(),getSettingsFromParentModules(module.key(),hasScanPerm,session));
+      ComponentDto project=dbClient.componentDao().getNullableRootProjectByKey(projectOrModuleKey,session);
+      if (project != null) {
+        if (!project.key().equals(module.key())) {
+          addSettings(ref,module.getKey(),getSettingsFromParents(module.key(),hasScanPerm,session));
+        }
+        projectKey=project.key();
+        addSettingsToChildrenModules(ref,projectOrModuleKey,Maps.<String,String>newHashMap(),hasScanPerm,session);
       }
-      projectKey=project.key();
-      addSettingsToChildrenModules(ref,projectOrModuleKey,Maps.<String,String>newHashMap(),hasScanPerm,session);
+ else {
+        addSettings(ref,projectOrModuleKey,getPropertiesMap(propertiesDao.selectProjectProperties(projectOrModuleKey,session),hasScanPerm));
+      }
     }
     addProfiles(ref,projectKey,profileName,session);
     addActiveRules(ref);
