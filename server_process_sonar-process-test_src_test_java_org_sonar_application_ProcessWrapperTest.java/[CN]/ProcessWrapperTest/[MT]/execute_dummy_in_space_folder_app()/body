@@ -1,0 +1,15 @@
+{
+  File home=temp.newFolder("t est");
+  assertThat(home.canWrite()).isTrue();
+  File lib=new File(home,"lib");
+  File tempdir=new File(home,"temp");
+  FileUtils.copyFileToDirectory(dummyAppJar,lib);
+  Props props=new Props(new Properties());
+  props.set("spaceHome",home.getAbsolutePath());
+  File effectiveHome=props.fileOf("spaceHome");
+  String cp=FilenameUtils.concat(new File(effectiveHome,"lib").getAbsolutePath(),"*");
+  System.out.println("cp = " + cp);
+  ProcessWrapper process=new ProcessWrapper("DummyOkProcess").addProperty(MonitoredProcess.NAME_PROPERTY,"DummyOkProcess").setTempDirectory(tempdir).addClasspath(cp).setWorkDir(home).setJmxPort(freePort).setClassName(DUMMY_OK_APP);
+  assertThat(process.isAlive()).isFalse();
+  assertCanStart(process);
+}
