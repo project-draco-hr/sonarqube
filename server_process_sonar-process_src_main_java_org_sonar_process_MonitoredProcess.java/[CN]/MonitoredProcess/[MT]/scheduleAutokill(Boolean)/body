@@ -2,8 +2,8 @@
   final Runnable breakOnMissingPing=new Runnable(){
     @Override public void run(){
       long time=System.currentTimeMillis();
-      if (time - lastPing > AUTOKILL_TIMEOUT_MS) {
-        LoggerFactory.getLogger(getClass()).info(String.format("Did not receive any ping during %d seconds. Shutting down.",AUTOKILL_TIMEOUT_MS / 1000));
+      if (time - lastPing > getTimeout()) {
+        LoggerFactory.getLogger(getClass()).info(String.format("Did not receive any ping during %d seconds. Shutting down.",getTimeout() / 1000));
         if (isMonitored) {
           terminate();
         }
@@ -13,5 +13,5 @@
 ;
   lastPing=System.currentTimeMillis();
   monitor=Executors.newScheduledThreadPool(1);
-  pingTask=monitor.scheduleAtFixedRate(breakOnMissingPing,AUTOKILL_CHECK_DELAY_MS,AUTOKILL_CHECK_DELAY_MS,TimeUnit.MILLISECONDS);
+  pingTask=monitor.scheduleAtFixedRate(breakOnMissingPing,getCheckDelay(),getCheckDelay(),TimeUnit.MILLISECONDS);
 }
