@@ -1,7 +1,13 @@
 {
   String loopbackAddress=localAddress();
   String path="/jndi/rmi://" + loopbackAddress + ":"+ jmxPort+ "/jmxrmi";
-  JMXServiceURL jmxUrl=new JMXServiceURL("rmi",loopbackAddress,jmxPort,path);
+  JMXServiceURL jmxUrl=null;
+  try {
+    jmxUrl=new JMXServiceURL("rmi",loopbackAddress,jmxPort,path);
+  }
+ catch (  MalformedURLException e) {
+    throw new IllegalStateException("JMX url does not look well formed",e);
+  }
   for (int i=0; i < 5; i++) {
     try {
       Thread.sleep(1000L);
@@ -18,6 +24,7 @@
       return bean;
     }
  catch (    Exception ignored) {
+      LOGGER.trace("Could not connect JMX yet",ignored);
     }
   }
   return null;
