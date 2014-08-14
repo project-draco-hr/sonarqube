@@ -1,0 +1,47 @@
+{
+  Map<String,Object> params=new HashMap<String,Object>();
+  try {
+    factory.newScript(params);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e.getMessage()).isEqualTo("Missing 'idField' parameter");
+  }
+  params.put(ListUpdate.ID_FIELD,"test");
+  try {
+    factory.newScript(params);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e.getMessage()).isEqualTo("Missing 'idValue' parameter");
+  }
+  params.put(ListUpdate.ID_VALUE,"test");
+  try {
+    factory.newScript(params);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e.getMessage()).isEqualTo("Missing 'field' parameter");
+  }
+  params.put(ListUpdate.FIELD,"test");
+  ExecutableScript script=factory.newScript(params);
+  assertThat(script).isNotNull();
+  params.put(ListUpdate.VALUE,new Integer(52));
+  try {
+    factory.newScript(params);
+    fail();
+  }
+ catch (  Exception e) {
+  }
+  params.put(ListUpdate.VALUE,ImmutableMap.of("key","value"));
+  script=factory.newScript(params);
+  assertThat(script).isNotNull();
+  params.remove(ListUpdate.ID_FIELD);
+  try {
+    factory.newScript(params);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e.getMessage()).isEqualTo("Missing 'idField' parameter");
+  }
+}
