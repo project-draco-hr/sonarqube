@@ -2,10 +2,26 @@
   new MinimumViableSystem().check();
   CommandLineParser cli=new CommandLineParser();
   Properties rawProperties=cli.parseArguments(args);
-  Props props=new PropsBuilder(rawProperties,new JdbcSettings()).build();
-  new ProcessLogging().configure(props,"/org/sonar/application/logback.xml");
+  Props props=null;
+  try {
+    props=new PropsBuilder(rawProperties,new JdbcSettings()).build();
+    new ProcessLogging().configure(props,"/org/sonar/application/logback.xml");
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException(e.getMessage());
+  }
+catch (  URISyntaxException e) {
+    throw new IllegalStateException(e.getMessage());
+  }
   App app=new App();
-  app.start(props);
-  LoggerFactory.getLogger(App.class).info("stopped");
-  System.exit(app.isSuccess() ? 0 : 1);
+  try {
+    app.start(props);
+  }
+ catch (  InterruptedException e) {
+    LoggerFactory.getLogger(App.class).info("interrupted");
+  }
+ finally {
+    LoggerFactory.getLogger(App.class).info("stopped");
+    System.exit(app.isSuccess() ? 0 : 1);
+  }
 }
