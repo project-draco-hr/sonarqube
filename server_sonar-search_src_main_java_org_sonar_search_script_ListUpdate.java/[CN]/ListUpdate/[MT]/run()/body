@@ -3,7 +3,9 @@
     Map<String,Object> source=XContentMapValues.nodeMapValue(ctx.get("_source"),"source from context");
     Object fieldValue=source.get(field);
     if (fieldValue == null && value != null) {
-      source.put(field,value);
+      List values=new ArrayList<Object>(1);
+      values.add(value);
+      source.put(field,values);
     }
  else     if (!XContentMapValues.isArray(fieldValue) && value != null) {
       Map currentFieldValue=XContentMapValues.nodeMapValue(fieldValue,"current FieldValue");
@@ -11,7 +13,10 @@
         source.put(field,value);
       }
  else {
-        source.put(field,org.elasticsearch.common.collect.ImmutableSet.of(fieldValue,value));
+        List values=new ArrayList<Object>(2);
+        values.add(fieldValue);
+        values.add(value);
+        source.put(field,values);
       }
     }
  else {
