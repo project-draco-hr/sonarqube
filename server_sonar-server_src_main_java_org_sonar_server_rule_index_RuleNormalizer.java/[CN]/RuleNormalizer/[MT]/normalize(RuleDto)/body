@@ -1,4 +1,5 @@
 {
+  List<UpdateRequest> requests=new ArrayList<UpdateRequest>();
   DbSession session=db.openSession(false);
   try {
     Map<String,Object> update=new HashMap<String,Object>();
@@ -107,9 +108,13 @@
     update.put(RuleField._TAGS.field(),Sets.union(rule.getSystemTags(),rule.getTags()));
     Map<String,Object> upsert=getUpsertFor(RuleField.ALL_FIELDS,update);
     upsert.put(RuleField.KEY.field(),rule.getKey().toString());
-    return ImmutableList.of(new UpdateRequest().replicationType(ReplicationType.ASYNC).consistencyLevel(WriteConsistencyLevel.QUORUM).id(rule.getKey().toString()).doc(update).upsert(upsert));
+    requests.add(new UpdateRequest().replicationType(ReplicationType.ASYNC).consistencyLevel(WriteConsistencyLevel.QUORUM).id(rule.getKey().toString()).doc(update).upsert(upsert));
+    for (    RuleParamDto param : db.ruleDao().findRuleParamsByRuleKey(session,rule.getKey())) {
+      requests.addAll(normalizeNested(param,rule.getKey()));
+    }
   }
   finally {
     session.close();
   }
+  return requests;
 }

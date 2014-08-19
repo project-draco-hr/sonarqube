@@ -1,4 +1,5 @@
 {
+  List<UpdateRequest> requests=new ArrayList<UpdateRequest>();
   ActiveRuleKey key=activeRuleDto.getKey();
   Preconditions.checkArgument(key != null,"Cannot normalize ActiveRuleDto with null key");
   Map<String,Object> newRule=new HashMap<String,Object>();
@@ -25,11 +26,14 @@
         parentKey=parentDto.getKey().toString();
       }
     }
+    requests.add(new UpdateRequest().replicationType(ReplicationType.ASYNC).routing(key.ruleKey().toString()).id(activeRuleDto.getKey().toString()).parent(activeRuleDto.getKey().ruleKey().toString()).doc(newRule).upsert(getUpsertFor(ActiveRuleField.ALL_FIELDS,newRule)));
+    for (    ActiveRuleParamDto param : db.activeRuleDao().findParamsByActiveRuleKey(session,key)) {
+      requests.addAll(normalizeNested(param,key));
+    }
     newRule.put(ActiveRuleField.PARENT_KEY.field(),parentKey);
   }
   finally {
     session.close();
   }
-  Map<String,Object> upsert=getUpsertFor(ActiveRuleField.ALL_FIELDS,newRule);
-  return ImmutableList.of(new UpdateRequest().replicationType(ReplicationType.ASYNC).routing(key.ruleKey().toString()).id(activeRuleDto.getKey().toString()).parent(activeRuleDto.getKey().ruleKey().toString()).doc(newRule).upsert(upsert));
+  return requests;
 }
