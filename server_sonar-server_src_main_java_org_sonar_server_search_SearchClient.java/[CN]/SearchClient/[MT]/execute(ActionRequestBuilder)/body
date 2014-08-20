@@ -1,8 +1,8 @@
 {
   StopWatch fullProfile=profiling.start("search",Profiling.Level.FULL);
-  ListenableActionFuture acc=request.execute();
+  K response=null;
   try {
-    K response=(K)acc.get();
+    response=(K)request.get();
     if (profiling.isProfilingEnabled(Profiling.Level.BASIC)) {
       if (ToXContent.class.isAssignableFrom(request.getClass())) {
         XContentBuilder debugResponse=XContentFactory.jsonBuilder();
@@ -30,6 +30,7 @@
     return response;
   }
  catch (  Exception e) {
+    LOGGER.error("could not execute request: " + response);
     throw new IllegalStateException("ES error: ",e);
   }
 }

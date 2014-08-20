@@ -1,0 +1,32 @@
+{
+  if (actions.isEmpty()) {
+    return;
+  }
+  try {
+    BulkRequestBuilder bulkRequestBuilder=new BulkRequestBuilder(searchClient);
+    Map<String,Index> indexes=getIndexMap();
+    for (    IndexActionRequest action : actions) {
+      action.setIndex(indexes.get(action.getIndexType()));
+    }
+    ExecutorService executorService=Executors.newFixedThreadPool(4);
+    for (    Future<List<ActionRequest>> updateRequests : executorService.invokeAll(actions)) {
+      for (      ActionRequest update : updateRequests.get()) {
+        if (UpdateRequest.class.isAssignableFrom(update.getClass())) {
+          bulkRequestBuilder.add((UpdateRequest)update);
+        }
+ else         if (DeleteRequest.class.isAssignableFrom(update.getClass())) {
+          bulkRequestBuilder.add((DeleteRequest)update);
+        }
+ else {
+          throw new IllegalStateException("Un-managed request type: " + update.getClass());
+        }
+      }
+    }
+    executorService.shutdown();
+    LOGGER.info("Executing batch request of size: " + bulkRequestBuilder.numberOfActions());
+    BulkResponse response=searchClient.execute(bulkRequestBuilder.setRefresh(true));
+  }
+ catch (  Exception e) {
+    e.printStackTrace();
+  }
+}
