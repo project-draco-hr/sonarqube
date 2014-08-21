@@ -108,7 +108,7 @@
     update.put(RuleField._TAGS.field(),Sets.union(rule.getSystemTags(),rule.getTags()));
     Map<String,Object> upsert=getUpsertFor(RuleField.ALL_FIELDS,update);
     upsert.put(RuleField.KEY.field(),rule.getKey().toString());
-    requests.add(new UpdateRequest().replicationType(ReplicationType.ASYNC).consistencyLevel(WriteConsistencyLevel.QUORUM).id(rule.getKey().toString()).doc(update).upsert(upsert));
+    requests.add(new UpdateRequest().id(rule.getKey().toString()).doc(update).upsert(upsert));
     for (    RuleParamDto param : db.ruleDao().findRuleParamsByRuleKey(session,rule.getKey())) {
       requests.addAll(normalizeNested(param,rule.getKey()));
     }
