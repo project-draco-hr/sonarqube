@@ -3,49 +3,27 @@
     return;
   }
   try {
-    long normTime=System.currentTimeMillis();
-    BulkRequestBuilder bulkRequestBuilder=new BulkRequestBuilder(searchClient);
     Map<String,Index> indexes=getIndexMap();
     Set<String> indices=new HashSet<String>();
     for (    IndexActionRequest action : actions) {
       Index index=indexes.get(action.getIndexType());
       action.setIndex(index);
-      indices.add(index.getIndexName());
-    }
-    ExecutorService executorService=Executors.newFixedThreadPool(10);
-    boolean requiresRefresh=false;
-    for (    IndexActionRequest action : actions) {
       if (action.needsRefresh()) {
-        requiresRefresh=true;
-        break;
+        indices.add(index.getIndexName());
       }
     }
-    for (    Future<List<ActionRequest>> updateRequests : executorService.invokeAll(actions)) {
-      for (      ActionRequest update : updateRequests.get()) {
-        if (UpdateRequest.class.isAssignableFrom(update.getClass())) {
-          bulkRequestBuilder.add(((UpdateRequest)update).refresh(false));
-        }
- else         if (DeleteRequest.class.isAssignableFrom(update.getClass())) {
-          bulkRequestBuilder.add(((DeleteRequest)update).refresh(false));
-        }
- else {
-          throw new IllegalStateException("Un-managed request type: " + update.getClass());
-        }
-      }
-    }
-    executorService.shutdown();
-    normTime=System.currentTimeMillis() - normTime;
+    BulkRequestBuilder bulkRequestBuilder=new BulkRequestBuilder(searchClient);
+    long normTime=executeNormalization(bulkRequestBuilder,actions);
     long indexTime=System.currentTimeMillis();
     BulkResponse response=searchClient.execute(bulkRequestBuilder.setRefresh(false));
     indexTime=System.currentTimeMillis() - indexTime;
-    long refreshTime=System.currentTimeMillis();
-    if (requiresRefresh) {
-      searchClient.admin().indices().prepareRefresh(indices.toArray(new String[indices.size()])).setForce(false).get();
-    }
-    refreshTime=System.currentTimeMillis() - refreshTime;
+    long refreshTime=this.refreshRequiredIndex(indices);
     LOGGER.debug("-- submitted {} items with {}ms in normalization, {}ms indexing and {}ms refresh({}). Total: {}ms",bulkRequestBuilder.numberOfActions(),normTime,indexTime,refreshTime,indices,(normTime + indexTime + refreshTime));
+    if (response.hasFailures()) {
+      throw new IllegalStateException("Errors while indexing stack: " + response.buildFailureMessage());
+    }
   }
  catch (  Exception e) {
-    e.printStackTrace();
+    LOGGER.error("Could not commit to ElasticSearch",e);
   }
 }

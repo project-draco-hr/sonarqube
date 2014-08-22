@@ -1,0 +1,11 @@
+{
+  long refreshTime=System.currentTimeMillis();
+  if (!indices.isEmpty()) {
+    RefreshRequestBuilder refreshRequest=searchClient.admin().indices().prepareRefresh(indices.toArray(new String[indices.size()])).setForce(false);
+    RefreshResponse refreshResponse=searchClient.execute(refreshRequest);
+    if (refreshResponse.getFailedShards() > 0) {
+      LOGGER.warn("{} Shard(s) did not refresh",refreshResponse.getFailedShards());
+    }
+  }
+  return System.currentTimeMillis() - refreshTime;
+}
