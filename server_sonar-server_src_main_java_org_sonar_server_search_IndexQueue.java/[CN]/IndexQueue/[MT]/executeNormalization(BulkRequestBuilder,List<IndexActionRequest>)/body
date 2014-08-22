@@ -1,7 +1,7 @@
 {
   long normTime=System.currentTimeMillis();
-  ExecutorService executorService=Executors.newFixedThreadPool(CONCURRENT_NORMALIZATION_FACTOR);
   try {
+    ExecutorService executorService=Executors.newFixedThreadPool(CONCURRENT_NORMALIZATION_FACTOR);
     for (    Future<List<ActionRequest>> updateRequests : executorService.invokeAll(actions)) {
       for (      ActionRequest update : updateRequests.get()) {
         if (UpdateRequest.class.isAssignableFrom(update.getClass())) {
@@ -15,10 +15,10 @@
         }
       }
     }
+    executorService.shutdown();
   }
  catch (  Exception e) {
     throw new IllegalStateException("Could not execute normalization for stack",e);
   }
-  executorService.shutdown();
   return System.currentTimeMillis() - normTime;
 }
