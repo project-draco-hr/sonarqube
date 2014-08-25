@@ -1,0 +1,7 @@
+{
+  MockUserSession.set().setLogin("john").setGlobalPermissions(GlobalPermissions.SCAN_EXECUTION,GlobalPermissions.DRY_RUN_EXECUTION);
+  when(componentDao.getNullableRootProjectByKey(project.key(),session)).thenReturn(null);
+  when(qProfileFactory.getByProjectAndLanguage(session,project.key(),"java")).thenReturn(QualityProfileDto.createFor("abcd").setName("SonarQube way").setLanguage("java").setRulesUpdatedAt("2014-01-14T14:00:00+0200"));
+  WsTester.TestRequest request=tester.newGetRequest("batch","project").setParam("key",project.key());
+  request.execute().assertJson(getClass(),"return_provisioned_project_profile.json");
+}
