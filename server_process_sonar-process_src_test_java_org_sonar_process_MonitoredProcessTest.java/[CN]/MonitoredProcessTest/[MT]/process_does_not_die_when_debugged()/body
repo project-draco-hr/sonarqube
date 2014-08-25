@@ -1,0 +1,19 @@
+{
+  Properties properties=new Properties();
+  properties.setProperty(MonitoredProcess.NAME_PROPERTY,DummyProcess.NAME);
+  properties.setProperty("sonar.search.javaOpts","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005");
+  final DummyProcess dummyProcess=new DummyProcess(new Props(properties));
+  assertThat(dummyProcess.isMonitored()).isFalse();
+  dummyProcess.setTimeout(100L).setCheckDelay(100L);
+  Thread process=new Thread(new Runnable(){
+    @Override public void run(){
+      dummyProcess.start();
+    }
+  }
+);
+  process.start();
+  Thread.sleep(600);
+  assertProcessRunning(dummyProcess);
+  dummyProcess.terminate();
+  assertProcessTerminated(dummyProcess);
+}
