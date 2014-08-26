@@ -2,11 +2,14 @@
   try {
     boolean ok=true;
     while (isRunning && ok) {
-      for (      ProcessWrapper process : processes) {
-        if (!ProcessUtils.isAlive(process.process())) {
-          LOGGER.info("{} is down, stopping all other processes",process.getName());
-          ok=false;
-          interrupt();
+synchronized (processes) {
+        LOGGER.debug("Monitoring {} processes.",processes.size());
+        for (        ProcessWrapper process : processes) {
+          if (!ProcessUtils.isAlive(process.process())) {
+            LOGGER.info("{} is down, stopping all other processes",process.getName());
+            ok=false;
+            interrupt();
+          }
         }
       }
       if (ok) {
