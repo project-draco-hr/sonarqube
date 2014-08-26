@@ -1,8 +1,14 @@
 {
   String url=BATCH_PROJECT_URL + "?key=" + reactor.getRoot().getKeyWithBranch();
   if (taskProperties.properties().containsKey(ModuleQProfiles.SONAR_PROFILE_PROP)) {
-    url+="&profile=" + taskProperties.properties().get(ModuleQProfiles.SONAR_PROFILE_PROP);
+    try {
+      url+="&profile=" + URLEncoder.encode(taskProperties.properties().get(ModuleQProfiles.SONAR_PROFILE_PROP),"UTF-8");
+    }
+ catch (    UnsupportedEncodingException e) {
+      throw new IllegalStateException("Unable to encode URL",e);
+    }
   }
+  url+="&preview=" + analysisMode.isPreview();
   InputSupplier<InputStream> jsonStream=serverClient.doRequest(url,null);
   try {
     return ProjectReferentials.fromJson(new InputStreamReader(jsonStream.getInput(),Charsets.UTF_8));
