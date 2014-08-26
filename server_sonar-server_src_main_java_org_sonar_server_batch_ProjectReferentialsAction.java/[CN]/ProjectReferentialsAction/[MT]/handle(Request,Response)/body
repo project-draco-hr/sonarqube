@@ -1,11 +1,12 @@
 {
-  UserSession userSession=UserSession.get();
-  boolean hasScanPerm=userSession.hasGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
+  boolean hasScanPerm=UserSession.get().hasGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
+  boolean preview=request.mandatoryParamAsBoolean(PARAM_PREVIEW);
+  checkPermission(preview);
   DbSession session=dbClient.openSession(false);
   try {
+    ProjectReferentials ref=new ProjectReferentials();
     String projectOrModuleKey=request.mandatoryParam(PARAM_KEY);
     String profileName=request.param(PARAM_PROFILE);
-    ProjectReferentials ref=new ProjectReferentials();
     String projectKey=null;
     AuthorizedComponentDto module=dbClient.componentDao().getNullableAuthorizedComponentByKey(projectOrModuleKey,session);
     if (module != null) {
