@@ -4,10 +4,12 @@
   db.qualityProfileDao().insert(dbSession,profile1,profile2);
   RuleDto rule1=RuleTesting.newXooX1().setSeverity(Severity.MAJOR);
   RuleDto rule2=RuleTesting.newXooX2().setSeverity(Severity.MAJOR);
-  db.ruleDao().insert(dbSession,rule1,rule2);
+  RuleDto removedRule=RuleTesting.newDto(RuleKey.of("xoo","removed")).setSeverity(Severity.MAJOR).setStatus(RuleStatus.REMOVED);
+  db.ruleDao().insert(dbSession,rule1,rule2,removedRule);
   db.activeRuleDao().insert(dbSession,ActiveRuleDto.createFor(profile1,rule1).setSeverity(Severity.MINOR));
   db.activeRuleDao().insert(dbSession,ActiveRuleDto.createFor(profile1,rule2).setSeverity(Severity.BLOCKER));
   db.activeRuleDao().insert(dbSession,ActiveRuleDto.createFor(profile2,rule2).setSeverity(Severity.CRITICAL));
+  db.activeRuleDao().insert(dbSession,ActiveRuleDto.createFor(profile2,removedRule).setSeverity(Severity.MAJOR));
   dbSession.commit();
   dbSession.clearCache();
   assertThat(db.activeRuleDao().findByRule(dbSession,rule1)).hasSize(1);

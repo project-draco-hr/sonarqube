@@ -1,5 +1,5 @@
 {
-  SearchRequestBuilder request=getClient().prepareSearch(getIndexName()).setQuery(QueryBuilders.termQuery(ActiveRuleNormalizer.ActiveRuleField.PROFILE_KEY.field(),key)).setRouting(key).setSize(Integer.MAX_VALUE);
+  SearchRequestBuilder request=getClient().prepareSearch(getIndexName()).setQuery(QueryBuilders.filteredQuery(QueryBuilders.termsQuery(ActiveRuleNormalizer.ActiveRuleField.PROFILE_KEY.field(),key),FilterBuilders.boolFilter().mustNot(FilterBuilders.hasParentFilter(this.getParentType(),FilterBuilders.termFilter(RuleNormalizer.RuleField.STATUS.field(),RuleStatus.REMOVED.name()))))).setRouting(key).setSize(Integer.MAX_VALUE);
   SearchResponse response=getClient().execute(request);
   List<ActiveRule> activeRules=new ArrayList<ActiveRule>();
   for (  SearchHit hit : response.getHits()) {
