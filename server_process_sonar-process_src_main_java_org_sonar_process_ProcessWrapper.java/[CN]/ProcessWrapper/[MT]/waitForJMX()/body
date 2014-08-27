@@ -1,21 +1,12 @@
 {
-  String loopbackAddress=localAddress();
-  String path="/jndi/rmi://" + loopbackAddress + ":"+ jmxPort+ "/jmxrmi";
-  JMXServiceURL jmxUrl;
-  try {
-    jmxUrl=new JMXServiceURL("rmi",loopbackAddress,jmxPort,path);
-  }
- catch (  MalformedURLException e) {
-    throw new IllegalStateException("JMX url does not look well formed",e);
-  }
+  JMXServiceURL jmxUrl=JmxUtils.serviceUrl(LoopbackAddress.get(),jmxPort);
   for (int i=0; i < 5; i++) {
     try {
       Thread.sleep(1000L);
-      LOGGER.debug("Try #{} to connect to JMX server for process '{}'",i,processName);
       JMXConnector jmxConnector=JMXConnectorFactory.connect(jmxUrl,null);
       jmxConnector.addConnectionNotificationListener(new NotificationListener(){
         @Override public void handleNotification(        Notification notification,        Object handback){
-          LOGGER.info("JMX Connection Notification:{}",notification.getMessage());
+          LOGGER.debug("JMX Connection Notification:{}",notification.getMessage());
         }
       }
 ,null,null);
@@ -23,7 +14,7 @@
       return JMX.newMBeanProxy(mBeanServer,JmxUtils.objectName(processName),ProcessMXBean.class);
     }
  catch (    Exception ignored) {
-      LOGGER.trace("Could not connect JMX yet",ignored);
+      LOGGER.info(String.format("Could not connect to JMX (attempt %d). Trying again.",i),ignored);
     }
   }
   return null;

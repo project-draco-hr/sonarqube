@@ -1,0 +1,18 @@
+{
+  InetAddress result=null;
+  while (ifaces.hasMoreElements() && result == null) {
+    NetworkInterface iface=ifaces.nextElement();
+    Enumeration<InetAddress> addresses=iface.getInetAddresses();
+    while (addresses.hasMoreElements()) {
+      InetAddress addr=addresses.nextElement();
+      if (addr.isLoopbackAddress()) {
+        result=addr;
+        break;
+      }
+    }
+  }
+  if (result == null) {
+    throw new IllegalStateException("Impossible to get a IP loopback address");
+  }
+  return result;
+}
