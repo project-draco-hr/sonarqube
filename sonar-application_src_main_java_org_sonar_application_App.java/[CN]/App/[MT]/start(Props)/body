@@ -7,7 +7,7 @@
     elasticsearch=new ProcessWrapper(JmxUtils.SEARCH_SERVER_NAME);
     elasticsearch.setWorkDir(homeDir).setJmxPort(props.valueAsInt(DefaultSettings.SEARCH_JMX_PORT)).addJavaOpts(props.value(DefaultSettings.SEARCH_JAVA_OPTS)).setTempDirectory(tempDir.getAbsoluteFile()).setClassName("org.sonar.search.SearchServer").addProperties(props.rawProperties()).addClasspath("./lib/common/*").addClasspath("./lib/search/*");
     if (elasticsearch.execute()) {
-      monitor.registerProcess(elasticsearch);
+      monitor.monitor(elasticsearch);
       if (elasticsearch.waitForReady()) {
         logger.info("search server is up");
         if (StringUtils.isEmpty(props.value(DefaultSettings.CLUSTER_MASTER))) {
@@ -17,7 +17,7 @@
             server.addClasspath(driverPath);
           }
           if (server.execute()) {
-            monitor.registerProcess(server);
+            monitor.monitor(server);
             if (server.waitForReady()) {
               success=true;
               logger.info("web server is up");

@@ -2,19 +2,17 @@
   try {
     boolean ok=true;
     while (isRunning && ok) {
-synchronized (processes) {
-        LOGGER.debug("Monitoring {} processes.",processes.size());
-        for (        ProcessWrapper process : processes) {
-          if (!ProcessUtils.isAlive(process.process())) {
-            LOGGER.info("{} is down, stopping all other processes",process.getName());
-            ok=false;
-            interrupt();
-          }
+      LOGGER.debug("Monitoring {} processes.",processes.size());
+      for (      ProcessWrapper process : processes) {
+        if (!ProcessUtils.isAlive(process.process())) {
+          LOGGER.info("{} is down, stopping all other processes",process.getName());
+          ok=false;
+          interrupt();
         }
       }
-      if (ok) {
-        Thread.sleep(PING_DELAY_MS);
-      }
+    }
+    if (ok) {
+      Thread.sleep(PING_DELAY_MS);
     }
   }
  catch (  InterruptedException e) {
