@@ -1,6 +1,6 @@
 {
-  super(ImmutableSettings.settingsBuilder().put("network.bind_host","localhost").put("node.rack_id",StringUtils.defaultIfEmpty(settings.getString(IndexProperties.NODE_NAME),"unknown")).put("cluster.name",StringUtils.defaultIfBlank(settings.getString(IndexProperties.CLUSTER_NAME),"sonarqube")).build());
+  super(ImmutableSettings.settingsBuilder().put("node.name",StringUtils.defaultIfEmpty(settings.getString(IndexProperties.NODE_NAME),"sq_local_client")).put("network.bind_host","localhost").put("node.rack_id",StringUtils.defaultIfEmpty(settings.getString(IndexProperties.NODE_NAME),"unknown")).put("cluster.name",StringUtils.defaultIfBlank(settings.getString(IndexProperties.CLUSTER_NAME),"sonarqube")).build());
   initLogging();
-  this.addTransportAddress(new InetSocketTransportAddress("localhost",settings.getInt(IndexProperties.NODE_PORT)));
+  this.addTransportAddress(new InetSocketTransportAddress(LoopbackAddress.get().getHostAddress(),settings.getInt(IndexProperties.NODE_PORT)));
   this.profiling=new Profiling(settings);
 }
