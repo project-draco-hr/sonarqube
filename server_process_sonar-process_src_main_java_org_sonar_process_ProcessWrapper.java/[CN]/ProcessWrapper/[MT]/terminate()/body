@@ -1,29 +1,32 @@
 {
-  if (processMXBean != null && process != null) {
-    LOGGER.info("{} stopping",getName());
-    ScheduledExecutorService killer=Executors.newScheduledThreadPool(1);
-    try {
-      Runnable killerTask=new Runnable(){
-        @Override public void run(){
-          ProcessUtils.destroyQuietly(process);
+synchronized (terminationLock) {
+    if (processMXBean != null && process != null) {
+      LOGGER.info("{} stopping",getName());
+      ScheduledExecutorService killer=Executors.newScheduledThreadPool(1);
+      try {
+        Runnable killerTask=new Runnable(){
+          @Override public void run(){
+            ProcessUtils.destroyQuietly(process);
+          }
         }
-      }
 ;
-      ScheduledFuture killerFuture=killer.schedule(killerTask,30,TimeUnit.SECONDS);
-      processMXBean.terminate();
-      killerFuture.cancel(true);
-      LOGGER.info("{} stopped",getName());
-    }
- catch (    Exception ignored) {
-      LOGGER.trace("Could not terminate process",ignored);
-    }
+        ScheduledFuture killerFuture=killer.schedule(killerTask,30,TimeUnit.SECONDS);
+        processMXBean.terminate();
+        this.join();
+        killerFuture.cancel(true);
+        LOGGER.info("{} stopped",getName());
+      }
+ catch (      Exception ignored) {
+        LOGGER.trace("Could not terminate process",ignored);
+      }
  finally {
-      killer.shutdownNow();
+        killer.shutdownNow();
+        interruptAndWait();
+      }
     }
-    interruptAndWait();
-  }
  else {
-    ProcessUtils.destroyQuietly(process);
+      ProcessUtils.destroyQuietly(process);
+    }
+    processMXBean=null;
   }
-  processMXBean=null;
 }
