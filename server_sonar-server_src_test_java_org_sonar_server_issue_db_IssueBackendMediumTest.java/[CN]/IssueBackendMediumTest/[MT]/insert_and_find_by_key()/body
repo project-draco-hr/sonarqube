@@ -9,12 +9,8 @@
   dbClient.issueDao().insert(dbSession,issue);
   dbSession.commit();
   assertThat(issue.getId()).isNotNull();
-  Date t0=new Date(0);
-  assertThat(dbClient.issueDao().findAfterDate(dbSession,t0)).hasSize(1);
-  Date t1=new Date();
-  assertThat(dbClient.issueDao().findAfterDate(dbSession,t1)).hasSize(0);
-  tester.clearIndexes();
-  assertThat(indexClient.get(IssueIndex.class).countAll()).isEqualTo(0);
-  tester.get(Platform.class).executeStartupTasks();
   assertThat(indexClient.get(IssueIndex.class).countAll()).isEqualTo(1);
+  IssueDoc issueDoc=indexClient.get(IssueIndex.class).getByKey(issue.getKey());
+  assertThat(issueDoc).isNotNull();
+  assertThat(issueDoc.key()).isEqualTo(issue.getKey());
 }
