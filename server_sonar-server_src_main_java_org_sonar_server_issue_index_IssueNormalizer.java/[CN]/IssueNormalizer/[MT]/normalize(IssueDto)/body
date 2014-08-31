@@ -1,6 +1,25 @@
 {
   Map<String,Object> update=new HashMap<String,Object>();
-  Map<String,Object> upsert=new HashMap<String,Object>();
   update.put(IssueField.KEY.field(),dto.getKey());
-  return ImmutableList.of(new UpdateRequest().id(dto.getKey().toString()).doc(update).upsert(update));
+  update.put(IssueField.UPDATED_AT.field(),dto.getUpdatedAt());
+  update.put(IssueField.CREATED_AT.field(),dto.getCreatedAt());
+  update.put(IssueField.ACTION_PLAN.field(),dto.getActionPlanKey());
+  update.put(IssueField.ASSIGNEE.field(),dto.getAssignee());
+  update.put(IssueField.AUTHOR_LOGIN.field(),dto.getAuthorLogin());
+  update.put(IssueField.ISSUE_CLOSE_DATE.field(),dto.getIssueCloseDate());
+  update.put(IssueField.COMPONENT.field(),dto.getComponentKey());
+  update.put(IssueField.ISSUE_CREATED_AT.field(),dto.getIssueCreationDate());
+  update.put(IssueField.ISSUE_UPDATED_AT.field(),dto.getIssueUpdateDate());
+  update.put(IssueField.EFFORT.field(),dto.getEffortToFix());
+  update.put(IssueField.RESOLUTION.field(),dto.getResolution());
+  update.put(IssueField.LINE.field(),dto.getLine());
+  update.put(IssueField.MESSAGE.field(),dto.getMessage());
+  update.put(IssueField.REPORTER.field(),dto.getReporter());
+  update.put(IssueField.STATUS.field(),dto.getStatus());
+  update.put(IssueField.SEVERITY.field(),dto.getSeverity());
+  update.put(IssueField.RULE.field(),dto.getRule());
+  update.put(IssueField.REPOSITORY.field(),dto.getRuleRepo());
+  Map<String,Object> upsert=getUpsertFor(IssueField.ALL_FIELDS,update);
+  upsert.put(IssueField.KEY.field(),dto.getKey().toString());
+  return ImmutableList.of(new UpdateRequest().id(dto.getKey().toString()).doc(update).upsert(upsert));
 }
