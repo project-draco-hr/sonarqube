@@ -1,0 +1,17 @@
+{
+  File symbol=new File(baseDir,"src/foo.xoo.symbol");
+  FileUtils.write(symbol,"1,4,7\n12,15,23\n\n#comment");
+  DefaultInputFile inputFile=new DefaultInputFile("src/foo.xoo").setAbsolutePath(new File(baseDir,"src/foo.xoo").getAbsolutePath()).setLanguage("xoo");
+  fileSystem.add(inputFile);
+  SymbolTableBuilder symbolTableBuilder=mock(SymbolTableBuilder.class);
+  when(context.symbolTableBuilder(inputFile)).thenReturn(symbolTableBuilder);
+  Symbol symbol1=mock(Symbol.class);
+  when(symbolTableBuilder.newSymbol(1,4)).thenReturn(symbol1);
+  Symbol symbol2=mock(Symbol.class);
+  when(symbolTableBuilder.newSymbol(12,15)).thenReturn(symbol2);
+  sensor.execute(context);
+  verify(symbolTableBuilder).newSymbol(1,4);
+  verify(symbolTableBuilder).newReference(symbol1,7);
+  verify(symbolTableBuilder).newSymbol(12,15);
+  verify(symbolTableBuilder).newReference(symbol2,23);
+}
