@@ -15,7 +15,10 @@
   assertThat(nodeHealth.getFsUsedPercent()).contains("%");
   assertThat(nodeHealth.getJvmThreads()).isGreaterThanOrEqualTo(0L);
   assertThat(nodeHealth.getProcessCpuPercent()).contains("%");
-  assertThat(nodeHealth.getOpenFiles()).isGreaterThanOrEqualTo(0L);
+  long openFiles=nodeHealth.getOpenFiles();
+  if (!tester.get(System2.class).isOsWindows()) {
+    assertThat(openFiles).isGreaterThanOrEqualTo(0L);
+  }
   assertThat(nodeHealth.getJvmUpSince().before(now)).isTrue();
   Map<String,IndexHealth> indexHealth=health.getIndexHealth();
   assertThat(indexHealth).isNotEmpty();
