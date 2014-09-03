@@ -1,0 +1,32 @@
+{
+  SearchClient searchClient=tester.get(SearchClient.class);
+  createIssuePermissionIndex(searchClient);
+  createIssueProjectIndex(searchClient);
+  RuleDto rule=RuleTesting.newXooX1();
+  tester.get(RuleDao.class).insert(dbSession,rule);
+  int nbProject=10;
+  int nbUser=5;
+  int componentPerProject=2;
+  Long projectId=1L;
+  Long componentId=1L;
+  for (int p=0; p < nbProject; p++) {
+    ComponentDto project=addComponent(projectId,projectId,"Project-" + projectId.toString());
+    addIssueAuthorization(searchClient,project,null,"anyone",false);
+    if (p % 2 == 0) {
+      addIssueAuthorization(searchClient,project,null,"user",false);
+    }
+    for (int u=1; u < nbUser; u++) {
+      addIssueAuthorization(searchClient,project,"user-" + u,null,false);
+    }
+    for (int c=0; c < componentPerProject; c++) {
+      ComponentDto file=addComponent(componentId,projectId,"Component-" + componentId.toString());
+      addIssue(rule,project,file);
+      componentId++;
+    }
+    dbSession.commit();
+    projectId++;
+  }
+  assertThat(searchIssueWithAuthorization(searchClient,"","anyone").getHits().getTotalHits()).isEqualTo(nbProject * componentPerProject);
+  assertThat(searchIssueWithAuthorization(searchClient,"","user").getHits().getTotalHits()).isEqualTo(nbProject * componentPerProject / 2);
+  assertThat(searchIssueWithAuthorization(searchClient,"user-1","").getHits().getTotalHits()).isEqualTo(nbProject * componentPerProject);
+}
