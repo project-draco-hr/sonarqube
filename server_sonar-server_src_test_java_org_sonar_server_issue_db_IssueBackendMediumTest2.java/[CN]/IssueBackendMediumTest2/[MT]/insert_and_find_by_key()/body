@@ -1,0 +1,30 @@
+{
+  RuleDto rule=RuleTesting.newXooX1();
+  tester.get(RuleDao.class).insert(dbSession,rule);
+  ComponentDto project=new ComponentDto().setId(1L).setKey("MyProject").setProjectId(1L);
+  tester.get(ComponentDao.class).insert(dbSession,project);
+  ComponentDto resource=new ComponentDto().setProjectId(1L).setKey("MyComponent").setId(2L);
+  tester.get(ComponentDao.class).insert(dbSession,resource);
+  IssueDto issue=new IssueDto().setIssueCreationDate(new Date()).setIssueUpdateDate(new Date()).setRule(rule).setRootComponent(project).setComponent(resource).setStatus("OPEN").setResolution("OPEN").setKee(UUID.randomUUID().toString()).setSeverity("MAJOR");
+  dbClient.issueDao().insert(dbSession,issue);
+  dbSession.commit();
+  assertThat(indexClient.get(IssueIndex.class).countAll()).isEqualTo(1);
+  IssueDoc issueDoc=indexClient.get(IssueIndex.class).getByKey(issue.getKey());
+  assertThat(issueDoc).isNotNull();
+  assertThat(issueDoc.actionPlanKey()).isEqualTo(issue.getActionPlanKey());
+  assertThat(issueDoc.assignee()).isEqualTo(issue.getAssignee());
+  assertThat(issueDoc.authorLogin()).isEqualTo(issue.getAuthorLogin());
+  assertThat(issueDoc.closeDate()).isEqualTo(issue.getIssueCloseDate());
+  assertThat(issueDoc.componentKey()).isEqualTo(issue.getComponentKey());
+  assertThat(issueDoc.creationDate()).isEqualTo(issue.getCreatedAt());
+  assertThat(issueDoc.effortToFix()).isEqualTo(issue.getEffortToFix());
+  assertThat(issueDoc.resolution()).isEqualTo(issue.getResolution());
+  assertThat(issueDoc.ruleKey()).isEqualTo(RuleKey.of(issue.getRuleRepo(),issue.getRule()));
+  assertThat(issueDoc.line()).isEqualTo(issue.getLine());
+  assertThat(issueDoc.message()).isEqualTo(issue.getMessage());
+  assertThat(issueDoc.reporter()).isEqualTo(issue.getReporter());
+  assertThat(issueDoc.key()).isEqualTo(issue.getKey());
+  assertThat(issueDoc.updateDate()).isEqualTo(issue.getIssueUpdateDate());
+  assertThat(issueDoc.status()).isEqualTo(issue.getStatus());
+  assertThat(issueDoc.severity()).isEqualTo(issue.getSeverity());
+}

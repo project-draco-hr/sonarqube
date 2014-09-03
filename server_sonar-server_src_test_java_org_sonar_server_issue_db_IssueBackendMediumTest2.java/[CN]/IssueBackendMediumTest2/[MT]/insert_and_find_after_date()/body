@@ -1,0 +1,20 @@
+{
+  RuleDto rule=RuleTesting.newXooX1();
+  tester.get(RuleDao.class).insert(dbSession,rule);
+  ComponentDto project=new ComponentDto().setId(1L).setKey("MyProject").setProjectId(1L);
+  tester.get(ComponentDao.class).insert(dbSession,project);
+  ComponentDto resource=new ComponentDto().setId(2L).setKey("MyComponent").setProjectId(1L);
+  tester.get(ComponentDao.class).insert(dbSession,resource);
+  IssueDto issue=new IssueDto().setId(1L).setRuleId(rule.getId()).setRootComponentId(project.getId()).setRootComponentKey_unit_test_only(project.key()).setComponentId(resource.getId()).setComponentKey_unit_test_only(resource.key()).setStatus("OPEN").setResolution("OPEN").setKee(UUID.randomUUID().toString());
+  dbClient.issueDao().insert(dbSession,issue);
+  dbSession.commit();
+  assertThat(issue.getId()).isNotNull();
+  Date t0=new Date(0);
+  assertThat(dbClient.issueDao().findAfterDate(dbSession,t0)).hasSize(1);
+  Date t1=new Date();
+  assertThat(dbClient.issueDao().findAfterDate(dbSession,t1)).hasSize(0);
+  tester.clearIndexes();
+  assertThat(indexClient.get(IssueIndex.class).countAll()).isEqualTo(0);
+  tester.get(Platform.class).executeStartupTasks();
+  assertThat(indexClient.get(IssueIndex.class).countAll()).isEqualTo(1);
+}
