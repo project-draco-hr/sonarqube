@@ -1,0 +1,15 @@
+{
+  final Date now=new Date(system.now());
+  MassUpdate massUpdate=context.prepareMassUpdate();
+  massUpdate.select("SELECT p.id FROM projects p WHERE p.scope=? AND p.enabled=?").setString(1,"PRJ").setBoolean(2,true);
+  massUpdate.update("UPDATE projects SET authorization_updated_at=? WHERE id=?");
+  massUpdate.execute(new MassUpdate.Handler(){
+    @Override public boolean handle(    Select.Row row,    SqlStatement update) throws SQLException {
+      Long id=row.getLong(1);
+      update.setDate(1,now);
+      update.setLong(2,id);
+      return true;
+    }
+  }
+);
+}
