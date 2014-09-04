@@ -1,0 +1,25 @@
+{
+  if (extraFields != null && UserSession.get().isLoggedIn()) {
+    if (extraFields.contains(ACTIONS_EXTRA_FIELD)) {
+      actionsWriter.writeActions(issue,json);
+    }
+    if (extraFields.contains(TRANSITIONS_EXTRA_FIELD)) {
+      actionsWriter.writeTransitions(issue,json);
+    }
+    String assignee=issue.assignee();
+    if (extraFields.contains(ASSIGNEE_NAME_EXTRA_FIELD) && assignee != null) {
+      User user=result.user(assignee);
+      json.prop(ASSIGNEE_NAME_EXTRA_FIELD,user != null ? user.name() : null);
+    }
+    String reporter=issue.reporter();
+    if (extraFields.contains(REPORTER_NAME_EXTRA_FIELD) && reporter != null) {
+      User user=result.user(reporter);
+      json.prop(REPORTER_NAME_EXTRA_FIELD,user != null ? user.name() : null);
+    }
+    String actionPlanKey=issue.actionPlanKey();
+    if (extraFields.contains(ACTION_PLAN_NAME_EXTRA_FIELD) && actionPlanKey != null) {
+      ActionPlan actionPlan=result.actionPlan(issue);
+      json.prop(ACTION_PLAN_NAME_EXTRA_FIELD,actionPlan != null ? actionPlan.name() : null);
+    }
+  }
+}
