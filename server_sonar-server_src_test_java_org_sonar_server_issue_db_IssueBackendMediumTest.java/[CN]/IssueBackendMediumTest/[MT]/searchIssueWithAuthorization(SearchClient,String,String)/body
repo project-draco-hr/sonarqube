@@ -1,10 +1,10 @@
 {
   BoolFilterBuilder fb=FilterBuilders.boolFilter();
-  OrFilterBuilder or=FilterBuilders.orFilter(FilterBuilders.termFilter("user",user));
+  OrFilterBuilder or=FilterBuilders.orFilter(FilterBuilders.termFilter("users",user));
   for (  String group : groups) {
-    or.add(FilterBuilders.termFilter("group",group));
+    or.add(FilterBuilders.termFilter("groups",group));
   }
   fb.must(FilterBuilders.termFilter("permission","read"),or).cache(true);
-  SearchRequestBuilder request=searchClient.prepareSearch(IndexDefinition.ISSUES.getIndexName()).setTypes(IndexDefinition.ISSUES.getIndexType()).setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),FilterBuilders.hasParentFilter(IndexDefinition.ISSUES_PROJECT.getIndexType(),QueryBuilders.hasChildQuery(IndexDefinition.ISSUES_PERMISSION.getIndexType(),QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),fb))))).setSize(Integer.MAX_VALUE);
+  SearchRequestBuilder request=searchClient.prepareSearch(IndexDefinition.ISSUES.getIndexName()).setTypes(IndexDefinition.ISSUES.getIndexType()).setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),FilterBuilders.hasParentFilter(IndexDefinition.ISSUES_AUTHORIZATION.getIndexType(),QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),fb)))).setSize(Integer.MAX_VALUE);
   return searchClient.execute(request);
 }

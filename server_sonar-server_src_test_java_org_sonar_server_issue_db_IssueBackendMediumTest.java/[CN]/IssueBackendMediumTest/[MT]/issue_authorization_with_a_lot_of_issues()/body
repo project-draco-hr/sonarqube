@@ -1,7 +1,5 @@
 {
   SearchClient searchClient=tester.get(SearchClient.class);
-  createIssuePermissionIndex(searchClient);
-  createIssueProjectIndex(searchClient);
   RuleDto rule=RuleTesting.newXooX1();
   tester.get(RuleDao.class).insert(dbSession,rule);
   int nbProject=10;
@@ -9,16 +7,19 @@
   int componentPerProject=5;
   Long projectId=1L;
   Long componentId=1L;
-  BulkRequestBuilder bulkRequestBuilder=new BulkRequestBuilder(searchClient);
+  List<String> users=newArrayList();
+  for (int u=0; u < nbUser; u++) {
+    users.add("user-" + u);
+  }
+  BulkRequestBuilder bulkRequestBuilder=new BulkRequestBuilder(searchClient).setRefresh(true);
   for (int p=0; p < nbProject; p++) {
     ComponentDto project=addComponent(projectId,projectId,"Project-" + projectId.toString());
-    addIssueAuthorization(searchClient,bulkRequestBuilder,project,null,"anyone");
+    List<String> groups=newArrayList();
+    groups.add("anyone");
     if (p % 2 == 0) {
-      addIssueAuthorization(searchClient,bulkRequestBuilder,project,null,"user");
+      groups.add("user");
     }
-    for (int u=0; u < nbUser; u++) {
-      addIssueAuthorization(searchClient,bulkRequestBuilder,project,"user-" + u,null);
-    }
+    bulkRequestBuilder.add(addIssueAuthorization(searchClient,project,users,groups,false));
     for (int c=0; c < componentPerProject; c++) {
       ComponentDto file=addComponent(componentId,projectId,"Component-" + componentId.toString());
       addIssue(rule,project,file);
