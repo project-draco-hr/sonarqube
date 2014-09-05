@@ -1,3 +1,24 @@
 {
-  return null;
+  Map<String,Object> params=newHashMap();
+  params.put("date",date);
+  params.put("permission",UserRole.USER);
+  Map<String,IssueAuthorizationDto> authorizationDtoMap=newHashMap();
+  List<Map<String,String>> rows=session.selectList("org.sonar.core.issue.db.IssueAuthorizationMapper.selectAfterDate",params);
+  for (  Map<String,String> row : rows) {
+    String project=row.get("PROJECT");
+    String user=row.get("USER");
+    String group=row.get("PERMISSION_GROUP");
+    IssueAuthorizationDto issueAuthorizationDto=authorizationDtoMap.get(project);
+    if (issueAuthorizationDto == null) {
+      issueAuthorizationDto=new IssueAuthorizationDto().setProject(project).setPermission(UserRole.USER);
+    }
+    if (group != null) {
+      issueAuthorizationDto.addGroup(group);
+    }
+    if (user != null) {
+      issueAuthorizationDto.addUser(user);
+    }
+    authorizationDtoMap.put(project,issueAuthorizationDto);
+  }
+  return authorizationDtoMap.values();
 }
