@@ -2,34 +2,22 @@
   File ioFile=inputFile.file();
   File highlightingFile=new File(ioFile.getParentFile(),ioFile.getName() + HIGHLIGHTING_EXTENSION);
   if (highlightingFile.exists()) {
-    XooConstants.LOG.debug("Processing " + highlightingFile.getAbsolutePath());
+    LOG.debug("Processing " + highlightingFile.getAbsolutePath());
     try {
       List<String> lines=FileUtils.readLines(highlightingFile,context.fileSystem().encoding().name());
       int lineNumber=0;
       HighlightingBuilder highlightingBuilder=context.highlightingBuilder(inputFile);
       for (      String line : lines) {
         lineNumber++;
-        if (StringUtils.isBlank(line)) {
+        if (StringUtils.isBlank(line) || line.startsWith("#")) {
           continue;
         }
-        if (line.startsWith("#")) {
-          continue;
-        }
-        try {
-          Iterator<String> split=Splitter.on(":").split(line).iterator();
-          int startOffset=Integer.parseInt(split.next());
-          int endOffset=Integer.parseInt(split.next());
-          TypeOfText type=TypeOfText.forCssClass(split.next());
-          highlightingBuilder.highlight(startOffset,endOffset,type);
-        }
- catch (        Exception e) {
-          throw new IllegalStateException("Error processing line " + lineNumber + " of file "+ highlightingFile.getAbsolutePath(),e);
-        }
+        processLine(highlightingFile,lineNumber,highlightingBuilder,line);
       }
       highlightingBuilder.done();
     }
  catch (    IOException e) {
-      throw new RuntimeException(e);
+      throw new IllegalStateException(e);
     }
   }
 }
