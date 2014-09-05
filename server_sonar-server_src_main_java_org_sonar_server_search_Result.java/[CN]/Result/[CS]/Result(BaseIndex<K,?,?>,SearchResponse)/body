@@ -12,9 +12,14 @@
   }
   if (response.getAggregations() != null) {
     for (    Map.Entry<String,Aggregation> facet : response.getAggregations().asMap().entrySet()) {
-      Terms aggregation=(Terms)facet.getValue();
-      for (      Terms.Bucket value : aggregation.getBuckets()) {
-        this.facets.put(facet.getKey(),new FacetValue(value.getKey(),(int)value.getDocCount()));
+      if (Terms.class.isAssignableFrom(facet.getValue().getClass())) {
+        Terms aggregation=(Terms)facet.getValue();
+        for (        Terms.Bucket value : aggregation.getBuckets()) {
+          this.facets.put(facet.getKey(),new FacetValue(value.getKey(),(int)value.getDocCount()));
+        }
+      }
+ else {
+        LOGGER.warn("Cannot process {} type of aggregation",facet.getValue().getClass());
       }
     }
   }
