@@ -1,0 +1,16 @@
+{
+  RuleDto rule=RuleTesting.newXooX1();
+  tester.get(RuleDao.class).insert(session,rule);
+  ComponentDto project=new ComponentDto().setId(1L).setKey("MyProject").setProjectId(1L);
+  tester.get(ComponentDao.class).insert(session,project);
+  ComponentDto resource=new ComponentDto().setProjectId(1L).setKey("MyComponent").setId(2L);
+  tester.get(ComponentDao.class).insert(session,resource);
+  IssueDto issue=new IssueDto().setIssueCreationDate(new Date()).setIssueUpdateDate(new Date()).setRule(rule).setRootComponent(project).setComponent(resource).setStatus("OPEN").setResolution("OPEN").setKee(UUID.randomUUID().toString()).setSeverity("MAJOR");
+  db.issueDao().insert(session,issue);
+  session.commit();
+  WsTester.TestRequest request=wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION);
+  WsTester.Result result=request.execute();
+  assertThat(result).isNotNull();
+  System.out.println("result.outputAsString() = " + result.outputAsString());
+  result.assertJson(this.getClass(),"empty_result.json",false);
+}
