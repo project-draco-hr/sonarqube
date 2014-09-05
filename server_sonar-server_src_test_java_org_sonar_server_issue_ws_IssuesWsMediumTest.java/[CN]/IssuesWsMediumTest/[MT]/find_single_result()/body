@@ -5,12 +5,11 @@
   tester.get(ComponentDao.class).insert(session,project);
   ComponentDto resource=new ComponentDto().setProjectId(1L).setKey("MyComponent").setId(2L);
   tester.get(ComponentDao.class).insert(session,resource);
-  IssueDto issue=new IssueDto().setIssueCreationDate(new Date()).setIssueUpdateDate(new Date()).setRule(rule).setRootComponent(project).setComponent(resource).setStatus("OPEN").setResolution("OPEN").setKee(UUID.randomUUID().toString()).setSeverity("MAJOR");
+  IssueDto issue=new IssueDto().setIssueCreationDate(DateUtils.parseDate("2014-09-04")).setIssueUpdateDate(DateUtils.parseDate("2014-12-04")).setRule(rule).setDebt(10L).setRootComponent(project).setComponent(resource).setStatus("OPEN").setResolution("OPEN").setKee("82fd47d4-b650-4037-80bc-7b112bd4eac2").setSeverity("MAJOR");
   db.issueDao().insert(session,issue);
   session.commit();
   WsTester.TestRequest request=wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION);
   WsTester.Result result=request.execute();
   assertThat(result).isNotNull();
-  System.out.println("result.outputAsString() = " + result.outputAsString());
-  result.assertJson(this.getClass(),"empty_result.json",false);
+  result.assertJson(this.getClass(),"single_result.json",false);
 }
