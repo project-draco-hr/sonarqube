@@ -1,0 +1,20 @@
+{
+  String assignee1="steph";
+  String assignee2="simon";
+  IssueDto issue1=getIssue().setAssignee(assignee1);
+  IssueDto issue2=getIssue().setAssignee(assignee2);
+  IssueDto issue3=getIssue();
+  db.issueDao().insert(session,issue1,issue2,issue3);
+  session.commit();
+  IssueQuery.Builder query=IssueQuery.builder();
+  SearchResponse result=index.search(query.build(),new QueryOptions());
+  assertThat(result.getHits().getTotalHits()).isEqualTo(3L);
+  query=IssueQuery.builder();
+  query.assignees(ImmutableList.of(assignee1));
+  result=index.search(query.build(),new QueryOptions());
+  assertThat(result.getHits().getTotalHits()).isEqualTo(1L);
+  query=IssueQuery.builder();
+  query.assignees(ImmutableList.of(assignee1,assignee2));
+  result=index.search(query.build(),new QueryOptions());
+  assertThat(result.getHits().getTotalHits()).isEqualTo(2L);
+}

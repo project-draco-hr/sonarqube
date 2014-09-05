@@ -1,0 +1,14 @@
+{
+  String assignee="steph";
+  IssueDto issue1=getIssue().setAssignee(assignee);
+  IssueDto issue2=getIssue();
+  db.issueDao().insert(session,issue1,issue2);
+  session.commit();
+  IssueQuery.Builder query=IssueQuery.builder();
+  SearchResponse result=index.search(query.build(),new QueryOptions());
+  assertThat(result.getHits().getTotalHits()).isEqualTo(2L);
+  query=IssueQuery.builder();
+  query.assigned(true);
+  result=index.search(query.build(),new QueryOptions());
+  assertThat(result.getHits().getTotalHits()).isEqualTo(1L);
+}

@@ -1,0 +1,20 @@
+{
+  String plan1="plan1";
+  String plan2="plan2";
+  IssueDto issue1=getIssue().setActionPlanKey(plan1);
+  IssueDto issue2=getIssue().setActionPlanKey(plan2);
+  db.issueDao().insert(session,issue1,issue2);
+  session.commit();
+  IssueQuery.Builder query=IssueQuery.builder();
+  query.actionPlans(ImmutableList.of(plan1));
+  SearchResponse result=index.search(query.build(),new QueryOptions());
+  assertThat(result.getHits().getTotalHits()).isEqualTo(1L);
+  query=IssueQuery.builder();
+  query.actionPlans(ImmutableList.of(plan2));
+  result=index.search(query.build(),new QueryOptions());
+  assertThat(result.getHits().getTotalHits()).isEqualTo(1L);
+  query=IssueQuery.builder();
+  query.actionPlans(ImmutableList.of(plan2,plan1));
+  result=index.search(query.build(),new QueryOptions());
+  assertThat(result.getHits().getTotalHits()).isEqualTo(2L);
+}
