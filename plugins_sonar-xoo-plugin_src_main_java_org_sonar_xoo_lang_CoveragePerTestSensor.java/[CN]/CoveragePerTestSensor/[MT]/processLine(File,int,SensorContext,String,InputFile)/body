@@ -1,0 +1,22 @@
+{
+  try {
+    Iterator<String> split=Splitter.on(":").split(line).iterator();
+    String testCaseName=split.next();
+    String mainFileRelativePath=split.next();
+    FileSystem fs=context.fileSystem();
+    InputFile mainFile=fs.inputFile(fs.predicates().hasRelativePath(mainFileRelativePath));
+    List<Integer> coveredLines=new ArrayList<Integer>();
+    Iterator<String> lines=Splitter.on(",").split(split.next()).iterator();
+    while (lines.hasNext()) {
+      coveredLines.add(Integer.parseInt(lines.next()));
+    }
+    TestCase testCase=context.getTestCase(testFile,testCaseName);
+    if (testCase == null) {
+      throw new IllegalStateException("No test case with name " + testCaseName + " on file "+ testFile);
+    }
+    context.saveCoveragePerTest(testCase,mainFile,coveredLines);
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Error processing line " + lineNumber + " of file "+ testplanFile.getAbsolutePath(),e);
+  }
+}
