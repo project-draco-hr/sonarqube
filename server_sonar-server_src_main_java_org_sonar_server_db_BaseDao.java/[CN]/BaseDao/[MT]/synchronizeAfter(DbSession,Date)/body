@@ -1,6 +1,19 @@
 {
-  for (  E dto : this.findAfterDate(session,date)) {
-    session.enqueue(new UpsertDto<E>(getIndexType(),dto,true));
+  ResultHandler synchronizeDtos=new ResultHandler(){
+    @Override public void handleResult(    ResultContext resultContext){
+      DTO dto=(DTO)resultContext.getResultObject();
+      System.out.println("dto = " + dto);
+      session.enqueue(new UpsertDto<DTO>(getIndexType(),dto,true));
+    }
+  }
+;
+  try {
+    Map<String,Object> params=newHashMap();
+    params.put("date",new Timestamp(date.getTime()));
+    session.select(getSynchronizeStatementFQN(),params,synchronizeDtos);
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException(e);
   }
   session.commit();
 }
