@@ -10,17 +10,8 @@
   assertThat(persistedDto.getCreatedAt()).isNotNull();
   assertThat(persistedDto.getUpdatedAt()).isNotNull();
   Rule hit=index.getByKey(RuleTesting.XOO_X1);
-  assertThat(hit).isNotNull();
-  assertThat(hit.key().repository()).isEqualTo(ruleDto.getRepositoryKey());
-  assertThat(hit.key().rule()).isEqualTo(ruleDto.getRuleKey());
-  assertThat(hit.language()).isEqualTo(ruleDto.getLanguage());
-  assertThat(hit.name()).isEqualTo(ruleDto.getName());
-  assertThat(hit.htmlDescription()).isEqualTo(ruleDto.getDescription());
-  assertThat(hit.status()).isEqualTo(RuleStatus.READY);
-  assertThat(hit.createdAt()).isNotNull();
-  assertThat(hit.updatedAt()).isNotNull();
-  assertThat(hit.internalKey()).isEqualTo(ruleDto.getConfigKey());
-  assertThat(hit.severity()).isEqualTo(ruleDto.getSeverityString());
-  assertThat(hit.isTemplate()).isFalse();
-  assertThat(hit.effortToFixDescription()).isEqualTo(ruleDto.getEffortToFixDescription());
+  assertRuleEquivalent(ruleDto,hit);
+  Collection<Rule> hits=index.getByKeys(RuleTesting.XOO_X1);
+  assertThat(hits).hasSize(1);
+  assertRuleEquivalent(ruleDto,Iterables.getFirst(hits,null));
 }
