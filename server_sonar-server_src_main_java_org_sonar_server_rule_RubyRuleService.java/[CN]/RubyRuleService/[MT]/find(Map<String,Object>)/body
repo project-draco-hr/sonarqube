@@ -10,7 +10,7 @@
   query.setDebtCharacteristics(RubyUtils.toStrings(params.get("debtCharacteristics")));
   query.setHasDebtCharacteristic(RubyUtils.toBoolean(params.get("hasDebtCharacteristic")));
   query.setSortField(RuleNormalizer.RuleField.NAME);
-  QueryOptions options=new QueryOptions();
+  QueryContext options=new QueryContext();
   Integer pageSize=RubyUtils.toInteger(params.get("pageSize"));
   int size=pageSize != null ? pageSize : 50;
   if (size > -1) {
@@ -21,7 +21,7 @@
     return new PagedResult<Rule>(result.getHits(),PagingResult.create(options.getLimit(),pageIndex,result.getTotal()));
   }
  else {
-    options=new QueryOptions().setScroll(true);
+    options=new QueryContext().setScroll(true);
     List<Rule> rules=newArrayList(service.search(query,options).scroll());
     return new PagedResult<Rule>(rules,PagingResult.create(Integer.MAX_VALUE,1,rules.size()));
   }

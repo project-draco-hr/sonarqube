@@ -5,11 +5,11 @@
   Date since=new Date();
   dao.insert(dbSession,RuleTesting.newDto(RuleKey.of("java","S002")));
   dbSession.commit();
-  assertThat(index.search(new RuleQuery(),new QueryOptions()).getHits()).hasSize(2);
+  assertThat(index.search(new RuleQuery(),new QueryContext()).getHits()).hasSize(2);
   RuleQuery availableSinceQuery=new RuleQuery().setAvailableSince(since);
-  List<Rule> hits=index.search(availableSinceQuery,new QueryOptions()).getHits();
+  List<Rule> hits=index.search(availableSinceQuery,new QueryContext()).getHits();
   assertThat(hits).hasSize(1);
   assertThat(hits.get(0).key()).isEqualTo(RuleKey.of("java","S002"));
   RuleQuery availableSinceNowQuery=new RuleQuery().setAvailableSince(DateUtils.addDays(since,1));
-  assertThat(index.search(availableSinceNowQuery,new QueryOptions()).getHits()).hasSize(0);
+  assertThat(index.search(availableSinceNowQuery,new QueryContext()).getHits()).hasSize(0);
 }

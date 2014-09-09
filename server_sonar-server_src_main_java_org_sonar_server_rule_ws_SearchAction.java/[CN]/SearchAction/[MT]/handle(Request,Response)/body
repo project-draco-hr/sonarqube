@@ -1,16 +1,16 @@
 {
   RuleQuery query=createRuleQuery(ruleService.newRuleQuery(),request);
   SearchOptions searchOptions=SearchOptions.create(request);
-  QueryOptions queryOptions=mapping.newQueryOptions(searchOptions);
-  queryOptions.setFacet(request.mandatoryParamAsBoolean(PARAM_FACETS));
-  Result<Rule> results=ruleService.search(query,queryOptions);
+  QueryContext queryContext=mapping.newQueryOptions(searchOptions);
+  queryContext.setFacet(request.mandatoryParamAsBoolean(PARAM_FACETS));
+  Result<Rule> results=ruleService.search(query,queryContext);
   JsonWriter json=response.newJsonWriter().beginObject();
   searchOptions.writeStatistics(json,results);
   writeRules(results,json,searchOptions);
   if (searchOptions.hasField("actives")) {
     activeRuleCompleter.completeSearch(query,results.getHits(),json);
   }
-  if (queryOptions.isFacet()) {
+  if (queryContext.isFacet()) {
     writeFacets(results,json);
   }
   json.endObject().close();

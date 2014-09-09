@@ -1,6 +1,6 @@
 {
   QProfileActivityQuery query=new QProfileActivityQuery();
-  QueryOptions queryOptions=new QueryOptions().setMaxLimit();
+  QueryContext queryContext=new QueryContext().setMaxLimit();
   List<String> profileKeys=RubyUtils.toStrings(params.get("profileKeys"));
   if (profileKeys != null) {
     query.setQprofileKeys(profileKeys);
@@ -15,7 +15,7 @@
   }
   Integer page=RubyUtils.toInteger(params.get("p"));
   int pageIndex=page != null ? page : 1;
-  queryOptions.setPage(pageIndex,50);
-  Result<QProfileActivity> result=service.searchActivities(query,queryOptions);
-  return new QProfileActivityResult(result.getHits(),Paging.create(queryOptions.getLimit(),pageIndex,Long.valueOf(result.getTotal()).intValue()));
+  queryContext.setPage(pageIndex,50);
+  Result<QProfileActivity> result=service.searchActivities(query,queryContext);
+  return new QProfileActivityResult(result.getHits(),Paging.create(queryContext.getLimit(),pageIndex,Long.valueOf(result.getTotal()).intValue()));
 }

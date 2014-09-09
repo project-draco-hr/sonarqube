@@ -10,7 +10,7 @@
   assertThat(dao.findAll(dbSession)).hasSize(max);
   assertThat(index.findAll().getHits()).hasSize(max);
   int count=0;
-  SearchResponse result=index.search(new ActivityQuery(),new QueryOptions().setScroll(true));
+  SearchResponse result=index.search(new ActivityQuery(),new QueryContext().setScroll(true));
   Iterator<Activity> logs=new Result<Activity>(index,result).scroll();
   while (logs.hasNext()) {
     logs.next();
@@ -19,7 +19,7 @@
   assertThat(count).isEqualTo(max);
   tester.clearIndexes();
   tester.get(Platform.class).executeStartupTasks();
-  result=index.search(new ActivityQuery(),new QueryOptions().setScroll(true));
+  result=index.search(new ActivityQuery(),new QueryContext().setScroll(true));
   logs=new Result<Activity>(index,result).scroll();
   count=0;
   while (logs.hasNext()) {

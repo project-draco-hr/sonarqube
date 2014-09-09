@@ -1,0 +1,57 @@
+{
+  SearchRequestBuilder esSearch=getClient().prepareSearch(this.getIndexName()).setTypes(this.getIndexType()).setIndices(this.getIndexName());
+  if (options.isScroll()) {
+    esSearch.setSearchType(SearchType.SCAN);
+    esSearch.setScroll(TimeValue.timeValueMinutes(3));
+  }
+  BoolFilterBuilder esFilter=FilterBuilders.boolFilter();
+  String user=options.getUserLogin();
+  Set<String> groups=options.getUserGroups();
+  OrFilterBuilder groupsAndUser=FilterBuilders.orFilter();
+  if (user != null) {
+    groupsAndUser.add(FilterBuilders.termFilter(IssueAuthorizationNormalizer.IssueAuthorizationField.USERS.field(),user));
+  }
+  for (  String group : groups) {
+    groupsAndUser.add(FilterBuilders.termFilter(IssueAuthorizationNormalizer.IssueAuthorizationField.GROUPS.field(),group));
+  }
+  esFilter.must(FilterBuilders.hasParentFilter(IndexDefinition.ISSUES_AUTHORIZATION.getIndexType(),QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),FilterBuilders.boolFilter().must(FilterBuilders.termFilter(IssueAuthorizationNormalizer.IssueAuthorizationField.PERMISSION.field(),UserRole.USER),groupsAndUser).cache(true))));
+  if (query.assigned() != null && query.assigned()) {
+    esFilter.must(FilterBuilders.existsFilter(IssueNormalizer.IssueField.ASSIGNEE.field()));
+  }
+  if (query.planned() != null && query.planned()) {
+    esFilter.must(FilterBuilders.existsFilter(IssueNormalizer.IssueField.ACTION_PLAN.field()));
+  }
+  if (query.resolved() != null && query.resolved()) {
+    esFilter.must(FilterBuilders.existsFilter(IssueNormalizer.IssueField.RESOLUTION.field()));
+  }
+  matchFilter(esFilter,IssueNormalizer.IssueField.ACTION_PLAN,query.actionPlans());
+  matchFilter(esFilter,IssueNormalizer.IssueField.ASSIGNEE,query.assignees());
+  matchFilter(esFilter,IssueNormalizer.IssueField.PROJECT,query.componentRoots());
+  matchFilter(esFilter,IssueNormalizer.IssueField.COMPONENT,query.components());
+  matchFilter(esFilter,IssueNormalizer.IssueField.KEY,query.issueKeys());
+  matchFilter(esFilter,IssueNormalizer.IssueField.RESOLUTION,query.resolutions());
+  matchFilter(esFilter,IssueNormalizer.IssueField.REPORTER,query.reporters());
+  matchFilter(esFilter,IssueNormalizer.IssueField.RULE,query.rules());
+  matchFilter(esFilter,IssueNormalizer.IssueField.SEVERITY,query.severities());
+  matchFilter(esFilter,IssueNormalizer.IssueField.STATUS,query.statuses());
+  if (query.createdAfter() != null) {
+    esFilter.must(FilterBuilders.rangeFilter(IssueNormalizer.IssueField.ISSUE_CREATED_AT.field()).gte(query.createdAfter()));
+  }
+  if (query.createdBefore() != null) {
+    esFilter.must(FilterBuilders.rangeFilter(IssueNormalizer.IssueField.ISSUE_CREATED_AT.field()).lte(query.createdBefore()));
+  }
+  QueryBuilder esQuery=QueryBuilders.matchAllQuery();
+  if (esFilter.hasClauses()) {
+    esSearch.setQuery(QueryBuilders.filteredQuery(esQuery,esFilter));
+  }
+ else {
+    esSearch.setQuery(esQuery);
+  }
+  if (options.isFacet()) {
+    esSearch.addAggregation(AggregationBuilders.terms(IssueNormalizer.IssueField.SEVERITY.field()).field(IssueNormalizer.IssueField.SEVERITY.field()));
+    esSearch.addAggregation(AggregationBuilders.terms(IssueNormalizer.IssueField.STATUS.field()).field(IssueNormalizer.IssueField.STATUS.field()));
+    esSearch.addAggregation(AggregationBuilders.terms(IssueNormalizer.IssueField.RESOLUTION.field()).field(IssueNormalizer.IssueField.RESOLUTION.field()));
+    esSearch.addAggregation(AggregationBuilders.terms(IssueNormalizer.IssueField.ACTION_PLAN.field()).field(IssueNormalizer.IssueField.ACTION_PLAN.field()));
+  }
+  return getClient().execute(esSearch);
+}
