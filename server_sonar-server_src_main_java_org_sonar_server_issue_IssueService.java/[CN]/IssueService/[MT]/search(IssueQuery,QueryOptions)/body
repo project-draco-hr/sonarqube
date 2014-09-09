@@ -1,8 +1,11 @@
 {
   IssueIndex issueIndex=indexClient.get(IssueIndex.class);
+  long t0=System.currentTimeMillis();
   SearchResponse esResults=issueIndex.search(query,options);
   IssueResult result=new IssueResult(issueIndex,esResults);
   result.setPaging(Paging.create(options.getLimit(),(options.getOffset() * options.getLimit()) + 1,new Long(esResults.getHits().getTotalHits()).intValue()));
+  long t1=System.currentTimeMillis();
+  long t2=System.currentTimeMillis();
   Set<RuleKey> ruleKeys=new HashSet<RuleKey>();
   Set<String> projectKeys=new HashSet<String>();
   Set<String> componentKeys=new HashSet<String>();
@@ -20,11 +23,12 @@
     indexClient.get(RuleIndex.class).getByKeys(ruleKeys);
     result.projects().addAll(dbClient.componentDao().getByKeys(session,projectKeys));
     result.components().addAll(dbClient.componentDao().getByKeys(session,componentKeys));
-    dbClient.userDao().selectUsersByLogins(userLogins);
+    dbClient.userDao().selectUsersByLogins(session,userLogins);
     dbClient.actionPlanDao().findByKeys(actionPlanKeys);
   }
   finally {
     session.close();
   }
+  long t3=System.currentTimeMillis();
   return result;
 }
