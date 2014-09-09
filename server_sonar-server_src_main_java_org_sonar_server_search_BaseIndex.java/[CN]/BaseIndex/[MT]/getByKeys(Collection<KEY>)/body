@@ -1,0 +1,21 @@
+{
+  List<DOMAIN> results=new ArrayList<DOMAIN>();
+  MultiGetRequestBuilder request=client.prepareMultiGet().setPreference("_local");
+  for (  KEY key : keys) {
+    request.add(new MultiGetRequest.Item(getIndexName(),getIndexType(),getKeyValue(key)).routing(getKeyValue(key)).fetchSourceContext(FetchSourceContext.FETCH_SOURCE));
+  }
+  try {
+    MultiGetResponse response=client.execute(request);
+    if (response.getResponses() != null) {
+      for (      MultiGetItemResponse item : response.getResponses()) {
+        results.add(toDoc(item.getResponse().getSource()));
+      }
+    }
+  }
+ catch (  Exception e) {
+    LOG.debug("could not multi-get.",e);
+  }
+ finally {
+    return results;
+  }
+}

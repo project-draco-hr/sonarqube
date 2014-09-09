@@ -1,0 +1,31 @@
+{
+  return new ResultHandler(){
+    private final Map<String,IssueAuthorizationDto> authorizationDtoMap=new HashMap<String,IssueAuthorizationDto>();
+    private int count=0;
+    @Override public void handleResult(    ResultContext context){
+      Map<String,String> row=(Map<String,String>)context.getResultObject();
+      System.out.println(row);
+      String project=row.get("project");
+      String user=row.get("user");
+      String group=row.get("permission_group");
+      IssueAuthorizationDto issueAuthorizationDto=authorizationDtoMap.get(project);
+      if (issueAuthorizationDto == null) {
+        issueAuthorizationDto=new IssueAuthorizationDto().setProject(project).setPermission(UserRole.USER);
+      }
+      if (group != null) {
+        issueAuthorizationDto.addGroup(group);
+      }
+      if (user != null) {
+        issueAuthorizationDto.addUser(user);
+      }
+      authorizationDtoMap.put(project,issueAuthorizationDto);
+      count++;
+      if (count == context.getResultCount()) {
+        for (        IssueAuthorizationDto authorization : authorizationDtoMap.values()) {
+          session.enqueue(new UpsertDto<IssueAuthorizationDto>(getIndexType(),authorization,true));
+        }
+      }
+    }
+  }
+;
+}

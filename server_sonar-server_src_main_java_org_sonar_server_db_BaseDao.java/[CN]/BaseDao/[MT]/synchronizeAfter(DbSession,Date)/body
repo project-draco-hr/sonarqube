@@ -1,6 +1,9 @@
 {
-  for (  E dto : this.findAfterDate(session,date)) {
-    session.enqueue(new UpsertDto<E>(getIndexType(),dto,true));
+  try {
+    session.select(getSynchronizeStatementFQN(),getSynchronizationParams(date),getSynchronizationResultHandler(session));
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException(e);
   }
   session.commit();
 }
