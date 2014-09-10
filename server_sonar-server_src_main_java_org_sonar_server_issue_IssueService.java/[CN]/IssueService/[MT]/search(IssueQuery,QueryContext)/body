@@ -1,30 +1,4 @@
 {
   IssueIndex issueIndex=indexClient.get(IssueIndex.class);
-  SearchResponse esResults=issueIndex.search(query,options);
-  IssueResult result=new IssueResult(issueIndex,esResults);
-  result.setPaging(Paging.create(options.getLimit(),(options.getOffset() * options.getLimit()) + 1,new Long(esResults.getHits().getTotalHits()).intValue()));
-  Set<RuleKey> ruleKeys=new HashSet<RuleKey>();
-  Set<String> projectKeys=new HashSet<String>();
-  Set<String> componentKeys=new HashSet<String>();
-  Set<String> actionPlanKeys=new HashSet<String>();
-  List<String> userLogins=new ArrayList<String>();
-  DbSession session=dbClient.openSession(false);
-  for (  Issue issue : result.getHits()) {
-    ruleKeys.add(issue.ruleKey());
-    projectKeys.add(issue.projectKey());
-    componentKeys.add(issue.componentKey());
-    actionPlanKeys.add(issue.actionPlanKey());
-    userLogins.add(issue.authorLogin());
-  }
-  try {
-    indexClient.get(RuleIndex.class).getByKeys(ruleKeys);
-    result.addProjects(dbClient.componentDao().getByKeys(session,projectKeys));
-    result.addComponents(dbClient.componentDao().getByKeys(session,componentKeys));
-    result.addUsers(userFinder.findByLogins(userLogins));
-    result.addActionPlans(actionPlanService.findByKeys(actionPlanKeys));
-  }
-  finally {
-    session.close();
-  }
-  return result;
+  return issueIndex.search(query,options);
 }

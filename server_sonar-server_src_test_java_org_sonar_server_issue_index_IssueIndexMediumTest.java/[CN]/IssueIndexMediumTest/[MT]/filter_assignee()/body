@@ -7,14 +7,14 @@
   db.issueDao().insert(session,issue1,issue2,issue3);
   session.commit();
   IssueQuery.Builder query=IssueQuery.builder();
-  SearchResponse result=index.search(query.build(),new QueryContext());
-  assertThat(result.getHits().getTotalHits()).isEqualTo(3L);
+  Result<Issue> result=index.search(query.build(),new QueryContext());
+  assertThat(result.getHits()).hasSize(3);
   query=IssueQuery.builder();
   query.assignees(ImmutableList.of(assignee1));
   result=index.search(query.build(),new QueryContext());
-  assertThat(result.getHits().getTotalHits()).isEqualTo(1L);
+  assertThat(result.getHits()).hasSize(1);
   query=IssueQuery.builder();
   query.assignees(ImmutableList.of(assignee1,assignee2));
   result=index.search(query.build(),new QueryContext());
-  assertThat(result.getHits().getTotalHits()).isEqualTo(2L);
+  assertThat(result.getHits()).hasSize(2);
 }

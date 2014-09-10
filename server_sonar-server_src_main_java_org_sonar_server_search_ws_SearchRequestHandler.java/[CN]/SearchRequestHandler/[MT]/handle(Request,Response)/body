@@ -1,0 +1,13 @@
+{
+  QueryContext context=getQueryContext(request);
+  QUERY query=doQuery(request);
+  Result<DOMAIN> result=doSearch(query,context);
+  JsonWriter json=response.newJsonWriter().beginObject();
+  this.writeStatistics(json,result);
+  doResultResponse(request,context,result,json);
+  doContextResponse(request,context,result,json);
+  if (context.isFacet()) {
+    writeFacets(result,json);
+  }
+  json.endObject().close();
+}
