@@ -1,25 +1,14 @@
 {
-  final List<Dependency> result=new ArrayList<SonarMojo.Dependency>();
+  LOG.warn("Computation of Maven dependencies by SonarQube is deprecated. Please update the version of SonarQube Maven plugin to 2.5+");
   try {
-    DependencyNode root=dependencyTreeBuilder.buildDependencyTree(project,localRepository,artifactFactory,artifactMetadataSource,null,artifactCollector);
+    DependencyNode root=treeBuilder.buildDependencyTree(project.getPom(),localRepository,artifactFactory,artifactMetadataSource,null,artifactCollector);
     DependencyNodeVisitor visitor=new BuildingDependencyNodeVisitor(new DependencyNodeVisitor(){
-      private Deque<Dependency> stack=new ArrayDeque<SonarMojo.Dependency>();
       public boolean visit(      DependencyNode node){
-        if (node.getParent() != null && node.getParent() != node) {
-          Dependency dependency=toDependency(node);
-          if (stack.isEmpty()) {
-            result.add(dependency);
-          }
- else {
-            stack.peek().dependencies().add(dependency);
-          }
-          stack.push(dependency);
-        }
         return true;
       }
       public boolean endVisit(      DependencyNode node){
-        if (!stack.isEmpty()) {
-          stack.pop();
+        if (node.getParent() != null && node.getParent() != node) {
+          saveDependency(node,context);
         }
         return true;
       }
@@ -34,7 +23,6 @@
     root.accept(visitor);
   }
  catch (  DependencyTreeBuilderException e) {
-    throw new IllegalStateException("Can not load the graph of dependencies of the project " + getSonarKey(project),e);
+    throw new SonarException("Can not load the graph of dependencies of the project " + project.getKey(),e);
   }
-  return result;
 }

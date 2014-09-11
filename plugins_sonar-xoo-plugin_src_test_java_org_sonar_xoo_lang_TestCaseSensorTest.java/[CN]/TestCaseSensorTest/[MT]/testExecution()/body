@@ -1,0 +1,11 @@
+{
+  File testPlan=new File(baseDir,"test/fooTest.xoo.testplan");
+  FileUtils.write(testPlan,"test1:UNIT:OK:::10\ntest2:INTEGRATION:ERROR:message:stack:15\n\n#comment");
+  DefaultInputFile testFile=new DefaultInputFile("foo","test/fooTest.xoo").setAbsolutePath(new File(baseDir,"test/fooTest.xoo").getAbsolutePath()).setLanguage("xoo").setType(Type.TEST);
+  fileSystem.add(testFile);
+  when(context.testCaseBuilder(testFile,"test1")).thenReturn(new DefaultTestCaseBuilder(testFile,"test1"));
+  when(context.testCaseBuilder(testFile,"test2")).thenReturn(new DefaultTestCaseBuilder(testFile,"test2"));
+  sensor.execute(context);
+  verify(context).addTestCase(new DefaultTestCaseBuilder(testFile,"test1").durationInMs(10).build());
+  verify(context).addTestCase(new DefaultTestCaseBuilder(testFile,"test2").type(TestCase.Type.INTEGRATION).status(TestCase.Status.ERROR).message("message").stackTrace("stack").durationInMs(15).build());
+}

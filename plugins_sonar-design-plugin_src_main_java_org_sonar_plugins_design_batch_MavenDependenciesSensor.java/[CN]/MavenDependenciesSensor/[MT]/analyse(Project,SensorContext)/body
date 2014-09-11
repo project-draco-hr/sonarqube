@@ -18,31 +18,6 @@
     }
   }
  else   if (treeBuilder != null) {
-    LOG.warn("Computation of Maven dependencies by SonarQube is deprecated. Please update the version of SonarQube Maven plugin to 2.5+");
-    try {
-      DependencyNode root=treeBuilder.buildDependencyTree(project.getPom(),localRepository,artifactFactory,artifactMetadataSource,null,artifactCollector);
-      DependencyNodeVisitor visitor=new BuildingDependencyNodeVisitor(new DependencyNodeVisitor(){
-        public boolean visit(        DependencyNode node){
-          return true;
-        }
-        public boolean endVisit(        DependencyNode node){
-          if (node.getParent() != null && node.getParent() != node) {
-            saveDependency(node,context);
-          }
-          return true;
-        }
-      }
-);
-      DependencyNodeFilter filter=StateDependencyNodeFilter.INCLUDED;
-      CollectingDependencyNodeVisitor collectingVisitor=new CollectingDependencyNodeVisitor();
-      DependencyNodeVisitor firstPassVisitor=new FilteringDependencyNodeVisitor(collectingVisitor,filter);
-      root.accept(firstPassVisitor);
-      DependencyNodeFilter secondPassFilter=new AncestorOrSelfDependencyNodeFilter(collectingVisitor.getNodes());
-      visitor=new FilteringDependencyNodeVisitor(visitor,secondPassFilter);
-      root.accept(visitor);
-    }
- catch (    DependencyTreeBuilderException e) {
-      throw new SonarException("Can not load the graph of dependencies of the project " + project.getKey(),e);
-    }
+    computeDependencyTree(project,context);
   }
 }
