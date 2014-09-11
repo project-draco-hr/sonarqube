@@ -1,0 +1,13 @@
+{
+  long t0=System.currentTimeMillis();
+  String key=UUID.randomUUID().toString();
+  FakeDto myDto=new FakeDto().setKey(key);
+  dao.insert(session,myDto);
+  session.commit();
+  assertThat(myDto.getId());
+  long t1=System.currentTimeMillis();
+  FakeDto dto=dao.getByKey(session,key);
+  assertThat(dto).isNotNull();
+  assertThat(dto.getUpdatedAt().getTime()).isGreaterThan(t0);
+  assertThat(dto.getCreatedAt().getTime()).isLessThan(t1);
+}
