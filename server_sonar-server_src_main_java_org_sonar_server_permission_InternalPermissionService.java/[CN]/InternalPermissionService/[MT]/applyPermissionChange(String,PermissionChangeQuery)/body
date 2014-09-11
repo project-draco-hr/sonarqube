@@ -1,8 +1,21 @@
 {
-  if (permissionChangeQuery.targetsUser()) {
-    applyUserPermissionChange(operation,permissionChangeQuery);
-  }
+  DbSession session=dbClient.openSession(false);
+  boolean changed;
+  try {
+    if (permissionChangeQuery.targetsUser()) {
+      changed=applyUserPermissionChange(session,operation,permissionChangeQuery);
+    }
  else {
-    applyGroupPermissionChange(operation,permissionChangeQuery);
+      changed=applyGroupPermissionChange(session,operation,permissionChangeQuery);
+    }
+    if (changed) {
+      session.commit();
+    }
+  }
+  finally {
+    session.close();
+  }
+  if (changed) {
+    synchronizePermissions();
   }
 }

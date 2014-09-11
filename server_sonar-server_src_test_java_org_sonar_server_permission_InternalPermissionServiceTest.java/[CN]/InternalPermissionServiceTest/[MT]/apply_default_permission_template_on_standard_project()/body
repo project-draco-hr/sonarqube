@@ -7,8 +7,8 @@
   when(mockComponent.key()).thenReturn(componentKey);
   when(mockComponent.qualifier()).thenReturn(qualifier);
   MockUserSession.set().setLogin("admin").addProjectPermissions(UserRole.ADMIN,componentKey);
-  when(resourceDao.findByKey(componentKey)).thenReturn(mockComponent);
+  when(componentDao.getByKey(session,componentKey)).thenReturn(mockComponent);
   service.applyDefaultPermissionTemplate(componentKey);
-  verify(resourceDao).findByKey(componentKey);
-  verify(permissionFacade).grantDefaultRoles(componentId,qualifier);
+  verify(permissionFacade).grantDefaultRoles(session,componentId,qualifier);
+  verify(issueAuthorizationDao).synchronizeAfter(eq(session),any(Date.class));
 }

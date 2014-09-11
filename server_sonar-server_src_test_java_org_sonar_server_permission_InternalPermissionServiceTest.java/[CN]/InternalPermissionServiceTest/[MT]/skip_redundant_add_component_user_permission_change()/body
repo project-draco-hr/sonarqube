@@ -1,8 +1,9 @@
 {
-  when(resourceDao.getResource(any(ResourceQuery.class))).thenReturn(new ResourceDto().setId(10L).setKey("org.sample.Sample"));
+  when(resourceDao.getResource(any(ResourceQuery.class),eq(session))).thenReturn(new ResourceDto().setId(10L).setKey("org.sample.Sample"));
   params=buildPermissionChangeParams("user",null,"org.sample.Sample","codeviewer");
   setUpComponentUserPermissions("user",10L,"codeviewer");
   MockUserSession.set().setLogin("admin").addProjectPermissions(UserRole.ADMIN,"org.sample.Sample");
   service.addPermission(params);
-  verify(permissionFacade,never()).insertUserPermission(anyLong(),anyLong(),anyString());
+  verify(permissionFacade,never()).insertUserPermission(anyLong(),anyLong(),anyString(),eq(session));
+  verifyZeroInteractions(issueAuthorizationDao);
 }

@@ -1,6 +1,10 @@
 {
-  when(userDao.selectActiveUserByLogin("user")).thenReturn(new UserDto().setId(2L).setLogin("user").setActive(true));
-  when(userDao.selectGroupByName("group")).thenReturn(new GroupDto().setId(2L).setName("group"));
   MockUserSession.set().setLogin("admin").setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
-  service=new InternalPermissionService(userDao,resourceDao,permissionFacade,finder);
+  when(dbClient.openSession(false)).thenReturn(session);
+  when(dbClient.componentDao()).thenReturn(componentDao);
+  when(dbClient.issueAuthorizationDao()).thenReturn(issueAuthorizationDao);
+  when(index.get(IssueAuthorizationIndex.class)).thenReturn(mock(IssueAuthorizationIndex.class));
+  when(userDao.selectActiveUserByLogin("user",session)).thenReturn(new UserDto().setId(2L).setLogin("user").setActive(true));
+  when(userDao.selectGroupByName("group",session)).thenReturn(new GroupDto().setId(2L).setName("group"));
+  service=new InternalPermissionService(dbClient,userDao,resourceDao,permissionFacade,finder,index);
 }

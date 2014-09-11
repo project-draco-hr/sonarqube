@@ -2,18 +2,26 @@
   UserSession.get().checkLoggedIn();
   ApplyPermissionTemplateQuery query=ApplyPermissionTemplateQuery.buildFromParams(params);
   query.validate();
-  if (query.getSelectedComponents().size() == 1) {
-    checkProjectAdminPermission(query.getSelectedComponents().get(0));
-  }
- else {
-    checkProjectAdminPermission(null);
-    UserSession.get().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
-  }
-  for (  String componentKey : query.getSelectedComponents()) {
-    ComponentDto component=(ComponentDto)resourceDao.findByKey(componentKey);
-    if (component == null) {
-      throw new IllegalStateException("Unable to find component with key " + componentKey);
+  DbSession session=dbClient.openSession(false);
+  try {
+    if (query.getSelectedComponents().size() == 1) {
+      checkProjectAdminPermission(query.getSelectedComponents().get(0));
     }
-    permissionFacade.applyPermissionTemplate(query.getTemplateKey(),component.getId());
+ else {
+      checkProjectAdminPermission(null);
+      UserSession.get().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+    }
+    for (    String componentKey : query.getSelectedComponents()) {
+      ComponentDto component=(ComponentDto)resourceDao.findByKey(componentKey);
+      if (component == null) {
+        throw new IllegalStateException("Unable to find component with key " + componentKey);
+      }
+      permissionFacade.applyPermissionTemplate(session,query.getTemplateKey(),component.getId());
+    }
+    session.commit();
   }
+  finally {
+    session.close();
+  }
+  synchronizePermissions();
 }

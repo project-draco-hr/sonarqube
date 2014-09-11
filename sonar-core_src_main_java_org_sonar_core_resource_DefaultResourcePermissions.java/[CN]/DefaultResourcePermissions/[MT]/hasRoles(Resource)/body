@@ -1,7 +1,13 @@
 {
-  if (resource.getId() != null) {
-    Long resourceId=Long.valueOf(resource.getId());
-    return permissionFacade.countComponentPermissions(resourceId) > 0;
+  DbSession session=myBatis.openSession(false);
+  try {
+    if (resource.getId() != null) {
+      Long resourceId=Long.valueOf(resource.getId());
+      return permissionFacade.countComponentPermissions(session,resourceId) > 0;
+    }
+  }
+  finally {
+    MyBatis.closeQuietly(session);
   }
   return false;
 }
