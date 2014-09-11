@@ -3,13 +3,15 @@
     private final Map<String,IssueAuthorizationDto> authorizationDtoMap=new HashMap<String,IssueAuthorizationDto>();
     private int count=0;
     @Override public void handleResult(    ResultContext context){
-      Map<String,String> row=(Map<String,String>)context.getResultObject();
-      String project=row.get("project");
-      String user=row.get("user");
-      String group=row.get("permission_group");
+      Map<String,Object> row=(Map<String,Object>)context.getResultObject();
+      String project=(String)row.get("project");
+      String user=(String)row.get("user");
+      String group=(String)row.get("permission_group");
+      Date updatedAt=(Date)row.get("updated_at");
       IssueAuthorizationDto issueAuthorizationDto=authorizationDtoMap.get(project);
       if (issueAuthorizationDto == null) {
         issueAuthorizationDto=new IssueAuthorizationDto().setProject(project).setPermission(UserRole.USER);
+        issueAuthorizationDto.setUpdatedAt(updatedAt);
       }
       if (group != null) {
         issueAuthorizationDto.addGroup(group);
