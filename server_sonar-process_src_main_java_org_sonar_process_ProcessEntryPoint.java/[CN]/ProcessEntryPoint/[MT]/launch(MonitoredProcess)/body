@@ -1,0 +1,22 @@
+{
+  if (!lifecycle.tryToMoveTo(State.STARTING)) {
+    throw new IllegalStateException("Already started");
+  }
+  monitoredProcess=mp;
+  JmxUtils.registerMBean(this,props.nonNullValue(PROPERTY_PROCESS_KEY));
+  Runtime.getRuntime().addShutdownHook(shutdownHook);
+  if (!props.valueAsBoolean(PROPERTY_AUTOKILL_DISABLED,false)) {
+    scheduleAutokill();
+  }
+  try {
+    monitoredProcess.start();
+    if (lifecycle.tryToMoveTo(State.STARTED)) {
+      monitoredProcess.awaitTermination();
+    }
+  }
+ catch (  Exception ignored) {
+  }
+ finally {
+    terminate();
+  }
+}

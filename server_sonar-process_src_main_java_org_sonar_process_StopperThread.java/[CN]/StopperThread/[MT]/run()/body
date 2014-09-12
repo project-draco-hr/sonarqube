@@ -1,0 +1,16 @@
+{
+  ExecutorService executor=Executors.newSingleThreadExecutor();
+  Future future=executor.submit(new Runnable(){
+    @Override public void run(){
+      terminable.terminate();
+    }
+  }
+);
+  try {
+    future.get(terminationTimeout,TimeUnit.MILLISECONDS);
+  }
+ catch (  Exception e) {
+    future.cancel(true);
+    executor.shutdownNow();
+  }
+}

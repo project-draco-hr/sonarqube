@@ -1,0 +1,19 @@
+{
+  boolean ready=false;
+  while (!ready) {
+    if (processRef.isTerminated()) {
+      throw new MessageException(String.format("%s failed to start",processRef));
+    }
+    try {
+      ready=jmxConnector.isReady(processRef);
+    }
+ catch (    Exception ignored) {
+    }
+    try {
+      Thread.sleep(300L);
+    }
+ catch (    InterruptedException e) {
+      throw new IllegalStateException("Interrupted while waiting for " + processRef + " to be ready",e);
+    }
+  }
+}

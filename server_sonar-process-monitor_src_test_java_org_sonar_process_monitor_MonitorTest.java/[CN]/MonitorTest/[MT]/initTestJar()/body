@@ -1,0 +1,17 @@
+{
+  File targetDir=new File("server/sonar-process/target");
+  if (!targetDir.exists() || !targetDir.isDirectory()) {
+    targetDir=new File("../sonar-process/target");
+  }
+  if (!targetDir.exists() || !targetDir.isDirectory()) {
+    throw new IllegalStateException("target dir of sonar-process module not found. Please build it.");
+  }
+  Collection<File> jars=FileUtils.listFiles(targetDir,new String[]{"jar"},false);
+  for (  File jar : jars) {
+    if (jar.getName().startsWith("sonar-process-") && jar.getName().endsWith("-test-jar-with-dependencies.jar")) {
+      testJar=jar;
+      return;
+    }
+  }
+  throw new IllegalStateException("No sonar-process-*-test-jar-with-dependencies.jar in " + targetDir);
+}
