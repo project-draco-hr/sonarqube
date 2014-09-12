@@ -1,0 +1,9 @@
+{
+  Monitor monitor=mock(Monitor.class);
+  ProcessRef ref=mock(ProcessRef.class,Mockito.RETURNS_DEEP_STUBS);
+  when(ref.getProcess().waitFor()).thenThrow(new InterruptedException()).thenReturn(0);
+  WatcherThread watcher=new WatcherThread(ref,monitor);
+  watcher.start();
+  watcher.join();
+  verify(monitor).stop();
+}

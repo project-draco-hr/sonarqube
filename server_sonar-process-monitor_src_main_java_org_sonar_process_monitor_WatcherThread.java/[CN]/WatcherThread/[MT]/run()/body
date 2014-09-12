@@ -2,20 +2,13 @@
   boolean alive=true;
   while (alive) {
     try {
-      process.getProcess().waitFor();
-      process.setTerminated(true);
-      LoggerFactory.getLogger(getClass()).info(process + " is down");
-      monitor.stop();
+      processRef.getProcess().waitFor();
+      processRef.setTerminated(true);
       alive=false;
+      LoggerFactory.getLogger(getClass()).info(String.format("%s is down",processRef));
+      monitor.stop();
     }
  catch (    InterruptedException ignored) {
-      if (ProcessUtils.isAlive(process.getProcess())) {
-        LoggerFactory.getLogger(getClass()).error(String.format("Watcher of [%s] was interrupted but process is still alive. Killing it.",process.getKey()));
-      }
-      alive=false;
-    }
- finally {
-      process.hardKill();
     }
   }
 }
