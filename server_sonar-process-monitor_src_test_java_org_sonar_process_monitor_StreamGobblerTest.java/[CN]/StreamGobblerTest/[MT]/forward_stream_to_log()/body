@@ -1,0 +1,12 @@
+{
+  InputStream stream=IOUtils.toInputStream("one\nsecond log\nthird log\n");
+  Logger logger=mock(Logger.class);
+  StreamGobbler gobbler=new StreamGobbler(stream,"WEB",logger);
+  verifyZeroInteractions(logger);
+  gobbler.start();
+  StreamGobbler.waitUntilFinish(gobbler);
+  verify(logger).info("one");
+  verify(logger).info("second log");
+  verify(logger).info("third log");
+  verifyNoMoreInteractions(logger);
+}
