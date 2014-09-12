@@ -2,27 +2,8 @@
   new MinimumViableSystem().check();
   CommandLineParser cli=new CommandLineParser();
   Properties rawProperties=cli.parseArguments(args);
-  Props props;
-  try {
-    props=new PropsBuilder(rawProperties,new JdbcSettings()).build();
-    new ProcessLogging().configure(props,"/org/sonar/application/logback.xml");
-  }
- catch (  Exception e) {
-    throw new IllegalStateException(e);
-  }
+  Props props=new PropsBuilder(rawProperties,new JdbcSettings()).build();
+  new ProcessLogging().configure(props,"/org/sonar/application/logback.xml");
   App app=new App();
-  ProcessUtils.addSelfShutdownHook(app);
-  try {
-    if (props.contains(SearchServer.ES_CLUSTER_INET)) {
-      LoggerFactory.getLogger(App.class).info("SonarQube slave configured to join SonarQube master : {}",props.value(SearchServer.ES_CLUSTER_INET));
-    }
-    app.start(props);
-  }
- catch (  InterruptedException e) {
-    LoggerFactory.getLogger(App.class).info("interrupted");
-  }
- finally {
-    LoggerFactory.getLogger(App.class).info("stopped");
-    System.exit(app.isSuccess() ? 0 : 1);
-  }
+  app.start(props);
 }

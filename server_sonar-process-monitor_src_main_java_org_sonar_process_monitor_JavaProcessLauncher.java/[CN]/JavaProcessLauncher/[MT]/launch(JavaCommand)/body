@@ -1,0 +1,17 @@
+{
+  Process process=null;
+  try {
+    ProcessBuilder processBuilder=create(command);
+    LoggerFactory.getLogger(getClass()).info("Launch {}: {}",command.getKey(),StringUtils.join(processBuilder.command()," "));
+    process=processBuilder.start();
+    StreamGobbler errorGobbler=new StreamGobbler(process.getErrorStream(),command.getKey());
+    StreamGobbler inputGobbler=new StreamGobbler(process.getInputStream(),command.getKey());
+    inputGobbler.start();
+    errorGobbler.start();
+    return new ProcessRef(command.getKey(),process,errorGobbler,inputGobbler);
+  }
+ catch (  Exception e) {
+    ProcessUtils.destroyQuietly(process);
+    throw new IllegalStateException("Fail to launch " + command.getKey(),e);
+  }
+}

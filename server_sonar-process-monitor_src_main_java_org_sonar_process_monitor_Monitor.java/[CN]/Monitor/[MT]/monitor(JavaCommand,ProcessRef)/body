@@ -1,0 +1,13 @@
+{
+  WatcherThread watcherThread=new WatcherThread(processRef,this);
+  watcherThread.start();
+  watcherThreads.add(watcherThread);
+  jmxConnector.connect(command,processRef);
+  processes.add(processRef);
+  processRef.setPingEnabled(!command.isDebugMode());
+  if (processRef.isPingEnabled()) {
+    PingerThread.startPinging(processRef,jmxConnector,timeouts);
+  }
+  waitForReady(processRef);
+  LoggerFactory.getLogger(getClass()).info(String.format("%s is up",processRef));
+}

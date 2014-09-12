@@ -1,0 +1,20 @@
+{
+  File propertiesFile=null;
+  try {
+    propertiesFile=File.createTempFile("sq-conf","properties");
+    Properties props=new Properties();
+    props.putAll(javaCommand.getArguments());
+    props.setProperty(ProcessEntryPoint.PROPERTY_PROCESS_KEY,javaCommand.getKey());
+    props.setProperty(ProcessEntryPoint.PROPERTY_AUTOKILL_DISABLED,String.valueOf(javaCommand.isDebugMode()));
+    props.setProperty(ProcessEntryPoint.PROPERTY_AUTOKILL_PING_TIMEOUT,String.valueOf(timeouts.getAutokillPingTimeout()));
+    props.setProperty(ProcessEntryPoint.PROPERTY_AUTOKILL_PING_INTERVAL,String.valueOf(timeouts.getAutokillPingInterval()));
+    props.setProperty(ProcessEntryPoint.PROPERTY_TERMINATION_TIMEOUT,String.valueOf(timeouts.getTerminationTimeout()));
+    OutputStream out=new FileOutputStream(propertiesFile);
+    props.store(out,String.format("Temporary properties file for command [%s]",javaCommand.getKey()));
+    out.close();
+    return propertiesFile;
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Cannot write temporary settings to " + propertiesFile,e);
+  }
+}

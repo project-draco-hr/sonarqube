@@ -14,18 +14,11 @@
     tomcat.getHost().setDeployOnStartup(true);
     Logging.configure(tomcat,props);
     Connectors.configure(tomcat,props);
-    StandardContext webappContext=Webapp.configure(tomcat,props);
-    ProcessUtils.addSelfShutdownHook(this);
+    webappContext=Webapp.configure(tomcat,props);
     tomcat.start();
-    if (webappContext.getState().isAvailable()) {
-      ready=true;
-      tomcat.getServer().await();
-    }
+    waitForWebappReady();
   }
  catch (  Exception e) {
-    throw new IllegalStateException("Fail to start web server",e);
-  }
- finally {
-    terminate();
+    Throwables.propagate(e);
   }
 }
