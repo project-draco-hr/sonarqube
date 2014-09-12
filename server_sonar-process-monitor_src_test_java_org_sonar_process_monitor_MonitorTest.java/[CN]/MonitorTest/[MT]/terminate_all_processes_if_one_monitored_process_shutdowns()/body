@@ -1,0 +1,13 @@
+{
+  monitor=newDefaultMonitor();
+  HttpProcessClient p1=new HttpProcessClient("p1"), p2=new HttpProcessClient("p2");
+  monitor.start(Arrays.asList(p1.newCommand(),p2.newCommand()));
+  assertThat(p1.isReady()).isTrue();
+  assertThat(p2.isReady()).isTrue();
+  p1.kill();
+  monitor.awaitTermination();
+  assertThat(p1.isReady()).isFalse();
+  assertThat(p2.isReady()).isFalse();
+  assertThat(p1.wasGracefullyTerminated()).isFalse();
+  assertThat(p2.wasGracefullyTerminated()).isTrue();
+}

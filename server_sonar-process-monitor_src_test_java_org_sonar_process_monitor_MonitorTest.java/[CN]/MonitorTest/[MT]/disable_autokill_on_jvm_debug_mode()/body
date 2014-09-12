@@ -1,0 +1,13 @@
+{
+  Timeouts timeouts=new Timeouts();
+  timeouts.setMonitorPingInterval(10L);
+  timeouts.setAutokillPingInterval(10L);
+  timeouts.setAutokillPingTimeout(10L);
+  CallVerifierJmxConnector jmxConnector=new CallVerifierJmxConnector();
+  monitor=new Monitor(new JavaProcessLauncher(timeouts),jmxConnector,timeouts,exit);
+  JavaCommand command=newStandardProcessCommand().addJavaOption("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=" + NetworkUtils.freePort());
+  monitor.start(Arrays.asList(command));
+  Thread.sleep(20L);
+  assertThat(jmxConnector.askedPing).isFalse();
+  monitor.stop();
+}

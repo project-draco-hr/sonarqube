@@ -1,0 +1,16 @@
+{
+  ProcessRef ref=mock(ProcessRef.class,Mockito.RETURNS_DEEP_STUBS);
+  when(ref.getProcess().waitFor()).thenAnswer(new Answer<Object>(){
+    @Override public Object answer(    InvocationOnMock invocationOnMock) throws Throwable {
+      Thread.sleep(Long.MAX_VALUE);
+      return 0;
+    }
+  }
+);
+  Monitor monitor=mock(Monitor.class);
+  WatcherThread watcher=new WatcherThread(ref,monitor);
+  watcher.start();
+  Thread.sleep(50L);
+  watcher.interrupt();
+  verify(ref).hardKill();
+}

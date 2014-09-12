@@ -1,0 +1,26 @@
+{
+  writeTimeToFile("startingAt");
+  ContextHandler context=new ContextHandler();
+  context.setContextPath("/");
+  context.setClassLoader(Thread.currentThread().getContextClassLoader());
+  server.setHandler(context);
+  context.setHandler(new AbstractHandler(){
+    @Override public void handle(    String target,    Request request,    HttpServletRequest httpServletRequest,    HttpServletResponse httpServletResponse) throws IOException, ServletException {
+      if ("/ping".equals(target)) {
+        request.setHandled(true);
+        httpServletResponse.getWriter().print("ping");
+      }
+ else       if ("/kill".equals(target)) {
+        writeTimeToFile("killedAt");
+        System.exit(0);
+      }
+    }
+  }
+);
+  try {
+    server.start();
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Fail to start Jetty",e);
+  }
+}

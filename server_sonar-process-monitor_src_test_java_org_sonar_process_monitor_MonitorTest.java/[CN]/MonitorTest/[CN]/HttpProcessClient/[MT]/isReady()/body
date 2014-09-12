@@ -1,0 +1,12 @@
+{
+  try {
+    HttpRequest httpRequest=HttpRequest.get("http://localhost:" + httpPort + "/ping").readTimeout(500).connectTimeout(500);
+    return httpRequest.ok() && httpRequest.body().equals("ping");
+  }
+ catch (  HttpRequest.HttpRequestException e) {
+    if (e.getCause() instanceof ConnectException) {
+      return false;
+    }
+    throw new IllegalStateException("Fail to know the process status",e);
+  }
+}

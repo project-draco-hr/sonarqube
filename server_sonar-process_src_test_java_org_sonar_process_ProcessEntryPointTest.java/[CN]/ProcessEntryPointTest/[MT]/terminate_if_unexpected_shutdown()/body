@@ -1,0 +1,22 @@
+{
+  Props props=new Props(new Properties());
+  props.set(ProcessEntryPoint.PROPERTY_PROCESS_KEY,"foo");
+  props.set(ProcessEntryPoint.PROPERTY_AUTOKILL_DISABLED,"true");
+  props.set(ProcessEntryPoint.PROPERTY_TERMINATION_TIMEOUT,"30000");
+  final ProcessEntryPoint entryPoint=new ProcessEntryPoint(props,exit);
+  final StandardProcess process=new StandardProcess();
+  Thread runner=new Thread(){
+    @Override public void run(){
+      entryPoint.launch(process);
+    }
+  }
+;
+  runner.start();
+  while (process.getState() != State.STARTED) {
+    Thread.sleep(10L);
+  }
+  entryPoint.getShutdownHook().start();
+  while (process.getState() != State.STOPPED) {
+    Thread.sleep(10L);
+  }
+}

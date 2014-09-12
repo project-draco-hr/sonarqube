@@ -1,0 +1,17 @@
+{
+  List<JavaCommand> commands=new ArrayList<JavaCommand>();
+  File homeDir=props.nonNullValueAsFile("sonar.path.home");
+  File tempDir=props.nonNullValueAsFile("sonar.path.temp");
+  JavaCommand elasticsearch=new JavaCommand(JmxUtils.SEARCH_SERVER_NAME);
+  elasticsearch.setWorkDir(homeDir).setJmxPort(props.valueAsInt(DefaultSettings.SEARCH_JMX_PORT)).addJavaOptions(props.value(DefaultSettings.SEARCH_JAVA_OPTS)).setTempDir(tempDir.getAbsoluteFile()).setClassName("org.sonar.search.SearchServer").setArguments(props.rawProperties()).addClasspath("./lib/common/*").addClasspath("./lib/search/*");
+  commands.add(elasticsearch);
+  if (StringUtils.isEmpty(props.value(DefaultSettings.CLUSTER_MASTER))) {
+    JavaCommand webServer=new JavaCommand(JmxUtils.WEB_SERVER_NAME).setWorkDir(homeDir).setJmxPort(props.valueAsInt(DefaultSettings.WEB_JMX_PORT)).addJavaOptions(props.nonNullValue(DefaultSettings.WEB_JAVA_OPTS)).setTempDir(tempDir.getAbsoluteFile()).setEnvVariable("sonar.path.logs",props.nonNullValue("sonar.path.logs")).setClassName("org.sonar.server.app.WebServer").setArguments(props.rawProperties()).addClasspath("./lib/common/*").addClasspath("./lib/server/*");
+    String driverPath=props.value(JdbcSettings.PROPERTY_DRIVER_PATH);
+    if (driverPath != null) {
+      webServer.addClasspath(driverPath);
+    }
+    commands.add(webServer);
+  }
+  return commands;
+}
