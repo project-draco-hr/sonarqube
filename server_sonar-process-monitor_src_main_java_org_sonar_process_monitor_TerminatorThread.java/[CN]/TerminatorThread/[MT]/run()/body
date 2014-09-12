@@ -3,22 +3,13 @@
     final ProcessRef processRef=processes.get(index);
     if (!processRef.isTerminated()) {
       processRef.setPingEnabled(false);
-      ExecutorService executor=Executors.newSingleThreadExecutor();
-      Future future=executor.submit(new Runnable(){
-        @Override public void run(){
-          LoggerFactory.getLogger(getClass()).info("Request termination of " + processRef);
-          jmxConnector.terminate(processRef);
-        }
-      }
-);
       try {
-        future.get(timeouts.getTerminationTimeout(),TimeUnit.MILLISECONDS);
+        jmxConnector.terminate(processRef,timeouts.getTerminationTimeout());
       }
  catch (      Exception ignored) {
         LoggerFactory.getLogger(getClass()).info(String.format("Kill %s",processRef));
       }
  finally {
-        executor.shutdownNow();
         processRef.hardKill();
       }
     }
