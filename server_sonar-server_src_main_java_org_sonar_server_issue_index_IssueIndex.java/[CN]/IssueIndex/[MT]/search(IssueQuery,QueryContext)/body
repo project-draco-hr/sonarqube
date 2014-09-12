@@ -15,13 +15,16 @@
     groupsAndUser.add(FilterBuilders.termFilter(IssueAuthorizationNormalizer.IssueAuthorizationField.GROUPS.field(),group));
   }
   esFilter.must(FilterBuilders.hasParentFilter(IndexDefinition.ISSUES_AUTHORIZATION.getIndexType(),QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),FilterBuilders.boolFilter().must(FilterBuilders.termFilter(IssueAuthorizationNormalizer.IssueAuthorizationField.PERMISSION.field(),UserRole.USER),groupsAndUser).cache(true))));
-  if (query.assigned() != null && query.assigned()) {
+  boolean assigned=(query.assigned() != null) ? query.assigned() : false;
+  if (assigned) {
     esFilter.must(FilterBuilders.existsFilter(IssueNormalizer.IssueField.ASSIGNEE.field()));
   }
-  if (query.planned() != null && query.planned()) {
+  boolean planned=(query.planned() != null) ? query.planned() : false;
+  if (planned) {
     esFilter.must(FilterBuilders.existsFilter(IssueNormalizer.IssueField.ACTION_PLAN.field()));
   }
-  if (query.resolved() != null && query.resolved()) {
+  boolean resolved=(query.resolved() != null) ? query.resolved() : false;
+  if (resolved) {
     esFilter.must(FilterBuilders.existsFilter(IssueNormalizer.IssueField.RESOLUTION.field()));
   }
   matchFilter(esFilter,IssueNormalizer.IssueField.ACTION_PLAN,query.actionPlans());
