@@ -1,0 +1,10 @@
+{
+  long t0=System.currentTimeMillis() - 1000;
+  String key=UUID.randomUUID().toString();
+  FakeDto myDto=new FakeDto().setKey(key);
+  dao.insert(session,myDto);
+  session.commit();
+  assertThat(queue.getCount()).isEqualTo(1);
+  dao.synchronizeAfter(session,new Date(t0));
+  assertThat(queue.getCount()).isEqualTo(2);
+}
