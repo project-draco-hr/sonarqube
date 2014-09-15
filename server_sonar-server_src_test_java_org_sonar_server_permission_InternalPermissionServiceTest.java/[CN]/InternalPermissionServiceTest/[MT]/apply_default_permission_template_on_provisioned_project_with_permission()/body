@@ -3,10 +3,8 @@
   final String componentKey="component";
   final long componentId=1234l;
   final String qualifier=Qualifiers.PROJECT;
-  ComponentDto mockComponent=mock(ComponentDto.class);
-  when(mockComponent.getId()).thenReturn(componentId);
-  when(mockComponent.qualifier()).thenReturn(qualifier);
-  when(componentDao.getAuthorizedComponentByKey(componentKey,session)).thenReturn(mockComponent);
+  ComponentDto project=new ComponentDto().setId(componentId).setKey(componentKey).setQualifier(qualifier);
+  when(componentDao.getAuthorizedComponentByKey(componentKey,session)).thenReturn(project);
   when(resourceDao.selectProvisionedProject(session,componentKey)).thenReturn(mock(ResourceDto.class));
   service.applyDefaultPermissionTemplate(componentKey);
   verify(issueAuthorizationDao).synchronizeAfter(eq(session),any(Date.class),eq(ImmutableMap.of("project","component")));

@@ -1,6 +1,16 @@
 {
   DbSession session=dbClient.openSession(false);
   try {
+    String projectKey=request.mandatoryParam(PARAM_PROJECT);
+    AuthorizedComponentDto project=dbClient.componentDao().getAuthorizedComponentByKey(projectKey,session);
+    boolean isFirstAnalysis=request.mandatoryParamAsBoolean(PARAM_FIRST_ANALYSIS);
+    if (isFirstAnalysis) {
+      permissionService.applyDefaultPermissionTemplate(session,project);
+      session.commit();
+    }
+    UserSession.get().checkGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
+    dbClient.issueDao().synchronizeAfter(session,index.get(IssueIndex.class).getLastSynchronization(),ImmutableMap.of("project",projectKey));
+    session.commit();
   }
   finally {
     MyBatis.closeQuietly(session);
