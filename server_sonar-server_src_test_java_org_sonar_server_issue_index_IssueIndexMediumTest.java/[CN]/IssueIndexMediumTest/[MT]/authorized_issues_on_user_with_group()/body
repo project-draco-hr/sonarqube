@@ -2,9 +2,6 @@
   ComponentDto project1=new ComponentDto().setId(10L).setKey("project1");
   ComponentDto project2=new ComponentDto().setId(11L).setKey("project2");
   tester.get(ComponentDao.class).insert(session,project1,project2);
-  IssueDto issue1=createIssue().setRootComponent(project1);
-  IssueDto issue2=createIssue().setRootComponent(project2);
-  db.issueDao().insert(session,issue1,issue2);
   UserDto john=new UserDto().setLogin("john").setName("john").setActive(true);
   db.userDao().insert(session,john);
   tester.get(PermissionFacade.class).insertUserPermission(project1.getId(),john.getId(),UserRole.USER,session);
@@ -12,6 +9,9 @@
   db.groupDao().insert(session,groupDto);
   tester.get(PermissionFacade.class).insertGroupPermission(project1.getId(),"sonar-users",UserRole.USER,session);
   db.issueAuthorizationDao().synchronizeAfter(session,new Date(0));
+  IssueDto issue1=createIssue().setRootComponent(project1);
+  IssueDto issue2=createIssue().setRootComponent(project2);
+  db.issueDao().insert(session,issue1,issue2);
   session.commit();
   session.clearCache();
   IssueQuery.Builder query=IssueQuery.builder();
