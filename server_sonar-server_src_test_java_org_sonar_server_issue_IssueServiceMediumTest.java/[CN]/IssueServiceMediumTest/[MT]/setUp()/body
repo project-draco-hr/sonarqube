@@ -1,15 +1,22 @@
 {
   tester.clearDbAndIndexes();
   db=tester.get(DbClient.class);
+  indexClient=tester.get(IndexClient.class);
   session=db.openSession(false);
   service=tester.get(IssueService.class);
   rule=RuleTesting.newXooX1();
   tester.get(RuleDao.class).insert(session,rule);
-  project=new ComponentDto().setEnabled(true).setId(1L).setKey("MyProject").setProjectId(1L);
+  project=new ComponentDto().setId(1L).setProjectId(1L).setKey("MyProject").setLongName("My Project").setQualifier(Qualifiers.PROJECT).setScope(Scopes.PROJECT);
   tester.get(ComponentDao.class).insert(session,project);
-  resource=new ComponentDto().setEnabled(true).setProjectId(1L).setKey("MyComponent").setId(2L);
+  tester.get(SnapshotDao.class).insert(session,SnapshotTesting.createForComponent(project));
+  resource=new ComponentDto().setId(2L).setProjectId(1L).setKey("MyComponent").setLongName("My Component");
   tester.get(ComponentDao.class).insert(session,resource);
+  tester.get(SnapshotDao.class).insert(session,SnapshotTesting.createForComponent(resource));
   tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),DefaultGroups.ANYONE,UserRole.USER,session);
   db.issueAuthorizationDao().synchronizeAfter(session,new Date(0));
+  UserDto user=new UserDto().setLogin("gandalf").setName("Gandalf");
+  db.userDao().insert(session,user);
+  tester.get(PermissionFacade.class).insertUserPermission(project.getId(),user.getId(),UserRole.USER,session);
+  userSession=MockUserSession.create().setLogin(user.getLogin()).setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN).addProjectPermissions(UserRole.USER,project.key());
   session.commit();
 }
