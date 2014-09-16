@@ -3,6 +3,8 @@
   tester.get(RuleDao.class).insert(dbSession,rule);
   ComponentDto project=new ComponentDto().setId(1L).setKey("MyProject").setProjectId(1L);
   tester.get(ComponentDao.class).insert(dbSession,project);
+  tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),DefaultGroups.ANYONE,UserRole.USER,dbSession);
+  dbClient.issueAuthorizationDao().synchronizeAfter(dbSession,new Date(0));
   ComponentDto resource=new ComponentDto().setProjectId(1L).setKey("MyComponent").setId(2L);
   tester.get(ComponentDao.class).insert(dbSession,resource);
   IssueDto issue=new IssueDto().setIssueCreationDate(new Date()).setIssueUpdateDate(new Date()).setRule(rule).setRootComponent(project).setComponent(resource).setStatus("OPEN").setResolution("OPEN").setKee(UUID.randomUUID().toString()).setSeverity("MAJOR");
@@ -10,7 +12,6 @@
   dbSession.commit();
   assertThat(indexClient.get(IssueIndex.class).countAll()).isEqualTo(1);
   Issue issueDoc=indexClient.get(IssueIndex.class).getByKey(issue.getKey());
-  assertThat(issueDoc).isNotNull();
   assertThat(issueDoc.actionPlanKey()).isEqualTo(issue.getActionPlanKey());
   assertThat(issueDoc.assignee()).isEqualTo(issue.getAssignee());
   assertThat(issueDoc.authorLogin()).isEqualTo(issue.getAuthorLogin());

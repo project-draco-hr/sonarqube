@@ -1,6 +1,8 @@
 {
   ComponentDto project=new ComponentDto().setId(1L).setKey("MyProject").setProjectId(1L);
   db.componentDao().insert(session,project);
+  tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),DefaultGroups.ANYONE,UserRole.USER,session);
+  db.issueAuthorizationDao().synchronizeAfter(session,new Date(0));
   ComponentDto resource=new ComponentDto().setProjectId(1L).setKey("MyComponent").setId(2L);
   db.componentDao().insert(session,resource);
   db.snapshotDao().insert(session,SnapshotTesting.createForComponent(resource));
@@ -11,10 +13,10 @@
   session.commit();
   clearIssueIndex();
   assertThat(db.issueDao().getByKey(session,issue.getKey())).isNotNull();
-  assertThat(tester.get(IssueIndex.class).getByKey(issue.getKey())).isNull();
+  assertThat(tester.get(IssueIndex.class).getNullableByKey(issue.getKey())).isNull();
   MockUserSession.set().setLogin("john").setGlobalPermissions(GlobalPermissions.SCAN_EXECUTION);
   WsTester.TestRequest request=wsTester.newGetRequest(BatchWs.API_ENDPOINT,UploadReportAction.UPLOAD_REPORT_ACTION);
   request.setParam(UploadReportAction.PARAM_PROJECT,project.key());
   request.execute();
-  assertThat(tester.get(IssueIndex.class).getByKey(issue.getKey())).isNotNull();
+  assertThat(tester.get(IssueIndex.class).getNullableByKey(issue.getKey())).isNotNull();
 }

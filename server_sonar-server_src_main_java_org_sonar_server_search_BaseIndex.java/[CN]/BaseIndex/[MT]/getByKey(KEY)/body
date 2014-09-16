@@ -1,8 +1,7 @@
 {
-  GetRequestBuilder request=client.prepareGet().setType(this.getIndexType()).setIndex(this.getIndexName()).setId(this.getKeyValue(key)).setFetchSource(true).setRouting(this.getKeyValue(key));
-  GetResponse response=client.execute(request);
-  if (response.isExists()) {
-    return toDoc(response.getSource());
+  DOMAIN value=getNullableByKey(key);
+  if (value == null) {
+    throw new NotFoundException(String.format("Key '%s' not found",key));
   }
-  return null;
+  return value;
 }

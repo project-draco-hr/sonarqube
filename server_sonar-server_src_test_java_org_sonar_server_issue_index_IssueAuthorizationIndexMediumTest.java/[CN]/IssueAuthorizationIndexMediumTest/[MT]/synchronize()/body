@@ -8,7 +8,7 @@
   tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),"devs",UserRole.USER,session);
   tester.get(PermissionFacade.class).insertUserPermission(project.getId(),john.getId(),UserRole.USER,session);
   session.commit();
-  assertThat(index.getByKey(project.getKey())).isNull();
+  assertThat(index.getNullableByKey(project.getKey())).isNull();
   db.issueAuthorizationDao().synchronizeAfter(session,new Date(0));
   session.commit();
   IssueAuthorizationDoc issueAuthorizationDoc=index.getByKey(project.getKey());
@@ -20,5 +20,5 @@
   assertThat(issueAuthorizationDoc.updatedAt()).isNotNull();
   tester.clearIndexes();
   tester.get(Platform.class).executeStartupTasks();
-  assertThat(index.getByKey(project.getKey())).isNotNull();
+  assertThat(index.getNullableByKey(project.getKey())).isNotNull();
 }

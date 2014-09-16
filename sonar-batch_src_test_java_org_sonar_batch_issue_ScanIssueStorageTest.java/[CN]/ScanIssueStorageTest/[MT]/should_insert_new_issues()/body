@@ -1,0 +1,12 @@
+{
+  setupData("should_insert_new_issues");
+  Project project=new Project("struts");
+  project.setId(10);
+  when(projectTree.getRootProject()).thenReturn(project);
+  DefaultIssueComment comment=DefaultIssueComment.create("ABCDE","emmerik","the comment");
+  comment.setKey("FGHIJ");
+  Date date=DateUtils.parseDate("2013-05-18");
+  DefaultIssue issue=new DefaultIssue().setKey("ABCDE").setNew(true).setRuleKey(RuleKey.of("squid","AvoidCycle")).setLine(5000).setDebt(Duration.create(10L)).setReporter("emmerik").setResolution("OPEN").setStatus("OPEN").setSeverity("BLOCKER").setAttribute("foo","bar").addComment(comment).setCreationDate(date).setUpdateDate(date).setCloseDate(date).setComponentKey("struts:Action");
+  storage.save(issue);
+  checkTables("should_insert_new_issues",new String[]{"id","created_at","updated_at","issue_change_creation_date"},"issues","issue_changes");
+}

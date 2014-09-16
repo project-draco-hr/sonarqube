@@ -8,18 +8,18 @@
   db.activeRuleDao().insert(dbSession,activeRule);
   dbSession.commit();
   tester.clearIndexes();
-  assertThat(index.get(ActiveRuleIndex.class).getByKey(activeRule.getKey())).isNull();
+  assertThat(index.get(ActiveRuleIndex.class).getNullableByKey(activeRule.getKey())).isNull();
   db.activeRuleDao().synchronizeAfter(dbSession,new Date(0L));
   dbSession.commit();
-  assertThat(index.get(ActiveRuleIndex.class).getByKey(activeRule.getKey())).isNotNull();
+  assertThat(index.get(ActiveRuleIndex.class).getNullableByKey(activeRule.getKey())).isNotNull();
   tester.clearIndexes();
-  assertThat(index.get(ActiveRuleIndex.class).getByKey(activeRule.getKey())).isNull();
+  assertThat(index.get(ActiveRuleIndex.class).getNullableByKey(activeRule.getKey())).isNull();
   db.activeRuleDao().synchronizeAfter(dbSession,beginning);
   dbSession.commit();
-  assertThat(index.get(ActiveRuleIndex.class).getByKey(activeRule.getKey())).isNotNull();
+  assertThat(index.get(ActiveRuleIndex.class).getNullableByKey(activeRule.getKey())).isNotNull();
   tester.clearIndexes();
   Date before=index.get(ActiveRuleIndex.class).getLastSynchronization();
   tester.get(Platform.class).executeStartupTasks();
-  assertThat(index.get(ActiveRuleIndex.class).getByKey(activeRule.getKey())).isNotNull();
+  assertThat(index.get(ActiveRuleIndex.class).getNullableByKey(activeRule.getKey())).isNotNull();
   assertThat(before.before(index.get(ActiveRuleIndex.class).getLastSynchronization())).isTrue();
 }
