@@ -5,6 +5,6 @@
   assertThat(db.issueDao().getByKey(session,issue.getKey())).isNotNull();
   IssueTesting.assertIsEquivalent(issue,indexClient.get(IssueIndex.class).getByKey(issue.getKey()));
   service.doTransition(issue.getKey(),DefaultTransitions.CONFIRM,userSession);
-  issue=tester.get(IssueDao.class).getByKey(session,issue.getKey());
-  IssueTesting.assertIsEquivalent(issue,indexClient.get(IssueIndex.class).getByKey(issue.getKey()));
+  Issue issueDoc=indexClient.get(IssueIndex.class).getByKey(issue.getKey());
+  assertThat(issueDoc.status()).isEqualTo(Issue.STATUS_CONFIRMED);
 }
