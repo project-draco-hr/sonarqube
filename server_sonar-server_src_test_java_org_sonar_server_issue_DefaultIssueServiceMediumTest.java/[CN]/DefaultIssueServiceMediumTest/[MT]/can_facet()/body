@@ -1,0 +1,12 @@
+{
+  IssueDto issue1=newIssue().setActionPlanKey("P1");
+  IssueDto issue2=newIssue().setActionPlanKey("P2").setResolution("NONE");
+  tester.get(IssueDao.class).insert(session,issue1,issue2);
+  session.commit();
+  org.sonar.server.search.Result<Issue> result=((DefaultIssueService)service).search(IssueQuery.builder().build(),new QueryContext());
+  assertThat(result.getHits()).hasSize(2);
+  assertThat(result.getFacets()).isEmpty();
+  result=((DefaultIssueService)service).search(IssueQuery.builder().build(),new QueryContext().setFacet(true));
+  assertThat(result.getFacets().keySet()).hasSize(4);
+  assertThat(result.getFacetKeys("actionPlan")).hasSize(2);
+}

@@ -1,0 +1,23 @@
+{
+  verifyLoggedIn();
+  DbSession session=dbClient.openSession(false);
+  try {
+    ActionPlan actionPlan=null;
+    if (!Strings.isNullOrEmpty(actionPlanKey)) {
+      actionPlan=actionPlanService.findByKey(actionPlanKey,UserSession.get());
+      if (actionPlan == null) {
+        throw new NotFoundException("Unknown action plan: " + actionPlanKey);
+      }
+    }
+    IssueDto issueDto=getByKey(session,issueKey);
+    DefaultIssue issue=issueDto.toDefaultIssue();
+    IssueChangeContext context=IssueChangeContext.createUser(new Date(),UserSession.get().login());
+    if (issueUpdater.plan(issue,actionPlan,context)) {
+      saveIssue(session,issue,context);
+    }
+    return issue;
+  }
+  finally {
+    session.close();
+  }
+}

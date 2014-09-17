@@ -1,0 +1,13 @@
+{
+  verifyLoggedIn();
+  IssueQueryResult queryResult=loadIssue(issueKey);
+  DefaultIssue issue=(DefaultIssue)queryResult.first();
+  UserSession.get().checkProjectPermission(UserRole.ISSUE_ADMIN,issue.projectKey());
+  IssueChangeContext context=IssueChangeContext.createUser(new Date(),UserSession.get().login());
+  if (issueUpdater.setManualSeverity(issue,severity,context)) {
+    issueStorage.save(issue);
+    issueNotifications.sendChanges(issue,context,queryResult);
+    dryRunCache.reportResourceModification(issue.componentKey());
+  }
+  return issue;
+}

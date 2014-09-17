@@ -1,0 +1,17 @@
+{
+  verifyLoggedIn();
+  DbSession session=dbClient.openSession(false);
+  try {
+    IssueDto issueDto=getByKey(session,issueKey);
+    DefaultIssue issue=issueDto.toDefaultIssue();
+    UserSession.get().checkProjectPermission(UserRole.ISSUE_ADMIN,issue.projectKey());
+    IssueChangeContext context=IssueChangeContext.createUser(new Date(),UserSession.get().login());
+    if (issueUpdater.setManualSeverity(issue,severity,context)) {
+      saveIssue(session,issue,context);
+    }
+    return issue;
+  }
+  finally {
+    session.close();
+  }
+}

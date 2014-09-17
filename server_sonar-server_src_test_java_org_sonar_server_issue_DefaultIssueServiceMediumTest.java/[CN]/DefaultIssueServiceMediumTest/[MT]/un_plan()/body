@@ -1,0 +1,10 @@
+{
+  String actionPlanKey="EFGH";
+  db.actionPlanDao().save(new ActionPlanDto().setKey(actionPlanKey).setProjectId(project.getId()));
+  IssueDto issue=newIssue().setActionPlanKey(actionPlanKey);
+  tester.get(IssueDao.class).insert(session,issue);
+  session.commit();
+  assertThat(indexClient.get(IssueIndex.class).getByKey(issue.getKey()).actionPlanKey()).isEqualTo(actionPlanKey);
+  service.plan(issue.getKey(),null);
+  assertThat(indexClient.get(IssueIndex.class).getByKey(issue.getKey()).actionPlanKey()).isNull();
+}

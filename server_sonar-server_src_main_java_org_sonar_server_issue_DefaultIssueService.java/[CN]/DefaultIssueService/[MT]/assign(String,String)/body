@@ -1,0 +1,23 @@
+{
+  verifyLoggedIn();
+  DbSession session=dbClient.openSession(false);
+  try {
+    IssueDto issueDto=getByKey(session,issueKey);
+    DefaultIssue issue=issueDto.toDefaultIssue();
+    User user=null;
+    if (!Strings.isNullOrEmpty(assignee)) {
+      user=userFinder.findByLogin(assignee);
+      if (user == null) {
+        throw new NotFoundException("Unknown user: " + assignee);
+      }
+    }
+    IssueChangeContext context=IssueChangeContext.createUser(new Date(),UserSession.get().login());
+    if (issueUpdater.assign(issue,user,context)) {
+      saveIssue(session,issue,context);
+    }
+    return issue;
+  }
+  finally {
+    session.close();
+  }
+}

@@ -1,0 +1,23 @@
+{
+  verifyLoggedIn();
+  DbSession session=dbClient.openSession(false);
+  try {
+    ComponentDto component=dbClient.componentDao().getByKey(session,componentKey);
+    ComponentDto project=dbClient.componentDao().getRootProjectByKey(componentKey,session);
+    UserSession.get().checkProjectPermission(UserRole.USER,project.getKey());
+    if (!ruleKey.isManual()) {
+      throw new IllegalArgumentException("Issues can be created only on rules marked as 'manual': " + ruleKey);
+    }
+    Rule rule=getRuleByKey(ruleKey);
+    DefaultIssue issue=new DefaultIssueBuilder().componentKey(component.getKey()).projectKey(project.getKey()).line(line).message(!Strings.isNullOrEmpty(message) ? message : rule.getName()).severity(Objects.firstNonNull(severity,Severity.MAJOR)).effortToFix(effortToFix).ruleKey(ruleKey).reporter(UserSession.get().login()).build();
+    Date now=new Date();
+    issue.setCreationDate(now);
+    issue.setUpdateDate(now);
+    issueStorage.save(issue);
+    dryRunCache.reportResourceModification(component.getKey());
+    return issue;
+  }
+  finally {
+    session.close();
+  }
+}
