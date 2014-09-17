@@ -1,0 +1,21 @@
+{
+  File fromResource=getFile(from);
+  File toResource=getFile(to);
+  if (sonarIndex.getEdge(fromResource,toResource) != null) {
+    throw new IllegalStateException("Dependency between " + from + " and "+ to+ " was already saved.");
+  }
+  Directory fromParent=fromResource.getParent();
+  Directory toParent=toResource.getParent();
+  Dependency parentDep=null;
+  if (!fromParent.equals(toParent)) {
+    parentDep=sonarIndex.getEdge(fromParent,toParent);
+    if (parentDep != null) {
+      parentDep.setWeight(parentDep.getWeight() + 1);
+    }
+ else {
+      parentDep=new Dependency(fromParent,toParent).setUsage("USES").setWeight(1);
+      parentDep=sensorContext.saveDependency(parentDep);
+    }
+  }
+  sensorContext.saveDependency(new Dependency(fromResource,toResource).setUsage("USES").setWeight(weight).setParent(parentDep));
+}

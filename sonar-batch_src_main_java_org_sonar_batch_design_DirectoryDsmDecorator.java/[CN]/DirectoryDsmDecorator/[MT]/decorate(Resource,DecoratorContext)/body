@@ -1,0 +1,20 @@
+{
+  if (shouldDecorateResource(resource,context)) {
+    List<DecoratorContext> fileContexts=context.getChildren();
+    List<Resource> files=new ArrayList<Resource>(fileContexts.size());
+    for (    DecoratorContext decoratorContext : fileContexts) {
+      files.add(decoratorContext.getResource());
+    }
+    IncrementalCyclesAndFESSolver<Resource> cycleDetector=new IncrementalCyclesAndFESSolver<Resource>(index,files);
+    Set<Cycle> cycles=cycleDetector.getCycles();
+    MinimumFeedbackEdgeSetSolver solver=new MinimumFeedbackEdgeSetSolver(cycles);
+    Set<Edge> feedbackEdges=solver.getEdges();
+    int tangles=solver.getWeightOfFeedbackEdgeSet();
+    savePositiveMeasure(context,CoreMetrics.FILE_CYCLES,cycles.size());
+    savePositiveMeasure(context,CoreMetrics.FILE_FEEDBACK_EDGES,feedbackEdges.size());
+    savePositiveMeasure(context,CoreMetrics.FILE_TANGLES,tangles);
+    savePositiveMeasure(context,CoreMetrics.FILE_EDGES_WEIGHT,getEdgesWeight(files));
+    Dsm<Resource> dsm=getDsm(files,feedbackEdges);
+    saveDsm(context,dsm);
+  }
+}
