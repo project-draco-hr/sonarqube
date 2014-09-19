@@ -2,13 +2,9 @@
   Function function=new TweetFunction();
   UserSession userSession=mock(UserSession.class);
   when(userSession.login()).thenReturn("arthur");
-  DefaultIssue issue=new DefaultIssue().setKey("ABCD");
-  IssueQueryResult issueQueryResult=mock(DefaultIssueQueryResult.class);
-  when(issueQueryResult.first()).thenReturn(issue);
-  Component project=mock(Component.class);
-  when(project.key()).thenReturn("struts");
-  when(issueQueryResult.project(issue)).thenReturn(project);
-  when(finder.find(any(IssueQuery.class))).thenReturn(issueQueryResult);
+  DefaultIssue issue=new DefaultIssue().setKey("ABCD").setProjectKey("struts");
+  when(componentDao.getByKey(session,"struts")).thenReturn(new ComponentDto().setKey("struts"));
+  when(issueService.getIssueByKey(session,"ABCD")).thenReturn(issue);
   actions.add("link-to-jira").setConditions(new AlwaysMatch()).setFunctions(function);
   assertThat(actionService.execute("ABCD","link-to-jira",userSession)).isNotNull();
   verify(propertiesDao).selectProjectProperties(eq("struts"));

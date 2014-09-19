@@ -1,9 +1,11 @@
 {
   String issueKey="ABCD";
-  Issue issue=new DefaultIssue().setKey(issueKey).setComponentKey("org.sonar.server.issue.IssueClient").setProjectKey("org.sonar.Sonar").setRuleKey(RuleKey.of("squid","AvoidCycle")).setLine(12).setMessage("Fix it").setResolution("FIXED").setStatus("CLOSED").setSeverity("MAJOR").setCreationDate(issueCreationDate);
-  issues.add(issue);
-  result.addComponents(Lists.<Component>newArrayList(new ComponentDto().setId(10L).setKey("org.sonar.server.issue.IssueClient").setLongName("SonarQube :: Issue Client").setName("SonarQube :: Issue Client").setQualifier("FIL").setSubProjectId(1L).setProjectId(1L)));
-  result.addComponents(Lists.<Component>newArrayList(new ComponentDto().setId(1L).setKey("org.sonar.Sonar").setLongName("SonarQube").setName("SonarQube").setProjectId(1L)));
+  DefaultIssue issue=new DefaultIssue().setKey(issueKey).setComponentKey("org.sonar.server.issue.IssueClient").setProjectKey("org.sonar.Sonar").setRuleKey(RuleKey.of("squid","AvoidCycle")).setLine(12).setMessage("Fix it").setResolution("FIXED").setStatus("CLOSED").setSeverity("MAJOR").setCreationDate(issueCreationDate);
+  when(issueService.getIssueByKey(session,issueKey)).thenReturn(issue);
+  ComponentDto file=new ComponentDto().setId(10L).setKey("org.sonar.server.issue.IssueClient").setLongName("SonarQube :: Issue Client").setName("SonarQube :: Issue Client").setQualifier("FIL").setSubProjectId(1L).setProjectId(1L);
+  when(componentDao.getNullableByKey(session,file.key())).thenReturn(file);
+  ComponentDto project=new ComponentDto().setId(1L).setKey("org.sonar.Sonar").setLongName("SonarQube").setName("SonarQube").setProjectId(1L);
+  when(componentDao.getNullableById(file.projectId(),session)).thenReturn(project);
   MockUserSession.set();
   WsTester.TestRequest request=tester.newGetRequest("api/issues","show").setParam("key",issueKey);
   request.execute().assertJson(getClass(),"show_issue.json");

@@ -3,10 +3,8 @@
   UserSession userSession=mock(UserSession.class);
   when(userSession.login()).thenReturn("arthur");
   DefaultIssue issue=new DefaultIssue().setKey("ABCD");
-  IssueQueryResult issueQueryResult=mock(DefaultIssueQueryResult.class);
-  when(issueQueryResult.first()).thenReturn(issue);
-  when(issueQueryResult.project(issue)).thenReturn(mock(Component.class));
-  when(finder.find(any(IssueQuery.class))).thenReturn(issueQueryResult);
+  when(componentDao.getByKey(eq(session),anyString())).thenReturn(mock(ComponentDto.class));
+  when(issueService.getIssueByKey(session,"ABCD")).thenReturn(issue);
   actions.add("link-to-jira").setConditions(new AlwaysMatch()).setFunctions(function);
   assertThat(actionService.execute("ABCD","link-to-jira",userSession)).isNotNull();
   verify(updater).addComment(eq(issue),eq("New tweet on issue ABCD"),any(IssueChangeContext.class));

@@ -1,9 +1,10 @@
 {
   Date date1=DateUtils.parseDateTime("2014-02-22T19:10:03+0100");
   Date date2=DateUtils.parseDateTime("2014-02-23T19:10:03+0100");
-  Issue issue=createStandardIssue().addComment(new DefaultIssueComment().setKey("COMMENT-ABCD").setMarkdownText("*My comment*").setUserLogin("john").setCreatedAt(date1)).addComment(new DefaultIssueComment().setKey("COMMENT-ABCE").setMarkdownText("Another comment").setUserLogin("arthur").setCreatedAt(date2));
-  issues.add(issue);
-  result.addUsers(Lists.<User>newArrayList(new DefaultUser().setLogin("john").setName("John"),new DefaultUser().setLogin("arthur").setName("Arthur")));
+  DefaultIssue issue=createStandardIssue().addComment(new DefaultIssueComment().setKey("COMMENT-ABCD").setMarkdownText("*My comment*").setUserLogin("john").setCreatedAt(date1)).addComment(new DefaultIssueComment().setKey("COMMENT-ABCE").setMarkdownText("Another comment").setUserLogin("arthur").setCreatedAt(date2));
+  when(issueService.getIssueByKey(session,issue.key())).thenReturn(issue);
+  when(userFinder.findByLogin("john")).thenReturn(new DefaultUser().setLogin("john").setName("John"));
+  when(userFinder.findByLogin("arthur")).thenReturn(new DefaultUser().setLogin("arthur").setName("Arthur"));
   when(i18n.ageFromNow(any(Locale.class),eq(date1))).thenReturn("9 days");
   when(i18n.ageFromNow(any(Locale.class),eq(date2))).thenReturn("10 days");
   MockUserSession.set().setLogin("arthur");

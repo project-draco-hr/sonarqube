@@ -1,20 +1,25 @@
 {
   Preconditions.checkArgument(!Strings.isNullOrEmpty(actionKey),"Missing action");
-  IssueQueryResult queryResult=loadIssue(issueKey);
-  DefaultIssue issue=(DefaultIssue)queryResult.first();
-  Action action=getAction(actionKey);
-  if (action == null) {
-    throw new IllegalArgumentException("Action is not found : " + actionKey);
+  DbSession session=dbClient.openSession(false);
+  try {
+    DefaultIssue issue=issueService.getIssueByKey(session,issueKey);
+    Action action=getAction(actionKey);
+    if (action == null) {
+      throw new IllegalArgumentException("Action is not found : " + actionKey);
+    }
+    if (!action.supports(issue)) {
+      throw new IllegalStateException("A condition is not respected");
+    }
+    IssueChangeContext changeContext=IssueChangeContext.createUser(new Date(),userSession.login());
+    Component project=dbClient.componentDao().getByKey(session,issue.projectKey());
+    FunctionContext functionContext=new FunctionContext(issue,updater,changeContext,getProjectSettings(project));
+    for (    Function function : action.functions()) {
+      function.execute(functionContext);
+    }
+    issueStorage.save(issue);
+    return issue;
   }
-  if (!action.supports(issue)) {
-    throw new IllegalStateException("A condition is not respected");
+  finally {
+    session.close();
   }
-  IssueChangeContext changeContext=IssueChangeContext.createUser(new Date(),userSession.login());
-  Component project=queryResult.project(issue);
-  FunctionContext functionContext=new FunctionContext(issue,updater,changeContext,getProjectSettings(project));
-  for (  Function function : action.functions()) {
-    function.execute(functionContext);
-  }
-  issueStorage.save(issue);
-  return issue;
 }

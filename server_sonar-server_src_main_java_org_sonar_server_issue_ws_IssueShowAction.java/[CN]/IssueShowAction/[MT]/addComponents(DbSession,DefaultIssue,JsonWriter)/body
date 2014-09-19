@@ -1,0 +1,9 @@
+{
+  ComponentDto component=dbClient.componentDao().getNullableByKey(session,issue.componentKey());
+  ComponentDto subProject=component != null ? dbClient.componentDao().getNullableById(component.subProjectId(),session) : null;
+  ComponentDto project=component != null ? dbClient.componentDao().getNullableById(component.projectId(),session) : null;
+  String projectName=project != null ? project.longName() != null ? project.longName() : project.name() : null;
+  boolean displaySubProjectLongName=subProject != null && project != null && !subProject.getId().equals(project.getId());
+  String subProjectName=displaySubProjectLongName ? subProject.longName() != null ? subProject.longName() : subProject.name() : null;
+  json.prop("component",issue.componentKey()).prop("componentLongName",component != null ? component.longName() : null).prop("componentQualifier",component != null ? component.qualifier() : null).prop("project",issue.projectKey()).prop("projectName",projectName).prop("subProjectName",subProjectName);
+}
