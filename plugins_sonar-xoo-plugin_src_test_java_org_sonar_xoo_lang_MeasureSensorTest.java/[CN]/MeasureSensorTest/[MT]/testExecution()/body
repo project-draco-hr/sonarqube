@@ -9,11 +9,10 @@
   when(metricFinder.findByKey("sqale_index")).thenReturn(CoreMetrics.TECHNICAL_DEBT);
   when(metricFinder.findByKey("comment_lines_data")).thenReturn(CoreMetrics.COMMENT_LINES_DATA);
   when(metricFinder.findByKey("bool")).thenReturn(booleanMetric);
-  when(context.measureBuilder()).thenReturn(new DefaultMeasureBuilder());
   sensor.execute(context);
-  verify(context).addMeasure(new DefaultMeasureBuilder().forMetric(CoreMetrics.NCLOC).onFile(inputFile).withValue(12).build());
-  verify(context).addMeasure(new DefaultMeasureBuilder().forMetric(CoreMetrics.BRANCH_COVERAGE).onFile(inputFile).withValue(5.3).build());
-  verify(context).addMeasure(new DefaultMeasureBuilder().forMetric(CoreMetrics.TECHNICAL_DEBT).onFile(inputFile).withValue(300L).build());
-  verify(context).addMeasure(new DefaultMeasureBuilder().forMetric(booleanMetric).onFile(inputFile).withValue(true).build());
-  verify(context).addMeasure(new DefaultMeasureBuilder().forMetric(CoreMetrics.COMMENT_LINES_DATA).onFile(inputFile).withValue("1=1,2=1").build());
+  verify(persister).store(new DefaultMeasure().forMetric(CoreMetrics.NCLOC).onFile(inputFile).withValue(12));
+  verify(persister).store(new DefaultMeasure().forMetric(CoreMetrics.BRANCH_COVERAGE).onFile(inputFile).withValue(5.3));
+  verify(persister).store(new DefaultMeasure().forMetric(CoreMetrics.TECHNICAL_DEBT).onFile(inputFile).withValue(300L));
+  verify(persister).store(new DefaultMeasure().forMetric(booleanMetric).onFile(inputFile).withValue(true));
+  verify(persister).store(new DefaultMeasure().forMetric(CoreMetrics.COMMENT_LINES_DATA).onFile(inputFile).withValue("1=1,2=1"));
 }

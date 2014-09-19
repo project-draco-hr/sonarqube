@@ -1,6 +1,9 @@
 {
-  Measure<Integer> issue=new DefaultMeasureBuilder<Integer>().forMetric(CoreMetrics.LINES).onProject().withValue(3).build();
-  assertThat(issue.inputFile()).isNull();
-  assertThat(issue.metric()).isEqualTo(CoreMetrics.LINES);
-  assertThat(issue.value()).isEqualTo(3);
+  SensorStorage<DefaultMeasure<Integer>> persister=mock(SensorStorage.class);
+  DefaultMeasure<Integer> newMeasure=new DefaultMeasure<Integer>(persister).forMetric(CoreMetrics.LINES).onProject().withValue(3);
+  assertThat(newMeasure.inputFile()).isNull();
+  assertThat(newMeasure.metric()).isEqualTo(CoreMetrics.LINES);
+  assertThat(newMeasure.value()).isEqualTo(3);
+  newMeasure.save();
+  verify(persister).store(newMeasure);
 }
