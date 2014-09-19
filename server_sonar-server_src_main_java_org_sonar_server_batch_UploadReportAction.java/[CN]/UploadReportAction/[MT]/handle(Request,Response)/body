@@ -1,18 +1,20 @@
 {
-  DbSession session=dbClient.openSession(false);
-  try {
-    String projectKey=request.mandatoryParam(PARAM_PROJECT);
-    AuthorizedComponentDto project=dbClient.componentDao().getAuthorizedComponentByKey(projectKey,session);
-    boolean isFirstAnalysis=request.mandatoryParamAsBoolean(PARAM_FIRST_ANALYSIS);
-    if (isFirstAnalysis) {
-      permissionService.synchronizePermissions(session,project.key());
+  UserSession.get().checkGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
+  if (settings.getString("sonar.issues.use_es_backend") != null) {
+    DbSession session=dbClient.openSession(false);
+    try {
+      String projectKey=request.mandatoryParam(PARAM_PROJECT);
+      AuthorizedComponentDto project=dbClient.componentDao().getAuthorizedComponentByKey(projectKey,session);
+      boolean isFirstAnalysis=request.mandatoryParamAsBoolean(PARAM_FIRST_ANALYSIS);
+      if (isFirstAnalysis) {
+        permissionService.synchronizePermissions(session,project.key());
+        session.commit();
+      }
+      dbClient.issueDao().synchronizeAfter(session,index.get(IssueIndex.class).getLastSynchronization(),ImmutableMap.of("project",projectKey));
       session.commit();
     }
-    UserSession.get().checkGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
-    dbClient.issueDao().synchronizeAfter(session,index.get(IssueIndex.class).getLastSynchronization(),ImmutableMap.of("project",projectKey));
-    session.commit();
-  }
   finally {
-    MyBatis.closeQuietly(session);
+      MyBatis.closeQuietly(session);
+    }
   }
 }
