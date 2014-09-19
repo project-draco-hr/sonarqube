@@ -1,8 +1,11 @@
 {
-  Issue issue=new DefaultIssueBuilder().onFile(new DefaultInputFile("foo","src/Foo.php")).ruleKey(RuleKey.of("repo","rule")).atLine(1).effortToFix(10.0).message("Wrong way!").build();
+  SensorStorage storage=mock(SensorStorage.class);
+  DefaultIssue issue=new DefaultIssue(storage).onFile(new DefaultInputFile("foo","src/Foo.php")).ruleKey(RuleKey.of("repo","rule")).atLine(1).effortToFix(10.0).message("Wrong way!");
   assertThat(issue.inputPath()).isEqualTo(new DefaultInputFile("foo","src/Foo.php"));
   assertThat(issue.ruleKey()).isEqualTo(RuleKey.of("repo","rule"));
   assertThat(issue.line()).isEqualTo(1);
   assertThat(issue.effortToFix()).isEqualTo(10.0);
   assertThat(issue.message()).isEqualTo("Wrong way!");
+  issue.save();
+  verify(storage).store(issue);
 }

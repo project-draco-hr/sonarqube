@@ -1,8 +1,11 @@
 {
-  Issue issue=new DefaultIssueBuilder().onProject().ruleKey(RuleKey.of("repo","rule")).effortToFix(10.0).message("Wrong way!").build();
+  SensorStorage storage=mock(SensorStorage.class);
+  DefaultIssue issue=new DefaultIssue(storage).onProject().ruleKey(RuleKey.of("repo","rule")).effortToFix(10.0).message("Wrong way!");
   assertThat(issue.inputPath()).isNull();
   assertThat(issue.ruleKey()).isEqualTo(RuleKey.of("repo","rule"));
   assertThat(issue.line()).isNull();
   assertThat(issue.effortToFix()).isEqualTo(10.0);
   assertThat(issue.message()).isEqualTo("Wrong way!");
+  issue.save();
+  verify(storage).store(issue);
 }
