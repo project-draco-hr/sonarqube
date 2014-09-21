@@ -1,17 +1,20 @@
 {
   Process process=null;
   try {
+    SharedStatus sharedStatus=new SharedStatus(command.getReadyFile());
+    sharedStatus.prepare();
     ProcessBuilder processBuilder=create(command);
     LoggerFactory.getLogger(getClass()).info("Launch {}: {}",command.getKey(),StringUtils.join(processBuilder.command()," "));
+    long startedAt=System.currentTimeMillis();
     process=processBuilder.start();
-    StreamGobbler errorGobbler=new StreamGobbler(process.getErrorStream(),command.getKey());
     StreamGobbler inputGobbler=new StreamGobbler(process.getInputStream(),command.getKey());
     inputGobbler.start();
-    errorGobbler.start();
-    return new ProcessRef(command.getKey(),process,errorGobbler,inputGobbler);
+    ProcessRef ref=new ProcessRef(command.getKey(),sharedStatus,process,inputGobbler);
+    ref.setLaunchedAt(startedAt);
+    return ref;
   }
  catch (  Exception e) {
-    ProcessUtils.destroyQuietly(process);
+    ProcessUtils.sendKillSignal(process);
     throw new IllegalStateException("Fail to launch " + command.getKey(),e);
   }
 }
