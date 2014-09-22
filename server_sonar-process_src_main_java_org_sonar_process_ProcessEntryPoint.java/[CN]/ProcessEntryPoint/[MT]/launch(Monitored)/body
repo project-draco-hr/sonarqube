@@ -6,13 +6,14 @@
   try {
     LoggerFactory.getLogger(getClass()).warn("Starting " + getKey());
     Runtime.getRuntime().addShutdownHook(shutdownHook);
+    stopWatcher.start();
     monitored.start();
     boolean ready=false;
     while (!ready) {
       ready=monitored.isReady();
       Thread.sleep(200L);
     }
-    sharedStatus.setReady();
+    commands.setReady();
     if (lifecycle.tryToMoveTo(Lifecycle.State.STARTED)) {
       monitored.awaitStop();
     }
@@ -21,6 +22,6 @@
     LoggerFactory.getLogger(getClass()).warn("Fail to start " + getKey(),e);
   }
  finally {
-    terminate();
+    stop();
   }
 }

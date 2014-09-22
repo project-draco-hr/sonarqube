@@ -1,0 +1,19 @@
+{
+  Props props=new Props(new Properties());
+  props.set(ProcessEntryPoint.PROPERTY_PROCESS_KEY,"test");
+  props.set(ProcessEntryPoint.PROPERTY_TERMINATION_TIMEOUT,"30000");
+  final ProcessEntryPoint entryPoint=new ProcessEntryPoint(props,exit,mock(ProcessCommands.class));
+  final StandardProcess process=new StandardProcess();
+  Thread runner=new Thread(){
+    @Override public void run(){
+      entryPoint.launch(process);
+    }
+  }
+;
+  runner.start();
+  while (process.getState() != State.STARTED) {
+    Thread.sleep(10L);
+  }
+  entryPoint.stop();
+  assertThat(process.getState()).isEqualTo(State.STOPPED);
+}

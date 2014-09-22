@@ -1,0 +1,16 @@
+{
+  File readyFile=mock(File.class);
+  ProcessCommands commands=new ProcessCommands(readyFile,temp.newFile());
+  when(readyFile.exists()).thenReturn(false);
+  when(readyFile.lastModified()).thenReturn(123456L);
+  assertThat(commands.wasReadyAfter(122000L)).isFalse();
+  when(readyFile.exists()).thenReturn(true);
+  when(readyFile.lastModified()).thenReturn(123456L);
+  assertThat(commands.wasReadyAfter(124000L)).isFalse();
+  when(readyFile.exists()).thenReturn(true);
+  when(readyFile.lastModified()).thenReturn(123456L);
+  assertThat(commands.wasReadyAfter(123123L)).isTrue();
+  when(readyFile.exists()).thenReturn(true);
+  when(readyFile.lastModified()).thenReturn(123000L);
+  assertThat(commands.wasReadyAfter(123456L)).isTrue();
+}

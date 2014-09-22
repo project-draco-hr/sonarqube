@@ -1,15 +1,15 @@
 {
   Process process=null;
   try {
-    SharedStatus sharedStatus=new SharedStatus(command.getReadyFile());
-    sharedStatus.prepare();
+    ProcessCommands commands=new ProcessCommands(command.getTempDir(),command.getKey());
+    commands.prepareMonitor();
     ProcessBuilder processBuilder=create(command);
     LoggerFactory.getLogger(getClass()).info("Launch {}: {}",command.getKey(),StringUtils.join(processBuilder.command()," "));
     long startedAt=System.currentTimeMillis();
     process=processBuilder.start();
     StreamGobbler inputGobbler=new StreamGobbler(process.getInputStream(),command.getKey());
     inputGobbler.start();
-    ProcessRef ref=new ProcessRef(command.getKey(),sharedStatus,process,inputGobbler);
+    ProcessRef ref=new ProcessRef(command.getKey(),commands,process,inputGobbler);
     ref.setLaunchedAt(startedAt);
     return ref;
   }
