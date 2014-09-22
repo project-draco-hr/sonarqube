@@ -1,0 +1,28 @@
+{
+  Set<RuleKey> ruleKeys=newHashSet();
+  Set<String> componentKeys=newHashSet();
+  Set<String> projectKeys=newHashSet();
+  for (  Issue issue : issues) {
+    ruleKeys.add(issue.ruleKey());
+    componentKeys.add(issue.componentKey());
+    String projectKey=issue.projectKey();
+    if (projectKey != null) {
+      projectKeys.add(projectKey);
+    }
+  }
+  DbSession session=dbClient.openSession(false);
+  try {
+    for (    Rule rule : ruleFinder.findByKeys(ruleKeys)) {
+      rules.put(rule.ruleKey(),rule);
+    }
+    for (    ComponentDto file : dbClient.componentDao().getByKeys(session,componentKeys)) {
+      components.put(file.getKey(),file);
+    }
+    for (    ComponentDto project : dbClient.componentDao().getByKeys(session,projectKeys)) {
+      projects.put(project.getKey(),project);
+    }
+  }
+  finally {
+    session.close();
+  }
+}

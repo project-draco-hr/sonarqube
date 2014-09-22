@@ -1,0 +1,17 @@
+{
+  List<String> issueKeys=newArrayList();
+  for (int i=0; i < 500; i++) {
+    IssueDto issue=IssueTesting.newDto(rule,file,project).setStatus(Issue.STATUS_OPEN);
+    tester.get(IssueDao.class).insert(session,issue);
+    issueKeys.add(issue.getKey());
+  }
+  session.commit();
+  Map<String,Object> properties=newHashMap();
+  properties.put("issues",Joiner.on(",").join(issueKeys));
+  properties.put("actions","do_transition");
+  properties.put("do_transition.transition",DefaultTransitions.CONFIRM);
+  IssueBulkChangeQuery issueBulkChangeQuery=new IssueBulkChangeQuery(properties,false);
+  IssueBulkChangeResult result=service.execute(issueBulkChangeQuery,userSession);
+  assertThat(result.issuesChanged()).hasSize(500);
+  assertThat(result.issuesNotChanged()).isEmpty();
+}

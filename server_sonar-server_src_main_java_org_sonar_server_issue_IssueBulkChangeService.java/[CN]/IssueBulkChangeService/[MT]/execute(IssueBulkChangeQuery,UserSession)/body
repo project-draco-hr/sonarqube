@@ -3,8 +3,8 @@
   long start=System.currentTimeMillis();
   userSession.checkLoggedIn();
   IssueBulkChangeResult result=new IssueBulkChangeResult();
-  IssueQueryResult issueQueryResult=issueFinder.find(IssueQuery.builder().issueKeys(issueBulkChangeQuery.issues()).pageSize(-1).requiredRole(UserRole.USER).build());
-  List<Issue> issues=issueQueryResult.issues();
+  List<Issue> issues=issueService.search(issueBulkChangeQuery.issues());
+  Referentials referentials=new Referentials(issues);
   List<Action> bulkActions=getActionsToApply(issueBulkChangeQuery,issues,userSession);
   IssueChangeContext issueChangeContext=IssueChangeContext.createUser(new Date(),userSession.login());
   Set<String> concernedProjects=new HashSet<String>();
@@ -19,9 +19,12 @@
       }
       issueStorage.save((DefaultIssue)issue);
       if (issueBulkChangeQuery.sendNotifications()) {
-        issueNotifications.sendChanges((DefaultIssue)issue,issueChangeContext,issueQueryResult);
+        String projectKey=issue.projectKey();
+        if (projectKey != null) {
+          issueNotifications.sendChanges((DefaultIssue)issue,issueChangeContext,referentials.rule(issue.ruleKey()),referentials.project(projectKey),referentials.component(issue.componentKey()));
+        }
       }
-      concernedProjects.add(((DefaultIssue)issue).projectKey());
+      concernedProjects.add(issue.projectKey());
     }
   }
   for (  String projectKey : concernedProjects) {

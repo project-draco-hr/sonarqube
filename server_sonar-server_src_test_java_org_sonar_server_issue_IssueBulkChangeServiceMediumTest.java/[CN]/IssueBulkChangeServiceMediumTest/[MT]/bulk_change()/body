@@ -1,0 +1,16 @@
+{
+  UserDto user=new UserDto().setLogin("fred").setName("Fred");
+  db.userDao().insert(session,user);
+  IssueDto issue1=IssueTesting.newDto(rule,file,project).setAssignee("fabrice");
+  IssueDto issue2=IssueTesting.newDto(rule,file,project).setAssignee("simon");
+  tester.get(IssueDao.class).insert(session,issue1,issue2);
+  session.commit();
+  Map<String,Object> properties=newHashMap();
+  properties.put("issues",issue1.getKey() + "," + issue2.getKey());
+  properties.put("actions","assign");
+  properties.put("assign.assignee",user.getLogin());
+  IssueBulkChangeQuery issueBulkChangeQuery=new IssueBulkChangeQuery(properties,true);
+  IssueBulkChangeResult result=service.execute(issueBulkChangeQuery,userSession);
+  assertThat(result.issuesChanged()).hasSize(2);
+  assertThat(result.issuesNotChanged()).isEmpty();
+}
