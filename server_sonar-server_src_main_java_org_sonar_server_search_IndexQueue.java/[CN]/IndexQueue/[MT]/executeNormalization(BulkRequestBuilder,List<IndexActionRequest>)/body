@@ -1,18 +1,14 @@
 {
   long normTime=System.currentTimeMillis();
   try {
-    boolean hasInlineRefreshRequest=false;
     ExecutorService executorService=Executors.newFixedThreadPool(CONCURRENT_NORMALIZATION_FACTOR);
     for (    Future<List<ActionRequest>> updateRequests : executorService.invokeAll(actions)) {
       for (      ActionRequest update : updateRequests.get()) {
         if (UpdateRequest.class.isAssignableFrom(update.getClass())) {
-          bulkRequestBuilder.add(((UpdateRequest)update));
+          bulkRequestBuilder.add(((UpdateRequest)update).refresh(false));
         }
  else         if (DeleteRequest.class.isAssignableFrom(update.getClass())) {
-          bulkRequestBuilder.add(((DeleteRequest)update));
-        }
- else         if (RefreshRequest.class.isAssignableFrom(update.getClass())) {
-          hasInlineRefreshRequest=true;
+          bulkRequestBuilder.add(((DeleteRequest)update).refresh(false));
         }
  else {
           throw new IllegalStateException("Un-managed request type: " + update.getClass());
@@ -20,7 +16,6 @@
       }
     }
     executorService.shutdown();
-    bulkRequestBuilder.setRefresh(hasInlineRefreshRequest);
   }
  catch (  Exception e) {
     throw new IllegalStateException("Could not execute normalization for stack",e);

@@ -2,7 +2,7 @@
   Integer port=props.valueAsInt(ES_PORT_PROPERTY);
   String clusterName=props.value(ES_CLUSTER_PROPERTY);
   LoggerFactory.getLogger(SearchServer.class).info("Starting ES[{}] on port: {}",clusterName,port);
-  ImmutableSettings.Builder esSettings=ImmutableSettings.settingsBuilder().put("discovery.zen.ping.multicast.enabled","false").put("index.refresh_interval","30").put("index.number_of_shards","1").put("index.number_of_replicas",MINIMUM_INDEX_REPLICATION).put("index.store.type","mmapfs").put("index.merge.scheduler.max_thread_count",Math.max(1,Math.min(3,Runtime.getRuntime().availableProcessors() / 2))).put("script.default_lang","native").put("script.native." + ListUpdate.NAME + ".type",ListUpdate.UpdateListScriptFactory.class.getName()).put("transport.tcp.port",port).put("http.enabled",false).put("path.data",esDataDir().getAbsolutePath()).put("path.work",esWorkDir().getAbsolutePath()).put("path.logs",esLogDir().getAbsolutePath());
+  ImmutableSettings.Builder esSettings=ImmutableSettings.settingsBuilder().put("discovery.zen.ping.multicast.enabled","false").put("index.number_of_shards","1").put("index.number_of_replicas",MINIMUM_INDEX_REPLICATION).put("index.store.type","mmapfs").put("script.default_lang","native").put("script.native." + ListUpdate.NAME + ".type",ListUpdate.UpdateListScriptFactory.class.getName()).put("transport.tcp.port",port).put("http.enabled",false).put("path.data",esDataDir().getAbsolutePath()).put("path.work",esWorkDir().getAbsolutePath()).put("path.logs",esLogDir().getAbsolutePath());
   if (!nodes.isEmpty()) {
     LoggerFactory.getLogger(SearchServer.class).info("Joining ES cluster with master: {}",nodes);
     esSettings.put("discovery.zen.ping.unicast.hosts",StringUtils.join(nodes,","));
