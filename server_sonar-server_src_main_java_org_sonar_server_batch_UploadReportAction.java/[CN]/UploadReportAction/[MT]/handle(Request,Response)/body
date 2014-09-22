@@ -5,11 +5,8 @@
     try {
       String projectKey=request.mandatoryParam(PARAM_PROJECT);
       AuthorizedComponentDto project=dbClient.componentDao().getAuthorizedComponentByKey(projectKey,session);
-      boolean isFirstAnalysis=request.mandatoryParamAsBoolean(PARAM_FIRST_ANALYSIS);
-      if (isFirstAnalysis) {
-        permissionService.synchronizePermissions(session,project.key());
-        session.commit();
-      }
+      permissionService.synchronizePermissions(session,project.key());
+      session.commit();
       dbClient.issueDao().synchronizeAfter(session,index.get(IssueIndex.class).getLastSynchronization(),ImmutableMap.of("project",projectKey));
       session.commit();
     }

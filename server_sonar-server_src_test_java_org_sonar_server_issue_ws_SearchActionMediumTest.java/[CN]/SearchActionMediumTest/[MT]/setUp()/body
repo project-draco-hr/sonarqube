@@ -1,0 +1,19 @@
+{
+  tester.clearDbAndIndexes();
+  db=tester.get(DbClient.class);
+  ws=tester.get(IssuesWs.class);
+  wsTester=tester.get(WsTester.class);
+  session=db.openSession(false);
+  rule=RuleTesting.newXooX1();
+  tester.get(RuleDao.class).insert(session,rule);
+  project=new ComponentDto().setId(1L).setKey("MyProject").setProjectId(1L);
+  db.componentDao().insert(session,project);
+  db.snapshotDao().insert(session,SnapshotTesting.createForComponent(project));
+  tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),DefaultGroups.ANYONE,UserRole.USER,session);
+  db.issueAuthorizationDao().synchronizeAfter(session,new Date(0));
+  file=new ComponentDto().setProjectId(1L).setKey("MyComponent").setId(2L);
+  db.componentDao().insert(session,file);
+  db.snapshotDao().insert(session,SnapshotTesting.createForComponent(file));
+  session.commit();
+  MockUserSession.set().setLogin("gandalf");
+}

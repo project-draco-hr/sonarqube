@@ -1,0 +1,16 @@
+{
+  IssueDto issue1=createIssue().setAssignee("steph");
+  IssueDto issue2=createIssue().setAssignee("simon");
+  db.issueDao().insert(session,issue1,issue2);
+  session.commit();
+  IssueQuery.Builder query=IssueQuery.builder().sort(IssueQuery.SORT_BY_ASSIGNEE).asc(true);
+  Result<Issue> result=index.search(query.build(),new QueryContext());
+  assertThat(result.getHits()).hasSize(2);
+  assertThat(result.getHits().get(0).assignee()).isEqualTo("simon");
+  assertThat(result.getHits().get(1).assignee()).isEqualTo("steph");
+  query=IssueQuery.builder().sort(IssueQuery.SORT_BY_ASSIGNEE).asc(false);
+  result=index.search(query.build(),new QueryContext());
+  assertThat(result.getHits()).hasSize(2);
+  assertThat(result.getHits().get(0).assignee()).isEqualTo("steph");
+  assertThat(result.getHits().get(1).assignee()).isEqualTo("simon");
+}

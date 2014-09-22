@@ -1,0 +1,7 @@
+{
+  db.issueDao().insert(session,createIssue().setRule(rule));
+  tester.get(RuleDao.class).insert(session,RuleTesting.newDto(RuleKey.of("rule","without issue")));
+  session.commit();
+  assertThat(index.search(IssueQuery.builder().rules(newArrayList(rule.getKey())).build(),new QueryContext()).getHits()).hasSize(1);
+  assertThat(index.search(IssueQuery.builder().rules(newArrayList(RuleKey.of("rule","without issue"))).build(),new QueryContext()).getHits()).isEmpty();
+}
