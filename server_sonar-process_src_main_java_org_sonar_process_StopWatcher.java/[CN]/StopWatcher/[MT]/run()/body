@@ -1,17 +1,23 @@
 {
-  while (watching) {
-    if (commands.askedForStopAfter(process.getLaunchedAt())) {
-      LoggerFactory.getLogger(getClass()).info("Stopping process");
-      process.stopAsync();
-      watching=false;
-    }
- else {
-      try {
-        Thread.sleep(500L);
-      }
- catch (      InterruptedException ignored) {
+  commands.prepare();
+  try {
+    while (watching) {
+      if (commands.askedForStop()) {
+        LoggerFactory.getLogger(getClass()).info("Stopping process");
+        stoppable.stopAsync();
         watching=false;
       }
+ else {
+        try {
+          Thread.sleep(500L);
+        }
+ catch (        InterruptedException ignored) {
+          watching=false;
+        }
+      }
     }
+  }
+  finally {
+    commands.endWatch();
   }
 }
