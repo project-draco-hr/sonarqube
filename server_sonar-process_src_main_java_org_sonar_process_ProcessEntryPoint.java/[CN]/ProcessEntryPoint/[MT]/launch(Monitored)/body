@@ -1,0 +1,25 @@
+{
+  if (!lifecycle.tryToMoveTo(Lifecycle.State.STARTING)) {
+    throw new IllegalStateException("Already started");
+  }
+  monitored=mp;
+  try {
+    Runtime.getRuntime().addShutdownHook(shutdownHook);
+    monitored.start();
+    boolean ready=false;
+    while (!ready) {
+      ready=monitored.isReady();
+      Thread.sleep(200L);
+    }
+    sharedStatus.setReady();
+    if (lifecycle.tryToMoveTo(Lifecycle.State.STARTED)) {
+      monitored.awaitStop();
+    }
+  }
+ catch (  Exception e) {
+    LoggerFactory.getLogger(getClass()).warn("Fail to start",e);
+  }
+ finally {
+    terminate();
+  }
+}

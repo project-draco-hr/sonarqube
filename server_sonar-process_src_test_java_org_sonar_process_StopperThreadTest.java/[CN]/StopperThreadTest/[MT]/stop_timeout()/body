@@ -1,0 +1,18 @@
+{
+  File file=temp.newFile();
+  SharedStatus sharedStatus=new SharedStatus(file);
+  assertThat(file).exists();
+  Monitored monitored=mock(Monitored.class);
+  doAnswer(new Answer(){
+    @Override public Object answer(    InvocationOnMock invocationOnMock) throws Throwable {
+      Thread.sleep(10000L);
+      return null;
+    }
+  }
+).when(monitored).stop();
+  StopperThread stopper=new StopperThread(monitored,sharedStatus,10L);
+  stopper.start();
+  stopper.join();
+  verify(monitored).stop();
+  assertThat(file).doesNotExist();
+}
