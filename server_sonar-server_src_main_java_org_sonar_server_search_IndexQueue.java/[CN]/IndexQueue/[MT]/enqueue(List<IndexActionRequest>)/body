@@ -6,28 +6,38 @@
     boolean refreshRequired=false;
     Map<String,Index> indexes=getIndexMap();
     Set<String> indices=new HashSet<String>();
-    for (    IndexActionRequest action : actions) {
-      if (action.needsRefresh()) {
-        refreshRequired=true;
+    for (    ClusterAction action : actions) {
+      if (IndexActionRequest.class.isAssignableFrom(action.getClass())) {
+        IndexActionRequest worker=(IndexActionRequest)action;
+        if (worker.needsRefresh()) {
+          refreshRequired=true;
+          indices.add(indexes.get(worker.getIndexType()).getIndexName());
+        }
       }
-      Index index=indexes.get(action.getIndexType());
-      action.setIndex(index);
-      if (action.needsRefresh()) {
-        indices.add(index.getIndexName());
+      if (IndexWorker.class.isAssignableFrom(action.getClass())) {
+        IndexWorker worker=(IndexWorker)action;
+        Index index=indexes.get(worker.getIndexType());
+        worker.setIndex(index);
+      }
+      if (RefreshActionRequest.class.isAssignableFrom(action.getClass())) {
+        refreshRequired=true;
+        indices.add(indexes.get(((RefreshActionRequest)action).getIndexType()).getIndexName());
       }
     }
     BulkRequestBuilder bulkRequestBuilder=new BulkRequestBuilder(searchClient);
     long normTime=executeNormalization(bulkRequestBuilder,actions);
-    long indexTime=System.currentTimeMillis();
-    BulkResponse response=searchClient.execute(bulkRequestBuilder.setRefresh(false));
-    indexTime=System.currentTimeMillis() - indexTime;
-    long refreshTime=0;
-    if (refreshRequired) {
-      refreshTime=this.refreshRequiredIndex(indices);
-    }
-    LOGGER.debug("-- submitted {} items with {}ms in normalization, {}ms indexing and {}ms refresh({}). Total: {}ms",bulkRequestBuilder.numberOfActions(),normTime,indexTime,refreshTime,indices,(normTime + indexTime + refreshTime));
-    if (response.hasFailures()) {
-      throw new IllegalStateException("Errors while indexing stack: " + response.buildFailureMessage());
+    if (bulkRequestBuilder.numberOfActions() > 0) {
+      long indexTime=System.currentTimeMillis();
+      BulkResponse response=searchClient.execute(bulkRequestBuilder.setRefresh(false));
+      indexTime=System.currentTimeMillis() - indexTime;
+      long refreshTime=0;
+      if (refreshRequired) {
+        refreshTime=this.refreshRequiredIndex(indices);
+      }
+      LOGGER.debug("-- submitted {} items with {}ms in normalization, {}ms indexing and {}ms refresh({}). Total: {}ms",bulkRequestBuilder.numberOfActions(),normTime,indexTime,refreshTime,indices,(normTime + indexTime + refreshTime));
+      if (response.hasFailures()) {
+        throw new IllegalStateException("Errors while indexing stack: " + response.buildFailureMessage());
+      }
     }
   }
  catch (  Exception e) {
