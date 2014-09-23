@@ -16,8 +16,11 @@
   writeActionPlans(json,actionPlanService.findByKeys(actionPlanKeys));
   DbSession session=dbClient.openSession(false);
   try {
-    writeProjects(json,dbClient.componentDao().getByKeys(session,projectKeys));
-    writeComponents(json,dbClient.componentDao().getByKeys(session,componentKeys));
+    List<ComponentDto> componentDtos=dbClient.componentDao().getByKeys(session,componentKeys);
+    List<ComponentDto> projectDtos=dbClient.componentDao().getByKeys(session,projectKeys);
+    componentDtos.addAll(projectDtos);
+    writeProjects(json,projectDtos);
+    writeComponents(json,componentDtos);
   }
   finally {
     session.close();
