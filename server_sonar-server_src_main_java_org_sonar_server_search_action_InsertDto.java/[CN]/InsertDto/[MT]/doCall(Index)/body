@@ -1,0 +1,13 @@
+{
+  List<ActionRequest> inserts=new ArrayList<ActionRequest>();
+  List<UpdateRequest> updates=index.getNormalizer().normalize(dto);
+  for (  UpdateRequest update : updates) {
+    if (update.doc() != null) {
+      inserts.add(update.upsertRequest().index(index.getIndexName()).type(index.getIndexType()).id(update.id()).routing(update.routing()));
+    }
+ else {
+      inserts.add(update.index(index.getIndexName()).type(index.getIndexType()));
+    }
+  }
+  return inserts;
+}
