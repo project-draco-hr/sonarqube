@@ -1,0 +1,19 @@
+{
+  IssueDto issue1=createIssue().setIssueCloseDate(DateUtils.parseDate("2014-09-23"));
+  IssueDto issue2=createIssue().setIssueCloseDate(DateUtils.parseDate("2014-09-24"));
+  IssueDto issue3=createIssue().setIssueCloseDate(null);
+  db.issueDao().insert(session,issue1,issue2,issue3);
+  session.commit();
+  IssueQuery.Builder query=IssueQuery.builder().sort(IssueQuery.SORT_BY_CLOSE_DATE).asc(true);
+  Result<Issue> result=index.search(query.build(),new QueryContext());
+  assertThat(result.getHits()).hasSize(3);
+  assertThat(result.getHits().get(0).closeDate()).isEqualTo(DateUtils.parseDate("2014-09-23"));
+  assertThat(result.getHits().get(1).closeDate()).isEqualTo(DateUtils.parseDate("2014-09-24"));
+  assertThat(result.getHits().get(2).closeDate()).isNull();
+  query=IssueQuery.builder().sort(IssueQuery.SORT_BY_CLOSE_DATE).asc(false);
+  result=index.search(query.build(),new QueryContext());
+  assertThat(result.getHits()).hasSize(3);
+  assertThat(result.getHits().get(0).closeDate()).isEqualTo(DateUtils.parseDate("2014-09-24"));
+  assertThat(result.getHits().get(1).closeDate()).isEqualTo(DateUtils.parseDate("2014-09-23"));
+  assertThat(result.getHits().get(2).closeDate()).isNull();
+}
