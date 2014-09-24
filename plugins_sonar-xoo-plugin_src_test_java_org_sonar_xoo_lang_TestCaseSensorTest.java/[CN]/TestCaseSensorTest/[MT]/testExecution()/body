@@ -3,9 +3,14 @@
   FileUtils.write(testPlan,"test1:UNIT:OK:::10\ntest2:INTEGRATION:ERROR:message:stack:15\n\n#comment");
   DefaultInputFile testFile=new DefaultInputFile("foo","test/fooTest.xoo").setAbsolutePath(new File(baseDir,"test/fooTest.xoo").getAbsolutePath()).setLanguage("xoo").setType(Type.TEST);
   fileSystem.add(testFile);
-  when(context.testCaseBuilder(testFile,"test1")).thenReturn(new DefaultTestCaseBuilder(testFile,"test1"));
-  when(context.testCaseBuilder(testFile,"test2")).thenReturn(new DefaultTestCaseBuilder(testFile,"test2"));
+  final SensorStorage sensorStorage=mock(SensorStorage.class);
+  when(context.newTestCase()).thenAnswer(new Answer<TestCase>(){
+    @Override public TestCase answer(    InvocationOnMock invocation) throws Throwable {
+      return new DefaultTestCase(sensorStorage);
+    }
+  }
+);
   sensor.execute(context);
-  verify(context).addTestCase(new DefaultTestCaseBuilder(testFile,"test1").durationInMs(10).build());
-  verify(context).addTestCase(new DefaultTestCaseBuilder(testFile,"test2").type(TestCase.Type.INTEGRATION).status(TestCase.Status.ERROR).message("message").stackTrace("stack").durationInMs(15).build());
+  verify(sensorStorage).store(new DefaultTestCase(null).inTestFile(testFile).name("test1").durationInMs(10));
+  verify(sensorStorage).store(new DefaultTestCase(null).inTestFile(testFile).name("test2").ofType(TestCase.Type.INTEGRATION).status(TestCase.Status.ERROR).message("message").stackTrace("stack").durationInMs(15));
 }

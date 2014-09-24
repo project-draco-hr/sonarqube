@@ -1,0 +1,14 @@
+{
+  InputFile file=new DefaultInputFile("foo","src/Foo.php");
+  ArgumentCaptor<Issue> argumentCaptor=ArgumentCaptor.forClass(Issue.class);
+  Issuable issuable=mock(Issuable.class);
+  when(resourcePerspectives.as(Issuable.class,File.create("src/Foo.php"))).thenReturn(issuable);
+  when(issuable.addIssue(argumentCaptor.capture())).thenReturn(true);
+  adaptor.store(new DefaultIssue().onFile(file).ruleKey(RuleKey.of("foo","bar")).message("Foo").atLine(3).effortToFix(10.0));
+  Issue issue=argumentCaptor.getValue();
+  assertThat(issue.ruleKey()).isEqualTo(RuleKey.of("foo","bar"));
+  assertThat(issue.message()).isEqualTo("Foo");
+  assertThat(issue.line()).isEqualTo(3);
+  assertThat(issue.severity()).isNull();
+  assertThat(issue.effortToFix()).isEqualTo(10.0);
+}

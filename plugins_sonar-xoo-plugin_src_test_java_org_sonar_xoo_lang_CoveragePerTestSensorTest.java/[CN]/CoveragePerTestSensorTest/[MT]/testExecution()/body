@@ -5,10 +5,15 @@
   DefaultInputFile testFile=new DefaultInputFile("foo","test/fooTest.xoo").setAbsolutePath(new File(baseDir,"test/fooTest.xoo").getAbsolutePath()).setLanguage("xoo").setType(Type.TEST);
   fileSystem.add(inputFile);
   fileSystem.add(testFile);
-  TestCase test1=new DefaultTestCaseBuilder(testFile,"test1").durationInMs(10).build();
-  TestCase test2=new DefaultTestCaseBuilder(testFile,"test2").durationInMs(10).build();
-  when(context.getTestCase(testFile,"test1")).thenReturn(test1);
-  when(context.getTestCase(testFile,"test2")).thenReturn(test2);
+  final SensorStorage sensorStorage=mock(SensorStorage.class);
+  when(context.newTestCase()).thenAnswer(new Answer<TestCase>(){
+    @Override public TestCase answer(    InvocationOnMock invocation) throws Throwable {
+      return new DefaultTestCase(sensorStorage);
+    }
+  }
+);
+  TestCase test1=new DefaultTestCase(null).inTestFile(testFile).name("test1");
+  TestCase test2=new DefaultTestCase(null).inTestFile(testFile).name("test2");
   sensor.execute(context);
   verify(context).saveCoveragePerTest(test1,inputFile,Arrays.asList(1,2,3,4));
   verify(context).saveCoveragePerTest(test2,inputFile,Arrays.asList(5,6,7));
