@@ -1,0 +1,21 @@
+{
+  Properties props=new Properties();
+  props.put(SearchServer.ES_PORT_PROPERTY,port.toString());
+  props.put(SearchServer.ES_CLUSTER_PROPERTY,cluster);
+  props.put(SearchServer.SONAR_PATH_HOME,temp.getRoot().getAbsolutePath());
+  SearchServer searchServer=new SearchServer(new Props(props));
+  assertThat(searchServer).isNotNull();
+  searchServer.start();
+  assertThat(searchServer.isReady()).isTrue();
+  Settings settings=ImmutableSettings.settingsBuilder().put("cluster.name",cluster).build();
+  Client client=new TransportClient(settings).addTransportAddress(new InetSocketTransportAddress("localhost",port));
+  assertThat(client.admin().cluster().prepareClusterStats().get().getStatus()).isEqualTo(ClusterHealthStatus.GREEN);
+  searchServer.stop();
+  searchServer.awaitStop();
+  try {
+    assertThat(client.admin().cluster().prepareClusterStats().get().getStatus()).isNotEqualTo(ClusterHealthStatus.GREEN);
+  }
+ catch (  NoNodeAvailableException exception) {
+    assertThat(exception.getMessage()).isEqualTo("No node available");
+  }
+}
