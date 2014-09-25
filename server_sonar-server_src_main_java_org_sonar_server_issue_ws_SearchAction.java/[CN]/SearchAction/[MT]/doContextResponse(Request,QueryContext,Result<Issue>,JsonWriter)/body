@@ -1,21 +1,33 @@
 {
-  Set<RuleKey> ruleKeys=new HashSet<RuleKey>();
-  Set<String> projectKeys=new HashSet<String>();
-  Set<String> componentKeys=new HashSet<String>();
-  Set<String> actionPlanKeys=new HashSet<String>();
-  List<String> userLogins=new ArrayList<String>();
+  List<String> issueKeys=newArrayList();
+  Set<RuleKey> ruleKeys=newHashSet();
+  Set<String> projectKeys=newHashSet();
+  Set<String> componentKeys=newHashSet();
+  Set<String> actionPlanKeys=newHashSet();
+  List<String> userLogins=newArrayList();
+  Map<String,User> usersByLogin=newHashMap();
+  Multimap<String,DefaultIssueComment> commentsByIssues=ArrayListMultimap.create();
   for (  Issue issue : result.getHits()) {
+    issueKeys.add(issue.key());
     ruleKeys.add(issue.ruleKey());
     projectKeys.add(issue.projectKey());
     componentKeys.add(issue.componentKey());
     actionPlanKeys.add(issue.actionPlanKey());
-    userLogins.add(issue.authorLogin());
+    if (issue.reporter() != null) {
+      userLogins.add(issue.reporter());
+    }
+    if (issue.assignee() != null) {
+      userLogins.add(issue.assignee());
+    }
   }
-  writeRules(json,!request.mandatoryParamAsBoolean(IssueFilterParameters.HIDE_RULES) ? ruleService.getByKeys(ruleKeys) : Collections.<Rule>emptyList());
-  writeUsers(json,userFinder.findByLogins(userLogins));
-  writeActionPlans(json,actionPlanService.findByKeys(actionPlanKeys));
   DbSession session=dbClient.openSession(false);
   try {
+    List<DefaultIssueComment> comments=issueChangeDao.selectCommentsByIssues(session,issueKeys);
+    for (    DefaultIssueComment issueComment : comments) {
+      userLogins.add(issueComment.userLogin());
+      commentsByIssues.put(issueComment.issueKey(),issueComment);
+    }
+    usersByLogin=getUsersByLogin(session,userLogins);
     List<ComponentDto> componentDtos=dbClient.componentDao().getByKeys(session,componentKeys);
     List<ComponentDto> projectDtos=dbClient.componentDao().getByKeys(session,projectKeys);
     componentDtos.addAll(projectDtos);
@@ -25,5 +37,10 @@
   finally {
     session.close();
   }
+  Map<String,ActionPlan> actionPlanByKeys=getActionPlanByKeys(actionPlanKeys);
+  writeIssues(result,commentsByIssues,usersByLogin,actionPlanByKeys,request.paramAsStrings(EXTRA_FIELDS_PARAM),json);
+  writeRules(json,!request.mandatoryParamAsBoolean(IssueFilterParameters.HIDE_RULES) ? ruleService.getByKeys(ruleKeys) : Collections.<Rule>emptyList());
+  writeUsers(json,usersByLogin);
+  writeActionPlans(json,actionPlanByKeys.values());
   writeLegacyPaging(context,json,result);
 }

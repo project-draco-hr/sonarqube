@@ -6,16 +6,16 @@
   session=db.openSession(false);
   rule=RuleTesting.newXooX1().setName("Rule name").setDescription("Rule desc").setStatus(RuleStatus.READY);
   tester.get(RuleDao.class).insert(session,rule);
-  project=new ComponentDto().setId(1L).setKey("MyProject").setProjectId(1L);
+  project=new ComponentDto().setKey("MyProject");
   db.componentDao().insert(session,project);
   db.snapshotDao().insert(session,SnapshotTesting.createForComponent(project));
   tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),DefaultGroups.ANYONE,UserRole.USER,session);
   db.issueAuthorizationDao().synchronizeAfter(session,new Date(0));
-  file=new ComponentDto().setProjectId(1L).setKey("MyComponent").setId(2L);
+  file=new ComponentDto().setKey("MyComponent").setProjectId(project.getId());
   db.componentDao().insert(session,file);
   db.snapshotDao().insert(session,SnapshotTesting.createForComponent(file));
-  UserDto john=new UserDto().setLogin("john").setName("John").setEmail("john@email.com").setActive(true);
+  UserDto john=new UserDto().setLogin("john").setName("John").setEmail("john@email.com");
   db.userDao().insert(session,john);
   session.commit();
-  MockUserSession.set().setLogin("gandalf");
+  MockUserSession.set().setLogin("john");
 }
