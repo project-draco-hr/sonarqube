@@ -1,3 +1,11 @@
 {
-  return new QueryContext().addFieldsToReturn(request.paramAsStrings(PARAM_FIELDS)).setFacet(request.mandatoryParamAsBoolean(PARAM_FACETS)).setPage(request.mandatoryParamAsInt(PARAM_PAGE),request.mandatoryParamAsInt(PARAM_PAGE_SIZE));
+  int pageSize=request.mandatoryParamAsInt(PARAM_PAGE_SIZE);
+  QueryContext queryContext=new QueryContext().addFieldsToReturn(request.paramAsStrings(PARAM_FIELDS)).setFacet(request.mandatoryParamAsBoolean(PARAM_FACETS));
+  if (pageSize < 1) {
+    queryContext.setPage(request.mandatoryParamAsInt(PARAM_PAGE),0).setMaxLimit();
+  }
+ else {
+    queryContext.setPage(request.mandatoryParamAsInt(PARAM_PAGE),pageSize);
+  }
+  return queryContext;
 }
