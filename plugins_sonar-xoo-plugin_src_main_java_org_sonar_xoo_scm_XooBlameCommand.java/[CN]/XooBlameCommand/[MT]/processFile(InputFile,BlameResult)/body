@@ -1,0 +1,29 @@
+{
+  File ioFile=inputFile.file();
+  File scmDataFile=new java.io.File(ioFile.getParentFile(),ioFile.getName() + SCM_EXTENSION);
+  if (!scmDataFile.exists()) {
+    throw new IllegalStateException("Missing file " + scmDataFile);
+  }
+  try {
+    List<String> lines=FileUtils.readLines(scmDataFile,Charsets.UTF_8.name());
+    List<BlameLine> blame=new ArrayList<BlameLine>(lines.size());
+    int lineNumber=0;
+    for (    String line : lines) {
+      lineNumber++;
+      if (StringUtils.isNotBlank(line)) {
+        String[] fields=StringUtils.split(line,',');
+        if (fields.length < 3) {
+          throw new IllegalStateException("Not enough fields on line " + lineNumber);
+        }
+        String revision=fields[0];
+        String author=fields[1];
+        Date date=DateUtils.parseDate(fields[2]);
+        blame.add(new BlameLine(date,revision,author));
+      }
+    }
+    result.add(inputFile,blame);
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException(e);
+  }
+}
