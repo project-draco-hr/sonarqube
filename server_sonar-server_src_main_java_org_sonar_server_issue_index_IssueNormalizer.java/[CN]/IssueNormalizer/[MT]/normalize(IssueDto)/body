@@ -1,10 +1,11 @@
 {
-  Map<String,Object> update=new HashMap<String,Object>();
+  Map<String,Object> update=newHashMap();
   update.put("_parent",dto.getRootComponentKey());
   update.put(IssueField.KEY.field(),dto.getKey());
   update.put(IssueField.UPDATED_AT.field(),dto.getUpdatedAt());
   update.put(IssueField.CREATED_AT.field(),dto.getCreatedAt());
   update.put(IssueField.ACTION_PLAN.field(),dto.getActionPlanKey());
+  update.put(IssueField.ATTRIBUTES.field(),KeyValueFormat.parse(dto.getIssueAttributes()));
   update.put(IssueField.ASSIGNEE.field(),dto.getAssignee());
   update.put(IssueField.AUTHOR_LOGIN.field(),dto.getAuthorLogin());
   update.put(IssueField.ISSUE_CLOSE_DATE.field(),dto.getIssueCloseDate());
@@ -23,6 +24,6 @@
   update.put(IssueField.LANGUAGE.field(),dto.getLanguage());
   update.put(IssueField.RULE_KEY.field(),dto.getRuleKey().toString());
   Map<String,Object> upsert=getUpsertFor(IssueField.ALL_FIELDS,update);
-  upsert.put(IssueField.KEY.field(),dto.getKey().toString());
-  return ImmutableList.of(new UpdateRequest().id(dto.getKey().toString()).routing(dto.getRootComponentKey()).parent(dto.getRootComponentKey()).doc(update).upsert(upsert));
+  upsert.put(IssueField.KEY.field(),dto.getKey());
+  return ImmutableList.of(new UpdateRequest().id(dto.getKey()).routing(dto.getRootComponentKey()).parent(dto.getRootComponentKey()).doc(update).upsert(upsert));
 }
