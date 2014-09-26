@@ -5,9 +5,11 @@
     try {
       String projectKey=request.mandatoryParam(PARAM_PROJECT);
       AuthorizedComponentDto project=dbClient.componentDao().getAuthorizedComponentByKey(projectKey,session);
-      permissionService.synchronizePermissions(session,project.key());
-      session.commit();
-      dbClient.issueDao().synchronizeAfter(session,index.get(IssueIndex.class).getLastSynchronization(),ImmutableMap.of("project",projectKey));
+      if (index.get(IssueAuthorizationIndex.class).getNullableByKey(project.key()) == null) {
+        permissionService.synchronizePermissions(session,project.key());
+        session.commit();
+      }
+      dbClient.issueDao().synchronizeAfter(session,index.get(IssueIndex.class).getLastSynchronization(),ImmutableMap.of("project",project.key()));
       session.commit();
     }
   finally {
