@@ -1,15 +1,6 @@
 {
   BoolFilterBuilder esFilter=FilterBuilders.boolFilter();
-  String user=options.getUserLogin();
-  Set<String> groups=options.getUserGroups();
-  OrFilterBuilder groupsAndUser=FilterBuilders.orFilter();
-  if (user != null) {
-    groupsAndUser.add(FilterBuilders.termFilter(IssueAuthorizationNormalizer.IssueAuthorizationField.USERS.field(),user));
-  }
-  for (  String group : groups) {
-    groupsAndUser.add(FilterBuilders.termFilter(IssueAuthorizationNormalizer.IssueAuthorizationField.GROUPS.field(),group));
-  }
-  esFilter.must(FilterBuilders.hasParentFilter(IndexDefinition.ISSUES_AUTHORIZATION.getIndexType(),QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),FilterBuilders.boolFilter().must(FilterBuilders.termFilter(IssueAuthorizationNormalizer.IssueAuthorizationField.PERMISSION.field(),UserRole.USER),groupsAndUser).cache(true))));
+  addAuthorizationFilter(esFilter,options);
   if (BooleanUtils.isTrue(query.assigned())) {
     esFilter.must(FilterBuilders.existsFilter(IssueNormalizer.IssueField.ASSIGNEE.field()));
   }
@@ -39,17 +30,6 @@
   matchFilter(esFilter,IssueNormalizer.IssueField.RULE_KEY,query.rules());
   matchFilter(esFilter,IssueNormalizer.IssueField.SEVERITY,query.severities());
   matchFilter(esFilter,IssueNormalizer.IssueField.STATUS,query.statuses());
-  Date createdAfter=query.createdAfter();
-  if (createdAfter != null) {
-    esFilter.must(FilterBuilders.rangeFilter(IssueNormalizer.IssueField.ISSUE_CREATED_AT.field()).gte(createdAfter));
-  }
-  Date createdBefore=query.createdBefore();
-  if (createdBefore != null) {
-    esFilter.must(FilterBuilders.rangeFilter(IssueNormalizer.IssueField.ISSUE_CREATED_AT.field()).lte(createdBefore));
-  }
-  Date createdAt=query.createdAt();
-  if (createdAt != null) {
-    esFilter.must(FilterBuilders.termFilter(IssueNormalizer.IssueField.ISSUE_CREATED_AT.field(),createdAt));
-  }
+  addDatesFilter(esFilter,query,options);
   return esFilter;
 }
