@@ -1,11 +1,11 @@
 {
   RuleDto rule=RuleTesting.newXooX1();
   tester.get(RuleDao.class).insert(dbSession,rule);
-  ComponentDto project=new ComponentDto().setId(1L).setKey("MyProject").setProjectId(1L);
+  ComponentDto project=new ComponentDto().setId(1L).setKey("MyProject");
   tester.get(ComponentDao.class).insert(dbSession,project);
   tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),DefaultGroups.ANYONE,UserRole.USER,dbSession);
   dbClient.issueAuthorizationDao().synchronizeAfter(dbSession,new Date(0));
-  ComponentDto resource=new ComponentDto().setProjectId(1L).setKey("MyComponent").setId(2L);
+  ComponentDto resource=new ComponentDto().setKey("MyComponent").setId(2L);
   tester.get(ComponentDao.class).insert(dbSession,resource);
   IssueDto issue=new IssueDto().setIssueCreationDate(new Date()).setIssueUpdateDate(new Date()).setRule(rule).setRootComponent(project).setComponent(resource).setStatus("OPEN").setResolution("OPEN").setKee(UUID.randomUUID().toString()).setSeverity("MAJOR");
   dbClient.issueDao().insert(dbSession,issue);
