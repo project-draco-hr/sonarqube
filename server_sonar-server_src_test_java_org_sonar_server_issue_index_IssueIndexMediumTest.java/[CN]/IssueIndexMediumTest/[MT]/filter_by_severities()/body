@@ -1,0 +1,7 @@
+{
+  db.issueDao().insert(session,createIssue().setSeverity(Severity.INFO),createIssue().setSeverity(Severity.MAJOR));
+  session.commit();
+  assertThat(index.search(IssueQuery.builder().severities(newArrayList(Severity.INFO,Severity.MAJOR)).build(),new QueryContext()).getHits()).hasSize(2);
+  assertThat(index.search(IssueQuery.builder().severities(newArrayList(Severity.INFO)).build(),new QueryContext()).getHits()).hasSize(1);
+  assertThat(index.search(IssueQuery.builder().severities(newArrayList(Severity.BLOCKER)).build(),new QueryContext()).getHits()).isEmpty();
+}

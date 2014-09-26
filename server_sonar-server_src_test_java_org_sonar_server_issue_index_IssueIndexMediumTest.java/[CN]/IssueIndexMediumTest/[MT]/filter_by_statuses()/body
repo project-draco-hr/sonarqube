@@ -1,0 +1,7 @@
+{
+  db.issueDao().insert(session,createIssue().setStatus(Issue.STATUS_CLOSED),createIssue().setStatus(Issue.STATUS_OPEN));
+  session.commit();
+  assertThat(index.search(IssueQuery.builder().statuses(newArrayList(Issue.STATUS_CLOSED,Issue.STATUS_OPEN)).build(),new QueryContext()).getHits()).hasSize(2);
+  assertThat(index.search(IssueQuery.builder().statuses(newArrayList(Issue.STATUS_CLOSED)).build(),new QueryContext()).getHits()).hasSize(1);
+  assertThat(index.search(IssueQuery.builder().statuses(newArrayList(Issue.STATUS_CONFIRMED)).build(),new QueryContext()).getHits()).isEmpty();
+}

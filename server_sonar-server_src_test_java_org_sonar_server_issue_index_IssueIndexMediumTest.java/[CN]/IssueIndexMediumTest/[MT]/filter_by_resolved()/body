@@ -1,0 +1,7 @@
+{
+  db.issueDao().insert(session,createIssue().setStatus(Issue.STATUS_CLOSED).setResolution(Issue.RESOLUTION_FIXED),createIssue().setStatus(Issue.STATUS_OPEN).setResolution(null),createIssue().setStatus(Issue.STATUS_OPEN).setResolution(null));
+  session.commit();
+  assertThat(index.search(IssueQuery.builder().resolved(true).build(),new QueryContext()).getHits()).hasSize(1);
+  assertThat(index.search(IssueQuery.builder().resolved(false).build(),new QueryContext()).getHits()).hasSize(2);
+  assertThat(index.search(IssueQuery.builder().resolved(null).build(),new QueryContext()).getHits()).hasSize(3);
+}

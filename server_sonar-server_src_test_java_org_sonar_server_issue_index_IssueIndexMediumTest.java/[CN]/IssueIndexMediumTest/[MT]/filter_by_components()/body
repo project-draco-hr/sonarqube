@@ -1,0 +1,8 @@
+{
+  db.issueDao().insert(session,createIssue().setComponentKey("file1"),createIssue().setComponentKey("file2"));
+  session.commit();
+  assertThat(index.search(IssueQuery.builder().components(newArrayList("file1","file2")).build(),new QueryContext()).getHits()).hasSize(2);
+  assertThat(index.search(IssueQuery.builder().components(newArrayList("file1")).build(),new QueryContext()).getHits()).hasSize(1);
+  assertThat(index.search(IssueQuery.builder().components(newArrayList("unknown")).build(),new QueryContext()).getHits()).isEmpty();
+  assertThat(index.search(IssueQuery.builder().components(newArrayList(project.key())).build(),new QueryContext()).getHits()).isEmpty();
+}
