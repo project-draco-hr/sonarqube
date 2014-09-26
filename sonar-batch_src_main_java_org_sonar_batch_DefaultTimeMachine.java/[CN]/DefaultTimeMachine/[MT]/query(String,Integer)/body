@@ -1,17 +1,17 @@
 {
   StringBuilder sb=new StringBuilder();
   Map<String,Object> params=Maps.newHashMap();
-  sb.append("SELECT met.key, m");
-  sb.append(" FROM ").append(MeasureModel.class.getSimpleName()).append(" m, ").append(Metric.class.getSimpleName()).append(" met, ").append(ResourceModel.class.getSimpleName()).append(" r, ").append(Snapshot.class.getSimpleName()).append(" s WHERE met.id=m.metricId AND m.snapshotId=s.id AND s.resourceId=r.id AND r.key=:kee AND s.status=:status AND s.qualifier<>:lib");
+  sb.append("SELECT m");
+  sb.append(" FROM ").append(MeasureModel.class.getSimpleName()).append(" m, ").append(ResourceModel.class.getSimpleName()).append(" r, ").append(Snapshot.class.getSimpleName()).append(" s WHERE m.snapshotId=s.id AND s.resourceId=r.id AND r.kee=:kee AND s.status=:status AND s.qualifier<>:lib");
   params.put("kee",resourceKey);
   params.put("status",Snapshot.STATUS_PROCESSED);
   params.put("lib",Qualifiers.LIBRARY);
   sb.append(" AND m.characteristicId IS NULL");
   sb.append(" AND m.personId IS NULL");
   sb.append(" AND m.ruleId IS NULL AND m.rulePriority IS NULL");
-  if (metricKeys.length > 0) {
-    sb.append(" AND met.key IN (:metricKeys) ");
-    params.put("metricKeys",Arrays.asList(metricKeys));
+  if (metricIds.length > 0) {
+    sb.append(" AND m.metricId IN (:metricIds) ");
+    params.put("metricIds",Arrays.asList(metricIds));
   }
   sb.append(" AND s.last=true ");
   sb.append(" ORDER BY s.createdAt ");
