@@ -14,14 +14,20 @@
   }
   session.commit();
   tester.get(BackendCleanup.class).clearIndex(IndexDefinition.ISSUES);
-  DbSession newSession=db.openSession(false);
+  tester.clearIndexes();
+  session.commit();
+  session.clearCache();
+  DbSession newSession=db.openSession(true);
   newSession.setImplicitCommitSize(10);
   try {
-    db.issueDao().synchronizeAfter(newSession,new Date(0));
+    db.issueDao().synchronizeAfter(newSession,index.getLastSynchronization());
     newSession.commit();
-    assertThat(index.search(IssueQuery.builder().build(),new QueryContext().setMaxLimit()).getHits()).hasSize(10);
   }
   finally {
     newSession.close();
+    newSession.clearCache();
   }
+  session.commit();
+  session.clearCache();
+  assertThat(index.search(IssueQuery.builder().build(),new QueryContext().setMaxLimit()).getHits()).hasSize(11);
 }
