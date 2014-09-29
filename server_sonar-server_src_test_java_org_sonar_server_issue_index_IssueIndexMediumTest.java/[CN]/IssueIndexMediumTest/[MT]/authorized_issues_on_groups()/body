@@ -1,7 +1,11 @@
 {
-  ComponentDto project1=new ComponentDto().setId(10L).setKey("project1");
-  ComponentDto project2=new ComponentDto().setId(11L).setKey("project2");
-  tester.get(ComponentDao.class).insert(session,project1,project2);
+  ComponentDto project1=ComponentTesting.newProjectDto().setKey("project1");
+  ComponentDto project2=ComponentTesting.newProjectDto().setKey("project2");
+  ComponentDto project3=ComponentTesting.newProjectDto().setKey("project3");
+  ComponentDto file1=ComponentTesting.newFileDto(project1).setKey("file1");
+  ComponentDto file2=ComponentTesting.newFileDto(project1).setKey("file2");
+  ComponentDto file3=ComponentTesting.newFileDto(project1).setKey("file3");
+  tester.get(ComponentDao.class).insert(session,project1,project2,project3,file1,file2,file3);
   GroupDto groupDto=new GroupDto().setName("sonar-users");
   db.groupDao().insert(session,groupDto);
   tester.get(PermissionFacade.class).insertGroupPermission(project1.getId(),groupDto.getName(),UserRole.USER,session);
@@ -9,9 +13,7 @@
   db.groupDao().insert(session,groupDto);
   tester.get(PermissionFacade.class).insertGroupPermission(project2.getId(),groupDto.getName(),UserRole.USER,session);
   db.issueAuthorizationDao().synchronizeAfter(session,new Date(0));
-  IssueDto issue1=createIssue().setRootComponent(project1);
-  IssueDto issue2=createIssue().setRootComponent(project2);
-  db.issueDao().insert(session,issue1,issue2);
+  db.issueDao().insert(session,IssueTesting.newDto(rule,file1,project1),IssueTesting.newDto(rule,file2,project2),IssueTesting.newDto(rule,file3,project3));
   session.commit();
   session.clearCache();
   IssueQuery.Builder query=IssueQuery.builder();
@@ -23,4 +25,6 @@
   assertThat(index.search(query.build(),new QueryContext()).getHits()).hasSize(2);
   MockUserSession.set().setUserGroups("another group");
   assertThat(index.search(query.build(),new QueryContext()).getHits()).hasSize(0);
+  MockUserSession.set().setUserGroups("sonar-users","sonar-admins");
+  assertThat(index.search(query.componentRoots(newArrayList(project3.key())).build(),new QueryContext()).getHits()).hasSize(0);
 }

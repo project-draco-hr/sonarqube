@@ -1,0 +1,12 @@
+{
+  MockUserSession.set().setLogin("admin").addProjectPermissions(UserRole.ADMIN,project.key());
+  UserDto user=new UserDto().setLogin("user1").setName("User1");
+  db.userDao().insert(session,user);
+  session.commit();
+  service.addPermission(params(user.getLogin(),null,project.key(),UserRole.USER));
+  service.removePermission(params(user.getLogin(),null,project.key(),UserRole.USER));
+  session.commit();
+  assertThat(tester.get(RoleDao.class).selectUserPermissions(session,user.getLogin(),project.getId())).isEmpty();
+  IssueAuthorizationDoc issueAuthorizationDoc=index.getNullableByKey(project.getKey());
+  assertThat(issueAuthorizationDoc).isNull();
+}

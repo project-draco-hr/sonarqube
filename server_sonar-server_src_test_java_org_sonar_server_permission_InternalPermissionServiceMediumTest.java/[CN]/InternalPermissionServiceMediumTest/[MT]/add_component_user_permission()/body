@@ -1,9 +1,17 @@
 {
   MockUserSession.set().setLogin("admin").addProjectPermissions(UserRole.ADMIN,project.key());
+  UserDto user=new UserDto().setLogin("john").setName("John");
+  db.userDao().insert(session,user);
+  session.commit();
   assertThat(tester.get(RoleDao.class).selectUserPermissions(session,user.getLogin(),project.getId())).isEmpty();
   assertThat(index.getNullableByKey(project.getKey())).isNull();
   service.addPermission(params(user.getLogin(),null,project.key(),UserRole.USER));
   session.commit();
   assertThat(tester.get(RoleDao.class).selectUserPermissions(session,user.getLogin(),project.getId())).hasSize(1);
-  assertThat(index.getNullableByKey(project.getKey())).isNotNull();
+  IssueAuthorizationDoc issueAuthorizationDoc=index.getNullableByKey(project.getKey());
+  assertThat(issueAuthorizationDoc).isNotNull();
+  assertThat(issueAuthorizationDoc.project()).isEqualTo(project.getKey());
+  assertThat(issueAuthorizationDoc.permission()).isEqualTo(UserRole.USER);
+  assertThat(issueAuthorizationDoc.users()).containsExactly(user.getLogin());
+  assertThat(issueAuthorizationDoc.groups()).isEmpty();
 }

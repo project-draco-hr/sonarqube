@@ -1,5 +1,5 @@
 {
-  return new DbSynchronizationHandler(){
+  return new DbSynchronizationHandler(session,params){
     private final Map<String,IssueAuthorizationDto> authorizationDtoMap=new HashMap<String,IssueAuthorizationDto>();
     @Override public void handleResult(    ResultContext context){
       Map<String,Object> row=(Map<String,Object>)context.getResultObject();
@@ -21,8 +21,14 @@
       authorizationDtoMap.put(project,issueAuthorizationDto);
     }
     @Override public void enqueueCollected(){
-      for (      IssueAuthorizationDto authorization : authorizationDtoMap.values()) {
-        session.enqueue(new UpsertDto<IssueAuthorizationDto>(getIndexType(),authorization,true));
+      String projectKey=getParams().get("project");
+      if (authorizationDtoMap.isEmpty() && projectKey != null) {
+        getSession().enqueue(new DeleteKey<String>(getIndexType(),projectKey));
+      }
+ else {
+        for (        IssueAuthorizationDto authorization : authorizationDtoMap.values()) {
+          getSession().enqueue(new UpsertDto<IssueAuthorizationDto>(getIndexType(),authorization,true));
+        }
       }
     }
   }
