@@ -1,0 +1,15 @@
+{
+  GitBlameCommand blameCommand=new GitBlameCommand();
+  JGitBlameCommand jblameCommand=new JGitBlameCommand();
+  Settings settings=new Settings(new PropertyDefinitions(new GitPlugin().getExtensions()));
+  GitScmProvider gitScmProvider=new GitScmProvider(settings,blameCommand,jblameCommand);
+  assertThat(gitScmProvider.blameCommand()).isEqualTo(jblameCommand);
+  settings.setProperty(GitPlugin.GIT_IMPLEMENTATION_PROP_KEY,GitPlugin.EXE);
+  assertThat(gitScmProvider.blameCommand()).isEqualTo(blameCommand);
+  settings.setProperty(GitPlugin.GIT_IMPLEMENTATION_PROP_KEY,GitPlugin.JGIT);
+  assertThat(gitScmProvider.blameCommand()).isEqualTo(jblameCommand);
+  settings.setProperty(GitPlugin.GIT_IMPLEMENTATION_PROP_KEY,"foo");
+  thrown.expect(IllegalArgumentException.class);
+  thrown.expectMessage("Illegal value for " + GitPlugin.GIT_IMPLEMENTATION_PROP_KEY + ": foo");
+  gitScmProvider.blameCommand();
+}

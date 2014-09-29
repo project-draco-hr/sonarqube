@@ -1,0 +1,24 @@
+{
+  Git git=null;
+  File basedir=fs.baseDir();
+  try {
+    git=Git.open(basedir);
+    for (    InputFile inputFile : files) {
+      String filename=inputFile.relativePath();
+      org.eclipse.jgit.blame.BlameResult blameResult=git.blame().setFilePath(filename).call();
+      List<BlameLine> lines=new ArrayList<BlameLine>();
+      for (int i=0; i < blameResult.getResultContents().size(); i++) {
+        lines.add(new org.sonar.api.batch.scm.BlameLine(blameResult.getSourceAuthor(i).getWhen(),blameResult.getSourceCommit(i).getName(),blameResult.getSourceAuthor(i).getEmailAddress(),blameResult.getSourceCommitter(i).getEmailAddress()));
+      }
+      result.add(inputFile,lines);
+    }
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("JGit blame failure!",e);
+  }
+ finally {
+    if (git != null && git.getRepository() != null) {
+      git.getRepository().close();
+    }
+  }
+}
