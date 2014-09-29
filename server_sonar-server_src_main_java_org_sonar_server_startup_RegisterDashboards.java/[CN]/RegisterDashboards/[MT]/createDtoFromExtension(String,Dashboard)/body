@@ -1,14 +1,16 @@
 {
   Date now=new Date();
-  DashboardDto dashboardDto=new DashboardDto().setName(name).setDescription(dashboard.getDescription()).setColumnLayout(dashboard.getLayout().getCode()).setShared(true).setGlobal(dashboard.isGlobal()).setCreatedAt(now).setUpdatedAt(now);
+  DashboardDto dashboardDto=new DashboardDto().setName(name).setDescription(dashboard.getDescription()).setColumnLayout(dashboard.getLayout().getCode()).setShared(true).setGlobal(dashboard.isGlobal());
+  dashboardDto.setCreatedAt(now).setUpdatedAt(now);
   for (int columnIndex=1; columnIndex <= dashboard.getLayout().getColumns(); columnIndex++) {
     List<Dashboard.Widget> widgets=dashboard.getWidgetsOfColumn(columnIndex);
     for (int rowIndex=1; rowIndex <= widgets.size(); rowIndex++) {
       Dashboard.Widget widget=widgets.get(rowIndex - 1);
-      WidgetDto widgetDto=new WidgetDto().setKey(widget.getId()).setColumnIndex(columnIndex).setRowIndex(rowIndex).setConfigured(true).setCreatedAt(now).setUpdatedAt(now);
+      WidgetDto widgetDto=new WidgetDto().setWidgetKey(widget.getId()).setColumnIndex(columnIndex).setRowIndex(rowIndex).setConfigured(true);
+      widgetDto.setCreatedAt(now).setUpdatedAt(now);
       dashboardDto.addWidget(widgetDto);
       for (      Entry<String,String> property : widget.getProperties().entrySet()) {
-        WidgetPropertyDto propDto=new WidgetPropertyDto().setKey(property.getKey()).setValue(property.getValue());
+        WidgetPropertyDto propDto=new WidgetPropertyDto().setPropertyKey(property.getKey()).setTextValue(property.getValue());
         widgetDto.addWidgetProperty(propDto);
       }
     }
