@@ -13,12 +13,12 @@
     issueKeys.add(issue.getKey());
   }
   session.commit();
+  assertThat(db.issueDao().findAfterDate(session,new Date(0))).hasSize(11);
+  assertThat(index.countAll()).isEqualTo(11);
   tester.get(BackendCleanup.class).clearIndex(IndexDefinition.ISSUES);
   tester.clearIndexes();
-  session.commit();
-  session.clearCache();
   DbSession newSession=db.openSession(true);
-  newSession.setImplicitCommitSize(10);
+  System.out.println("index.getLastSynchronization() = " + index.getLastSynchronization());
   try {
     db.issueDao().synchronizeAfter(newSession,index.getLastSynchronization());
     newSession.commit();
@@ -29,5 +29,5 @@
   }
   session.commit();
   session.clearCache();
-  assertThat(index.search(IssueQuery.builder().build(),new QueryContext().setMaxLimit()).getHits()).hasSize(11);
+  assertThat(index.countAll()).isEqualTo(11);
 }
