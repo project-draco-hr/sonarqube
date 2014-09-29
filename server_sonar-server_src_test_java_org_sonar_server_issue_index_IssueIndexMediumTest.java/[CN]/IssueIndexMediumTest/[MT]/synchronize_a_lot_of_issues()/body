@@ -1,0 +1,27 @@
+{
+  ComponentDto project=new ComponentDto().setKey("MyProject").setProjectId_unit_test_only(1L);
+  db.componentDao().insert(session,project);
+  tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),DefaultGroups.ANYONE,UserRole.USER,session);
+  db.issueAuthorizationDao().synchronizeAfter(session,new Date(0));
+  ComponentDto resource=new ComponentDto().setProjectId_unit_test_only(project.getId()).setKey("MyComponent");
+  db.componentDao().insert(session,resource);
+  db.snapshotDao().insert(session,SnapshotTesting.createForComponent(resource));
+  List<String> issueKeys=newArrayList();
+  for (int i=0; i < 11; i++) {
+    IssueDto issue=IssueTesting.newDto(rule,resource,project);
+    tester.get(IssueDao.class).insert(session,issue);
+    issueKeys.add(issue.getKey());
+  }
+  session.commit();
+  tester.get(BackendCleanup.class).clearIndex(IndexDefinition.ISSUES);
+  DbSession newSession=db.openSession(false);
+  newSession.setImplicitCommitSize(10);
+  try {
+    db.issueDao().synchronizeAfter(newSession,new Date(0));
+    newSession.commit();
+    assertThat(index.search(IssueQuery.builder().build(),new QueryContext().setMaxLimit()).getHits()).hasSize(10);
+  }
+  finally {
+    newSession.close();
+  }
+}

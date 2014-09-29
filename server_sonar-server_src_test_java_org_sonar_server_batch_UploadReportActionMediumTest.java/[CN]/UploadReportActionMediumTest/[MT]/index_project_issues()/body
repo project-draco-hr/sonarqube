@@ -11,7 +11,7 @@
   IssueDto issue=new IssueDto().setIssueCreationDate(DateUtils.parseDate("2014-09-04")).setIssueUpdateDate(DateUtils.parseDate("2014-12-04")).setRule(rule).setDebt(10L).setRootComponent(project).setComponent(resource).setStatus("OPEN").setResolution("OPEN").setKee("82fd47d4-b650-4037-80bc-7b112bd4eac2").setSeverity("MAJOR");
   db.issueDao().insert(session,issue);
   session.commit();
-  clearIssueIndex();
+  tester.get(BackendCleanup.class).clearIndex(IndexDefinition.ISSUES);
   assertThat(db.issueDao().getByKey(session,issue.getKey())).isNotNull();
   assertThat(tester.get(IssueIndex.class).getNullableByKey(issue.getKey())).isNull();
   MockUserSession.set().setLogin("john").setGlobalPermissions(GlobalPermissions.SCAN_EXECUTION);
