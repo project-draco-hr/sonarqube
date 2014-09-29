@@ -1,15 +1,15 @@
 {
   UserSession.get().checkGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
-  if (settings.getString("sonar.issues.use_es_backend") != null) {
-    String projectKey=request.mandatoryParam(PARAM_PROJECT);
-    DbSession session=dbClient.openSession(false);
-    try {
-      dbClient.componentDao().getAuthorizedComponentByKey(projectKey,session);
-      computationService.create(projectKey);
-    }
+  String projectKey=request.mandatoryParam(PARAM_PROJECT);
+  DbSession session=dbClient.openSession(false);
+  try {
+    dbClient.componentDao().getAuthorizedComponentByKey(projectKey,session);
+    computationService.create(projectKey);
+  }
   finally {
-      MyBatis.closeQuietly(session);
-    }
+    MyBatis.closeQuietly(session);
+  }
+  if (settings.getString("sonar.issues.use_es_backend") != null) {
     session=dbClient.openSession(true);
     try {
       if (index.get(IssueAuthorizationIndex.class).getNullableByKey(projectKey) == null) {

@@ -1,0 +1,16 @@
+{
+  DbSession session=dbClient.openSession(false);
+  AnalysisReportDao dao=dbClient.analysisReportDao();
+  try {
+    if (serverUpgradeStatus.isUpgraded()) {
+      dao.cleanWithTruncate(session);
+    }
+ else {
+      dao.cleanWithUpdateAllToPendingStatus(session);
+    }
+    session.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}
