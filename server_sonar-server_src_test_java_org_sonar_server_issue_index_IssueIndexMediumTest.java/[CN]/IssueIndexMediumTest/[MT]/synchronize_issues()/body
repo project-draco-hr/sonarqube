@@ -1,9 +1,9 @@
 {
-  ComponentDto project=new ComponentDto().setKey("MyProject").setProjectId_unit_test_only(1L);
+  ComponentDto project=new ComponentDto().setKey("MyProject");
   db.componentDao().insert(session,project);
   tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),DefaultGroups.ANYONE,UserRole.USER,session);
   db.issueAuthorizationDao().synchronizeAfter(session,new Date(0));
-  ComponentDto resource=new ComponentDto().setProjectId_unit_test_only(project.getId()).setKey("MyComponent");
+  ComponentDto resource=new ComponentDto().setSubProjectId(project.getId()).setKey("MyComponent");
   db.componentDao().insert(session,resource);
   db.snapshotDao().insert(session,SnapshotTesting.createForComponent(resource));
   List<String> issueKeys=newArrayList();
@@ -18,16 +18,12 @@
   tester.get(BackendCleanup.class).clearIndex(IndexDefinition.ISSUES);
   tester.clearIndexes();
   DbSession newSession=db.openSession(true);
-  System.out.println("index.getLastSynchronization() = " + index.getLastSynchronization());
   try {
     db.issueDao().synchronizeAfter(newSession,index.getLastSynchronization());
     newSession.commit();
   }
   finally {
     newSession.close();
-    newSession.clearCache();
   }
-  session.commit();
-  session.clearCache();
   assertThat(index.countAll()).isEqualTo(11);
 }
