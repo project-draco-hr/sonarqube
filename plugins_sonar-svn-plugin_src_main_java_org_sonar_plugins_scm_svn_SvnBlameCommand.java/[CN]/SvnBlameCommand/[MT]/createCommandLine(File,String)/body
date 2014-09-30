@@ -1,0 +1,33 @@
+{
+  Command cl=Command.create("svn");
+  for (  Entry<String,String> env : System.getenv().entrySet()) {
+    cl.setEnvironmentVariable(env.getKey(),env.getValue());
+  }
+  cl.setEnvironmentVariable("LC_MESSAGES","en");
+  if (workingDirectory != null) {
+    cl.setDirectory(workingDirectory);
+  }
+  cl.addArgument("blame");
+  cl.addArgument("--xml");
+  cl.addArgument(filename);
+  cl.addArgument("--non-interactive");
+  String configDir=configuration.configDir();
+  if (configDir != null) {
+    cl.addArgument("--config-dir");
+    cl.addArgument(configDir);
+  }
+  String username=configuration.username();
+  if (username != null) {
+    cl.addArgument("--username");
+    cl.addArgument(username);
+    String password=configuration.password();
+    if (password != null) {
+      cl.addArgument("--password");
+      cl.addArgument(password);
+    }
+  }
+  if (configuration.trustServerCert()) {
+    cl.addArgument("--trust-server-cert");
+  }
+  return cl;
+}

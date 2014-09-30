@@ -1,0 +1,18 @@
+{
+  LOG.info("Working directory: " + fs.baseDir().getAbsolutePath());
+  ExecutorService executorService=Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+  List<Future<Void>> tasks=new ArrayList<Future<Void>>();
+  for (  InputFile inputFile : files) {
+    tasks.add(submitTask(fs,result,executorService,inputFile));
+  }
+  for (  Future<Void> task : tasks) {
+    try {
+      task.get();
+    }
+ catch (    ExecutionException e) {
+      throw e.getCause() instanceof RuntimeException ? (RuntimeException)e.getCause() : new IllegalStateException(e.getCause());
+    }
+catch (    InterruptedException e) {
+    }
+  }
+}
