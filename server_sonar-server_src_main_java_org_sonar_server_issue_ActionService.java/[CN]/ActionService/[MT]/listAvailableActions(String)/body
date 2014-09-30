@@ -1,3 +1,9 @@
 {
-  return listAvailableActions(issueService.getIssueByKey(issueKey));
+  DbSession session=dbClient.openSession(false);
+  try {
+    return listAvailableActions(issueService.getByKeyForUpdate(session,issueKey).toDefaultIssue());
+  }
+  finally {
+    session.close();
+  }
 }

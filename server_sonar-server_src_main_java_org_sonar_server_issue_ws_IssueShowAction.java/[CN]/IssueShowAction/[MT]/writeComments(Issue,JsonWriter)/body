@@ -2,7 +2,8 @@
   json.name("comments").beginArray();
   String login=UserSession.get().login();
   Map<String,User> usersByLogin=newHashMap();
-  for (  IssueComment comment : issue.comments()) {
+  List<DefaultIssueComment> comments=commentService.findComments(issue.key());
+  for (  IssueComment comment : comments) {
     String userLogin=comment.userLogin();
     User user=usersByLogin.get(userLogin);
     if (user == null) {
@@ -12,7 +13,7 @@
       }
     }
   }
-  for (  IssueComment comment : issue.comments()) {
+  for (  IssueComment comment : comments) {
     String userLogin=comment.userLogin();
     User user=usersByLogin.get(userLogin);
     json.beginObject().prop("key",comment.key()).prop("userName",user != null ? user.name() : null).prop("raw",comment.markdownText()).prop("html",Markdown.convertToHtml(comment.markdownText())).prop("createdAt",DateUtils.formatDateTime(comment.createdAt())).prop("fCreatedAge",formatAgeDate(comment.createdAt())).prop("updatable",login != null && login.equals(userLogin)).endObject();

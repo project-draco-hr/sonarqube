@@ -2,11 +2,10 @@
   Function function=new TweetFunction();
   UserSession userSession=mock(UserSession.class);
   when(userSession.login()).thenReturn("arthur");
-  DefaultIssue issue=new DefaultIssue().setKey("ABCD");
   when(componentDao.getByKey(eq(session),anyString())).thenReturn(mock(ComponentDto.class));
-  when(issueService.getIssueByKey(session,"ABCD")).thenReturn(issue);
+  when(issueService.getByKeyForUpdate(session,"ABCD")).thenReturn(issue);
   actions.add("link-to-jira").setConditions(new AlwaysMatch()).setFunctions(function);
   assertThat(actionService.execute("ABCD","link-to-jira",userSession)).isNotNull();
-  verify(updater).addComment(eq(issue),eq("New tweet on issue ABCD"),any(IssueChangeContext.class));
-  verify(updater).setAttribute(eq(issue),eq("tweet"),eq("tweet sent"),any(IssueChangeContext.class));
+  verify(updater).addComment(any(DefaultIssue.class),eq("New tweet on issue ABCD"),any(IssueChangeContext.class));
+  verify(updater).setAttribute(any(DefaultIssue.class),eq("tweet"),eq("tweet sent"),any(IssueChangeContext.class));
 }
