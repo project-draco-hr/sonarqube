@@ -1,5 +1,10 @@
 {
-  when(issueService.search(anyListOf(String.class))).thenReturn(newArrayList((Issue)new DefaultIssue().setKey("ABCD"),new DefaultIssue().setKey("EFGH")));
+  IssueDto issueDto1=IssueTesting.newDto(RuleTesting.newDto(rule.ruleKey()).setId(50),file,project).setKee("ABCD");
+  IssueDto issueDto2=IssueTesting.newDto(RuleTesting.newDto(rule.ruleKey()).setId(50),file,project).setKee("EFGH");
+  org.sonar.server.search.Result<Issue> resultIssues=mock(org.sonar.server.search.Result.class);
+  when(resultIssues.getHits()).thenReturn(Lists.<Issue>newArrayList(issueDto1.toDefaultIssue(),issueDto2.toDefaultIssue()));
+  when(issueService.search(any(IssueQuery.class),any(QueryContext.class))).thenReturn(resultIssues);
+  when(issueDao.getByKeys(dbSession,newArrayList("ABCD","EFGH"))).thenReturn(newArrayList(issueDto1,issueDto2));
   Map<String,Object> properties=newHashMap();
   properties.put("issues","ABCD,EFGH");
   properties.put("actions","assign");
@@ -21,5 +26,5 @@
   assertThat(result.issuesChanged()).hasSize(1);
   assertThat(result.issuesNotChanged()).hasSize(1);
   verify(assignAction,times(1)).execute(anyMap(),any(IssueBulkChangeService.ActionContext.class));
-  verify(issueStorage).save(eq(issue));
+  verify(issueStorage).save(eq(issueDto1.toDefaultIssue()));
 }
