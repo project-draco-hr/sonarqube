@@ -1,5 +1,13 @@
 {
   IssueQuery issueQuery=IssueQuery.builder().build();
-  service.execute(issueQuery);
-  verify(issueFinder).find(issueQuery);
+  QueryContext queryContext=new QueryContext().setPage(2,50);
+  Result<Issue> result=mock(Result.class);
+  when(result.getHits()).thenReturn(newArrayList((Issue)new DefaultIssue()));
+  when(result.getTotal()).thenReturn(100L);
+  when(issueIndex.search(issueQuery,queryContext)).thenReturn(result);
+  IssueFilterService.IssueFilterResult issueFilterResult=service.execute(issueQuery,queryContext);
+  assertThat(issueFilterResult.issues()).hasSize(1);
+  assertThat(issueFilterResult.paging().total()).isEqualTo(100);
+  assertThat(issueFilterResult.paging().pageIndex()).isEqualTo(2);
+  assertThat(issueFilterResult.paging().pageSize()).isEqualTo(50);
 }

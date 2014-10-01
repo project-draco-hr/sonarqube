@@ -1,10 +1,8 @@
 {
-  DefaultIssue issue=mock(DefaultIssue.class);
-  when(issue.comments()).thenReturn(Lists.<IssueComment>newArrayList(new DefaultIssueComment()));
-  IssueQueryResult issueQueryResult=new DefaultIssueQueryResult(Lists.<Issue>newArrayList(issue));
-  when(finder.find(any(IssueQuery.class))).thenReturn(issueQueryResult);
-  issueCommentService.addComment("myIssue","my comment",MockUserSession.get());
-  verify(updater).addComment(eq(issue),eq("my comment"),any(IssueChangeContext.class));
-  verify(storage).save(eq(issue));
-  verify(issueNotifications).sendChanges(eq(issue),any(IssueChangeContext.class),eq(issueQueryResult),eq("my comment"));
+  IssueDto issueDto=IssueTesting.newDto(RuleTesting.newXooX1().setId(500),ComponentTesting.newFileDto(ComponentTesting.newProjectDto()),ComponentTesting.newProjectDto());
+  when(issueService.getByKeyForUpdate(session,"ABCD")).thenReturn(issueDto);
+  when(issueCommentService.findComments(session,"ABCD")).thenReturn(newArrayList(new DefaultIssueComment()));
+  issueCommentService.addComment("ABCD","my comment",MockUserSession.get());
+  verify(updater).addComment(eq(issueDto.toDefaultIssue()),eq("my comment"),any(IssueChangeContext.class));
+  verify(issueService).saveIssue(eq(session),eq(issueDto.toDefaultIssue()),any(IssueChangeContext.class),eq("my comment"));
 }
