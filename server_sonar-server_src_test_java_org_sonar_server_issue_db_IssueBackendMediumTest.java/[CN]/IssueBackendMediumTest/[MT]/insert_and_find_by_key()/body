@@ -7,7 +7,7 @@
   dbClient.issueAuthorizationDao().synchronizeAfter(dbSession,new Date(0));
   ComponentDto resource=new ComponentDto().setKey("MyComponent").setId(2L);
   tester.get(ComponentDao.class).insert(dbSession,resource);
-  IssueDto issue=new IssueDto().setIssueCreationDate(new Date()).setIssueUpdateDate(new Date()).setRule(rule).setRootComponent(project).setComponent(resource).setStatus("OPEN").setResolution("OPEN").setKee(UUID.randomUUID().toString()).setSeverity("MAJOR");
+  IssueDto issue=new IssueDto().setIssueCreationDate(new Date()).setIssueUpdateDate(new Date()).setRule(rule).setRootComponent(project).setComponent(resource).setStatus("OPEN").setResolution("OPEN").setKee(UUID.randomUUID().toString()).setSeverity("MAJOR").setIssueAttributes(KeyValueFormat.format(ImmutableMap.of("key","value")));
   dbClient.issueDao().insert(dbSession,issue);
   dbSession.commit();
   assertThat(indexClient.get(IssueIndex.class).countAll()).isEqualTo(1);
@@ -27,4 +27,6 @@
   assertThat(issueDoc.updateDate()).isEqualTo(issue.getIssueUpdateDate());
   assertThat(issueDoc.status()).isEqualTo(issue.getStatus());
   assertThat(issueDoc.severity()).isEqualTo(issue.getSeverity());
+  assertThat(issueDoc.attributes()).isEqualTo(KeyValueFormat.parse(issue.getIssueAttributes()));
+  assertThat(issueDoc.attribute("key")).isEqualTo("value");
 }
