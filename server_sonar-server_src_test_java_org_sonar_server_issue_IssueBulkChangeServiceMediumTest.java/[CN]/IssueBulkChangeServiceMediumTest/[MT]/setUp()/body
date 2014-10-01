@@ -8,10 +8,10 @@
   tester.get(RuleDao.class).insert(session,rule);
   project=new ComponentDto().setKey("MyProject").setLongName("My Project").setQualifier(Qualifiers.PROJECT).setScope(Scopes.PROJECT);
   tester.get(ComponentDao.class).insert(session,project);
-  tester.get(SnapshotDao.class).insert(session,SnapshotTesting.createForComponent(project));
+  tester.get(SnapshotDao.class).insert(session,SnapshotTesting.createForProject(project));
   file=new ComponentDto().setSubProjectId(project.getId()).setKey("MyComponent").setLongName("My Component");
   tester.get(ComponentDao.class).insert(session,file);
-  tester.get(SnapshotDao.class).insert(session,SnapshotTesting.createForComponent(file));
+  tester.get(SnapshotDao.class).insert(session,SnapshotTesting.createForComponent(file,project));
   tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),DefaultGroups.ANYONE,UserRole.USER,session);
   db.issueAuthorizationDao().synchronizeAfter(session,new Date(0));
   userSession=MockUserSession.set().setLogin("john").addProjectPermissions(UserRole.USER,project.key());

@@ -1,0 +1,16 @@
+{
+  UserSession.get().checkProjectPermission(UserRole.ADMIN,projectKey);
+  DbSession session=dbClient.openSession(false);
+  try {
+    ComponentDto project=getByKey(projectKey);
+    resourceKeyUpdaterDao.bulkUpdateKey(project.getId(),stringToReplace,replacementString);
+    session.commit();
+    ComponentDto newProject=dbClient.componentDao().getById(project.getId(),session);
+    updateIssuesIndex(session,projectKey,newProject.key());
+    previewCache.reportResourceModification(newProject.key());
+    session.commit();
+  }
+  finally {
+    session.close();
+  }
+}

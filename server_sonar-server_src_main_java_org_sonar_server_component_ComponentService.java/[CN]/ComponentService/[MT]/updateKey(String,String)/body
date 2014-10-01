@@ -1,0 +1,17 @@
+{
+  UserSession.get().checkComponentPermission(UserRole.ADMIN,projectOrModuleKey);
+  DbSession session=dbClient.openSession(false);
+  try {
+    ComponentDto projectOrModule=getByKey(projectOrModuleKey);
+    ComponentDto oldRootProject=dbClient.componentDao().getRootProjectByKey(projectOrModuleKey,session);
+    resourceKeyUpdaterDao.updateKey(projectOrModule.getId(),newKey);
+    session.commit();
+    ComponentDto newRootProject=dbClient.componentDao().getRootProjectByKey(newKey,session);
+    updateIssuesIndex(session,oldRootProject.key(),newRootProject.key());
+    previewCache.reportResourceModification(newRootProject.key());
+    session.commit();
+  }
+  finally {
+    session.close();
+  }
+}

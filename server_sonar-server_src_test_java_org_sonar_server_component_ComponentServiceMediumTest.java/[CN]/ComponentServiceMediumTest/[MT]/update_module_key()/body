@@ -1,0 +1,23 @@
+{
+  ComponentDto module=ComponentTesting.newModuleDto(project).setKey("sample:root:module");
+  tester.get(ComponentDao.class).insert(session,module);
+  tester.get(SnapshotDao.class).insert(session,SnapshotTesting.createForComponent(module,project));
+  ComponentDto file=ComponentTesting.newFileDto(module).setKey("sample:root:module:src/File.xoo");
+  tester.get(ComponentDao.class).insert(session,file);
+  tester.get(SnapshotDao.class).insert(session,SnapshotTesting.createForComponent(file,project));
+  IssueDto issue=IssueTesting.newDto(rule,file,project);
+  db.issueDao().insert(session,issue);
+  session.commit();
+  MockUserSession.set().setLogin("john").addComponentPermission(UserRole.ADMIN,project.key(),module.key());
+  service.updateKey(module.key(),"sample:root2:module");
+  session.commit();
+  assertThat(service.getNullableByKey(project.key())).isNotNull();
+  assertThat(service.getNullableByKey(module.key())).isNull();
+  assertThat(service.getNullableByKey("sample:root2:module")).isNotNull();
+  assertThat(service.getNullableByKey(file.key())).isNull();
+  assertThat(service.getNullableByKey("sample:root2:module:src/File.xoo")).isNotNull();
+  assertThat(tester.get(IssueIndex.class).getNullableByKey(issue.getKey()).componentKey()).isEqualTo("sample:root2:module:src/File.xoo");
+  assertThat(tester.get(IssueIndex.class).getNullableByKey(issue.getKey()).projectKey()).isEqualTo(project.key());
+  assertThat(tester.get(IssueAuthorizationIndex.class).getNullableByKey(project.getKey())).isNotNull();
+  assertThat(db.propertiesDao().selectProjectProperties(project.key(),session)).hasSize(1);
+}

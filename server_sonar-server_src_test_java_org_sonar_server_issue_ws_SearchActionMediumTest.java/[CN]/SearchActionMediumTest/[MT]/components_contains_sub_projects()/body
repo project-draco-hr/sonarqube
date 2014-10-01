@@ -1,15 +1,15 @@
 {
   ComponentDto project=new ComponentDto().setKey("ProjectHavingModule").setScope("PRJ");
   db.componentDao().insert(session,project);
-  db.snapshotDao().insert(session,SnapshotTesting.createForComponent(project));
+  db.snapshotDao().insert(session,SnapshotTesting.createForProject(project));
   tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),DefaultGroups.ANYONE,UserRole.USER,session);
   db.issueAuthorizationDao().synchronizeAfter(session,new Date(0));
   ComponentDto module=new ComponentDto().setKey("ModuleHavingFile").setScope("PRJ").setSubProjectId(project.getId());
   db.componentDao().insert(session,module);
-  db.snapshotDao().insert(session,SnapshotTesting.createForComponent(module));
+  db.snapshotDao().insert(session,SnapshotTesting.createForComponent(module,project));
   ComponentDto file=new ComponentDto().setKey("FileLinkedToModule").setScope("FIL").setSubProjectId(module.getId());
   db.componentDao().insert(session,file);
-  db.snapshotDao().insert(session,SnapshotTesting.createForComponent(file));
+  db.snapshotDao().insert(session,SnapshotTesting.createForComponent(file,project));
   IssueDto issue=IssueTesting.newDto(rule,file,project);
   db.issueDao().insert(session,issue);
   session.commit();
