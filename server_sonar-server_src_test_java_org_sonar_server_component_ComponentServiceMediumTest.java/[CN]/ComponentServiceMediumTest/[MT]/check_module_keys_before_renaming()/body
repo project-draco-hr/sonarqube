@@ -1,0 +1,14 @@
+{
+  ComponentDto module=ComponentTesting.newModuleDto(project).setKey("sample:root:module");
+  tester.get(ComponentDao.class).insert(session,module);
+  tester.get(SnapshotDao.class).insert(session,SnapshotTesting.createForComponent(module,project));
+  ComponentDto file=ComponentTesting.newFileDto(module).setKey("sample:root:module:src/File.xoo");
+  tester.get(ComponentDao.class).insert(session,file);
+  tester.get(SnapshotDao.class).insert(session,SnapshotTesting.createForComponent(file,project));
+  session.commit();
+  MockUserSession.set().setLogin("john").addProjectPermissions(UserRole.ADMIN,project.key());
+  Map<String,String> result=service.checkModuleKeysBeforeRenaming(project.key(),"sample","sample2");
+  assertThat(result).hasSize(2);
+  assertThat(result.get("sample:root")).isEqualTo("sample2:root");
+  assertThat(result.get("sample:root:module")).isEqualTo("sample2:root:module");
+}

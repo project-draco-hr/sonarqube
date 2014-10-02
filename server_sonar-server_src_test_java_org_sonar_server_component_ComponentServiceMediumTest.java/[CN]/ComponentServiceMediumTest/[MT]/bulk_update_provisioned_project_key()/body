@@ -1,0 +1,11 @@
+{
+  ComponentDto provisionedProject=ComponentTesting.newProjectDto().setKey("provisionedProject");
+  tester.get(ComponentDao.class).insert(session,provisionedProject);
+  session.commit();
+  MockUserSession.set().setLogin("john").addComponentPermission(UserRole.ADMIN,provisionedProject.key(),provisionedProject.key());
+  service.bulkUpdateKey(provisionedProject.key(),"provisionedProject","provisionedProject2");
+  session.commit();
+  assertThat(service.getNullableByKey(provisionedProject.key())).isNull();
+  assertThat(service.getNullableByKey("provisionedProject2")).isNotNull();
+  assertThat(db.propertiesDao().selectProjectProperties("provisionedProject2",session)).hasSize(1);
+}
