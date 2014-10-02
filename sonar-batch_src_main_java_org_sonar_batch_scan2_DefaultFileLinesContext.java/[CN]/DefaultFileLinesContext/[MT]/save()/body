@@ -6,10 +6,8 @@
       throw new IllegalStateException("Unable to find metric with key: " + metricKey);
     }
     Map<Integer,Object> lines=entry.getValue();
-    if (shouldSave(lines)) {
-      String data=KeyValueFormat.format(lines);
-      measureCache.put(projectKey,ComponentKeys.createEffectiveKey(projectKey,inputFile),new DefaultMeasure<String>().forMetric(metric).onFile(inputFile).withValue(data));
-      entry.setValue(ImmutableMap.copyOf(lines));
-    }
+    String data=KeyValueFormat.format(lines);
+    new DefaultMeasure<String>(sensorStorage).forMetric(metric).onFile(inputFile).withValue(data).save();
+    entry.setValue(ImmutableMap.copyOf(lines));
   }
 }

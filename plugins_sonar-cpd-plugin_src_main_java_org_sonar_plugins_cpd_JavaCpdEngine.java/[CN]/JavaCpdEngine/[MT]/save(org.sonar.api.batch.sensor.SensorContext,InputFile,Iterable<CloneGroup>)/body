@@ -4,11 +4,11 @@
   }
   Set<Integer> duplicatedLines=new HashSet<Integer>();
   int duplicatedBlocks=computeBlockAndLineCount(duplications,duplicatedLines);
-  FileLinesContext linesContext=contextFactory.createFor(inputFile);
+  Map<Integer,Integer> duplicationByLine=new HashMap<Integer,Integer>();
   for (int i=1; i <= inputFile.lines(); i++) {
-    linesContext.setIntValue(CoreMetrics.DUPLICATION_LINES_DATA_KEY,i,duplicatedLines.contains(i) ? 1 : 0);
+    duplicationByLine.put(i,duplicatedLines.contains(i) ? 1 : 0);
   }
-  linesContext.save();
+  ((DefaultMeasure<String>)context.<String>newMeasure().forMetric(CoreMetrics.DUPLICATION_LINES_DATA).onFile(inputFile).withValue(KeyValueFormat.format(duplicationByLine))).setFromCore().save();
   context.<Integer>newMeasure().forMetric(CoreMetrics.DUPLICATED_FILES).onFile(inputFile).withValue(1).save();
   context.<Integer>newMeasure().forMetric(CoreMetrics.DUPLICATED_LINES).onFile(inputFile).withValue(duplicatedLines.size()).save();
   context.<Integer>newMeasure().forMetric(CoreMetrics.DUPLICATED_BLOCKS).onFile(inputFile).withValue(duplicatedBlocks).save();
