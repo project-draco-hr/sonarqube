@@ -4,12 +4,20 @@
     esSearch.setSearchType(SearchType.SCAN);
     esSearch.setScroll(TimeValue.timeValueMinutes(3));
   }
-  setFacets(options,esSearch);
+  QueryBuilder qb=this.getQuery(query,options);
+  HashMap<String,FilterBuilder> filters=this.getFilters(query,options);
+  if (options.isFacet()) {
+    for (    AggregationBuilder aggregation : getFacets(qb,filters).values()) {
+      esSearch.addAggregation(aggregation);
+    }
+  }
   setSorting(query,esSearch);
   setPagination(options,esSearch);
   setFields(options,esSearch);
-  FilterBuilder fb=this.getFilter(query,options);
-  QueryBuilder qb=this.getQuery(query,options);
+  BoolFilterBuilder fb=FilterBuilders.boolFilter();
+  for (  FilterBuilder ffb : filters.values()) {
+    fb.must(ffb);
+  }
   esSearch.setQuery(QueryBuilders.filteredQuery(qb,fb));
   SearchResponse esResult=getClient().execute(esSearch);
   return new Result<Rule>(this,esResult);

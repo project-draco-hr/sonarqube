@@ -1,0 +1,15 @@
+{
+  if (Terms.class.isAssignableFrom(aggregation.getClass())) {
+    Terms termAggregation=(Terms)aggregation;
+    for (    Terms.Bucket value : termAggregation.getBuckets()) {
+      this.facets.put(aggregation.getName(),new FacetValue(value.getKey(),(int)value.getDocCount()));
+    }
+  }
+ else   if (HasAggregations.class.isAssignableFrom(aggregation.getClass())) {
+    HasAggregations hasAggregations=(HasAggregations)aggregation;
+    for (    Aggregation internalAggregation : ((HasAggregations)aggregation).getAggregations())     this.processAggregation(internalAggregation);
+  }
+ else {
+    ;
+  }
+}
