@@ -3,12 +3,16 @@
   for (  InputFile inputFile : files) {
     String filename=inputFile.relativePath();
     Command cl=createCommandLine(fs.baseDir(),filename);
-    GitBlameConsumer consumer=new GitBlameConsumer();
+    GitBlameConsumer consumer=new GitBlameConsumer(filename);
     StringStreamConsumer stderr=new StringStreamConsumer();
     int exitCode=execute(cl,consumer,stderr);
     if (exitCode != 0) {
       throw new IllegalStateException("The git blame command [" + cl.toString() + "] failed: "+ stderr.getOutput());
     }
-    result.add(inputFile,consumer.getLines());
+    List<BlameLine> lines=consumer.getLines();
+    if (lines.size() == inputFile.lines() - 1) {
+      lines.add(lines.get(lines.size() - 1));
+    }
+    result.add(inputFile,lines);
   }
 }

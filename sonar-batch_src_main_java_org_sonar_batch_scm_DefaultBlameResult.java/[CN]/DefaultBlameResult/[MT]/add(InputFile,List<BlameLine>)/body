@@ -1,4 +1,7 @@
 {
+  Preconditions.checkNotNull(file);
+  Preconditions.checkNotNull(lines);
+  Preconditions.checkArgument(lines.size() == file.lines(),"Expected one blame result per line");
   PropertiesBuilder<Integer,String> authors=propertiesBuilder(CoreMetrics.SCM_AUTHORS_BY_LINE);
   PropertiesBuilder<Integer,String> dates=propertiesBuilder(CoreMetrics.SCM_LAST_COMMIT_DATETIMES_BY_LINE);
   PropertiesBuilder<Integer,String> revisions=propertiesBuilder(CoreMetrics.SCM_REVISIONS_BY_LINE);
@@ -8,11 +11,6 @@
     dates.add(lineNumber,DateUtils.formatDateTime(line.getDate()));
     revisions.add(lineNumber,line.getRevision());
     lineNumber++;
-    if (lineNumber > lines.size() && lineNumber == file.lines()) {
-      authors.add(lineNumber,normalizeString(line.getAuthor()));
-      dates.add(lineNumber,DateUtils.formatDateTime(line.getDate()));
-      revisions.add(lineNumber,line.getRevision());
-    }
   }
   ScmSensor.saveMeasures(context,file,authors.buildData(),dates.buildData(),revisions.buildData());
 }
