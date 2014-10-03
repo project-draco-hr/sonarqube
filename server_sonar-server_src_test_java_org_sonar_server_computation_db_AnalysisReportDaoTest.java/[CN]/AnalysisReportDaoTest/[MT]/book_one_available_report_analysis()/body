@@ -1,0 +1,10 @@
+{
+  Date mockedNow=DateUtils.parseDate("2014-09-30");
+  when(system2.now()).thenReturn(mockedNow.getTime());
+  db.prepareDbUnit(getClass(),"one_available_analysis.xml");
+  AnalysisReportDto report=AnalysisReportDto.newForTests(1L);
+  AnalysisReportDto reportBooked=dao.tryToBookReportAnalysis(session,report);
+  assertThat(reportBooked.getId()).isEqualTo(1L);
+  assertThat(reportBooked.getStatus()).isEqualTo(WORKING);
+  assertThat(reportBooked.getUpdatedAt()).isEqualTo(mockedNow);
+}
