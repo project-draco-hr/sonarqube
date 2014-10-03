@@ -6,6 +6,7 @@
   Set<String> actionPlanKeys=newHashSet();
   List<String> userLogins=newArrayList();
   Map<String,User> usersByLogin=newHashMap();
+  Map<String,ComponentDto> componentsByKey=newHashMap();
   Multimap<String,DefaultIssueComment> commentsByIssues=ArrayListMultimap.create();
   for (  Issue issue : result.getHits()) {
     issueKeys.add(issue.key());
@@ -33,6 +34,9 @@
     List<ComponentDto> projectDtos=dbClient.componentDao().getByKeys(session,projectKeys);
     componentDtos.addAll(subProjectDtos);
     componentDtos.addAll(projectDtos);
+    for (    ComponentDto componentDto : componentDtos) {
+      componentsByKey.put(componentDto.key(),componentDto);
+    }
     writeProjects(json,projectDtos);
     writeComponents(json,componentDtos);
   }
@@ -40,7 +44,7 @@
     session.close();
   }
   Map<String,ActionPlan> actionPlanByKeys=getActionPlanByKeys(actionPlanKeys);
-  writeIssues(result,commentsByIssues,usersByLogin,actionPlanByKeys,request.paramAsStrings(EXTRA_FIELDS_PARAM),json);
+  writeIssues(result,commentsByIssues,usersByLogin,actionPlanByKeys,componentsByKey,request.paramAsStrings(EXTRA_FIELDS_PARAM),json);
   writeRules(json,!request.mandatoryParamAsBoolean(IssueFilterParameters.HIDE_RULES) ? ruleService.getByKeys(ruleKeys) : Collections.<Rule>emptyList());
   writeUsers(json,usersByLogin);
   writeActionPlans(json,actionPlanByKeys.values());
