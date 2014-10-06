@@ -3,13 +3,14 @@
   props.put(SearchServer.ES_PORT_PROPERTY,port.toString());
   props.put(SearchServer.ES_CLUSTER_PROPERTY,cluster);
   props.put(SearchServer.SONAR_PATH_HOME,temp.getRoot().getAbsolutePath());
-  SearchServer searchServer=new SearchServer(new Props(props));
+  searchServer=new SearchServer(new Props(props));
   assertThat(searchServer).isNotNull();
   searchServer.start();
   assertThat(searchServer.isReady()).isTrue();
-  Client client=getSearchClient();
+  client=getSearchClient();
   searchServer.stop();
   searchServer.awaitStop();
+  searchServer=null;
   try {
     assertThat(client.admin().cluster().prepareClusterStats().get().getStatus()).isNotEqualTo(ClusterHealthStatus.GREEN);
   }

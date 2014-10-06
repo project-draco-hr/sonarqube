@@ -1,0 +1,31 @@
+{
+  Properties props=new Properties();
+  props.put(SearchServer.CLUSTER_ACTIVATION,Boolean.FALSE.toString());
+  props.put(SearchServer.ES_PORT_PROPERTY,port.toString());
+  props.put(SearchServer.SONAR_NODE_NAME,"MASTER");
+  props.put(SearchServer.ES_CLUSTER_PROPERTY,cluster);
+  props.put(SearchServer.SONAR_PATH_HOME,temp.getRoot().getAbsolutePath());
+  searchServer=new SearchServer(new Props(props));
+  assertThat(searchServer).isNotNull();
+  searchServer.start();
+  assertThat(searchServer.isReady()).isTrue();
+  client=getSearchClient();
+  client.admin().indices().prepareCreate("test").get();
+  props=new Properties();
+  props.put(SearchServer.ES_CLUSTER_INET,"localhost:" + port);
+  props.put(SearchServer.SONAR_NODE_NAME,"SLAVE");
+  props.put(SearchServer.ES_PORT_PROPERTY,NetworkUtils.freePort() + "");
+  props.put(SearchServer.ES_CLUSTER_PROPERTY,cluster);
+  props.put(SearchServer.SONAR_PATH_HOME,temp2.getRoot().getAbsolutePath());
+  SearchServer slaveServer=new SearchServer(new Props(props));
+  assertThat(slaveServer).isNotNull();
+  try {
+    slaveServer.start();
+  }
+ catch (  Exception e) {
+    assertThat(e.getMessage()).isEqualTo(SearchServer.WRONG_MASTER_REPLICATION_FACTOR);
+  }
+  assertThat(client.admin().cluster().prepareClusterStats().get().getNodesStats().getCounts().getTotal()).isEqualTo(1);
+  slaveServer.stop();
+  slaveServer.awaitStop();
+}

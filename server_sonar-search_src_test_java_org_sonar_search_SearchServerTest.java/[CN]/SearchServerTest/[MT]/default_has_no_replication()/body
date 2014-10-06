@@ -3,11 +3,13 @@
   props.put(SearchServer.ES_PORT_PROPERTY,port.toString());
   props.put(SearchServer.ES_CLUSTER_PROPERTY,cluster);
   props.put(SearchServer.SONAR_PATH_HOME,temp.getRoot().getAbsolutePath());
-  SearchServer searchServer=new SearchServer(new Props(props));
+  searchServer=new SearchServer(new Props(props));
   assertThat(searchServer).isNotNull();
   searchServer.start();
   assertThat(searchServer.isReady()).isTrue();
-  Client client=getSearchClient();
+  client=getSearchClient();
   client.admin().indices().prepareCreate("test").get();
   assertThat(client.admin().indices().prepareGetSettings("test").get().getSetting("test","index.number_of_replicas")).isEqualTo("0");
+  searchServer.stop();
+  searchServer.awaitStop();
 }

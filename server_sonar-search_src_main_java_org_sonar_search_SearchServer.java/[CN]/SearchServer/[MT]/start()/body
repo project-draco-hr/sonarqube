@@ -5,7 +5,6 @@
   Integer replicationFactor=0;
   ImmutableSettings.Builder esSettings=ImmutableSettings.settingsBuilder().put("discovery.zen.ping.multicast.enabled","false").put("index.number_of_shards","1").put("index.refresh_interval","30s").put("index.store.type","mmapfs").put("indices.store.throttle.type","none").put("index.merge.scheduler.max_thread_count",Math.max(1,Math.min(3,Runtime.getRuntime().availableProcessors() / 2))).put("script.default_lang","native").put("script.native." + ListUpdate.NAME + ".type",ListUpdate.UpdateListScriptFactory.class.getName()).put("transport.tcp.port",port).put("http.enabled",false).put("path.data",esDataDir().getAbsolutePath()).put("path.work",esWorkDir().getAbsolutePath()).put("path.logs",esLogDir().getAbsolutePath());
   if (!nodes.isEmpty()) {
-    replicationFactor=1;
     LoggerFactory.getLogger(SearchServer.class).info("Joining ES cluster with master: {}",nodes);
     esSettings.put("discovery.zen.ping.unicast.hosts",StringUtils.join(nodes,","));
     esSettings.put("node.master",false);
@@ -35,5 +34,15 @@
   }
   node=new InternalNode(esSettings.build(),true);
   node.start();
+  if (!nodes.isEmpty()) {
+    for (    ObjectCursor<Settings> settingCursor : node.client().admin().indices().prepareGetSettings().get().getIndexToSettings().values()) {
+      Settings settings=settingCursor.value;
+      String clusterReplicationFactor=settings.get("index.number_of_replicas","-1");
+      if (Integer.parseInt(clusterReplicationFactor) <= 0) {
+        node.stop();
+        throw new IllegalStateException(WRONG_MASTER_REPLICATION_FACTOR);
+      }
+    }
+  }
   node.client().admin().indices().preparePutTemplate("default").setTemplate("*").addMapping("_default_","{\"dynamic\": \"strict\"}").get();
 }
