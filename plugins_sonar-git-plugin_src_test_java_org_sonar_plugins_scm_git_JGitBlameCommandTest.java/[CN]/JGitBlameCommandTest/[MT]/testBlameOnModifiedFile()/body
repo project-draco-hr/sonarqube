@@ -1,12 +1,12 @@
 {
   File projectDir=temp.newFolder();
   javaUnzip(new File("test-repos/dummy-git.zip"),projectDir);
-  JGitBlameCommand jGitBlameCommand=new JGitBlameCommand();
+  JGitBlameCommand jGitBlameCommand=new JGitBlameCommand(new PathResolver());
   DefaultFileSystem fs=new DefaultFileSystem();
   File baseDir=new File(projectDir,"dummy-git");
   fs.setBaseDir(baseDir);
-  String relativePath="src/main/java/org/dummy/Dummy.java";
-  DefaultInputFile inputFile=new DefaultInputFile("foo",relativePath);
+  String relativePath=DUMMY_JAVA;
+  DefaultInputFile inputFile=new DefaultInputFile("foo",relativePath).setFile(new File(baseDir,relativePath));
   fs.add(inputFile);
   FileUtils.write(new File(baseDir,relativePath),"modification and \n some new line",true);
   BlameResult blameResult=mock(BlameResult.class);

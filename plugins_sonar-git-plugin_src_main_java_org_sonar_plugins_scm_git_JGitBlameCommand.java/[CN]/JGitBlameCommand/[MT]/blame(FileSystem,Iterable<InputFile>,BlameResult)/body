@@ -2,9 +2,11 @@
   Git git=null;
   File basedir=fs.baseDir();
   try {
-    git=Git.open(basedir);
+    Repository repo=new RepositoryBuilder().findGitDir(basedir).setMustExist(true).build();
+    git=Git.wrap(repo);
+    File gitBaseDir=repo.getWorkTree();
     for (    InputFile inputFile : files) {
-      String filename=inputFile.relativePath();
+      String filename=pathResolver.relativePath(gitBaseDir,inputFile.file());
       org.eclipse.jgit.blame.BlameResult blameResult=git.blame().setFilePath(filename).call();
       List<BlameLine> lines=new ArrayList<BlameLine>();
       for (int i=0; i < blameResult.getResultContents().size(); i++) {
