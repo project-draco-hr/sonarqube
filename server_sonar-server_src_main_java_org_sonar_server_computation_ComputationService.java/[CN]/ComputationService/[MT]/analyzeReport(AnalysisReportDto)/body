@@ -1,2 +1,15 @@
 {
+  DbSession session=dbClient.openSession(true);
+  String projectKey=report.getProjectKey();
+  try {
+    synchronizeProjectPermissionsIfNotFound(session,projectKey);
+    indexProjectIssues(session,projectKey);
+  }
+ catch (  Exception exception) {
+    LOG.debug(String.format("Error during analysis '%s' of project '%s'",report.getId(),projectKey),exception);
+  }
+ finally {
+    MyBatis.closeQuietly(session);
+    LOG.debug(String.format("Analysis '%s' of project '%s' finished.",report.getId(),projectKey));
+  }
 }

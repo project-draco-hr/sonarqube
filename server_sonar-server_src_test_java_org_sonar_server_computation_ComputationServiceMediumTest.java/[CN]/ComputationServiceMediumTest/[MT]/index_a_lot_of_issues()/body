@@ -1,0 +1,25 @@
+{
+  ComponentDto project=insertPermissionsForProject(DEFAULT_PROJECT_KEY);
+  db.issueAuthorizationDao().synchronizeAfter(session,new Date(0));
+  ComponentDto file=ComponentTesting.newFileDto(project);
+  db.componentDao().insert(session,file);
+  db.snapshotDao().insert(session,SnapshotTesting.createForComponent(file,project));
+  RuleDto rule=RuleTesting.newXooX1();
+  tester.get(RuleDao.class).insert(session,rule);
+  List<String> issueKeys=newArrayList();
+  for (int i=0; i < 2001; i++) {
+    IssueDto issue=IssueTesting.newDto(rule,file,project);
+    tester.get(IssueDao.class).insert(session,issue);
+    issueKeys.add(issue.getKey());
+  }
+  session.commit();
+  session.clearCache();
+  clearIssueIndexToSimulateBatchInsertWithoutIndexing();
+  sut.create(DEFAULT_PROJECT_KEY);
+  List<AnalysisReportDto> reports=sut.findByProjectKey(DEFAULT_PROJECT_KEY);
+  sut.analyzeReport(reports.get(0));
+  session.commit();
+  session.clearCache();
+  Result<Issue> issueIndex=tester.get(IssueIndex.class).search(IssueQuery.builder().build(),new QueryContext());
+  assertThat(issueIndex.getTotal()).isEqualTo(2001);
+}
