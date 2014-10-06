@@ -5,7 +5,13 @@
       Command cl=createCommandLine(fs.baseDir(),filename);
       SvnBlameConsumer consumer=new SvnBlameConsumer(filename);
       StringStreamConsumer stderr=new StringStreamConsumer();
-      int exitCode=execute(cl,consumer,stderr);
+      int exitCode;
+      try {
+        exitCode=execute(cl,consumer,stderr);
+      }
+ catch (      CommandException e) {
+        throw e.getCause() instanceof RuntimeException ? (RuntimeException)e.getCause() : new IllegalStateException(e.getCause());
+      }
       if (exitCode != 0) {
         throw new IllegalStateException("The svn blame command [" + cl.toString() + "] failed: "+ stderr.getOutput());
       }
