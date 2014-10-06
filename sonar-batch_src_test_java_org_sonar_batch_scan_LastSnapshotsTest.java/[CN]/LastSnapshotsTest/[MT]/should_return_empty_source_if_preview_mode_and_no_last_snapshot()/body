@@ -1,9 +1,9 @@
 {
-  setupData("last_snapshot");
+  db.prepareDbUnit(getClass(),"last_snapshot.xml");
   ServerClient server=mock(ServerClient.class);
   when(server.request(anyString(),eq("GET"),eq(false),eq(30 * 1000))).thenThrow(new HttpDownloader.HttpException(new URI(""),404));
   when(mode.isPreview()).thenReturn(true);
-  LastSnapshots lastSnapshots=new LastSnapshots(mode,getSession(),server);
+  LastSnapshots lastSnapshots=new LastSnapshots(mode,new SnapshotSourceDao(db.myBatis()),server);
   String source=lastSnapshots.getSource(newFile());
   assertThat(source).isEqualTo("");
   verify(server).request("/api/sources?resource=myproject:org/foo/Bar.c&format=txt","GET",false,30 * 1000);
