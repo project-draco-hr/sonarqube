@@ -1,5 +1,6 @@
 {
   Properties props=new Properties();
+  props.put(SearchServer.CLUSTER_ACTIVATION,Boolean.TRUE.toString());
   props.put(SearchServer.ES_PORT_PROPERTY,port.toString());
   props.put(SearchServer.ES_CLUSTER_PROPERTY,cluster);
   props.put(SearchServer.SONAR_PATH_HOME,temp.getRoot().getAbsolutePath());
@@ -8,12 +9,6 @@
   searchServer.start();
   assertThat(searchServer.isReady()).isTrue();
   Client client=getSearchClient();
-  searchServer.stop();
-  searchServer.awaitStop();
-  try {
-    assertThat(client.admin().cluster().prepareClusterStats().get().getStatus()).isNotEqualTo(ClusterHealthStatus.GREEN);
-  }
- catch (  NoNodeAvailableException exception) {
-    assertThat(exception.getMessage()).isEqualTo("No node available");
-  }
+  client.admin().indices().prepareCreate("test").get();
+  assertThat(client.admin().indices().prepareGetSettings("test").get().getSetting("test","index.number_of_replicas")).isEqualTo("1");
 }
