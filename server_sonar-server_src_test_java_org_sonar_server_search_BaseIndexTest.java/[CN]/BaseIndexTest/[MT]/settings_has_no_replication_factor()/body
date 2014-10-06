@@ -1,0 +1,24 @@
+{
+  BaseIndex index=getIndex(this.searchClient);
+  assertThat(index.getIndexSettings().get("index.number_of_replicas")).isNull();
+  BaseIndex newIndex=new BaseIndex(IndexDefinition.TEST,null,searchClient){
+    @Override protected ImmutableSettings.Builder addCustomIndexSettings(    ImmutableSettings.Builder baseIndexSettings){
+      return baseIndexSettings.put("index.number_of_replicas",22);
+    }
+    @Override protected String getKeyValue(    Serializable key){
+      return null;
+    }
+    @Override protected Map mapProperties(){
+      return Collections.emptyMap();
+    }
+    @Override protected Map mapKey(){
+      return Collections.emptyMap();
+    }
+    @Override public Object toDoc(    Map fields){
+      return null;
+    }
+  }
+;
+  newIndex.start();
+  assertThat(index.getIndexSettings().get("index.number_of_replicas")).isNull();
+}

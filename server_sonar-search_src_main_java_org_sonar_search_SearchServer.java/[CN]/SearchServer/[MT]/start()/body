@@ -4,6 +4,7 @@
   LoggerFactory.getLogger(SearchServer.class).info("Starting ES[{}] on port: {}",clusterName,port);
   ImmutableSettings.Builder esSettings=ImmutableSettings.settingsBuilder().put("discovery.zen.ping.multicast.enabled","false").put("index.refresh_interval","30s").put("index.number_of_shards","1").put("index.number_of_replicas",MINIMUM_INDEX_REPLICATION).put("index.store.type","mmapfs").put("indices.store.throttle.type","none").put("index.merge.scheduler.max_thread_count",Math.max(1,Math.min(3,Runtime.getRuntime().availableProcessors() / 2))).put("script.default_lang","native").put("script.native." + ListUpdate.NAME + ".type",ListUpdate.UpdateListScriptFactory.class.getName()).put("transport.tcp.port",port).put("http.enabled",false).put("path.data",esDataDir().getAbsolutePath()).put("path.work",esWorkDir().getAbsolutePath()).put("path.logs",esLogDir().getAbsolutePath());
   if (!nodes.isEmpty()) {
+    props.set(CLUSTER_ACTIVATION,Boolean.TRUE.toString());
     LoggerFactory.getLogger(SearchServer.class).info("Joining ES cluster with master: {}",nodes);
     esSettings.put("discovery.zen.ping.unicast.hosts",StringUtils.join(nodes,","));
     esSettings.put("node.master",false);
@@ -26,6 +27,12 @@
       LoggerFactory.getLogger(SearchServer.class).warn("Could not determine hostname",e);
       esSettings.put("node.name","sq-" + System.currentTimeMillis());
     }
+  }
+  if (props.valueAsBoolean(CLUSTER_ACTIVATION)) {
+    esSettings.put("index.number_of_replicas",1);
+  }
+ else {
+    esSettings.put("index.number_of_replicas",0);
   }
   node=NodeBuilder.nodeBuilder().settings(esSettings).build().start();
   node.client().admin().indices().preparePutTemplate("default").setTemplate("*").addMapping("_default_","{\"dynamic\": \"strict\"}").get();
