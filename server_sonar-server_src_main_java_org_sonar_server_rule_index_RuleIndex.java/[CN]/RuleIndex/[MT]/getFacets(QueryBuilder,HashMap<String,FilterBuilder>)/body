@@ -1,20 +1,20 @@
 {
   Map<String,AggregationBuilder> aggregations=new HashMap<String,AggregationBuilder>();
-  BoolFilterBuilder langFacetFilter=FilterBuilders.boolFilter();
+  BoolFilterBuilder langFacetFilter=FilterBuilders.boolFilter().must(FilterBuilders.queryFilter(query));
   for (  Map.Entry<String,FilterBuilder> filter : filters.entrySet()) {
     if (filter.getKey() != RuleNormalizer.RuleField.LANGUAGE.field()) {
       langFacetFilter.must(filter.getValue());
     }
   }
   aggregations.put(FACET_LANGUAGES + "global",AggregationBuilders.global(FACET_LANGUAGES).subAggregation(AggregationBuilders.filter(FACET_LANGUAGES + "_filter").filter(langFacetFilter).subAggregation(AggregationBuilders.terms(FACET_LANGUAGES).field(RuleNormalizer.RuleField.LANGUAGE.field()).order(Terms.Order.count(false)).size(10).minDocCount(1))));
-  BoolFilterBuilder tagsFacetFilter=FilterBuilders.boolFilter();
+  BoolFilterBuilder tagsFacetFilter=FilterBuilders.boolFilter().must(FilterBuilders.queryFilter(query));
   for (  Map.Entry<String,FilterBuilder> filter : filters.entrySet()) {
     if (filter.getKey() != RuleNormalizer.RuleField._TAGS.field()) {
       tagsFacetFilter.must(filter.getValue());
     }
   }
   aggregations.put(FACET_TAGS + "global",AggregationBuilders.global(FACET_TAGS).subAggregation(AggregationBuilders.filter(FACET_TAGS + "_filter").filter(tagsFacetFilter).subAggregation(AggregationBuilders.terms(FACET_TAGS).field(RuleNormalizer.RuleField._TAGS.field()).order(Terms.Order.count(false)).size(10).minDocCount(1))));
-  BoolFilterBuilder repositoriesFacetFilter=FilterBuilders.boolFilter();
+  BoolFilterBuilder repositoriesFacetFilter=FilterBuilders.boolFilter().must(FilterBuilders.queryFilter(query));
   for (  Map.Entry<String,FilterBuilder> filter : filters.entrySet()) {
     if (filter.getKey() != RuleNormalizer.RuleField.REPOSITORY.field()) {
       repositoriesFacetFilter.must(filter.getValue());
