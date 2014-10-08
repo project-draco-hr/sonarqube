@@ -1,7 +1,15 @@
 {
   String key="test_key";
   DeleteKey<String> deleteAction=new DeleteKey<String>(TEST_INDEX.getIndexType(),key);
-  List<DeleteRequest> requests=deleteAction.doCall(index);
+  try {
+    deleteAction.call();
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e.getMessage()).isEqualTo(IndexAction.MISSING_INDEX_EXCEPTION);
+  }
+  deleteAction.setIndex(index);
+  List<DeleteRequest> requests=deleteAction.call();
   assertThat(requests).hasSize(1);
   DeleteRequest request=requests.get(0);
   assertThat(request.type()).isEqualTo(TEST_INDEX.getIndexType());
