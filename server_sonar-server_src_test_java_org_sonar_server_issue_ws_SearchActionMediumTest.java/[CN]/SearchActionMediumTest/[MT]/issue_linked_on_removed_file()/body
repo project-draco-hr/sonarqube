@@ -1,0 +1,8 @@
+{
+  IssueDto issue=IssueTesting.newDto(rule,file,project).setKee("82fd47d4-b650-4037-80bc-7b112bd4eac2").setRule(rule).setRootComponent(project).setComponent(file).setStatus("OPEN").setResolution("OPEN").setSeverity("MAJOR").setIssueCreationDate(DateUtils.parseDate("2014-09-04")).setIssueUpdateDate(DateUtils.parseDate("2014-12-04"));
+  db.issueDao().insert(session,issue);
+  db.componentDao().deleteByKey(session,file.key());
+  session.commit();
+  WsTester.Result result=wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).execute();
+  result.assertJson(this.getClass(),"issue_linked_on_removed_file.json",false);
+}
