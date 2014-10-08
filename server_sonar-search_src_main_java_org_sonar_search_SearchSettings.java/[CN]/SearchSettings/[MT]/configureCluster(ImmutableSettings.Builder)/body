@@ -1,0 +1,25 @@
+{
+  if (!clusterNodes.isEmpty()) {
+    LoggerFactory.getLogger(SearchServer.class).info("Joining ES cluster with master: {}",clusterNodes);
+    builder.put("discovery.zen.ping.unicast.hosts",StringUtils.join(clusterNodes,","));
+    builder.put("node.master",false);
+    builder.put("discovery.zen.minimum_master_nodes",1);
+  }
+  int replicationFactor=props.valueAsBoolean(ProcessConstants.CLUSTER_ACTIVATION,false) ? 1 : 0;
+  builder.put("index.number_of_replicas",replicationFactor);
+  builder.put("cluster.name",clusterName);
+  builder.put("cluster.routing.allocation.awareness.attributes","rack_id");
+  builder.put("node.rack_id",props.value(ProcessConstants.CLUSTER_NODE_NAME,"unknown"));
+  if (props.contains(ProcessConstants.CLUSTER_NODE_NAME)) {
+    builder.put("node.name",props.value(ProcessConstants.CLUSTER_NODE_NAME));
+  }
+ else {
+    try {
+      builder.put("node.name",InetAddress.getLocalHost().getHostName());
+    }
+ catch (    Exception e) {
+      LoggerFactory.getLogger(SearchServer.class).warn("Could not determine hostname",e);
+      builder.put("node.name","sq-" + System.currentTimeMillis());
+    }
+  }
+}

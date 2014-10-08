@@ -1,0 +1,21 @@
+{
+  File homeDir=temp.newFolder();
+  Props props=new Props(new Properties());
+  props.set(ProcessConstants.SEARCH_PORT,"1234");
+  props.set(ProcessConstants.PATH_HOME,homeDir.getAbsolutePath());
+  props.set(ProcessConstants.CLUSTER_NAME,"test");
+  SearchSettings searchSettings=new SearchSettings(props);
+  assertThat(searchSettings.inCluster()).isFalse();
+  assertThat(searchSettings.clusterName()).isEqualTo("test");
+  assertThat(searchSettings.tcpPort()).isEqualTo(1234);
+  Settings generated=searchSettings.build();
+  assertThat(generated.get("transport.tcp.port")).isEqualTo("1234");
+  assertThat(generated.get("cluster.name")).isEqualTo("test");
+  assertThat(generated.get("path.data")).isNotNull();
+  assertThat(generated.get("path.logs")).isNotNull();
+  assertThat(generated.get("path.work")).isNotNull();
+  assertThat(generated.get("http.enabled")).isEqualTo("false");
+  assertThat(generated.get("index.number_of_replicas")).isEqualTo("0");
+  assertThat(generated.get("discovery.zen.ping.unicast.hosts")).isNull();
+  assertThat(generated.get("node.name")).isNotEmpty();
+}
