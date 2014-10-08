@@ -31,14 +31,15 @@
     update.put(RuleField.NOTE_CREATED_AT.field(),rule.getNoteCreatedAt());
     update.put(RuleField.NOTE_UPDATED_AT.field(),rule.getNoteUpdatedAt());
     Integer templateId=rule.getTemplateId();
+    String templateKeyFieldValue=null;
     if (templateId != null) {
       RuleDto templateRule=db.ruleDao().getById(session,templateId);
-      RuleKey templateKey=templateRule.getKey();
-      update.put(RuleField.TEMPLATE_KEY.field(),templateKey != null ? templateKey.toString() : null);
+      if (templateRule != null) {
+        RuleKey templateKey=templateRule.getKey();
+        templateKeyFieldValue=templateKey != null ? templateKey.toString() : null;
+      }
     }
- else {
-      update.put(RuleField.TEMPLATE_KEY.field(),null);
-    }
+    update.put(RuleField.TEMPLATE_KEY.field(),templateKeyFieldValue);
     update.put(RuleField.CHARACTERISTIC.field(),null);
     update.put(RuleField.SUB_CHARACTERISTIC.field(),null);
     update.put(RuleField.DEFAULT_CHARACTERISTIC.field(),null);
@@ -105,7 +106,7 @@
     }
     update.put(RuleField.TAGS.field(),rule.getTags());
     update.put(RuleField.SYSTEM_TAGS.field(),rule.getSystemTags());
-    update.put(RuleField._TAGS.field(),Sets.union(rule.getSystemTags(),rule.getTags()));
+    update.put(RuleField.ALL_TAGS.field(),Sets.union(rule.getSystemTags(),rule.getTags()));
     Map<String,Object> upsert=getUpsertFor(RuleField.ALL_FIELDS,update);
     upsert.put(RuleField.KEY.field(),rule.getKey().toString());
     requests.add(new UpdateRequest().id(rule.getKey().toString()).doc(update).upsert(upsert));
