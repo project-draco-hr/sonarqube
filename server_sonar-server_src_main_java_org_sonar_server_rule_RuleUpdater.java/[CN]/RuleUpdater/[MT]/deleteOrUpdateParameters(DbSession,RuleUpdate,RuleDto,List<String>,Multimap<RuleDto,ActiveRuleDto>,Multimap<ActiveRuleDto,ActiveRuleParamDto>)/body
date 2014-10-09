@@ -1,20 +1,22 @@
 {
   for (  RuleParamDto ruleParamDto : dbClient.ruleDao().findRuleParamsByRuleKey(dbSession,update.getRuleKey())) {
     String key=ruleParamDto.getName();
-    String value=update.parameter(key);
-    if (!Strings.isNullOrEmpty(value)) {
-      ruleParamDto.setDefaultValue(value);
-      dbClient.ruleDao().updateRuleParam(dbSession,customRule,ruleParamDto);
+    String value=Strings.emptyToNull(update.parameter(key));
+    ruleParamDto.setDefaultValue(value);
+    dbClient.ruleDao().updateRuleParam(dbSession,customRule,ruleParamDto);
+    if (value != null) {
       for (      ActiveRuleDto activeRuleDto : activeRules.get(customRule)) {
         for (        ActiveRuleParamDto activeRuleParamDto : activeRuleParams.get(activeRuleDto)) {
           if (activeRuleParamDto.getKey().equals(key)) {
             dbClient.activeRuleDao().updateParam(dbSession,activeRuleDto,activeRuleParamDto.setValue(value));
           }
+ else {
+            dbClient.activeRuleDao().addParam(dbSession,activeRuleDto,ActiveRuleParamDto.createFor(ruleParamDto).setValue(value));
+          }
         }
       }
     }
  else {
-      dbClient.ruleDao().removeRuleParam(dbSession,customRule,ruleParamDto);
       for (      ActiveRuleDto activeRuleDto : activeRules.get(customRule)) {
         for (        ActiveRuleParamDto activeRuleParamDto : activeRuleParams.get(activeRuleDto)) {
           if (activeRuleParamDto.getKey().equals(key)) {

@@ -11,6 +11,7 @@
   ruleDao.insert(dbSession,customRule);
   ruleDao.addRuleParam(dbSession,customRule,templateRuleParam1.setDefaultValue("a.*"));
   ruleDao.addRuleParam(dbSession,customRule,templateRuleParam2.setDefaultValue("txt"));
+  ruleDao.addRuleParam(dbSession,customRule,templateRuleParam3);
   QualityProfileDto profileDto=QProfileTesting.newXooP1();
   db.qualityProfileDao().insert(dbSession,profileDto);
   dbSession.commit();
@@ -22,18 +23,19 @@
   updater.update(update,UserSession.get());
   dbSession.clearCache();
   Rule customRuleReloaded=ruleIndex.getByKey(customRule.getKey());
-  assertThat(customRuleReloaded.params()).hasSize(2);
+  assertThat(customRuleReloaded.params()).hasSize(3);
   assertThat(customRuleReloaded.param("regex")).isNotNull();
   assertThat(customRuleReloaded.param("regex").defaultValue()).isEqualTo("b.*");
   assertThat(customRuleReloaded.param("message")).isNotNull();
   assertThat(customRuleReloaded.param("message").defaultValue()).isEqualTo("a message");
-  assertThat(customRuleReloaded.param("format")).isNull();
+  assertThat(customRuleReloaded.param("format")).isNotNull();
+  assertThat(customRuleReloaded.param("format").defaultValue()).isNull();
   RuleParam param=customRuleReloaded.params().get(0);
   assertThat(param.defaultValue()).isEqualTo("b.*");
   ActiveRule activeRule=tester.get(ActiveRuleIndex.class).getByKey(ActiveRuleKey.of(profileDto.getKey(),customRule.getKey()));
   assertThat(activeRule.params()).hasSize(2);
   assertThat(activeRule.params().get("regex")).isEqualTo("b.*");
-  assertThat(activeRule.params().get("format")).isNull();
   assertThat(activeRule.params().get("message")).isEqualTo("a message");
+  assertThat(activeRule.params().get("format")).isNull();
   assertThat(activeRule.severity()).isEqualTo(Severity.BLOCKER);
 }
