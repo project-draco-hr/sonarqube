@@ -1,0 +1,12 @@
+{
+  setupData("select_only_enable_users");
+  PermissionQuery query=PermissionQuery.builder().permission("user").build();
+  List<UserWithPermissionDto> result=dao.selectUsers(query,999L);
+  assertThat(result).hasSize(3);
+  assertThat(Iterables.find(result,new Predicate<UserWithPermissionDto>(){
+    @Override public boolean apply(    @Nullable UserWithPermissionDto input){
+      return input.getLogin().equals("disabledUser");
+    }
+  }
+,null)).isNull();
+}
