@@ -1,0 +1,15 @@
+{
+  DbSession session=dbClient.openSession(false);
+  try {
+    AnalysisReportDto nextAvailableReport=dao.getNextAvailableReport(session);
+    if (nextAvailableReport == null) {
+      return null;
+    }
+    AnalysisReportDto report=dao.tryToBookReportAnalysis(session,nextAvailableReport);
+    session.commit();
+    return report;
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

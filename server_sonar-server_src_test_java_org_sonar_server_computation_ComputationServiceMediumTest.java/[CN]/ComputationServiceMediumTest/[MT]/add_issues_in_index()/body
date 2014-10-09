@@ -10,8 +10,8 @@
   db.issueDao().insert(session,issue);
   session.commit();
   clearIssueIndexToSimulateBatchInsertWithoutIndexing();
-  sut.addAnalysisReport(DEFAULT_PROJECT_KEY);
-  List<AnalysisReportDto> reports=sut.findByProjectKey(DEFAULT_PROJECT_KEY);
+  queue.add(DEFAULT_PROJECT_KEY);
+  List<AnalysisReportDto> reports=queue.findByProjectKey(DEFAULT_PROJECT_KEY);
   sut.analyzeReport(reports.get(0));
   assertThat(tester.get(IssueIndex.class).getNullableByKey(issue.getKey())).isNotNull();
 }

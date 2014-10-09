@@ -1,6 +1,12 @@
 {
-  AnalysisReportDto report=service.findAndBookNextAvailableAnalysisReport();
+  AnalysisReportDto report=queue.bookNextAvailable();
   if (report != null) {
-    service.analyzeReport(report);
+    try {
+      service.analyzeReport(report);
+      queue.remove(report);
+    }
+ catch (    Exception exception) {
+      LOG.error(String.format("Analysis of report %s failed",report),exception);
+    }
   }
 }
