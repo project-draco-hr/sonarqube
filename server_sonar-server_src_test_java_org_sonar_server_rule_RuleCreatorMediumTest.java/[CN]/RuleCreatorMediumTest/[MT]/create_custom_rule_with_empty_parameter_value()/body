@@ -1,0 +1,13 @@
+{
+  RuleDto templateRule=createTemplateRule();
+  NewRule newRule=NewRule.createForCustomRule("CUSTOM_RULE",templateRule.getKey()).setName("My custom").setHtmlDescription("Some description").setSeverity(Severity.MAJOR).setStatus(RuleStatus.READY).setParameters(ImmutableMap.of("regex",""));
+  RuleKey customRuleKey=creator.create(newRule);
+  dbSession.clearCache();
+  List<RuleParamDto> params=db.ruleDao().findRuleParamsByRuleKey(dbSession,customRuleKey);
+  assertThat(params).hasSize(1);
+  RuleParamDto param=params.get(0);
+  assertThat(param.getName()).isEqualTo("regex");
+  assertThat(param.getDescription()).isEqualTo("Reg ex");
+  assertThat(param.getType()).isEqualTo("STRING");
+  assertThat(param.getDefaultValue()).isNull();
+}

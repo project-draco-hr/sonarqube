@@ -1,0 +1,35 @@
+{
+  DbSession session=db.openSession(false);
+  try {
+    Migration45Mapper mapper=session.getMapper(Migration45Mapper.class);
+    List<RuleParameter> templateRuleParams=mapper.selectAllTemplateRuleParameters();
+    Multimap<Integer,RuleParameter> templateRuleParamsByRuleId=ArrayListMultimap.create();
+    for (    RuleParameter templateRuleParam : templateRuleParams) {
+      templateRuleParamsByRuleId.put(templateRuleParam.getRuleId(),templateRuleParam);
+    }
+    List<Rule> customRules=mapper.selectAllCustomRules();
+    Multimap<Integer,Integer> customRuleIdsByTemplateRuleId=HashMultimap.create();
+    for (    Rule customRule : customRules) {
+      customRuleIdsByTemplateRuleId.put(customRule.getTemplateId(),customRule.getId());
+    }
+    List<RuleParameter> customRuleParams=mapper.selectAllCustomRuleParameters();
+    Multimap<Integer,RuleParameter> customRuleParamsByRuleId=ArrayListMultimap.create();
+    for (    RuleParameter customRuleParam : customRuleParams) {
+      customRuleParamsByRuleId.put(customRuleParam.getRuleId(),customRuleParam);
+    }
+    for (    Integer templateRuleId : templateRuleParamsByRuleId.keySet()) {
+      for (      RuleParameter templateRuleParam : templateRuleParamsByRuleId.get(templateRuleId)) {
+        for (        Integer customRuleId : customRuleIdsByTemplateRuleId.get(templateRuleId)) {
+          if (!hasParameter(templateRuleParam.getName(),customRuleParamsByRuleId.get(customRuleId))) {
+            mapper.insertRuleParameter(new RuleParameter().setRuleId(customRuleId).setRuleTemplateId(templateRuleId).setName(templateRuleParam.getName()).setDescription(templateRuleParam.getDescription()).setType(templateRuleParam.getType()));
+            mapper.updateRuleUpdateAt(customRuleId,new Date(system.now()));
+          }
+        }
+      }
+    }
+    session.commit();
+  }
+  finally {
+    session.close();
+  }
+}
