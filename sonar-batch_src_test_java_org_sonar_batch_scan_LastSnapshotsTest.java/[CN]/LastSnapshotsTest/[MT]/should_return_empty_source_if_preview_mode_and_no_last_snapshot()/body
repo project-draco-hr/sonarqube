@@ -4,7 +4,7 @@
   when(server.request(anyString(),eq(false),eq(30 * 1000))).thenThrow(new HttpDownloader.HttpException(new URI(""),404));
   when(mode.isPreview()).thenReturn(true);
   LastSnapshots lastSnapshots=new LastSnapshots(mode,new SnapshotSourceDao(db.myBatis()),server);
-  String source=lastSnapshots.getSource(newFile());
+  String source=lastSnapshots.getSource(newFileWithSpace());
   assertThat(source).isEqualTo("");
-  verify(server).request("/api/sources?resource=myproject:org/foo/Bar.c&format=txt",false,30 * 1000);
+  verify(server).request("/api/sources?resource=myproject%3Aorg%2Ffoo%2FFoo+Bar.c&format=txt",false,30 * 1000);
 }
