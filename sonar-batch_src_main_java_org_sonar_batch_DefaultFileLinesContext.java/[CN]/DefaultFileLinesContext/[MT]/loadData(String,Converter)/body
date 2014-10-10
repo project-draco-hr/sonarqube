@@ -1,7 +1,8 @@
 {
   Measure measure=index.getMeasure(resource,new Metric(metricKey));
-  if (measure == null || measure.getData() == null) {
-    return ImmutableMap.of();
+  String data=measure != null ? measure.getData() : null;
+  if (data != null) {
+    return ImmutableMap.copyOf(KeyValueFormat.parse(data,KeyValueFormat.newIntegerConverter(),converter));
   }
-  return ImmutableMap.copyOf(KeyValueFormat.parse(measure.getData(),KeyValueFormat.newIntegerConverter(),converter));
+  return ImmutableMap.of();
 }
