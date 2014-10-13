@@ -1,0 +1,15 @@
+{
+  String moduleKey=value.getString();
+  String relativePath=value.getString();
+  InputFile testFile=inputPathCache.getFile(moduleKey,relativePath);
+  if (testFile == null) {
+    throw new IllegalStateException("Unable to load InputFile " + moduleKey + ":"+ relativePath);
+  }
+  String name=value.getString();
+  String message=value.getString();
+  String stack=value.getString();
+  long duration=value.getLong();
+  TestCaseExecution.Type type=TestCaseExecution.Type.values()[value.getInt()];
+  TestCaseExecution.Status status=TestCaseExecution.Status.values()[value.getInt()];
+  return new DefaultTestCaseExecution().inTestFile(testFile).ofType(type).name(name).durationInMs(duration != -1 ? duration : null).status(status).message(message).stackTrace(stack);
+}

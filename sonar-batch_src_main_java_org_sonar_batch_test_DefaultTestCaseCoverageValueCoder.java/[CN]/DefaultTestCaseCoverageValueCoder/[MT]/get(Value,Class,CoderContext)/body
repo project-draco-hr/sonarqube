@@ -1,0 +1,21 @@
+{
+  String testModuleKey=value.getString();
+  String testRelativePath=value.getString();
+  InputFile testFile=inputPathCache.getFile(testModuleKey,testRelativePath);
+  if (testFile == null) {
+    throw new IllegalStateException("Unable to load InputFile " + testModuleKey + ":"+ testRelativePath);
+  }
+  String name=value.getString();
+  String mainModuleKey=value.getString();
+  String mainRelativePath=value.getString();
+  InputFile mainFile=inputPathCache.getFile(mainModuleKey,mainRelativePath);
+  if (mainFile == null) {
+    throw new IllegalStateException("Unable to load InputFile " + mainModuleKey + ":"+ mainRelativePath);
+  }
+  int size=value.getInt();
+  List<Integer> lines=new ArrayList<Integer>(size);
+  for (int i=0; i < size; i++) {
+    lines.add(value.getInt());
+  }
+  return new DefaultTestCaseCoverage().testFile(testFile).testName(name).cover(mainFile).onLines(lines);
+}
