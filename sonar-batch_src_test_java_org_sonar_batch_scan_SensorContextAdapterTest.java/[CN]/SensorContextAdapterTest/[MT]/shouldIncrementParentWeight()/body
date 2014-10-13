@@ -1,0 +1,19 @@
+{
+  File foo=File.create("src1/Foo.java");
+  File bar=File.create("src2/Bar.java");
+  Directory src1=Directory.create("src1");
+  Directory src2=Directory.create("src2");
+  when(sensorContext.getResource(foo)).thenReturn(foo);
+  when(sensorContext.getResource(bar)).thenReturn(bar);
+  Dependency parentDep=new Dependency(src1,src2).setWeight(4);
+  when(sonarIndex.getEdge(src1,src2)).thenReturn(parentDep);
+  adaptor.store(new DefaultDependency().from(new DefaultInputFile("foo","src1/Foo.java").setType(Type.MAIN)).to(new DefaultInputFile("foo","src2/Bar.java").setType(Type.MAIN)).weight(3));
+  ArgumentCaptor<Dependency> argumentCaptor=ArgumentCaptor.forClass(Dependency.class);
+  verify(sensorContext).saveDependency(argumentCaptor.capture());
+  assertThat(parentDep.getWeight()).isEqualTo(5);
+  Dependency value=argumentCaptor.getValue();
+  assertThat(value.getFrom()).isEqualTo(foo);
+  assertThat(value.getTo()).isEqualTo(bar);
+  assertThat(value.getWeight()).isEqualTo(3);
+  assertThat(value.getUsage()).isEqualTo("USES");
+}
