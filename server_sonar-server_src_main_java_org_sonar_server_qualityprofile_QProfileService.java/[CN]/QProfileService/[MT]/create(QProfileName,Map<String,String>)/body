@@ -1,0 +1,19 @@
+{
+  verifyAdminPermission();
+  DbSession dbSession=db.openSession(false);
+  try {
+    QProfileResult result=new QProfileResult();
+    QualityProfileDto profile=factory.create(dbSession,name);
+    result.setProfile(profile);
+    if (xmlQProfilesByPlugin != null) {
+      for (      Map.Entry<String,String> entry : xmlQProfilesByPlugin.entrySet()) {
+        result.add(exporters.importXml(profile,entry.getKey(),entry.getValue(),dbSession));
+      }
+    }
+    dbSession.commit();
+    return result;
+  }
+  finally {
+    dbSession.close();
+  }
+}
