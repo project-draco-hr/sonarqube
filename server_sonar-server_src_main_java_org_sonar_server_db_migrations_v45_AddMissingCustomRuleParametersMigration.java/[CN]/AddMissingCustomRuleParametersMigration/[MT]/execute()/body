@@ -19,12 +19,7 @@
     }
     for (    Integer templateRuleId : templateRuleParamsByRuleId.keySet()) {
       for (      RuleParameter templateRuleParam : templateRuleParamsByRuleId.get(templateRuleId)) {
-        for (        Integer customRuleId : customRuleIdsByTemplateRuleId.get(templateRuleId)) {
-          if (!hasParameter(templateRuleParam.getName(),customRuleParamsByRuleId.get(customRuleId))) {
-            mapper.insertRuleParameter(new RuleParameter().setRuleId(customRuleId).setRuleTemplateId(templateRuleId).setName(templateRuleParam.getName()).setDescription(templateRuleParam.getDescription()).setType(templateRuleParam.getType()));
-            mapper.updateRuleUpdateAt(customRuleId,new Date(system.now()));
-          }
-        }
+        insertCustomRuleParameterIfNotAlreadyExisting(templateRuleParam,templateRuleId,customRuleIdsByTemplateRuleId,customRuleParamsByRuleId,session);
       }
     }
     session.commit();
