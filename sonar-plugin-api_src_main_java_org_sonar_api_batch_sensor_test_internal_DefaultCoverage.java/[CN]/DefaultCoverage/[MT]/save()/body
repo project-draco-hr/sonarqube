@@ -1,0 +1,17 @@
+{
+  Preconditions.checkNotNull(this.storage,"No persister on this object");
+  Preconditions.checkState(!saved,"This object was already saved");
+  Preconditions.checkNotNull(this.file,"File is mandatory on Coverage");
+  Preconditions.checkNotNull(this.type,"Type is mandatory on Coverage");
+  if (hitsByLine.size() > 0) {
+    new DefaultMeasure<Integer>(storage).onFile(file).forMetric(type.linesToCover()).withValue(hitsByLine.size()).save();
+    new DefaultMeasure<Integer>(storage).onFile(file).forMetric(type.uncoveredLines()).withValue(hitsByLine.size() - totalCoveredLines).save();
+    new DefaultMeasure<String>(storage).onFile(file).forMetric(type.lineHitsData()).withValue(KeyValueFormat.format(hitsByLine)).save();
+  }
+  if (totalConditions > 0) {
+    new DefaultMeasure<Integer>(storage).onFile(file).forMetric(type.conditionsToCover()).withValue(totalConditions).save();
+    new DefaultMeasure<Integer>(storage).onFile(file).forMetric(type.uncoveredConditions()).withValue(totalConditions - totalCoveredConditions).save();
+    new DefaultMeasure<String>(storage).onFile(file).forMetric(type.coveredConditionsByLine()).withValue(KeyValueFormat.format(coveredConditionsByLine)).save();
+    new DefaultMeasure<String>(storage).onFile(file).forMetric(type.conditionsByLine()).withValue(KeyValueFormat.format(conditionsByLine)).save();
+  }
+}
