@@ -1,6 +1,8 @@
 {
-  when(queue.bookNextAvailable()).thenReturn(AnalysisReportDto.newForTests(1L));
+  AnalysisReportDto report=AnalysisReportDto.newForTests(1L);
+  when(queue.bookNextAvailable()).thenReturn(report);
   sut.run();
+  assertThat(report.getStatus()).isEqualTo(SUCCESS);
   verify(queue).bookNextAvailable();
-  verify(service).analyzeReport(any(AnalysisReportDto.class));
+  verify(service).analyzeReport(report);
 }

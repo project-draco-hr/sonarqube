@@ -1,0 +1,11 @@
+{
+  ActivityQuery query=logService.newActivityQuery();
+  query.setTypes(Arrays.asList(Activity.Type.ANALYSIS_REPORT));
+  SearchOptions searchOptions=SearchOptions.create(request);
+  QueryContext queryContext=mapping.newQueryOptions(searchOptions);
+  Result<Activity> results=logService.search(query,queryContext);
+  JsonWriter json=response.newJsonWriter().beginObject();
+  searchOptions.writeStatistics(json,results);
+  writeLogs(results,json,searchOptions);
+  json.endObject().close();
+}

@@ -1,0 +1,16 @@
+{
+  insertPermissionsForProject(DEFAULT_PROJECT_KEY);
+  queue.add(DEFAULT_PROJECT_KEY);
+  queue.add(DEFAULT_PROJECT_KEY);
+  queue.add(DEFAULT_PROJECT_KEY);
+  List<AnalysisReportDto> reports=queue.all();
+  for (  AnalysisReportDto report : reports) {
+    report.succeed();
+    queue.remove(report);
+  }
+  session.commit();
+  WsTester.TestRequest request=wsTester.newGetRequest(AnalysisReportWebService.API_ENDPOINT,AnalysisReportHistorySearchAction.SEARCH_ACTION);
+  WsTester.Result result=request.execute();
+  assertThat(result).isNotNull();
+  System.out.println(result.outputAsString());
+}
