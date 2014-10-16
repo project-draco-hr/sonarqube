@@ -1,0 +1,12 @@
+{
+  IssueDto issueDto=IssueTesting.newDto(RuleTesting.newXooX1().setId(500),ComponentTesting.newFileDto(ComponentTesting.newProjectDto()),ComponentTesting.newProjectDto());
+  when(issueService.getByKeyForUpdate(session,"ABCD")).thenReturn(issueDto);
+  when(issueCommentService.findComments(session,"ABCD")).thenReturn(Collections.<DefaultIssueComment>emptyList());
+  try {
+    issueCommentService.addComment("ABCD","my comment",MockUserSession.get());
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(BadRequestException.class).hasMessage("Fail to add a comment on issue ABCD");
+  }
+}
