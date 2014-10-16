@@ -2,7 +2,6 @@
   File projectDir=temp.newFolder();
   javaUnzip(new File("test-repos/dummy-git.zip"),projectDir);
   JGitBlameCommand jGitBlameCommand=new JGitBlameCommand(new PathResolver());
-  DefaultFileSystem fs=new DefaultFileSystem();
   File baseDir=new File(projectDir,"dummy-git");
   fs.setBaseDir(baseDir);
   String relativePath=DUMMY_JAVA;
@@ -12,8 +11,9 @@
   DefaultInputFile inputFile2=new DefaultInputFile("foo",relativePath2).setFile(new File(baseDir,relativePath2));
   fs.add(inputFile2);
   FileUtils.copyFile(new File(baseDir,relativePath),new File(baseDir,relativePath2));
-  BlameResult blameResult=mock(BlameResult.class);
+  BlameOutput blameResult=mock(BlameOutput.class);
   thrown.expect(IllegalStateException.class);
   thrown.expectMessage("Unable to blame file " + relativePath2 + ". No blame info at line 1. Is file commited?");
-  jGitBlameCommand.blame(fs,Arrays.<InputFile>asList(inputFile,inputFile2),blameResult);
+  when(input.filesToBlame()).thenReturn(Arrays.<InputFile>asList(inputFile,inputFile2));
+  jGitBlameCommand.blame(input,blameResult);
 }

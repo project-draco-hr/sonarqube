@@ -1,0 +1,23 @@
+{
+  Git git=null;
+  File basedir=input.fileSystem().baseDir();
+  try {
+    Repository repo=new RepositoryBuilder().findGitDir(basedir).setMustExist(true).build();
+    git=Git.wrap(repo);
+    File gitBaseDir=repo.getWorkTree();
+    for (    InputFile inputFile : input.filesToBlame()) {
+      blame(output,git,gitBaseDir,inputFile);
+    }
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Unable to open Git repository",e);
+  }
+catch (  GitAPIException e) {
+    throw new IllegalStateException("Unable to blame",e);
+  }
+ finally {
+    if (git != null && git.getRepository() != null) {
+      git.getRepository().close();
+    }
+  }
+}

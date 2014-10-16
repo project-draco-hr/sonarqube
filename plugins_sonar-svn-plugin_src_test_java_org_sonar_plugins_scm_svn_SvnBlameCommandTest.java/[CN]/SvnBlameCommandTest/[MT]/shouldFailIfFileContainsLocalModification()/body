@@ -3,7 +3,7 @@
   FileUtils.write(source,"sample content");
   DefaultInputFile inputFile=new DefaultInputFile("foo","src/foo.xoo").setAbsolutePath(new File(baseDir,"src/foo.xoo").getAbsolutePath());
   fs.add(inputFile);
-  BlameResult result=mock(BlameResult.class);
+  BlameOutput result=mock(BlameOutput.class);
   CommandExecutor commandExecutor=mock(CommandExecutor.class);
   when(commandExecutor.execute(any(Command.class),any(StreamConsumer.class),any(StreamConsumer.class),anyLong())).thenAnswer(new Answer<Integer>(){
     @Override public Integer answer(    InvocationOnMock invocation) throws Throwable {
@@ -18,5 +18,6 @@
 );
   thrown.expect(IllegalStateException.class);
   thrown.expectMessage("Unable to blame file src/foo.xoo. No blame info at line 2. Is file commited?");
-  new SvnBlameCommand(commandExecutor,mock(SvnConfiguration.class)).blame(fs,Arrays.<InputFile>asList(inputFile),result);
+  when(input.filesToBlame()).thenReturn(Arrays.<InputFile>asList(inputFile));
+  new SvnBlameCommand(commandExecutor,mock(SvnConfiguration.class)).blame(input,result);
 }

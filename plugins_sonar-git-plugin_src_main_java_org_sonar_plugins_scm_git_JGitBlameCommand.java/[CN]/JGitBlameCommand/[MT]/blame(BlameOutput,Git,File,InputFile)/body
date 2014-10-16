@@ -1,0 +1,17 @@
+{
+  String filename=pathResolver.relativePath(gitBaseDir,inputFile.file());
+  org.eclipse.jgit.blame.BlameResult blameResult=git.blame().setTextComparator(RawTextComparator.WS_IGNORE_ALL).setFilePath(filename).call();
+  List<BlameLine> lines=new ArrayList<BlameLine>();
+  for (int i=0; i < blameResult.getResultContents().size(); i++) {
+    if (blameResult.getSourceAuthor(i) == null || blameResult.getSourceCommit(i) == null) {
+      LOG.info("Author: " + blameResult.getSourceAuthor(i));
+      LOG.info("Source commit: " + blameResult.getSourceCommit(i));
+      throw new IllegalStateException("Unable to blame file " + inputFile.relativePath() + ". No blame info at line "+ (i + 1)+ ". Is file commited?");
+    }
+    lines.add(new org.sonar.api.batch.scm.BlameLine().date(blameResult.getSourceAuthor(i).getWhen()).revision(blameResult.getSourceCommit(i).getName()).author(blameResult.getSourceAuthor(i).getEmailAddress()));
+  }
+  if (lines.size() == inputFile.lines() - 1) {
+    lines.add(lines.get(lines.size() - 1));
+  }
+  output.blameResult(inputFile,lines);
+}
