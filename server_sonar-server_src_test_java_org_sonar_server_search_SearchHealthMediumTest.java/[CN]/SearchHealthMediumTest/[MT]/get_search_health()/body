@@ -14,12 +14,22 @@
   assertThat(nodeHealth.getJvmHeapUsedPercent()).contains("%");
   assertThat(nodeHealth.getFsUsedPercent()).contains("%");
   assertThat(nodeHealth.getJvmThreads()).isGreaterThanOrEqualTo(0L);
+  assertThat(nodeHealth.getFieldCacheMemory()).isGreaterThanOrEqualTo(0L);
+  assertThat(nodeHealth.getFilterCacheMemory()).isGreaterThanOrEqualTo(0L);
   assertThat(nodeHealth.getProcessCpuPercent()).contains("%");
   long openFiles=nodeHealth.getOpenFiles();
   if (!tester.get(System2.class).isOsWindows()) {
     assertThat(openFiles).isGreaterThanOrEqualTo(0L);
   }
   assertThat(nodeHealth.getJvmUpSince().before(now)).isTrue();
+  List<NodeHealth.Performance> performances=nodeHealth.getPerformanceStats();
+  assertThat(performances).hasSize(7);
+  for (  NodeHealth.Performance performance : performances) {
+    assertThat(performance.getName()).isNotNull();
+    assertThat(performance.getValue()).isNotNull();
+    assertThat(performance.getMessage()).isNotNull();
+    assertThat(performance.getStatus()).isNotNull();
+  }
   Map<String,IndexHealth> indexHealth=health.getIndexHealth();
   assertThat(indexHealth).isNotEmpty();
   for (  IndexHealth index : indexHealth.values()) {
