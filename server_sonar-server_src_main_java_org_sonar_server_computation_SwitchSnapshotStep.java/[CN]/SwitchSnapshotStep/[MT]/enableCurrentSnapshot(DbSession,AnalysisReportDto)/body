@@ -1,0 +1,7 @@
+{
+  SnapshotDto snapshot=dao.getByKey(session,report.getSnapshotId());
+  SnapshotDto previousLastSnapshot=dao.getLastSnapshot(session,snapshot);
+  boolean isLast=previousLastSnapshot == null || previousLastSnapshot.getCreatedAt().before(snapshot.getCreatedAt());
+  dao.updateSnapshotAndChildrenLastFlagAndStatus(session,snapshot,isLast,SnapshotDto.STATUS_PROCESSED);
+  session.commit();
+}

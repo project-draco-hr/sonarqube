@@ -1,0 +1,11 @@
+{
+  setupData("snapshots");
+  SnapshotDto snapshot=defaultSnapshot().setId(1L);
+  dao.updateSnapshotAndChildrenLastFlagAndStatus(session,snapshot,false,SnapshotDto.STATUS_PROCESSED);
+  session.commit();
+  List<SnapshotDto> snapshots=dao.findSnapshotAndChildrenOfProjectScope(session,snapshot);
+  assertThat(snapshots).hasSize(2);
+  assertThat(snapshots).onProperty("id").containsOnly(1L,6L);
+  assertThat(snapshots).onProperty("last").containsOnly(false);
+  assertThat(snapshots).onProperty("status").containsOnly(SnapshotDto.STATUS_PROCESSED);
+}

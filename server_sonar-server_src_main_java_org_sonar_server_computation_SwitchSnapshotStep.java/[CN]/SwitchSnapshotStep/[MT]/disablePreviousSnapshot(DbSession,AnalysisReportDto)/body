@@ -1,0 +1,11 @@
+{
+  SnapshotDto referenceSnapshot=dao.getByKey(session,report.getSnapshotId());
+  List<SnapshotDto> snapshots=dao.findSnapshotAndChildrenOfProjectScope(session,referenceSnapshot);
+  for (  SnapshotDto snapshot : snapshots) {
+    SnapshotDto previousLastSnapshot=dao.getLastSnapshot(session,snapshot);
+    if (previousLastSnapshot != null) {
+      dao.updateSnapshotAndChildrenLastFlag(session,previousLastSnapshot,false);
+      session.commit();
+    }
+  }
+}

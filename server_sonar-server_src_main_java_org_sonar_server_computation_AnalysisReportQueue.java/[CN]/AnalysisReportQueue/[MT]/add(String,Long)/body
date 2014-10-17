@@ -1,0 +1,12 @@
+{
+  UserSession.get().checkGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
+  AnalysisReportDto report=newPendingAnalysisReport(projectKey).setSnapshotId(snapshotId);
+  DbSession session=dbClient.openSession(false);
+  try {
+    checkThatProjectExistsInDatabase(projectKey,session);
+    return insertInDatabase(report,session);
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}
