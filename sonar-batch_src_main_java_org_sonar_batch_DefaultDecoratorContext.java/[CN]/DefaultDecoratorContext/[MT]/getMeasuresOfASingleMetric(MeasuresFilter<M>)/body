@@ -1,0 +1,17 @@
+{
+  Collection<Measure> unfiltered;
+  String metricKey=((MeasuresFilters.MetricFilter<M>)filter).filterOnMetricKey();
+  if (CoreMetrics.DUPLICATIONS_DATA_KEY.equals(metricKey)) {
+    List<DuplicationGroup> group=duplicationCache.byComponent(resource.getEffectiveKey());
+    if (group != null) {
+      unfiltered=Arrays.asList(new Measure(CoreMetrics.DUPLICATIONS_DATA,DuplicationUtils.toXml(group)));
+    }
+ else {
+      unfiltered=Collections.<Measure>emptyList();
+    }
+  }
+ else {
+    unfiltered=measuresByMetric.get(metricKey);
+  }
+  return unfiltered;
+}
