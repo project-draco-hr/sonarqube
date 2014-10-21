@@ -1,35 +1,9 @@
 {
   BoolFilterBuilder esFilter=FilterBuilders.boolFilter();
-  addAuthorizationFilter(esFilter,options);
-  if (BooleanUtils.isTrue(query.assigned())) {
-    esFilter.must(FilterBuilders.existsFilter(IssueNormalizer.IssueField.ASSIGNEE.field()));
+  for (  FilterBuilder filter : getFilters(query,options).values()) {
+    if (filter != null) {
+      esFilter.must(filter);
+    }
   }
- else   if (BooleanUtils.isFalse(query.assigned())) {
-    esFilter.must(FilterBuilders.missingFilter(IssueNormalizer.IssueField.ASSIGNEE.field()));
-  }
-  if (BooleanUtils.isTrue(query.planned())) {
-    esFilter.must(FilterBuilders.existsFilter(IssueNormalizer.IssueField.ACTION_PLAN.field()));
-  }
- else   if (BooleanUtils.isFalse(query.planned())) {
-    esFilter.must(FilterBuilders.missingFilter(IssueNormalizer.IssueField.ACTION_PLAN.field()));
-  }
-  if (BooleanUtils.isTrue(query.resolved())) {
-    esFilter.must(FilterBuilders.existsFilter(IssueNormalizer.IssueField.RESOLUTION.field()));
-  }
- else   if (BooleanUtils.isFalse(query.resolved())) {
-    esFilter.must(FilterBuilders.missingFilter(IssueNormalizer.IssueField.RESOLUTION.field()));
-  }
-  matchFilter(esFilter,IssueNormalizer.IssueField.KEY,query.issueKeys());
-  matchFilter(esFilter,IssueNormalizer.IssueField.ACTION_PLAN,query.actionPlans());
-  matchFilter(esFilter,IssueNormalizer.IssueField.ASSIGNEE,query.assignees());
-  matchFilter(esFilter,IssueNormalizer.IssueField.PROJECT,query.componentRoots());
-  matchFilter(esFilter,IssueNormalizer.IssueField.COMPONENT,query.components());
-  matchFilter(esFilter,IssueNormalizer.IssueField.LANGUAGE,query.languages());
-  matchFilter(esFilter,IssueNormalizer.IssueField.RESOLUTION,query.resolutions());
-  matchFilter(esFilter,IssueNormalizer.IssueField.REPORTER,query.reporters());
-  matchFilter(esFilter,IssueNormalizer.IssueField.RULE_KEY,query.rules());
-  matchFilter(esFilter,IssueNormalizer.IssueField.SEVERITY,query.severities());
-  matchFilter(esFilter,IssueNormalizer.IssueField.STATUS,query.statuses());
-  addDatesFilter(esFilter,query);
   return esFilter;
 }

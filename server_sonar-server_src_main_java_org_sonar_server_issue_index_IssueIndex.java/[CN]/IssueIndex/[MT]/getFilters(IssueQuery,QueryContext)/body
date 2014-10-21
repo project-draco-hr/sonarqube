@@ -1,0 +1,38 @@
+{
+  Map<String,FilterBuilder> filters=Maps.newHashMap();
+  filters.put("__authorization",getAuthorizationFilter(options));
+  String isAssigned="__isAssigned";
+  if (BooleanUtils.isTrue(query.assigned())) {
+    filters.put(isAssigned,FilterBuilders.existsFilter(IssueNormalizer.IssueField.ASSIGNEE.field()));
+  }
+ else   if (BooleanUtils.isFalse(query.assigned())) {
+    filters.put(isAssigned,FilterBuilders.missingFilter(IssueNormalizer.IssueField.ASSIGNEE.field()));
+  }
+  String isPlanned="__isPlanned";
+  if (BooleanUtils.isTrue(query.planned())) {
+    filters.put(isPlanned,FilterBuilders.existsFilter(IssueNormalizer.IssueField.ACTION_PLAN.field()));
+  }
+ else   if (BooleanUtils.isFalse(query.planned())) {
+    filters.put(isPlanned,FilterBuilders.missingFilter(IssueNormalizer.IssueField.ACTION_PLAN.field()));
+  }
+  String isResolved="__isResolved";
+  if (BooleanUtils.isTrue(query.resolved())) {
+    filters.put(isResolved,FilterBuilders.existsFilter(IssueNormalizer.IssueField.RESOLUTION.field()));
+  }
+ else   if (BooleanUtils.isFalse(query.resolved())) {
+    filters.put(isResolved,FilterBuilders.missingFilter(IssueNormalizer.IssueField.RESOLUTION.field()));
+  }
+  filters.put(IssueNormalizer.IssueField.KEY.field(),matchFilter(IssueNormalizer.IssueField.KEY,query.issueKeys()));
+  filters.put(IssueNormalizer.IssueField.ACTION_PLAN.field(),matchFilter(IssueNormalizer.IssueField.ACTION_PLAN,query.actionPlans()));
+  filters.put(IssueNormalizer.IssueField.ASSIGNEE.field(),matchFilter(IssueNormalizer.IssueField.ASSIGNEE,query.assignees()));
+  filters.put(IssueNormalizer.IssueField.PROJECT.field(),matchFilter(IssueNormalizer.IssueField.PROJECT,query.componentRoots()));
+  filters.put(IssueNormalizer.IssueField.COMPONENT.field(),matchFilter(IssueNormalizer.IssueField.COMPONENT,query.components()));
+  filters.put(IssueNormalizer.IssueField.LANGUAGE.field(),matchFilter(IssueNormalizer.IssueField.LANGUAGE,query.languages()));
+  filters.put(IssueNormalizer.IssueField.RESOLUTION.field(),matchFilter(IssueNormalizer.IssueField.RESOLUTION,query.resolutions()));
+  filters.put(IssueNormalizer.IssueField.REPORTER.field(),matchFilter(IssueNormalizer.IssueField.REPORTER,query.reporters()));
+  filters.put(IssueNormalizer.IssueField.RULE_KEY.field(),matchFilter(IssueNormalizer.IssueField.RULE_KEY,query.rules()));
+  filters.put(IssueNormalizer.IssueField.SEVERITY.field(),matchFilter(IssueNormalizer.IssueField.SEVERITY,query.severities()));
+  filters.put(IssueNormalizer.IssueField.STATUS.field(),matchFilter(IssueNormalizer.IssueField.STATUS,query.statuses()));
+  addDatesFilter(filters,query);
+  return filters;
+}

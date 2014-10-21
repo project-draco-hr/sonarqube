@@ -4,17 +4,23 @@
     esSearch.setSearchType(SearchType.SCAN);
     esSearch.setScroll(TimeValue.timeValueMinutes(3));
   }
-  setFacets(options,esSearch);
   setSorting(query,esSearch);
   setPagination(options,esSearch);
   QueryBuilder esQuery=QueryBuilders.matchAllQuery();
-  BoolFilterBuilder esFilter=getFilter(query,options);
+  BoolFilterBuilder esFilter=FilterBuilders.boolFilter();
+  Map<String,FilterBuilder> filters=getFilters(query,options);
+  for (  FilterBuilder filter : filters.values()) {
+    if (filter != null) {
+      esFilter.must(filter);
+    }
+  }
   if (esFilter.hasClauses()) {
     esSearch.setQuery(QueryBuilders.filteredQuery(esQuery,esFilter));
   }
  else {
     esSearch.setQuery(esQuery);
   }
+  setFacets(options,filters,esQuery,esSearch);
   SearchResponse response=getClient().execute(esSearch);
   return new Result<Issue>(this,response);
 }
