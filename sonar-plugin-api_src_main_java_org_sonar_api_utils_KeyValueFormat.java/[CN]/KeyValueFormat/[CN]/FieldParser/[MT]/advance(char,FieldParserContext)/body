@@ -1,0 +1,23 @@
+{
+  boolean end=false;
+  char c=csv.charAt(position);
+  if (c == separator && !context.escaped) {
+    end=true;
+    position++;
+  }
+ else   if (c == '\\' && context.escaped && position < csv.length() + 1 && csv.charAt(position + 1) == DOUBLE_QUOTE) {
+    context.previous=DOUBLE_QUOTE;
+    context.result.append(context.previous);
+    position+=2;
+  }
+ else   if (c == '"' && context.escaped && context.previous != '\\') {
+    end=true;
+    position+=2;
+  }
+ else {
+    context.result.append(c);
+    context.previous=c;
+    position++;
+  }
+  return end;
+}
