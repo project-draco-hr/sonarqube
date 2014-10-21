@@ -1,0 +1,43 @@
+{
+  DbSession session=db.openSession(true);
+  try {
+    Migration50Mapper mapper=session.getMapper(Migration50Mapper.class);
+    for (    Component project : mapper.selectEnabledRootTrkProjects()) {
+      Map<Long,String> uuidByComponentId=newHashMap();
+      Map<Long,Component> componentsBySnapshotId=newHashMap();
+      List<Component> components=mapper.selectComponentChildrenForProjects(project.getId());
+      components.add(project);
+      for (      Component component : components) {
+        componentsBySnapshotId.put(component.getSnapshotId(),component);
+        component.setUuid(getOrCreateUuid(component.getId(),uuidByComponentId));
+        component.setProjectUuid(getOrCreateUuid(project.getId(),uuidByComponentId));
+      }
+      for (      Component component : components) {
+        String snapshotPath=component.getSnapshotPath();
+        StringBuilder moduleUuidPath=new StringBuilder();
+        Component lastModule=null;
+        if (!Strings.isNullOrEmpty(snapshotPath)) {
+          for (          String s : Splitter.on(".").omitEmptyStrings().split(snapshotPath)) {
+            Long snapshotId=Long.valueOf(s);
+            Component currentComponent=componentsBySnapshotId.get(snapshotId);
+            if (currentComponent.getScope().equals(Scopes.PROJECT)) {
+              lastModule=currentComponent;
+              moduleUuidPath.append(currentComponent.getUuid()).append(".");
+            }
+          }
+        }
+        if (moduleUuidPath.length() > 0) {
+          component.setModuleUuidPath(moduleUuidPath.toString());
+        }
+        if (lastModule != null && !lastModule.getId().equals(project.getId())) {
+          component.setModuleUuid(getOrCreateUuid(lastModule.getId(),uuidByComponentId));
+        }
+        mapper.updateComponentUuids(component);
+      }
+    }
+    session.commit();
+  }
+  finally {
+    session.close();
+  }
+}
