@@ -1,0 +1,16 @@
+{
+  MassUpdate massUpdate=context.prepareMassUpdate();
+  massUpdate.select("select id,data_field from activities where log_type='QPROFILE'");
+  massUpdate.update("delete activities where id=?");
+  massUpdate.execute(new MassUpdate.Handler(){
+    @Override public boolean handle(    Select.Row row,    SqlStatement update) throws SQLException {
+      String csv=row.getString(2);
+      if (isUnescaped(csv)) {
+        update.setLong(1,row.getLong(1));
+        return true;
+      }
+      return false;
+    }
+  }
+);
+}
