@@ -1,0 +1,37 @@
+{
+  if (position >= csv.length()) {
+    return null;
+  }
+  StringBuilder result=new StringBuilder();
+  boolean escaped=false;
+  char firstChar=csv.charAt(position);
+  char previous=(char)-1;
+  if (firstChar == DOUBLE_QUOTE) {
+    escaped=true;
+    position++;
+    previous=firstChar;
+  }
+  boolean end=false;
+  while (position < csv.length() && !end) {
+    char c=csv.charAt(position);
+    if (c == separator && !escaped) {
+      end=true;
+      position++;
+    }
+ else     if (c == '\\' && escaped && position < csv.length() + 1 && csv.charAt(position + 1) == DOUBLE_QUOTE) {
+      previous=DOUBLE_QUOTE;
+      result.append(previous);
+      position+=2;
+    }
+ else     if (c == '"' && escaped && previous != '\\') {
+      end=true;
+      position+=2;
+    }
+ else {
+      result.append(c);
+      previous=c;
+      position++;
+    }
+  }
+  return result.toString();
+}
