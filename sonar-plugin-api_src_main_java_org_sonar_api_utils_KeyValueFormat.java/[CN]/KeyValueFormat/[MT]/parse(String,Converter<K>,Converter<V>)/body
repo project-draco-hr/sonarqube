@@ -1,12 +1,17 @@
 {
   Map<K,V> map=Maps.newLinkedHashMap();
-  if (data != null) {
-    String[] pairs=StringUtils.split(data,PAIR_SEPARATOR);
-    for (    String pair : pairs) {
-      int indexOfEqualSign=pair.indexOf(FIELD_SEPARATOR);
-      String key=pair.substring(0,indexOfEqualSign);
-      String value=pair.substring(indexOfEqualSign + 1);
-      map.put(keyConverter.parse(key),valueConverter.parse(value));
+  if (input != null) {
+    FieldParser reader=new FieldParser(input);
+    boolean end=false;
+    while (!end) {
+      String key=reader.nextKey();
+      if (key == null) {
+        end=true;
+      }
+ else {
+        String val=StringUtils.defaultString(reader.nextVal(),"");
+        map.put(keyConverter.parse(key),valueConverter.parse(val));
+      }
     }
   }
   return map;
