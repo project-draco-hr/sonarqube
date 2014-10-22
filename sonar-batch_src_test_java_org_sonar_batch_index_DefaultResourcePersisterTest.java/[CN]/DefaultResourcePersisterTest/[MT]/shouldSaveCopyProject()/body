@@ -2,12 +2,15 @@
   setupData("shared");
   ResourcePersister persister=new DefaultResourcePersister(getSession(),mock(ResourcePermissions.class),snapshotCache,resourceCache);
   persister.saveProject(singleCopyProject,null);
-  checkTables("shouldSaveCopyProject",new String[]{"build_date","created_at","authorization_updated_at","uuid"},"projects","snapshots");
+  checkTables("shouldSaveCopyProject",new String[]{"build_date","created_at","authorization_updated_at","uuid","project_uuid","module_uuid","module_uuid_path"},"projects","snapshots");
   enableSnapshot(1001);
   SqlSession session=getMyBatis().openSession(false);
   try {
     ComponentDto newProject=session.getMapper(ComponentMapper.class).selectByKey("foo");
     assertThat(newProject.uuid()).isNotNull();
+    assertThat(newProject.projectUuid()).isEqualTo(newProject.uuid());
+    assertThat(newProject.moduleUuid()).isNull();
+    assertThat(newProject.moduleUuidPath()).isNull();
   }
   finally {
     MyBatis.closeQuietly(session);

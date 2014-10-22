@@ -1,10 +1,11 @@
 {
   Snapshot moduleSnapshot=snapshotsByResource.get(project);
   Integer moduleId=moduleSnapshot.getResourceId();
-  ResourceModel model=findOrCreateModel(resource);
+  ResourceModel model=findOrCreateModel(resource,parentReference != null ? parentReference : project);
   model.setRootId(moduleId);
   model=session.save(model);
   resource.setId(model.getId());
+  resource.setUuid(model.getUuid());
   Snapshot parentSnapshot=(Snapshot)ObjectUtils.defaultIfNull(getSnapshot(parentReference),moduleSnapshot);
   Snapshot snapshot=new Snapshot(model,parentSnapshot);
   snapshot.setBuildDate(new Date());

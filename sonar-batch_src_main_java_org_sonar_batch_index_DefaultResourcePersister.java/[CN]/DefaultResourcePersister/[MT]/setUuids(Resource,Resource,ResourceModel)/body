@@ -1,0 +1,31 @@
+{
+  model.setUuid(UUID.randomUUID().toString());
+  if (parentResource != null) {
+    ResourceModel parentModel=session.getSingleResult(ResourceModel.class,"id",parentResource.getId());
+    if (parentModel.getProjectUuid() != null) {
+      model.setProjectUuid(parentModel.getProjectUuid());
+    }
+ else {
+      model.setProjectUuid(parentModel.getUuid());
+    }
+    if (Qualifiers.isProject(parentResource,true)) {
+      model.setModuleUuid(parentResource.getUuid());
+    }
+ else {
+      model.setModuleUuid(parentModel.getModuleUuid());
+    }
+    if (Qualifiers.isProject(resource,true)) {
+      String parentModuleUuidPath=parentModel.getModuleUuidPath();
+      model.setModuleUuidPath(parentModuleUuidPath != null ? parentModuleUuidPath + "." + parentModel.getUuid() : parentModel.getUuid());
+    }
+ else {
+      String parentModuleUuidPath=parentModel.getModuleUuidPath();
+      model.setModuleUuidPath(parentModuleUuidPath != null ? parentModuleUuidPath : parentModel.getUuid());
+    }
+  }
+ else {
+    if (Qualifiers.isProject(resource,false)) {
+      model.setProjectUuid(model.getUuid());
+    }
+  }
+}
