@@ -5,5 +5,23 @@
   persister.saveProject(moduleA,multiModuleProject);
   persister.saveProject(moduleB,multiModuleProject);
   persister.saveProject(moduleB1,moduleB);
-  checkTables("shouldSaveNewMultiModulesProject",new String[]{"build_date","created_at","authorization_updated_at"},"projects","snapshots");
+  checkTables("shouldSaveNewMultiModulesProject",new String[]{"build_date","created_at","authorization_updated_at","uuid"},"projects","snapshots");
+  enableSnapshot(1001);
+  enableSnapshot(1002);
+  enableSnapshot(1003);
+  enableSnapshot(1004);
+  SqlSession session=getMyBatis().openSession(false);
+  try {
+    ComponentDto root=session.getMapper(ComponentMapper.class).selectByKey("root");
+    assertThat(root.uuid()).isNotNull();
+    ComponentDto a=session.getMapper(ComponentMapper.class).selectByKey("a");
+    assertThat(a.uuid()).isNotNull();
+    ComponentDto b=session.getMapper(ComponentMapper.class).selectByKey("b");
+    assertThat(b.uuid()).isNotNull();
+    ComponentDto b1=session.getMapper(ComponentMapper.class).selectByKey("b1");
+    assertThat(b1.uuid()).isNotNull();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
 }

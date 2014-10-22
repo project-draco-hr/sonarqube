@@ -3,5 +3,14 @@
   ResourcePersister persister=new DefaultResourcePersister(getSession(),mock(ResourcePermissions.class),snapshotCache,resourceCache);
   persister.saveProject(singleProject,null);
   persister.saveResource(singleProject,Directory.create("src/main/java/org/foo","org.foo").setEffectiveKey("foo:src/main/java/org/foo"));
-  checkTables("shouldSaveNewDirectory",new String[]{"build_date","created_at","authorization_updated_at"},"projects","snapshots");
+  checkTables("shouldSaveNewDirectory",new String[]{"build_date","created_at","authorization_updated_at","uuid"},"projects","snapshots");
+  enableSnapshot(1002);
+  SqlSession session=getMyBatis().openSession(false);
+  try {
+    ComponentDto newDir=session.getMapper(ComponentMapper.class).selectByKey("foo:src/main/java/org/foo");
+    assertThat(newDir.uuid()).isNotNull();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
 }

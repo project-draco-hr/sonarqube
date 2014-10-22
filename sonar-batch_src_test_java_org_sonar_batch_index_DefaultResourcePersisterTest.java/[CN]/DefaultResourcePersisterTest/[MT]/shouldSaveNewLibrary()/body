@@ -5,5 +5,14 @@
   persister.saveResource(singleProject,new Library("junit:junit","4.8.2").setEffectiveKey("junit:junit"));
   persister.saveResource(singleProject,new Library("junit:junit","4.8.2").setEffectiveKey("junit:junit"));
   persister.saveResource(singleProject,new Library("junit:junit","3.2").setEffectiveKey("junit:junit"));
-  checkTables("shouldSaveNewLibrary",new String[]{"build_date","created_at","authorization_updated_at"},"projects","snapshots");
+  checkTables("shouldSaveNewLibrary",new String[]{"build_date","created_at","authorization_updated_at","uuid"},"projects","snapshots");
+  enableSnapshot(1002);
+  SqlSession session=getMyBatis().openSession(false);
+  try {
+    ComponentDto newLib=session.getMapper(ComponentMapper.class).selectByKey("junit:junit");
+    assertThat(newLib.uuid()).isNotNull();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
 }
