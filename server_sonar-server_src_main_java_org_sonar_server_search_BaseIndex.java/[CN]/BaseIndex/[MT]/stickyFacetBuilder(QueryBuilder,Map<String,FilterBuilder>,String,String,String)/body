@@ -1,13 +1,6 @@
 {
-  BoolFilterBuilder facetFilter=FilterBuilders.boolFilter().must(FilterBuilders.queryFilter(query));
-  for (  Map.Entry<String,FilterBuilder> filter : filters.entrySet()) {
-    if (filter.getValue() != null && !StringUtils.equals(filter.getKey(),fieldName)) {
-      facetFilter.must(filter.getValue());
-    }
-  }
-  FilterAggregationBuilder facetTopAggregation=AggregationBuilders.filter(facetName + "_filter").filter(facetFilter).subAggregation(AggregationBuilders.terms(facetName).field(fieldName).order(Terms.Order.count(false)).size(10).minDocCount(1));
-  if (selected.length > 0) {
-    facetTopAggregation=facetTopAggregation.subAggregation(AggregationBuilders.terms(facetName + "_selected").field(fieldName).include(Joiner.on('|').join(selected)));
-  }
+  BoolFilterBuilder facetFilter=getStickyFacetFilter(query,filters,fieldName);
+  FilterAggregationBuilder facetTopAggregation=buildTopFacetAggregation(fieldName,facetName,facetFilter);
+  facetTopAggregation=addSelectedItemsToFacet(fieldName,facetName,facetTopAggregation,selected);
   return AggregationBuilders.global(facetName).subAggregation(facetTopAggregation);
 }
