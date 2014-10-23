@@ -3,10 +3,9 @@
   params=Maps.newHashMap();
   params.put("template_key","my_template_key");
   params.put("components","org.sample.Sample");
-  ComponentDto c=mock(ComponentDto.class);
-  when(c.getId()).thenReturn(1L);
-  when(componentDao.getAuthorizedComponentByKey("org.sample.Sample",session)).thenReturn(c);
+  ComponentDto project=ComponentTesting.newProjectDto().setId(1L).setKey("org.sample.Sample");
+  when(componentDao.getAuthorizedComponentByKey("org.sample.Sample",session)).thenReturn(project);
   service.applyPermissionTemplate(params);
   verify(permissionFacade).applyPermissionTemplate(session,"my_template_key",1L);
-  verify(issueAuthorizationDao).synchronizeAfter(eq(session),any(Date.class),eq(ImmutableMap.of("project","org.sample.Sample")));
+  verify(issueAuthorizationDao).synchronizeAfter(eq(session),any(Date.class),eq(ImmutableMap.of("project",project.uuid())));
 }

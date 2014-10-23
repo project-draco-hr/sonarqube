@@ -1,11 +1,11 @@
 {
-  project=new ComponentDto().setKey("Sample").setAuthorizationUpdatedAt(DateUtils.parseDate("2014-09-11"));
+  project=new ComponentDto().setKey("Sample").setUuid("ABCD").setAuthorizationUpdatedAt(DateUtils.parseDate("2014-09-11"));
   db.componentDao().insert(session,project);
   GroupDto sonarUsers=new GroupDto().setName("devs");
   db.groupDao().insert(session,sonarUsers);
   tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),"devs",UserRole.USER,session);
   session.commit();
-  assertThat(index.getNullableByKey(project.getKey())).isNull();
+  assertThat(index.getNullableByKey(project.uuid())).isNull();
   tester.get(Platform.class).executeStartupTasks();
-  assertThat(index.getNullableByKey(project.getKey())).isNotNull();
+  assertThat(index.getNullableByKey(project.uuid())).isNotNull();
 }

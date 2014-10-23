@@ -1,9 +1,10 @@
 {
-  when(componentDao.getAuthorizedComponentByKey("org.sample.Sample",session)).thenReturn(new AuthorizedComponentDto().setId(10L).setKey("org.sample.Sample"));
+  ComponentDto project=ComponentTesting.newProjectDto().setId(10L).setKey("org.sample.Sample");
+  when(componentDao.getAuthorizedComponentByKey("org.sample.Sample",session)).thenReturn(project);
   params=buildPermissionChangeParams(null,"group","org.sample.Sample","user");
   setUpGlobalGroupPermissions("group","codeviewer");
   MockUserSession.set().setLogin("admin").addProjectPermissions(UserRole.ADMIN,"org.sample.Sample");
   service.addPermission(params);
   verify(permissionFacade).insertGroupPermission(eq(10L),eq(2L),eq("user"),eq(session));
-  verify(issueAuthorizationDao).synchronizeAfter(eq(session),any(Date.class),eq(ImmutableMap.of("project","org.sample.Sample")));
+  verify(issueAuthorizationDao).synchronizeAfter(eq(session),any(Date.class),eq(ImmutableMap.of("project",project.uuid())));
 }

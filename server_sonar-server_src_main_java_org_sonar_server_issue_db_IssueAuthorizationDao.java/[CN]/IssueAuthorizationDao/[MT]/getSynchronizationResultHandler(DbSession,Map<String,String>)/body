@@ -9,7 +9,7 @@
       Date updatedAt=(Date)row.get("updatedAt");
       IssueAuthorizationDto issueAuthorizationDto=authorizationDtoMap.get(project);
       if (issueAuthorizationDto == null) {
-        issueAuthorizationDto=new IssueAuthorizationDto().setProject(project).setPermission(UserRole.USER);
+        issueAuthorizationDto=new IssueAuthorizationDto().setProjectUuid(project).setPermission(UserRole.USER);
         issueAuthorizationDto.setUpdatedAt(updatedAt);
       }
       if (group != null) {
@@ -21,9 +21,9 @@
       authorizationDtoMap.put(project,issueAuthorizationDto);
     }
     @Override public void enqueueCollected(){
-      String projectKey=getParams().get("project");
-      if (authorizationDtoMap.isEmpty() && projectKey != null) {
-        getSession().enqueue(new DeleteKey<String>(getIndexType(),projectKey));
+      String projectUuid=getParams().get("project");
+      if (authorizationDtoMap.isEmpty() && projectUuid != null) {
+        getSession().enqueue(new DeleteKey<String>(getIndexType(),projectUuid));
       }
  else {
         for (        IssueAuthorizationDto authorization : authorizationDtoMap.values()) {

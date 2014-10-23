@@ -1,13 +1,10 @@
 {
-  ComponentDto c1=mock(ComponentDto.class);
-  when(c1.getId()).thenReturn(1L);
-  when(componentDao.getAuthorizedComponentByKey("org.sample.Sample1",session)).thenReturn(c1);
-  ComponentDto c2=mock(ComponentDto.class);
-  when(c2.getId()).thenReturn(2L);
-  when(componentDao.getAuthorizedComponentByKey("org.sample.Sample2",session)).thenReturn(c2);
-  ComponentDto c3=mock(ComponentDto.class);
-  when(c3.getId()).thenReturn(3L);
-  when(componentDao.getAuthorizedComponentByKey("org.sample.Sample3",session)).thenReturn(c3);
+  ComponentDto project1=ComponentTesting.newProjectDto().setId(1L);
+  when(componentDao.getAuthorizedComponentByKey("org.sample.Sample1",session)).thenReturn(project1);
+  ComponentDto project2=ComponentTesting.newProjectDto().setId(2L);
+  when(componentDao.getAuthorizedComponentByKey("org.sample.Sample2",session)).thenReturn(project2);
+  ComponentDto project3=ComponentTesting.newProjectDto().setId(3L);
+  when(componentDao.getAuthorizedComponentByKey("org.sample.Sample3",session)).thenReturn(project3);
   params=Maps.newHashMap();
   params.put("template_key","my_template_key");
   params.put("components","org.sample.Sample1,org.sample.Sample2,org.sample.Sample3");
@@ -15,7 +12,7 @@
   verify(permissionFacade).applyPermissionTemplate(session,"my_template_key",1L);
   verify(permissionFacade).applyPermissionTemplate(session,"my_template_key",2L);
   verify(permissionFacade).applyPermissionTemplate(session,"my_template_key",3L);
-  verify(issueAuthorizationDao).synchronizeAfter(eq(session),any(Date.class),eq(ImmutableMap.of("project","org.sample.Sample1")));
-  verify(issueAuthorizationDao).synchronizeAfter(eq(session),any(Date.class),eq(ImmutableMap.of("project","org.sample.Sample2")));
-  verify(issueAuthorizationDao).synchronizeAfter(eq(session),any(Date.class),eq(ImmutableMap.of("project","org.sample.Sample3")));
+  verify(issueAuthorizationDao).synchronizeAfter(eq(session),any(Date.class),eq(ImmutableMap.of("project",project1.uuid())));
+  verify(issueAuthorizationDao).synchronizeAfter(eq(session),any(Date.class),eq(ImmutableMap.of("project",project2.uuid())));
+  verify(issueAuthorizationDao).synchronizeAfter(eq(session),any(Date.class),eq(ImmutableMap.of("project",project3.uuid())));
 }

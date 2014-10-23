@@ -1,0 +1,13 @@
+{
+  ComponentDto module=ComponentTesting.newModuleDto(project);
+  ComponentDto subModule=ComponentTesting.newModuleDto(module);
+  ComponentDto file=ComponentTesting.newFileDto(subModule);
+  tester.get(ComponentDao.class).insert(session,module,subModule,file);
+  db.issueDao().insert(session,IssueTesting.newDto(rule,file,project));
+  session.commit();
+  assertThat(index.search(IssueQuery.builder().componentRoots(newArrayList(file.uuid())).build(),new QueryContext()).getHits()).isEmpty();
+  assertThat(index.search(IssueQuery.builder().componentRoots(newArrayList(module.uuid())).build(),new QueryContext()).getHits()).hasSize(1);
+  assertThat(index.search(IssueQuery.builder().componentRoots(newArrayList(subModule.uuid())).build(),new QueryContext()).getHits()).hasSize(1);
+  assertThat(index.search(IssueQuery.builder().componentRoots(newArrayList(project.uuid())).build(),new QueryContext()).getHits()).hasSize(1);
+  assertThat(index.search(IssueQuery.builder().componentRoots(newArrayList("unknown")).build(),new QueryContext()).getHits()).isEmpty();
+}

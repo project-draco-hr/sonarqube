@@ -3,9 +3,9 @@
   tester.get(RuleDao.class).insert(session,manualRule);
   session.commit();
   Issue result=service.createManualIssue(file.key(),manualRule.getKey(),10,"Fix it",Severity.MINOR,2d);
-  Issue manualIssue=indexClient.get(IssueIndex.class).getByKey(result.key());
-  assertThat(manualIssue.componentKey()).isEqualTo(file.key());
-  assertThat(manualIssue.projectKey()).isEqualTo(project.key());
+  IssueDoc manualIssue=(IssueDoc)indexClient.get(IssueIndex.class).getByKey(result.key());
+  assertThat(manualIssue.componentUuid()).isEqualTo(file.uuid());
+  assertThat(manualIssue.projectUuid()).isEqualTo(project.uuid());
   assertThat(manualIssue.ruleKey()).isEqualTo(manualRule.getKey());
   assertThat(manualIssue.message()).isEqualTo("Fix it");
   assertThat(manualIssue.line()).isEqualTo(10);

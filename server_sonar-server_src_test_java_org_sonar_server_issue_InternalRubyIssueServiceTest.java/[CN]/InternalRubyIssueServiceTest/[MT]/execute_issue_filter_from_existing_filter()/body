@@ -8,15 +8,12 @@
   overrideProps.put("resolved",true);
   overrideProps.put("pageSize",20);
   overrideProps.put("pageIndex",2);
+  when(issueQueryService.createFromMap(overrideProps)).thenReturn(IssueQuery.builder().build());
   service.execute(10L,overrideProps);
   ArgumentCaptor<IssueQuery> issueQueryArgumentCaptor=ArgumentCaptor.forClass(IssueQuery.class);
   ArgumentCaptor<QueryContext> contextArgumentCaptor=ArgumentCaptor.forClass(QueryContext.class);
   verify(issueFilterService).execute(issueQueryArgumentCaptor.capture(),contextArgumentCaptor.capture());
   verify(issueFilterService).find(eq(10L),any(UserSession.class));
-  IssueQuery issueQuery=issueQueryArgumentCaptor.getValue();
-  assertThat(issueQuery.componentRoots()).contains("struts");
-  assertThat(issueQuery.statuses()).contains("CLOSED");
-  assertThat(issueQuery.resolved()).isTrue();
   QueryContext queryContext=contextArgumentCaptor.getValue();
   assertThat(queryContext.getLimit()).isEqualTo(20);
   assertThat(queryContext.getPage()).isEqualTo(2);

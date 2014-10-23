@@ -1,4 +1,6 @@
 {
+  Timer timer=new Timer("Db Migration Progress");
+  timer.schedule(progressTask,MassUpdate.ProgressTask.PERIOD_MS,MassUpdate.ProgressTask.PERIOD_MS);
   DbSession session=db.openSession(true);
   try {
     Migration50Mapper mapper=session.getMapper(Migration50Mapper.class);
@@ -33,11 +35,15 @@
           component.setModuleUuid(getOrCreateUuid(lastModule.getId(),uuidByComponentId));
         }
         mapper.updateComponentUuids(component);
+        counter.getAndIncrement();
       }
     }
     session.commit();
+    progressTask.log();
   }
   finally {
     session.close();
+    timer.cancel();
+    timer.purge();
   }
 }

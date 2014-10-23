@@ -5,13 +5,13 @@
   session=db.openSession(false);
   rule=RuleTesting.newXooX1().setName("Rule name").setDescription("Rule desc").setStatus(RuleStatus.READY);
   tester.get(RuleDao.class).insert(session,rule);
-  project=new ComponentDto().setKey("MyProject");
+  project=ComponentTesting.newProjectDto().setUuid("ABCD").setProjectUuid("ABCD").setKey("MyProject");
   db.componentDao().insert(session,project);
   db.snapshotDao().insert(session,SnapshotTesting.createForProject(project));
   tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),DefaultGroups.ANYONE,UserRole.USER,session);
   tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),DefaultGroups.ANYONE,UserRole.CODEVIEWER,session);
   db.issueAuthorizationDao().synchronizeAfter(session,new Date(0));
-  file=new ComponentDto().setKey("MyComponent").setSubProjectId(project.getId());
+  file=ComponentTesting.newFileDto(project).setUuid("BCDE").setKey("MyComponent").setSubProjectId(project.getId());
   db.componentDao().insert(session,file);
   SnapshotDto snapshot=db.snapshotDao().insert(session,SnapshotTesting.createForComponent(file,project));
   SnapshotSourceDto snapshotSource=new SnapshotSourceDto().setSnapshotId(snapshot.getId()).setData("First Line\n" + "Second Line\n" + "Third Line\n"+ "Fourth Line\n"+ "Fifth Line\n");

@@ -1,5 +1,5 @@
 {
-  project=new ComponentDto().setKey("Sample").setAuthorizationUpdatedAt(DateUtils.parseDate("2014-09-11"));
+  project=new ComponentDto().setKey("Sample").setUuid("ABCD").setAuthorizationUpdatedAt(DateUtils.parseDate("2014-09-11"));
   db.componentDao().insert(session,project);
   GroupDto sonarUsers=new GroupDto().setName("devs");
   db.groupDao().insert(session,sonarUsers);
@@ -10,8 +10,8 @@
   session.commit();
   db.issueAuthorizationDao().synchronizeAfter(session,new Date(0));
   session.commit();
-  assertThat(index.getNullableByKey(project.getKey())).isNotNull();
-  db.issueAuthorizationDao().deleteByKey(session,project.key());
+  assertThat(index.getNullableByKey(project.uuid())).isNotNull();
+  db.issueAuthorizationDao().deleteByKey(session,project.uuid());
   session.commit();
-  assertThat(index.getNullableByKey(project.getKey())).isNull();
+  assertThat(index.getNullableByKey(project.uuid())).isNull();
 }

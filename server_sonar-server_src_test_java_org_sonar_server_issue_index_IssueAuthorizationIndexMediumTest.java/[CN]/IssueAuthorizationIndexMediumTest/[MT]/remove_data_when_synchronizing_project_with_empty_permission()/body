@@ -1,16 +1,16 @@
 {
-  project=new ComponentDto().setKey("Sample").setAuthorizationUpdatedAt(DateUtils.parseDate("2014-09-11"));
+  project=new ComponentDto().setKey("Sample").setUuid("ABCD").setAuthorizationUpdatedAt(DateUtils.parseDate("2014-09-11"));
   db.componentDao().insert(session,project);
   GroupDto sonarUsers=new GroupDto().setName("devs");
   db.groupDao().insert(session,sonarUsers);
   UserDto john=new UserDto().setLogin("john").setName("John").setActive(true);
   db.userDao().insert(session,john);
   tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),"devs",UserRole.USER,session);
-  db.issueAuthorizationDao().synchronizeAfter(session,new Date(0),ImmutableMap.of(IssueAuthorizationDao.PROJECT_KEY,project.key()));
+  db.issueAuthorizationDao().synchronizeAfter(session,new Date(0),ImmutableMap.of(IssueAuthorizationDao.PROJECT_UUID,project.uuid()));
   session.commit();
-  assertThat(index.getByKey(project.getKey())).isNotNull();
+  assertThat(index.getByKey(project.uuid())).isNotNull();
   tester.get(PermissionFacade.class).deleteGroupPermission(project.getId(),"devs",UserRole.USER,session);
-  db.issueAuthorizationDao().synchronizeAfter(session,new Date(0),ImmutableMap.of(IssueAuthorizationDao.PROJECT_KEY,project.key()));
+  db.issueAuthorizationDao().synchronizeAfter(session,new Date(0),ImmutableMap.of(IssueAuthorizationDao.PROJECT_UUID,project.uuid()));
   session.commit();
-  assertThat(index.getNullableByKey(project.getKey())).isNull();
+  assertThat(index.getNullableByKey(project.uuid())).isNull();
 }

@@ -1,11 +1,11 @@
 {
   String issueKey="ABCD";
-  DefaultIssue issue=createIssue();
+  ComponentDto project=ComponentTesting.newProjectDto().setId(1L).setKey("org.sonar.Sonar").setLongName("SonarQube").setName("SonarQube");
+  when(componentDao.getByUuid(session,project.uuid())).thenReturn(project);
+  ComponentDto file=ComponentTesting.newFileDto(project).setId(10L).setEnabled(false).setKey("org.sonar.server.issue.IssueClient").setLongName("SonarQube :: Issue Client").setName("SonarQube :: Issue Client").setQualifier("FIL").setSubProjectId(1L);
+  when(componentDao.getByUuid(session,file.uuid())).thenReturn(file);
+  DefaultIssue issue=createIssue().setComponentUuid(file.uuid()).setProjectUuid(project.uuid());
   when(issueService.getByKey(issueKey)).thenReturn(issue);
-  ComponentDto project=mock(ComponentDto.class);
-  when(project.key()).thenReturn("org.sonar.Sonar");
-  when(project.longName()).thenReturn("SonarQube");
-  when(componentDao.getNullableByKey(session,project.key())).thenReturn(project);
   MockUserSession.set();
   WsTester.TestRequest request=tester.newGetRequest("api/issues","show").setParam("key",issueKey);
   request.execute().assertJson(getClass(),"show_issue_on_removed_component.json");
