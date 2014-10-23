@@ -8,25 +8,7 @@
     component.setProjectUuid(getOrCreateUuid(project.getId(),uuidByComponentId));
   }
   for (  Component component : components) {
-    String snapshotPath=component.getSnapshotPath();
-    StringBuilder moduleUuidPath=new StringBuilder();
-    Component lastModule=null;
-    if (!Strings.isNullOrEmpty(snapshotPath)) {
-      for (      String s : Splitter.on(".").omitEmptyStrings().split(snapshotPath)) {
-        Long snapshotId=Long.valueOf(s);
-        Component currentComponent=componentsBySnapshotId.get(snapshotId);
-        if (currentComponent.getScope().equals(Scopes.PROJECT)) {
-          lastModule=currentComponent;
-          moduleUuidPath.append(currentComponent.getUuid()).append(".");
-        }
-      }
-    }
-    if (moduleUuidPath.length() > 0) {
-      component.setModuleUuidPath(moduleUuidPath.toString());
-    }
-    if (lastModule != null && !lastModule.getId().equals(project.getId())) {
-      component.setModuleUuid(getOrCreateUuid(lastModule.getId(),uuidByComponentId));
-    }
+    updateComponent(component,project,componentsBySnapshotId,uuidByComponentId);
     mapper.updateComponentUuids(component);
     counter.getAndIncrement();
   }
