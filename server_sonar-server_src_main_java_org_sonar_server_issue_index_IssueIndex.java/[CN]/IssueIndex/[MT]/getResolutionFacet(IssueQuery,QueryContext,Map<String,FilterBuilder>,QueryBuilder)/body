@@ -1,0 +1,9 @@
+{
+  String fieldName=IssueNormalizer.IssueField.RESOLUTION.field();
+  String facetName=IssueFilterParameters.RESOLUTIONS;
+  BoolFilterBuilder facetFilter=getStickyFacetFilter(esQuery,filters,fieldName);
+  FilterAggregationBuilder facetTopAggregation=buildTopFacetAggregation(fieldName,facetName,facetFilter);
+  addSelectedItemsToFacet(fieldName,facetName,facetTopAggregation,query.resolutions().toArray(new String[0]));
+  facetTopAggregation.subAggregation(AggregationBuilders.missing(facetName + "_missing").field(fieldName));
+  return AggregationBuilders.global(facetName).subAggregation(facetTopAggregation);
+}
