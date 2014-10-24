@@ -1,0 +1,20 @@
+{
+  db.prepareDbUnit(getClass(),"migrate_view.xml");
+  migration.execute();
+  session.commit();
+  Component view=mapper.selectComponentByKey("view");
+  assertThat(view.getUuid()).isNotNull();
+  assertThat(view.getProjectUuid()).isEqualTo(view.getUuid());
+  assertThat(view.getModuleUuid()).isNull();
+  assertThat(view.getModuleUuidPath()).isNull();
+  Component subView=mapper.selectComponentByKey("subView");
+  assertThat(subView.getUuid()).isNotNull();
+  assertThat(subView.getProjectUuid()).isEqualTo(view.getUuid());
+  assertThat(subView.getModuleUuid()).isNull();
+  assertThat(subView.getModuleUuidPath()).isEqualTo(view.getUuid());
+  Component techProject=mapper.selectComponentByKey("vieworg.struts:struts");
+  assertThat(techProject.getUuid()).isNotNull();
+  assertThat(techProject.getProjectUuid()).isEqualTo(view.getUuid());
+  assertThat(techProject.getModuleUuid()).isEqualTo(subView.getUuid());
+  assertThat(techProject.getModuleUuidPath()).isEqualTo(view.getUuid() + "." + subView.getUuid());
+}

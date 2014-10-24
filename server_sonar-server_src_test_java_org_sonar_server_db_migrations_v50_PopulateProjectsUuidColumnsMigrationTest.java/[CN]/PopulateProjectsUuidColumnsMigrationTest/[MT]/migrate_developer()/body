@@ -1,0 +1,15 @@
+{
+  db.prepareDbUnit(getClass(),"migrate_developer.xml");
+  migration.execute();
+  session.commit();
+  Component dev=mapper.selectComponentByKey("DEV:developer@company.net");
+  assertThat(dev.getUuid()).isNotNull();
+  assertThat(dev.getProjectUuid()).isEqualTo(dev.getUuid());
+  assertThat(dev.getModuleUuid()).isNull();
+  assertThat(dev.getModuleUuidPath()).isNull();
+  Component techDev=mapper.selectComponentByKey("DEV:developer@company.net:org.struts:struts");
+  assertThat(techDev.getUuid()).isNotNull();
+  assertThat(techDev.getProjectUuid()).isEqualTo(dev.getUuid());
+  assertThat(techDev.getModuleUuid()).isNull();
+  assertThat(techDev.getModuleUuidPath()).isEqualTo(dev.getUuid());
+}
