@@ -3,12 +3,9 @@
   DbSession session=dbClient.openSession(false);
   try {
     AuthorizedComponentDto projectOrModule=getByKey(projectOrModuleKey);
-    ResourceDto oldRootProject=getRootProjectByComponentKey(session,projectOrModuleKey);
     resourceKeyUpdaterDao.updateKey(projectOrModule.getId(),newKey);
     session.commit();
-    String newRootProjectKey=getRootProjectByComponentKey(session,newKey).getKey();
-    updateIssuesIndex(session,oldRootProject.getKey(),newRootProjectKey);
-    previewCache.reportResourceModification(newRootProjectKey);
+    previewCache.reportResourceModification(newKey);
     session.commit();
   }
   finally {
