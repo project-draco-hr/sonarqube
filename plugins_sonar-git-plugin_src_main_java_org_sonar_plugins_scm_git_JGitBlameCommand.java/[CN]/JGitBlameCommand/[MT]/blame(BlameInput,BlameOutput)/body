@@ -5,15 +5,25 @@
     Repository repo=new RepositoryBuilder().findGitDir(basedir).setMustExist(true).build();
     git=Git.wrap(repo);
     File gitBaseDir=repo.getWorkTree();
+    ExecutorService executorService=Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+    List<Future<Void>> tasks=new ArrayList<Future<Void>>();
     for (    InputFile inputFile : input.filesToBlame()) {
-      blame(output,git,gitBaseDir,inputFile);
+      tasks.add(submitTask(output,git,gitBaseDir,inputFile,executorService));
+    }
+    for (    Future<Void> task : tasks) {
+      try {
+        task.get();
+      }
+ catch (      ExecutionException e) {
+        throw e.getCause() instanceof RuntimeException ? (RuntimeException)e.getCause() : new IllegalStateException(e.getCause());
+      }
+catch (      InterruptedException e) {
+        throw new IllegalStateException(e);
+      }
     }
   }
  catch (  IOException e) {
     throw new IllegalStateException("Unable to open Git repository",e);
-  }
-catch (  GitAPIException e) {
-    throw new IllegalStateException("Unable to blame",e);
   }
  finally {
     if (git != null && git.getRepository() != null) {

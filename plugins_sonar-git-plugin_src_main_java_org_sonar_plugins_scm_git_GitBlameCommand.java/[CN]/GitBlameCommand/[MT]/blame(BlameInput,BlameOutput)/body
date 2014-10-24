@@ -1,19 +1,20 @@
 {
   FileSystem fs=input.fileSystem();
   LOG.debug("Working directory: " + fs.baseDir().getAbsolutePath());
+  ExecutorService executorService=Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+  List<Future<Void>> tasks=new ArrayList<Future<Void>>();
   for (  InputFile inputFile : input.filesToBlame()) {
-    String filename=inputFile.relativePath();
-    Command cl=createCommandLine(fs.baseDir(),filename);
-    GitBlameConsumer consumer=new GitBlameConsumer(filename);
-    StringStreamConsumer stderr=new StringStreamConsumer();
-    int exitCode=execute(cl,consumer,stderr);
-    if (exitCode != 0) {
-      throw new IllegalStateException("The git blame command [" + cl.toString() + "] failed: "+ stderr.getOutput());
+    tasks.add(submitTask(fs.baseDir(),output,inputFile,executorService));
+  }
+  for (  Future<Void> task : tasks) {
+    try {
+      task.get();
     }
-    List<BlameLine> lines=consumer.getLines();
-    if (lines.size() == inputFile.lines() - 1) {
-      lines.add(lines.get(lines.size() - 1));
+ catch (    ExecutionException e) {
+      throw e.getCause() instanceof RuntimeException ? (RuntimeException)e.getCause() : new IllegalStateException(e.getCause());
     }
-    output.blameResult(inputFile,lines);
+catch (    InterruptedException e) {
+      throw new IllegalStateException(e);
+    }
   }
 }
