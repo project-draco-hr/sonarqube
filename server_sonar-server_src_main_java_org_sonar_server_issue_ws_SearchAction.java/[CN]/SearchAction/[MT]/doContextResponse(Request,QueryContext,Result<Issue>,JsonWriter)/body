@@ -25,18 +25,15 @@
       userLogins.add(issue.assignee());
     }
   }
-  for (  FacetValue rule : result.getFacetValues(IssueFilterParameters.RULES)) {
-    ruleKeys.add(RuleKey.parse(rule.getKey()));
+  Collection<FacetValue> facetRules=result.getFacetValues(IssueFilterParameters.RULES);
+  if (facetRules != null) {
+    for (    FacetValue rule : facetRules) {
+      ruleKeys.add(RuleKey.parse(rule.getKey()));
+    }
   }
-  for (  FacetValue project : result.getFacetValues(IssueFilterParameters.COMPONENT_ROOTS)) {
-    projectUuids.add(project.getKey());
-  }
-  for (  FacetValue component : result.getFacetValues(IssueFilterParameters.COMPONENTS)) {
-    componentUuids.add(component.getKey());
-  }
-  for (  FacetValue user : result.getFacetValues(IssueFilterParameters.ASSIGNEES)) {
-    userLogins.add(user.getKey());
-  }
+  collectFacetKeys(result,IssueFilterParameters.COMPONENT_ROOTS,projectUuids);
+  collectFacetKeys(result,IssueFilterParameters.COMPONENTS,componentUuids);
+  collectFacetKeys(result,IssueFilterParameters.ASSIGNEES,userLogins);
   DbSession session=dbClient.openSession(false);
   try {
     List<DefaultIssueComment> comments=issueChangeDao.selectCommentsByIssues(session,issueKeys);
