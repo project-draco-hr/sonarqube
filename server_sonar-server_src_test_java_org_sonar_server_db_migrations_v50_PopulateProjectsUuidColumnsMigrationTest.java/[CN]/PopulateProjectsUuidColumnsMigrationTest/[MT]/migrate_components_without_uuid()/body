@@ -1,0 +1,20 @@
+{
+  db.prepareDbUnit(getClass(),"migrate_components_without_uuid.xml");
+  migration.execute();
+  session.commit();
+  Component root=mapper.selectComponentByKey("org.struts:struts");
+  assertThat(root.getUuid()).isNotNull();
+  assertThat(root.getProjectUuid()).isEqualTo(root.getUuid());
+  assertThat(root.getModuleUuid()).isNull();
+  assertThat(root.getModuleUuidPath()).isNull();
+  Component module=mapper.selectComponentByKey("org.struts:struts-core");
+  assertThat(module.getUuid()).isNotNull();
+  assertThat(module.getProjectUuid()).isNull();
+  assertThat(module.getModuleUuid()).isNull();
+  assertThat(module.getModuleUuidPath()).isNull();
+  Component file=mapper.selectComponentByKey("org.struts:struts-core:src/org/struts/RequestContext.java");
+  assertThat(file.getUuid()).isNotNull();
+  assertThat(file.getProjectUuid()).isNull();
+  assertThat(file.getModuleUuid()).isNull();
+  assertThat(file.getModuleUuidPath()).isNull();
+}
