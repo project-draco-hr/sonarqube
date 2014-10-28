@@ -2,12 +2,16 @@
   Map<Long,Component> componentsBySnapshotId=newHashMap();
   List<Component> components=mapper.selectComponentChildrenForProjects(project.getId());
   components.add(project);
+  List<Component> componentsToMigrate=newArrayList();
   for (  Component component : components) {
     componentsBySnapshotId.put(component.getSnapshotId(),component);
-    component.setUuid(getOrCreateUuid(component,uuidByComponentId));
-    component.setProjectUuid(getOrCreateUuid(project,uuidByComponentId));
+    if (component.getUuid() == null) {
+      component.setUuid(getOrCreateUuid(component,uuidByComponentId));
+      component.setProjectUuid(getOrCreateUuid(project,uuidByComponentId));
+      componentsToMigrate.add(component);
+    }
   }
-  for (  Component component : components) {
+  for (  Component component : componentsToMigrate) {
     updateComponent(component,project,componentsBySnapshotId,uuidByComponentId);
     mapper.updateComponentUuids(component);
     counter.getAndIncrement();

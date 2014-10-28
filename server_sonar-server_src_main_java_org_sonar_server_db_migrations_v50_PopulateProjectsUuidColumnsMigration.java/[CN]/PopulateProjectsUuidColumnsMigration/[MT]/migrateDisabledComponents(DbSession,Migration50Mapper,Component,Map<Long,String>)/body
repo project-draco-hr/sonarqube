@@ -1,7 +1,14 @@
 {
-  for (  Component component : mapper.selectDisabledComponentChildrenForProjects(project.getId())) {
+  String projectUuid=getOrCreateUuid(project,uuidByComponentId);
+  for (  Component component : mapper.selectDisabledDirectComponentChildrenForProjects(project.getId())) {
     component.setUuid(getOrCreateUuid(component,uuidByComponentId));
-    component.setProjectUuid(getOrCreateUuid(project,uuidByComponentId));
+    component.setProjectUuid(projectUuid);
+    mapper.updateComponentUuids(component);
+    counter.getAndIncrement();
+  }
+  for (  Component component : mapper.selectDisabledNoneDirectComponentChildrenForProjects(project.getId())) {
+    component.setUuid(getOrCreateUuid(component,uuidByComponentId));
+    component.setProjectUuid(projectUuid);
     mapper.updateComponentUuids(component);
     counter.getAndIncrement();
   }
