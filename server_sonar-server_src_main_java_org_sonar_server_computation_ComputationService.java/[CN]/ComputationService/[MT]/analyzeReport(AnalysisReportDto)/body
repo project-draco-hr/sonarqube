@@ -1,11 +1,15 @@
 {
+  LOG.info(String.format("### Analysis '%s' of project '%s' started??###",report.getId(),report.getProjectKey()));
   DbSession session=dbClient.openSession(true);
   try {
     for (    ComputationStep step : stepRegistry.steps()) {
+      LOG.info(String.format("# %s step started...",step.description()));
       step.execute(session,report);
+      LOG.info(String.format("# %s step finished",step.description()));
     }
   }
   finally {
     MyBatis.closeQuietly(session);
+    LOG.info(String.format("### Analysis '%s' finished??###",report.getId()));
   }
 }
