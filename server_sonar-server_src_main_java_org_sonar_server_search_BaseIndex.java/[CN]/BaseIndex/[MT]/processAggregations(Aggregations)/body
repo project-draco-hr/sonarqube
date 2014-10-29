@@ -2,16 +2,15 @@
   Multimap<String,FacetValue> stats=ArrayListMultimap.create();
   if (aggregations != null) {
     for (    Aggregation aggregation : aggregations.asList()) {
-      if (aggregation.getClass().isAssignableFrom(StringTerms.class)) {
+      if (aggregation instanceof StringTerms) {
         for (        Terms.Bucket value : ((Terms)aggregation).getBuckets()) {
-          FacetValue facetValue=new FacetValue(value.getKey(),(int)value.getDocCount());
-          facetValue.setSubFacets(processAggregations(value.getAggregations()));
+          FacetValue facetValue=new FacetValue(value.getKey(),value.getDocCount());
           stats.put(aggregation.getName(),facetValue);
         }
       }
- else       if (aggregation.getClass().isAssignableFrom(InternalValueCount.class)) {
+ else       if (aggregation instanceof InternalValueCount) {
         InternalValueCount count=(InternalValueCount)aggregation;
-        FacetValue facetValue=new FacetValue(count.getName(),(int)count.getValue());
+        FacetValue facetValue=new FacetValue(count.getName(),count.getValue());
         stats.put(count.getName(),facetValue);
       }
     }
