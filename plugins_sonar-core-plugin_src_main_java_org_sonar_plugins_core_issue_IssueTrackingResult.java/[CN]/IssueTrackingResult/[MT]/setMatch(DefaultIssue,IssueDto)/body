@@ -1,5 +1,9 @@
 {
   matched.put(issue,matching);
-  unmatchedByRule.remove(RuleKey.of(matching.getRuleRepo(),matching.getRule()),matching);
-  unmatched.remove(matching);
+  RuleKey ruleKey=RuleKey.of(matching.getRuleRepo(),matching.getRule());
+  unmatchedByRuleAndKey.get(ruleKey).remove(matching.getKee());
+  unmatchedByKey.remove(matching.getKee());
+  Integer lineNotNull=matching.getLine() != null ? matching.getLine() : 0;
+  String checksumNotNull=StringUtils.defaultString(matching.getChecksum(),"");
+  unmatchedByRuleAndLineAndChecksum.get(ruleKey).get(lineNotNull).get(checksumNotNull).remove(matching);
 }
