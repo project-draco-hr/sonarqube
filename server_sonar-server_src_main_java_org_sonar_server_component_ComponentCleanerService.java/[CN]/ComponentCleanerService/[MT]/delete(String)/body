@@ -1,16 +1,16 @@
 {
-  DbSession session=dbClient.openSession(false);
+  DbSession dbSession=dbClient.openSession(false);
   try {
-    ComponentDto project=dbClient.componentDao().getByKey(session,projectKey);
+    ComponentDto project=dbClient.componentDao().getByKey(dbSession,projectKey);
     if (!Scopes.PROJECT.equals(project.scope())) {
       throw new IllegalArgumentException("Only project can be deleted");
     }
     purgeDao.deleteResourceTree(project.getId());
-    deletePermissionIndexes(session,project.uuid());
-    session.commit();
+    deletePermissionIndexes(dbSession,project.uuid());
+    dbSession.commit();
+    deleteIssuesFromIndex(project.uuid());
   }
   finally {
-    session.close();
+    MyBatis.closeQuietly(dbSession);
   }
-  deleteIssuesFromIndex(projectKey);
 }

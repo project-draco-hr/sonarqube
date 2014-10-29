@@ -1,0 +1,13 @@
+{
+  tester.get(IssueDao.class).insert(session,IssueTesting.newDto(rule,file,project));
+  tester.get(IssueDao.class).insert(session,IssueTesting.newDto(rule,file,project));
+  tester.get(IssueDao.class).insert(session,IssueTesting.newDto(rule,file,ComponentTesting.newProjectDto()));
+  session.commit();
+  Result<Issue> tempSearchResult=index.search(IssueQuery.builder().componentRootUuids(newArrayList(project.uuid())).build(),new QueryContext());
+  assertThat(tempSearchResult.getTotal()).isEqualTo(2L);
+  assertThat(index.countAll()).isEqualTo(3L);
+  index.deleteByProjectUuid(project.uuid());
+  Result<Issue> searchResult=index.search(IssueQuery.builder().componentRootUuids(newArrayList(project.uuid())).build(),new QueryContext());
+  assertThat(searchResult.getHits()).isEmpty();
+  assertThat(index.countAll()).isEqualTo(1);
+}
