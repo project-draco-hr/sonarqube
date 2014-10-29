@@ -1,6 +1,6 @@
 {
   Map<Long,Component> componentsBySnapshotId=newHashMap();
-  List<Component> components=mapper.selectComponentChildrenForProjects(project.getId());
+  List<Component> components=readSession.getMapper(Migration50Mapper.class).selectComponentChildrenForProjects(project.getId());
   components.add(project);
   List<Component> componentsToMigrate=newArrayList();
   for (  Component component : components) {
@@ -13,7 +13,7 @@
   }
   for (  Component component : componentsToMigrate) {
     updateComponent(component,project,componentsBySnapshotId,uuidByComponentId);
-    mapper.updateComponentUuids(component);
+    writeSession.getMapper(Migration50Mapper.class).updateComponentUuids(component);
     counter.getAndIncrement();
   }
 }
