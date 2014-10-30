@@ -1,0 +1,16 @@
+{
+  boolean changed;
+  if (permissionChangeQuery.targetsUser()) {
+    changed=applyUserPermissionChange(session,operation,permissionChangeQuery);
+  }
+ else {
+    changed=applyGroupPermissionChange(session,operation,permissionChangeQuery);
+  }
+  if (changed) {
+    String project=permissionChangeQuery.component();
+    if (project != null) {
+      synchronizeProjectPermissions(session,dbClient.componentDao().getByKey(session,project).uuid());
+    }
+    session.commit();
+  }
+}

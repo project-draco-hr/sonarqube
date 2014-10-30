@@ -1,6 +1,7 @@
 {
-  if (index.get(IssueAuthorizationIndex.class).getNullableByKey(report.getProjectKey()) == null) {
-    permissionService.synchronizePermissions(session,report.getProject().uuid());
+  String projectUuid=report.getProject().uuid();
+  if (index.get(IssueAuthorizationIndex.class).getNullableByKey(projectUuid) == null) {
+    dbClient.issueAuthorizationDao().synchronizeAfter(session,null,ImmutableMap.of(IssueAuthorizationDao.PROJECT_UUID,projectUuid));
     session.commit();
   }
 }
