@@ -1,0 +1,15 @@
+{
+  project=ComponentTesting.newProjectDto().setAuthorizationUpdatedAt(DateUtils.parseDate("2014-09-11"));
+  db.componentDao().insert(session,project);
+  GroupDto sonarUsers=new GroupDto().setName("devs");
+  db.groupDao().insert(session,sonarUsers);
+  tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),"devs",UserRole.USER,session);
+  session.commit();
+  db.issueAuthorizationDao().synchronizeAfter(session,null,ImmutableMap.of("project",project.uuid()));
+  session.commit();
+  Date date=index.getLastSynchronization(ImmutableMap.of("project",project.uuid()));
+  assertThat(date).isNotNull();
+  db.issueAuthorizationDao().synchronizeAfter(session,null,ImmutableMap.of("project","Another project"));
+  session.commit();
+  assertThat(index.getLastSynchronization(ImmutableMap.of("project",project.uuid()))).isEqualTo(date);
+}

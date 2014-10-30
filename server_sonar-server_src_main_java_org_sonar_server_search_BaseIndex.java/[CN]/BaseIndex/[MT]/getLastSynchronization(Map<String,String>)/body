@@ -1,0 +1,14 @@
+{
+  SearchRequestBuilder request=client.prepareSearch(this.getIndexName()).setTypes(this.getIndexType()).setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),getLastSynchronizationBuilder(params))).setSize(0).addAggregation(AggregationBuilders.max("latest").field(BaseNormalizer.UPDATED_AT_FIELD));
+  SearchResponse response=client.execute(request);
+  Max max=response.getAggregations().get("latest");
+  if (max.getValue() > 0) {
+    Date date=new DateTime(Double.valueOf(max.getValue()).longValue()).toDate();
+    LOG.debug("Index {}:{} has last update of {}",this.getIndexName(),this.getIndexType(),date);
+    return date;
+  }
+ else {
+    LOG.debug("Index {}:{} has no last update date",this.getIndexName(),this.getIndexType());
+    return null;
+  }
+}

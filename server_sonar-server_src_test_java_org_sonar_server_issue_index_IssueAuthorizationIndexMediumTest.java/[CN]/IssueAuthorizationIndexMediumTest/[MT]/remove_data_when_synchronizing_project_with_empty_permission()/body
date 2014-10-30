@@ -6,11 +6,11 @@
   UserDto john=new UserDto().setLogin("john").setName("John").setActive(true);
   db.userDao().insert(session,john);
   tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),"devs",UserRole.USER,session);
-  db.issueAuthorizationDao().synchronizeAfter(session,null,ImmutableMap.of(IssueAuthorizationDao.PROJECT_UUID,project.uuid()));
+  db.issueAuthorizationDao().synchronizeAfter(session,null,ImmutableMap.of("project",project.uuid()));
   session.commit();
   assertThat(index.getByKey(project.uuid())).isNotNull();
   tester.get(PermissionFacade.class).deleteGroupPermission(project.getId(),"devs",UserRole.USER,session);
-  db.issueAuthorizationDao().synchronizeAfter(session,null,ImmutableMap.of(IssueAuthorizationDao.PROJECT_UUID,project.uuid()));
+  db.issueAuthorizationDao().synchronizeAfter(session,null,ImmutableMap.of("project",project.uuid()));
   session.commit();
   assertThat(index.getNullableByKey(project.uuid())).isNull();
 }
