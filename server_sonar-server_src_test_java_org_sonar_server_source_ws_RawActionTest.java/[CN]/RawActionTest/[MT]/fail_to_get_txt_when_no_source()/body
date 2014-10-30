@@ -1,6 +1,13 @@
 {
   String fileKey="src/Foo.java";
-  when(sourceService.getLinesAsTxt(fileKey)).thenReturn(Collections.<String>emptyList());
+  when(componentDao.getByKey(session,fileKey)).thenReturn(file);
+  when(sourceService.getLinesAsTxt(session,fileKey)).thenReturn(Collections.<String>emptyList());
   WsTester.TestRequest request=tester.newGetRequest("api/sources","raw").setParam("key",fileKey);
-  request.execute();
+  try {
+    request.execute();
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(NotFoundException.class).hasMessage("");
+  }
 }
