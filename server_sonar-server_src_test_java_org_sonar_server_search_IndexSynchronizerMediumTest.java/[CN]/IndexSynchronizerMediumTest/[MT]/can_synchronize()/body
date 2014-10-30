@@ -11,12 +11,6 @@
   assertThat(indexClient.get(RuleIndex.class).countAll()).isEqualTo(numberOfRules);
   tester.clearIndexes();
   assertThat(indexClient.get(RuleIndex.class).countAll()).isEqualTo(0);
-  DbSession syncSession=dbClient.openSession(true);
-  try {
-    synchronizer.synchronize(syncSession,dbClient.ruleDao(),indexClient.get(RuleIndex.class));
-    assertThat(indexClient.get(RuleIndex.class).countAll()).isEqualTo(numberOfRules);
-  }
-  finally {
-    syncSession.close();
-  }
+  synchronizer.execute();
+  assertThat(indexClient.get(RuleIndex.class).countAll()).isEqualTo(numberOfRules);
 }
