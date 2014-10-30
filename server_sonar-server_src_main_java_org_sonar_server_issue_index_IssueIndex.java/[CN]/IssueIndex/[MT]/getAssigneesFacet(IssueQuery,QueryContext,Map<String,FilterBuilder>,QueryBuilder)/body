@@ -4,9 +4,10 @@
   Map<String,FilterBuilder> assigneeFilters=Maps.newHashMap(filters);
   assigneeFilters.remove("__isAssigned");
   assigneeFilters.remove(fieldName);
-  BoolFilterBuilder facetFilter=getStickyFacetFilter(esQuery,assigneeFilters,fieldName);
-  FilterAggregationBuilder facetTopAggregation=buildTopFacetAggregation(fieldName,facetName,facetFilter,DEFAULT_ISSUE_FACET_SIZE,1);
-  addSelectedItemsToFacet(fieldName,facetName,facetTopAggregation,query.assignees().toArray());
+  StickyFacetBuilder assigneeFacetBuilder=new StickyFacetBuilder(esQuery,assigneeFilters);
+  BoolFilterBuilder facetFilter=assigneeFacetBuilder.getStickyFacetFilter(fieldName);
+  FilterAggregationBuilder facetTopAggregation=assigneeFacetBuilder.buildTopFacetAggregation(fieldName,facetName,facetFilter,DEFAULT_ISSUE_FACET_SIZE,1);
+  facetTopAggregation=assigneeFacetBuilder.addSelectedItemsToFacet(fieldName,facetName,facetTopAggregation,query.assignees().toArray());
   facetTopAggregation.subAggregation(AggregationBuilders.missing(facetName + "_missing").field(fieldName));
   return AggregationBuilders.global(facetName).subAggregation(facetTopAggregation);
 }
