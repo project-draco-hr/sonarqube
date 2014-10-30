@@ -1,0 +1,20 @@
+{
+  final Date now=new Date(system.now());
+  MassUpdate massUpdate=context.prepareMassUpdate();
+  massUpdate.select("SELECT if.id, if.data FROM issue_filters if");
+  massUpdate.update("UPDATE issue_filters SET data=?, updated_at=? WHERE id=?");
+  massUpdate.execute(new MassUpdate.Handler(){
+    @Override public boolean handle(    Select.Row row,    SqlStatement update) throws SQLException {
+      Long id=row.getLong(1);
+      String data=row.getString(2);
+      if (!data.contains(OLD_COMPONENT_ROOTS_FIELDS)) {
+        return false;
+      }
+      update.setString(1,convertData(context,data));
+      update.setDate(2,now);
+      update.setLong(3,id);
+      return true;
+    }
+  }
+);
+}
