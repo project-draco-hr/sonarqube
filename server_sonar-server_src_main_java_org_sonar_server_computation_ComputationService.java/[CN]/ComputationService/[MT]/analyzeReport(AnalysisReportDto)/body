@@ -1,15 +1,23 @@
 {
   LOG.info(String.format("#%s - %s - Analysis report processing started",report.getId(),report.getProjectKey()));
   DbSession session=dbClient.openSession(true);
+  ComponentDto project=findProject(report,session);
   try {
+    report.succeed();
     for (    ComputationStep step : stepRegistry.steps()) {
       LOG.info(String.format("%s step started",step.description()));
-      step.execute(session,report);
+      step.execute(session,report,project);
       session.commit();
       LOG.info(String.format("%s step finished",step.description()));
     }
   }
-  finally {
+ catch (  Exception exception) {
+    report.fail();
+    Throwables.propagate(exception);
+  }
+ finally {
+    logActivity(session,report,project);
+    session.commit();
     MyBatis.closeQuietly(session);
     LOG.info(String.format("#%s - %s - Analysis report processing finished",report.getId(),report.getProjectKey()));
   }

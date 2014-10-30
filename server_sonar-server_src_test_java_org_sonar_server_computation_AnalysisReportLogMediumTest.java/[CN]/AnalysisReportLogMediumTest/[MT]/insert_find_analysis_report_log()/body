@@ -1,15 +1,16 @@
 {
-  AnalysisReportDto report=AnalysisReportDto.newForTests(1L).setProjectKey("projectKey").setStatus(FAILED).setCreatedAt(DateUtils.parseDate("2014-10-15")).setUpdatedAt(DateUtils.parseDate("2014-10-16")).setStartedAt(DateUtils.parseDate("2014-10-17")).setFinishedAt(DateUtils.parseDate("2014-10-18")).setProject(ComponentTesting.newProjectDto());
-  service.write(dbSession,ANALYSIS_REPORT,new AnalysisReportLog(report));
+  AnalysisReportDto report=AnalysisReportDto.newForTests(1L).setProjectKey("projectKey").setStatus(FAILED).setCreatedAt(DateUtils.parseDate("2014-10-15")).setUpdatedAt(DateUtils.parseDate("2014-10-16")).setStartedAt(DateUtils.parseDate("2014-10-17")).setFinishedAt(DateUtils.parseDate("2014-10-18"));
+  ComponentDto project=ComponentTesting.newProjectDto();
+  service.write(dbSession,ANALYSIS_REPORT,new AnalysisReportLog(report,project));
   dbSession.commit();
   assertThat(index.findAll().getHits()).hasSize(1);
   Activity activity=Iterables.getFirst(index.findAll().getHits(),null);
   assertThat(activity).isNotNull();
   Map<String,String> details=activity.details();
   assertThat(details.get("id")).isEqualTo(String.valueOf(report.getId()));
-  assertThat(details.get("projectKey")).isEqualTo(report.getProjectKey());
-  assertThat(details.get("projectName")).isEqualTo(report.getProjectName());
-  assertThat(details.get("projectUuid")).isEqualTo(report.getProjectUuid());
+  assertThat(details.get("projectKey")).isEqualTo(project.key());
+  assertThat(details.get("projectName")).isEqualTo(project.name());
+  assertThat(details.get("projectUuid")).isEqualTo(project.uuid());
   assertThat(details.get("status")).isEqualTo("FAILED");
   assertThat(details.get("submittedAt")).isEqualTo("2014-10-15T00:00:00+0200");
   assertThat(details.get("startedAt")).isEqualTo("2014-10-17T00:00:00+0200");

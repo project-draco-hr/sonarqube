@@ -1,9 +1,8 @@
 {
-  ComponentDto project=insertPermissionsForProject(DEFAULT_PROJECT_KEY);
+  ComponentDto project=insertProjectWithPermissions(DEFAULT_PROJECT_KEY);
   queue.add(DEFAULT_PROJECT_KEY,123L);
   List<AnalysisReportDto> reports=queue.findByProjectKey(DEFAULT_PROJECT_KEY);
-  getAndSetProjectStep.execute(session,reports.get(0));
-  sut.execute(session,reports.get(0));
+  sut.execute(session,reports.get(0),project);
   IssueAuthorizationDoc issueAuthorizationIndex=tester.get(IssueAuthorizationIndex.class).getNullableByKey(project.uuid());
   assertThat(issueAuthorizationIndex).isNotNull();
   assertThat(issueAuthorizationIndex.groups()).containsExactly(DefaultGroups.ANYONE);

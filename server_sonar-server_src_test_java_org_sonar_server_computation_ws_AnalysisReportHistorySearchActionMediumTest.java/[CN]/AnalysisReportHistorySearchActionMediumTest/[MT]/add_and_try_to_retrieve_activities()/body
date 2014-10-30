@@ -4,10 +4,12 @@
   queue.add(DEFAULT_PROJECT_KEY,123L);
   queue.add(DEFAULT_PROJECT_KEY,123L);
   List<AnalysisReportDto> reports=queue.all();
+  ComponentDto project=ComponentTesting.newProjectDto().setName(DEFAULT_PROJECT_NAME).setKey(DEFAULT_PROJECT_KEY);
   for (  AnalysisReportDto report : reports) {
     report.succeed();
-    queue.remove(report);
+    activityService.write(session,Activity.Type.ANALYSIS_REPORT,new AnalysisReportLog(report,project));
   }
+  session.commit();
   userSession.setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
   WsTester.TestRequest request=wsTester.newGetRequest(AnalysisReportWebService.API_ENDPOINT,AnalysisReportHistorySearchAction.SEARCH_ACTION);
   WsTester.Result result=request.execute();
