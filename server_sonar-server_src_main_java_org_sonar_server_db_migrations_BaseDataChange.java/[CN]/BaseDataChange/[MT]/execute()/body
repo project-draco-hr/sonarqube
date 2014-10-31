@@ -1,18 +1,9 @@
 {
-  Connection readConnection=null, writeConnection=null;
+  Context context=new Context(db);
   try {
-    readConnection=db.getDataSource().getConnection();
-    readConnection.setAutoCommit(false);
-    if (readConnection.getMetaData().supportsTransactionIsolationLevel(Connection.TRANSACTION_READ_UNCOMMITTED)) {
-      readConnection.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-    }
-    writeConnection=db.getDataSource().getConnection();
-    writeConnection.setAutoCommit(false);
-    Context context=new Context(db,readConnection,writeConnection);
     execute(context);
   }
   finally {
-    DbUtils.closeQuietly(readConnection);
-    DbUtils.closeQuietly(writeConnection);
+    context.close();
   }
 }
