@@ -1,0 +1,26 @@
+{
+  Timer timer=new Timer("Db Migration Progress");
+  timer.schedule(progressTask,MassUpdate.ProgressTask.PERIOD_MS,MassUpdate.ProgressTask.PERIOD_MS);
+  final DbSession readSession=db.openSession(false);
+  final DbSession writeSession=db.openSession(true);
+  try {
+    readSession.select("org.sonar.core.persistence.migration.v50.Migration50Mapper.selectSnapshotSources",new ResultHandler(){
+      @Override public void handleResult(      ResultContext context){
+        SnapshotSource snapshotSource=(SnapshotSource)context.getResultObject();
+        snapshotSource.setUpdatedAt(snapshotSource.getSnapshotBuildDate());
+        writeSession.getMapper(Migration50Mapper.class).updateSnapshotSource(snapshotSource);
+        counter.getAndIncrement();
+      }
+    }
+);
+    writeSession.commit();
+    readSession.commit();
+    progressTask.log();
+  }
+  finally {
+    readSession.close();
+    writeSession.close();
+    timer.cancel();
+    timer.purge();
+  }
+}
