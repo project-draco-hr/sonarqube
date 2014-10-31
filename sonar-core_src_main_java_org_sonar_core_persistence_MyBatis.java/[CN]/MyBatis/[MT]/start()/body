@@ -2,12 +2,14 @@
   LogFactory.useSlf4jLogging();
   Configuration conf=new Configuration();
   conf.setEnvironment(new Environment("production",createTransactionFactory(),database.getDataSource()));
-  conf.setDatabaseId(database.getDialect().getId());
   conf.setUseGeneratedKeys(true);
   conf.setLazyLoadingEnabled(false);
   conf.setJdbcTypeForNull(JdbcType.NULL);
-  conf.getVariables().setProperty("_true",database.getDialect().getTrueSqlValue());
-  conf.getVariables().setProperty("_false",database.getDialect().getFalseSqlValue());
+  Dialect dialect=database.getDialect();
+  conf.setDatabaseId(dialect.getId());
+  conf.getVariables().setProperty("_true",dialect.getTrueSqlValue());
+  conf.getVariables().setProperty("_false",dialect.getFalseSqlValue());
+  conf.getVariables().setProperty("_scrollFetchSize",String.valueOf(dialect.getScrollDefaultFetchSize()));
   loadAlias(conf,"ActiveDashboard",ActiveDashboardDto.class);
   loadAlias(conf,"Author",AuthorDto.class);
   loadAlias(conf,"Component",ComponentDto.class);
