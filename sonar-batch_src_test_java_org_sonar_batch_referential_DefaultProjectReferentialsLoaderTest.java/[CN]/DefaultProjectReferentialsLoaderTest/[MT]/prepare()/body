@@ -2,7 +2,9 @@
   serverClient=mock(ServerClient.class);
   analysisMode=mock(AnalysisMode.class);
   loader=new DefaultProjectReferentialsLoader(mock(DatabaseSession.class),serverClient,analysisMode,mock(SnapshotDataDao.class));
-  when(serverClient.request(anyString())).thenReturn("");
+  loader=spy(loader);
+  doReturn(null).when(loader).lastSnapshotCreationDate(anyString());
+  when(serverClient.request(anyString())).thenReturn("{}");
   reactor=new ProjectReactor(ProjectDefinition.create().setKey("foo"));
   taskProperties=new TaskProperties(Maps.<String,String>newHashMap(),"");
 }
