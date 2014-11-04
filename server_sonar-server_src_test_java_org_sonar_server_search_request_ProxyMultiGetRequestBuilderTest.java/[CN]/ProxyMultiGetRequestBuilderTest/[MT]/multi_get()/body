@@ -1,0 +1,10 @@
+{
+  RuleDto rule=RuleTesting.newXooX1();
+  tester.get(RuleDao.class).insert(dbSession,RuleTesting.newXooX1());
+  dbSession.commit();
+  MultiGetRequestBuilder request=searchClient.prepareMultiGet();
+  request.add(new MultiGetRequest.Item(IndexDefinition.RULE.getIndexName(),IndexDefinition.RULE.getIndexType(),rule.getKey().toString()).fetchSourceContext(FetchSourceContext.FETCH_SOURCE));
+  MultiGetResponse response=request.get();
+  assertThat(response.getResponses()).isNotEmpty();
+  assertThat(response.getResponses()[0].getResponse().getSource()).isNotEmpty();
+}

@@ -1,0 +1,8 @@
+{
+  tester.get(RuleDao.class).insert(dbSession,RuleTesting.newXooX1());
+  dbSession.commit();
+  SearchResponse search=searchClient.prepareSearch(IndexDefinition.RULE.getIndexName()).setSearchType(SearchType.SCAN).setScroll(TimeValue.timeValueSeconds(3L)).get();
+  SearchScrollRequestBuilder scrollRequest=searchClient.prepareSearchScroll(search.getScrollId());
+  SearchResponse response=scrollRequest.get();
+  assertThat(response.getHits().getTotalHits()).isEqualTo(1);
+}

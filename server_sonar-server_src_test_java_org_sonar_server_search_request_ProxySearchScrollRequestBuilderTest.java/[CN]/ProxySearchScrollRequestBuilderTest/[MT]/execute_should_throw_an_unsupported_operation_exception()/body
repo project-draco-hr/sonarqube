@@ -1,0 +1,10 @@
+{
+  SearchResponse search=searchClient.prepareSearch(IndexDefinition.RULE.getIndexName()).setSearchType(SearchType.SCAN).setScroll(TimeValue.timeValueSeconds(3L)).get();
+  try {
+    searchClient.prepareSearchScroll(search.getScrollId()).execute();
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(UnsupportedOperationException.class).hasMessage("execute() should not be called as it's used for asynchronous");
+  }
+}

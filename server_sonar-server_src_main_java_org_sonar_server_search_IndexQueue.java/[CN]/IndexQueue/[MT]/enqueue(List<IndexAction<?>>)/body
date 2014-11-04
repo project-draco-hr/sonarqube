@@ -13,11 +13,11 @@
       indices.add(index.getIndexName());
     }
   }
-  BulkRequestBuilder bulkRequestBuilder=new BulkRequestBuilder(searchClient);
+  BulkRequestBuilder bulkRequestBuilder=searchClient.prepareBulk();
   long normTime=processActionsIntoQueries(bulkRequestBuilder,actions);
   if (bulkRequestBuilder.numberOfActions() > 0) {
     long indexTime=System.currentTimeMillis();
-    BulkResponse response=searchClient.execute(bulkRequestBuilder.setRefresh(false));
+    BulkResponse response=bulkRequestBuilder.setRefresh(false).get();
     indexTime=System.currentTimeMillis() - indexTime;
     long refreshTime=0;
     if (refreshRequired) {

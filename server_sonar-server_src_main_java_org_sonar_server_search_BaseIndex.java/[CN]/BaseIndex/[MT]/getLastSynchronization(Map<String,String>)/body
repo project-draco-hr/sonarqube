@@ -1,6 +1,6 @@
 {
   SearchRequestBuilder request=client.prepareSearch(this.getIndexName()).setTypes(this.getIndexType()).setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),getLastSynchronizationBuilder(params))).setSize(0).addAggregation(AggregationBuilders.max("latest").field(BaseNormalizer.UPDATED_AT_FIELD));
-  SearchResponse response=client.execute(request);
+  SearchResponse response=request.get();
   Max max=response.getAggregations().get("latest");
   if (max.getValue() > 0) {
     Date date=new DateTime(Double.valueOf(max.getValue()).longValue()).toDate();
