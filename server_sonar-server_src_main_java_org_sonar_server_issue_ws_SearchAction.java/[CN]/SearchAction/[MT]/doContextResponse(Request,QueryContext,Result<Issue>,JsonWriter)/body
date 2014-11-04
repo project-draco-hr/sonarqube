@@ -31,7 +31,7 @@
       ruleKeys.add(RuleKey.parse(rule.getKey()));
     }
   }
-  collectFacetKeys(result,IssueFilterParameters.COMPONENT_ROOT_UUIDS,projectUuids);
+  collectFacetKeys(result,IssueFilterParameters.PROJECT_UUIDS,projectUuids);
   collectFacetKeys(result,IssueFilterParameters.COMPONENT_UUIDS,componentUuids);
   collectFacetKeys(result,IssueFilterParameters.ASSIGNEES,userLogins);
   collectFacetKeys(result,IssueFilterParameters.REPORTERS,userLogins);
@@ -45,9 +45,12 @@
     usersByLogin=getUsersByLogin(userLogins);
     List<ComponentDto> fileDtos=dbClient.componentDao().getByUuids(session,componentUuids);
     List<ComponentDto> subProjectDtos=dbClient.componentDao().findSubProjectsByComponentUuids(session,componentUuids);
-    projectDtos=dbClient.componentDao().getByUuids(session,projectUuids);
     componentDtos.addAll(fileDtos);
     componentDtos.addAll(subProjectDtos);
+    for (    ComponentDto component : componentDtos) {
+      projectUuids.add(component.projectUuid());
+    }
+    projectDtos=dbClient.componentDao().getByUuids(session,projectUuids);
     componentDtos.addAll(projectDtos);
     for (    ComponentDto componentDto : componentDtos) {
       componentsByUuid.put(componentDto.uuid(),componentDto);
