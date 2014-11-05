@@ -1,4 +1,6 @@
 {
+  Timer timer=new Timer("Db Migration Progress");
+  timer.schedule(progressTask,MassUpdate.ProgressTask.PERIOD_MS,MassUpdate.ProgressTask.PERIOD_MS);
   DbSession session=db.openSession(false);
   try {
     Migration45Mapper mapper=session.getMapper(Migration45Mapper.class);
@@ -23,13 +25,17 @@
           if (!hasParameter(templateRuleParam.getName(),customRuleParamsByRuleId.get(customRuleId))) {
             mapper.insertRuleParameter(new RuleParameter().setRuleId(customRuleId).setRuleTemplateId(templateRuleId).setName(templateRuleParam.getName()).setDescription(templateRuleParam.getDescription()).setType(templateRuleParam.getType()));
             mapper.updateRuleUpdateAt(customRuleId,new Date(system.now()));
+            counter.getAndIncrement();
           }
         }
       }
     }
     session.commit();
+    progressTask.log();
   }
   finally {
     session.close();
+    timer.cancel();
+    timer.purge();
   }
 }
