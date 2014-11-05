@@ -3,13 +3,9 @@
     database=new H2Database("sonarHibernate",true);
     database.start();
     databaseCommands=DatabaseCommands.forDialect(database.getDialect());
-    databaseTester=new DataSourceDatabaseTester(database.getDataSource());
-    DefaultDatabaseConnector dbConnector=new MemoryDatabaseConnector(database);
+    dbConnector=new MemoryDatabaseConnector(database);
     dbConnector.start();
-    session=new JpaDatabaseSession(dbConnector);
-    session.start();
-    myBatis=new MyBatis(database,new Logback(),queue);
+    myBatis=new MyBatis(database,new Logback(),new NullQueue());
     myBatis.start();
   }
-  databaseCommands.truncateDatabase(database.getDataSource());
 }
