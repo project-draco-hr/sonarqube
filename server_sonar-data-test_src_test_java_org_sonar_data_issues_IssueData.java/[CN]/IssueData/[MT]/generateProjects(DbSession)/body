@@ -1,17 +1,12 @@
 {
   for (long p=1; p <= MAX_NUMBER_PROJECTS; p++) {
-    ComponentDto project=new ComponentDto().setId(p).setKey("MyProject").setProjectId_unit_test_only(p);
+    ComponentDto project=ComponentTesting.newProjectDto().setKey("project-" + p).setName("Project " + p).setLongName("Project " + p);
     db.componentDao().insert(setupSession,project);
-    projects.put(project.projectId(),new ArrayList<Long>());
-    List<ComponentDto> resources=new ArrayList<ComponentDto>();
     for (int i=0; i < generator.nextInt(MAX_NUMBER_RESOURCES_PER_PROJECT); i++) {
-      ComponentDto resource=new ComponentDto().setKey("MyComponent_" + (p * MAX_NUMBER_PROJECTS + i)).setProjectId_unit_test_only(project.getId());
-      db.componentDao().insert(setupSession,resource);
-      resources.add(resource);
+      ComponentDto file=ComponentTesting.newFileDto(project).setKey("file-" + (p * MAX_NUMBER_PROJECTS + i)).setName("File " + (p * MAX_NUMBER_PROJECTS + i)).setLongName("File " + (p * MAX_NUMBER_PROJECTS + i));
+      db.componentDao().insert(setupSession,file);
+      componentsByProjectId.put(project,file);
     }
     setupSession.commit();
-    for (    ComponentDto resource : resources) {
-      projects.get(project.projectId()).add(resource.getId());
-    }
   }
 }

@@ -1,0 +1,20 @@
+{
+  for (long p=1; p <= PROJECTS_NUMBER; p++) {
+    ComponentDto project=ComponentTesting.newProjectDto().setKey("project-" + p).setName("Project " + p).setLongName("Project " + p);
+    componentDao.insert(session,project);
+    for (int i=0; i < NUMBER_FILES_PER_PROJECT; i++) {
+      String index=p * PROJECTS_NUMBER + i + "";
+      ComponentDto file=ComponentTesting.newFileDto(project).setKey("file-" + index).setName("File " + index).setLongName("File " + index);
+      componentDao.insert(session,file);
+      issueDao.insert(session,IssueTesting.newDto(rules.next(),file,project).setMessage("Message on " + index).setAssignee(users.next()).setReporter(users.next()).setAuthorLogin(users.next()).setSeverity(Severity.BLOCKER).setStatus(Issue.STATUS_RESOLVED).setResolution(Issue.RESOLUTION_FIXED));
+    }
+    session.commit();
+  }
+  long start=System.currentTimeMillis();
+  int issueInsertCount=ISSUE_COUNT;
+  issueDao.synchronizeAfter(session);
+  long stop=System.currentTimeMillis();
+  assertThat(issueDao.synchronizedIssues).isEqualTo(issueInsertCount);
+  long time=stop - start;
+  LOGGER.info("Processed {} Issues in {} ms with avg {} Issue/second",ISSUE_COUNT,time,documentPerSecond(time));
+}
