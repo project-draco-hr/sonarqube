@@ -6,7 +6,14 @@
       String index=p * PROJECTS_NUMBER + i + "";
       ComponentDto file=ComponentTesting.newFileDto(project).setKey("file-" + index).setName("File " + index).setLongName("File " + index);
       componentDao.insert(session,file);
-      issueDao.insert(session,IssueTesting.newDto(rules.next(),file,project).setMessage("Message on " + index).setAssignee(users.next()).setReporter(users.next()).setAuthorLogin(users.next()).setSeverity(Severity.BLOCKER).setStatus(Issue.STATUS_RESOLVED).setResolution(Issue.RESOLUTION_FIXED));
+      String status=statuses.next();
+      String resolution=null;
+      if (status.equals(Issue.STATUS_RESOLVED) || status.equals(Issue.STATUS_CLOSED)) {
+        resolution=resolutions.next();
+      }
+      RuleDto rule=rules.next();
+      IssueDto issue=IssueTesting.newDto(rule,file,project).setMessage("Message from rule " + rule.getKey().toString()).setAssignee(users.next()).setReporter(users.next()).setAuthorLogin(users.next()).setSeverity(severities.next()).setStatus(status).setResolution(resolution);
+      issueDao.insert(session,issue);
     }
     session.commit();
   }
