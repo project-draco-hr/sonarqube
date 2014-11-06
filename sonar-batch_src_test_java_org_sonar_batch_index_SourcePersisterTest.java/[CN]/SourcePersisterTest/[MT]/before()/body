@@ -1,8 +1,18 @@
 {
-  setupData("shared");
   ResourcePersister resourcePersister=mock(ResourcePersister.class);
   Snapshot snapshot=new Snapshot();
   snapshot.setId(1000);
   when(resourcePersister.getSnapshotOrFail(any(Resource.class))).thenReturn(snapshot);
-  sourcePersister=new SourcePersister(resourcePersister,new SnapshotSourceDao(getMyBatis()));
+  inputPathCache=mock(InputPathCache.class);
+  resourceCache=mock(ResourceCache.class);
+  projectTree=mock(ProjectTree.class);
+  system2=mock(System2.class);
+  measureCache=mock(MeasureCache.class);
+  when(measureCache.byMetric(anyString(),anyString())).thenReturn(Collections.<org.sonar.api.measures.Measure>emptyList());
+  componentDataCache=mock(ComponentDataCache.class);
+  sourcePersister=new SourcePersister(resourcePersister,new SnapshotSourceDao(getMyBatis()),inputPathCache,getMyBatis(),measureCache,componentDataCache,projectTree,system2,resourceCache);
+  Project project=new Project(PROJECT_KEY);
+  project.setUuid("projectUuid");
+  when(projectTree.getRootProject()).thenReturn(project);
+  basedir=temp.newFolder();
 }

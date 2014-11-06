@@ -1,0 +1,12 @@
+{
+  setupData("file_sources");
+  when(system2.newDate()).thenReturn(DateUtils.parseDateTime("2014-10-29T16:44:02+0100"));
+  String relativePathNew="src/new.java";
+  java.io.File newFile=new java.io.File(basedir,relativePathNew);
+  FileUtils.write(newFile,"foo\nbar\nbiz");
+  DefaultInputFile inputFileNew=new DefaultInputFile(PROJECT_KEY,relativePathNew).setLines(3).setAbsolutePath(newFile.getAbsolutePath());
+  when(inputPathCache.all()).thenReturn(Arrays.<InputPath>asList(inputFileNew));
+  mockResourceCache(relativePathNew,PROJECT_KEY,"uuidnew");
+  sourcePersister.persist();
+  checkTables("testPersistNewFileNoScmNoHighlighting","file_sources");
+}

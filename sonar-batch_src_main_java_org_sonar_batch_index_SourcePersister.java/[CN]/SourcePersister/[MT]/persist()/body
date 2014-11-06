@@ -1,0 +1,37 @@
+{
+  DbSession session=mybatis.openSession(false);
+  try {
+    FileSourceMapper mapper=session.getMapper(FileSourceMapper.class);
+    for (    InputPath inputPath : inputPathCache.all()) {
+      if (inputPath instanceof InputFile) {
+        DefaultInputFile inputFile=(DefaultInputFile)inputPath;
+        org.sonar.api.resources.File file=(org.sonar.api.resources.File)resourceCache.get(inputFile.key());
+        String fileUuid=file.getUuid();
+        FileSourceDto previous=mapper.select(fileUuid);
+        String newData=getSourceData(inputFile);
+        String dataHash=DigestUtils.md5Hex(newData);
+        Date now=system2.newDate();
+        if (previous == null) {
+          FileSourceDto newFileSource=new FileSourceDto().setProjectUuid(projectTree.getRootProject().getUuid()).setFileUuid(fileUuid).setData(newData).setDataHash(dataHash).setCreatedAt(now).setUpdatedAt(now);
+          mapper.insert(newFileSource);
+        }
+ else {
+          if (dataHash.equals(previous.getDataHash())) {
+            continue;
+          }
+ else {
+            previous.setData(newData).setDataHash(dataHash).setUpdatedAt(now);
+            mapper.update(previous);
+          }
+        }
+      }
+      session.commit();
+    }
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Unable to save file sources",e);
+  }
+ finally {
+    MyBatis.closeQuietly(session);
+  }
+}

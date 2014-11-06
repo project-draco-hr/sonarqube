@@ -1,0 +1,17 @@
+{
+  setupData("file_sources");
+  when(system2.newDate()).thenReturn(DateUtils.parseDateTime("2014-10-29T16:44:02+0100"));
+  String relativePathNew="src/new.java";
+  java.io.File newFile=new java.io.File(basedir,relativePathNew);
+  FileUtils.write(newFile,"foo\nbar\nbiz");
+  DefaultInputFile inputFileNew=new DefaultInputFile(PROJECT_KEY,relativePathNew).setLines(3).setAbsolutePath(newFile.getAbsolutePath()).setOriginalLineOffsets(new long[]{0,4,7});
+  when(inputPathCache.all()).thenReturn(Arrays.<InputPath>asList(inputFileNew));
+  mockResourceCache(relativePathNew,PROJECT_KEY,"uuidnew");
+  when(measureCache.byMetric(PROJECT_KEY + ":" + relativePathNew,CoreMetrics.SCM_AUTHORS_BY_LINE_KEY)).thenReturn(Arrays.asList(new Measure(CoreMetrics.SCM_AUTHORS_BY_LINE,"1=julien;2=simon;3=julien")));
+  when(measureCache.byMetric(PROJECT_KEY + ":" + relativePathNew,CoreMetrics.SCM_LAST_COMMIT_DATETIMES_BY_LINE_KEY)).thenReturn(Arrays.asList(new Measure(CoreMetrics.SCM_LAST_COMMIT_DATETIMES_BY_LINE,"1=2014-10-11T16:44:02+0100;2=2014-10-12T16:44:02+0100;3=2014-10-13T16:44:02+0100")));
+  when(measureCache.byMetric(PROJECT_KEY + ":" + relativePathNew,CoreMetrics.SCM_REVISIONS_BY_LINE_KEY)).thenReturn(Arrays.asList(new Measure(CoreMetrics.SCM_REVISIONS_BY_LINE,"1=123;2=234;3=345")));
+  SyntaxHighlightingData highlighting=new SyntaxHighlightingData(Arrays.asList(SyntaxHighlightingRule.create(0,3,TypeOfText.ANNOTATION),SyntaxHighlightingRule.create(4,5,TypeOfText.COMMENT),SyntaxHighlightingRule.create(7,16,TypeOfText.CONSTANT)));
+  when(componentDataCache.getData(PROJECT_KEY + ":" + relativePathNew,SnapshotDataTypes.SYNTAX_HIGHLIGHTING)).thenReturn(highlighting);
+  sourcePersister.persist();
+  checkTables("testPersistNewFileWithScmAndHighlighting","file_sources");
+}

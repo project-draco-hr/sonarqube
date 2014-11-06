@@ -1,0 +1,27 @@
+{
+  if (file.lines() == 0) {
+    return "";
+  }
+  List<String> lines;
+  try {
+    lines=FileUtils.readLines(file.file(),file.encoding());
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Unable to read file",e);
+  }
+  if (lines.size() == file.lines() - 1) {
+    lines.add("");
+  }
+  Map<Integer,String> authorsByLine=getLineMetric(file,CoreMetrics.SCM_AUTHORS_BY_LINE_KEY);
+  Map<Integer,String> revisionsByLine=getLineMetric(file,CoreMetrics.SCM_REVISIONS_BY_LINE_KEY);
+  Map<Integer,String> datesByLine=getLineMetric(file,CoreMetrics.SCM_LAST_COMMIT_DATETIMES_BY_LINE_KEY);
+  SyntaxHighlightingData highlighting=componentDataCache.getData(file.key(),SnapshotDataTypes.SYNTAX_HIGHLIGHTING);
+  String[] highlightingPerLine=computeHighlightingPerLine(file,highlighting);
+  ByteArrayOutputStream output=new ByteArrayOutputStream();
+  CsvWriter csv=CsvWriter.of(new OutputStreamWriter(output,UTF_8));
+  for (int lineIdx=1; lineIdx <= file.lines(); lineIdx++) {
+    csv.values(revisionsByLine.get(lineIdx),authorsByLine.get(lineIdx),datesByLine.get(lineIdx),highlightingPerLine[lineIdx - 1],CharMatcher.anyOf(BOM).removeFrom(lines.get(lineIdx - 1)));
+  }
+  csv.close();
+  return new String(output.toByteArray(),UTF_8);
+}
