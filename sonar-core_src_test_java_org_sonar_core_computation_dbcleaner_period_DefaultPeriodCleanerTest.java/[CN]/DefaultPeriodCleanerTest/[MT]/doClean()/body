@@ -1,12 +1,13 @@
 {
   PurgeDao dao=mock(PurgeDao.class);
-  when(dao.selectPurgeableSnapshots(123L)).thenReturn(Arrays.asList(new PurgeableSnapshotDto().setSnapshotId(999L).setDate(new Date())));
+  DbSession session=mock(DbSession.class);
+  when(dao.selectPurgeableSnapshots(123L,session)).thenReturn(Arrays.asList(new PurgeableSnapshotDto().setSnapshotId(999L).setDate(new Date())));
   Filter filter1=newLazyFilter();
   Filter filter2=newLazyFilter();
-  DefaultPeriodCleaner cleaner=new DefaultPeriodCleaner(dao,mock(Settings.class));
-  cleaner.doClean(123L,Arrays.asList(filter1,filter2));
+  DefaultPeriodCleaner cleaner=new DefaultPeriodCleaner(dao,mock(Settings.class),mock(MyBatis.class));
+  cleaner.doClean(123L,Arrays.asList(filter1,filter2),session);
   verify(filter1).log();
   verify(filter2).log();
-  verify(dao,times(2)).deleteSnapshots(argThat(newRootSnapshotQuery()));
-  verify(dao,times(2)).deleteSnapshots(argThat(newSnapshotIdQuery()));
+  verify(dao,times(2)).deleteSnapshots(argThat(newRootSnapshotQuery()),eq(session));
+  verify(dao,times(2)).deleteSnapshots(argThat(newSnapshotIdQuery()),eq(session));
 }
