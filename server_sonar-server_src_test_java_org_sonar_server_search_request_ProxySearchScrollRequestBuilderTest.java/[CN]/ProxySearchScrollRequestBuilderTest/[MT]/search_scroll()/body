@@ -1,8 +1,11 @@
 {
-  tester.get(RuleDao.class).insert(dbSession,RuleTesting.newXooX1());
-  dbSession.commit();
-  SearchResponse search=searchClient.prepareSearch(IndexDefinition.RULE.getIndexName()).setSearchType(SearchType.SCAN).setScroll(TimeValue.timeValueSeconds(3L)).get();
-  SearchScrollRequestBuilder scrollRequest=searchClient.prepareSearchScroll(search.getScrollId());
-  SearchResponse response=scrollRequest.get();
-  assertThat(response.getHits().getTotalHits()).isEqualTo(1);
+  try {
+    SearchResponse search=searchClient.prepareSearch(IndexDefinition.RULE.getIndexName()).setSearchType(SearchType.SCAN).setScroll(TimeValue.timeValueSeconds(3L)).get();
+    searchClient.prepareSearchScroll(search.getScrollId()).get();
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalStateException.class);
+    assertThat(e.getMessage()).contains("Fail to execute ES search request '{:{}}' on indices '[rules]'");
+  }
 }

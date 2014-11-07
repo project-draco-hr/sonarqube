@@ -1,7 +1,9 @@
 {
-  tester.get(RuleDao.class).insert(dbSession,RuleTesting.newXooX1());
-  dbSession.commit();
-  DeleteByQueryRequestBuilder requestBuilder=searchClient.prepareDeleteByQuery(IndexDefinition.RULE.getIndexName()).setQuery(QueryBuilders.matchAllQuery());
-  DeleteByQueryResponse response=requestBuilder.get();
-  assertThat(response.iterator()).hasSize(1);
+  try {
+    searchClient.prepareDeleteByQuery(IndexDefinition.RULE.getIndexName()).setQuery(QueryBuilders.matchAllQuery()).get();
+    fail();
+  }
+ catch (  IllegalStateException e) {
+    assertThat(e.getMessage()).isEqualTo("Fail to execute ES delete by query request on indices 'rules'");
+  }
 }

@@ -1,4 +1,11 @@
 {
-  RefreshRequestBuilder requestBuilder=searchClient.prepareRefresh(IndexDefinition.RULE.getIndexName());
-  requestBuilder.get();
+  try {
+    RefreshRequestBuilder requestBuilder=searchClient.prepareRefresh(IndexDefinition.RULE.getIndexName());
+    requestBuilder.get();
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalStateException.class);
+    assertThat(e.getMessage()).contains("Fail to execute ES refresh request on indices 'rules'");
+  }
 }

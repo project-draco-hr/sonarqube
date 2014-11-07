@@ -1,6 +1,9 @@
 {
-  tester.get(RuleDao.class).insert(dbSession,RuleTesting.newXooX1());
-  dbSession.commit();
-  CountResponse response=searchClient.prepareCount(IndexDefinition.RULE.getIndexName()).get();
-  assertThat(response.getCount()).isEqualTo(1);
+  try {
+    searchClient.prepareCount(IndexDefinition.RULE.getIndexName()).get();
+    fail();
+  }
+ catch (  IllegalStateException e) {
+    assertThat(e.getMessage()).isEqualTo("Fail to execute ES count request on indices 'rules'");
+  }
 }
