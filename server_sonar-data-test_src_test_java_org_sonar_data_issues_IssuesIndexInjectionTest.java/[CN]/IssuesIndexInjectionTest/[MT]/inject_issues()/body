@@ -2,12 +2,10 @@
   int issueInsertCount=ISSUE_COUNT;
   long start=System.currentTimeMillis();
   for (long projectIndex=1; projectIndex <= PROJECTS_NUMBER; projectIndex++) {
-    ComponentDto project=ComponentTesting.newProjectDto().setKey("project-" + projectIndex).setName("Project " + projectIndex).setLongName("Project " + projectIndex);
-    componentDao.insert(session,project);
+    ComponentDto project=ComponentTesting.newProjectDto().setId(ids++).setKey("project-" + projectIndex).setName("Project " + projectIndex).setLongName("Project " + projectIndex);
     for (int fileIndex=0; fileIndex < NUMBER_FILES_PER_PROJECT; fileIndex++) {
       String index=projectIndex * PROJECTS_NUMBER + fileIndex + "";
-      ComponentDto file=ComponentTesting.newFileDto(project).setKey("file-" + index).setName("File " + index).setLongName("File " + index);
-      componentDao.insert(session,file);
+      ComponentDto file=ComponentTesting.newFileDto(project).setId(ids++).setKey("file-" + index).setName("File " + index).setLongName("File " + index);
       for (int issueIndex=1; issueIndex < NUMBER_ISSUES_PER_FILE + 1; issueIndex++) {
         String status=statuses.next();
         String resolution=null;
@@ -19,17 +17,15 @@
         }
         RuleDto rule=rules.next();
         IssueDto issue=IssueTesting.newDto(rule,file,project).setMessage("Message from rule " + rule.getKey().toString() + " on line "+ issueIndex).setLine(issueIndex).setAssignee(users.next()).setReporter(users.next()).setAuthorLogin(users.next()).setSeverity(severities.next()).setStatus(status).setResolution(resolution);
-        issueDao.insert(session,issue);
+        session.enqueue(new InsertDto<IssueDto>(IndexDefinition.ISSUES.getIndexType(),issue,false));
       }
-      session.commit();
     }
   }
-  LOGGER.info("Inserted {} Issues in {} ms",ISSUE_COUNT,System.currentTimeMillis() - start);
-  start=System.currentTimeMillis();
-  issueDao.synchronizeAfter(session);
+  session.enqueue(new RefreshIndex(IndexDefinition.ISSUES.getIndexType()));
+  session.commit();
   long stop=System.currentTimeMillis();
-  assertThat(issueDao.synchronizedIssues).isEqualTo(issueInsertCount);
+  assertThat(issueIndex.countAll()).isEqualTo(issueInsertCount);
   long time=stop - start;
-  LOGGER.info("Extracted {} Issues in {} ms with avg {} Issue/second",ISSUE_COUNT,time,documentPerSecond(time));
-  assertDurationAround(time,Long.parseLong(getProperty("IssuesDbExtractionTest.extract_issues")));
+  LOGGER.info("processed {} Issues in {} ms with avg {} Issue/second",ISSUE_COUNT,time,documentPerSecond(time));
+  assertDurationAround(time,Long.parseLong(getProperty("IssuesIndexInjectionTest.inject_issues")));
 }
