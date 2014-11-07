@@ -1,30 +1,18 @@
 {
-  int issueInsertCount=ISSUE_COUNT;
+  generateData();
   long start=System.currentTimeMillis();
-  for (long projectIndex=1; projectIndex <= PROJECTS_NUMBER; projectIndex++) {
-    ComponentDto project=ComponentTesting.newProjectDto().setId(ids++).setKey("project-" + projectIndex).setName("Project " + projectIndex).setLongName("Project " + projectIndex);
-    for (int fileIndex=0; fileIndex < NUMBER_FILES_PER_PROJECT; fileIndex++) {
-      String index=projectIndex * PROJECTS_NUMBER + fileIndex + "";
-      ComponentDto file=ComponentTesting.newFileDto(project).setId(ids++).setKey("file-" + index).setName("File " + index).setLongName("File " + index);
+  for (  ComponentDto project : projects) {
+    for (    ComponentDto file : componentsByProjectId.get(project)) {
       for (int issueIndex=1; issueIndex < NUMBER_ISSUES_PER_FILE + 1; issueIndex++) {
-        String status=statuses.next();
-        String resolution=null;
-        if (status.equals(Issue.STATUS_CLOSED)) {
-          resolution=closedResolutions.next();
-        }
- else         if (status.equals(Issue.STATUS_RESOLVED)) {
-          resolution=resolvedResolutions.next();
-        }
-        RuleDto rule=rules.next();
-        IssueDto issue=IssueTesting.newDto(rule,file,project).setMessage("Message from rule " + rule.getKey().toString() + " on line "+ issueIndex).setLine(issueIndex).setAssignee(users.next()).setReporter(users.next()).setAuthorLogin(users.next()).setSeverity(severities.next()).setStatus(status).setResolution(resolution);
-        session.enqueue(new InsertDto<IssueDto>(IndexDefinition.ISSUES.getIndexType(),issue,false));
+        batchSession.enqueue(new InsertDto<IssueDto>(IndexDefinition.ISSUES.getIndexType(),newIssue(issueIndex,file,project,rules.next()),false));
       }
     }
   }
-  session.enqueue(new RefreshIndex(IndexDefinition.ISSUES.getIndexType()));
-  session.commit();
+  batchSession.enqueue(new RefreshIndex(IndexDefinition.ISSUES.getIndexType()));
+  batchSession.commit();
+  batchSession.clearCache();
   long stop=System.currentTimeMillis();
-  assertThat(issueIndex.countAll()).isEqualTo(issueInsertCount);
+  assertThat(issueIndex.countAll()).isEqualTo(ISSUE_COUNT);
   long time=stop - start;
   LOGGER.info("processed {} Issues in {} ms with avg {} Issue/second",ISSUE_COUNT,time,documentPerSecond(time));
   assertDurationAround(time,Long.parseLong(getProperty("IssuesIndexInjectionTest.inject_issues")));

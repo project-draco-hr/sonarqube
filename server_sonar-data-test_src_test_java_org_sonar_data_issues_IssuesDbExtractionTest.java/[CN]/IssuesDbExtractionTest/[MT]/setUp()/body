@@ -3,10 +3,8 @@
   ruleDao=new RuleDao();
   componentDao=new ComponentDao(System2.INSTANCE);
   session=db.myBatis().openSession(false);
-  rules=Iterables.cycle(generateRules(session)).iterator();
-  users=Iterables.cycle(generateUsers()).iterator();
-  severities=Iterables.cycle(Severity.ALL).iterator();
-  statuses=Iterables.cycle(Issue.STATUS_OPEN,Issue.STATUS_CONFIRMED,Issue.STATUS_REOPENED,Issue.STATUS_RESOLVED,Issue.STATUS_CLOSED).iterator();
-  closedResolutions=Iterables.cycle(Issue.RESOLUTION_FALSE_POSITIVE,Issue.RESOLUTION_FIXED,Issue.RESOLUTION_REMOVED).iterator();
-  resolvedResolutions=Iterables.cycle(Issue.RESOLUTION_FALSE_POSITIVE,Issue.RESOLUTION_FIXED).iterator();
+  for (int i=0; i < RULES_NUMBER; i++) {
+    ruleDao.insert(session,rules.next());
+  }
+  session.commit();
 }

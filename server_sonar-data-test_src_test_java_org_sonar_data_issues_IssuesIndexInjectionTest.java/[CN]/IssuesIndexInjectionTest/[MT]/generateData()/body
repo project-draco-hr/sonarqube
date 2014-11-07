@@ -1,0 +1,17 @@
+{
+  long ids=1;
+  for (int i=0; i < RULES_NUMBER; i++) {
+    rules.next().setId((int)ids++);
+  }
+  long start=System.currentTimeMillis();
+  for (long projectIndex=0; projectIndex < PROJECTS_NUMBER; projectIndex++) {
+    ComponentDto project=ComponentTesting.newProjectDto().setId(ids++).setKey("project-" + projectIndex).setName("Project " + projectIndex).setLongName("Project " + projectIndex);
+    projects.add(project);
+    for (int fileIndex=0; fileIndex < NUMBER_FILES_PER_PROJECT; fileIndex++) {
+      String index=projectIndex * PROJECTS_NUMBER + fileIndex + "";
+      ComponentDto file=ComponentTesting.newFileDto(project).setId(ids++).setKey("file-" + index).setName("File " + index).setLongName("File " + index);
+      componentsByProjectId.put(project,file);
+    }
+  }
+  LOGGER.info("Generated data in {} ms",System.currentTimeMillis() - start);
+}

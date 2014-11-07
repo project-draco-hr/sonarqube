@@ -1,7 +1,7 @@
 {
   int issueInsertCount=ISSUE_COUNT;
   long start=System.currentTimeMillis();
-  for (long projectIndex=1; projectIndex <= PROJECTS_NUMBER; projectIndex++) {
+  for (long projectIndex=0; projectIndex < PROJECTS_NUMBER; projectIndex++) {
     ComponentDto project=ComponentTesting.newProjectDto().setKey("project-" + projectIndex).setName("Project " + projectIndex).setLongName("Project " + projectIndex);
     componentDao.insert(session,project);
     for (int fileIndex=0; fileIndex < NUMBER_FILES_PER_PROJECT; fileIndex++) {
@@ -9,17 +9,7 @@
       ComponentDto file=ComponentTesting.newFileDto(project).setKey("file-" + index).setName("File " + index).setLongName("File " + index);
       componentDao.insert(session,file);
       for (int issueIndex=1; issueIndex < NUMBER_ISSUES_PER_FILE + 1; issueIndex++) {
-        String status=statuses.next();
-        String resolution=null;
-        if (status.equals(Issue.STATUS_CLOSED)) {
-          resolution=closedResolutions.next();
-        }
- else         if (status.equals(Issue.STATUS_RESOLVED)) {
-          resolution=resolvedResolutions.next();
-        }
-        RuleDto rule=rules.next();
-        IssueDto issue=IssueTesting.newDto(rule,file,project).setMessage("Message from rule " + rule.getKey().toString() + " on line "+ issueIndex).setLine(issueIndex).setAssignee(users.next()).setReporter(users.next()).setAuthorLogin(users.next()).setSeverity(severities.next()).setStatus(status).setResolution(resolution);
-        issueDao.insert(session,issue);
+        issueDao.insert(session,newIssue(issueIndex,file,project,rules.next()));
       }
       session.commit();
     }
