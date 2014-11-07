@@ -1,25 +1,20 @@
 {
   int issueInsertCount=ISSUE_COUNT;
-  long start=System.currentTimeMillis();
-  for (long projectIndex=0; projectIndex < PROJECTS_NUMBER; projectIndex++) {
-    ComponentDto project=ComponentTesting.newProjectDto().setKey("project-" + projectIndex).setName("Project " + projectIndex).setLongName("Project " + projectIndex);
-    componentDao.insert(session,project);
-    for (int fileIndex=0; fileIndex < NUMBER_FILES_PER_PROJECT; fileIndex++) {
-      String index=projectIndex * PROJECTS_NUMBER + fileIndex + "";
-      ComponentDto file=ComponentTesting.newFileDto(project).setKey("file-" + index).setName("File " + index).setLongName("File " + index);
-      componentDao.insert(session,file);
-      for (int issueIndex=1; issueIndex < NUMBER_ISSUES_PER_FILE + 1; issueIndex++) {
-        issueDao.insert(session,newIssue(issueIndex,file,project,rules.next()));
-      }
-      session.commit();
-    }
+  Timer timer=new Timer("Extract Issues");
+  timer.schedule(progressTask,ProgressTask.PERIOD_MS,ProgressTask.PERIOD_MS);
+  try {
+    generateData();
+    long start=System.currentTimeMillis();
+    issueDao.synchronizeAfter(session);
+    long stop=System.currentTimeMillis();
+    progressTask.log();
+    assertThat(issueDao.synchronizedIssues).isEqualTo(issueInsertCount);
+    long time=stop - start;
+    LOGGER.info("Extracted {} Issues in {} ms with avg {} Issue/second",ISSUE_COUNT,time,documentPerSecond(time));
+    assertDurationAround(time,Long.parseLong(getProperty("IssuesDbExtractionTest.extract_issues")));
   }
-  LOGGER.info("Inserted {} Issues in {} ms",ISSUE_COUNT,System.currentTimeMillis() - start);
-  start=System.currentTimeMillis();
-  issueDao.synchronizeAfter(session);
-  long stop=System.currentTimeMillis();
-  assertThat(issueDao.synchronizedIssues).isEqualTo(issueInsertCount);
-  long time=stop - start;
-  LOGGER.info("Extracted {} Issues in {} ms with avg {} Issue/second",ISSUE_COUNT,time,documentPerSecond(time));
-  assertDurationAround(time,Long.parseLong(getProperty("IssuesDbExtractionTest.extract_issues")));
+  finally {
+    timer.cancel();
+    timer.purge();
+  }
 }

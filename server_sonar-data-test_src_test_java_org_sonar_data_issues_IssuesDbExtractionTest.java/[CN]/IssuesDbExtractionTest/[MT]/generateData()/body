@@ -1,0 +1,21 @@
+{
+  long start=System.currentTimeMillis();
+  for (int i=0; i < RULES_NUMBER; i++) {
+    ruleDao.insert(session,rules.next());
+  }
+  session.commit();
+  for (long projectIndex=0; projectIndex < PROJECTS_NUMBER; projectIndex++) {
+    ComponentDto project=ComponentTesting.newProjectDto().setKey("project-" + projectIndex).setName("Project " + projectIndex).setLongName("Project " + projectIndex);
+    componentDao.insert(session,project);
+    for (int fileIndex=0; fileIndex < NUMBER_FILES_PER_PROJECT; fileIndex++) {
+      String index=projectIndex * PROJECTS_NUMBER + fileIndex + "";
+      ComponentDto file=ComponentTesting.newFileDto(project).setKey("file-" + index).setName("File " + index).setLongName("File " + index);
+      componentDao.insert(session,file);
+      for (int issueIndex=1; issueIndex < NUMBER_ISSUES_PER_FILE + 1; issueIndex++) {
+        issueDao.insert(session,newIssue(issueIndex,file,project,rules.next()));
+      }
+      session.commit();
+    }
+  }
+  LOGGER.info("Generated data in {} ms",System.currentTimeMillis() - start);
+}

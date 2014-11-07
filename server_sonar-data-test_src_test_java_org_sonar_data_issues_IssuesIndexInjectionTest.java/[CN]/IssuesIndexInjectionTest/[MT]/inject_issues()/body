@@ -1,19 +1,28 @@
 {
   generateData();
-  long start=System.currentTimeMillis();
-  for (  ComponentDto project : projects) {
-    for (    ComponentDto file : componentsByProjectId.get(project)) {
-      for (int issueIndex=1; issueIndex < NUMBER_ISSUES_PER_FILE + 1; issueIndex++) {
-        batchSession.enqueue(new InsertDto<IssueDto>(IndexDefinition.ISSUES.getIndexType(),newIssue(issueIndex,file,project,rules.next()),false));
+  Timer timer=new Timer("Inject Issues");
+  timer.schedule(progressTask,ProgressTask.PERIOD_MS,ProgressTask.PERIOD_MS);
+  try {
+    long start=System.currentTimeMillis();
+    for (    ComponentDto project : projects) {
+      for (      ComponentDto file : componentsByProjectId.get(project)) {
+        for (int issueIndex=1; issueIndex < NUMBER_ISSUES_PER_FILE + 1; issueIndex++) {
+          batchSession.enqueue(new InsertDto<IssueDto>(IndexDefinition.ISSUES.getIndexType(),newIssue(issueIndex,file,project,rules.next()),false));
+          counter.getAndIncrement();
+        }
       }
     }
+    batchSession.enqueue(new RefreshIndex(IndexDefinition.ISSUES.getIndexType()));
+    batchSession.commit();
+    long stop=System.currentTimeMillis();
+    progressTask.log();
+    assertThat(issueIndex.countAll()).isEqualTo(ISSUE_COUNT);
+    long time=stop - start;
+    LOGGER.info("Processed {} Issues in {} ms with avg {} Issue/second",ISSUE_COUNT,time,documentPerSecond(time));
+    assertDurationAround(time,Long.parseLong(getProperty("IssuesIndexInjectionTest.inject_issues")));
   }
-  batchSession.enqueue(new RefreshIndex(IndexDefinition.ISSUES.getIndexType()));
-  batchSession.commit();
-  batchSession.clearCache();
-  long stop=System.currentTimeMillis();
-  assertThat(issueIndex.countAll()).isEqualTo(ISSUE_COUNT);
-  long time=stop - start;
-  LOGGER.info("processed {} Issues in {} ms with avg {} Issue/second",ISSUE_COUNT,time,documentPerSecond(time));
-  assertDurationAround(time,Long.parseLong(getProperty("IssuesIndexInjectionTest.inject_issues")));
+  finally {
+    timer.cancel();
+    timer.purge();
+  }
 }
