@@ -1,0 +1,13 @@
+{
+  MassUpdate massUpdate=context.prepareMassUpdate();
+  massUpdate.select("SELECT ss.id, s.build_date " + "FROM snapshot_sources ss " + "INNER JOIN snapshots s ON s.id = ss.snapshot_id "+ "WHERE ss.updated_at IS NULL");
+  massUpdate.update("UPDATE snapshot_sources " + "SET updated_at=? " + "WHERE id=?");
+  massUpdate.execute(new MassUpdate.Handler(){
+    @Override public boolean handle(    Select.Row row,    SqlStatement update) throws SQLException {
+      update.setDate(1,row.getDate(2));
+      update.setLong(2,row.getLong(1));
+      return true;
+    }
+  }
+);
+}
