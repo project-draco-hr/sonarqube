@@ -1,5 +1,6 @@
 {
   generateData();
+  ProgressTask progressTask=new ProgressTask(counter);
   Timer timer=new Timer("Inject Issues");
   timer.schedule(progressTask,ProgressTask.PERIOD_MS,ProgressTask.PERIOD_MS);
   try {
@@ -17,9 +18,9 @@
     long stop=System.currentTimeMillis();
     progressTask.log();
     assertThat(issueIndex.countAll()).isEqualTo(ISSUE_COUNT);
-    long time=stop - start;
-    LOGGER.info("Inserted {} Issues in {} ms with avg {} Issue/second",ISSUE_COUNT,time,documentPerSecond(time));
-    assertDurationAround(time,Long.parseLong(getProperty("IssuesIndexInjectionTest.inject_issues")));
+    long totalTime=stop - start;
+    LOGGER.info("Inserted {} Issues in {} ms with avg {} Issue/second",ISSUE_COUNT,totalTime,documentPerSecond(ISSUE_COUNT,totalTime));
+    assertDurationAround(totalTime,Long.parseLong(getProperty("IssuesIndexInjectionTest.inject_issues")));
   }
   finally {
     timer.cancel();
