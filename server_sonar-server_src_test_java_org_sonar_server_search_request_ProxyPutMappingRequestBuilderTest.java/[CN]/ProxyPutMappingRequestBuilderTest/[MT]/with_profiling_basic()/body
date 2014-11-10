@@ -1,0 +1,13 @@
+{
+  Profiling profiling=new Profiling(new Settings().setProperty(Profiling.CONFIG_PROFILING_LEVEL,Profiling.Level.BASIC.name()));
+  SearchClient searchClient=new SearchClient(new Settings(),profiling);
+  try {
+    PutMappingRequestBuilder requestBuilder=searchClient.preparePutMapping(IndexDefinition.RULE.getIndexName()).setType(IndexDefinition.RULE.getIndexType()).setIgnoreConflicts(true).setSource(mapDomain());
+    requestBuilder.get();
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(IllegalStateException.class);
+    assertThat(e.getMessage()).contains("Fail to execute ES put mapping request");
+  }
+}
