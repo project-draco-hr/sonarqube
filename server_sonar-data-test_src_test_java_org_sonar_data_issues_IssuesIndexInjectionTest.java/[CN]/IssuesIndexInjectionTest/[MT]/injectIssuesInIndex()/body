@@ -1,12 +1,11 @@
 {
-  generateData();
   ProgressTask progressTask=new ProgressTask(counter);
   Timer timer=new Timer("Inject Issues");
   timer.schedule(progressTask,ProgressTask.PERIOD_MS,ProgressTask.PERIOD_MS);
   try {
     long start=System.currentTimeMillis();
     for (    ComponentDto project : projects) {
-      for (      ComponentDto file : componentsByProjectId.get(project)) {
+      for (      ComponentDto file : componentsByProject.get(project)) {
         for (int issueIndex=1; issueIndex < NUMBER_ISSUES_PER_FILE + 1; issueIndex++) {
           batchSession.enqueue(new InsertDto<IssueDto>(IndexDefinition.ISSUES.getIndexType(),newIssue(issueIndex,file,project,rules.next()),false));
           counter.getAndIncrement();
@@ -20,7 +19,6 @@
     assertThat(issueIndex.countAll()).isEqualTo(ISSUE_COUNT);
     long totalTime=stop - start;
     LOGGER.info("Inserted {} Issues in {} ms with avg {} Issue/second",ISSUE_COUNT,totalTime,documentPerSecond(ISSUE_COUNT,totalTime));
-    assertDurationAround(totalTime,Long.parseLong(getProperty("IssuesIndexInjectionTest.inject_issues")));
   }
   finally {
     timer.cancel();

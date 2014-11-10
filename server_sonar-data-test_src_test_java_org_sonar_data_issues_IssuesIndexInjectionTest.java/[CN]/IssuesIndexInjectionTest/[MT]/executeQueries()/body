@@ -1,0 +1,13 @@
+{
+  long start=System.currentTimeMillis();
+  Result<Issue> result=issueIndex.search(IssueQuery.builder().build(),new QueryContext());
+  LOGGER.info("Search for all issues : returned {} issues in {} ms",result.getTotal(),System.currentTimeMillis() - start);
+  start=System.currentTimeMillis();
+  ComponentDto project=componentsByProject.keySet().iterator().next();
+  result=issueIndex.search(IssueQuery.builder().projectUuids(newArrayList(project.uuid())).build(),new QueryContext());
+  LOGGER.info("Search for issues from one project : returned {} issues in {} ms",result.getTotal(),System.currentTimeMillis() - start);
+  start=System.currentTimeMillis();
+  ComponentDto file=componentsByProject.get(project).get(0);
+  result=issueIndex.search(IssueQuery.builder().componentUuids(newArrayList(file.uuid())).build(),new QueryContext());
+  LOGGER.info("Search for issues from one file : returned {} issues in {} ms",result.getTotal(),System.currentTimeMillis() - start);
+}
