@@ -1,0 +1,19 @@
+{
+  IndexDefinition.IndexDefinitionContext context=new IndexDefinition.IndexDefinitionContext();
+  for (  IndexDefinition definition : definitions) {
+    definition.define(context);
+  }
+  for (  NewIndex newIndex : context.getIndices().values()) {
+    boolean exists=client.prepareExists(newIndex.getName()).get().isExists();
+    if (exists) {
+      if (needsToDeleteIndex(newIndex)) {
+        LOGGER.info(String.format("Delete index %s (settings changed)",newIndex.getName()));
+        deleteIndex(newIndex.getName());
+        exists=false;
+      }
+    }
+    if (!exists) {
+      createIndex(newIndex);
+    }
+  }
+}

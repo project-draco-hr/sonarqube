@@ -7,7 +7,7 @@
       builder.put("node.master",true);
     }
  else     if (!masterHosts.isEmpty()) {
-      LOGGER.info("Elasticsearch cluster enabled. Slave node connecting to master: {}",masterHosts);
+      LOGGER.info("Elasticsearch cluster enabled. Node connecting to master: {}",masterHosts);
       builder.put("discovery.zen.ping.unicast.hosts",StringUtils.join(masterHosts,","));
       builder.put("node.master",false);
       builder.put("discovery.zen.minimum_master_nodes",1);
@@ -16,7 +16,7 @@
       throw new MessageException(String.format("Not an Elasticsearch master nor slave. Please check properties %s and %s",ProcessConstants.CLUSTER_MASTER,ProcessConstants.CLUSTER_MASTER_HOST));
     }
   }
-  builder.put("index.number_of_replicas",replicationFactor);
+  builder.put(IndexMetaData.SETTING_NUMBER_OF_REPLICAS,replicationFactor);
   builder.put("cluster.name",clusterName);
   builder.put("cluster.routing.allocation.awareness.attributes","rack_id");
   builder.put("node.rack_id",props.value(ProcessConstants.CLUSTER_NODE_NAME,"unknown"));

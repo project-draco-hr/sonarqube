@@ -1,0 +1,14 @@
+{
+  GetSettingsRequestBuilder replicaRequest=client.admin().indices().prepareGetSettings(index);
+  String initialRequestSetting=replicaRequest.get().getSetting(index,IndexMetaData.SETTING_NUMBER_OF_REPLICAS);
+  int initialReplicas=Integer.parseInt(StringUtils.defaultIfEmpty(initialRequestSetting,"0"));
+  if (initialReplicas > 0) {
+    setNumberOfReplicas(index,0);
+  }
+  index(requests);
+  refresh(index);
+  optimize(index);
+  if (initialReplicas > 0) {
+    setNumberOfReplicas(index,initialReplicas);
+  }
+}

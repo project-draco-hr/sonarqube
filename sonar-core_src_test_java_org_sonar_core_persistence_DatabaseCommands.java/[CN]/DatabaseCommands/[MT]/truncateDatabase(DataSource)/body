@@ -1,16 +1,21 @@
 {
   Connection connection=dataSource.getConnection();
-  connection.setAutoCommit(false);
-  Statement statement=connection.createStatement();
-  for (  String table : DatabaseVersion.TABLES) {
-    try {
-      statement.executeUpdate("TRUNCATE TABLE " + table);
-      connection.commit();
-    }
- catch (    Exception e) {
-      connection.rollback();
+  Statement statement=null;
+  try {
+    connection.setAutoCommit(false);
+    statement=connection.createStatement();
+    for (    String table : DatabaseVersion.TABLES) {
+      try {
+        statement.executeUpdate("TRUNCATE TABLE " + table);
+        connection.commit();
+      }
+ catch (      Exception e) {
+        connection.rollback();
+      }
     }
   }
-  statement.close();
-  connection.close();
+  finally {
+    DbUtils.closeQuietly(connection);
+    DbUtils.closeQuietly(statement);
+  }
 }

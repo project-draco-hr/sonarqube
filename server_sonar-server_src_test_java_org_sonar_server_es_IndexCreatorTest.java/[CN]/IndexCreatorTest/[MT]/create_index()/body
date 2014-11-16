@@ -1,0 +1,14 @@
+{
+  assertThat(mappings()).isEmpty();
+  IndexCreator creator=new IndexCreator(es.client(),new IndexDefinition[]{new FakeIndexDefinition()});
+  creator.start();
+  ImmutableOpenMap<String,ImmutableOpenMap<String,MappingMetaData>> mappings=mappings();
+  MappingMetaData mapping=mappings.get("fakes").get("fake");
+  assertThat(mapping.type()).isEqualTo("fake");
+  assertThat(mapping.getSourceAsMap()).isNotEmpty();
+  assertThat(countMappingFields(mapping)).isEqualTo(2);
+  assertThat(field(mapping,"updatedAt").get("type")).isEqualTo("date");
+  assertThat(setting("fakes","index.sonar_hash")).isNotEmpty();
+  creator.stop();
+  assertThat(mappings()).isNotEmpty();
+}

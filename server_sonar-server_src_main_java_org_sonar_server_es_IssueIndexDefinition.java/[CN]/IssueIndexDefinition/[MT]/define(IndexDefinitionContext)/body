@@ -1,0 +1,44 @@
+{
+  NewIndex index=context.create(INDEX_ISSUES);
+  boolean clusterMode=settings.getBoolean(ProcessConstants.CLUSTER_ACTIVATE);
+  if (clusterMode) {
+    index.getSettings().put(IndexMetaData.SETTING_NUMBER_OF_SHARDS,4);
+    index.getSettings().put(IndexMetaData.SETTING_NUMBER_OF_REPLICAS,1);
+  }
+  NewIndex.NewMapping authorizationMapping=index.createMapping(TYPE_ISSUE_AUTHORIZATION);
+  authorizationMapping.setAttribute("_id",ImmutableMap.of("path",IssueAuthorizationNormalizer.IssueAuthorizationField.PROJECT.field()));
+  authorizationMapping.createDateTimeField(BaseNormalizer.UPDATED_AT_FIELD);
+  authorizationMapping.stringFieldBuilder("project").build();
+  authorizationMapping.stringFieldBuilder("groups").build();
+  authorizationMapping.stringFieldBuilder("users").build();
+  NewIndex.NewMapping issueMapping=index.createMapping(TYPE_ISSUE);
+  issueMapping.setAttribute("_id",ImmutableMap.of("path",IssueNormalizer.IssueField.KEY.field()));
+  issueMapping.setAttribute("_parent",ImmutableMap.of("type",TYPE_ISSUE_AUTHORIZATION));
+  issueMapping.setAttribute("_routing",ImmutableMap.of("required",true,"path",IssueNormalizer.IssueField.PROJECT.field()));
+  issueMapping.stringFieldBuilder("component").build();
+  issueMapping.stringFieldBuilder("actionPlan").build();
+  issueMapping.stringFieldBuilder("assignee").enableSorting().build();
+  issueMapping.stringFieldBuilder("attributes").build();
+  issueMapping.stringFieldBuilder("authorLogin").build();
+  issueMapping.createDateTimeField("createdAt");
+  issueMapping.createDoubleField("debt");
+  issueMapping.createDoubleField("effort");
+  issueMapping.stringFieldBuilder("filePath").enableSorting().build();
+  issueMapping.createDateTimeField("issueCreatedAt");
+  issueMapping.createDateTimeField("issueUpdatedAt");
+  issueMapping.createDateTimeField("issueClosedAt");
+  issueMapping.stringFieldBuilder("key").enableSorting().build();
+  issueMapping.stringFieldBuilder("language").build();
+  issueMapping.createIntegerField("line");
+  issueMapping.stringFieldBuilder("message").build();
+  issueMapping.stringFieldBuilder("module").build();
+  issueMapping.createUuidPathField("modulePath");
+  issueMapping.stringFieldBuilder("project").enableSorting().build();
+  issueMapping.stringFieldBuilder("reporter").build();
+  issueMapping.stringFieldBuilder("resolution").build();
+  issueMapping.stringFieldBuilder("ruleKey").build();
+  issueMapping.stringFieldBuilder("severity").build();
+  issueMapping.createByteField("severityValue");
+  issueMapping.stringFieldBuilder("status").enableSorting().build();
+  issueMapping.createDateTimeField("updatedAt");
+}
