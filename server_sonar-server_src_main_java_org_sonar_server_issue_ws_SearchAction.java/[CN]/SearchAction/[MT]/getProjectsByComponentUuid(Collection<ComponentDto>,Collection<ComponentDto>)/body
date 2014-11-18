@@ -1,23 +1,4 @@
 {
-  Map<String,ComponentDto> projectsByUuid=newHashMap();
-  for (  ComponentDto project : projects) {
-    if (project == null) {
-      throw new IllegalStateException("Found a null project in issues");
-    }
-    if (project.uuid() == null) {
-      throw new IllegalStateException("Project has no UUID: " + project.getKey());
-    }
-    projectsByUuid.put(project.uuid(),project);
-  }
-  Map<String,ComponentDto> projectsByComponentUuid=newHashMap();
-  for (  ComponentDto component : components) {
-    if (component.uuid() == null) {
-      throw new IllegalStateException("Component has no UUID: " + component.getKey());
-    }
-    if (!projectsByUuid.containsKey(component.projectUuid())) {
-      throw new IllegalStateException("Project cannot be found for component: " + component.getKey() + " / "+ component.uuid());
-    }
-    projectsByComponentUuid.put(component.uuid(),projectsByUuid.get(component.projectUuid()));
-  }
-  return projectsByComponentUuid;
+  Map<String,ComponentDto> projectsByUuid=buildProjectsByUuid(projects);
+  return buildProjectsByComponentUuid(components,projectsByUuid);
 }
