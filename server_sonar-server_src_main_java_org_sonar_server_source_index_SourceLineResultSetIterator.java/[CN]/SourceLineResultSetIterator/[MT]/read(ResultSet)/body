@@ -1,0 +1,32 @@
+{
+  String projectUuid=rs.getString(1);
+  String fileUuid=rs.getString(2);
+  Date updatedAt=SqlUtil.getDate(rs,4);
+  Reader dataStream=rs.getClob(5).getCharacterStream();
+  int line=1;
+  List<SourceLineDoc> lines=Lists.newArrayList();
+  CSVParser csvParser=null;
+  try {
+    csvParser=new CSVParser(dataStream,CSVFormat.DEFAULT);
+    for (    CSVRecord record : csvParser) {
+      SourceLineDoc doc=new SourceLineDoc(Maps.<String,Object>newHashMapWithExpectedSize(8));
+      doc.setProjectUuid(projectUuid);
+      doc.setFileUuid(fileUuid);
+      doc.setLine(line++);
+      doc.setUpdateDate(updatedAt);
+      doc.setScmRevision(record.get(0));
+      doc.setScmAuthor(record.get(1));
+      doc.setScmDate(DateUtils.parseDateTimeQuietly(record.get(2)));
+      doc.setHighlighting(record.get(3));
+      doc.setSource(record.get(4));
+    }
+  }
+ catch (  IOException ioError) {
+    throw new IllegalStateException(String.format("Impossible to parse source line data, stuck at line %d",line),ioError);
+  }
+ finally {
+    IOUtils.closeQuietly(csvParser);
+    IOUtils.closeQuietly(dataStream);
+  }
+  return lines;
+}

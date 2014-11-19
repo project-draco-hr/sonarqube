@@ -1,0 +1,18 @@
+{
+  NewIndex index=context.create(INDEX_SOURCE_LINES);
+  boolean clusterMode=settings.getBoolean(ProcessConstants.CLUSTER_ACTIVATE);
+  if (clusterMode) {
+    index.getSettings().put(IndexMetaData.SETTING_NUMBER_OF_SHARDS,4);
+    index.getSettings().put(IndexMetaData.SETTING_NUMBER_OF_REPLICAS,1);
+  }
+  NewIndex.NewIndexType sourceLineMapping=index.createType(TYPE_SOURCE_LINE);
+  sourceLineMapping.stringFieldBuilder(FIELD_PROJECT_UUID).build();
+  sourceLineMapping.stringFieldBuilder(FIELD_FILE_UUID).build();
+  sourceLineMapping.createIntegerField(FIELD_LINE);
+  sourceLineMapping.stringFieldBuilder(FIELD_SCM_REVISION).build();
+  sourceLineMapping.stringFieldBuilder(FIELD_SCM_AUTHOR).build();
+  sourceLineMapping.createDateTimeField(FIELD_SCM_DATE);
+  sourceLineMapping.stringFieldBuilder(FIELD_HIGHLIGHTING).build();
+  sourceLineMapping.stringFieldBuilder(FIELD_SOURCE).build();
+  sourceLineMapping.createDateTimeField(BaseNormalizer.UPDATED_AT_FIELD);
+}

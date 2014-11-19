@@ -1,0 +1,14 @@
+{
+  bulk.start();
+  while (sourceLines.hasNext()) {
+    Collection<SourceLineDoc> lineDocs=sourceLines.next();
+    for (    SourceLineDoc sourceLine : lineDocs) {
+      bulk.add(newUpsertRequest(sourceLine));
+      long dtoUpdatedAt=sourceLine.updateDate().getTime();
+      if (lastUpdatedAt < dtoUpdatedAt) {
+        lastUpdatedAt=dtoUpdatedAt;
+      }
+    }
+  }
+  bulk.stop();
+}
