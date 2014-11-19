@@ -1,0 +1,12 @@
+{
+  assertThat(replicas()).isEqualTo(1);
+  BulkIndexer indexer=new BulkIndexer(esTester.client(),FakeIndexDefinition.INDEX).setLarge(true).setFlushByteSize(new ByteSizeValue(1,ByteSizeUnit.BYTES).bytes());
+  indexer.start();
+  assertThat(replicas()).isEqualTo(0);
+  for (int i=0; i < 10; i++) {
+    indexer.add(newIndexRequest(i));
+  }
+  indexer.stop();
+  assertThat(count()).isEqualTo(10);
+  assertThat(replicas()).isEqualTo(1);
+}

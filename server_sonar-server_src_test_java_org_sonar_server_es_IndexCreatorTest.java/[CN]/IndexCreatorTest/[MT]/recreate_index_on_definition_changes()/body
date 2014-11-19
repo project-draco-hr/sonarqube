@@ -1,11 +1,15 @@
 {
   assertThat(mappings()).isEmpty();
-  IndexCreator creator=new IndexCreator(es.client(),new IndexDefinition[]{new FakeIndexDefinition()});
+  IndexRegistry registry=new IndexRegistry(new IndexDefinition[]{new FakeIndexDefinition()});
+  registry.start();
+  IndexCreator creator=new IndexCreator(es.client(),registry);
   creator.start();
   creator.stop();
   String hashV1=setting("fakes","index.sonar_hash");
   assertThat(hashV1).isNotEmpty();
-  creator=new IndexCreator(es.client(),new IndexDefinition[]{new FakeIndexDefinitionV2()});
+  registry=new IndexRegistry(new IndexDefinition[]{new FakeIndexDefinitionV2()});
+  registry.start();
+  creator=new IndexCreator(es.client(),registry);
   creator.start();
   ImmutableOpenMap<String,ImmutableOpenMap<String,MappingMetaData>> mappings=mappings();
   MappingMetaData mapping=mappings.get("fakes").get("fake");

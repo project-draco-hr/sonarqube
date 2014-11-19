@@ -2,14 +2,4 @@
   LoggerFactory.getLogger(SearchServer.class).info("Starting Elasticsearch[{}] on port {}",settings.clusterName(),settings.tcpPort());
   node=new InternalNode(settings.build(),true);
   node.start();
-  if (settings.inCluster() && !settings.isMaster()) {
-    for (    ObjectCursor<Settings> settingCursor : node.client().admin().indices().prepareGetSettings().get().getIndexToSettings().values()) {
-      Settings settings=settingCursor.value;
-      String clusterReplicationFactor=settings.get(IndexMetaData.SETTING_NUMBER_OF_REPLICAS,"-1");
-      if (Integer.parseInt(clusterReplicationFactor) <= 0) {
-        node.stop();
-        throw new MessageException("Invalid number of Elasticsearch replicas: " + clusterReplicationFactor);
-      }
-    }
-  }
 }

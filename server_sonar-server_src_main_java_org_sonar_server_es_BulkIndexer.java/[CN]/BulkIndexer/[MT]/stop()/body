@@ -1,0 +1,13 @@
+{
+  if (bulkRequest.numberOfActions() > 0) {
+    executeBulk(bulkRequest);
+  }
+  if (refresh) {
+    client.prepareRefresh(indexName).get();
+  }
+  if (large) {
+    client.nativeClient().admin().indices().prepareOptimize(indexName).setMaxNumSegments(1).setWaitForMerge(true).get();
+    updateSettings(largeInitialSettings);
+  }
+  bulkRequest=null;
+}

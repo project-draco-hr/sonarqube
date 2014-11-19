@@ -1,7 +1,7 @@
 {
+  Profiling profiling=new Profiling(new Settings().setProperty(Profiling.CONFIG_PROFILING_LEVEL,Profiling.Level.BASIC.name()));
+  SearchClient searchClient=new SearchClient(new Settings(),profiling);
   try {
-    Profiling profiling=new Profiling(new Settings().setProperty(Profiling.CONFIG_PROFILING_LEVEL,Profiling.Level.BASIC.name()));
-    SearchClient searchClient=new SearchClient(new Settings(),profiling);
     SearchResponse search=searchClient.prepareSearch(IndexDefinition.RULE.getIndexName()).setSearchType(SearchType.SCAN).setScroll(TimeValue.timeValueSeconds(3L)).get();
     searchClient.prepareSearchScroll(search.getScrollId()).get();
     fail();
@@ -10,4 +10,5 @@
     assertThat(e).isInstanceOf(IllegalStateException.class);
     assertThat(e.getMessage()).contains("Fail to execute ES search request '{}' on indices '[rules]'");
   }
+  searchClient.stop();
 }

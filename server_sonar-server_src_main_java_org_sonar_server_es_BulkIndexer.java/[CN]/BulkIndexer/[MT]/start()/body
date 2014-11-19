@@ -1,0 +1,18 @@
+{
+  Preconditions.checkState(bulkRequest == null,"Bulk indexing is already started");
+  if (large) {
+    largeInitialSettings=Maps.newHashMap();
+    Map<String,Object> bulkSettings=Maps.newHashMap();
+    GetSettingsResponse settingsResp=client.nativeClient().admin().indices().prepareGetSettings(indexName).get();
+    int initialReplicas=Integer.parseInt(settingsResp.getSetting(indexName,IndexMetaData.SETTING_NUMBER_OF_REPLICAS));
+    if (initialReplicas > 0) {
+      largeInitialSettings.put(IndexMetaData.SETTING_NUMBER_OF_REPLICAS,initialReplicas);
+      bulkSettings.put(IndexMetaData.SETTING_NUMBER_OF_REPLICAS,0);
+    }
+    String refreshInterval=settingsResp.getSetting(indexName,"index.refresh_interval");
+    largeInitialSettings.put("index.refresh_interval",refreshInterval);
+    bulkSettings.put("index.refresh_interval","-1");
+    updateSettings(bulkSettings);
+  }
+  bulkRequest=client.prepareBulk();
+}

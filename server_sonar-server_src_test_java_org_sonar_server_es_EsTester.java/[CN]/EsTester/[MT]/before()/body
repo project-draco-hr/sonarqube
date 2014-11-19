@@ -1,13 +1,18 @@
 {
-  if (sharedNode == null) {
-    String nodeName=EsTester.class.getName();
-    sharedNode=NodeBuilder.nodeBuilder().local(true).data(true).settings(ImmutableSettings.builder().put(ClusterName.SETTING,nodeName).put("node.name",nodeName).put(IndexMetaData.SETTING_NUMBER_OF_SHARDS,1).put(IndexMetaData.SETTING_NUMBER_OF_REPLICAS,0).put("processors",1).put("http.enabled",false).put("index.store.type","ram").put("config.ignore_system_properties",true).put("gateway.type","none")).build();
-    sharedNode.start();
-    assertThat(DiscoveryNode.localNode(sharedNode.settings())).isTrue();
-    client=new EsClient(new Profiling(new Settings()),sharedNode.client());
-  }
- else {
-    DeleteIndexResponse response=sharedNode.client().admin().indices().prepareDelete("_all").get();
-    assertThat(response.isAcknowledged()).isTrue();
+  String nodeName="es-ram-" + PROCESS_ID;
+  node=NodeBuilder.nodeBuilder().local(true).data(true).settings(ImmutableSettings.builder().put("cluster.name",nodeName).put("node.name",nodeName).put(IndexMetaData.SETTING_NUMBER_OF_SHARDS,1).put(IndexMetaData.SETTING_NUMBER_OF_REPLICAS,0).put("processors",1).put("http.enabled",false).put("index.store.type","memory").put("config.ignore_system_properties",true).put("path.home","target/es-" + PROCESS_ID).put("gateway.type","none")).build();
+  node.start();
+  assertThat(DiscoveryNode.localNode(node.settings())).isTrue();
+  DeleteIndexResponse response=node.client().admin().indices().prepareDelete("_all").get();
+  assertThat(response.isAcknowledged()).isTrue();
+  client=new EsClient(new Profiling(new Settings()),node.client());
+  client.start();
+  if (!definitions.isEmpty()) {
+    ComponentContainer container=new ComponentContainer();
+    container.addSingletons(definitions);
+    container.addSingleton(client);
+    container.addSingleton(IndexRegistry.class);
+    container.addSingleton(IndexCreator.class);
+    container.startComponents();
   }
 }
