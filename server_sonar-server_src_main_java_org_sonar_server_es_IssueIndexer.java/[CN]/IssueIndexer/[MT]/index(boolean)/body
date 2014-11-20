@@ -1,14 +1,14 @@
 {
-  final BulkIndexer bulk=new BulkIndexer(esClient,IssueIndexDefinition.INDEX_ISSUES);
-  bulk.setLarge(large);
+  final BulkIndexer bulk=createBulkIndexer(large);
   DbSession dbSession=dbClient.openSession(false);
   Connection dbConnection=dbSession.getConnection();
   try {
     IssueResultSetIterator rowIt=IssueResultSetIterator.create(dbClient,dbConnection,getLastUpdatedAt());
-    indexIssues(bulk,rowIt);
+    index(bulk,rowIt);
     rowIt.close();
   }
   finally {
+    DbUtils.closeQuietly(dbConnection);
     dbSession.close();
   }
 }

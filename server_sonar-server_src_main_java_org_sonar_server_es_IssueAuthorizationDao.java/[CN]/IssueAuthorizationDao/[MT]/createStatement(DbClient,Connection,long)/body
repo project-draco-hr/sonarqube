@@ -1,0 +1,17 @@
+{
+  String sql;
+  if (afterDate > 0L) {
+    sql=StringUtils.replace(SQL_TEMPLATE,"{dateCondition}"," AND projects.authorization_updated_at>=? ");
+  }
+ else {
+    sql=StringUtils.replace(SQL_TEMPLATE,"{dateCondition}","");
+  }
+  PreparedStatement stmt=dbClient.newScrollingSelectStatement(connection,sql);
+  if (afterDate > 0L) {
+    Timestamp ts=new Timestamp(afterDate);
+    for (int i=1; i <= 4; i++) {
+      stmt.setTimestamp(i,ts);
+    }
+  }
+  return stmt;
+}
