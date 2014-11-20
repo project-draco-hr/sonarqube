@@ -1,0 +1,21 @@
+{
+  db.prepareDbUnit(getClass(),"source-with-scm.xml");
+  Connection connection=db.openConnection();
+  PreparedStatement stmt=connection.prepareStatement("UPDATE file_sources SET data = ? WHERE id=1");
+  stmt.setBytes(1,("aef12a,alice,2014-04-25T12:34:56+0100,,class Foo {\r\n" + "abe465,bob,2014-07-25T12:34:56+0100,,  // Empty\r\n" + "afb789,carol,2014-03-23T12:34:56+0100,,}\r\n"+ "afb789,carol,2014-03-23T12:34:56+0100,,\r\n").getBytes(Charsets.UTF_8));
+  stmt.executeUpdate();
+  connection.commit();
+  SourceLineResultSetIterator iterator=SourceLineResultSetIterator.create(dbClient,connection,0L);
+  assertThat(iterator.hasNext()).isTrue();
+  List<SourceLineDoc> sourceLines=Lists.newArrayList(iterator.next());
+  assertThat(sourceLines).hasSize(4);
+  SourceLineDoc firstLine=sourceLines.get(0);
+  assertThat(firstLine.projectUuid()).isEqualTo("uuid-MyProject");
+  assertThat(firstLine.fileUuid()).isEqualTo("uuid-MyFile.xoo");
+  assertThat(firstLine.line()).isEqualTo(1);
+  assertThat(firstLine.scmRevision()).isEqualTo("aef12a");
+  assertThat(firstLine.scmAuthor()).isEqualTo("alice");
+  assertThat(firstLine.scmDate()).isEqualTo(DateUtils.parseDateTime("2014-04-25T12:34:56+0100"));
+  assertThat(firstLine.highlighting()).isEmpty();
+  assertThat(firstLine.source()).isEqualTo("class Foo {");
+}
