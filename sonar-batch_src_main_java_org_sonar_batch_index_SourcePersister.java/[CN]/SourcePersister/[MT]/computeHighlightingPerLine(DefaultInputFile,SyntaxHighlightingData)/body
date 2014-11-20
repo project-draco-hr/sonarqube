@@ -1,27 +1,19 @@
 {
-  String[] highlightingPerLine=new String[file.lines()];
+  String[] result=new String[file.lines()];
   if (highlighting == null) {
-    return highlightingPerLine;
+    return result;
   }
   Iterable<SyntaxHighlightingRule> rules=highlighting.syntaxHighlightingRuleSet();
   int currentLineIdx=1;
-  StringBuilder currentLineSb=new StringBuilder();
+  StringBuilder[] highlightingPerLine=new StringBuilder[file.lines()];
   for (  SyntaxHighlightingRule rule : rules) {
-    long ruleStartOffset=rule.getStartPosition();
-    long ruleEndOffset=rule.getEndPosition();
-    while (currentLineIdx < file.lines() && ruleStartOffset >= file.originalLineOffsets()[currentLineIdx]) {
-      saveLineHighlighting(highlightingPerLine,currentLineIdx,currentLineSb);
+    while (currentLineIdx < file.lines() && rule.getStartPosition() >= file.originalLineOffsets()[currentLineIdx]) {
       currentLineIdx++;
     }
-    long ruleStartOffsetCurrentLine=ruleStartOffset;
-    while (currentLineIdx < file.lines() && ruleEndOffset >= file.originalLineOffsets()[currentLineIdx]) {
-      writeRule(currentLineSb,ruleStartOffsetCurrentLine - file.originalLineOffsets()[currentLineIdx - 1],file.originalLineOffsets()[currentLineIdx] - 1,rule.getTextType());
-      saveLineHighlighting(highlightingPerLine,currentLineIdx,currentLineSb);
-      currentLineIdx++;
-      ruleStartOffsetCurrentLine=file.originalLineOffsets()[currentLineIdx];
-    }
-    writeRule(currentLineSb,ruleStartOffsetCurrentLine - file.originalLineOffsets()[currentLineIdx - 1],ruleEndOffset - file.originalLineOffsets()[currentLineIdx - 1],rule.getTextType());
+    writeRule(file,rule,highlightingPerLine,currentLineIdx);
   }
-  saveLineHighlighting(highlightingPerLine,currentLineIdx,currentLineSb);
-  return highlightingPerLine;
+  for (int i=0; i < file.lines(); i++) {
+    result[i]=highlightingPerLine[i] != null ? highlightingPerLine[i].toString() : null;
+  }
+  return result;
 }

@@ -1,0 +1,21 @@
+{
+  DefaultInputFile inputFile=(DefaultInputFile)inputPath;
+  org.sonar.api.resources.File file=(org.sonar.api.resources.File)resourceCache.get(inputFile.key());
+  String fileUuid=file.getUuid();
+  FileSourceDto previous=mapper.select(fileUuid);
+  String newData=getSourceData(inputFile);
+  String dataHash=newData != null ? DigestUtils.md5Hex(newData) : "0";
+  Date now=system2.newDate();
+  if (previous == null) {
+    FileSourceDto newFileSource=new FileSourceDto().setProjectUuid(projectTree.getRootProject().getUuid()).setFileUuid(fileUuid).setData(newData).setDataHash(dataHash).setCreatedAt(now).setUpdatedAt(now);
+    mapper.insert(newFileSource);
+    session.commit();
+  }
+ else {
+    if (!dataHash.equals(previous.getDataHash())) {
+      previous.setData(newData).setDataHash(dataHash).setUpdatedAt(now);
+      mapper.update(previous);
+      session.commit();
+    }
+  }
+}
