@@ -1,10 +1,18 @@
 {
   DbSession session=mybatis.openSession(false);
   try {
+    final Map<String,FileSourceDto> fileSourceDtoByFileUuid=new HashMap<String,FileSourceDto>();
+    session.select("org.sonar.core.source.db.FileSourceMapper.selectAllFileDataHashByProject",projectTree.getRootProject().getUuid(),new ResultHandler(){
+      @Override public void handleResult(      ResultContext context){
+        FileSourceDto dto=(FileSourceDto)context.getResultObject();
+        fileSourceDtoByFileUuid.put(dto.getFileUuid(),dto);
+      }
+    }
+);
     FileSourceMapper mapper=session.getMapper(FileSourceMapper.class);
     for (    InputPath inputPath : inputPathCache.all()) {
       if (inputPath instanceof InputFile) {
-        persist(session,mapper,inputPath);
+        persist(session,mapper,inputPath,fileSourceDtoByFileUuid);
       }
     }
   }
