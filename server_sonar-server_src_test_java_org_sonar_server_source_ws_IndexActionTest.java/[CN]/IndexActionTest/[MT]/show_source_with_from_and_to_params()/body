@@ -1,0 +1,15 @@
+{
+  String fileKey="src/Foo.java";
+  Map<String,Object> fieldMap=Maps.newHashMap();
+  fieldMap.put(SourceLineIndexDefinition.FIELD_PROJECT_UUID,"abcd");
+  fieldMap.put(SourceLineIndexDefinition.FIELD_FILE_UUID,"efgh");
+  fieldMap.put(SourceLineIndexDefinition.FIELD_LINE,3);
+  fieldMap.put(SourceLineIndexDefinition.FIELD_SCM_REVISION,"cafebabe");
+  fieldMap.put(SourceLineIndexDefinition.FIELD_SCM_DATE,null);
+  fieldMap.put(SourceLineIndexDefinition.FIELD_SCM_AUTHOR,"polop");
+  fieldMap.put(SourceLineIndexDefinition.FIELD_SOURCE,"}");
+  fieldMap.put(BaseNormalizer.UPDATED_AT_FIELD,new Date());
+  when(sourceLineIndex.getLines(fileKey,3,3)).thenReturn(newArrayList(new SourceLineDoc(fieldMap)));
+  WsTester.TestRequest request=tester.newGetRequest("api/sources","index").setParam("uuid",fileKey).setParam("from","3").setParam("to","3");
+  request.execute().assertJson(getClass(),"show_source_with_params_from_and_to.json");
+}
