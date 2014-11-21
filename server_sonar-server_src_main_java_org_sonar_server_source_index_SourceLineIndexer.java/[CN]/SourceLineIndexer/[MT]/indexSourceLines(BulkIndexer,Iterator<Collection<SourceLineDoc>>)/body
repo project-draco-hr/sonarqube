@@ -2,13 +2,18 @@
   bulk.start();
   while (sourceLines.hasNext()) {
     Collection<SourceLineDoc> lineDocs=sourceLines.next();
+    String fileUuid=null;
+    int lastLine=0;
     for (    SourceLineDoc sourceLine : lineDocs) {
+      lastLine++;
+      fileUuid=sourceLine.fileUuid();
       bulk.add(newUpsertRequest(sourceLine));
       long dtoUpdatedAt=sourceLine.updateDate().getTime();
       if (lastUpdatedAt < dtoUpdatedAt) {
         lastUpdatedAt=dtoUpdatedAt;
       }
     }
+    index.deleteLinesFromFileAbove(fileUuid,lastLine);
   }
   bulk.stop();
 }
