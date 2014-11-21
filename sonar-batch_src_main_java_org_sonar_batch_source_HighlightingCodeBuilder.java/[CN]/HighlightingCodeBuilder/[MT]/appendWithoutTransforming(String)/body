@@ -1,0 +1,22 @@
+{
+  if (startOffset == -1) {
+    Matcher startMatcher=START_TAG_PATTERN.matcher(htmlTag);
+    if (startMatcher.matches()) {
+      startOffset=currentOffset;
+      cssClass=startMatcher.group(1);
+    }
+ else {
+      LOG.warn("Expected to match highlighting start html tag but was: " + htmlTag);
+    }
+  }
+ else {
+    Matcher endMatcher=END_TAG_PATTERN.matcher(htmlTag);
+    if (endMatcher.matches()) {
+      highlightingBuilder.registerHighlightingRule(startOffset,currentOffset,TypeOfText.forCssClass(cssClass));
+      startOffset=-1;
+    }
+ else {
+      LOG.warn("Expected to match highlighting end html tag but was: " + htmlTag);
+    }
+  }
+}
