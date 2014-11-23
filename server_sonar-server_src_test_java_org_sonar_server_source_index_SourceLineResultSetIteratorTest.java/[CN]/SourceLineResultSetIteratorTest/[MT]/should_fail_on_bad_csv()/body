@@ -2,10 +2,19 @@
   db.prepareDbUnit(getClass(),"source-with-scm.xml");
   Connection connection=db.openConnection();
   PreparedStatement stmt=connection.prepareStatement("UPDATE file_sources SET data = ? WHERE id=1");
-  stmt.setBytes(1,("plouf").getBytes(Charsets.UTF_8));
+  stmt.setString(1,"plouf");
   stmt.executeUpdate();
   connection.commit();
+  stmt.close();
   SourceLineResultSetIterator iterator=SourceLineResultSetIterator.create(dbClient,connection,0L);
-  assertThat(iterator.hasNext()).isTrue();
-  iterator.next();
+  try {
+    assertThat(iterator.hasNext()).isTrue();
+    iterator.next();
+    fail();
+  }
+ catch (  IllegalStateException e) {
+  }
+ finally {
+    iterator.close();
+  }
 }
