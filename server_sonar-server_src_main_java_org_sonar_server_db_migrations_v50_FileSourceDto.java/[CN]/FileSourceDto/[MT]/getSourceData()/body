@@ -4,11 +4,13 @@
   int line=0;
   String sourceLine=null;
   CsvWriter csv=CsvWriter.of(new OutputStreamWriter(output,UTF_8));
+  StringBuilder lineHashes=new StringBuilder();
   while (sourceSplitter.hasNext()) {
     line++;
     sourceLine=sourceSplitter.next();
+    lineHashes.append(lineChecksum(sourceLine)).append("\n");
     csv.values(revisions.get(line),authors.get(line),dates.get(line),highlighting,sourceLine);
   }
   csv.close();
-  return new String(output.toByteArray(),UTF_8);
+  return new String[]{new String(output.toByteArray(),UTF_8),lineHashes.toString()};
 }

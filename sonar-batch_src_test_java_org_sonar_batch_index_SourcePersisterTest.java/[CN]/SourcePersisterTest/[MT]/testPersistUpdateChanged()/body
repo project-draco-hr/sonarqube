@@ -5,7 +5,7 @@
   String relativePathSame="src/changed.java";
   java.io.File sameFile=new java.io.File(basedir,relativePathSame);
   FileUtils.write(sameFile,"changed\ncontent");
-  DefaultInputFile inputFileNew=new DefaultInputFile(PROJECT_KEY,relativePathSame).setLines(2).setAbsolutePath(sameFile.getAbsolutePath());
+  DefaultInputFile inputFileNew=new DefaultInputFile(PROJECT_KEY,relativePathSame).setLines(2).setAbsolutePath(sameFile.getAbsolutePath()).setLineHashes(new String[]{"foo","bar"});
   when(inputPathCache.all()).thenReturn(Arrays.<InputPath>asList(inputFileNew));
   mockResourceCache(relativePathSame,PROJECT_KEY,"uuidsame");
   sourcePersister.persist();
@@ -13,5 +13,6 @@
   assertThat(fileSourceDto.getCreatedAt()).isEqualTo(DateUtils.parseDateTime("2014-10-10T16:44:02+0200").getTime());
   assertThat(fileSourceDto.getUpdatedAt()).isEqualTo(now.getTime());
   assertThat(fileSourceDto.getData()).isEqualTo(",,,,changed\r\n,,,,content\r\n");
+  assertThat(fileSourceDto.getLineHashes()).isEqualTo("foo\nbar");
   assertThat(fileSourceDto.getDataHash()).isEqualTo("e41cca9c51ff853c748f708f39dfc035");
 }

@@ -7,13 +7,13 @@
   String newDataHash=newData != null ? DigestUtils.md5Hex(newData) : "0";
   Date now=system2.newDate();
   if (previous == null) {
-    FileSourceDto newFileSource=new FileSourceDto().setProjectUuid(projectTree.getRootProject().getUuid()).setFileUuid(fileUuid).setData(newData).setDataHash(newDataHash).setCreatedAt(now.getTime()).setUpdatedAt(now.getTime());
+    FileSourceDto newFileSource=new FileSourceDto().setProjectUuid(projectTree.getRootProject().getUuid()).setFileUuid(fileUuid).setData(newData).setDataHash(newDataHash).setLineHashes(StringUtils.defaultIfEmpty(Joiner.on('\n').join(inputFile.lineHashes()),null)).setCreatedAt(now.getTime()).setUpdatedAt(now.getTime());
     mapper.insert(newFileSource);
     session.commit();
   }
  else {
     if (!newDataHash.equals(previous.getDataHash())) {
-      previous.setData(newData).setDataHash(newDataHash).setUpdatedAt(now.getTime());
+      previous.setData(newData).setLineHashes(StringUtils.defaultIfEmpty(Joiner.on('\n').join(inputFile.lineHashes()),null)).setDataHash(newDataHash).setUpdatedAt(now.getTime());
       mapper.update(previous);
       session.commit();
     }
