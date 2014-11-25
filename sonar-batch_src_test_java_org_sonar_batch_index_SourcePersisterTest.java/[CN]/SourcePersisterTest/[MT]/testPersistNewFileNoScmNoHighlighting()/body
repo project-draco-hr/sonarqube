@@ -5,7 +5,7 @@
   String relativePathNew="src/new.java";
   java.io.File newFile=new java.io.File(basedir,relativePathNew);
   FileUtils.write(newFile,"foo\nbar\nbiz");
-  DefaultInputFile inputFileNew=new DefaultInputFile(PROJECT_KEY,relativePathNew).setLines(3).setAbsolutePath(newFile.getAbsolutePath()).setLineHashes(new String[]{"foo","bar","bee"});
+  DefaultInputFile inputFileNew=new DefaultInputFile(PROJECT_KEY,relativePathNew).setLines(3).setAbsolutePath(newFile.getAbsolutePath()).setLineHashes(new byte[][]{md5("foo"),md5("bar"),md5("biz")});
   when(inputPathCache.all()).thenReturn(Arrays.<InputPath>asList(inputFileNew));
   mockResourceCache(relativePathNew,PROJECT_KEY,"uuidnew");
   sourcePersister.persist();
@@ -13,6 +13,6 @@
   assertThat(fileSourceDto.getCreatedAt()).isEqualTo(now.getTime());
   assertThat(fileSourceDto.getUpdatedAt()).isEqualTo(now.getTime());
   assertThat(fileSourceDto.getData()).isEqualTo(",,,,,,,foo\r\n,,,,,,,bar\r\n,,,,,,,biz\r\n");
-  assertThat(fileSourceDto.getLineHashes()).isEqualTo("foo\nbar\nbee");
+  assertThat(fileSourceDto.getLineHashes()).isEqualTo(md5Hex("foo") + "\n" + md5Hex("bar")+ "\n"+ md5Hex("biz"));
   assertThat(fileSourceDto.getDataHash()).isEqualTo("419c2b162018f6bbeb04fc0500d7852d");
 }
