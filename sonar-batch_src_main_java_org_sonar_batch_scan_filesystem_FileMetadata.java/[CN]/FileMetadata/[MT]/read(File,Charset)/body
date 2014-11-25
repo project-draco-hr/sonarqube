@@ -3,16 +3,16 @@
   long currentOriginalOffset=0;
   List<Long> originalLineOffsets=new ArrayList<Long>();
   List<Object> lineHashes=new ArrayList<Object>();
-  StringBuilder currentLineStr=new StringBuilder();
   int lines=0;
   char c=(char)-1;
   try {
     MessageDigest globalMd5Digest=DigestUtils.getMd5Digest();
-    globalMd5Digest.reset();
+    MessageDigest lineMd5Digest=DigestUtils.getMd5Digest();
     reader=new BufferedReader(new InputStreamReader(new FileInputStream(file),encoding));
     int i=reader.read();
     boolean afterCR=false;
     originalLineOffsets.add(0L);
+    boolean blankline=true;
     while (i != -1) {
       c=(char)i;
       if (c == BOM) {
@@ -35,18 +35,21 @@
       if (c == LINE_FEED) {
         lines++;
         originalLineOffsets.add(currentOriginalOffset);
-        lineHashes.add(md5IgnoreWhitespace(currentLineStr));
-        currentLineStr.setLength(0);
+        lineHashes.add(blankline ? null : lineMd5Digest.digest());
+        blankline=true;
       }
  else {
-        currentLineStr.append(c);
+        if (!Character.isWhitespace(c)) {
+          blankline=false;
+          updateDigestUTF8Char(c,lineMd5Digest);
+        }
       }
-      globalMd5Digest.update(charToBytesUTF(c));
+      updateDigestUTF8Char(c,globalMd5Digest);
       i=reader.read();
     }
     if (c != (char)-1) {
       lines++;
-      lineHashes.add(md5IgnoreWhitespace(currentLineStr));
+      lineHashes.add(blankline ? null : lineMd5Digest.digest());
     }
     String filehash=Hex.encodeHexString(globalMd5Digest.digest());
     return new Metadata(lines,filehash,originalLineOffsets,lineHashes.toArray(new byte[0][]));

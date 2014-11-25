@@ -1,0 +1,13 @@
+{
+  File srcDir=new File(baseDir,"src");
+  srcDir.mkdir();
+  int nbFiles=100;
+  int ruleCount=100000;
+  for (int nb=1; nb <= nbFiles; nb++) {
+    File xooFile=new File(srcDir,"sample" + nb + ".xoo");
+    FileUtils.write(xooFile,StringUtils.repeat(StringUtils.repeat("a",100) + "\n",ruleCount / 1000));
+  }
+  TaskResult result=tester.newTask().properties(builder.put("sonar.sources","src").build()).start();
+  assertThat(result.inputFiles()).hasSize(100);
+  assertThat(result.inputDirs()).hasSize(1);
+}
