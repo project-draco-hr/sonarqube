@@ -11,6 +11,9 @@
   when(measureCache.byMetric(PROJECT_KEY + ":" + relativePathNew,CoreMetrics.SCM_AUTHORS_BY_LINE_KEY)).thenReturn(Arrays.asList(new Measure(CoreMetrics.SCM_AUTHORS_BY_LINE,"1=julien;2=simon;3=julien")));
   when(measureCache.byMetric(PROJECT_KEY + ":" + relativePathNew,CoreMetrics.SCM_LAST_COMMIT_DATETIMES_BY_LINE_KEY)).thenReturn(Arrays.asList(new Measure(CoreMetrics.SCM_LAST_COMMIT_DATETIMES_BY_LINE,"1=2014-10-11T16:44:02+0100;2=2014-10-12T16:44:02+0100;3=2014-10-13T16:44:02+0100")));
   when(measureCache.byMetric(PROJECT_KEY + ":" + relativePathNew,CoreMetrics.SCM_REVISIONS_BY_LINE_KEY)).thenReturn(Arrays.asList(new Measure(CoreMetrics.SCM_REVISIONS_BY_LINE,"1=123;2=234;3=345")));
+  when(measureCache.byMetric(PROJECT_KEY + ":" + relativePathNew,CoreMetrics.COVERAGE_LINE_HITS_DATA_KEY)).thenReturn(Arrays.asList(new Measure(CoreMetrics.COVERAGE_LINE_HITS_DATA,"1=1;3=0")));
+  when(measureCache.byMetric(PROJECT_KEY + ":" + relativePathNew,CoreMetrics.CONDITIONS_BY_LINE_KEY)).thenReturn(Arrays.asList(new Measure(CoreMetrics.CONDITIONS_BY_LINE,"1=4")));
+  when(measureCache.byMetric(PROJECT_KEY + ":" + relativePathNew,CoreMetrics.COVERED_CONDITIONS_BY_LINE_KEY)).thenReturn(Arrays.asList(new Measure(CoreMetrics.COVERED_CONDITIONS_BY_LINE,"1=2")));
   SyntaxHighlightingData highlighting=new SyntaxHighlightingDataBuilder().registerHighlightingRule(0,3,TypeOfText.ANNOTATION).registerHighlightingRule(4,5,TypeOfText.COMMENT).registerHighlightingRule(7,16,TypeOfText.CONSTANT).build();
   when(componentDataCache.getData(PROJECT_KEY + ":" + relativePathNew,SnapshotDataTypes.SYNTAX_HIGHLIGHTING)).thenReturn(highlighting);
   sourcePersister.persist();
@@ -18,6 +21,6 @@
   assertThat(fileSourceDto.getCreatedAt()).isEqualTo(now.getTime());
   assertThat(fileSourceDto.getUpdatedAt()).isEqualTo(now.getTime());
   assertThat(fileSourceDto.getLineHashes()).isEqualTo("foo\nbar\nbee");
-  assertThat(fileSourceDto.getData()).isEqualTo("123,julien,2014-10-11T16:44:02+0100,\"0,3,a\",foo\r\n" + "234,simon,2014-10-12T16:44:02+0100,\"0,1,cd\",bar\r\n" + "345,julien,2014-10-13T16:44:02+0100,\"0,9,c\",biz\r\n");
-  assertThat(fileSourceDto.getDataHash()).isEqualTo("a2aaee165e33957a67331fb9f869e0f1");
+  assertThat(fileSourceDto.getData()).isEqualTo("123,julien,2014-10-11T16:44:02+0100,1,4,2,\"0,3,a\",foo\r\n" + "234,simon,2014-10-12T16:44:02+0100,,,,\"0,1,cd\",bar\r\n" + "345,julien,2014-10-13T16:44:02+0100,0,,,\"0,9,c\",biz\r\n");
+  assertThat(fileSourceDto.getDataHash()).isEqualTo("66cf8a9176f59672044663f48a19989c");
 }
