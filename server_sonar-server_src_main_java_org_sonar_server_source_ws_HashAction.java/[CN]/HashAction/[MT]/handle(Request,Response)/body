@@ -1,0 +1,17 @@
+{
+  DbSession session=dbClient.openSession(false);
+  try {
+    String componentKey=request.mandatoryParam("key");
+    ComponentDto component=dbClient.componentDao().getByKey(session,componentKey);
+    if (component == null) {
+      throw new NotFoundException("Unable to find component with key " + componentKey);
+    }
+    String lineHashes=fileSourceDao.selectLineHashes(component.uuid(),session);
+    OutputStream output=response.stream().setMediaType("text/plain").output();
+    output.write(lineHashes.getBytes(Charsets.UTF_8));
+    output.close();
+  }
+  finally {
+    session.close();
+  }
+}
