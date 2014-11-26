@@ -5,7 +5,12 @@
   }
   issueCache.clear(resource.getEffectiveKey());
   Collection<IssueDto> dbOpenIssues=initialOpenIssues.selectAndRemoveIssues(resource.getEffectiveKey());
-  SourceHashHolder sourceHashHolder=new SourceHashHolder(index,lastSnapshots,resource);
+  SourceHashHolder sourceHashHolder=null;
+  if (ResourceUtils.isFile(resource)) {
+    File sonarFile=(File)resource;
+    InputFile file=inputPathCache.getFile(project.getEffectiveKey(),sonarFile.getPath());
+    sourceHashHolder=new SourceHashHolder((DefaultInputFile)file,lastLineHashes);
+  }
   IssueTrackingResult trackingResult=tracking.track(sourceHashHolder,dbOpenIssues,issues);
   addUnmatched(trackingResult.unmatched(),sourceHashHolder,issues);
   mergeMatched(trackingResult);

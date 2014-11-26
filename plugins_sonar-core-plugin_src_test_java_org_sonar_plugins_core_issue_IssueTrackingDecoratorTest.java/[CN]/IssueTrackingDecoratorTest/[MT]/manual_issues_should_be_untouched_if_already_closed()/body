@@ -1,12 +1,10 @@
 {
-  Resource file=new File("Action.java").setEffectiveKey("struts:Action.java").setId(123);
   IssueDto unmatchedIssue=new IssueDto().setKee("ABCDE").setReporter("freddy").setLine(1).setStatus("CLOSED").setRuleKey("manual","Performance");
   when(ruleFinder.findByKey(RuleKey.of("manual","Performance"))).thenReturn(new Rule("manual","Performance"));
   IssueTrackingResult trackingResult=new IssueTrackingResult();
   trackingResult.addUnmatched(unmatchedIssue);
   String originalSource="public interface Action {}";
-  when(index.getSource(file)).thenReturn(originalSource);
-  when(lastSnapshots.getSource(file)).thenReturn(originalSource);
+  Resource file=mockHashes(originalSource,originalSource);
   when(tracking.track(isA(SourceHashHolder.class),anyCollection(),anyCollection())).thenReturn(trackingResult);
   decorator.doDecorate(file);
   verify(workflow,times(1)).doAutomaticTransition(any(DefaultIssue.class),any(IssueChangeContext.class));

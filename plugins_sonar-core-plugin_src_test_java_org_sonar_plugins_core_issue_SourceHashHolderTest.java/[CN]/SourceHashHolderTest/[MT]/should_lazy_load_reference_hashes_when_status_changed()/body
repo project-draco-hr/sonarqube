@@ -1,0 +1,12 @@
+{
+  final String source="source";
+  String key="foo:src/Foo.java";
+  when(file.lineHashes()).thenReturn(new byte[][]{md5(source)});
+  when(file.key()).thenReturn(key);
+  when(file.status()).thenReturn(InputFile.Status.CHANGED);
+  when(lastSnapshots.getLineHashes(key)).thenReturn(new String[]{md5Hex(source)});
+  assertThat(sourceHashHolder.getHashedReference().getHash(1)).isEqualTo(md5Hex(source));
+  verify(lastSnapshots).getLineHashes(key);
+  assertThat(sourceHashHolder.getHashedReference().getHash(1)).isEqualTo(md5Hex(source));
+  Mockito.verifyNoMoreInteractions(lastSnapshots);
+}

@@ -1,0 +1,21 @@
+{
+  int size=hashes.length();
+  int[] rollingHashes=new int[size];
+  RollingHashCalculator hashCalulator=new RollingHashCalculator(halfBlockSize * 2 + 1);
+  for (int i=1; i <= Math.min(size,halfBlockSize + 1); i++) {
+    hashCalulator.add(hashes.getHash(i).hashCode());
+  }
+  for (int i=1; i <= size; i++) {
+    rollingHashes[i - 1]=hashCalulator.getHash();
+    if (i - halfBlockSize > 0) {
+      hashCalulator.remove(hashes.getHash(i - halfBlockSize).hashCode());
+    }
+    if (i + 1 + halfBlockSize <= size) {
+      hashCalulator.add(hashes.getHash(i + 1 + halfBlockSize).hashCode());
+    }
+ else {
+      hashCalulator.add(0);
+    }
+  }
+  return new RollingFileHashes(rollingHashes);
+}
