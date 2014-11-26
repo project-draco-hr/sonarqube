@@ -1,11 +1,11 @@
 {
-  NewIndex index=context.create(INDEX_ISSUES);
+  NewIndex index=context.create(INDEX);
   boolean clusterMode=settings.getBoolean(ProcessConstants.CLUSTER_ACTIVATE);
   if (clusterMode) {
     index.getSettings().put(IndexMetaData.SETTING_NUMBER_OF_SHARDS,4);
     index.getSettings().put(IndexMetaData.SETTING_NUMBER_OF_REPLICAS,1);
   }
-  NewIndex.NewIndexType authorizationMapping=index.createType(TYPE_ISSUE_AUTHORIZATION);
+  NewIndex.NewIndexType authorizationMapping=index.createType(TYPE_AUTHORIZATION);
   authorizationMapping.setAttribute("_id",ImmutableMap.of("path",FIELD_AUTHORIZATION_PROJECT_UUID));
   authorizationMapping.createDateTimeField(FIELD_AUTHORIZATION_UPDATED_AT);
   authorizationMapping.stringFieldBuilder(FIELD_AUTHORIZATION_PROJECT_UUID).build();
@@ -13,7 +13,7 @@
   authorizationMapping.stringFieldBuilder(FIELD_AUTHORIZATION_USERS).build();
   NewIndex.NewIndexType issueMapping=index.createType(TYPE_ISSUE);
   issueMapping.setAttribute("_id",ImmutableMap.of("path",FIELD_ISSUE_KEY));
-  issueMapping.setAttribute("_parent",ImmutableMap.of("type",TYPE_ISSUE_AUTHORIZATION));
+  issueMapping.setAttribute("_parent",ImmutableMap.of("type",TYPE_AUTHORIZATION));
   issueMapping.setAttribute("_routing",ImmutableMap.of("required",true,"path",FIELD_ISSUE_PROJECT_UUID));
   issueMapping.stringFieldBuilder(FIELD_ISSUE_ACTION_PLAN).build();
   issueMapping.stringFieldBuilder(FIELD_ISSUE_ASSIGNEE).enableSorting().build();

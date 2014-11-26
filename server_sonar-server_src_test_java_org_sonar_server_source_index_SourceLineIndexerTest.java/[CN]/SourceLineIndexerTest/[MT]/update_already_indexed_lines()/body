@@ -1,14 +1,12 @@
 {
-  es.client().prepareIndex(SourceLineIndexDefinition.INDEX_SOURCE_LINES,SourceLineIndexDefinition.TYPE_SOURCE_LINE).setSource(IOUtils.toString(new FileInputStream(TestUtils.getResource(this.getClass(),"line2.json")))).get();
-  es.client().prepareIndex(SourceLineIndexDefinition.INDEX_SOURCE_LINES,SourceLineIndexDefinition.TYPE_SOURCE_LINE).setSource(IOUtils.toString(new FileInputStream(TestUtils.getResource(this.getClass(),"line2_other_file.json")))).setRefresh(true).get();
-  BulkIndexer bulk=new BulkIndexer(es.client(),SourceLineIndexDefinition.INDEX_SOURCE_LINES);
+  es.client().prepareIndex(SourceLineIndexDefinition.INDEX,SourceLineIndexDefinition.TYPE).setSource(IOUtils.toString(new FileInputStream(TestUtils.getResource(this.getClass(),"line2.json")))).get();
+  es.client().prepareIndex(SourceLineIndexDefinition.INDEX,SourceLineIndexDefinition.TYPE).setSource(IOUtils.toString(new FileInputStream(TestUtils.getResource(this.getClass(),"line2_other_file.json")))).setRefresh(true).get();
   SourceLineDoc line1=new SourceLineDoc(ImmutableMap.<String,Object>builder().put(SourceLineIndexDefinition.FIELD_PROJECT_UUID,"abcd").put(SourceLineIndexDefinition.FIELD_FILE_UUID,"efgh").put(SourceLineIndexDefinition.FIELD_LINE,1).put(SourceLineIndexDefinition.FIELD_SCM_REVISION,"cafebabe").put(SourceLineIndexDefinition.FIELD_SCM_DATE,DateUtils.parseDateTime("2014-01-01T12:34:56+0100")).put(SourceLineIndexDefinition.FIELD_SCM_AUTHOR,"polop").put(SourceLineIndexDefinition.FIELD_SOURCE,"package org.sonar.server.source;").put(BaseNormalizer.UPDATED_AT_FIELD,new Date()).build());
-  Collection<SourceLineDoc> sourceLines=ImmutableList.of(line1);
-  List<Collection<SourceLineDoc>> sourceLineContainer=Lists.newArrayList();
-  sourceLineContainer.add(sourceLines);
-  indexer.indexSourceLines(bulk,sourceLineContainer.iterator());
-  assertThat(es.countDocuments(SourceLineIndexDefinition.INDEX_SOURCE_LINES,SourceLineIndexDefinition.TYPE_SOURCE_LINE)).isEqualTo(2L);
-  SearchResponse fileSearch=es.client().prepareSearch(SourceLineIndexDefinition.INDEX_SOURCE_LINES).setTypes(SourceLineIndexDefinition.TYPE_SOURCE_LINE).setQuery(QueryBuilders.termQuery(SourceLineIndexDefinition.FIELD_FILE_UUID,"efgh")).get();
+  SourceLineResultSetIterator.SourceFile file=new SourceLineResultSetIterator.SourceFile("efgh",System.currentTimeMillis());
+  file.addLine(line1);
+  indexer.index(Iterators.singletonIterator(file));
+  assertThat(countDocuments()).isEqualTo(2L);
+  SearchResponse fileSearch=es.client().prepareSearch(SourceLineIndexDefinition.INDEX).setTypes(SourceLineIndexDefinition.TYPE).setQuery(QueryBuilders.termQuery(SourceLineIndexDefinition.FIELD_FILE_UUID,"efgh")).get();
   assertThat(fileSearch.getHits().getTotalHits()).isEqualTo(1L);
   Map<String,Object> fields=fileSearch.getHits().getHits()[0].sourceAsMap();
   assertThat(fields).hasSize(8);

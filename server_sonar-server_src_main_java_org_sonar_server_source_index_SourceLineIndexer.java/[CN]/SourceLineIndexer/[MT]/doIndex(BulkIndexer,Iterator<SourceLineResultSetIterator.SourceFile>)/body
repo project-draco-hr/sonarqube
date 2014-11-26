@@ -1,0 +1,14 @@
+{
+  long maxUpdatedAt=0L;
+  bulk.start();
+  while (files.hasNext()) {
+    SourceLineResultSetIterator.SourceFile file=files.next();
+    for (    SourceLineDoc line : file.getLines()) {
+      bulk.add(newUpsertRequest(line));
+    }
+    deleteLinesFromFileAbove(file.getFileUuid(),file.getLines().size());
+    maxUpdatedAt=Math.max(maxUpdatedAt,file.getUpdatedAt());
+  }
+  bulk.stop();
+  return maxUpdatedAt;
+}
