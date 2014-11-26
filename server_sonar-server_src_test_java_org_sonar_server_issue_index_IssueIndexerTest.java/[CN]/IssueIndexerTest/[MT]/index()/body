@@ -1,0 +1,14 @@
+{
+  dbTester.prepareDbUnit(getClass(),"index.xml");
+  IssueIndexer indexer=createIndexer();
+  indexer.index();
+  List<IssueDoc> docs=esTester.getDocuments("issues","issue",IssueDoc.class);
+  assertThat(docs).hasSize(1);
+  IssueDoc doc=docs.get(0);
+  assertThat(doc.projectUuid()).isEqualTo("THE_PROJECT");
+  assertThat(doc.componentUuid()).isEqualTo("THE_FILE");
+  assertThat(doc.severity()).isEqualTo("BLOCKER");
+  assertThat(doc.ruleKey()).isEqualTo(RuleKey.of("squid","AvoidCycles"));
+  indexer.deleteProject("THE_PROJECT",true);
+  assertThat(esTester.countDocuments("issues","issue")).isZero();
+}

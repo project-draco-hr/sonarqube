@@ -1,0 +1,13 @@
+{
+  dbTester.prepareDbUnit(getClass(),"index.xml");
+  IssueAuthorizationIndexer indexer=createIndexer();
+  indexer.doIndex(0L);
+  List<SearchHit> docs=esTester.getDocuments("issues","issueAuthorization");
+  assertThat(docs).hasSize(1);
+  SearchHit doc=docs.get(0);
+  assertThat(doc.getSource().get("project")).isEqualTo("ABC");
+  assertThat((Collection)doc.getSource().get("groups")).containsOnly("devs","Anyone");
+  assertThat((Collection)doc.getSource().get("users")).containsOnly("user1");
+  indexer.deleteProject("ABC",true);
+  assertThat(esTester.countDocuments("issues","issueAuthorization")).isZero();
+}
