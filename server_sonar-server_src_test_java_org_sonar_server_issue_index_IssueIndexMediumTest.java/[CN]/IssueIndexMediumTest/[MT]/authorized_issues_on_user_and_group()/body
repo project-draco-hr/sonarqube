@@ -7,8 +7,9 @@
   tester.get(PermissionFacade.class).insertUserPermission(project1.getId(),john.getId(),UserRole.USER,session);
   GroupDto groupDto=new GroupDto().setName("sonar-users");
   db.groupDao().insert(session,groupDto);
-  tester.get(PermissionFacade.class).insertGroupPermission(project1.getId(),"sonar-users",UserRole.USER,session);
-  db.issueAuthorizationDao().synchronizeAfter(session,new Date(0));
+  session.commit();
+  MockUserSession.set().setLogin("admin").setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
+  tester.get(InternalPermissionService.class).addPermission(new PermissionChange().setComponentKey(project1.getKey()).setGroup("sonar-users").setPermission(UserRole.USER));
   db.issueDao().insert(session,IssueTesting.newDto(rule,file,project1),IssueTesting.newDto(rule,file,project2));
   session.commit();
   session.clearCache();

@@ -1,10 +1,10 @@
 {
   ComponentDto project=ComponentTesting.newProjectDto();
   db.componentDao().insert(session,project);
-  tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),DefaultGroups.ANYONE,UserRole.USER,session);
-  db.issueAuthorizationDao().synchronizeAfter(session,new Date(0));
   session.commit();
-  assertThat(tester.get(IssueAuthorizationIndex.class).getNullableByKey(project.uuid())).isNotNull();
+  MockUserSession.set().setLogin("admin").setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
+  tester.get(InternalPermissionService.class).addPermission(new PermissionChange().setComponentKey(project.getKey()).setGroup(DefaultGroups.ANYONE).setPermission(UserRole.USER));
+  assertThat(countIssueAuthorizationDocs()).isEqualTo(1);
   service.delete(project.getKey());
-  assertThat(tester.get(IssueAuthorizationIndex.class).getNullableByKey(project.uuid())).isNull();
+  assertThat(countIssueAuthorizationDocs()).isEqualTo(0);
 }

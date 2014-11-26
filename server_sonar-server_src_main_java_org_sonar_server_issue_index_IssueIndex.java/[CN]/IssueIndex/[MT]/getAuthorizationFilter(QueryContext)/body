@@ -3,10 +3,10 @@
   Set<String> groups=options.getUserGroups();
   OrFilterBuilder groupsAndUser=FilterBuilders.orFilter();
   if (user != null) {
-    groupsAndUser.add(FilterBuilders.termFilter(IssueAuthorizationNormalizer.IssueAuthorizationField.USERS.field(),user));
+    groupsAndUser.add(FilterBuilders.termFilter(IssueIndexDefinition.FIELD_AUTHORIZATION_USERS,user));
   }
   for (  String group : groups) {
-    groupsAndUser.add(FilterBuilders.termFilter(IssueAuthorizationNormalizer.IssueAuthorizationField.GROUPS.field(),group));
+    groupsAndUser.add(FilterBuilders.termFilter(IssueIndexDefinition.FIELD_AUTHORIZATION_GROUPS,group));
   }
-  return FilterBuilders.hasParentFilter(IndexDefinition.ISSUES_AUTHORIZATION.getIndexType(),QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),FilterBuilders.boolFilter().must(groupsAndUser).cache(true)));
+  return FilterBuilders.hasParentFilter(IssueIndexDefinition.TYPE_ISSUE_AUTHORIZATION,QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),FilterBuilders.boolFilter().must(groupsAndUser).cache(true)));
 }

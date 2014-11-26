@@ -3,8 +3,9 @@
   tester.get(RuleDao.class).insert(dbSession,rule);
   ComponentDto project=ComponentTesting.newProjectDto();
   tester.get(ComponentDao.class).insert(dbSession,project);
-  tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),DefaultGroups.ANYONE,UserRole.USER,dbSession);
-  dbClient.issueAuthorizationDao().synchronizeAfter(dbSession,new Date(0));
+  dbSession.commit();
+  MockUserSession.set().setLogin("admin").setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
+  tester.get(InternalPermissionService.class).addPermission(new PermissionChange().setComponentKey(project.getKey()).setGroup(DefaultGroups.ANYONE).setPermission(UserRole.USER));
   ComponentDto file=ComponentTesting.newFileDto(project);
   tester.get(ComponentDao.class).insert(dbSession,file);
   IssueDto issue=IssueTesting.newDto(rule,file,project).setIssueAttributes(KeyValueFormat.format(ImmutableMap.of("key","value")));

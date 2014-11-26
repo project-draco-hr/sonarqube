@@ -2,8 +2,8 @@
   ComponentDto project=ComponentTesting.newProjectDto().setKey("ProjectHavingModule");
   db.componentDao().insert(session,project);
   db.snapshotDao().insert(session,SnapshotTesting.createForProject(project));
-  tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),DefaultGroups.ANYONE,UserRole.USER,session);
-  db.issueAuthorizationDao().synchronizeAfter(session,new Date(0));
+  session.commit();
+  tester.get(InternalPermissionService.class).addPermission(new PermissionChange().setComponentKey(project.getKey()).setGroup(DefaultGroups.ANYONE).setPermission(UserRole.USER));
   ComponentDto module=ComponentTesting.newFileDto(project).setKey("ModuleHavingFile").setScope("PRJ").setSubProjectId(project.getId());
   db.componentDao().insert(session,module);
   db.snapshotDao().insert(session,SnapshotTesting.createForComponent(module,project));

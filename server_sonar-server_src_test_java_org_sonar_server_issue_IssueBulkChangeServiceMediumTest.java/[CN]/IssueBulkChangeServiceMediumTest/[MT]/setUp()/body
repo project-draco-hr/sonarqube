@@ -11,8 +11,8 @@
   file=ComponentTesting.newFileDto(project).setKey("MyComponent");
   tester.get(ComponentDao.class).insert(session,file);
   tester.get(SnapshotDao.class).insert(session,SnapshotTesting.createForComponent(file,project));
-  tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),DefaultGroups.ANYONE,UserRole.USER,session);
-  db.issueAuthorizationDao().synchronizeAfter(session,new Date(0));
-  userSession=MockUserSession.set().setLogin("john").addProjectPermissions(UserRole.USER,project.key());
   session.commit();
+  MockUserSession.set().setLogin("admin").setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
+  tester.get(InternalPermissionService.class).addPermission(new PermissionChange().setComponentKey(project.getKey()).setGroup(DefaultGroups.ANYONE).setPermission(UserRole.USER));
+  userSession=MockUserSession.set().setLogin("john").addProjectPermissions(UserRole.USER,project.key());
 }

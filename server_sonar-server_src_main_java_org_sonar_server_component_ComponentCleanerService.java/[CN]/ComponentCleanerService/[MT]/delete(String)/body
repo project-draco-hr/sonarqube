@@ -3,12 +3,11 @@
   try {
     ComponentDto project=dbClient.componentDao().getByKey(dbSession,projectKey);
     if (!Scopes.PROJECT.equals(project.scope())) {
-      throw new IllegalArgumentException("Only project can be deleted");
+      throw new IllegalArgumentException("Only projects can be deleted");
     }
     purgeDao.deleteResourceTree(project.getId());
-    deletePermissionIndexes(dbSession,project.uuid());
     dbSession.commit();
-    deleteIssuesFromIndex(project.uuid());
+    deleteFromIndices(project.uuid());
   }
   finally {
     MyBatis.closeQuietly(dbSession);

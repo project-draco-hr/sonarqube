@@ -1,0 +1,12 @@
+{
+  Profiling profiling=new Profiling(new Settings().setProperty(Profiling.CONFIG_PROFILING_LEVEL,Profiling.Level.BASIC.name()));
+  SearchClient searchClient=new SearchClient(new Settings(),profiling);
+  try {
+    searchClient.prepareDelete("fakes","fake","the_id").get();
+    fail();
+  }
+ catch (  IllegalStateException e) {
+    assertThat(e.getMessage()).isEqualTo("Fail to execute ES delete request of doc the_id in index fakes/fake");
+  }
+  searchClient.stop();
+}

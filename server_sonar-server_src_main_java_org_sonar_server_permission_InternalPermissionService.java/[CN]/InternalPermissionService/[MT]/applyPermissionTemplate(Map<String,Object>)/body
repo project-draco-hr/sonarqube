@@ -1,24 +1,5 @@
 {
   UserSession.get().checkLoggedIn();
   ApplyPermissionTemplateQuery query=ApplyPermissionTemplateQuery.buildFromParams(params);
-  query.validate();
-  DbSession session=dbClient.openSession(false);
-  try {
-    if (query.getSelectedComponents().size() == 1) {
-      checkProjectAdminPermission(query.getSelectedComponents().get(0));
-    }
- else {
-      checkProjectAdminPermission(null);
-      UserSession.get().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
-    }
-    for (    String componentKey : query.getSelectedComponents()) {
-      ComponentDto component=dbClient.componentDao().getByKey(session,componentKey);
-      permissionFacade.applyPermissionTemplate(session,query.getTemplateKey(),component.getId());
-      synchronizeProjectPermissions(session,component.uuid());
-    }
-    session.commit();
-  }
-  finally {
-    session.close();
-  }
+  applyPermissionTemplate(query);
 }

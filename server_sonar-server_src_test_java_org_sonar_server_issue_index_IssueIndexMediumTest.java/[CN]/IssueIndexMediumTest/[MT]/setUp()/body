@@ -9,8 +9,9 @@
   tester.get(ComponentDao.class).insert(session,project);
   file=ComponentTesting.newFileDto(project);
   tester.get(ComponentDao.class).insert(session,file);
-  tester.get(PermissionFacade.class).insertGroupPermission(project.getId(),DefaultGroups.ANYONE,UserRole.USER,session);
-  db.issueAuthorizationDao().synchronizeAfter(session,new Date(0));
+  session.commit();
+  MockUserSession.set().setLogin("admin").setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
+  tester.get(InternalPermissionService.class).addPermission(new PermissionChange().setComponentKey(project.getKey()).setGroup(DefaultGroups.ANYONE).setPermission(UserRole.USER));
   MockUserSession.set();
   session.commit();
   session.clearCache();

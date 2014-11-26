@@ -1,0 +1,14 @@
+{
+  SearchRequestBuilder req=client.nativeClient().prepareSearch(indexName).setTypes(typeName).setQuery(QueryBuilders.matchAllQuery());
+  req.setSearchType(SearchType.SCAN).setScroll(new TimeValue(60000)).setSize(100);
+  SearchResponse response=req.get();
+  List<SearchHit> result=Lists.newArrayList();
+  while (true) {
+    Iterables.addAll(result,response.getHits());
+    response=client.nativeClient().prepareSearchScroll(response.getScrollId()).setScroll(new TimeValue(600000)).execute().actionGet();
+    if (response.getHits().getHits().length == 0) {
+      break;
+    }
+  }
+  return result;
+}
