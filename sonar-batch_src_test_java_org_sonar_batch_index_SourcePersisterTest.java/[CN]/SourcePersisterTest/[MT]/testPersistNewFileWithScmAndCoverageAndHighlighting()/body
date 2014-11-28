@@ -22,11 +22,19 @@
   when(measureCache.byMetric(PROJECT_KEY + ":" + relativePathNew,CoreMetrics.OVERALL_COVERED_CONDITIONS_BY_LINE_KEY)).thenReturn(Arrays.asList(new Measure(CoreMetrics.OVERALL_COVERED_CONDITIONS_BY_LINE,"1=4")));
   SyntaxHighlightingData highlighting=new SyntaxHighlightingDataBuilder().registerHighlightingRule(0,3,TypeOfText.ANNOTATION).registerHighlightingRule(4,5,TypeOfText.COMMENT).registerHighlightingRule(7,16,TypeOfText.CONSTANT).build();
   when(componentDataCache.getData(PROJECT_KEY + ":" + relativePathNew,SnapshotDataTypes.SYNTAX_HIGHLIGHTING)).thenReturn(highlighting);
+  DefaultSymbolTableBuilder symbolBuilder=new DefaultSymbolTableBuilder(PROJECT_KEY + ":" + relativePathNew,null);
+  org.sonar.api.batch.sensor.symbol.Symbol s1=symbolBuilder.newSymbol(1,2);
+  symbolBuilder.newReference(s1,4);
+  symbolBuilder.newReference(s1,11);
+  org.sonar.api.batch.sensor.symbol.Symbol s2=symbolBuilder.newSymbol(4,6);
+  symbolBuilder.newReference(s2,0);
+  symbolBuilder.newReference(s2,7);
+  when(componentDataCache.getData(PROJECT_KEY + ":" + relativePathNew,SnapshotDataTypes.SYMBOL_HIGHLIGHTING)).thenReturn(symbolBuilder.build());
   sourcePersister.persist();
   FileSourceDto fileSourceDto=new FileSourceDao(getMyBatis()).select("uuidnew");
   assertThat(fileSourceDto.getCreatedAt()).isEqualTo(now.getTime());
   assertThat(fileSourceDto.getUpdatedAt()).isEqualTo(now.getTime());
   assertThat(fileSourceDto.getLineHashes()).isEqualTo(md5Hex("foo") + "\n" + md5Hex("bar")+ "\n"+ md5Hex("biz"));
-  assertThat(fileSourceDto.getData()).isEqualTo("123,julien,2014-10-11T16:44:02+0100,1,4,2,2,5,3,3,6,4,\"0,3,a\",foo\r\n" + "234,simon,2014-10-12T16:44:02+0100,,,,,,,,,,\"0,1,cd\",bar\r\n" + "345,julien,2014-10-13T16:44:02+0100,0,,,0,,,0,,,\"0,9,c\",biz\r\n");
-  assertThat(fileSourceDto.getDataHash()).isEqualTo("cb7bdbb98bd053c7367c92e6596b37c0");
+  assertThat(fileSourceDto.getData()).isEqualTo("123,julien,2014-10-11T16:44:02+0100,1,4,2,2,5,3,3,6,4,\"0,3,a\",\"1,2,1;0,2,2\",foo\r\n" + "234,simon,2014-10-12T16:44:02+0100,,,,,,,,,,\"0,1,cd\",\"0,1,1;0,2,2\",bar\r\n" + "345,julien,2014-10-13T16:44:02+0100,0,,,0,,,0,,,\"0,9,c\",\"4,5,1;0,2,2\",biz\r\n");
+  assertThat(fileSourceDto.getDataHash()).isEqualTo("594752666dd282f4a3bb985829c790fa");
 }

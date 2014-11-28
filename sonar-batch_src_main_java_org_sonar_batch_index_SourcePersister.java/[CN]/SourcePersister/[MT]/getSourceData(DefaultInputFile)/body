@@ -26,10 +26,11 @@
   Map<Integer,String> overallCoveredCondByLine=getLineMetric(file,CoreMetrics.OVERALL_COVERED_CONDITIONS_BY_LINE_KEY);
   SyntaxHighlightingData highlighting=loadHighlighting(file);
   String[] highlightingPerLine=computeHighlightingPerLine(file,highlighting);
+  String[] symbolReferencesPerLine=computeSymbolReferencesPerLine(file,loadSymbolReferences(file));
   ByteArrayOutputStream output=new ByteArrayOutputStream();
   CsvWriter csv=CsvWriter.of(new OutputStreamWriter(output,UTF_8));
   for (int lineIdx=1; lineIdx <= file.lines(); lineIdx++) {
-    csv.values(revisionsByLine.get(lineIdx),authorsByLine.get(lineIdx),datesByLine.get(lineIdx),utHitsByLine.get(lineIdx),utCondByLine.get(lineIdx),utCoveredCondByLine.get(lineIdx),itHitsByLine.get(lineIdx),itCondByLine.get(lineIdx),itCoveredCondByLine.get(lineIdx),overallHitsByLine.get(lineIdx),overallCondByLine.get(lineIdx),overallCoveredCondByLine.get(lineIdx),highlightingPerLine[lineIdx - 1],CharMatcher.anyOf(BOM).removeFrom(lines.get(lineIdx - 1)));
+    csv.values(revisionsByLine.get(lineIdx),authorsByLine.get(lineIdx),datesByLine.get(lineIdx),utHitsByLine.get(lineIdx),utCondByLine.get(lineIdx),utCoveredCondByLine.get(lineIdx),itHitsByLine.get(lineIdx),itCondByLine.get(lineIdx),itCoveredCondByLine.get(lineIdx),overallHitsByLine.get(lineIdx),overallCondByLine.get(lineIdx),overallCoveredCondByLine.get(lineIdx),highlightingPerLine[lineIdx - 1],symbolReferencesPerLine[lineIdx - 1],CharMatcher.anyOf(BOM).removeFrom(lines.get(lineIdx - 1)));
   }
   csv.close();
   return StringUtils.defaultIfEmpty(new String(output.toByteArray(),UTF_8),null);

@@ -1,0 +1,26 @@
+{
+  String[] result=new String[file.lines()];
+  if (symbolRefs == null) {
+    return result;
+  }
+  StringBuilder[] symbolRefsPerLine=new StringBuilder[file.lines()];
+  long[] originalLineOffsets=file.originalLineOffsets();
+  int symbolId=1;
+  for (  Symbol symbol : symbolRefs.referencesBySymbol().keySet()) {
+    int declarationStartOffset=symbol.getDeclarationStartOffset();
+    int declarationEndOffset=symbol.getDeclarationEndOffset();
+    int length=declarationEndOffset - declarationStartOffset;
+    addSymbol(symbolId,declarationStartOffset,declarationEndOffset,originalLineOffsets,symbolRefsPerLine);
+    for (    Integer referenceStartOffset : symbolRefs.referencesBySymbol().get(symbol)) {
+      if (referenceStartOffset == declarationStartOffset) {
+        continue;
+      }
+      addSymbol(symbolId,referenceStartOffset,referenceStartOffset + length,originalLineOffsets,symbolRefsPerLine);
+    }
+    symbolId++;
+  }
+  for (int i=0; i < file.lines(); i++) {
+    result[i]=symbolRefsPerLine[i] != null ? symbolRefsPerLine[i].toString() : null;
+  }
+  return result;
+}
