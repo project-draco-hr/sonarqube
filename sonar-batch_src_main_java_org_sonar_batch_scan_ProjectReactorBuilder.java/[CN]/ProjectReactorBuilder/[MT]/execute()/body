@@ -1,9 +1,18 @@
 {
-  Properties bootstrapProperties=new Properties();
-  bootstrapProperties.putAll(props.properties());
-  ProjectDefinition rootProject=defineProject(bootstrapProperties,null);
+  Properties allProperties=new Properties();
+  allProperties.putAll(taskProps.properties());
+  SortedSet<String> moduleIds=new TreeSet<String>(new Comparator<String>(){
+    @Override public int compare(    String o1,    String o2){
+      return o2.compareTo(o1);
+    }
+  }
+);
+  collectModuleIds(null,allProperties,moduleIds);
+  Map<String,Properties> propertiesByModuleId=extractPropertiesByModule(allProperties,new ArrayList<String>(moduleIds));
+  ProjectDefinition rootProject=defineRootProject(propertiesByModuleId.get(""),null);
   rootProjectWorkDir=rootProject.getWorkDir();
-  defineChildren(rootProject);
+  defineChildren(rootProject,propertiesByModuleId);
   cleanAndCheckProjectDefinitions(rootProject);
+  taskProps.properties().clear();
   return new ProjectReactor(rootProject);
 }

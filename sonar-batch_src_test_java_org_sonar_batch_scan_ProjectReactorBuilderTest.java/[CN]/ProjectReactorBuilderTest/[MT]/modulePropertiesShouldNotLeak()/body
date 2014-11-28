@@ -1,0 +1,32 @@
+{
+  ProjectDefinition projectDefinition=loadProjectDefinition("big-multi-module-definitions-all-in-root");
+  assertThat(projectDefinition.getProperties().getProperty("module11.property")).isNull();
+  ProjectDefinition module1=null;
+  ProjectDefinition module2=null;
+  for (  ProjectDefinition prj : projectDefinition.getSubProjects()) {
+    if (prj.getKey().equals("com.foo.project:module1")) {
+      module1=prj;
+    }
+ else     if (prj.getKey().equals("com.foo.project:module2")) {
+      module2=prj;
+    }
+  }
+  assertThat(module1.getProperties().getProperty("module11.property")).isNull();
+  assertThat(module1.getProperties().getProperty("property")).isNull();
+  assertThat(module2.getProperties().getProperty("module11.property")).isNull();
+  assertThat(module2.getProperties().getProperty("property")).isNull();
+  ProjectDefinition module11=null;
+  ProjectDefinition module12=null;
+  for (  ProjectDefinition prj : module1.getSubProjects()) {
+    if (prj.getKey().equals("com.foo.project:module1:module11")) {
+      module11=prj;
+    }
+ else     if (prj.getKey().equals("com.foo.project:module1:module12")) {
+      module12=prj;
+    }
+  }
+  assertThat(module11.getProperties().getProperty("module11.property")).isNull();
+  assertThat(module11.getProperties().getProperty("property")).isEqualTo("My module11 property");
+  assertThat(module12.getProperties().getProperty("module11.property")).isNull();
+  assertThat(module12.getProperties().getProperty("property")).isNull();
+}
