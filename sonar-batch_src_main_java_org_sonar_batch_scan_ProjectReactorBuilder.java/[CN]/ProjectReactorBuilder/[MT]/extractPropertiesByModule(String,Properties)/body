@@ -1,0 +1,21 @@
+{
+  Properties allProperties=new Properties();
+  allProperties.putAll(parentProperties);
+  Properties currentModuleProperties=new Properties();
+  String prefix=!currentModuleId.isEmpty() ? currentModuleId + "." : "";
+  for (  Map.Entry<Object,Object> entry : allProperties.entrySet()) {
+    String key=(String)entry.getKey();
+    int prefixLength=prefix.length();
+    if (key.startsWith(prefix)) {
+      currentModuleProperties.put(key.substring(prefixLength),entry.getValue());
+      parentProperties.remove(key);
+    }
+  }
+  String[] moduleIds=getListFromProperty(currentModuleProperties,PROPERTY_MODULES);
+  Map<String,Properties> result=new HashMap<String,Properties>();
+  for (  String moduleId : moduleIds) {
+    result.putAll(extractPropertiesByModule(moduleId,currentModuleProperties));
+  }
+  result.put(currentModuleId,currentModuleProperties);
+  return result;
+}
