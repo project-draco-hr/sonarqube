@@ -7,7 +7,7 @@
   if (!indexResponse.isAcknowledged()) {
     throw new IllegalStateException("Failed to create index " + index.getName());
   }
-  client.prepareHealth().setWaitForEvents(Priority.LANGUID).setWaitForGreenStatus().get();
+  client.waitForStatus(ClusterHealthStatus.YELLOW);
   for (  Map.Entry<String,IndexRegistry.IndexType> entry : index.getTypes().entrySet()) {
     LOGGER.info(String.format("Create type %s/%s",index.getName(),entry.getKey()));
     PutMappingResponse mappingResponse=client.preparePutMapping(index.getName()).setType(entry.getKey()).setIgnoreConflicts(false).setSource(entry.getValue().getAttributes()).get();
@@ -15,4 +15,5 @@
       throw new IllegalStateException("Failed to create type " + entry.getKey());
     }
   }
+  client.waitForStatus(ClusterHealthStatus.YELLOW);
 }
