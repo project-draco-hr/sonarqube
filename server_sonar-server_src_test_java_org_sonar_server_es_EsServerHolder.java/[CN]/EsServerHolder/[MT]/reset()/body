@@ -1,5 +1,6 @@
 {
-  TransportClient client=newClient();
+  TransportClient client=new TransportClient(ImmutableSettings.settingsBuilder().put("node.name",nodeName).put("network.bind_host","localhost").put("cluster.name",clusterName).build());
+  client.addTransportAddress(new InetSocketTransportAddress(LoopbackAddress.get().getHostAddress(),port));
   client.admin().cluster().prepareHealth().setWaitForGreenStatus().get();
   DeleteIndexResponse response=client.admin().indices().prepareDelete("_all").get();
   if (!response.isAcknowledged()) {
