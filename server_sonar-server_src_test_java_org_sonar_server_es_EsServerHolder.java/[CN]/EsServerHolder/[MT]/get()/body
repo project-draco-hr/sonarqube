@@ -1,0 +1,20 @@
+{
+  if (HOLDER == null) {
+    File homeDir=TestUtils.newTempDir("tmp-es-");
+    homeDir.delete();
+    homeDir.mkdir();
+    String clusterName="testCluster";
+    String nodeName="test";
+    int port=NetworkUtils.freePort();
+    Properties properties=new Properties();
+    properties.setProperty(ProcessConstants.CLUSTER_NAME,clusterName);
+    properties.setProperty(ProcessConstants.CLUSTER_NODE_NAME,nodeName);
+    properties.setProperty(ProcessConstants.SEARCH_PORT,String.valueOf(port));
+    properties.setProperty(ProcessConstants.PATH_HOME,homeDir.getAbsolutePath());
+    SearchServer server=new SearchServer(new Props(properties));
+    server.start();
+    HOLDER=new EsServerHolder(server,clusterName,nodeName,port);
+  }
+  HOLDER.reset();
+  return HOLDER;
+}
