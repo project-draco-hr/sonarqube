@@ -1,0 +1,22 @@
+{
+  String[] result=new String[file.lines()];
+  if (duplicationGroups == null) {
+    return result;
+  }
+  StringBuilder[] dupPerLine=new StringBuilder[file.lines()];
+  int blockId=1;
+  for (  DuplicationGroup group : duplicationGroups) {
+    addBlock(blockId,group.originBlock(),dupPerLine);
+    blockId++;
+    for (    Block dups : group.duplicates()) {
+      if (dups.resourceKey().equals(file.key())) {
+        addBlock(blockId,dups,dupPerLine);
+        blockId++;
+      }
+    }
+  }
+  for (int i=0; i < file.lines(); i++) {
+    result[i]=dupPerLine[i] != null ? dupPerLine[i].toString() : null;
+  }
+  return result;
+}
