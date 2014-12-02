@@ -2,11 +2,8 @@
   String fileKey=request.mandatoryParam("key");
   DbSession session=dbClient.openSession(false);
   try {
-    dbClient.componentDao().getByKey(session,fileKey);
-    List<String> lines=sourceService.getLinesAsTxt(session,fileKey);
-    if (lines == null) {
-      throw new NotFoundException("File '" + fileKey + "' does not exist");
-    }
+    ComponentDto componentDto=dbClient.componentDao().getByKey(session,fileKey);
+    List<String> lines=sourceService.getLinesAsTxt(componentDto.uuid(),null,null);
     IOUtils.writeLines(lines,"\n",response.stream().output(),Charsets.UTF_8);
   }
  catch (  IOException e) {

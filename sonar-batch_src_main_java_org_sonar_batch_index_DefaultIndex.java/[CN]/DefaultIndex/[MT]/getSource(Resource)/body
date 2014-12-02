@@ -1,3 +1,15 @@
 {
-  return persistence.getSource(resource);
+  Resource resource=getResource(reference);
+  if (resource instanceof File) {
+    File file=(File)resource;
+    Project module=(Project)file.getParent().getParent();
+    ProjectDefinition def=projectTree.getProjectDefinition(module);
+    try {
+      return FileUtils.readFileToString(new java.io.File(def.getBaseDir(),file.getPath()));
+    }
+ catch (    IOException e) {
+      throw new IllegalStateException("Unable to read file content " + reference,e);
+    }
+  }
+  return null;
 }

@@ -1,6 +1,7 @@
 {
-  String componentKey="src/Foo.java";
-  when(sourceService.getLinesAsHtml(eq(componentKey),anyInt(),anyInt())).thenReturn(newArrayList("/*"," * Header"," */","","public class <span class=\"sym-31 sym\">HelloWorld</span> {","}"));
-  WsTester.TestRequest request=tester.newGetRequest("api/sources","show").setParam("key",componentKey);
+  String fileKey="src/Foo.java";
+  when(componentDao.getByKey(session,fileKey)).thenReturn(file);
+  when(sourceService.getLinesAsHtml(eq(file.uuid()),anyInt(),anyInt())).thenReturn(newArrayList("/*"," * Header"," */","","public class <span class=\"sym-31 sym\">HelloWorld</span> {","}"));
+  WsTester.TestRequest request=tester.newGetRequest("api/sources","show").setParam("key",fileKey);
   request.execute().assertJson(getClass(),"show_source.json");
 }
