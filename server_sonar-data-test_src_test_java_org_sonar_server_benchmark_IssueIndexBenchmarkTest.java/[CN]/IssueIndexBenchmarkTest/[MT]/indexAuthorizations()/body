@@ -1,4 +1,5 @@
 {
+  LOGGER.info("Indexing issue authorizations");
   IssueAuthorizationIndexer indexer=tester.get(IssueAuthorizationIndexer.class);
   List<IssueAuthorizationDao.Dto> authorizations=Lists.newArrayList();
   for (int i=0; i < PROJECTS; i++) {
@@ -7,5 +8,8 @@
     authorization.addUser("admin");
     authorizations.add(authorization);
   }
+  long start=System.currentTimeMillis();
   indexer.index(authorizations);
+  long period=System.currentTimeMillis() - start;
+  LOGGER.info(String.format("%d authorizations indexed in %d ms (%d docs/second)",PROJECTS,period,1000 * PROJECTS / period));
 }
