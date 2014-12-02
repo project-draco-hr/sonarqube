@@ -1,0 +1,24 @@
+{
+  Map<Integer,String> result=new HashMap<Integer,String>();
+  if (duplicationGroups.isEmpty()) {
+    return result;
+  }
+  Map<Integer,StringBuilder> dupPerLine=new HashMap<Integer,StringBuilder>();
+  int blockId=1;
+  for (  List<Block> group : duplicationGroups) {
+    Block originBlock=group.get(0);
+    addBlock(blockId,originBlock,dupPerLine);
+    blockId++;
+    for (int i=1; i < group.size(); i++) {
+      Block duplicate=group.get(i);
+      if (duplicate.resourceKey.equals(originBlock.resourceKey)) {
+        addBlock(blockId,duplicate,dupPerLine);
+        blockId++;
+      }
+    }
+  }
+  for (  Map.Entry<Integer,StringBuilder> entry : dupPerLine.entrySet()) {
+    result.put(entry.getKey(),entry.getValue().toString());
+  }
+  return result;
+}

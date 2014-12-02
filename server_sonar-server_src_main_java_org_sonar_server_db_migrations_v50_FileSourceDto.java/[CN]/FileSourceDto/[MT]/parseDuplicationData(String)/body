@@ -1,0 +1,25 @@
+{
+  try {
+    ImmutableList.Builder<List<Block>> groups=ImmutableList.builder();
+    StringReader reader=new StringReader(data);
+    SMInputFactory inputFactory=initStax();
+    SMHierarchicCursor rootC=inputFactory.rootElementCursor(reader);
+    rootC.advance();
+    SMInputCursor groupsCursor=rootC.childElementCursor("g");
+    while (groupsCursor.getNext() != null) {
+      SMInputCursor blocksCursor=groupsCursor.childElementCursor("b");
+      ImmutableList.Builder<Block> group=ImmutableList.builder();
+      while (blocksCursor.getNext() != null) {
+        String resourceKey=blocksCursor.getAttrValue("r");
+        int firstLine=getAttrIntValue(blocksCursor,"s");
+        int numberOfLines=getAttrIntValue(blocksCursor,"l");
+        group.add(new Block(resourceKey,firstLine,numberOfLines));
+      }
+      groups.add(group.build());
+    }
+    return groups.build();
+  }
+ catch (  XMLStreamException e) {
+    throw new SonarException(e.getMessage(),e);
+  }
+}
