@@ -1,18 +1,16 @@
 {
-  Collection<SnapshotDataDto> snapshotDataEntries=Lists.newArrayList();
-  if (highlighting != null) {
-    SnapshotDataDto highlightingDto=new SnapshotDataDto();
-    highlightingDto.setData(highlighting);
-    highlightingDto.setDataType(SnapshotDataTypes.SYNTAX_HIGHLIGHTING);
-    snapshotDataEntries.add(highlightingDto);
+  if (sourceLine == null) {
+    return null;
   }
-  if (symbols != null) {
-    SnapshotDataDto symbolsDto=new SnapshotDataDto();
-    symbolsDto.setData(symbols);
-    symbolsDto.setDataType(SINGLE_LINE_SYMBOLS);
-    snapshotDataEntries.add(symbolsDto);
+  DecorationDataHolder decorationDataHolder=new DecorationDataHolder();
+  if (StringUtils.isNotBlank(highlighting)) {
+    decorationDataHolder.loadSyntaxHighlightingData(highlighting);
   }
-  List<String> decoratedSource=decorate(sourceLine,snapshotDataEntries,1,1);
+  if (StringUtils.isNotBlank(symbols)) {
+    decorationDataHolder.loadLineSymbolReferences(symbols);
+  }
+  HtmlTextDecorator textDecorator=new HtmlTextDecorator();
+  List<String> decoratedSource=textDecorator.decorateTextWithHtml(sourceLine,decorationDataHolder,1,1);
   if (decoratedSource == null) {
     return null;
   }
