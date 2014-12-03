@@ -1,8 +1,11 @@
 {
-  String componentKey="src/Foo.java";
+  String componentUuid="abcd";
   when(sourceLineIndex.getLines(anyString(),anyInt(),anyInt())).thenReturn(Lists.<SourceLineDoc>newArrayList());
+  String componentKey="componentKey";
+  when(componentService.getByUuid(componentUuid)).thenReturn(new ComponentDto().setKey(componentKey));
+  MockUserSession.set().setLogin("login").addComponentPermission(UserRole.CODEVIEWER,"polop",componentKey);
   try {
-    WsTester.TestRequest request=tester.newGetRequest("api/sources","lines").setParam("uuid",componentKey);
+    WsTester.TestRequest request=tester.newGetRequest("api/sources","lines").setParam("uuid",componentUuid);
     request.execute();
     fail();
   }

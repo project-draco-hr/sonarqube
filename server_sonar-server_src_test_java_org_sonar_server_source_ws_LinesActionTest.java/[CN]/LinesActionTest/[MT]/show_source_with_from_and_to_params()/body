@@ -1,5 +1,5 @@
 {
-  String fileKey="src/Foo.java";
+  String fileUuid="efgh";
   Map<String,Object> fieldMap=Maps.newHashMap();
   fieldMap.put(SourceLineIndexDefinition.FIELD_PROJECT_UUID,"abcd");
   fieldMap.put(SourceLineIndexDefinition.FIELD_FILE_UUID,"efgh");
@@ -15,7 +15,10 @@
   fieldMap.put(SourceLineIndexDefinition.FIELD_OVERALL_COVERED_CONDITIONS,null);
   fieldMap.put(SourceLineIndexDefinition.FIELD_DUPLICATIONS,null);
   fieldMap.put(BaseNormalizer.UPDATED_AT_FIELD,new Date());
-  when(sourceLineIndex.getLines(fileKey,3,3)).thenReturn(newArrayList(new SourceLineDoc(fieldMap)));
-  WsTester.TestRequest request=tester.newGetRequest("api/sources","lines").setParam("uuid",fileKey).setParam("from","3").setParam("to","3");
+  String componentKey="componentKey";
+  when(componentService.getByUuid(fileUuid)).thenReturn(new ComponentDto().setKey(componentKey));
+  MockUserSession.set().setLogin("login").addComponentPermission(UserRole.CODEVIEWER,"polop",componentKey);
+  when(sourceLineIndex.getLines(fileUuid,3,3)).thenReturn(newArrayList(new SourceLineDoc(fieldMap)));
+  WsTester.TestRequest request=tester.newGetRequest("api/sources","lines").setParam("uuid",fileUuid).setParam("from","3").setParam("to","3");
   request.execute().assertJson(getClass(),"show_source_with_params_from_and_to.json");
 }
