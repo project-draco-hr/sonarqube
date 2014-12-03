@@ -1,0 +1,19 @@
+{
+  if (rootProperties.containsKey(PROPERTY_MODULES)) {
+    checkMandatoryProperties(rootProperties,MANDATORY_PROPERTIES_FOR_MULTIMODULE_PROJECT);
+  }
+ else {
+    checkMandatoryProperties(rootProperties,MANDATORY_PROPERTIES_FOR_SIMPLE_PROJECT);
+  }
+  File baseDir=new File(rootProperties.get(PROPERTY_PROJECT_BASEDIR));
+  final String projectKey=rootProperties.get(CoreProperties.PROJECT_KEY_PROPERTY);
+  File workDir;
+  if (parent == null) {
+    validateDirectories(rootProperties,baseDir,projectKey);
+    workDir=initRootProjectWorkDir(baseDir);
+  }
+ else {
+    workDir=initModuleWorkDir(baseDir,rootProperties);
+  }
+  return ProjectDefinition.create().setProperties(rootProperties).setBaseDir(baseDir).setWorkDir(workDir).setBuildDir(initModuleBuildDir(baseDir,rootProperties));
+}

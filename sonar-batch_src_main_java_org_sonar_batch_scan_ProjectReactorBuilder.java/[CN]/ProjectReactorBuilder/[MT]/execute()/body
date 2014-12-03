@@ -1,13 +1,11 @@
 {
-  Properties allProperties=new Properties();
-  allProperties.putAll(taskProps.properties());
-  Map<String,Properties> propertiesByModuleId=extractPropertiesByModule("",allProperties);
+  Map<String,Map<String,String>> propertiesByModuleId=extractPropertiesByModule("",taskProps.properties());
   ProjectDefinition rootProject=defineRootProject(propertiesByModuleId.get(""),null);
   rootProjectWorkDir=rootProject.getWorkDir();
   defineChildren(rootProject,propertiesByModuleId);
   cleanAndCheckProjectDefinitions(rootProject);
   taskProps.properties().clear();
-  for (  Map.Entry<Object,Object> entry : propertiesByModuleId.get("").entrySet()) {
+  for (  Map.Entry<String,String> entry : propertiesByModuleId.get("").entrySet()) {
     taskProps.properties().put((String)entry.getKey(),(String)entry.getValue());
   }
   return new ProjectReactor(rootProject);
