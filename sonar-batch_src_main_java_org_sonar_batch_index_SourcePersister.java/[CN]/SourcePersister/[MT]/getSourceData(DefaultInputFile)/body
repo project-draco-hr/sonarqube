@@ -28,11 +28,27 @@
   String[] highlightingPerLine=computeHighlightingPerLine(file,highlighting);
   String[] symbolReferencesPerLine=computeSymbolReferencesPerLine(file,loadSymbolReferences(file));
   String[] duplicationsPerLine=computeDuplicationsPerLine(file,duplicationCache.byComponent(file.key()));
-  ByteArrayOutputStream output=new ByteArrayOutputStream();
-  CsvWriter csv=CsvWriter.of(new OutputStreamWriter(output,UTF_8));
+  StringWriter writer=new StringWriter(file.lines() * 16);
+  CsvWriter csv=CsvWriter.of(writer);
   for (int lineIdx=1; lineIdx <= file.lines(); lineIdx++) {
     csv.values(revisionsByLine.get(lineIdx),authorsByLine.get(lineIdx),datesByLine.get(lineIdx),utHitsByLine.get(lineIdx),utCondByLine.get(lineIdx),utCoveredCondByLine.get(lineIdx),itHitsByLine.get(lineIdx),itCondByLine.get(lineIdx),itCoveredCondByLine.get(lineIdx),overallHitsByLine.get(lineIdx),overallCondByLine.get(lineIdx),overallCoveredCondByLine.get(lineIdx),highlightingPerLine[lineIdx - 1],symbolReferencesPerLine[lineIdx - 1],duplicationsPerLine[lineIdx - 1],CharMatcher.anyOf(BOM).removeFrom(lines.get(lineIdx - 1)));
+    revisionsByLine.remove(lineIdx);
+    authorsByLine.remove(lineIdx);
+    datesByLine.remove(lineIdx);
+    utHitsByLine.remove(lineIdx);
+    utCondByLine.remove(lineIdx);
+    utCoveredCondByLine.remove(lineIdx);
+    itHitsByLine.remove(lineIdx);
+    itCondByLine.remove(lineIdx);
+    itCoveredCondByLine.remove(lineIdx);
+    overallHitsByLine.remove(lineIdx);
+    overallCondByLine.remove(lineIdx);
+    overallCoveredCondByLine.remove(lineIdx);
+    highlightingPerLine[lineIdx - 1]=null;
+    symbolReferencesPerLine[lineIdx - 1]=null;
+    duplicationsPerLine[lineIdx - 1]=null;
+    lines.set(lineIdx - 1,null);
   }
   csv.close();
-  return StringUtils.defaultIfEmpty(new String(output.toByteArray(),UTF_8),null);
+  return StringUtils.defaultIfEmpty(writer.toString(),null);
 }

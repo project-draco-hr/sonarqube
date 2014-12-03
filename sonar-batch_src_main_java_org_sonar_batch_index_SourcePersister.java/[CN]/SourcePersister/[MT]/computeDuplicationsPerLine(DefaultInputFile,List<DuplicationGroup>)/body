@@ -3,20 +3,26 @@
   if (duplicationGroups == null) {
     return result;
   }
+  List<DuplicationGroup> groups=new LinkedList<DuplicationGroup>(duplicationGroups);
   StringBuilder[] dupPerLine=new StringBuilder[file.lines()];
   int blockId=1;
-  for (  DuplicationGroup group : duplicationGroups) {
+  for (Iterator<DuplicationGroup> it=groups.iterator(); it.hasNext(); ) {
+    DuplicationGroup group=it.next();
     addBlock(blockId,group.originBlock(),dupPerLine);
     blockId++;
-    for (    Block dups : group.duplicates()) {
+    for (Iterator<Block> dupsIt=group.duplicates().iterator(); dupsIt.hasNext(); ) {
+      Block dups=dupsIt.next();
       if (dups.resourceKey().equals(file.key())) {
         addBlock(blockId,dups,dupPerLine);
         blockId++;
       }
+      dupsIt.remove();
     }
+    it.remove();
   }
   for (int i=0; i < file.lines(); i++) {
     result[i]=dupPerLine[i] != null ? dupPerLine[i].toString() : null;
+    dupPerLine[i]=null;
   }
   return result;
 }
