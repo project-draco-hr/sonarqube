@@ -2,8 +2,7 @@
   if (select == null || update == null) {
     throw new IllegalStateException("SELECT or UPDATE requests are not defined");
   }
-  Timer timer=new Timer("Db Migration Progress");
-  timer.schedule(progressTask,ProgressTask.PERIOD_MS,ProgressTask.PERIOD_MS);
+  progress.start();
   try {
     select.scroll(new Select.RowHandler(){
       @Override public void handle(      Select.Row row) throws SQLException {
@@ -18,10 +17,9 @@
       update.execute().commit();
     }
     update.close();
-    progressTask.log();
+    progress.log();
   }
   finally {
-    timer.cancel();
-    timer.purge();
+    progress.stop();
   }
 }

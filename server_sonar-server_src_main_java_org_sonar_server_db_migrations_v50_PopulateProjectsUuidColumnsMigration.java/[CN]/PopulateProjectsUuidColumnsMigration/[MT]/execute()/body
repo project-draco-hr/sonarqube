@@ -1,6 +1,5 @@
 {
-  Timer timer=new Timer("Db Migration Progress");
-  timer.schedule(progressTask,ProgressTask.PERIOD_MS,ProgressTask.PERIOD_MS);
+  progress.start();
   final DbSession readSession=db.openSession(false);
   final DbSession writeSession=db.openSession(true);
   try {
@@ -17,12 +16,11 @@
     readSession.commit();
     migrateComponentsWithoutUuid(readSession,writeSession);
     writeSession.commit();
-    progressTask.log();
+    progress.log();
   }
   finally {
     readSession.close();
     writeSession.close();
-    timer.cancel();
-    timer.purge();
+    progress.stop();
   }
 }

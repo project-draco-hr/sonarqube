@@ -1,6 +1,5 @@
 {
-  Timer timer=new Timer("Db Migration Progress");
-  timer.schedule(progressTask,ProgressTask.PERIOD_MS,ProgressTask.PERIOD_MS);
+  progress.start();
   DbSession session=db.openSession(false);
   try {
     Migration45Mapper mapper=session.getMapper(Migration45Mapper.class);
@@ -25,11 +24,10 @@
       }
     }
     session.commit();
-    progressTask.log();
+    progress.log();
   }
   finally {
     session.close();
-    timer.cancel();
-    timer.purge();
+    progress.stop();
   }
 }
