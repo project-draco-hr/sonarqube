@@ -1,3 +1,32 @@
 {
-  bulkRequest.get();
+  List<ActionRequest> retries=Lists.newArrayList();
+  BulkResponse response=bulkRequest.get();
+  for (  BulkItemResponse item : response.getItems()) {
+    if (item.isFailed()) {
+      ActionRequest retry=bulkRequest.request().requests().get(item.getItemId());
+      retries.add(retry);
+    }
+  }
+  if (!retries.isEmpty()) {
+    LOGGER.warn(String.format("%d index requests failed. Trying again.",retries.size()));
+    BulkRequestBuilder retryBulk=client.prepareBulk();
+    for (    ActionRequest retry : retries) {
+      retryBulk.request().add(retry);
+    }
+    BulkResponse retryBulkResponse=retryBulk.get();
+    if (retryBulkResponse.hasFailures()) {
+      LOGGER.error("New attempt to index documents failed");
+      for (int index=0; index < retryBulkResponse.getItems().length; index++) {
+        BulkItemResponse item=retryBulkResponse.getItems()[index];
+        if (item.isFailed()) {
+          StringBuilder sb=new StringBuilder();
+          String msg=sb.append("\n[").append(index).append("]: index [").append(item.getIndex()).append("], type [").append(item.getType()).append("], id [").append(item.getId()).append("], message [").append(item.getFailureMessage()).append("]").toString();
+          LOGGER.error(msg);
+        }
+      }
+    }
+ else {
+      LOGGER.info("New index attempt succeeded");
+    }
+  }
 }
