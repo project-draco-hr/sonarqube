@@ -1,13 +1,13 @@
 {
   DbSession session=db.openSession(true);
   try {
-    List<String> projectUuids=db.componentDao().findProjectUuids(session);
     synchronize(session,db.ruleDao(),index.get(RuleIndex.class));
-    issueAuthorizationIndexer.index();
-    synchronizeByProject(session,db.issueDao(),index.get(IssueIndex.class),IssueNormalizer.IssueField.PROJECT.field(),projectUuids);
     synchronize(session,db.activeRuleDao(),index.get(ActiveRuleIndex.class));
     synchronize(session,db.activityDao(),index.get(ActivityIndex.class));
-    LOG.info("Indexing of sourceLine records");
+    LOG.info("Indexing issues");
+    issueAuthorizationIndexer.index();
+    issueIndexer.indexAll();
+    LOG.info("Indexing source files");
     sourceLineIndexer.index();
     session.commit();
   }

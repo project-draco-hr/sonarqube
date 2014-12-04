@@ -1,8 +1,6 @@
 {
   ComponentDto file=ComponentTesting.newFileDto(project).setKey("sample:root:src/File.xoo");
   tester.get(ComponentDao.class).insert(session,file);
-  IssueDto issue=IssueTesting.newDto(rule,file,project);
-  db.issueDao().insert(session,issue);
   session.commit();
   MockUserSession.set().setLogin("john").addComponentPermission(UserRole.ADMIN,project.key(),project.key());
   service.updateKey(project.key(),"sample2:root");
@@ -11,8 +9,5 @@
   assertThat(service.getNullableByKey("sample2:root")).isNotNull();
   assertThat(service.getNullableByKey(file.key())).isNull();
   assertThat(service.getNullableByKey("sample2:root:src/File.xoo")).isNotNull();
-  assertThat(tester.get(IssueIndex.class).getNullableByKey(issue.getKey()).componentUuid()).isEqualTo(file.uuid());
-  assertThat(tester.get(IssueIndex.class).getNullableByKey(issue.getKey()).projectUuid()).isEqualTo(project.uuid());
-  assertThat(tester.get(SearchClient.class).prepareCount(IndexDefinition.ISSUES.getIndexName()).setTypes(IndexDefinition.ISSUES.getIndexType()).get().getCount()).isEqualTo(1);
   assertThat(db.propertiesDao().selectProjectProperties("sample2:root",session)).hasSize(1);
 }

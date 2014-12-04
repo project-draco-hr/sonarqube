@@ -1,7 +1,6 @@
 {
-  IssueDto issue=IssueTesting.newDto(rule,file,project);
-  db.issueDao().insert(session,issue);
-  session.commit();
-  Issue result=index.getByKey(issue.getKey());
-  IssueTesting.assertIsEquivalent(issue,(IssueDoc)result);
+  IssueDoc issue=IssueTesting.newDoc();
+  tester.get(IssueIndexer.class).index(Iterators.singletonIterator(issue));
+  Issue loaded=index.getByKey(issue.key());
+  assertThat(loaded).isNotNull();
 }

@@ -1,0 +1,9 @@
+{
+  db.prepareDbUnit(getClass(),"before.xml");
+  System2 system=mock(System2.class);
+  when(system.now()).thenReturn(1500000000000L);
+  DatabaseMigration migration=new FeedIssueLongDates(db.database(),system);
+  migration.execute();
+  int count=db.count("select count(*) from issues where created_at_ms is not null and updated_at_ms is not null");
+  assertThat(count).isEqualTo(2);
+}

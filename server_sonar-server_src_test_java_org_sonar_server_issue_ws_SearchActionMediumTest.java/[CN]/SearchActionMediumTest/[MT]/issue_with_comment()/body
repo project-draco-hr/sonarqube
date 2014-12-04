@@ -5,6 +5,7 @@
   tester.get(IssueChangeDao.class).insert(session,new IssueChangeDto().setIssueKey(issue.getKey()).setKey("COMMENT-ABCD").setChangeData("*My comment*").setChangeType(IssueChangeDto.TYPE_COMMENT).setUserLogin("john").setCreatedAt(DateUtils.parseDate("2014-09-09")));
   tester.get(IssueChangeDao.class).insert(session,new IssueChangeDto().setIssueKey(issue.getKey()).setKey("COMMENT-ABCE").setChangeData("Another comment").setChangeType(IssueChangeDto.TYPE_COMMENT).setUserLogin("fabrice").setCreatedAt(DateUtils.parseDate("2014-09-10")));
   session.commit();
+  tester.get(IssueIndexer.class).indexAll();
   WsTester.Result result=wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).execute();
   result.assertJson(this.getClass(),"issue_with_comment.json",false);
 }

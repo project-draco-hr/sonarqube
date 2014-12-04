@@ -1,6 +1,7 @@
 {
   db.issueDao().insert(session,IssueTesting.newDto(rule,file,project).setKee("82fd47d4-b650-4037-80bc-7b112bd4eac2"));
   session.commit();
+  tester.get(IssueIndexer.class).indexAll();
   wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).setParam(IssueFilterParameters.PROJECT_UUIDS,project.uuid()).execute().assertJson(this.getClass(),"search_by_project_uuid.json",false);
   wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).setParam(IssueFilterParameters.PROJECT_UUIDS,"unknown").execute().assertJson(this.getClass(),"no_issue.json",false);
 }

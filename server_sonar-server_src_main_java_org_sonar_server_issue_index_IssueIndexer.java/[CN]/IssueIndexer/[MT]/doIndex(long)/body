@@ -1,16 +1,3 @@
 {
-  final BulkIndexer bulk=createBulkIndexer(lastUpdatedAt == 0L);
-  DbSession dbSession=dbClient.openSession(false);
-  Connection dbConnection=dbSession.getConnection();
-  long maxDate;
-  try {
-    IssueResultSetIterator rowIt=IssueResultSetIterator.create(dbClient,dbConnection,lastUpdatedAt);
-    maxDate=doIndex(bulk,rowIt);
-    rowIt.close();
-    return maxDate;
-  }
-  finally {
-    DbUtils.closeQuietly(dbConnection);
-    dbSession.close();
-  }
+  return doIndex(createBulkIndexer(false),lastUpdatedAt);
 }

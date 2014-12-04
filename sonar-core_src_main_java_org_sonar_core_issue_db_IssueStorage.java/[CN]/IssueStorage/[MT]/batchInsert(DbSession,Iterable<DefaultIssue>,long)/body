@@ -1,0 +1,20 @@
+{
+  List<DefaultIssue> toBeUpdated=newArrayList();
+  int count=0;
+  IssueChangeMapper issueChangeMapper=session.getMapper(IssueChangeMapper.class);
+  for (  DefaultIssue issue : issues) {
+    if (issue.isNew()) {
+      doInsert(session,now,issue);
+      insertChanges(issueChangeMapper,issue);
+      if (count > BatchSession.MAX_BATCH_SIZE) {
+        session.commit();
+      }
+      count++;
+    }
+ else     if (issue.isChanged()) {
+      toBeUpdated.add(issue);
+    }
+  }
+  session.commit();
+  return toBeUpdated;
+}
