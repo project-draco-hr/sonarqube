@@ -9,10 +9,10 @@
  else {
     esSearch.setQuery(esQuery);
   }
-  esSearch.addAggregation(AggregationBuilders.terms(IssueNormalizer.IssueField.ASSIGNEE.field()).size(Integer.MAX_VALUE).field(IssueNormalizer.IssueField.ASSIGNEE.field()));
-  esSearch.addAggregation(AggregationBuilders.missing("notAssigned").field(IssueNormalizer.IssueField.ASSIGNEE.field()));
+  esSearch.addAggregation(AggregationBuilders.terms(IssueIndexDefinition.FIELD_ISSUE_ASSIGNEE).size(Integer.MAX_VALUE).field(IssueIndexDefinition.FIELD_ISSUE_ASSIGNEE));
+  esSearch.addAggregation(AggregationBuilders.missing("notAssigned").field(IssueIndexDefinition.FIELD_ISSUE_ASSIGNEE));
   SearchResponse response=esSearch.get();
-  Terms aggregation=(Terms)response.getAggregations().getAsMap().get(IssueNormalizer.IssueField.ASSIGNEE.field());
+  Terms aggregation=(Terms)response.getAggregations().getAsMap().get(IssueIndexDefinition.FIELD_ISSUE_ASSIGNEE);
   List<FacetValue> facetValues=newArrayList();
   for (  Terms.Bucket value : aggregation.getBuckets()) {
     facetValues.add(new FacetValue(value.getKey(),value.getDocCount()));
