@@ -1,0 +1,22 @@
+{
+  String fileKey=request.mandatoryParam("resource");
+  UserSession.get().checkComponentPermission(UserRole.CODEVIEWER,fileKey);
+  Integer from=request.mandatoryParamAsInt("from");
+  Integer to=request.paramAsInt("to");
+  DbSession session=dbClient.openSession(false);
+  try {
+    ComponentDto componentDto=dbClient.componentDao().getByKey(session,fileKey);
+    List<String> lines=sourceService.getLinesAsTxt(componentDto.uuid(),from,to == null ? null : to - 1);
+    JsonWriter json=response.newJsonWriter().beginArray().beginObject();
+    Integer lineCounter=from;
+    for (    String line : lines) {
+      json.prop(lineCounter.toString(),line);
+      lineCounter++;
+    }
+    json.endObject().endArray().close();
+    ;
+  }
+  finally {
+    session.close();
+  }
+}

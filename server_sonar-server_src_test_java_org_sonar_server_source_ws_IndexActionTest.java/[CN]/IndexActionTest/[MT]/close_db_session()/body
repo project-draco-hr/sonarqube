@@ -1,0 +1,12 @@
+{
+  String fileKey="src/Foo.java";
+  MockUserSession.set().addComponentPermission(UserRole.CODEVIEWER,"polop",fileKey);
+  when(componentDao.getByKey(session,fileKey)).thenThrow(new NotFoundException());
+  WsTester.TestRequest request=tester.newGetRequest("api/sources","index").setParam("resource",fileKey);
+  try {
+    request.execute();
+  }
+ catch (  NotFoundException nfe) {
+    verify(session).close();
+  }
+}
