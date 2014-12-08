@@ -1,0 +1,28 @@
+{
+  final Map<Integer,String> tagsByRuleId=Maps.newHashMap();
+  context.prepareSelect("SELECT id, system_tags, tags FROM rules").scroll(new RowHandler(){
+    @Override public void handle(    Row row) throws SQLException {
+      Integer id=row.getInt(1);
+      tagsByRuleId.put(id,TAG_JOINER.join(row.getString(2),row.getString(3)));
+    }
+  }
+);
+  MassUpdate update=context.prepareMassUpdate().rowPluralName("issues");
+  update.select("SELECT id, rule_id FROM issues WHERE tags IS NULL");
+  update.update("UPDATE issues SET tags = ?, updated_at = ? WHERE id = ?");
+  update.execute(new Handler(){
+    @Override public boolean handle(    Row row,    SqlStatement update) throws SQLException {
+      Long id=row.getLong(1);
+      Integer ruleId=row.getInt(2);
+      boolean updated=false;
+      if (tagsByRuleId.get(ruleId) != null) {
+        updated=true;
+        update.setString(1,tagsByRuleId.get(ruleId));
+        update.setLong(2,now);
+        update.setLong(3,id);
+      }
+      return updated;
+    }
+  }
+);
+}
