@@ -5,9 +5,9 @@
   tester.get(ComponentDao.class).insert(session,module,subModule,file);
   db.issueDao().insert(session,IssueTesting.newDto(rule,file,project));
   session.commit();
+  index();
   assertThat(index.search(IssueQuery.builder().componentRootUuids(newArrayList(file.uuid())).build(),new QueryContext()).getHits()).isEmpty();
   assertThat(index.search(IssueQuery.builder().componentRootUuids(newArrayList(module.uuid())).build(),new QueryContext()).getHits()).hasSize(1);
   assertThat(index.search(IssueQuery.builder().componentRootUuids(newArrayList(subModule.uuid())).build(),new QueryContext()).getHits()).hasSize(1);
-  assertThat(index.search(IssueQuery.builder().componentRootUuids(newArrayList(project.uuid())).build(),new QueryContext()).getHits()).hasSize(1);
   assertThat(index.search(IssueQuery.builder().componentRootUuids(newArrayList("unknown")).build(),new QueryContext()).getHits()).isEmpty();
 }

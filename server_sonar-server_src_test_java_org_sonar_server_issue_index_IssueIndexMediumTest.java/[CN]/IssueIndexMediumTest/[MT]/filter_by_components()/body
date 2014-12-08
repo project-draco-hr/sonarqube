@@ -4,6 +4,7 @@
   tester.get(ComponentDao.class).insert(session,file1,file2);
   db.issueDao().insert(session,IssueTesting.newDto(rule,file1,project),IssueTesting.newDto(rule,file2,project));
   session.commit();
+  index();
   assertThat(index.search(IssueQuery.builder().componentUuids(newArrayList(file1.uuid(),file2.uuid())).build(),new QueryContext()).getHits()).hasSize(2);
   assertThat(index.search(IssueQuery.builder().componentUuids(newArrayList(file1.uuid())).build(),new QueryContext()).getHits()).hasSize(1);
   assertThat(index.search(IssueQuery.builder().componentUuids(newArrayList("unknown")).build(),new QueryContext()).getHits()).isEmpty();
