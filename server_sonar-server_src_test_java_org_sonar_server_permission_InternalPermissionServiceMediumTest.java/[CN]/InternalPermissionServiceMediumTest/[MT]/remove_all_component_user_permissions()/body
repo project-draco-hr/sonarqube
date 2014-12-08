@@ -7,5 +7,9 @@
   service.removePermission(params(user.getLogin(),null,project.key(),UserRole.USER));
   session.commit();
   assertThat(tester.get(RoleDao.class).selectUserPermissions(session,user.getLogin(),project.getId())).isEmpty();
-  assertThat(countIssueAuthorizationDocs()).isEqualTo(0);
+  SearchResponse docs=getAllIndexDocs();
+  assertThat(docs.getHits().getTotalHits()).isEqualTo(1L);
+  SearchHit doc=docs.getHits().getAt(0);
+  assertThat((Collection)doc.sourceAsMap().get(IssueIndexDefinition.FIELD_AUTHORIZATION_USERS)).hasSize(0);
+  assertThat((Collection)doc.sourceAsMap().get(IssueIndexDefinition.FIELD_AUTHORIZATION_GROUPS)).hasSize(0);
 }

@@ -12,5 +12,9 @@
   service.removePermission(change);
   session.commit();
   assertThat(tester.get(RoleDao.class).selectGroupPermissions(session,group.getName(),project.getId())).hasSize(0);
-  assertThat(countIssueAuthorizationDocs()).isEqualTo(0);
+  SearchResponse docs=getAllIndexDocs();
+  assertThat(docs.getHits().getTotalHits()).isEqualTo(1L);
+  SearchHit doc=docs.getHits().getAt(0);
+  assertThat((Collection)doc.sourceAsMap().get(IssueIndexDefinition.FIELD_AUTHORIZATION_USERS)).hasSize(0);
+  assertThat((Collection)doc.sourceAsMap().get(IssueIndexDefinition.FIELD_AUTHORIZATION_GROUPS)).hasSize(0);
 }
