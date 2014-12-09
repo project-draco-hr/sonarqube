@@ -1,0 +1,11 @@
+{
+  long start=System.currentTimeMillis();
+  profiler.reset();
+  Settings settings=projectSettingsFactory.newProjectSettings(session,idUuidPair.getId());
+  PurgeConfiguration configuration=newDefaultPurgeConfiguration(settings,idUuidPair.getId());
+  cleanHistoricalData(session,configuration.rootProjectId(),settings);
+  doPurge(session,configuration);
+  deleteIndexedIssuesBefore(idUuidPair.getUuid(),configuration.maxLiveDateOfClosedIssues());
+  logProfiling(start,settings);
+  return this;
+}
