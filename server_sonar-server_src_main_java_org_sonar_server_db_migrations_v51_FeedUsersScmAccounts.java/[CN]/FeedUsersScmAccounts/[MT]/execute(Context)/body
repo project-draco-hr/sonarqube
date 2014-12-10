@@ -1,0 +1,23 @@
+{
+  final long now=system.now();
+  MassUpdate massUpdate=context.prepareMassUpdate();
+  massUpdate.select("SELECT u.id, u.login, u.email FROM users u WHERE scm_accounts IS NULL");
+  massUpdate.update("UPDATE users SET scm_accounts=?, updated_at=? WHERE id=?");
+  massUpdate.rowPluralName("users");
+  massUpdate.execute(new MassUpdate.Handler(){
+    @Override public boolean handle(    Select.Row row,    SqlStatement update) throws SQLException {
+      Long id=row.getLong(1);
+      String login=row.getString(2);
+      String email=row.getString(3);
+      StringWriter writer=new StringWriter(2);
+      CsvWriter csv=CsvWriter.of(writer);
+      csv.values(login,email);
+      csv.close();
+      update.setString(1,writer.toString());
+      update.setLong(2,now);
+      update.setLong(3,id);
+      return true;
+    }
+  }
+);
+}
