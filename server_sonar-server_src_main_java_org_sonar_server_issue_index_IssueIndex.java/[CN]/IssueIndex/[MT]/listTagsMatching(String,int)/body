@@ -1,0 +1,14 @@
+{
+  SearchRequestBuilder count=getClient().prepareSearch(IssueIndexDefinition.INDEX).setTypes(IssueIndexDefinition.TYPE_ISSUE).setQuery(QueryBuilders.matchAllQuery());
+  TermsBuilder aggreg=AggregationBuilders.terms("_ref").field(IssueIndexDefinition.FIELD_ISSUE_TAGS).size(pageSize).order(Order.term(true)).minDocCount(1L);
+  if (query != null) {
+    aggreg.include(".*" + query + ".*");
+  }
+  Terms result=count.addAggregation(aggreg).get().getAggregations().get("_ref");
+  return Collections2.transform(result.getBuckets(),new Function<Bucket,String>(){
+    @Override public String apply(    Bucket bucket){
+      return bucket.getKey();
+    }
+  }
+);
+}
