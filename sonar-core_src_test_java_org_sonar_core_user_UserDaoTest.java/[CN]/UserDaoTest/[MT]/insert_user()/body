@@ -1,6 +1,14 @@
 {
-  Date date=DateUtils.parseDate("2014-06-20");
+  Long date=DateUtils.parseDate("2014-06-20").getTime();
   UserDto userDto=new UserDto().setId(1L).setLogin("john").setName("John").setEmail("jo@hn.com").setCreatedAt(date).setUpdatedAt(date);
   dao.insert(session,userDto);
-  checkTables("insert");
+  session.commit();
+  UserDto user=dao.selectActiveUserByLogin("john");
+  assertThat(user).isNotNull();
+  assertThat(user.getId()).isNotNull();
+  assertThat(user.getLogin()).isEqualTo("john");
+  assertThat(user.getName()).isEqualTo("John");
+  assertThat(user.getEmail()).isEqualTo("jo@hn.com");
+  assertThat(user.getCreatedAt()).isEqualTo(date);
+  assertThat(user.getUpdatedAt()).isEqualTo(date);
 }
