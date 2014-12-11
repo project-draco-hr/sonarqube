@@ -1,0 +1,22 @@
+{
+  IssueDto issue=newIssue();
+  tester.get(IssueDao.class).insert(session,issue);
+  session.commit();
+  index();
+  assertThat(indexClient.get(IssueIndex.class).getByKey(issue.getKey()).tags()).isEmpty();
+  service.setTags(issue.getKey(),ImmutableSet.of("bug","Convention"));
+  assertThat(indexClient.get(IssueIndex.class).getByKey(issue.getKey()).tags()).containsOnly("bug","convention");
+  service.setTags(issue.getKey(),Sets.newHashSet("security",null,"","convention"));
+  assertThat(indexClient.get(IssueIndex.class).getByKey(issue.getKey()).tags()).containsOnly("security","convention");
+  try {
+    service.setTags(issue.getKey(),ImmutableSet.of("pol op"));
+  }
+ catch (  Exception exception) {
+    assertThat(exception).isInstanceOf(IllegalArgumentException.class);
+  }
+  assertThat(indexClient.get(IssueIndex.class).getByKey(issue.getKey()).tags()).containsOnly("security","convention");
+  service.setTags(issue.getKey(),ImmutableSet.of("convention","security"));
+  assertThat(indexClient.get(IssueIndex.class).getByKey(issue.getKey()).tags()).containsOnly("security","convention");
+  service.setTags(issue.getKey(),ImmutableSet.<String>of());
+  assertThat(indexClient.get(IssueIndex.class).getByKey(issue.getKey()).tags()).isEmpty();
+}
