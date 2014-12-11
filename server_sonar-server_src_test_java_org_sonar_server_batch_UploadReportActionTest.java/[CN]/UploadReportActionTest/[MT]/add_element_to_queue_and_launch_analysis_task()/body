@@ -3,7 +3,9 @@
   Request request=mock(Request.class);
   when(request.mandatoryParam(UploadReportAction.PARAM_PROJECT_KEY)).thenReturn(DEFAULT_PROJECT_KEY);
   when(request.mandatoryParam(UploadReportAction.PARAM_SNAPSHOT)).thenReturn("123");
+  InputStream reportData=IOUtils.toInputStream("report-data");
+  when(request.paramAsInputStream(UploadReportAction.PARAM_REPORT_DATA)).thenReturn(reportData);
   sut.handle(request,response);
-  verify(queue).add(DEFAULT_PROJECT_KEY,123L,null);
+  verify(queue).add(DEFAULT_PROJECT_KEY,123L,reportData);
   verify(analysisTaskLauncher).startAnalysisTaskNow();
 }
