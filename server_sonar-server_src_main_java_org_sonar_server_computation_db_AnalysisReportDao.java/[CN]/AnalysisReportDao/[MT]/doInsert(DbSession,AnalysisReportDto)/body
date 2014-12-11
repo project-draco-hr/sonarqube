@@ -1,24 +1,28 @@
 {
   Connection connection=session.getConnection();
+  PreparedStatement ps=null;
   try {
-    PreparedStatement preparedStatement=connection.prepareStatement(INSERT_QUERY);
-    preparedStatement.setString(1,report.getProjectKey());
-    preparedStatement.setLong(2,report.getSnapshotId());
-    preparedStatement.setString(3,report.getStatus().toString());
+    ps=connection.prepareStatement(INSERT_QUERY);
+    ps.setString(1,report.getProjectKey());
+    ps.setLong(2,report.getSnapshotId());
+    ps.setString(3,report.getStatus().toString());
     InputStreamReader inputStreamReader=null;
     if (report.getData() != null) {
       inputStreamReader=new InputStreamReader(report.getData(),Charsets.UTF_8);
     }
-    preparedStatement.setCharacterStream(4,inputStreamReader);
-    preparedStatement.setTimestamp(5,dateToTimestamp(report.getCreatedAt()));
-    preparedStatement.setTimestamp(6,dateToTimestamp(report.getUpdatedAt()));
-    preparedStatement.setTimestamp(7,dateToTimestamp(report.getStartedAt()));
-    preparedStatement.setTimestamp(8,dateToTimestamp(report.getFinishedAt()));
-    preparedStatement.executeUpdate();
+    ps.setCharacterStream(4,inputStreamReader);
+    ps.setTimestamp(5,dateToTimestamp(report.getCreatedAt()));
+    ps.setTimestamp(6,dateToTimestamp(report.getUpdatedAt()));
+    ps.setTimestamp(7,dateToTimestamp(report.getStartedAt()));
+    ps.setTimestamp(8,dateToTimestamp(report.getFinishedAt()));
+    ps.executeUpdate();
     connection.commit();
   }
  catch (  SQLException e) {
-    e.printStackTrace();
+    throw new IllegalStateException(String.format("Failed to insert %s in the database",report),e);
+  }
+ finally {
+    DatabaseUtils.closeQuietly(ps);
   }
   return report;
 }
