@@ -1,0 +1,27 @@
+{
+  Connection connection=session.getConnection();
+  InputStream reportDataStream=null;
+  PreparedStatement ps=null;
+  try {
+    ps=connection.prepareStatement(SELECT_REPORT_DATA);
+    ps.setLong(1,id);
+    ResultSet rs=ps.executeQuery();
+    if (rs.next()) {
+      reportDataStream=rs.getBinaryStream(1);
+      File directory=tempFolder.newDir();
+      ZipUtils.unzip(reportDataStream,directory);
+      return directory.getAbsolutePath();
+    }
+  }
+ catch (  SQLException e) {
+    throw new IllegalStateException(String.format("Failed to read report '%d' in the database",id),e);
+  }
+catch (  IOException e) {
+    throw new IllegalStateException(String.format("Failed to decompress report '%d'",id),e);
+  }
+ finally {
+    IOUtils.closeQuietly(reportDataStream);
+    DatabaseUtils.closeQuietly(ps);
+  }
+  return "";
+}

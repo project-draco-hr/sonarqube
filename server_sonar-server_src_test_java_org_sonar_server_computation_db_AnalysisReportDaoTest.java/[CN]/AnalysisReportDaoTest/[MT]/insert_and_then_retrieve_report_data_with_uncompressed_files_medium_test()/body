@@ -1,0 +1,13 @@
+{
+  db.prepareDbUnit(getClass(),"empty.xml");
+  AnalysisReportDto report=newDefaultAnalysisReport();
+  InputStream zip=getClass().getResource("/org/sonar/server/computation/db/AnalysisReportDaoTest/zip.zip").openStream();
+  report.setData(zip);
+  File toDir=new File("target/tmp/unzip-report-in-database/");
+  when(tempFolder.newDir()).thenReturn(toDir);
+  sut.insert(session,report);
+  session.commit();
+  IOUtils.closeQuietly(zip);
+  sut.getUncompressedReport(session,1L);
+  assertThat(toDir.list()).hasSize(3);
+}
