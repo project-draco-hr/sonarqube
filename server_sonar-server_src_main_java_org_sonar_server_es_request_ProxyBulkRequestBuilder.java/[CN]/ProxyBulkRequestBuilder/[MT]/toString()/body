@@ -1,0 +1,24 @@
+{
+  StringBuilder message=new StringBuilder();
+  message.append("Bulk[");
+  for (int i=0; i < request.requests().size(); i++) {
+    ActionRequest item=request.requests().get(i);
+    if (item instanceof IndexRequest) {
+      IndexRequest request=(IndexRequest)item;
+      message.append(String.format("index id '%s' in %s/%s",request.id(),request.index(),request.type()));
+    }
+ else     if (item instanceof UpdateRequest) {
+      UpdateRequest request=(UpdateRequest)item;
+      message.append(String.format("update id '%s' in %s/%s",request.id(),request.index(),request.type()));
+    }
+ else     if (item instanceof DeleteRequest) {
+      DeleteRequest request=(DeleteRequest)item;
+      message.append(String.format("delete id '%s' from %s/%s",request.id(),request.index(),request.type()));
+    }
+    if (i < request.requests().size() - 1) {
+      message.append(", ");
+    }
+  }
+  message.append("]");
+  return message.toString();
+}

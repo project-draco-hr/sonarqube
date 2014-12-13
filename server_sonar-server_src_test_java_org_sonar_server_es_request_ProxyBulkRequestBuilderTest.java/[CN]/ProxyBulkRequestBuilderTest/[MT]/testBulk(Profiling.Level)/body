@@ -1,0 +1,9 @@
+{
+  esTester.setProfilingLevel(profilingLevel);
+  BulkRequestBuilder req=esTester.client().prepareBulk();
+  req.add(new UpdateRequest(FakeIndexDefinition.INDEX,FakeIndexDefinition.TYPE,"key1").doc(FakeIndexDefinition.newDoc(1)));
+  req.add(new DeleteRequest(FakeIndexDefinition.INDEX,FakeIndexDefinition.TYPE,"key2"));
+  req.add(new IndexRequest(FakeIndexDefinition.INDEX,FakeIndexDefinition.TYPE,"key3").source(FakeIndexDefinition.newDoc(3)));
+  BulkResponse response=req.get();
+  assertThat(response.getItems()).hasSize(3);
+}
