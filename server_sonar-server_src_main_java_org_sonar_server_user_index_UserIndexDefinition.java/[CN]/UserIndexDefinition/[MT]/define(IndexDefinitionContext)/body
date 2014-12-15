@@ -1,0 +1,16 @@
+{
+  NewIndex index=context.create(INDEX);
+  boolean clusterMode=settings.getBoolean(ProcessConstants.CLUSTER_ACTIVATE);
+  if (clusterMode) {
+    index.getSettings().put(IndexMetaData.SETTING_NUMBER_OF_SHARDS,4);
+    index.getSettings().put(IndexMetaData.SETTING_NUMBER_OF_REPLICAS,1);
+  }
+  NewIndex.NewIndexType issueMapping=index.createType(TYPE_USER);
+  issueMapping.setAttribute("_id",ImmutableMap.of("path",FIELD_LOGIN));
+  issueMapping.stringFieldBuilder(FIELD_NAME).build();
+  issueMapping.stringFieldBuilder(FIELD_EMAIL).enableSorting().build();
+  issueMapping.createDateTimeField(FIELD_CREATED_AT);
+  issueMapping.createDateTimeField(FIELD_UPDATED_AT);
+  issueMapping.createBooleanField(FIELD_ACTIVE);
+  issueMapping.stringFieldBuilder(FIELD_SCM_ACCOUNTS).build();
+}
