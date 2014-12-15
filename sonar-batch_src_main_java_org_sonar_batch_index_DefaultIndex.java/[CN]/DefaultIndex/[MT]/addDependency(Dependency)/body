@@ -1,5 +1,9 @@
 {
-  Dependency existingDep=getEdge(dependency.getFrom(),dependency.getTo());
+  Resource from=getResource(dependency.getFrom());
+  Preconditions.checkArgument(from != null,dependency.getFrom() + " is not indexed");
+  Resource to=getResource(dependency.getTo());
+  Preconditions.checkArgument(to != null,dependency.getTo() + " is not indexed");
+  Dependency existingDep=getEdge(from,to);
   if (existingDep != null) {
     return existingDep;
   }
@@ -8,7 +12,7 @@
     addDependency(parentDependency);
   }
   if (registerDependency(dependency)) {
-    persistence.saveDependency(currentProject,dependency,parentDependency);
+    dependencyPersister.saveDependency(currentProject,from,to,dependency,parentDependency);
   }
   return dependency;
 }

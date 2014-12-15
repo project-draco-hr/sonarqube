@@ -1,12 +1,18 @@
 {
-  Snapshot moduleSnapshot=snapshotsByResource.get(project);
-  Integer moduleId=moduleSnapshot.getResourceId();
+  BatchResource moduleResource=resourceCache.get(project.getEffectiveKey());
+  Integer moduleId=moduleResource.resource().getId();
   ResourceModel model=findOrCreateModel(resource,parentReference != null ? parentReference : project);
   model.setRootId(moduleId);
   model=session.save(model);
   resource.setId(model.getId());
   resource.setUuid(model.getUuid());
-  Snapshot parentSnapshot=(Snapshot)ObjectUtils.defaultIfNull(getSnapshot(parentReference),moduleSnapshot);
+  Snapshot parentSnapshot;
+  if (parentReference != null) {
+    parentSnapshot=resourceCache.get(parentReference.getEffectiveKey()).snapshot();
+  }
+ else {
+    parentSnapshot=moduleResource.snapshot();
+  }
   Snapshot snapshot=new Snapshot(model,parentSnapshot);
   snapshot.setBuildDate(new Date());
   snapshot=session.save(snapshot);

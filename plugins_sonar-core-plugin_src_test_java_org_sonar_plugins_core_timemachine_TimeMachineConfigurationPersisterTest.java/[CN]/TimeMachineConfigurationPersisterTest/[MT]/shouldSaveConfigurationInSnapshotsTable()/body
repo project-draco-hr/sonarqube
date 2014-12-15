@@ -5,7 +5,10 @@
   PastSnapshot vs3=new PastSnapshot("version",DateUtils.parseDate("2008-12-13"),getSession().getSingleResult(Snapshot.class,"id",300)).setModeParameter("1.2.3").setIndex(3);
   when(timeMachineConfiguration.getProjectPastSnapshots()).thenReturn(Arrays.asList(vs1,vs3));
   Snapshot projectSnapshot=getSession().getSingleResult(Snapshot.class,"id",1000);
-  TimeMachineConfigurationPersister persister=new TimeMachineConfigurationPersister(timeMachineConfiguration,projectSnapshot,getSession());
-  persister.persistConfiguration();
+  ResourceCache resourceCache=new ResourceCache();
+  Project project=new Project("foo");
+  resourceCache.add(project,projectSnapshot);
+  TimeMachineConfigurationPersister persister=new TimeMachineConfigurationPersister(timeMachineConfiguration,resourceCache,getSession());
+  persister.persistConfiguration(project);
   checkTables("shouldSaveConfigurationInSnapshotsTable","snapshots");
 }

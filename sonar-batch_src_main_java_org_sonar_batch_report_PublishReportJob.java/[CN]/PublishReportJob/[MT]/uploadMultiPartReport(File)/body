@@ -1,0 +1,27 @@
+{
+  LOG.debug("Publish results");
+  URL url;
+  try {
+    int snapshotId=resourceCache.get(project.getEffectiveKey()).snapshotId();
+    url=new URL(serverClient.getURL() + "/batch/upload_report?project=" + project.getEffectiveKey()+ "&snapshot="+ snapshotId);
+  }
+ catch (  MalformedURLException e) {
+    throw new IllegalArgumentException("Invalid URL",e);
+  }
+  HttpRequest request=HttpRequest.post(url);
+  request.trustAllCerts();
+  request.trustAllHosts();
+  request.header("User-Agent",String.format("SonarQube %s",server.getVersion()));
+  request.basic(serverClient.getLogin(),serverClient.getPassword());
+  request.part("report",report);
+  if (!request.ok()) {
+    int responseCode=request.code();
+    if (responseCode == 401) {
+      throw new IllegalStateException(String.format(serverClient.getMessageWhenNotAuthorized(),CoreProperties.LOGIN,CoreProperties.PASSWORD));
+    }
+    if (responseCode == 403) {
+      throw new IllegalStateException(request.body());
+    }
+    throw new IllegalStateException(String.format("Fail to execute request [code=%s, url=%s]: %s",responseCode,url,request.body()));
+  }
+}

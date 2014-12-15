@@ -1,14 +1,13 @@
 {
   DbSession session=mybatis.openSession(true);
   try {
-    for (    Map.Entry<String,Snapshot> componentEntry : snapshots.snapshots()) {
-      String componentKey=componentEntry.getKey();
-      Snapshot snapshot=componentEntry.getValue();
+    for (    BatchResource batchResource : resourceCache.all()) {
+      String componentKey=batchResource.resource().getEffectiveKey();
       String fileHashesdata=data.getStringData(componentKey,SnapshotDataTypes.FILE_HASHES);
       if (fileHashesdata != null) {
         SnapshotDataDto dto=new SnapshotDataDto();
-        dto.setSnapshotId(snapshot.getId());
-        dto.setResourceId(snapshot.getResourceId());
+        dto.setSnapshotId(batchResource.snapshotId());
+        dto.setResourceId(batchResource.resource().getId());
         dto.setDataType(SnapshotDataTypes.FILE_HASHES);
         dto.setData(fileHashesdata);
         dao.insert(session,dto);
