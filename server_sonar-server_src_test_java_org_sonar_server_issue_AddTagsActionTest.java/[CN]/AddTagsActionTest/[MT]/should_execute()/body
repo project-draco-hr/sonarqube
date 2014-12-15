@@ -1,0 +1,10 @@
+{
+  Map<String,Object> properties=newHashMap();
+  properties.put("add_tags.tags","tag2,tag3");
+  DefaultIssue issue=mock(DefaultIssue.class);
+  when(issue.tags()).thenReturn(ImmutableSet.of("tag1","tag3"));
+  Action.Context context=mock(Action.Context.class);
+  when(context.issue()).thenReturn(issue);
+  action.execute(properties,context);
+  verify(issueUpdater).setTags(eq(issue),(Collection<String>)Matchers.argThat(org.hamcrest.Matchers.containsInAnyOrder("tag1","tag2","tag3")),any(IssueChangeContext.class));
+}
