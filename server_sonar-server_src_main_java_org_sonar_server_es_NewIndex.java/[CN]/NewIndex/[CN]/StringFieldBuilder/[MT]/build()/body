@@ -1,4 +1,5 @@
 {
+  validate();
   Map<String,Object> hash=new TreeMap<String,Object>();
   if (wordSearch || sortable || gramSearch) {
     hash.put("type","multi_field");
@@ -12,11 +13,11 @@
     if (gramSearch) {
       multiFields.put(IndexField.SEARCH_PARTIAL_SUFFIX,ImmutableSortedMap.of("type","string","index","analyzed","index_analyzer","index_grams","search_analyzer","search_grams"));
     }
-    multiFields.put(fieldName,NOT_ANALYZED);
+    multiFields.put(fieldName,ImmutableMap.of("type","string","index","not_analyzed","omit_norms","true","doc_values",docValues));
     hash.put("fields",multiFields);
   }
  else {
-    hash.putAll(NOT_ANALYZED);
+    hash.putAll(ImmutableMap.of("type","string","index","not_analyzed","omit_norms","true","doc_values",docValues));
   }
   indexType.setProperty(fieldName,hash);
 }
