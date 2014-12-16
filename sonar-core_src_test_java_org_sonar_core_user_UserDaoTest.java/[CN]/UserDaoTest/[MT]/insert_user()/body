@@ -1,6 +1,6 @@
 {
   Long date=DateUtils.parseDate("2014-06-20").getTime();
-  UserDto userDto=new UserDto().setId(1L).setLogin("john").setName("John").setEmail("jo@hn.com").setCreatedAt(date).setUpdatedAt(date);
+  UserDto userDto=new UserDto().setId(1L).setLogin("john").setName("John").setEmail("jo@hn.com").setScmAccounts("jo.hn,john2").setActive(true).setSalt("1234").setCryptedPassword("abcd").setCreatedAt(date).setUpdatedAt(date);
   dao.insert(session,userDto);
   session.commit();
   UserDto user=dao.selectActiveUserByLogin("john");
@@ -9,6 +9,10 @@
   assertThat(user.getLogin()).isEqualTo("john");
   assertThat(user.getName()).isEqualTo("John");
   assertThat(user.getEmail()).isEqualTo("jo@hn.com");
+  assertThat(user.isActive()).isTrue();
+  assertThat(user.getScmAccounts()).isEqualTo("jo.hn,john2");
+  assertThat(user.getSalt()).isEqualTo("1234");
+  assertThat(user.getCryptedPassword()).isEqualTo("abcd");
   assertThat(user.getCreatedAt()).isEqualTo(date);
   assertThat(user.getUpdatedAt()).isEqualTo(date);
 }
