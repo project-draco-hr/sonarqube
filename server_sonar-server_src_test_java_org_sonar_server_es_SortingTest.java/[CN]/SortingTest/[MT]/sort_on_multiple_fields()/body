@@ -1,0 +1,15 @@
+{
+  Sorting sorting=new Sorting();
+  sorting.add("fileLine","file");
+  sorting.add("fileLine","line");
+  sorting.add("fileLine","severity").reverse();
+  sorting.add("fileLine","key").missingLast();
+  SearchRequestBuilder request=new SearchRequestBuilder(mock(InternalClient.class));
+  sorting.fill(request,"fileLine",true);
+  List<SortBuilder> fields=fields(request);
+  assertThat(fields).hasSize(4);
+  expectField(fields.get(0),"file","_first",SortOrder.ASC);
+  expectField(fields.get(1),"line","_first",SortOrder.ASC);
+  expectField(fields.get(2),"severity","_first",SortOrder.DESC);
+  expectField(fields.get(3),"key","_last",SortOrder.ASC);
+}

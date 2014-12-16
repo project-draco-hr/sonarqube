@@ -1,23 +1,10 @@
 {
   String sortField=query.sort();
   if (sortField != null) {
-    Boolean asc=query.asc();
-    List<IndexField> fields=toIndexFields(sortField);
-    for (    IndexField field : fields) {
-      FieldSortBuilder sortBuilder=SortBuilders.fieldSort(field.sortField());
-      if (asc != null && asc) {
-        sortBuilder.missing("_first");
-        sortBuilder.order(SortOrder.ASC);
-      }
- else {
-        sortBuilder.missing("_last");
-        sortBuilder.order(SortOrder.DESC);
-      }
-      esSearch.addSort(sortBuilder);
-    }
+    boolean asc=BooleanUtils.isTrue(query.asc());
+    sorting.fill(esRequest,sortField,asc);
   }
  else {
-    esSearch.addSort(IssueNormalizer.IssueField.ISSUE_UPDATED_AT.sortField(),SortOrder.DESC);
-    esSearch.addSort(IssueNormalizer.IssueField.KEY.sortField(),SortOrder.ASC);
+    sorting.fillDefault(esRequest);
   }
 }
