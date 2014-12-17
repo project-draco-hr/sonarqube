@@ -1,0 +1,27 @@
+{
+  LOGGER.info("Scroll table FILE_SOURCES");
+  DbClient dbClient=new DbClient(dbTester.database(),dbTester.myBatis());
+  Connection connection=dbTester.openConnection();
+  AtomicLong counter=new AtomicLong();
+  ProgressTask progress=new ProgressTask(LOGGER,"source file",counter);
+  Timer timer=new Timer("SourceDbScroll");
+  timer.schedule(progress,ProgressTask.PERIOD_MS,ProgressTask.PERIOD_MS);
+  try {
+    long start=System.currentTimeMillis();
+    SourceLineResultSetIterator it=SourceLineResultSetIterator.create(dbClient,connection,0L);
+    while (it.hasNext()) {
+      SourceLineResultSetIterator.SourceFile row=it.next();
+      assertThat(row.getLines().size()).isEqualTo(3220);
+      assertThat(row.getFileUuid()).isNotEmpty();
+      counter.incrementAndGet();
+    }
+    long end=System.currentTimeMillis();
+    long period=end - start;
+    long throughputPerSecond=1000L * counter.get() / period;
+    LOGGER.info(String.format("%d FILE_SOURCES rows scrolled in %d ms (%d rows/second)",counter.get(),period,throughputPerSecond));
+  }
+  finally {
+    DbUtils.closeQuietly(connection);
+    timer.cancel();
+  }
+}
