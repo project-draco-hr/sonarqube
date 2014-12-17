@@ -6,7 +6,14 @@
   StringBuilder[] symbolRefsPerLine=new StringBuilder[file.lines()];
   long[] originalLineOffsets=file.originalLineOffsets();
   int symbolId=1;
-  for (  Symbol symbol : symbolRefs.referencesBySymbol().keySet()) {
+  List<Symbol> symbols=new ArrayList<Symbol>(symbolRefs.referencesBySymbol().keySet());
+  Collections.sort(symbols,new Comparator<Symbol>(){
+    @Override public int compare(    Symbol o1,    Symbol o2){
+      return o1.getDeclarationStartOffset() - o2.getDeclarationStartOffset();
+    }
+  }
+);
+  for (  Symbol symbol : symbols) {
     int declarationStartOffset=symbol.getDeclarationStartOffset();
     int declarationEndOffset=symbol.getDeclarationEndOffset();
     int length=declarationEndOffset - declarationStartOffset;
