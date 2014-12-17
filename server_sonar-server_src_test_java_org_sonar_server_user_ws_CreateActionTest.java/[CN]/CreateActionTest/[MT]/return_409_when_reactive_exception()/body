@@ -1,0 +1,13 @@
+{
+  doThrow(new ReactivationException("Already exists","john")).when(service).create(any(NewUser.class));
+  Map<String,Object> userDocMap=newHashMap();
+  userDocMap.put("login","john");
+  userDocMap.put("name","John");
+  userDocMap.put("email","john@email.com");
+  userDocMap.put("scmAccounts",newArrayList("jn"));
+  userDocMap.put("active",true);
+  userDocMap.put("createdAt",15000L);
+  userDocMap.put("updatedAt",15000L);
+  when(service.getByLogin("john")).thenReturn(new UserDoc(userDocMap));
+  tester.newPostRequest("api/users","create").setParam("login","john").setParam("name","John2").setParam("email","john2@email.com").setParam("scm_accounts","jn2").setParam("password","12345").setParam("password_confirmation","12345").execute().assertStatus(409).assertJson(getClass(),"return_409_when_reactive_exception.json");
+}
