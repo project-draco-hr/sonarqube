@@ -3,7 +3,8 @@
   GroupDto userGroup=new GroupDto().setName(CoreProperties.CORE_DEFAULT_GROUP_DEFAULT_VALUE);
   dbClient.groupDao().insert(session,userGroup);
   session.commit();
-  service.create(NewUser.create().setLogin("user").setName("User").setEmail("user@mail.com").setPassword("password").setPasswordConfirmation("password").setScmAccounts(newArrayList("u1","u_1")));
-  assertThat(tester.get(UserDao.class).selectNullableByLogin(session,"user")).isNotNull();
+  boolean result=service.create(NewUser.create().setLogin("user").setName("User").setEmail("user@mail.com").setPassword("password").setPasswordConfirmation("password").setScmAccounts(newArrayList("u1","u_1")));
+  assertThat(result).isFalse();
+  assertThat(dbClient.userDao().selectNullableByLogin(session,"user")).isNotNull();
   assertThat(esClient.prepareGet(UserIndexDefinition.INDEX,UserIndexDefinition.TYPE_USER,"user").get().isExists()).isTrue();
 }

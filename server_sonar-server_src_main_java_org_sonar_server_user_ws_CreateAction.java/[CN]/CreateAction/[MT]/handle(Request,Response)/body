@@ -1,11 +1,6 @@
 {
   String login=request.mandatoryParam(PARAM_LOGIN);
-  NewUser newUser=NewUser.create().setLogin(login).setName(request.mandatoryParam(PARAM_NAME)).setEmail(request.param(PARAM_EMAIL)).setScmAccounts(request.paramAsStrings(PARAM_SCM_ACCOUNTS)).setPassword(request.mandatoryParam(PARAM_PASSWORD)).setPasswordConfirmation(request.mandatoryParam(PARAM_PASSWORD_CONFIRMATION)).setPreventReactivation(request.mandatoryParamAsBoolean(PARAM_PREVENT_REACTIVATION));
-  try {
-    service.create(newUser);
-    writeResponse(response,login);
-  }
- catch (  ReactivationException e) {
-    write409(response,login);
-  }
+  NewUser newUser=NewUser.create().setLogin(login).setName(request.mandatoryParam(PARAM_NAME)).setEmail(request.param(PARAM_EMAIL)).setScmAccounts(request.paramAsStrings(PARAM_SCM_ACCOUNTS)).setPassword(request.mandatoryParam(PARAM_PASSWORD)).setPasswordConfirmation(request.mandatoryParam(PARAM_PASSWORD_CONFIRMATION));
+  boolean isUserReactivated=service.create(newUser);
+  writeResponse(response,login,isUserReactivated);
 }

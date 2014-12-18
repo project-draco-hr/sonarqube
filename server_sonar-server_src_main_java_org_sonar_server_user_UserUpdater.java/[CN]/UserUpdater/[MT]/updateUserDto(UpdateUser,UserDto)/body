@@ -1,0 +1,25 @@
+{
+  List<Message> messages=newArrayList();
+  String name=updateUser.name();
+  if (updateUser.isNameChanged()) {
+    validateNameFormat(name,messages);
+    userDto.setName(name);
+  }
+  String email=updateUser.email();
+  if (updateUser.isEmailChanged()) {
+    validateEmailFormat(email,messages);
+    userDto.setEmail(email);
+  }
+  String password=updateUser.password();
+  String passwordConfirmation=updateUser.passwordConfirmation();
+  if (updateUser.isPasswordChanged()) {
+    validatePasswords(password,passwordConfirmation,messages);
+    setEncryptedPassWord(password,userDto);
+  }
+  if (updateUser.isScmAccountsChanged()) {
+    userDto.setScmAccounts(convertScmAccountsToCsv(updateUser.scmAccounts()));
+  }
+  if (!messages.isEmpty()) {
+    throw new BadRequestException(messages);
+  }
+}
