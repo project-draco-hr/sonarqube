@@ -1,0 +1,13 @@
+{
+  IssueMapper issueMapper=session.getMapper(IssueMapper.class);
+  IssueDto dto=IssueDto.toDtoForUpdate(issue,projectId(),now);
+  if (Issue.STATUS_CLOSED.equals(issue.status()) || issue.selectedAt() == null) {
+    issueMapper.update(dto);
+  }
+ else {
+    int count=issueMapper.updateIfBeforeSelectedDate(dto);
+    if (count == 0) {
+      conflictResolver.resolve(issue,issueMapper);
+    }
+  }
+}

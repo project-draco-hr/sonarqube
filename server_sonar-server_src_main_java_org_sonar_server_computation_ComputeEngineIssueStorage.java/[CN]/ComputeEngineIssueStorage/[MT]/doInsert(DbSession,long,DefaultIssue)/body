@@ -1,0 +1,12 @@
+{
+  IssueMapper issueMapper=session.getMapper(IssueMapper.class);
+  long componentId=componentId(session,issue);
+  long projectId=projectId();
+  Rule rule=rule(issue);
+  List<String> allTags=new ArrayList<String>();
+  allTags.addAll(Arrays.asList(rule.getTags()));
+  allTags.addAll(Arrays.asList(rule.getSystemTags()));
+  issue.setTags(allTags);
+  IssueDto dto=IssueDto.toDtoForBatchInsert(issue,componentId,projectId,rule.getId(),now);
+  issueMapper.insert(dto);
+}
