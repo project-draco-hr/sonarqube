@@ -1,5 +1,12 @@
 {
   when(dbClient.openSession(false)).thenReturn(session);
   when(dbClient.componentDao()).thenReturn(componentDao);
-  issueQueryService=new IssueQueryService(dbClient);
+  when(componentService.componentUuids(any(DbSession.class),any(Collection.class),eq(true))).thenAnswer(new Answer<Collection<String>>(){
+    @Override public Collection<String> answer(    InvocationOnMock invocation) throws Throwable {
+      Collection<String> componentKeys=(Collection<String>)invocation.getArguments()[1];
+      return componentKeys == null ? Arrays.<String>asList() : componentKeys;
+    }
+  }
+);
+  issueQueryService=new IssueQueryService(dbClient,componentService);
 }

@@ -1,0 +1,19 @@
+{
+  Collection<String> componentUuids=newArrayList();
+  if (componentKeys != null && !componentKeys.isEmpty()) {
+    List<ComponentDto> components=dbClient.componentDao().getByKeys(session,componentKeys);
+    if (!ignoreMissingComponents && components.size() < componentKeys.size()) {
+      Collection<String> foundKeys=Collections2.transform(components,new Function<ComponentDto,String>(){
+        @Override public String apply(        ComponentDto component){
+          return component.key();
+        }
+      }
+);
+      throw new NotFoundException("The following component keys do not match any component:\n" + Joiner.on('\n').join(CollectionUtils.subtract(componentKeys,foundKeys)));
+    }
+    for (    ComponentDto component : components) {
+      componentUuids.add(component.uuid());
+    }
+  }
+  return componentUuids;
+}

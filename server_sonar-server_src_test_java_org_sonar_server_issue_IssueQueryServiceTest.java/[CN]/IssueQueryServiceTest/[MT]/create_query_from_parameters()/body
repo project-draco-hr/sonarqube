@@ -5,8 +5,10 @@
   map.put("statuses",newArrayList("CLOSED"));
   map.put("resolutions",newArrayList("FALSE-POSITIVE"));
   map.put("resolved",true);
-  map.put("components",newArrayList("org.apache"));
-  map.put("componentRoots",newArrayList("org.sonar"));
+  ArrayList<String> componentKeys=newArrayList("org.apache");
+  map.put("components",componentKeys);
+  ArrayList<String> moduleKeys=newArrayList("org.sonar");
+  map.put("componentRoots",moduleKeys);
   map.put("reporters",newArrayList("marilyn"));
   map.put("assignees",newArrayList("joanna"));
   map.put("languages",newArrayList("xoo"));
@@ -19,8 +21,8 @@
   map.put("rules","squid:AvoidCycle,findbugs:NullReference");
   map.put("sort","CREATION_DATE");
   map.put("asc",true);
-  when(componentDao.getByKeys(session,newArrayList("org.apache"))).thenReturn(newArrayList(new ComponentDto().setUuid("ABCD")));
-  when(componentDao.getByKeys(session,newArrayList("org.sonar"))).thenReturn(newArrayList(new ComponentDto().setUuid("BCDE")));
+  when(componentService.componentUuids(session,componentKeys,true)).thenReturn(newArrayList("ABCD"));
+  when(componentService.componentUuids(session,moduleKeys,true)).thenReturn(newArrayList("BCDE"));
   IssueQuery query=issueQueryService.createFromMap(map);
   assertThat(query.issueKeys()).containsOnly("ABCDE1234");
   assertThat(query.severities()).containsOnly("MAJOR","MINOR");
