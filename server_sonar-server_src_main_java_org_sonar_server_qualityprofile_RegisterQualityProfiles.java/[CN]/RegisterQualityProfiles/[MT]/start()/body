@@ -5,18 +5,19 @@
     ListMultimap<String,RulesProfile> profilesByLanguage=profilesByLanguage();
     for (    String language : profilesByLanguage.keySet()) {
       List<RulesProfile> defs=profilesByLanguage.get(language);
-      verifyLanguage(language,defs);
-      for (      Map.Entry<String,Collection<RulesProfile>> entry : profilesByName(defs).entrySet()) {
-        String name=entry.getKey();
-        QProfileName profileName=new QProfileName(language,name);
-        if (shouldRegister(profileName,session)) {
-          register(profileName,entry.getValue(),session);
-          session.commit();
+      if (verifyLanguage(language,defs)) {
+        for (        Map.Entry<String,Collection<RulesProfile>> entry : profilesByName(defs).entrySet()) {
+          String name=entry.getKey();
+          QProfileName profileName=new QProfileName(language,name);
+          if (shouldRegister(profileName,session)) {
+            register(profileName,entry.getValue(),session);
+            session.commit();
+          }
+          builtInProfiles.put(language,name);
         }
-        builtInProfiles.put(language,name);
+        setDefault(language,defs,session);
+        session.commit();
       }
-      setDefault(language,defs,session);
-      session.commit();
     }
   }
   finally {
