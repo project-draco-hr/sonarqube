@@ -1,0 +1,30 @@
+{
+  boolean hasScanPerm=UserSession.get().hasGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
+  checkPermission(query.isPreview());
+  DbSession session=dbClient.openSession(false);
+  try {
+    ProjectReferentials ref=new ProjectReferentials();
+    String projectKey=null;
+    ComponentDto module=dbClient.componentDao().getNullableByKey(session,query.getModuleKey());
+    if (module != null) {
+      ComponentDto project=dbClient.componentDao().getNullableRootProjectByKey(query.getModuleKey(),session);
+      if (project != null) {
+        if (!project.key().equals(module.key())) {
+          addSettings(ref,module.getKey(),getSettingsFromParents(module.key(),hasScanPerm,session));
+        }
+        projectKey=project.key();
+        addSettingsToChildrenModules(ref,query.getModuleKey(),Maps.<String,String>newHashMap(),hasScanPerm,session);
+      }
+ else {
+        addSettings(ref,query.getModuleKey(),getPropertiesMap(dbClient.propertiesDao().selectProjectProperties(query.getModuleKey(),session),hasScanPerm));
+        projectKey=query.getModuleKey();
+      }
+    }
+    addProfiles(ref,projectKey,query.getProfileName(),session);
+    addActiveRules(ref);
+    return ref;
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

@@ -1,0 +1,23 @@
+{
+  MockUserSession.set().setLogin("john").setGlobalPermissions(GlobalPermissions.SCAN_EXECUTION);
+  ComponentDto project=ComponentTesting.newProjectDto();
+  tester.get(DbClient.class).componentDao().insert(dbSession,project);
+  SnapshotDto projectSnapshot=SnapshotTesting.createForProject(project);
+  tester.get(DbClient.class).snapshotDao().insert(dbSession,projectSnapshot);
+  addDefaultProfile();
+  tester.get(DbClient.class).propertiesDao().setProperty(new PropertyDto().setKey("sonar.jira.project.key").setValue("SONAR").setResourceId(project.getId()),dbSession);
+  ComponentDto module=ComponentTesting.newModuleDto(project);
+  tester.get(DbClient.class).componentDao().insert(dbSession,module);
+  SnapshotDto moduleSnapshot=SnapshotTesting.createForComponent(module,project,projectSnapshot);
+  tester.get(DbClient.class).snapshotDao().insert(dbSession,moduleSnapshot);
+  tester.get(DbClient.class).propertiesDao().setProperty(new PropertyDto().setKey("sonar.jira.login.secured").setValue("john").setResourceId(module.getId()),dbSession);
+  ComponentDto subModule=ComponentTesting.newModuleDto(module);
+  tester.get(DbClient.class).componentDao().insert(dbSession,subModule);
+  tester.get(DbClient.class).snapshotDao().insert(dbSession,SnapshotTesting.createForComponent(subModule,module,moduleSnapshot));
+  tester.get(DbClient.class).propertiesDao().setProperty(new PropertyDto().setKey("sonar.coverage.exclusions").setValue("**/*.java").setResourceId(subModule.getId()),dbSession);
+  dbSession.commit();
+  ProjectReferentials ref=loader.load(ProjectReferentialsQuery.create().setModuleKey(subModule.key()));
+  assertThat(ref.settings(project.key())).isEmpty();
+  assertThat(ref.settings(module.key())).isEmpty();
+  assertThat(ref.settings(subModule.key())).isEqualTo(ImmutableMap.of("sonar.jira.project.key","SONAR","sonar.jira.login.secured","john","sonar.coverage.exclusions","**/*.java"));
+}

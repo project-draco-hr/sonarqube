@@ -1,34 +1,5 @@
 {
-  boolean hasScanPerm=UserSession.get().hasGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
-  boolean preview=request.mandatoryParamAsBoolean(PARAM_PREVIEW);
-  checkPermission(preview);
-  DbSession session=dbClient.openSession(false);
-  try {
-    ProjectReferentials ref=new ProjectReferentials();
-    String projectOrModuleKey=request.mandatoryParam(PARAM_KEY);
-    String profileName=request.param(PARAM_PROFILE);
-    String projectKey=null;
-    ComponentDto module=dbClient.componentDao().getNullableByKey(session,projectOrModuleKey);
-    if (module != null) {
-      ComponentDto project=dbClient.componentDao().getNullableRootProjectByKey(projectOrModuleKey,session);
-      if (project != null) {
-        if (!project.key().equals(module.key())) {
-          addSettings(ref,module.getKey(),getSettingsFromParents(module.key(),hasScanPerm,session));
-        }
-        projectKey=project.key();
-        addSettingsToChildrenModules(ref,projectOrModuleKey,Maps.<String,String>newHashMap(),hasScanPerm,session);
-      }
- else {
-        addSettings(ref,projectOrModuleKey,getPropertiesMap(propertiesDao.selectProjectProperties(projectOrModuleKey,session),hasScanPerm));
-        projectKey=projectOrModuleKey;
-      }
-    }
-    addProfiles(ref,projectKey,profileName,session);
-    addActiveRules(ref);
-    response.stream().setMediaType(MimeTypes.JSON);
-    IOUtils.write(ref.toJson(),response.stream().output());
-  }
-  finally {
-    MyBatis.closeQuietly(session);
-  }
+  ProjectReferentials ref=projectReferentialsLoader.load(ProjectReferentialsQuery.create().setModuleKey(request.mandatoryParam(PARAM_KEY)).setProfileName(request.param(PARAM_PROFILE)).setPreview(request.mandatoryParamAsBoolean(PARAM_PREVIEW)));
+  response.stream().setMediaType(MimeTypes.JSON);
+  IOUtils.write(ref.toJson(),response.stream().output());
 }
