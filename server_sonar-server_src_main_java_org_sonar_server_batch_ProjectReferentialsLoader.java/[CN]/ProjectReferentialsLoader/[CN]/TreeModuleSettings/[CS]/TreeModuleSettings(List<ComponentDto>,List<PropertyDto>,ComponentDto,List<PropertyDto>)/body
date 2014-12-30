@@ -1,0 +1,23 @@
+{
+  propertiesByModuleId=ArrayListMultimap.create();
+  moduleIdsByKey=newHashMap();
+  moduleUuidsByKey=newHashMap();
+  moduleChildrenByModuleUuid=ArrayListMultimap.create();
+  for (  PropertyDto settings : moduleChildrenSettings) {
+    propertiesByModuleId.put(settings.getResourceId(),settings);
+  }
+  propertiesByModuleId.putAll(module.getId(),moduleSettings);
+  moduleIdsByKey.put(module.key(),module.getId());
+  moduleUuidsByKey.put(module.key(),module.uuid());
+  for (  ComponentDto componentDto : moduleChildren) {
+    moduleIdsByKey.put(componentDto.key(),componentDto.getId());
+    moduleUuidsByKey.put(componentDto.key(),componentDto.uuid());
+    String moduleUuid=componentDto.moduleUuid();
+    if (moduleUuid != null) {
+      moduleChildrenByModuleUuid.put(moduleUuid,componentDto);
+    }
+ else {
+      moduleChildrenByModuleUuid.put(module.uuid(),componentDto);
+    }
+  }
+}
