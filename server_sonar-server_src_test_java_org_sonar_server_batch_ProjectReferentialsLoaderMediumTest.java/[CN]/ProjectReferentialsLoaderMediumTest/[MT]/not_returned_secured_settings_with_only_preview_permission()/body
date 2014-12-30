@@ -1,0 +1,13 @@
+{
+  MockUserSession.set().setLogin("john").setGlobalPermissions(GlobalPermissions.DRY_RUN_EXECUTION);
+  ComponentDto project=ComponentTesting.newProjectDto();
+  tester.get(DbClient.class).componentDao().insert(dbSession,project);
+  tester.get(DbClient.class).snapshotDao().insert(dbSession,SnapshotTesting.createForProject(project));
+  addDefaultProfile();
+  tester.get(DbClient.class).propertiesDao().setProperty(new PropertyDto().setKey("sonar.jira.project.key").setValue("SONAR").setResourceId(project.getId()),dbSession);
+  tester.get(DbClient.class).propertiesDao().setProperty(new PropertyDto().setKey("sonar.jira.login.secured").setValue("john").setResourceId(project.getId()),dbSession);
+  dbSession.commit();
+  ProjectReferentials ref=loader.load(ProjectReferentialsQuery.create().setModuleKey(project.key()).setPreview(true));
+  Map<String,String> projectSettings=ref.settings(project.key());
+  assertThat(projectSettings).isEqualTo(ImmutableMap.of("sonar.jira.project.key","SONAR"));
+}

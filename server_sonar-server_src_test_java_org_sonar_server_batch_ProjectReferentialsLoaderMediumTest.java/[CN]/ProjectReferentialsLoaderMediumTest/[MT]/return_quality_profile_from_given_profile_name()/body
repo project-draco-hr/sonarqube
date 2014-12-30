@@ -1,0 +1,18 @@
+{
+  MockUserSession.set().setLogin("john").setGlobalPermissions(GlobalPermissions.SCAN_EXECUTION);
+  Date ruleUpdatedAt=DateUtils.parseDateTime("2014-01-14T13:00:00+0100");
+  ComponentDto project=ComponentTesting.newProjectDto();
+  tester.get(DbClient.class).componentDao().insert(dbSession,project);
+  tester.get(DbClient.class).snapshotDao().insert(dbSession,SnapshotTesting.createForProject(project));
+  QualityProfileDto profileDto=QProfileTesting.newDto(QProfileName.createFor(ServerTester.Xoo.KEY,"SonarQube way"),"abcd").setRulesUpdatedAt(DateUtils.formatDateTime(ruleUpdatedAt));
+  tester.get(DbClient.class).qualityProfileDao().insert(dbSession,profileDto);
+  tester.get(DbClient.class).propertiesDao().setProperty(new PropertyDto().setKey("sonar.profile.xoo").setValue("SonarQube way"),dbSession);
+  dbSession.commit();
+  ProjectReferentials ref=loader.load(ProjectReferentialsQuery.create().setModuleKey(project.key()).setProfileName("SonarQube way"));
+  List<QProfile> profiles=newArrayList(ref.qProfiles());
+  assertThat(profiles).hasSize(1);
+  assertThat(profiles.get(0).key()).isEqualTo("abcd");
+  assertThat(profiles.get(0).name()).isEqualTo("SonarQube way");
+  assertThat(profiles.get(0).language()).isEqualTo("xoo");
+  assertThat(profiles.get(0).rulesUpdatedAt()).isEqualTo(ruleUpdatedAt);
+}

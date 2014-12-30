@@ -1,0 +1,36 @@
+{
+  boolean hasScanPerm=UserSession.get().hasGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
+  checkPermission(query.isPreview());
+  DbSession session=dbClient.openSession(false);
+  try {
+    ProjectReferentials ref=new ProjectReferentials();
+    String projectKey=query.getModuleKey();
+    ComponentDto module=dbClient.componentDao().getNullableByKey(session,query.getModuleKey());
+    if (module != null) {
+      ComponentDto project=dbClient.componentDao().getNullableRootProjectByKey(query.getModuleKey(),session);
+      if (project != null) {
+        if (!project.key().equals(module.key())) {
+          addSettings(ref,module.getKey(),getSettingsFromParents(module.key(),hasScanPerm,session));
+          projectKey=project.key();
+        }
+        List<PropertyDto> moduleSettings=dbClient.propertiesDao().selectProjectProperties(query.getModuleKey(),session);
+        List<ProjectRefentialsComponentDto> moduleChildren=dbClient.componentDao().findChildrenModulesFromModule(session,query.getModuleKey());
+        List<PropertyDto> moduleChildrenSettings=newArrayList();
+        if (!moduleChildren.isEmpty()) {
+          moduleChildrenSettings=dbClient.propertiesDao().findChildrenModuleProperties(query.getModuleKey(),session);
+        }
+        TreeModuleSettings treeModuleSettings=new TreeModuleSettings(moduleChildren,moduleChildrenSettings,module,moduleSettings);
+        addSettingsToChildrenModules(ref,query.getModuleKey(),Maps.<String,String>newHashMap(),treeModuleSettings,hasScanPerm,session);
+      }
+ else {
+        addSettings(ref,query.getModuleKey(),getPropertiesMap(dbClient.propertiesDao().selectProjectProperties(query.getModuleKey(),session),hasScanPerm));
+      }
+    }
+    addProfiles(ref,projectKey,query.getProfileName(),session);
+    addActiveRules(ref);
+    return ref;
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}
