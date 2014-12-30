@@ -1,0 +1,13 @@
+{
+  setupData("multi-modules");
+  List<ProjectRefentialsComponentDto> modules=dao.findChildrenModulesFromModule(session,"org.struts:struts");
+  assertThat(modules).hasSize(2);
+  assertThat(modules).onProperty("id").containsOnly(2L,3L);
+  assertThat(modules).onProperty("parentModuleKey").containsOnly("org.struts:struts","org.struts:struts-core");
+  modules=dao.findChildrenModulesFromModule(session,"org.struts:struts-core");
+  assertThat(modules).hasSize(1);
+  assertThat(modules).onProperty("id").containsOnly(3L);
+  assertThat(modules).onProperty("parentModuleKey").containsOnly("org.struts:struts-core");
+  modules=dao.findChildrenModulesFromModule(session,"org.struts:struts-data");
+  assertThat(modules).isEmpty();
+}
