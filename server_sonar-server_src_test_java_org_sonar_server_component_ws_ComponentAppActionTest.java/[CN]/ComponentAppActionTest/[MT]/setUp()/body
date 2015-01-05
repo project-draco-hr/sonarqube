@@ -2,12 +2,9 @@
   DbClient dbClient=mock(DbClient.class);
   when(dbClient.openSession(false)).thenReturn(session);
   when(dbClient.componentDao()).thenReturn(componentDao);
-  when(dbClient.resourceDao()).thenReturn(resourceDao);
   when(dbClient.propertiesDao()).thenReturn(propertiesDao);
   when(dbClient.measureDao()).thenReturn(measureDao);
-  project=ComponentTesting.newProjectDto().setId(1L).setName("SonarQube").setLongName("SonarQube").setKey("org.codehaus.sonar:sonar");
-  when(issueService.findSeveritiesByComponent(anyString(),any(Date.class),eq(session))).thenReturn(mock(Multiset.class));
-  when(issueService.findRulesByComponent(anyString(),any(Date.class),eq(session))).thenReturn(mock(RulesAggregation.class));
+  project=ComponentTesting.newProjectDto().setId(1L).setName("SonarQube").setUuid(PROJECT_UUID).setLongName("SonarQube").setKey("org.codehaus.sonar:sonar");
   when(measureDao.findByComponentKeyAndMetricKeys(anyString(),anyListOf(String.class),eq(session))).thenReturn(measures);
-  tester=new WsTester(new ComponentsWs(new ComponentAppAction(dbClient,issueService,views,ruleService,periods,durations,i18n)));
+  tester=new WsTester(new ComponentsWs(new ComponentAppAction(dbClient,durations,i18n)));
 }

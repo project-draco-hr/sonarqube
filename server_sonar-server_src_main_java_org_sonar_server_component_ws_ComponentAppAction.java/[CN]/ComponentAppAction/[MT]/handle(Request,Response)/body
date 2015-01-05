@@ -1,29 +1,19 @@
 {
-  String fileKey=request.mandatoryParam(PARAM_KEY);
+  String componentUuid=request.mandatoryParam(PARAM_UUID);
   UserSession userSession=UserSession.get();
   JsonWriter json=response.newJsonWriter();
   json.beginObject();
   DbSession session=dbClient.openSession(false);
   try {
-    ComponentDto component=dbClient.componentDao().getNullableByKey(session,fileKey);
+    ComponentDto component=dbClient.componentDao().getNullableByUuid(session,componentUuid);
     if (component == null) {
-      throw new NotFoundException(String.format("Component '%s' does not exist",fileKey));
+      throw new NotFoundException(String.format("Component '%s' does not exist",componentUuid));
     }
-    userSession.checkComponentPermission(UserRole.USER,fileKey);
-    List<Period> periodList=periods(component.projectUuid(),session);
-    Integer periodIndex=request.paramAsInt(PARAM_PERIOD);
-    Date periodDate=periodDate(periodIndex,periodList);
-    RulesAggregation rulesAggregation=issueService.findRulesByComponent(component.key(),periodDate,session);
-    Multiset<String> severitiesAggregation=issueService.findSeveritiesByComponent(component.key(),periodDate,session);
+    userSession.checkComponentPermission(UserRole.USER,component.getKey());
     Map<String,MeasureDto> measuresByMetricKey=measuresByMetricKey(component,session);
     appendComponent(json,component,userSession,session);
     appendPermissions(json,component,userSession);
-    appendPeriods(json,periodList);
-    appendIssuesAggregation(json,rulesAggregation,severitiesAggregation);
-    appendMeasures(json,measuresByMetricKey,severitiesAggregation,periodIndex);
-    appendTabs(json,measuresByMetricKey);
-    appendExtensions(json,component,userSession);
-    appendManualRules(json);
+    appendMeasures(json,measuresByMetricKey);
   }
   finally {
     MyBatis.closeQuietly(session);
