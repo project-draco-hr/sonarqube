@@ -1,0 +1,17 @@
+{
+  String data=row.getString(2);
+  String[] fields=StringUtils.split(data,FIELD_SEPARATOR);
+  List<String> fieldsToKeep=Lists.newArrayList();
+  for (  String field : fields) {
+    if (field.startsWith(COMPONENTS) || field.startsWith(PROJECTS) || field.startsWith(COMPONENT_ROOTS)|| field.startsWith(COMPONENT_ROOT_UUIDS)) {
+      fieldsToKeep.add(field.replace(COMPONENTS,"componentKeys=").replace(PROJECTS,"projectKeys=").replace(COMPONENT_ROOTS,"moduleKeys=").replace(COMPONENT_ROOT_UUIDS,"moduleUuids="));
+    }
+ else {
+      fieldsToKeep.add(field);
+    }
+  }
+  update.setString(1,StringUtils.join(fieldsToKeep,FIELD_SEPARATOR));
+  update.setDate(2,now);
+  update.setLong(3,row.getLong(1));
+  return true;
+}
