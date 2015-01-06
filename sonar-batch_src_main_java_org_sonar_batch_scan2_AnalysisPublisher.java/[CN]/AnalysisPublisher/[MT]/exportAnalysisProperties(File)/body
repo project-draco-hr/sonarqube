@@ -2,15 +2,10 @@
   File propsFile=new File(exportDir,"analysis.properties");
   Properties props=new Properties();
   props.putAll(settings.getProperties());
-  FileWriter writer=null;
-  try {
-    writer=new FileWriter(propsFile);
+  try (Writer writer=new OutputStreamWriter(new FileOutputStream(propsFile),Charsets.UTF_8)){
     props.store(writer,"SonarQube batch");
   }
  catch (  IOException e) {
     throw unableToExport(e);
-  }
- finally {
-    IOUtils.closeQuietly(writer);
   }
 }

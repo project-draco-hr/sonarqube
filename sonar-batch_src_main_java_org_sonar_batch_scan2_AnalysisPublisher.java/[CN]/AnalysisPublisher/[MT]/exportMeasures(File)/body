@@ -1,8 +1,6 @@
 {
   File measuresFile=new File(exportDir,"measures.json");
-  FileWriter measureWriter=null;
-  try {
-    measureWriter=new FileWriter(measuresFile);
+  try (Writer measureWriter=new OutputStreamWriter(new FileOutputStream(measuresFile),Charsets.UTF_8)){
     JsonWriter jsonWriter=JsonWriter.of(measureWriter);
     jsonWriter.beginObject().name("measures").beginArray();
     for (    Measure<?> measure : measureCache.byModule(def.getKey())) {
@@ -17,8 +15,5 @@
   }
  catch (  IOException e) {
     throw unableToExport(e);
-  }
- finally {
-    IOUtils.closeQuietly(measureWriter);
   }
 }

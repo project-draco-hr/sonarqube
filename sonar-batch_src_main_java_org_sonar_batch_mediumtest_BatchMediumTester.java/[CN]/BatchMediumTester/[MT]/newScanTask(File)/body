@@ -1,17 +1,10 @@
 {
   Properties prop=new Properties();
-  FileReader reader=null;
-  try {
-    reader=new FileReader(sonarProps);
+  try (Reader reader=new InputStreamReader(new FileInputStream(sonarProps),Charsets.UTF_8)){
     prop.load(reader);
   }
  catch (  Exception e) {
     throw new IllegalStateException("Unable to read configuration file",e);
-  }
- finally {
-    if (reader != null) {
-      IOUtils.closeQuietly(reader);
-    }
   }
   TaskBuilder builder=new TaskBuilder(this);
   builder.property("sonar.task","scan");

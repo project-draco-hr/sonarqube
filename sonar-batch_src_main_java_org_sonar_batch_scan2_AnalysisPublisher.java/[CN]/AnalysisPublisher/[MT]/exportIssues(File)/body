@@ -1,8 +1,6 @@
 {
   File issuesFile=new File(exportDir,"issues.json");
-  FileWriter issueWriter=null;
-  try {
-    issueWriter=new FileWriter(issuesFile);
+  try (Writer issueWriter=new OutputStreamWriter(new FileOutputStream(issuesFile),Charsets.UTF_8)){
     JsonWriter jsonWriter=JsonWriter.of(issueWriter);
     jsonWriter.beginObject().name("issues").beginArray();
     for (    Issue issue : issueCache.byModule(def.getKey())) {
@@ -22,8 +20,5 @@
   }
  catch (  IOException e) {
     throw unableToExport(e);
-  }
- finally {
-    IOUtils.closeQuietly(issueWriter);
   }
 }
