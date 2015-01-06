@@ -1,22 +1,15 @@
 {
   IssuesBySeverity newIssues=new IssuesBySeverity();
   IssueChangeContext context=IssueChangeContext.createScan(project.getAnalysisDate());
-  Map<DefaultIssue,Rule> shouldSentNotification=new LinkedHashMap<DefaultIssue,Rule>();
+  Map<DefaultIssue,Rule> changedIssuesRuleMap=new LinkedHashMap<>();
   for (  DefaultIssue issue : issueCache.all()) {
-    if (issue.isNew() && issue.resolution() == null) {
+    if (isNew(issue)) {
       newIssues.add(issue);
     }
-    if (!issue.isNew() && issue.isChanged() && issue.mustSendNotifications()) {
-      Rule rule=ruleFinder.findByKey(issue.ruleKey());
-      if (rule != null) {
-        shouldSentNotification.put(issue,rule);
-      }
+ else     if (hasChangedAndNeedNotification(issue)) {
+      addIssueToMap(issue,changedIssuesRuleMap);
     }
   }
-  if (!shouldSentNotification.isEmpty()) {
-    notifications.sendChanges(shouldSentNotification,context,project,null,null);
-  }
-  if (!newIssues.isEmpty()) {
-    notifications.sendNewIssues(project,newIssues);
-  }
+  sendChangedIssues(project,context,changedIssuesRuleMap);
+  sendNewIssues(project,newIssues);
 }
