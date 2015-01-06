@@ -17,9 +17,15 @@
     setEncryptedPassWord(password,userDto);
   }
   if (updateUser.isScmAccountsChanged()) {
-    List<String> scmAccounts=sanitizeScmAccounts(updateUser.scmAccounts());
-    validateScmAccounts(dbSession,scmAccounts,userDto.getLogin(),email != null ? email : userDto.getEmail(),userDto,messages);
-    userDto.setScmAccounts(convertScmAccountsToCsv(scmAccounts));
+    List<String> scmAccounts=updateUser.scmAccounts();
+    if (scmAccounts != null && !scmAccounts.isEmpty()) {
+      scmAccounts=sanitizeScmAccounts(updateUser.scmAccounts());
+      validateScmAccounts(dbSession,scmAccounts,userDto.getLogin(),email != null ? email : userDto.getEmail(),userDto,messages);
+      userDto.setScmAccounts(convertScmAccountsToCsv(scmAccounts));
+    }
+ else {
+      userDto.setScmAccounts(null);
+    }
   }
   if (!messages.isEmpty()) {
     throw new BadRequestException(messages);
