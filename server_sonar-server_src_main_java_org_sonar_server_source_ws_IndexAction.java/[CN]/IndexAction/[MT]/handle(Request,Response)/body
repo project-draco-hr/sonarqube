@@ -3,8 +3,7 @@
   UserSession.get().checkComponentPermission(UserRole.CODEVIEWER,fileKey);
   Integer from=request.mandatoryParamAsInt("from");
   Integer to=request.paramAsInt("to");
-  DbSession session=dbClient.openSession(false);
-  try {
+  try (DbSession session=dbClient.openSession(false)){
     ComponentDto componentDto=dbClient.componentDao().getByKey(session,fileKey);
     List<String> lines=sourceService.getLinesAsTxt(componentDto.uuid(),from,to == null ? null : to - 1);
     JsonWriter json=response.newJsonWriter().beginArray().beginObject();
@@ -15,7 +14,4 @@
     }
     json.endObject().endArray().close();
   }
-  finally {
-    session.close();
-  }
-}
+ }
