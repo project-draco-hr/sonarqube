@@ -1,0 +1,15 @@
+{
+  if (scmAccounts != null) {
+    for (    String scmAccount : scmAccounts) {
+      if (scmAccount.equals(login) || scmAccount.equals(email)) {
+        messages.add(Message.of("user.login_or_email_used_as_scm_account"));
+      }
+ else {
+        UserDto matchingUser=dbClient.userDao().selectNullableByScmAccountOrLoginOrName(dbSession,scmAccount);
+        if (matchingUser != null) {
+          messages.add(Message.of("user.scm_account_already_used",scmAccount,matchingUser.getName(),matchingUser.getLogin()));
+        }
+      }
+    }
+  }
+}

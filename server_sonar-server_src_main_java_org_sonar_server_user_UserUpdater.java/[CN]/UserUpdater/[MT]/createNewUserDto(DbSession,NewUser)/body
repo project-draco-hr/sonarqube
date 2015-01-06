@@ -16,7 +16,9 @@
   String passwordConfirmation=newUser.passwordConfirmation();
   validatePasswords(password,passwordConfirmation,messages);
   setEncryptedPassWord(password,userDto);
-  userDto.setScmAccounts(convertScmAccountsToCsv(newUser.scmAccounts()));
+  List<String> scmAccounts=sanitizeScmAccounts(newUser.scmAccounts());
+  validateScmAccounts(dbSession,scmAccounts,login,email,messages);
+  userDto.setScmAccounts(convertScmAccountsToCsv(scmAccounts));
   if (!messages.isEmpty()) {
     throw new BadRequestException(messages);
   }

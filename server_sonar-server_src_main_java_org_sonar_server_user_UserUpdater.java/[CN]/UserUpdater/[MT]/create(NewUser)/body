@@ -1,8 +1,8 @@
 {
-  UserDto userDto=createNewUserDto(newUser);
   boolean isUserReactivated=false;
   DbSession dbSession=dbClient.openSession(false);
   try {
+    UserDto userDto=createNewUserDto(dbSession,newUser);
     String login=userDto.getLogin();
     UserDto existingUser=dbClient.userDao().selectNullableByLogin(dbSession,login);
     if (existingUser == null) {
@@ -13,7 +13,7 @@
         throw new IllegalArgumentException(String.format("An active user with login '%s' already exists",login));
       }
       UpdateUser updateUser=UpdateUser.create(login).setName(newUser.name()).setEmail(newUser.email()).setScmAccounts(newUser.scmAccounts()).setPassword(newUser.password()).setPasswordConfirmation(newUser.passwordConfirmation());
-      updateUserDto(updateUser,existingUser);
+      updateUserDto(dbSession,updateUser,existingUser);
       updateUser(dbSession,existingUser);
       isUserReactivated=true;
     }

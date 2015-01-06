@@ -17,7 +17,9 @@
     setEncryptedPassWord(password,userDto);
   }
   if (updateUser.isScmAccountsChanged()) {
-    userDto.setScmAccounts(convertScmAccountsToCsv(updateUser.scmAccounts()));
+    List<String> scmAccounts=sanitizeScmAccounts(updateUser.scmAccounts());
+    validateScmAccounts(dbSession,scmAccounts,userDto.getLogin(),email != null ? email : userDto.getEmail(),messages);
+    userDto.setScmAccounts(convertScmAccountsToCsv(scmAccounts));
   }
   if (!messages.isEmpty()) {
     throw new BadRequestException(messages);

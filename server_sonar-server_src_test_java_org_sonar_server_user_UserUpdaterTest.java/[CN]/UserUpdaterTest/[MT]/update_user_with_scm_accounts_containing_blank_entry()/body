@@ -1,0 +1,9 @@
+{
+  db.prepareDbUnit(getClass(),"update_user.xml");
+  createDefaultGroup();
+  userUpdater.update(UpdateUser.create("marius").setName("Marius2").setEmail("marius2@mail.com").setPassword("password2").setPasswordConfirmation("password2").setScmAccounts(newArrayList("ma2","",null)));
+  session.commit();
+  session.clearCache();
+  UserDto dto=userDao.selectNullableByLogin(session,"marius");
+  assertThat(dto.getScmAccounts()).isEqualTo(",ma2,");
+}
