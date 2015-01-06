@@ -7,7 +7,9 @@
  else {
         UserDto matchingUser=dbClient.userDao().selectNullableByScmAccountOrLoginOrName(dbSession,scmAccount);
         if (matchingUser != null) {
-          messages.add(Message.of("user.scm_account_already_used",scmAccount,matchingUser.getName(),matchingUser.getLogin()));
+          if (existingUser == null || !matchingUser.getId().equals(existingUser.getId())) {
+            messages.add(Message.of("user.scm_account_already_used",scmAccount,matchingUser.getName(),matchingUser.getLogin()));
+          }
         }
       }
     }
