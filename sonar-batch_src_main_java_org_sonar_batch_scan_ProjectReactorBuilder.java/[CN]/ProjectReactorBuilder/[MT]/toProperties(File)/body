@@ -1,15 +1,10 @@
 {
   Properties propsFromFile=new Properties();
-  FileInputStream fileInputStream=null;
-  try {
-    fileInputStream=new FileInputStream(propertyFile);
+  try (FileInputStream fileInputStream=new FileInputStream(propertyFile)){
     propsFromFile.load(fileInputStream);
   }
  catch (  IOException e) {
     throw new IllegalStateException("Impossible to read the property file: " + propertyFile.getAbsolutePath(),e);
-  }
- finally {
-    IOUtils.closeQuietly(fileInputStream);
   }
   for (  String propKey : propsFromFile.stringPropertyNames()) {
     propsFromFile.setProperty(propKey,StringUtils.trim(propsFromFile.getProperty(propKey)));

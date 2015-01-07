@@ -16,8 +16,7 @@
   enableSnapshot(1004);
   enableSnapshot(1005);
   enableSnapshot(1006);
-  SqlSession session=getMyBatis().openSession(false);
-  try {
+  try (SqlSession session=getMyBatis().openSession(false)){
     ComponentDto root=session.getMapper(ComponentMapper.class).selectByKey("root");
     assertThat(root.uuid()).isNotNull();
     assertThat(root.projectUuid()).isEqualTo(root.uuid());
@@ -49,7 +48,4 @@
     assertThat(fileComp.moduleUuid()).isEqualTo(b1.uuid());
     assertThat(fileComp.moduleUuidPath()).isEqualTo(root.uuid() + "." + b.uuid()+ "."+ b1.uuid());
   }
-  finally {
-    MyBatis.closeQuietly(session);
-  }
-}
+ }

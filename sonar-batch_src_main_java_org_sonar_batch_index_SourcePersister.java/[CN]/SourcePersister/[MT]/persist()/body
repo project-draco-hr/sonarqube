@@ -1,6 +1,5 @@
 {
-  DbSession session=mybatis.openSession(false);
-  try {
+  try (DbSession session=mybatis.openSession(false)){
     final Map<String,FileSourceDto> fileSourceDtoByFileUuid=new HashMap<String,FileSourceDto>();
     session.select("org.sonar.core.source.db.FileSourceMapper.selectAllFileDataHashByProject",projectTree.getRootProject().getUuid(),new ResultHandler(){
       @Override public void handleResult(      ResultContext context){
@@ -18,8 +17,5 @@
   }
  catch (  Exception e) {
     throw new IllegalStateException("Unable to save file sources",e);
-  }
- finally {
-    MyBatis.closeQuietly(session);
   }
 }
