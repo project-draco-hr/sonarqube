@@ -1,13 +1,13 @@
 {
   try (DbSession session=mybatis.openSession(false)){
     MeasureMapper mapper=session.getMapper(MeasureMapper.class);
-    org.sonar.api.measures.Metric duplicationMetricWithId=metricFinder.findByKey(CoreMetrics.DUPLICATIONS_DATA_KEY);
+    Metric duplicationMetricWithId=metricFinder.findByKey(CoreMetrics.DUPLICATIONS_DATA_KEY);
     for (    Entry<List<DuplicationGroup>> entry : duplicationCache.entries()) {
       String effectiveKey=entry.key()[0].toString();
       Measure measure=new Measure(duplicationMetricWithId,DuplicationUtils.toXml(entry.value())).setPersistenceMode(PersistenceMode.DATABASE);
       BatchResource batchResource=resourceCache.get(effectiveKey);
       if (MeasurePersister.shouldPersistMeasure(batchResource.resource(),measure)) {
-        MeasureModel measureModel=MeasurePersister.model(measure,ruleFinder).setSnapshotId(batchResource.snapshotId());
+        MeasureModel measureModel=MeasurePersister.model(measure,ruleFinder,metricFinder).setSnapshotId(batchResource.snapshotId());
         mapper.insert(measureModel);
         session.commit();
       }
