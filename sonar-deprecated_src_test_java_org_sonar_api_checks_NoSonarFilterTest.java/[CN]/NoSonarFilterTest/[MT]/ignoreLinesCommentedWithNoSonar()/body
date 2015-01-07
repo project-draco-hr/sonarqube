@@ -3,7 +3,12 @@
   noSonarLines.add(31);
   noSonarLines.add(55);
   filter.addResource(javaFile,noSonarLines);
-  assertThat(filter.isIgnored(new Violation(null,javaFile))).isFalse();
-  assertThat(filter.isIgnored(new Violation(null,javaFile).setLineId(30))).isFalse();
-  assertThat(filter.isIgnored(new Violation(null,javaFile).setLineId(31))).isTrue();
+  Issue issue=mock(Issue.class);
+  when(issue.componentKey()).thenReturn("struts:org.apache.Action");
+  when(issue.ruleKey()).thenReturn(RuleKey.of("squid","Foo"));
+  assertThat(filter.accept(issue,chain)).isTrue();
+  when(issue.line()).thenReturn(30);
+  assertThat(filter.accept(issue,chain)).isTrue();
+  when(issue.line()).thenReturn(31);
+  assertThat(filter.accept(issue,chain)).isFalse();
 }
