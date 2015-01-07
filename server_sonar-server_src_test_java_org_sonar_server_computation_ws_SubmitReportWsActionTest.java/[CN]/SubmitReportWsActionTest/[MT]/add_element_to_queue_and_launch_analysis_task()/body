@@ -1,0 +1,11 @@
+{
+  Response response=mock(Response.class);
+  Request request=mock(Request.class);
+  when(request.mandatoryParam(SubmitReportWsAction.PARAM_PROJECT_KEY)).thenReturn(DEFAULT_PROJECT_KEY);
+  when(request.mandatoryParamAsLong(SubmitReportWsAction.PARAM_SNAPSHOT)).thenReturn(123L);
+  InputStream reportData=IOUtils.toInputStream("report-data");
+  when(request.paramAsInputStream(SubmitReportWsAction.PARAM_REPORT_DATA)).thenReturn(reportData);
+  sut.handle(request,response);
+  verify(queue).add(DEFAULT_PROJECT_KEY,123L,reportData);
+  verify(analysisTaskLauncher).startAnalysisTaskNow();
+}
