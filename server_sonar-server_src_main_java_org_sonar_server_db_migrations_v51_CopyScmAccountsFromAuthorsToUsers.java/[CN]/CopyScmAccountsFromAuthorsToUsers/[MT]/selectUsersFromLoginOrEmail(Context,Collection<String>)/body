@@ -1,0 +1,25 @@
+{
+  final List<User> users=newArrayList();
+  StringBuilder sql=new StringBuilder("SELECT u.id, u.login, u.email, u.scm_accounts FROM users u WHERE u.active=? AND (");
+  for (int i=0; i < authors.size(); i++) {
+    if (i < authors.size() - 1) {
+      sql.append("u.login=? OR u.email=? OR ");
+    }
+ else {
+      sql.append("u.login=? OR u.email=?)");
+    }
+  }
+  Select select=context.prepareSelect(sql.toString());
+  select.setBoolean(1,true);
+  int currentIndex=2;
+  for (  String author : authors) {
+    select.setString(currentIndex++,author).setString(currentIndex++,author);
+  }
+  select.scroll(new Select.RowHandler(){
+    @Override public void handle(    Select.Row row) throws SQLException {
+      users.add(new User(row.getLong(1),row.getString(2),row.getString(3),row.getString(4)));
+    }
+  }
+);
+  return users;
+}

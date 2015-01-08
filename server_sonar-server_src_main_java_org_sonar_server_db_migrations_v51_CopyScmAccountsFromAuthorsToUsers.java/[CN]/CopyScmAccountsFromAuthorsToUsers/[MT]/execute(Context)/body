@@ -1,0 +1,40 @@
+{
+  ProgressLogger progress=ProgressLogger.create(getClass(),counter);
+  progress.start();
+  final Long now=system.now();
+  try {
+    final Multimap<Long,String> authorsByPersonId=ArrayListMultimap.create();
+    context.prepareSelect("SELECT a.person_id, a.login FROM authors a," + "  (SELECT person_id, COUNT(*) AS nb FROM authors GROUP BY person_id HAVING COUNT(*) > 1) AS group_by_person" + "     WHERE a.person_id = group_by_person.person_id ").scroll(new Select.RowHandler(){
+      @Override public void handle(      Select.Row row) throws SQLException {
+        authorsByPersonId.put(row.getLong(1),row.getString(2));
+      }
+    }
+);
+    Upsert update=context.prepareUpsert("UPDATE users SET scm_accounts = ?, updated_at = ? WHERE id = ?");
+    for (    Long personId : authorsByPersonId.keySet()) {
+      List<String> authors=newArrayList(authorsByPersonId.get(personId));
+      List<User> users=selectUsersFromLoginOrEmail(context,authors);
+      if (users.size() == 1) {
+        User user=users.get(0);
+        if (authors.contains(user.login)) {
+          authors.remove(user.login);
+        }
+        if (authors.contains(user.email)) {
+          authors.remove(user.email);
+        }
+        if (!authors.isEmpty()) {
+          update.setString(1,convertScmAccountsToCsv(authors)).setLong(2,now).setLong(3,user.id).addBatch();
+          counter.getAndIncrement();
+        }
+      }
+    }
+    if (((UpsertImpl)update).getBatchCount() > 0L) {
+      update.execute().commit();
+    }
+    update.close();
+    progress.log();
+  }
+  finally {
+    progress.stop();
+  }
+}

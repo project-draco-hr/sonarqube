@@ -1,0 +1,18 @@
+{
+  db.prepareDbUnit(getClass(),"before.xml");
+  Long oldDate=1500000000000L;
+  Long updatedDate=2000000000000L;
+  when(system.now()).thenReturn(updatedDate);
+  migration.execute();
+  User simon=getUserByLogin("simon");
+  assertThat(simon.scmAccounts).isEqualTo(",Simon B,simon@codehaus.org,");
+  assertThat(simon.updatedAt).isEqualTo(updatedDate);
+  User fabrice=getUserByLogin("fabrice");
+  assertThat(fabrice.scmAccounts).isEqualTo(",fab,");
+  assertThat(fabrice.updatedAt).isEqualTo(updatedDate);
+  assertThat(getUserByLogin("julien").updatedAt).isEqualTo(oldDate);
+  assertThat(getUserByLogin("jb").updatedAt).isEqualTo(oldDate);
+  assertThat(getUserByLogin("disable").updatedAt).isEqualTo(oldDate);
+  assertThat(getUserByLogin("teryk").updatedAt).isEqualTo(oldDate);
+  assertThat(getUserByLogin("teryk2").updatedAt).isEqualTo(oldDate);
+}
