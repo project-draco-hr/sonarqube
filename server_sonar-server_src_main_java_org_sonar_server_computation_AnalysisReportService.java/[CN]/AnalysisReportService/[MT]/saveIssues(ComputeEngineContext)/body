@@ -2,9 +2,7 @@
   IssueStorage issueStorage=issueStorageFactory.newComputeEngineIssueStorage(context.getProject());
   File issuesFile=new File(context.getReportDirectory(),"issues.json");
   List<DefaultIssue> issues=new ArrayList<>(MAX_ISSUES_SIZE);
-  try {
-    InputStream issuesStream=new FileInputStream(issuesFile);
-    JsonReader reader=new JsonReader(new InputStreamReader(issuesStream));
+  try (InputStream issuesStream=new FileInputStream(issuesFile);JsonReader reader=new JsonReader(new InputStreamReader(issuesStream))){
     reader.beginArray();
     while (reader.hasNext()) {
       ReportIssue reportIssue=gson.fromJson(reader,ReportIssue.class);
