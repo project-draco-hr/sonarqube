@@ -1,12 +1,5 @@
 {
-  String componentKey="new-project";
-  String componentName="New Project";
-  String qualifier=Qualifiers.SUBVIEW;
-  long componentId=Long.MAX_VALUE;
-  ComponentDto component=mock(ComponentDto.class);
-  when(component.getId()).thenReturn(componentId);
-  when(resourceDao.findByKey(componentKey)).thenReturn(null).thenReturn(component);
-  service.createComponent(componentKey,componentName,qualifier);
-  verify(resourceDao,never()).insertOrUpdate(any(ResourceDto.class));
-  verifyZeroInteractions(resourceIndexerDao);
+  when(resourceDao.findByKey(anyString())).thenReturn(ComponentTesting.newProjectDto());
+  service.createComponent("new-project","New Project",Qualifiers.SUBVIEW);
+  verify(componentService,never()).create(any(NewComponent.class));
 }

@@ -1,0 +1,15 @@
+{
+  String componentKey="new-project";
+  String componentName="New Project";
+  String qualifier=Qualifiers.PROJECT;
+  when(resourceDao.findByKey(componentKey)).thenReturn(ComponentTesting.newProjectDto());
+  when(componentService.create(any(NewComponent.class))).thenReturn(componentKey);
+  service.createComponent(componentKey,componentName,qualifier);
+  ArgumentCaptor<NewComponent> newComponentArgumentCaptor=ArgumentCaptor.forClass(NewComponent.class);
+  verify(componentService).create(newComponentArgumentCaptor.capture());
+  NewComponent newComponent=newComponentArgumentCaptor.getValue();
+  assertThat(newComponent.key()).isEqualTo(componentKey);
+  assertThat(newComponent.name()).isEqualTo(componentName);
+  assertThat(newComponent.branch()).isNull();
+  assertThat(newComponent.qualifier()).isEqualTo(Qualifiers.PROJECT);
+}
