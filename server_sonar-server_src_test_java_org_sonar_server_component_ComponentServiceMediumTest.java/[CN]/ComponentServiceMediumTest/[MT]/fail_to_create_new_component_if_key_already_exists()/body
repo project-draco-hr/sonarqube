@@ -1,0 +1,13 @@
+{
+  MockUserSession.set().setLogin("john").setGlobalPermissions(GlobalPermissions.PROVISIONING);
+  ComponentDto project=ComponentTesting.newProjectDto().setKey("struts");
+  tester.get(ComponentDao.class).insert(session,project);
+  session.commit();
+  try {
+    service.create(NewComponent.create("struts","Struts project"));
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).isInstanceOf(BadRequestException.class).hasMessage("Could not create Project, key already exists: struts");
+  }
+}

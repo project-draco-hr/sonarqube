@@ -1,0 +1,22 @@
+{
+  UserSession.get().checkGlobalPermission(GlobalPermissions.PROVISIONING);
+  DbSession session=dbClient.openSession(false);
+  try {
+    checkKeyFormat(newComponent.qualifier(),newComponent.key());
+    checkBranchFormat(newComponent.qualifier(),newComponent.branch());
+    String keyWithBranch=ComponentKeys.createKey(newComponent.key(),newComponent.branch());
+    ComponentDto existingComponent=getNullableByKey(keyWithBranch);
+    if (existingComponent != null) {
+      throw new BadRequestException(formatMessage("Could not create %s, key already exists: %s",newComponent.qualifier(),keyWithBranch));
+    }
+    String uuid=Uuids.create();
+    ComponentDto component=dbClient.componentDao().insert(session,new ComponentDto().setUuid(uuid).setProjectUuid(uuid).setKey(keyWithBranch).setDeprecatedKey(keyWithBranch).setName(newComponent.name()).setLongName(newComponent.name()).setScope(Scopes.PROJECT).setQualifier(newComponent.qualifier()).setCreatedAt(new Date()));
+    resourceIndexerDao.indexResource(session,component.getId());
+    session.commit();
+    permissionService.applyDefaultPermissionTemplate(component.key());
+    return component.key();
+  }
+  finally {
+    session.close();
+  }
+}
