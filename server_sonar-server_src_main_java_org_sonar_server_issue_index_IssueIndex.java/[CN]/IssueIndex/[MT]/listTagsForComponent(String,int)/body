@@ -1,5 +1,5 @@
 {
-  SearchRequestBuilder count=getClient().prepareSearch(IssueIndexDefinition.INDEX).setTypes(IssueIndexDefinition.TYPE_ISSUE).setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),FilterBuilders.boolFilter().must(getAuthorizationFilter(new QueryContext())).must(componentFilter(Arrays.asList(componentUuid)))));
+  SearchRequestBuilder count=getClient().prepareSearch(IssueIndexDefinition.INDEX).setTypes(IssueIndexDefinition.TYPE_ISSUE).setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),FilterBuilders.boolFilter().must(getAuthorizationFilter(new QueryContext())).must(FilterBuilders.missingFilter(IssueIndexDefinition.FIELD_ISSUE_RESOLUTION)).must(componentFilter(Arrays.asList(componentUuid)))));
   TermsBuilder aggreg=AggregationBuilders.terms("_ref").field(IssueIndexDefinition.FIELD_ISSUE_TAGS).size(pageSize).order(Order.count(false)).minDocCount(1L);
   Terms result=count.addAggregation(aggreg).get().getAggregations().get("_ref");
   Map<String,Long> map=Maps.newHashMap();
