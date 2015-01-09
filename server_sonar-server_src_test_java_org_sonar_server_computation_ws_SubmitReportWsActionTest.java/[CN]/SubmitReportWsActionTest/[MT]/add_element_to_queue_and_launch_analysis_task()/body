@@ -1,8 +1,11 @@
 {
-  AnalysisReportDto report=AnalysisReportDto.newForTests(123L);
-  when(queue.add(any(String.class),anyLong(),any(InputStream.class))).thenReturn(report);
-  WsTester.TestRequest request=wsTester.newGetRequest(ComputationWebService.API_ENDPOINT,"submit_report").setParam(SubmitReportWsAction.PARAM_PROJECT_KEY,"789-123").setParam(SubmitReportWsAction.PARAM_SNAPSHOT,"456").setParam(SubmitReportWsAction.PARAM_REPORT_DATA,null);
-  request.execute();
-  verify(queue).add(eq("789-123"),eq(456L),any(InputStream.class));
-  verify(taskLauncher).startAnalysisTaskNow();
+  Response response=mock(Response.class);
+  Request request=mock(Request.class);
+  when(request.mandatoryParam(SubmitReportWsAction.PARAM_PROJECT_KEY)).thenReturn(DEFAULT_PROJECT_KEY);
+  when(request.mandatoryParamAsLong(SubmitReportWsAction.PARAM_SNAPSHOT)).thenReturn(123L);
+  InputStream reportData=IOUtils.toInputStream("report-data");
+  when(request.paramAsInputStream(SubmitReportWsAction.PARAM_REPORT_DATA)).thenReturn(reportData);
+  sut.handle(request,response);
+  verify(queue).add(DEFAULT_PROJECT_KEY,123L,reportData);
+  verify(analysisTaskLauncher).startAnalysisTaskNow();
 }

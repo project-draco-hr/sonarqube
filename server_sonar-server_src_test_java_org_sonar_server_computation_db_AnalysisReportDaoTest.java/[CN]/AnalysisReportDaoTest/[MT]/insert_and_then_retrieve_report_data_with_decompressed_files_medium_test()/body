@@ -3,11 +3,10 @@
   AnalysisReportDto report=newDefaultAnalysisReport();
   InputStream zip=getClass().getResource("/org/sonar/server/computation/db/AnalysisReportDaoTest/zip.zip").openStream();
   report.setData(zip);
-  File toDir=new File("target/tmp/unzip-report-in-database/");
-  when(tempFolder.newDir()).thenReturn(toDir);
+  File toDir=temp.newFolder();
   sut.insert(session,report);
   session.commit();
   IOUtils.closeQuietly(zip);
-  sut.getDecompressedReport(session,1L);
+  sut.selectAndDecompressToDir(session,1L,toDir);
   assertThat(toDir.list()).hasSize(3);
 }
