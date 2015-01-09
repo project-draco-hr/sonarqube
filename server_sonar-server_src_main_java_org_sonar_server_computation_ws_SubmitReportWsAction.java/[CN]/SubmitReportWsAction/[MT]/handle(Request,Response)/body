@@ -2,8 +2,8 @@
   String projectKey=request.mandatoryParam(PARAM_PROJECT_KEY);
   long snapshotId=request.mandatoryParamAsLong(PARAM_SNAPSHOT);
   try (InputStream reportData=request.paramAsInputStream(PARAM_REPORT_DATA)){
-    AnalysisReportDto report=queue.add(projectKey,snapshotId,reportData);
-    taskLauncher.startAnalysisTaskNow();
-    response.newJsonWriter().beginObject().prop("key",report.getId()).endObject().close();
+    String reportKey=queue.add(projectKey,snapshotId,reportData);
+    workerLauncher.startAnalysisTaskNow();
+    response.newJsonWriter().beginObject().prop("key",reportKey).endObject().close();
   }
  }
