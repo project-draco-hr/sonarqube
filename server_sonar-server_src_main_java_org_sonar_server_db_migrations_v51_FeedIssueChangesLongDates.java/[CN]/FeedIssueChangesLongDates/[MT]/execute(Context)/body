@@ -1,0 +1,34 @@
+{
+  final long now=system.now();
+  MassUpdate massUpdate=context.prepareMassUpdate();
+  massUpdate.select("SELECT i.created_at, i.updated_at, i.issue_change_creation_date_ms, i.id FROM issue_changes i WHERE created_at_ms IS NULL");
+  massUpdate.update("UPDATE issue_changes SET created_at_ms=?, updated_at_ms=?, issue_change_creation_date_ms=? WHERE id=?");
+  massUpdate.rowPluralName("issue_changes");
+  massUpdate.execute(new MassUpdate.Handler(){
+    @Override public boolean handle(    Select.Row row,    SqlStatement update) throws SQLException {
+      Date createdAt=row.getDate(1);
+      Date updatedAt=row.getDate(2);
+      Date functionalCreatedAt=row.getDate(3);
+      Long id=row.getLong(4);
+      updateColumn(update,1,createdAt);
+      updateColumn(update,2,updatedAt);
+      if (functionalCreatedAt == null) {
+        update.setLong(3,null);
+      }
+ else {
+        update.setLong(3,functionalCreatedAt.getTime());
+      }
+      update.setLong(4,id);
+      return true;
+    }
+    private void updateColumn(    SqlStatement update,    int position,    Date time) throws SQLException {
+      if (time == null) {
+        update.setLong(position,now);
+      }
+ else {
+        update.setLong(position,Math.min(now,time.getTime()));
+      }
+    }
+  }
+);
+}
