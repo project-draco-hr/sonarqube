@@ -1,0 +1,31 @@
+{
+  final long now=system.now();
+  MassUpdate massUpdate=context.prepareMassUpdate();
+  massUpdate.select("SELECT a.created_at, a.updated_at, a.started_at, a.finished_at, a.id FROM analysis_reports a WHERE created_at_ms IS NULL");
+  massUpdate.update("UPDATE analysis_reports SET created_at_ms=?, updated_at_ms=?, started_at_ms=?, finished_at_ms=? WHERE id=?");
+  massUpdate.rowPluralName("analysis_reports");
+  massUpdate.execute(new MassUpdate.Handler(){
+    @Override public boolean handle(    Select.Row row,    SqlStatement update) throws SQLException {
+      Date createdAt=row.getDate(1);
+      Date updatedAt=row.getDate(2);
+      Date startedAt=row.getDate(3);
+      Date finishedAt=row.getDate(4);
+      Long id=row.getLong(5);
+      updateColumn(update,1,createdAt);
+      updateColumn(update,2,updatedAt);
+      update.setLong(3,startedAt == null ? null : startedAt.getTime());
+      update.setLong(4,finishedAt == null ? null : finishedAt.getTime());
+      update.setLong(5,id);
+      return true;
+    }
+    private void updateColumn(    SqlStatement update,    int position,    Date time) throws SQLException {
+      if (time == null) {
+        update.setLong(position,now);
+      }
+ else {
+        update.setLong(position,Math.min(now,time.getTime()));
+      }
+    }
+  }
+);
+}
