@@ -8,7 +8,7 @@
   ArrayList<String> componentKeys=newArrayList("org.apache");
   map.put("components",componentKeys);
   ArrayList<String> moduleKeys=newArrayList("org.sonar");
-  map.put("componentRoots",moduleKeys);
+  map.put("moduleKeys",moduleKeys);
   map.put("reporters",newArrayList("marilyn"));
   map.put("assignees",newArrayList("joanna"));
   map.put("languages",newArrayList("xoo"));
@@ -22,8 +22,22 @@
   map.put("rules","squid:AvoidCycle,findbugs:NullReference");
   map.put("sort","CREATION_DATE");
   map.put("asc",true);
-  when(componentService.componentUuids(session,componentKeys,true)).thenReturn(newArrayList("ABCD"));
-  when(componentService.componentUuids(session,moduleKeys,true)).thenReturn(newArrayList("BCDE"));
+  when(componentService.componentUuids(eq(session),Matchers.anyCollection(),eq(true))).thenAnswer(new Answer<Collection<String>>(){
+    @Override public Collection<String> answer(    InvocationOnMock invocation) throws Throwable {
+      Collection<String> components=(Collection<String>)invocation.getArguments()[1];
+      if (components == null) {
+        return newArrayList();
+      }
+      if (components.contains("org.apache")) {
+        return newArrayList("ABCD");
+      }
+ else       if (components.contains("org.sonar")) {
+        return newArrayList("BCDE");
+      }
+      return newArrayList();
+    }
+  }
+);
   IssueQuery query=issueQueryService.createFromMap(map);
   assertThat(query.issueKeys()).containsOnly("ABCDE1234");
   assertThat(query.severities()).containsOnly("MAJOR","MINOR");

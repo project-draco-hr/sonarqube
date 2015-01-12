@@ -2,7 +2,12 @@
   Map<String,Object> map=newHashMap();
   ArrayList<String> componentKeys=newArrayList("unknown");
   map.put("components",componentKeys);
-  when(componentService.componentUuids(any(DbSession.class),eq(componentKeys),eq(true))).thenReturn(Arrays.<String>asList());
+  when(componentService.componentUuids(eq(session),Matchers.anyCollection(),eq(true))).thenAnswer(new Answer<Collection<String>>(){
+    @Override public Collection<String> answer(    InvocationOnMock invocation) throws Throwable {
+      return newArrayList();
+    }
+  }
+);
   IssueQuery query=issueQueryService.createFromMap(map);
   assertThat(query.componentUuids()).containsOnly("<UNKNOWN>");
 }
