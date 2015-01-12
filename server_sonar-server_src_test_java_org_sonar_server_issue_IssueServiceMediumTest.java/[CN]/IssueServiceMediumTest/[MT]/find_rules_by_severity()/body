@@ -1,8 +1,10 @@
 {
-  tester.get(IssueDao.class).insert(session,newIssue().setSeverity(Severity.MAJOR));
-  tester.get(IssueDao.class).insert(session,newIssue().setSeverity(Severity.MAJOR));
-  tester.get(IssueDao.class).insert(session,newIssue().setSeverity(Severity.INFO));
-  session.commit();
+  RuleDto rule=newRule();
+  ComponentDto project=newProject();
+  ComponentDto file=newFile(project);
+  saveIssue(IssueTesting.newDto(rule,file,project).setSeverity(Severity.MAJOR));
+  saveIssue(IssueTesting.newDto(rule,file,project).setSeverity(Severity.MAJOR));
+  saveIssue(IssueTesting.newDto(rule,file,project).setSeverity(Severity.INFO));
   Multiset<String> result=service.findSeveritiesByComponent(file.key(),null,session);
   assertThat(result.count("MAJOR")).isEqualTo(2);
   assertThat(result.count("INFO")).isEqualTo(1);

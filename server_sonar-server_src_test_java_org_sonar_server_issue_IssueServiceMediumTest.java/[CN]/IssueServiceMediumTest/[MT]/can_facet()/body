@@ -1,9 +1,9 @@
 {
-  IssueDto issue1=newIssue().setActionPlanKey("P1");
-  IssueDto issue2=newIssue().setActionPlanKey("P2").setResolution("NONE");
-  tester.get(IssueDao.class).insert(session,issue1,issue2);
-  session.commit();
-  index();
+  RuleDto rule=newRule();
+  ComponentDto project=newProject();
+  ComponentDto file=newFile(project);
+  saveIssue(IssueTesting.newDto(rule,file,project).setActionPlanKey("P1"));
+  saveIssue(IssueTesting.newDto(rule,file,project).setActionPlanKey("P2").setResolution("NONE"));
   org.sonar.server.search.Result<Issue> result=service.search(IssueQuery.builder().build(),new QueryContext());
   assertThat(result.getHits()).hasSize(2);
   assertThat(result.getFacets()).isEmpty();

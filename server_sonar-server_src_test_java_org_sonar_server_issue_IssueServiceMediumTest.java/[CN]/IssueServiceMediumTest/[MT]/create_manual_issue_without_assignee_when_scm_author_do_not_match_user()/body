@@ -1,0 +1,14 @@
+{
+  ComponentDto project=newProject();
+  ComponentDto file=newFile(project);
+  newSourceLine(file,1,"unknown");
+  createDefaultGroup();
+  newUser("arthur");
+  MockUserSession.set().setLogin("john").addProjectPermissions(UserRole.USER,project.key());
+  RuleDto manualRule=RuleTesting.newManualRule("manualRuleKey");
+  tester.get(RuleDao.class).insert(session,manualRule);
+  session.commit();
+  Issue result=service.createManualIssue(file.key(),manualRule.getKey(),1,"Fix it",Severity.MINOR,2d);
+  IssueDoc manualIssue=(IssueDoc)indexClient.get(IssueIndex.class).getByKey(result.key());
+  assertThat(manualIssue.assignee()).isNull();
+}

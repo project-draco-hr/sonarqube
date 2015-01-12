@@ -1,7 +1,12 @@
 {
-  db.issueDao().insert(session,IssueTesting.newDto(rule,file,project).setTags(ImmutableSet.of("convention","java8","bug")),IssueTesting.newDto(rule,file,project).setTags(ImmutableSet.of("convention","bug")),IssueTesting.newDto(rule,file,project),IssueTesting.newDto(rule,file,project).setTags(ImmutableSet.of("convention","java8","bug")).setResolution(Issue.RESOLUTION_FIXED),IssueTesting.newDto(rule,file,project).setTags(ImmutableSet.of("convention")));
-  session.commit();
-  index();
+  RuleDto rule=newRule();
+  ComponentDto project=newProject();
+  ComponentDto file=newFile(project);
+  saveIssue(IssueTesting.newDto(rule,file,project).setTags(ImmutableSet.of("convention","java8","bug")));
+  saveIssue(IssueTesting.newDto(rule,file,project).setTags(ImmutableSet.of("convention","bug")));
+  saveIssue(IssueTesting.newDto(rule,file,project));
+  saveIssue(IssueTesting.newDto(rule,file,project).setTags(ImmutableSet.of("convention","java8","bug")).setResolution(Issue.RESOLUTION_FIXED));
+  saveIssue(IssueTesting.newDto(rule,file,project).setTags(ImmutableSet.of("convention")));
   assertThat(service.listTagsForComponent(project.uuid(),5)).contains(entry("convention",3L),entry("bug",2L),entry("java8",1L));
   assertThat(service.listTagsForComponent(project.uuid(),2)).contains(entry("convention",3L),entry("bug",2L)).doesNotContainEntry("java8",1L);
   assertThat(service.listTagsForComponent("other",10)).isEmpty();

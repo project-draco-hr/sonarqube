@@ -1,15 +1,18 @@
 {
+  ComponentDto project=newProject();
+  ComponentDto file=newFile(project);
+  MockUserSession.set().setLogin("john").addProjectPermissions(UserRole.USER,project.key());
   RuleDto manualRule=RuleTesting.newManualRule("manualRuleKey");
   tester.get(RuleDao.class).insert(session,manualRule);
   session.commit();
-  Issue result=service.createManualIssue(file.key(),manualRule.getKey(),10,"Fix it",Severity.MINOR,2d);
+  Issue result=service.createManualIssue(file.key(),manualRule.getKey(),null,"Fix it",Severity.MINOR,2d);
   IssueDoc manualIssue=(IssueDoc)indexClient.get(IssueIndex.class).getByKey(result.key());
   assertThat(manualIssue.componentUuid()).isEqualTo(file.uuid());
   assertThat(manualIssue.projectUuid()).isEqualTo(project.uuid());
   assertThat(manualIssue.ruleKey()).isEqualTo(manualRule.getKey());
   assertThat(manualIssue.message()).isEqualTo("Fix it");
-  assertThat(manualIssue.line()).isEqualTo(10);
+  assertThat(manualIssue.line()).isNull();
   assertThat(manualIssue.severity()).isEqualTo(Severity.MINOR);
   assertThat(manualIssue.effortToFix()).isEqualTo(2d);
-  assertThat(manualIssue.reporter()).isEqualTo(connectedUser.getLogin());
+  assertThat(manualIssue.reporter()).isEqualTo("john");
 }

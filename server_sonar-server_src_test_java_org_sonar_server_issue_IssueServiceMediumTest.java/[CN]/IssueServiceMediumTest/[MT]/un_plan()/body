@@ -1,10 +1,11 @@
 {
+  RuleDto rule=newRule();
+  ComponentDto project=newProject();
+  ComponentDto file=newFile(project);
+  MockUserSession.set().setLogin("john");
   String actionPlanKey="EFGH";
   db.actionPlanDao().save(new ActionPlanDto().setKey(actionPlanKey).setProjectId(project.getId()));
-  IssueDto issue=newIssue().setActionPlanKey(actionPlanKey);
-  tester.get(IssueDao.class).insert(session,issue);
-  session.commit();
-  index();
+  IssueDto issue=saveIssue(IssueTesting.newDto(rule,file,project).setActionPlanKey(actionPlanKey));
   assertThat(indexClient.get(IssueIndex.class).getByKey(issue.getKey()).actionPlanKey()).isEqualTo(actionPlanKey);
   service.plan(issue.getKey(),null);
   assertThat(indexClient.get(IssueIndex.class).getByKey(issue.getKey()).actionPlanKey()).isNull();
