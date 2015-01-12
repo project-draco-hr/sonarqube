@@ -1,3 +1,11 @@
 {
-  return mapping.newQueryOptions(SearchOptions.create(request));
+  QueryContext context=super.getQueryContext(request);
+  QueryContext searchQueryContext=mapping.newQueryOptions(SearchOptions.create(request)).setLimit(context.getLimit()).setOffset(context.getOffset()).setScroll(context.isScroll());
+  if (context.facets().contains("true")) {
+    searchQueryContext.addFacets(DEFAULT_FACETS);
+  }
+ else {
+    searchQueryContext.addFacets(context.facets());
+  }
+  return searchQueryContext;
 }
