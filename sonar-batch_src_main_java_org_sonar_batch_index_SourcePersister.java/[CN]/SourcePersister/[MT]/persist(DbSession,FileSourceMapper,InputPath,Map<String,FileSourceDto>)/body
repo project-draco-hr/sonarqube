@@ -8,13 +8,13 @@
   String newDataHash=newData != null ? DigestUtils.md5Hex(newData) : "0";
   Date now=system2.newDate();
   if (previous == null) {
-    FileSourceDto newFileSource=new FileSourceDto().setProjectUuid(projectTree.getRootProject().getUuid()).setFileUuid(fileUuid).setData(newData).setDataHash(newDataHash).setLineHashes(lineHashesAsMd5Hex(inputFile)).setCreatedAt(now.getTime()).setUpdatedAt(now.getTime());
+    FileSourceDto newFileSource=new FileSourceDto().setProjectUuid(projectTree.getRootProject().getUuid()).setFileUuid(fileUuid).setData(newData).setDataHash(newDataHash).setSrcHash(inputFile.hash()).setLineHashes(lineHashesAsMd5Hex(inputFile)).setCreatedAt(now.getTime()).setUpdatedAt(now.getTime());
     mapper.insert(newFileSource);
     session.commit();
   }
  else {
     if (!newDataHash.equals(previous.getDataHash())) {
-      previous.setData(newData).setLineHashes(lineHashesAsMd5Hex(inputFile)).setDataHash(newDataHash).setUpdatedAt(now.getTime());
+      previous.setData(newData).setLineHashes(lineHashesAsMd5Hex(inputFile)).setDataHash(newDataHash).setSrcHash(inputFile.hash()).setUpdatedAt(now.getTime());
       mapper.update(previous);
       session.commit();
     }
