@@ -4,7 +4,7 @@
   userSession.checkLoggedIn();
   IssueBulkChangeResult result=new IssueBulkChangeResult();
   List<Issue> issues=getByKeysForUpdate(issueBulkChangeQuery.issues());
-  Referentials referentials=new Referentials(issues);
+  Repository repository=new Repository(issues);
   List<Action> bulkActions=getActionsToApply(issueBulkChangeQuery,issues,userSession);
   IssueChangeContext issueChangeContext=IssueChangeContext.createUser(new Date(),userSession.login());
   Set<String> concernedProjects=new HashSet<String>();
@@ -21,7 +21,7 @@
       if (issueBulkChangeQuery.sendNotifications()) {
         String projectKey=issue.projectKey();
         if (projectKey != null) {
-          issueNotifications.sendChanges((DefaultIssue)issue,issueChangeContext,referentials.rule(issue.ruleKey()),referentials.project(projectKey),referentials.component(issue.componentKey()));
+          issueNotifications.sendChanges((DefaultIssue)issue,issueChangeContext,repository.rule(issue.ruleKey()),repository.project(projectKey),repository.component(issue.componentKey()));
         }
       }
       concernedProjects.add(issue.projectKey());
