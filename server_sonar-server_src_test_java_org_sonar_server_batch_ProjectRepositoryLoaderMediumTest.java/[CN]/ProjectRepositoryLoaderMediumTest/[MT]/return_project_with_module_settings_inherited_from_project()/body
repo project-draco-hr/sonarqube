@@ -2,14 +2,11 @@
   MockUserSession.set().setLogin("john").setGlobalPermissions(GlobalPermissions.SCAN_EXECUTION);
   ComponentDto project=ComponentTesting.newProjectDto();
   tester.get(DbClient.class).componentDao().insert(dbSession,project);
-  SnapshotDto projectSnapshot=SnapshotTesting.createForProject(project);
-  tester.get(DbClient.class).snapshotDao().insert(dbSession,projectSnapshot);
   addDefaultProfile();
   tester.get(DbClient.class).propertiesDao().setProperty(new PropertyDto().setKey("sonar.jira.project.key").setValue("SONAR").setResourceId(project.getId()),dbSession);
   tester.get(DbClient.class).propertiesDao().setProperty(new PropertyDto().setKey("sonar.jira.login.secured").setValue("john").setResourceId(project.getId()),dbSession);
   ComponentDto module=ComponentTesting.newModuleDto(project);
   tester.get(DbClient.class).componentDao().insert(dbSession,module);
-  tester.get(DbClient.class).snapshotDao().insert(dbSession,SnapshotTesting.createForComponent(module,projectSnapshot));
   dbSession.commit();
   ProjectReferentials ref=loader.load(ProjectRepositoryQuery.create().setModuleKey(project.key()));
   assertThat(ref.settings(project.key())).isEqualTo(ImmutableMap.of("sonar.jira.project.key","SONAR","sonar.jira.login.secured","john"));

@@ -1,9 +1,11 @@
 {
   setupData("multi-modules");
   List<ComponentDto> modules=dao.findChildrenModulesFromModule(session,"org.struts:struts");
-  assertThat(modules).extracting("uuid").containsOnly("EFGH","FGHI");
+  assertThat(modules).extracting("uuid").containsOnly("ABCD","EFGH","FGHI");
   modules=dao.findChildrenModulesFromModule(session,"org.struts:struts-core");
-  assertThat(modules).extracting("uuid").containsOnly("FGHI");
+  assertThat(modules).extracting("uuid").containsOnly("EFGH","FGHI");
   modules=dao.findChildrenModulesFromModule(session,"org.struts:struts-data");
-  assertThat(modules).isEmpty();
+  assertThat(modules).extracting("uuid").containsOnly("FGHI");
+  assertThat(dao.findChildrenModulesFromModule(session,"org.struts:struts-core:src/org/struts")).isEmpty();
+  assertThat(dao.findChildrenModulesFromModule(session,"unknown")).isEmpty();
 }
