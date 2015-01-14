@@ -1,0 +1,17 @@
+{
+  InputPathCache inputFileCache=container.getComponentByType(InputPathCache.class);
+  for (  Entry<Measure> measureEntry : container.getComponentByType(MeasureCache.class).entries()) {
+    String componentKey=measureEntry.key()[0].toString();
+    InputFile file=inputFileCache.getFile(StringUtils.substringBeforeLast(componentKey,":"),StringUtils.substringAfterLast(componentKey,":"));
+    Measure oldMeasure=measureEntry.value();
+    DefaultMeasure<Serializable> newMeasure=new DefaultMeasure<>().forMetric(oldMeasure.getMetric());
+    if (file != null) {
+      newMeasure.onFile(file);
+    }
+ else {
+      newMeasure.onProject();
+    }
+    newMeasure.withValue(oldMeasure.value());
+    measures.add(newMeasure);
+  }
+}

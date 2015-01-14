@@ -1,0 +1,13 @@
+{
+  File foo=File.create("src/Foo.java");
+  File bar=File.create("src/Bar.java");
+  when(sonarIndex.getResource(foo)).thenReturn(foo);
+  when(sonarIndex.getResource(bar)).thenReturn(bar);
+  sensorStorage.store(new DefaultDependency().from(new DefaultInputFile("foo","src/Foo.java").setType(Type.MAIN)).to(new DefaultInputFile("foo","src/Bar.java").setType(Type.MAIN)).weight(3));
+  ArgumentCaptor<Dependency> argumentCaptor=ArgumentCaptor.forClass(Dependency.class);
+  verify(sonarIndex).addDependency(argumentCaptor.capture());
+  assertThat(argumentCaptor.getValue().getFrom()).isEqualTo(foo);
+  assertThat(argumentCaptor.getValue().getTo()).isEqualTo(bar);
+  assertThat(argumentCaptor.getValue().getWeight()).isEqualTo(3);
+  assertThat(argumentCaptor.getValue().getUsage()).isEqualTo("USES");
+}
