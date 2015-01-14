@@ -13,14 +13,18 @@
           addSettings(ref,module.getKey(),getSettingsFromParents(module.key(),hasScanPerm,session));
           projectKey=project.key();
         }
-        List<PropertyDto> moduleSettings=dbClient.propertiesDao().selectProjectProperties(query.getModuleKey(),session);
         List<ComponentDto> moduleChildren=dbClient.componentDao().findChildrenModulesFromModule(session,query.getModuleKey());
+        moduleChildren.add(module);
+        Map<String,String> moduleUuidsByKey=moduleUuidsByKey(module,moduleChildren);
+        Map<String,Long> moduleIdsByKey=moduleIdsByKey(module,moduleChildren);
+        List<PropertyDto> moduleSettings=dbClient.propertiesDao().selectProjectProperties(query.getModuleKey(),session);
         List<PropertyDto> moduleChildrenSettings=newArrayList();
         if (!moduleChildren.isEmpty()) {
           moduleChildrenSettings=dbClient.propertiesDao().findChildrenModuleProperties(query.getModuleKey(),session);
         }
-        TreeModuleSettings treeModuleSettings=new TreeModuleSettings(moduleChildren,moduleChildrenSettings,module,moduleSettings);
+        TreeModuleSettings treeModuleSettings=new TreeModuleSettings(moduleUuidsByKey,moduleIdsByKey,moduleChildren,moduleChildrenSettings,module,moduleSettings);
         addSettingsToChildrenModules(ref,query.getModuleKey(),Maps.<String,String>newHashMap(),treeModuleSettings,hasScanPerm,session);
+        addFileData(session,ref,moduleChildren,module.key());
       }
  else {
         addSettings(ref,query.getModuleKey(),getPropertiesMap(dbClient.propertiesDao().selectProjectProperties(query.getModuleKey(),session),hasScanPerm));
