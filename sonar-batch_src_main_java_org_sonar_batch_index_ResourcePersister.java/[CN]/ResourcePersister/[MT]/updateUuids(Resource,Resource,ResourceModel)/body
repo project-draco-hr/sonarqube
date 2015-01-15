@@ -4,25 +4,20 @@
   }
   if (parentResource != null) {
     ResourceModel parentModel=session.getSingleResult(ResourceModel.class,"id",parentResource.getId());
-    if (parentModel.getProjectUuid() != null) {
-      model.setProjectUuid(parentModel.getProjectUuid());
-    }
- else {
-      model.setProjectUuid(parentModel.getUuid());
-    }
+    model.setProjectUuid(parentModel.getProjectUuid());
     if (Scopes.isProject(parentResource)) {
       model.setModuleUuid(parentResource.getUuid());
       String parentModuleUuidPath=parentModel.getModuleUuidPath();
-      model.setModuleUuidPath(StringUtils.isNotBlank(parentModuleUuidPath) ? parentModuleUuidPath + "." + parentModel.getUuid() : parentModel.getUuid());
+      model.setModuleUuidPath(parentModuleUuidPath + parentModel.getUuid() + ".");
     }
  else {
       model.setModuleUuid(parentModel.getModuleUuid());
       String parentModuleUuidPath=parentModel.getModuleUuidPath();
-      model.setModuleUuidPath(StringUtils.isNotBlank(parentModuleUuidPath) ? parentModuleUuidPath : parentModel.getUuid());
+      model.setModuleUuidPath(parentModuleUuidPath);
     }
   }
  else {
     model.setProjectUuid(model.getUuid());
-    model.setModuleUuidPath("");
+    model.setModuleUuidPath(".");
   }
 }
