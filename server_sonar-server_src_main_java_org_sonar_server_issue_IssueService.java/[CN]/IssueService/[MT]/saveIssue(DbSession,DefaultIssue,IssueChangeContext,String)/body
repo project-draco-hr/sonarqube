@@ -4,6 +4,7 @@
     throw new IllegalStateException(String.format("Issue '%s' has no project key",issue.key()));
   }
   issueStorage.save(session,issue);
-  issueNotifications.sendChanges(issue,context,getNullableRuleByKey(issue.ruleKey()),dbClient.componentDao().getByKey(session,projectKey),dbClient.componentDao().getNullableByKey(session,issue.componentKey()),comment);
+  Rule rule=getNullableRuleByKey(issue.ruleKey());
+  issueNotifications.sendChanges(issue,context.login(),rule != null ? rule.getName() : null,dbClient.componentDao().getByKey(session,projectKey),dbClient.componentDao().getNullableByKey(session,issue.componentKey()),comment,false);
   dryRunCache.reportResourceModification(issue.componentKey());
 }

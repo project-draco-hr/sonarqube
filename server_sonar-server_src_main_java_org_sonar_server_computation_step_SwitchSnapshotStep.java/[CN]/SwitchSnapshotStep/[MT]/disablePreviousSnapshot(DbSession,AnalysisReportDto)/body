@@ -1,16 +1,16 @@
 {
   SnapshotDto referenceSnapshot;
   try {
-    referenceSnapshot=dao.getByKey(session,report.getSnapshotId());
+    referenceSnapshot=dbClient.snapshotDao().getByKey(session,report.getSnapshotId());
   }
  catch (  Exception exception) {
     throw new IllegalStateException(String.format("Unexpected error while trying to retrieve snapshot of analysis %s",report),exception);
   }
-  List<SnapshotDto> snapshots=dao.findSnapshotAndChildrenOfProjectScope(session,referenceSnapshot);
+  List<SnapshotDto> snapshots=dbClient.snapshotDao().findSnapshotAndChildrenOfProjectScope(session,referenceSnapshot);
   for (  SnapshotDto snapshot : snapshots) {
-    SnapshotDto previousLastSnapshot=dao.getLastSnapshot(session,snapshot);
+    SnapshotDto previousLastSnapshot=dbClient.snapshotDao().getLastSnapshot(session,snapshot);
     if (previousLastSnapshot != null) {
-      dao.updateSnapshotAndChildrenLastFlag(session,previousLastSnapshot,false);
+      dbClient.snapshotDao().updateSnapshotAndChildrenLastFlag(session,previousLastSnapshot,false);
       session.commit();
     }
   }

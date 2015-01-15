@@ -1,0 +1,19 @@
+{
+  NewIssuesStatistics newIssuesStatistics=new NewIssuesStatistics();
+  CloseableIterator<DefaultIssue> issues=finalIssues.traverse();
+  try {
+    while (issues.hasNext()) {
+      DefaultIssue issue=issues.next();
+      if (issue.isNew() && issue.resolution() == null) {
+        newIssuesStatistics.add(issue);
+      }
+ else       if (issue.isChanged() && issue.mustSendNotifications()) {
+        service.sendChanges(issue,null,rules.ruleName(issue.ruleKey()),context.getProject(),null,null,true);
+      }
+    }
+  }
+  finally {
+    issues.close();
+  }
+  sendNewIssuesStatistics(context,newIssuesStatistics);
+}

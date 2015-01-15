@@ -1,0 +1,19 @@
+{
+  ByteArrayOutputStream bytesOutput=new ByteArrayOutputStream();
+  ObjectOutputStream objectOutputStream=new ObjectOutputStream(bytesOutput);
+  objectOutputStream.writeObject(new SimpleSerializable("first"));
+  objectOutputStream.writeObject(new SimpleSerializable("second"));
+  objectOutputStream.writeObject(new SimpleSerializable("third"));
+  objectOutputStream.flush();
+  objectOutputStream.close();
+  ObjectInputStreamIterator<SimpleSerializable> it=new ObjectInputStreamIterator<>(new ByteArrayInputStream(bytesOutput.toByteArray()));
+  assertThat(it.next().value).isEqualTo("first");
+  assertThat(it.next().value).isEqualTo("second");
+  assertThat(it.next().value).isEqualTo("third");
+  try {
+    it.next();
+    fail();
+  }
+ catch (  NoSuchElementException expected) {
+  }
+}

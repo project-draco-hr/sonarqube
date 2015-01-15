@@ -1,14 +1,13 @@
 {
   TimeProfiler profiler=new TimeProfiler(LOG).start(String.format("#%s - %s - processing analysis report",report.getId(),report.getProjectKey()));
-  DbSession session=dbClient.openSession(true);
-  ComponentDto project=findProject(report,session);
+  ComponentDto project=loadProject(report);
   File reportDir=tempFolder.newDir();
   try {
     ComputationContext context=new ComputationContext(report,project,reportDir);
-    dbClient.analysisReportDao().selectAndDecompressToDir(session,report.getId(),reportDir);
-    for (    ComputationStep step : stepRegistry.steps()) {
+    decompressReport(report,reportDir);
+    for (    ComputationStep step : steps.orderedSteps()) {
       TimeProfiler stepProfiler=new TimeProfiler(LOG).start(step.getDescription());
-      step.execute(session,context);
+      step.execute(context);
       stepProfiler.stop();
     }
     report.succeed();
@@ -19,9 +18,7 @@
   }
  finally {
     FileUtils.deleteQuietly(reportDir);
-    logActivity(session,report,project);
-    session.commit();
-    MyBatis.closeQuietly(session);
+    logActivity(report,project);
     profiler.stop();
   }
 }

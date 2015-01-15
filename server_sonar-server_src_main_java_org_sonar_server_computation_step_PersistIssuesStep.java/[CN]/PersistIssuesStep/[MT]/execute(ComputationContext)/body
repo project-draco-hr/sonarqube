@@ -1,0 +1,42 @@
+{
+  DbSession session=dbClient.openSession(true);
+  IssueMapper mapper=session.getMapper(IssueMapper.class);
+  IssueChangeMapper changeMapper=session.getMapper(IssueChangeMapper.class);
+  int count=0;
+  CloseableIterator<DefaultIssue> issues=finalIssues.traverse();
+  try {
+    while (issues.hasNext()) {
+      DefaultIssue issue=issues.next();
+      if (issue.isNew()) {
+        Integer ruleId=ruleCache.get(issue.ruleKey()).getId();
+        mapper.insert(IssueDto.toDtoForBatchInsert(issue,issue.componentId(),context.getProject().getId(),ruleId,system2.now()));
+        count++;
+      }
+ else {
+        IssueDto dto=IssueDto.toDtoForUpdate(issue,context.getProject().getId(),system2.now());
+        if (Issue.STATUS_CLOSED.equals(issue.status()) || issue.selectedAt() == null) {
+          mapper.update(dto);
+        }
+ else {
+          int updateCount=mapper.updateIfBeforeSelectedDate(dto);
+          if (updateCount == 0) {
+            conflictResolver.resolve(issue,mapper);
+          }
+        }
+        count++;
+      }
+      count+=insertChanges(changeMapper,issue);
+      if (count > BatchSession.MAX_BATCH_SIZE) {
+        session.flushStatements();
+        session.commit();
+        count=0;
+      }
+    }
+    session.flushStatements();
+    session.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+    issues.close();
+  }
+}

@@ -1,0 +1,18 @@
+{
+  int count=0;
+  for (  IssueComment comment : issue.comments()) {
+    DefaultIssueComment c=(DefaultIssueComment)comment;
+    if (c.isNew()) {
+      IssueChangeDto changeDto=IssueChangeDto.of(c);
+      mapper.insert(changeDto);
+      count++;
+    }
+  }
+  FieldDiffs diffs=issue.currentChange();
+  if (!issue.isNew() && diffs != null) {
+    IssueChangeDto changeDto=IssueChangeDto.of(issue.key(),diffs);
+    mapper.insert(changeDto);
+    count++;
+  }
+  return count;
+}

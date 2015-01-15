@@ -1,0 +1,20 @@
+{
+  AnalysisReportDto report=null;
+  try {
+    report=queue.pop();
+  }
+ catch (  Exception e) {
+    LOG.error("Failed to pop the queue of analysis reports",e);
+  }
+  if (report != null) {
+    try {
+      process(report);
+    }
+ catch (    Exception e) {
+      LOG.error(String.format("Failed to process analysis report %d of project %s",report.getId(),report.getProjectKey()),e);
+    }
+ finally {
+      removeSilentlyFromQueue(report);
+    }
+  }
+}

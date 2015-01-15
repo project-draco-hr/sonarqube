@@ -1,0 +1,16 @@
+{
+  ByteArrayOutputStream bytesOutput=new ByteArrayOutputStream();
+  ObjectOutputStream objectOutputStream=new ObjectOutputStream(bytesOutput);
+  objectOutputStream.writeObject(new SimpleSerializable("first"));
+  objectOutputStream.writeBoolean(false);
+  objectOutputStream.flush();
+  objectOutputStream.close();
+  ObjectInputStreamIterator<SimpleSerializable> it=new ObjectInputStreamIterator<>(new ByteArrayInputStream(bytesOutput.toByteArray()));
+  assertThat(it.next().value).isEqualTo("first");
+  try {
+    it.next();
+    fail();
+  }
+ catch (  RuntimeException expected) {
+  }
+}

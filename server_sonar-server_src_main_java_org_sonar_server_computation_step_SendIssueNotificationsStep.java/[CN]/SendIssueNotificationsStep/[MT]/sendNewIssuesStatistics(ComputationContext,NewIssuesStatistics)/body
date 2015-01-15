@@ -1,0 +1,10 @@
+{
+  if (!newIssuesStatistics.isEmpty()) {
+    ComponentDto project=context.getProject();
+    Notification notification=new Notification("new-issues").setFieldValue("projectName",project.longName()).setFieldValue("projectKey",project.key()).setDefaultMessage(newIssuesStatistics.size() + " new issues on " + project.longName()+ ".\n").setFieldValue("projectDate",DateUtils.formatDateTime(context.getAnalysisDate())).setFieldValue("projectUuid",project.uuid()).setFieldValue("count",String.valueOf(newIssuesStatistics.size()));
+    for (    String severity : Severity.ALL) {
+      notification.setFieldValue("count-" + severity,String.valueOf(newIssuesStatistics.issuesWithSeverity(severity)));
+    }
+    service.send(notification,true);
+  }
+}

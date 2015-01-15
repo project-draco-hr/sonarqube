@@ -1,0 +1,24 @@
+{
+  Notification notification=null;
+  if (comment != null || issue.mustSendNotifications()) {
+    FieldDiffs currentChange=issue.currentChange();
+    notification=new Notification("issue-changes").setFieldValue("projectName",project.longName()).setFieldValue("projectKey",project.key()).setFieldValue("key",issue.key()).setFieldValue("changeAuthor",changeAuthorLogin).setFieldValue("reporter",issue.reporter()).setFieldValue("assignee",issue.assignee()).setFieldValue("message",issue.message()).setFieldValue("ruleName",ruleName).setFieldValue("componentKey",issue.componentKey());
+    if (component != null) {
+      notification.setFieldValue("componentName",component.longName());
+    }
+    if (comment != null) {
+      notification.setFieldValue("comment",comment);
+    }
+    if (currentChange != null) {
+      for (      Map.Entry<String,FieldDiffs.Diff> entry : currentChange.diffs().entrySet()) {
+        String type=entry.getKey();
+        FieldDiffs.Diff diff=entry.getValue();
+        Serializable newValue=diff.newValue();
+        Serializable oldValue=diff.oldValue();
+        notification.setFieldValue("old." + type,oldValue != null ? oldValue.toString() : null);
+        notification.setFieldValue("new." + type,newValue != null ? newValue.toString() : null);
+      }
+    }
+  }
+  return notification;
+}
