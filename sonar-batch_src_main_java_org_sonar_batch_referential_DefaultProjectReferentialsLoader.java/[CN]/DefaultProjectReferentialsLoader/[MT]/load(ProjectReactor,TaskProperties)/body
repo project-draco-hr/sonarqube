@@ -9,9 +9,9 @@
   ProjectReferentials ref=ProjectReferentials.fromJson(serverClient.request(url));
   if (session != null) {
     for (    ProjectDefinition module : reactor.getProjects()) {
-      for (      Map.Entry<String,String> hashByPaths : hashByRelativePath(module.getKeyWithBranch()).entrySet()) {
-        String path=hashByPaths.getKey();
-        String hash=hashByPaths.getValue();
+      for (      Entry<String,FileData> fileDataByPaths : ref.fileDataByPath(module.getKeyWithBranch()).entrySet()) {
+        String path=fileDataByPaths.getKey();
+        FileData fileData=fileDataByPaths.getValue();
         String lastCommits=null;
         String revisions=null;
         String authors=null;
@@ -27,7 +27,7 @@
             authors=((MeasureModel)measureByKey[1]).getData(CoreMetrics.SCM_AUTHORS_BY_LINE);
           }
         }
-        ref.addFileData(module.getKeyWithBranch(),path,new FileData(hash,authors == null,lastCommits,revisions,authors));
+        ref.addFileData(module.getKeyWithBranch(),path,new FileData(fileData.hash(),authors == null,lastCommits,revisions,authors));
       }
     }
     ref.setLastAnalysisDate(lastSnapshotCreationDate(projectKey));
