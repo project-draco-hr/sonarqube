@@ -3,10 +3,14 @@
     return;
   }
   BatchResource parentBatchResource=batchResource.parent();
+  Snapshot s;
   if (parentBatchResource != null) {
     persist(parentBatchResource);
+    s=persist(findModule(parentBatchResource),batchResource.resource(),parentBatchResource.resource());
   }
-  Snapshot s=persist(findParentModule(batchResource),batchResource.resource(),parentBatchResource != null ? parentBatchResource.resource() : null);
+ else {
+    s=persistProject((Project)batchResource.resource(),null);
+  }
   batchResource.setSnapshot(s);
   if (ResourceUtils.isPersistable(batchResource.resource())) {
     graph.addComponent(batchResource.resource(),batchResource.snapshotId());
