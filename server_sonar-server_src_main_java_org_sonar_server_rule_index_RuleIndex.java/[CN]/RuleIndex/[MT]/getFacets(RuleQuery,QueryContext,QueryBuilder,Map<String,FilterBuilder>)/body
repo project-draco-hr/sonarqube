@@ -2,21 +2,10 @@
   Map<String,AggregationBuilder> aggregations=new HashMap<String,AggregationBuilder>();
   StickyFacetBuilder stickyFacetBuilder=stickyFacetBuilder(queryBuilder,filters);
   addDefaultFacets(query,options,queryBuilder,filters,aggregations,stickyFacetBuilder);
-  if (options.facets().contains(FACET_STATUSES)) {
-    aggregations.put(FACET_STATUSES,stickyFacetBuilder.buildStickyFacet(RuleNormalizer.RuleField.STATUS.field(),FACET_STATUSES,ALL_STATUSES.toArray()));
-  }
+  addStatusFacetIfNeeded(query,options,aggregations,stickyFacetBuilder);
   if (options.facets().contains(FACET_SEVERITIES)) {
     aggregations.put(FACET_SEVERITIES,stickyFacetBuilder.buildStickyFacet(RuleNormalizer.RuleField.SEVERITY.field(),FACET_SEVERITIES,Severity.ALL.toArray()));
   }
-  if (options.facets().contains(FACET_DEBT_CHARACTERISTICS)) {
-    int characsSize=10;
-    int subCharacsSize=300;
-    Collection<String> characsFromQuery=query.getDebtCharacteristics();
-    Object[] selectedChars=characsFromQuery == null ? new Object[0] : characsFromQuery.toArray();
-    AggregationBuilder debtChar=AggregationBuilders.filter(FACET_DEBT_CHARACTERISTICS + "__chars").filter(stickyFacetBuilder.getStickyFacetFilter(RuleNormalizer.RuleField.CHARACTERISTIC.field())).subAggregation(AggregationBuilders.terms(FACET_DEBT_CHARACTERISTICS + "__chars_top").field(RuleNormalizer.RuleField.CHARACTERISTIC.field()).size(characsSize)).subAggregation(AggregationBuilders.terms(FACET_DEBT_CHARACTERISTICS + "__chars_selected").field(RuleNormalizer.RuleField.CHARACTERISTIC.field()).include(Joiner.on('|').join(selectedChars)).size(characsSize));
-    AggregationBuilder debtSubChar=AggregationBuilders.filter(FACET_DEBT_CHARACTERISTICS + "__subchars").filter(stickyFacetBuilder.getStickyFacetFilter(RuleNormalizer.RuleField.CHARACTERISTIC.field())).subAggregation(AggregationBuilders.terms(FACET_DEBT_CHARACTERISTICS + "__subchars_top").field(RuleNormalizer.RuleField.SUB_CHARACTERISTIC.field()).size(subCharacsSize)).subAggregation(AggregationBuilders.terms(FACET_DEBT_CHARACTERISTICS + "__chars_selected").field(RuleNormalizer.RuleField.SUB_CHARACTERISTIC.field()).include(Joiner.on('|').join(selectedChars)).size(subCharacsSize));
-    GlobalBuilder debtCharTopLevel=AggregationBuilders.global(FACET_DEBT_CHARACTERISTICS).subAggregation(debtChar).subAggregation(debtSubChar);
-    aggregations.put(FACET_DEBT_CHARACTERISTICS,debtCharTopLevel);
-  }
+  addCharacteristicsFacetIfNeeded(query,options,aggregations,stickyFacetBuilder);
   return aggregations;
 }

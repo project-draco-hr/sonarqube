@@ -1,0 +1,8 @@
+{
+  if (options.facets().contains(FACET_STATUSES)) {
+    Collection<RuleStatus> statusesFromQuery=query.getStatuses();
+    Object[] selectedStatuses=statusesFromQuery == null ? new Object[0] : statusesFromQuery.toArray();
+    AggregationBuilder statuses=AggregationBuilders.filter(FACET_STATUSES + "__top").filter(stickyFacetBuilder.getStickyFacetFilter(RuleNormalizer.RuleField.STATUS.field()).mustNot(FilterBuilders.termFilter(RuleNormalizer.RuleField.STATUS.field(),RuleStatus.REMOVED.toString()))).subAggregation(AggregationBuilders.terms(FACET_STATUSES + "__values").field(RuleNormalizer.RuleField.STATUS.field())).subAggregation(AggregationBuilders.terms(FACET_STATUSES + "__selected").field(RuleNormalizer.RuleField.STATUS.field()).include(Joiner.on('|').join(selectedStatuses)));
+    aggregations.put(FACET_STATUSES,statuses);
+  }
+}
