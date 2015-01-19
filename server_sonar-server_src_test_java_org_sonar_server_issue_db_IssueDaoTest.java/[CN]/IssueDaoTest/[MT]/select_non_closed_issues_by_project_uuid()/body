@@ -1,0 +1,21 @@
+{
+  setupData("shared","select_non_closed_issues_by_project_uuid");
+  DefaultResultHandler handler=new DefaultResultHandler();
+  dao.selectNonClosedIssuesByProjectUuid(session,"ABCD",handler);
+  assertThat(handler.getResultList()).hasSize(4);
+  handler=new DefaultResultHandler();
+  dao.selectNonClosedIssuesByProjectUuid(session,"DBCA",handler);
+  assertThat(handler.getResultList()).hasSize(1);
+  BatchIssueDto batchIssueDto=(BatchIssueDto)handler.getResultList().get(0);
+  assertThat(batchIssueDto.getKey()).isEqualTo("1000");
+  assertThat(batchIssueDto.getRuleKey()).isEqualTo("AvoidCycle");
+  assertThat(batchIssueDto.getRuleRepo()).isEqualTo("squid");
+  assertThat(batchIssueDto.getMessage()).isEqualTo("Avoid this");
+  assertThat(batchIssueDto.getLine()).isEqualTo(200);
+  assertThat(batchIssueDto.getResolution()).isEqualTo(Issue.RESOLUTION_FALSE_POSITIVE);
+  assertThat(batchIssueDto.getStatus()).isEqualTo(Issue.STATUS_RESOLVED);
+  assertThat(batchIssueDto.getComponentPath()).isEqualTo("src/main/java/Sample.java");
+  assertThat(batchIssueDto.getChecksum()).isEqualTo("123456");
+  assertThat(batchIssueDto.getAssigneeLogin()).isEqualTo("john");
+  assertThat(batchIssueDto.getAssigneeName()).isEqualTo("John Doo");
+}

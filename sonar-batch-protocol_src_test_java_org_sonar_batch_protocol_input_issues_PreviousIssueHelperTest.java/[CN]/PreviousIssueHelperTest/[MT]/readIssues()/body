@@ -1,5 +1,6 @@
 {
-  PreviousIssueHelper helper=PreviousIssueHelper.create();
+  StringWriter out=new StringWriter();
+  PreviousIssueHelper helper=PreviousIssueHelper.create(out);
   StringReader reader=new StringReader("[{\"key\": \"key1\", \"componentPath\": \"path\", \"ruleKey\": \"rulekey\", \"ruleRepo\": \"repokey\", \"line\": 2,\"message\": \"message\", \"severity\": \"severity\", \"resolution\": \"resolution\", \"status\": \"status\", \"checksum\": \"checksum\",\"assigneeLogin\": \"login\", \"assigneeFullname\": \"fullname\"}," + "{\"key\": \"key2\"}]");
   Iterator<PreviousIssue> iterator=helper.getIssues(reader).iterator();
   PreviousIssue issue1=iterator.next();
@@ -19,4 +20,5 @@
   assertThat(issue1.assigneeLogin()).isEqualTo("login");
   assertThat(issue1.assigneeFullname()).isEqualTo("fullname");
   assertThat(issue2.key()).isEqualTo("key2");
+  helper.close();
 }
