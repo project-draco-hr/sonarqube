@@ -1,0 +1,6 @@
+{
+  ServerClient serverClient=mock(ServerClient.class);
+  UserRepository userRepo=new UserRepository(serverClient);
+  when(serverClient.request("/api/users/search?format=json&includeDeactivated=true&logins=fmallet,sbrandhof")).thenReturn("{ \"users\": [ { \"login\": \"fmallet\", \"name\": \"Freddy Mallet\", \"active\": true, \"email\": \"f@m.com\" }, { \"login\": \"sbrandhof\", \"name\": \"Simon\", \"active\": true } ] }");
+  assertThat(userRepo.loadFromWs(Arrays.asList("fmallet","sbrandhof"))).containsOnly(new User("fmallet","Freddy Mallet"),new User("sbrandhof","Simon"));
+}
