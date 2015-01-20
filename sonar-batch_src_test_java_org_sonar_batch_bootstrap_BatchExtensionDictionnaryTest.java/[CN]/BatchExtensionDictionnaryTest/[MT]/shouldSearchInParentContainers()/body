@@ -1,0 +1,13 @@
+{
+  BatchExtension a=new FakeSensor();
+  BatchExtension b=new FakeSensor();
+  BatchExtension c=new FakeSensor();
+  ComponentContainer grandParent=new ComponentContainer();
+  grandParent.addSingleton(a);
+  ComponentContainer parent=grandParent.createChild();
+  parent.addSingleton(b);
+  ComponentContainer child=parent.createChild();
+  child.addSingleton(c);
+  BatchExtensionDictionnary dictionnary=new BatchExtensionDictionnary(child,mock(DefaultSensorContext.class),mock(AnalyzerOptimizer.class));
+  assertThat(dictionnary.select(BatchExtension.class,null,true,null)).containsOnly(a,b,c);
+}

@@ -1,8 +1,14 @@
 {
+  Object extensionToEvaluate;
   if (extension instanceof SensorWrapper) {
-    return super.evaluatePhase(((SensorWrapper)extension).wrappedSensor());
+    extensionToEvaluate=((SensorWrapper)extension).wrappedSensor();
   }
  else {
-    return super.evaluatePhase(extension);
+    extensionToEvaluate=extension;
   }
+  Phase phaseAnnotation=AnnotationUtils.getAnnotation(extensionToEvaluate,Phase.class);
+  if (phaseAnnotation != null) {
+    return phaseAnnotation.name();
+  }
+  return Phase.Name.DEFAULT;
 }
