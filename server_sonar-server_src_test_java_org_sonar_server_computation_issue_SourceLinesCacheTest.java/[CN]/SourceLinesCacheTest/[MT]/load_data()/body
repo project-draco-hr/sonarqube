@@ -1,0 +1,13 @@
+{
+  dbTester.prepareDbUnit(getClass(),"load_data.xml");
+  DbClient dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),new FileSourceDao(dbTester.myBatis()));
+  SourceLinesCache cache=new SourceLinesCache(dbClient);
+  cache.init("FILE_A");
+  assertThat(cache.countLines()).isEqualTo(0);
+  assertThat(cache.lineAuthor(1)).isEqualTo("charlie");
+  assertThat(cache.lineAuthor(2)).isEqualTo("cabu");
+  assertThat(cache.lineAuthor(3)).isNull();
+  assertThat(cache.countLines()).isEqualTo(2);
+  cache.clear();
+  assertThat(cache.countLines()).isEqualTo(0);
+}
