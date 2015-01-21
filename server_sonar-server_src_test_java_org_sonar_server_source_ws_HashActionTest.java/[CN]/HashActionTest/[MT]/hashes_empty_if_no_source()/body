@@ -1,9 +1,6 @@
 {
-  String componentKey="project:src/File.xoo";
-  String uuid="polop";
-  ComponentDto component=new ComponentDto().setUuid(uuid);
-  MockUserSession.set().setLogin("polop").addComponentPermission(UserRole.CODEVIEWER,"palap",componentKey);
-  when(componentDao.getByKey(any(DbSession.class),eq(componentKey))).thenReturn(component);
-  WsTester.TestRequest request=tester.newGetRequest("api/sources","hash").setParam("key",componentKey);
+  db.prepareDbUnit(getClass(),"no_source.xml");
+  MockUserSession.set().setLogin("polop").addComponentPermission(UserRole.CODEVIEWER,PROJECT_KEY,COMPONENT_KEY);
+  WsTester.TestRequest request=tester.newGetRequest("api/sources","hash").setParam("key",COMPONENT_KEY);
   request.execute().assertNoContent();
 }

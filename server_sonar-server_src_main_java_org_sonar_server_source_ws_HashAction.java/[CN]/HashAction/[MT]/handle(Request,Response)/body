@@ -1,16 +1,19 @@
 {
   try (DbSession session=dbClient.openSession(false)){
-    String componentKey=request.mandatoryParam("key");
+    final String componentKey=request.mandatoryParam("key");
     UserSession.get().checkComponentPermission(UserRole.CODEVIEWER,componentKey);
-    ComponentDto component=dbClient.componentDao().getByKey(session,componentKey);
-    String lineHashes=dbClient.fileSourceDao().selectLineHashes(component.uuid(),session);
-    if (lineHashes == null) {
-      response.noContent();
-    }
- else {
-      try (OutputStream output=response.stream().setMediaType("text/plain").output()){
-        output.write(lineHashes.getBytes(Charsets.UTF_8));
+    final ComponentDto component=dbClient.componentDao().getByKey(session,componentKey);
+    response.stream().setMediaType("text/plain");
+    OutputStreamWriter writer=new OutputStreamWriter(response.stream().output(),Charsets.UTF_8);
+    try {
+      HashFunction hashFunction=new HashFunction(writer,componentKey);
+      dbClient.fileSourceDao().readLineHashesStream(session,component.uuid(),hashFunction);
+      if (!hashFunction.hasData()) {
+        response.noContent();
       }
-     }
+    }
+  finally {
+      writer.close();
+    }
   }
  }
