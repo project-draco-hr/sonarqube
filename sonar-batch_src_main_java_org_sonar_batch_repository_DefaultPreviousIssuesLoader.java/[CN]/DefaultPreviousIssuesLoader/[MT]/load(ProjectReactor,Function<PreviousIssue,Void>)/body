@@ -1,0 +1,11 @@
+{
+  InputSupplier<InputStream> request=serverClient.doRequest("/batch/issues?key=" + ServerClient.encodeForUrl(reactor.getRoot().getKeyWithBranch()),"GET",null);
+  try (InputStream is=request.getInput();Reader reader=new InputStreamReader(is,Charsets.UTF_8)){
+    for (    PreviousIssue issue : PreviousIssueHelper.getIssues(reader)) {
+      consumer.apply(issue);
+    }
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Unable to get previous issues",e);
+  }
+}

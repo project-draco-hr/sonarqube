@@ -1,0 +1,17 @@
+{
+  unmatchedByKey.put(i.key(),i);
+  RuleKey ruleKey=i.ruleKey();
+  if (!unmatchedByRuleAndKey.containsKey(ruleKey)) {
+    unmatchedByRuleAndKey.put(ruleKey,new HashMap<String,PreviousIssue>());
+    unmatchedByRuleAndLineAndChecksum.put(ruleKey,new HashMap<Integer,Multimap<String,PreviousIssue>>());
+  }
+  unmatchedByRuleAndKey.get(ruleKey).put(i.key(),i);
+  Map<Integer,Multimap<String,PreviousIssue>> unmatchedForRule=unmatchedByRuleAndLineAndChecksum.get(ruleKey);
+  Integer lineNotNull=lineNotNull(i);
+  if (!unmatchedForRule.containsKey(lineNotNull)) {
+    unmatchedForRule.put(lineNotNull,HashMultimap.<String,PreviousIssue>create());
+  }
+  Multimap<String,PreviousIssue> unmatchedForRuleAndLine=unmatchedForRule.get(lineNotNull);
+  String checksumNotNull=StringUtils.defaultString(i.checksum(),"");
+  unmatchedForRuleAndLine.put(checksumNotNull,i);
+}

@@ -1,0 +1,21 @@
+{
+  TimeProfiler profiler=new TimeProfiler(LOG).start("Load previous issues");
+  try {
+    this.issuesCache=caches.createCache("previousIssues");
+    previousIssuesLoader.load(reactor,new Function<PreviousIssue,Void>(){
+      @Override public Void apply(      PreviousIssue issue){
+        String componentKey=issue.componentKey();
+        BatchResource r=resourceCache.get(componentKey);
+        if (r == null) {
+          issuesCache.put(0,issue.key(),issue);
+        }
+        issuesCache.put(r.batchId(),issue.key(),issue);
+        return null;
+      }
+    }
+);
+  }
+  finally {
+    profiler.stop();
+  }
+}

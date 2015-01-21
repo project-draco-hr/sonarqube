@@ -1,0 +1,12 @@
+{
+  for (  PreviousIssue unmatchedIssue : unmatchedIssues) {
+    org.sonar.batch.protocol.input.issues.PreviousIssue unmatchedPreviousIssue=((PreviousIssueFromWs)unmatchedIssue).getDto();
+    ActiveRule activeRule=activeRules.find(unmatchedIssue.ruleKey());
+    DefaultIssue unmatched=toUnmatchedIssue(unmatchedPreviousIssue);
+    if (activeRule != null && !Issue.STATUS_CLOSED.equals(unmatchedPreviousIssue.status())) {
+      relocateManualIssue(unmatched,unmatchedIssue,sourceHashHolder);
+    }
+    updateUnmatchedIssue(unmatched,false);
+    issues.add(unmatched);
+  }
+}

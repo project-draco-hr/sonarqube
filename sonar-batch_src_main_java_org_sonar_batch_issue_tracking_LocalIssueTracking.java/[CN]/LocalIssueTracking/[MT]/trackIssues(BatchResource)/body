@@ -1,0 +1,30 @@
+{
+  Collection<DefaultIssue> issues=Lists.newArrayList();
+  for (  Issue issue : issueCache.byComponent(component.resource().getEffectiveKey())) {
+    issues.add((DefaultIssue)issue);
+  }
+  issueCache.clear(component.resource().getEffectiveKey());
+  Collection<PreviousIssue> previousIssues=new ArrayList<>();
+  for (  org.sonar.batch.protocol.input.issues.PreviousIssue previousIssue : previousIssueCache.byComponent(component)) {
+    previousIssues.add(new PreviousIssueFromWs(previousIssue));
+  }
+  SourceHashHolder sourceHashHolder=null;
+  if (ResourceUtils.isFile(component.resource())) {
+    File sonarFile=(File)component.resource();
+    InputFile file=inputPathCache.getFile(component.parent().parent().resource().getEffectiveKey(),sonarFile.getPath());
+    if (file == null) {
+      throw new IllegalStateException("Resource " + component.resource() + " was not found in InputPath cache");
+    }
+    sourceHashHolder=new SourceHashHolder((DefaultInputFile)file,lastLineHashes);
+  }
+  IssueTrackingResult trackingResult=tracking.track(sourceHashHolder,previousIssues,issues);
+  addUnmatched(trackingResult.unmatched(),sourceHashHolder,issues);
+  mergeMatched(trackingResult);
+  if (ResourceUtils.isRootProject(component.resource())) {
+    addIssuesOnDeletedComponents(issues);
+  }
+  for (  DefaultIssue issue : issues) {
+    workflow.doAutomaticTransition(issue,changeContext);
+    issueCache.put(issue);
+  }
+}
