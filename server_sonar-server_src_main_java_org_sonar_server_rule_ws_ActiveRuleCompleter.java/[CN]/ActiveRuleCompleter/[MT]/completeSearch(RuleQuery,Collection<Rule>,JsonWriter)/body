@@ -1,36 +1,4 @@
 {
-  json.name("actives").beginObject();
-  Collection<String> qProfileKeys=Sets.newHashSet();
-  String profileKey=query.getQProfileKey();
-  if (profileKey != null) {
-    for (    Rule rule : rules) {
-      ActiveRule activeRule=loader.getActiveRule(ActiveRuleKey.of(profileKey,rule.key()));
-      if (activeRule != null) {
-        qProfileKeys=writeActiveRules(rule.key(),Arrays.asList(activeRule),json);
-      }
-    }
-  }
- else {
-    for (    Rule rule : rules) {
-      qProfileKeys=writeActiveRules(rule.key(),loader.findActiveRulesByRule(rule.key()),json);
-    }
-  }
-  json.endObject();
-  Map<String,QualityProfileDto> qProfilesByKey=Maps.newHashMap();
-  for (  String qProfileKey : qProfileKeys) {
-    if (!qProfilesByKey.containsKey(qProfileKey)) {
-      QualityProfileDto profile=loader.getByKey(qProfileKey);
-      qProfilesByKey.put(qProfileKey,profile);
-      if (profile.getParentKee() != null && !qProfilesByKey.containsKey(profile.getParentKee())) {
-        qProfilesByKey.put(profile.getParentKee(),loader.getByKey(profile.getParentKee()));
-      }
-    }
-  }
-  json.name("qProfiles").beginObject();
-  for (  QualityProfileDto profile : qProfilesByKey.values()) {
-    Language language=languages.get(profile.getLanguage());
-    String langName=language == null ? profile.getLanguage() : language.getName();
-    json.name(profile.getKey()).beginObject().prop("name",profile.getName()).prop("lang",profile.getLanguage()).prop("langName",langName).prop("parent",profile.getParentKee()).endObject();
-  }
-  json.endObject();
+  Collection<String> harvestedProfileKeys=writeActiveRules(json,query,rules);
+  writeProfiles(json,harvestedProfileKeys);
 }
