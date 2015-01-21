@@ -6,11 +6,14 @@
     statement=connection.createStatement();
     for (    String table : DatabaseVersion.TABLES) {
       try {
-        statement.executeUpdate(getTruncateCommand(table));
-        connection.commit();
+        if (countRows(connection,table) > 0) {
+          statement.executeUpdate(getTruncateCommand(table));
+          connection.commit();
+        }
       }
  catch (      Exception e) {
         connection.rollback();
+        throw new IllegalStateException("Fail to truncate table " + table,e);
       }
     }
   }
