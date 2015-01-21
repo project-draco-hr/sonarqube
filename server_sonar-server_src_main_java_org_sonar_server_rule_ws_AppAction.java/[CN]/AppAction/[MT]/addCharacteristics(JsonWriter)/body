@@ -1,16 +1,12 @@
 {
-  Map<Integer,DefaultDebtCharacteristic> caracById=Maps.newHashMap();
-  for (  DebtCharacteristic carac : debtModel.allCharacteristics()) {
-    DefaultDebtCharacteristic fullCarac=(DefaultDebtCharacteristic)carac;
-    caracById.put(fullCarac.id(),fullCarac);
-  }
+  List<DebtCharacteristic> rootCharacs=sortRootCaracs();
+  Multimap<Integer,DefaultDebtCharacteristic> subByCaracId=ventilateSubCaracs(rootCharacs);
   json.name("characteristics").beginArray();
-  for (  DefaultDebtCharacteristic carac : caracById.values()) {
-    json.beginObject().prop("key",carac.key()).prop("name",carac.name());
-    if (carac.isSub()) {
-      json.prop("parent",caracById.get(carac.parentId()).key());
+  for (  DebtCharacteristic rootCarac : rootCharacs) {
+    json.beginObject().prop("key",rootCarac.key()).prop("name",rootCarac.name()).endObject();
+    for (    DefaultDebtCharacteristic child : sortSubCaracs(subByCaracId,rootCarac)) {
+      json.beginObject().prop("key",child.key()).prop("name",child.name()).prop("parent",rootCarac.key()).endObject();
     }
-    json.endObject();
   }
   json.endArray();
 }
