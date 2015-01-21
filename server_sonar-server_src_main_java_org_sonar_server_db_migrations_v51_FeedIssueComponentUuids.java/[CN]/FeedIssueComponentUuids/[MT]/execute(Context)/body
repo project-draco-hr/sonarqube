@@ -1,0 +1,14 @@
+{
+  MassUpdate update=context.prepareMassUpdate().rowPluralName("issues");
+  update.select("SELECT c.uuid, c.project_uuid, i.id " + "FROM issues i " + "INNER JOIN projects c ON i.component_id=c.id "+ "WHERE i.component_uuid is null");
+  update.update("UPDATE issues SET component_uuid=?, project_uuid=? WHERE id=?");
+  update.execute(new Handler(){
+    @Override public boolean handle(    Row row,    SqlStatement update) throws SQLException {
+      update.setString(1,row.getString(1));
+      update.setString(2,row.getString(2));
+      update.setLong(3,row.getLong(3));
+      return true;
+    }
+  }
+);
+}
