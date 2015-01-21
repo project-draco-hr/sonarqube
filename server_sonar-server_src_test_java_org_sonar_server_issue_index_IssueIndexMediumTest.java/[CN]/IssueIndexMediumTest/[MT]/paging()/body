@@ -1,10 +1,9 @@
 {
+  ComponentDto project=ComponentTesting.newProjectDto();
+  ComponentDto file=ComponentTesting.newFileDto(project);
   for (int i=0; i < 12; i++) {
-    IssueDto issue=IssueTesting.newDto(rule,file,project);
-    tester.get(IssueDao.class).insert(session,issue);
+    indexIssues(IssueTesting.newDoc("ISSUE" + i,file));
   }
-  session.commit();
-  index();
   IssueQuery.Builder query=IssueQuery.builder();
   Result<Issue> result=index.search(query.build(),new QueryContext().setPage(2,10));
   assertThat(result.getHits()).hasSize(2);

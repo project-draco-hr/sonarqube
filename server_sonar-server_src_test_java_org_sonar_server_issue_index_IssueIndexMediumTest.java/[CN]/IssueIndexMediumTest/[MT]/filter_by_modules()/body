@@ -1,11 +1,9 @@
 {
+  ComponentDto project=ComponentTesting.newProjectDto();
   ComponentDto module=ComponentTesting.newModuleDto(project);
   ComponentDto subModule=ComponentTesting.newModuleDto(module);
   ComponentDto file=ComponentTesting.newFileDto(subModule);
-  tester.get(ComponentDao.class).insert(session,module,subModule,file);
-  db.issueDao().insert(session,IssueTesting.newDto(rule,module,project),IssueTesting.newDto(rule,subModule,project),IssueTesting.newDto(rule,file,project));
-  session.commit();
-  index();
+  indexIssues(IssueTesting.newDoc("ISSUE3",module),IssueTesting.newDoc("ISSUE5",subModule),IssueTesting.newDoc("ISSUE2",file));
   assertThat(index.search(IssueQuery.builder().moduleUuids(newArrayList(file.uuid())).build(),new QueryContext()).getHits()).isEmpty();
   assertThat(index.search(IssueQuery.builder().moduleUuids(newArrayList(module.uuid())).build(),new QueryContext()).getHits()).hasSize(1);
   assertThat(index.search(IssueQuery.builder().moduleUuids(newArrayList(subModule.uuid())).build(),new QueryContext()).getHits()).hasSize(1);

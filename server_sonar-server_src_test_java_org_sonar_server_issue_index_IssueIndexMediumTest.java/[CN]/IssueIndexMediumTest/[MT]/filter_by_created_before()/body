@@ -1,9 +1,7 @@
 {
-  IssueDto issue1=IssueTesting.newDto(rule,file,project).setIssueCreationDate(DateUtils.parseDate("2014-09-20"));
-  IssueDto issue2=IssueTesting.newDto(rule,file,project).setIssueCreationDate(DateUtils.parseDate("2014-09-23"));
-  db.issueDao().insert(session,issue1,issue2);
-  session.commit();
-  index();
+  ComponentDto project=ComponentTesting.newProjectDto();
+  ComponentDto file=ComponentTesting.newFileDto(project);
+  indexIssues(IssueTesting.newDoc("ISSUE1",file).setFuncCreationDate(DateUtils.parseDate("2014-09-20")),IssueTesting.newDoc("ISSUE2",file).setFuncCreationDate(DateUtils.parseDate("2014-09-23")));
   assertThat(index.search(IssueQuery.builder().createdBefore(DateUtils.parseDate("2014-09-19")).build(),new QueryContext()).getHits()).isEmpty();
   assertThat(index.search(IssueQuery.builder().createdBefore(DateUtils.parseDate("2014-09-20")).build(),new QueryContext()).getHits()).hasSize(1);
   assertThat(index.search(IssueQuery.builder().createdBefore(DateUtils.parseDate("2014-09-21")).build(),new QueryContext()).getHits()).hasSize(1);

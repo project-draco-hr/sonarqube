@@ -1,7 +1,7 @@
 {
-  db.issueDao().insert(session,IssueTesting.newDto(rule,file,project).setActionPlanKey("AP-KEY"),IssueTesting.newDto(rule,file,project).setActionPlanKey(null),IssueTesting.newDto(rule,file,project).setActionPlanKey(null));
-  session.commit();
-  index();
+  ComponentDto project=ComponentTesting.newProjectDto();
+  ComponentDto file=ComponentTesting.newFileDto(project);
+  indexIssues(IssueTesting.newDoc("ISSUE1",file).setActionPlanKey("AP-KEY"),IssueTesting.newDoc("ISSUE2",file).setActionPlanKey(null),IssueTesting.newDoc("ISSUE3",file).setActionPlanKey(null));
   assertThat(index.search(IssueQuery.builder().planned(true).build(),new QueryContext()).getHits()).hasSize(1);
   assertThat(index.search(IssueQuery.builder().planned(false).build(),new QueryContext()).getHits()).hasSize(2);
   assertThat(index.search(IssueQuery.builder().planned(null).build(),new QueryContext()).getHits()).hasSize(3);

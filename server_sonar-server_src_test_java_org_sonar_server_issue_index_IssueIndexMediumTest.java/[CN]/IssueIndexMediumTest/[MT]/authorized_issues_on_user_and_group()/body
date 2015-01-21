@@ -1,19 +1,10 @@
 {
   ComponentDto project1=ComponentTesting.newProjectDto().setKey("project1");
   ComponentDto project2=ComponentTesting.newProjectDto().setKey("project2");
-  tester.get(ComponentDao.class).insert(session,project1,project2);
-  UserDto john=new UserDto().setLogin("john").setName("john").setActive(true);
-  db.userDao().insert(session,john);
-  tester.get(PermissionFacade.class).insertUserPermission(project1.getId(),john.getId(),UserRole.USER,session);
-  GroupDto groupDto=new GroupDto().setName("sonar-users");
-  db.groupDao().insert(session,groupDto);
-  session.commit();
-  MockUserSession.set().setLogin("admin").setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
-  tester.get(InternalPermissionService.class).addPermission(new PermissionChange().setComponentKey(project1.getKey()).setGroup("sonar-users").setPermission(UserRole.USER));
-  db.issueDao().insert(session,IssueTesting.newDto(rule,file,project1),IssueTesting.newDto(rule,file,project2));
-  session.commit();
-  session.clearCache();
-  index();
+  ComponentDto file1=ComponentTesting.newFileDto(project1).setKey("file1");
+  ComponentDto file2=ComponentTesting.newFileDto(project2).setKey("file2");
+  indexIssue(IssueTesting.newDoc("ISSUE1",file1),"sonar-users","john");
+  indexIssue(IssueTesting.newDoc("ISSUE2",file2),null,"max");
   IssueQuery.Builder query=IssueQuery.builder();
   MockUserSession.set().setLogin("john").setUserGroups("sonar-users");
   assertThat(index.search(query.build(),new QueryContext()).getHits()).hasSize(1);

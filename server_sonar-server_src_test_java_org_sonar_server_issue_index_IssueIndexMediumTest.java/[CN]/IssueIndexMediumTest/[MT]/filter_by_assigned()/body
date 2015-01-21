@@ -1,7 +1,7 @@
 {
-  db.issueDao().insert(session,IssueTesting.newDto(rule,file,project).setAssignee("steph"),IssueTesting.newDto(rule,file,project).setAssignee(null),IssueTesting.newDto(rule,file,project).setAssignee(null));
-  session.commit();
-  index();
+  ComponentDto project=ComponentTesting.newProjectDto();
+  ComponentDto file=ComponentTesting.newFileDto(project);
+  indexIssues(IssueTesting.newDoc("ISSUE1",file).setAssignee("steph"),IssueTesting.newDoc("ISSUE2",file).setAssignee(null),IssueTesting.newDoc("ISSUE3",file).setAssignee(null));
   assertThat(index.search(IssueQuery.builder().assigned(true).build(),new QueryContext()).getHits()).hasSize(1);
   assertThat(index.search(IssueQuery.builder().assigned(false).build(),new QueryContext()).getHits()).hasSize(2);
   assertThat(index.search(IssueQuery.builder().assigned(null).build(),new QueryContext()).getHits()).hasSize(3);

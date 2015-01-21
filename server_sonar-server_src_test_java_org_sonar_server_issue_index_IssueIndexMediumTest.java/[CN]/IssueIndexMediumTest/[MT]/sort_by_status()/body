@@ -1,7 +1,7 @@
 {
-  db.issueDao().insert(session,IssueTesting.newDto(rule,file,project).setStatus(Issue.STATUS_OPEN),IssueTesting.newDto(rule,file,project).setStatus(Issue.STATUS_CLOSED),IssueTesting.newDto(rule,file,project).setStatus(Issue.STATUS_REOPENED));
-  session.commit();
-  index();
+  ComponentDto project=ComponentTesting.newProjectDto();
+  ComponentDto file=ComponentTesting.newFileDto(project);
+  indexIssues(IssueTesting.newDoc("ISSUE1",file).setStatus(Issue.STATUS_OPEN),IssueTesting.newDoc("ISSUE2",file).setStatus(Issue.STATUS_CLOSED),IssueTesting.newDoc("ISSUE3",file).setStatus(Issue.STATUS_REOPENED));
   IssueQuery.Builder query=IssueQuery.builder().sort(IssueQuery.SORT_BY_STATUS).asc(true);
   Result<Issue> result=index.search(query.build(),new QueryContext());
   assertThat(result.getHits().get(0).status()).isEqualTo(Issue.STATUS_CLOSED);
