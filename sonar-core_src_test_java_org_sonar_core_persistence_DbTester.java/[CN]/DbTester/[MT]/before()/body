@@ -3,6 +3,7 @@
   if (settings.hasKey("orchestrator.configUrl")) {
     loadOrchestratorSettings(settings);
   }
+  String login=settings.getString("sonar.jdbc.username");
   for (  String key : settings.getKeysStartingWith("sonar.jdbc")) {
     LOG.info(key + ": " + settings.getString(key));
   }
@@ -25,7 +26,7 @@
   }
   LOG.info("Test Database: " + db);
   commands=DatabaseCommands.forDialect(db.getDialect());
-  tester=new DataSourceDatabaseTester(db.getDataSource());
+  tester=new DataSourceDatabaseTester(db.getDataSource(),login);
   myBatis=new MyBatis(db,new Logback(),new NullQueue());
   myBatis.start();
   truncateTables();
