@@ -1,17 +1,9 @@
 {
-  ComponentDto project=ComponentTesting.newProjectDto().setKey("ProjectHavingModule");
-  db.componentDao().insert(session,project);
-  SnapshotDto projectSnapshot=SnapshotTesting.createForProject(project);
-  db.snapshotDao().insert(session,projectSnapshot);
-  session.commit();
-  tester.get(InternalPermissionService.class).addPermission(new PermissionChange().setComponentKey(project.getKey()).setGroup(DefaultGroups.ANYONE).setPermission(UserRole.USER));
-  ComponentDto module=ComponentTesting.newFileDto(project).setKey("ModuleHavingFile").setScope("PRJ").setParentProjectId(project.getId());
-  db.componentDao().insert(session,module);
-  db.snapshotDao().insert(session,SnapshotTesting.createForComponent(module,projectSnapshot));
-  ComponentDto file=ComponentTesting.newFileDto(module).setKey("FileLinkedToModule");
-  db.componentDao().insert(session,file);
-  db.snapshotDao().insert(session,SnapshotTesting.createForComponent(file,projectSnapshot));
-  IssueDto issue=IssueTesting.newDto(rule,file,project);
+  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("ABCD").setKey("ProjectHavingModule"));
+  setDefaultProjectPermission(project);
+  ComponentDto module=insertComponent(ComponentTesting.newModuleDto(project).setKey("ModuleHavingFile"));
+  ComponentDto file=insertComponent(ComponentTesting.newFileDto(module,"BCDE").setKey("FileLinkedToModule"));
+  IssueDto issue=IssueTesting.newDto(newRule(),file,project);
   db.issueDao().insert(session,issue);
   session.commit();
   tester.get(IssueIndexer.class).indexAll();

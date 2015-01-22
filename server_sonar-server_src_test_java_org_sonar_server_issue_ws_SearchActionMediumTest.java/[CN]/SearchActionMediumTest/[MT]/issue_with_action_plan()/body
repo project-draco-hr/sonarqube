@@ -1,8 +1,9 @@
 {
-  db.userDao().insert(session,new UserDto().setLogin("simon").setName("Simon").setEmail("simon@email.com"));
-  db.userDao().insert(session,new UserDto().setLogin("fabrice").setName("Fabrice").setEmail("fabrice@email.com"));
+  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("ABCD").setKey("MyProject"));
+  setDefaultProjectPermission(project);
+  ComponentDto file=insertComponent(ComponentTesting.newFileDto(project,"BCDE").setKey("MyComponent"));
   tester.get(ActionPlanDao.class).save(new ActionPlanDto().setKey("AP-ABCD").setName("1.0").setStatus("OPEN").setProjectId(project.getId()).setUserLogin("simon").setDeadLine(DateUtils.parseDateTime("2014-01-24T19:10:03+0100")).setCreatedAt(DateUtils.parseDateTime("2014-01-22T19:10:03+0100")).setUpdatedAt(DateUtils.parseDateTime("2014-01-23T19:10:03+0100")));
-  IssueDto issue=IssueTesting.newDto(rule,file,project).setKee("82fd47d4-b650-4037-80bc-7b112bd4eac2").setActionPlanKey("AP-ABCD");
+  IssueDto issue=IssueTesting.newDto(newRule(),file,project).setKee("82fd47d4-b650-4037-80bc-7b112bd4eac2").setActionPlanKey("AP-ABCD");
   db.issueDao().insert(session,issue);
   session.commit();
   tester.get(IssueIndexer.class).indexAll();

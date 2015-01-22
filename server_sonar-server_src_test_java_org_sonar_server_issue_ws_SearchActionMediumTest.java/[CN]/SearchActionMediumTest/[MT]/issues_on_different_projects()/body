@@ -1,15 +1,13 @@
 {
-  db.userDao().insert(session,new UserDto().setLogin("simon").setName("Simon").setEmail("simon@email.com"));
+  RuleDto rule=newRule();
+  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("ABCD").setKey("MyProject"));
+  setDefaultProjectPermission(project);
+  ComponentDto file=insertComponent(ComponentTesting.newFileDto(project,"BCDE").setKey("MyComponent"));
   IssueDto issue=IssueTesting.newDto(rule,file,project).setKee("82fd47d4-b650-4037-80bc-7b112bd4eac2").setStatus("OPEN").setResolution("OPEN").setSeverity("MAJOR").setIssueCreationDate(DateUtils.parseDate("2014-09-04")).setIssueUpdateDate(DateUtils.parseDate("2017-12-04"));
   db.issueDao().insert(session,issue);
-  ComponentDto project2=ComponentTesting.newProjectDto().setUuid("DBCA").setProjectUuid("DBCA").setKey("MyProject2");
-  db.componentDao().insert(session,project2);
-  db.snapshotDao().insert(session,SnapshotTesting.createForProject(project2));
-  session.commit();
-  tester.get(InternalPermissionService.class).addPermission(new PermissionChange().setComponentKey(project2.getKey()).setGroup(DefaultGroups.ANYONE).setPermission(UserRole.USER));
-  tester.get(InternalPermissionService.class).addPermission(new PermissionChange().setComponentKey(project2.getKey()).setGroup(DefaultGroups.ANYONE).setPermission(UserRole.CODEVIEWER));
-  ComponentDto file2=ComponentTesting.newFileDto(project2).setUuid("EDCB").setKey("MyComponent2").setParentProjectId(project2.getId());
-  db.componentDao().insert(session,file2);
+  ComponentDto project2=insertComponent(ComponentTesting.newProjectDto("DBCA").setKey("MyProject2"));
+  setDefaultProjectPermission(project2);
+  ComponentDto file2=insertComponent(ComponentTesting.newFileDto(project2,"EDCB").setKey("MyComponent2"));
   IssueDto issue2=IssueTesting.newDto(rule,file2,project2).setKee("92fd47d4-b650-4037-80bc-7b112bd4eac2").setStatus("OPEN").setResolution("OPEN").setSeverity("MAJOR").setIssueCreationDate(DateUtils.parseDate("2014-09-04")).setIssueUpdateDate(DateUtils.parseDate("2017-12-04"));
   db.issueDao().insert(session,issue2);
   session.commit();

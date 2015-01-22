@@ -3,21 +3,4 @@
   db=tester.get(DbClient.class);
   wsTester=tester.get(WsTester.class);
   session=db.openSession(false);
-  rule=RuleTesting.newXooX1().setName("Rule name").setDescription("Rule desc").setStatus(RuleStatus.READY);
-  tester.get(RuleDao.class).insert(session,rule);
-  project=ComponentTesting.newProjectDto().setUuid("ABCD").setProjectUuid("ABCD").setKey("MyProject");
-  db.componentDao().insert(session,project);
-  db.snapshotDao().insert(session,SnapshotTesting.createForProject(project));
-  session.commit();
-  MockUserSession.set().setLogin("admin").setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
-  tester.get(InternalPermissionService.class).addPermission(new PermissionChange().setComponentKey(project.getKey()).setGroup(DefaultGroups.ANYONE).setPermission(UserRole.USER));
-  tester.get(InternalPermissionService.class).addPermission(new PermissionChange().setComponentKey(project.getKey()).setGroup(DefaultGroups.ANYONE).setPermission(UserRole.CODEVIEWER));
-  file=ComponentTesting.newFileDto(project).setUuid("BCDE").setKey("MyComponent").setParentProjectId(project.getId());
-  db.componentDao().insert(session,file);
-  otherFile=ComponentTesting.newFileDto(project).setUuid("FEDC").setKey("OtherComponent").setParentProjectId(project.getId());
-  db.componentDao().insert(session,otherFile);
-  UserDto john=new UserDto().setLogin("john").setName("John").setEmail("john@email.com");
-  db.userDao().insert(session,john);
-  session.commit();
-  MockUserSession.set().setLogin("john").addComponentPermission(UserRole.CODEVIEWER,project.getKey(),file.getKey()).setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
 }
