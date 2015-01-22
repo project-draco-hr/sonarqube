@@ -1,0 +1,8 @@
+{
+  ComponentDto project=ComponentTesting.newProjectDto("ABCD");
+  ComponentDto project2=ComponentTesting.newProjectDto("EFGH");
+  indexIssues(IssueTesting.newDoc("ISSUE1",ComponentTesting.newFileDto(project)),IssueTesting.newDoc("ISSUE2",ComponentTesting.newFileDto(project)),IssueTesting.newDoc("ISSUE3",ComponentTesting.newFileDto(project2)));
+  Result<Issue> result=index.search(IssueQuery.builder().build(),new QueryContext().addFacets(newArrayList("projectUuids")));
+  assertThat(result.getFacets()).containsOnlyKeys("projectUuids");
+  assertThat(result.getFacets().get("projectUuids")).containsOnly(new FacetValue("ABCD",2),new FacetValue("EFGH",1));
+}

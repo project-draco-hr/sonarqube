@@ -1,0 +1,9 @@
+{
+  ComponentDto project=ComponentTesting.newProjectDto();
+  ComponentDto file=ComponentTesting.newFileDto(project);
+  RuleKey ruleKey=RuleKey.of("repo","X1");
+  indexIssues(IssueTesting.newDoc("ISSUE1",file).setRuleKey(ruleKey.toString()).setLanguage("xoo"));
+  Result<Issue> result=index.search(IssueQuery.builder().build(),new QueryContext().addFacets(newArrayList("languages")));
+  assertThat(result.getFacets()).containsOnlyKeys("languages");
+  assertThat(result.getFacets().get("languages")).containsOnly(new FacetValue("xoo",1));
+}
