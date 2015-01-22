@@ -2,7 +2,7 @@
   Map<String,QualityProfileDto> qProfilesByKey=Maps.newHashMap();
   for (  String qProfileKey : harvestedProfileKeys) {
     if (!qProfilesByKey.containsKey(qProfileKey)) {
-      QualityProfileDto profile=loader.getByKey(qProfileKey);
+      QualityProfileDto profile=loadProfile(qProfileKey);
       if (profile == null) {
         LOG.warn("Could not find quality profile with key " + qProfileKey);
         continue;
@@ -10,7 +10,7 @@
       qProfilesByKey.put(qProfileKey,profile);
       String parentKee=profile.getParentKee();
       if (parentKee != null && !qProfilesByKey.containsKey(parentKee)) {
-        qProfilesByKey.put(parentKee,loader.getByKey(parentKee));
+        qProfilesByKey.put(parentKee,loadProfile(parentKee));
       }
     }
   }
