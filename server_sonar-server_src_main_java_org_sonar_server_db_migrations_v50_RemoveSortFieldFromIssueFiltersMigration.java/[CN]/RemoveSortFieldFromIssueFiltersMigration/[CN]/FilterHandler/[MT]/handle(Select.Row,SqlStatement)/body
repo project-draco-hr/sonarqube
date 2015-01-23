@@ -1,0 +1,20 @@
+{
+  String data=row.getString(2);
+  String[] fields=StringUtils.split(data,FIELD_SEPARATOR);
+  boolean found=false;
+  List<String> fieldsToKeep=Lists.newArrayList();
+  for (  String field : fields) {
+    if (field.startsWith(SORT_KEY) || field.startsWith(ASC_KEY)) {
+      found=true;
+    }
+ else {
+      fieldsToKeep.add(field);
+    }
+  }
+  if (found) {
+    update.setString(1,StringUtils.join(fieldsToKeep,FIELD_SEPARATOR));
+    update.setDate(2,now);
+    update.setLong(3,row.getLong(1));
+  }
+  return found;
+}
