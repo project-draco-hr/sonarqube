@@ -1,56 +1,49 @@
 {
-  long currentOriginalOffset=0;
-  List<Long> originalLineOffsets=new ArrayList<Long>();
-  List<Object> lineHashes=new ArrayList<Object>();
-  int lines=1;
   char c=(char)0;
-  try (Reader reader=new BufferedReader(new InputStreamReader(new FileInputStream(file),encoding))){
-    MessageDigest globalMd5Digest=DigestUtils.getMd5Digest();
-    MessageDigest lineMd5Digest=DigestUtils.getMd5Digest();
+  LineCounter lineCounter=new LineCounter();
+  FileHashComputer fileHashComputer=new FileHashComputer();
+  LineOffsetCounter lineOffsetCounter=new LineOffsetCounter();
+  LineHashesComputer lineHashesComputer=new LineHashesComputer();
+  CharHandler[] handlers=new CharHandler[]{lineCounter,fileHashComputer,lineOffsetCounter,lineHashesComputer};
+  try (BOMInputStream bomIn=new BOMInputStream(new FileInputStream(file),ByteOrderMark.UTF_8,ByteOrderMark.UTF_16LE,ByteOrderMark.UTF_16BE,ByteOrderMark.UTF_32LE,ByteOrderMark.UTF_32BE);Reader reader=new BufferedReader(new InputStreamReader(bomIn,encoding))){
     int i=reader.read();
     boolean afterCR=false;
-    originalLineOffsets.add(0L);
-    boolean blankline=true;
     while (i != -1) {
       c=(char)i;
-      if (c == BOM) {
-        i=reader.read();
-        continue;
-      }
-      currentOriginalOffset++;
       if (afterCR) {
-        afterCR=false;
-        if (c == LINE_FEED) {
-          originalLineOffsets.set(originalLineOffsets.size() - 1,originalLineOffsets.get(originalLineOffsets.size() - 1) + 1);
-          i=reader.read();
-          continue;
+        for (        CharHandler handler : handlers) {
+          if (c != CARRIAGE_RETURN && c != LINE_FEED) {
+            handler.handleIgnoreEoL(c);
+          }
+          handler.handleAll(c);
+          handler.newLine();
+        }
+        afterCR=c == CARRIAGE_RETURN;
+      }
+ else       if (c == LINE_FEED) {
+        for (        CharHandler handler : handlers) {
+          handler.handleAll(c);
+          handler.newLine();
         }
       }
-      if (c == CARRIAGE_RETURN) {
+ else       if (c == CARRIAGE_RETURN) {
         afterCR=true;
-        c=LINE_FEED;
-      }
-      if (c == LINE_FEED) {
-        lines++;
-        originalLineOffsets.add(currentOriginalOffset);
-        lineHashes.add(blankline ? null : lineMd5Digest.digest());
-        blankline=true;
+        for (        CharHandler handler : handlers) {
+          handler.handleAll(c);
+        }
       }
  else {
-        if (!Character.isWhitespace(c)) {
-          blankline=false;
-          updateDigestUTF8Char(c,lineMd5Digest);
+        for (        CharHandler handler : handlers) {
+          handler.handleIgnoreEoL(c);
+          handler.handleAll(c);
         }
       }
-      updateDigestUTF8Char(c,globalMd5Digest);
       i=reader.read();
     }
-    if (c != (char)-1) {
-      lineHashes.add(blankline ? null : lineMd5Digest.digest());
+    for (    CharHandler handler : handlers) {
+      handler.eof();
     }
-    boolean empty=lines == 1 && blankline;
-    String filehash=empty ? null : Hex.encodeHexString(globalMd5Digest.digest());
-    return new Metadata(lines,filehash,originalLineOffsets,lineHashes.toArray(new byte[0][]),empty);
+    return new Metadata(lineCounter.lines(),lineCounter.nonBlankLines(),fileHashComputer.getHash(),lineOffsetCounter.getOriginalLineOffsets(),lineHashesComputer.lineHashes(),lineCounter.isEmpty());
   }
  catch (  IOException e) {
     throw new IllegalStateException(String.format("Fail to read file '%s' with encoding '%s'",file.getAbsolutePath(),encoding),e);

@@ -1,5 +1,8 @@
 {
   for (  InputFile f : fs.inputFiles(fs.predicates().hasType(Type.MAIN))) {
     ((DefaultMeasure<Integer>)context.<Integer>newMeasure().onFile(f).forMetric(CoreMetrics.LINES).withValue(f.lines())).setFromCore().save();
+    if (f.language() == null) {
+      ((DefaultMeasure<Integer>)context.<Integer>newMeasure().onFile(f).forMetric(CoreMetrics.NCLOC).withValue(((DefaultInputFile)f).nonBlankLines())).save();
+    }
   }
 }
