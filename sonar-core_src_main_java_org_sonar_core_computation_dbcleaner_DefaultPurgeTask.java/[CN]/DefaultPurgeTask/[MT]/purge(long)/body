@@ -1,10 +1,10 @@
 {
   long start=System.currentTimeMillis();
-  String resourceQualifier=resourceDao.getResource(resourceId).getQualifier();
-  if (isNotViewNorSubview(resourceQualifier)) {
+  ResourceDto component=resourceDao.getResource(resourceId);
+  if (isNotViewNorSubview(component.getQualifier())) {
     profiler.reset();
     cleanHistoricalData(resourceId);
-    doPurge(resourceId);
+    doPurge(new IdUuidPair(component.getId(),component.getUuid()));
     if (settings.getBoolean(CoreProperties.PROFILING_LOG_PROPERTY)) {
       long duration=System.currentTimeMillis() - start;
       LOG.info("\n -------- Profiling for purge: " + TimeUtils.formatDuration(duration) + " --------\n");
