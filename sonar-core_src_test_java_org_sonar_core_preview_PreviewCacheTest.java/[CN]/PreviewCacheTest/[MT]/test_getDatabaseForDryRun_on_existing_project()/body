@@ -9,9 +9,9 @@
   }
 );
   when(resourceDao.getRootProjectByComponentId(123L)).thenReturn(new ResourceDto().setId(123L));
-  byte[] dbContent=dryRunCache.getDatabaseForPreview(123L);
-  assertThat(new String(dbContent)).isEqualTo("fake db content");
-  dbContent=dryRunCache.getDatabaseForPreview(123L);
-  assertThat(new String(dbContent)).isEqualTo("fake db content");
+  String path=dryRunCache.getPathToDatabaseFile(123L);
+  assertThat(FileUtils.readFileToString(new File(path))).isEqualTo("fake db content");
+  path=dryRunCache.getPathToDatabaseFile(123L);
+  assertThat(FileUtils.readFileToString(new File(path))).isEqualTo("fake db content");
   verify(dryRunDatabaseFactory,times(1)).createNewDatabaseForDryRun(anyLong(),any(File.class),anyString());
 }

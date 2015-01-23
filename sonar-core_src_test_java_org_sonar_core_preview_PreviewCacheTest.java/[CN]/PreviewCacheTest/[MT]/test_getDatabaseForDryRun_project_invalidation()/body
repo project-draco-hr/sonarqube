@@ -17,11 +17,11 @@
   }
 );
   when(resourceDao.getRootProjectByComponentId(123L)).thenReturn(new ResourceDto().setId(123L));
-  byte[] dbContent=dryRunCache.getDatabaseForPreview(123L);
-  assertThat(new String(dbContent)).isEqualTo("fake db content 1");
+  String path=dryRunCache.getPathToDatabaseFile(123L);
+  assertThat(FileUtils.readFileToString(new File(path))).isEqualTo("fake db content 1");
   Thread.sleep(100);
   when(propertiesDao.selectProjectProperty(123L,PreviewCache.SONAR_PREVIEW_CACHE_LAST_UPDATE_KEY)).thenReturn(new PropertyDto().setValue("" + System.currentTimeMillis()));
-  dbContent=dryRunCache.getDatabaseForPreview(123L);
-  assertThat(new String(dbContent)).isEqualTo("fake db content 2");
+  path=dryRunCache.getPathToDatabaseFile(123L);
+  assertThat(FileUtils.readFileToString(new File(path))).isEqualTo("fake db content 2");
   verify(dryRunDatabaseFactory,times(2)).createNewDatabaseForDryRun(anyLong(),any(File.class),anyString());
 }

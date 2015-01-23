@@ -16,11 +16,11 @@
     }
   }
 );
-  byte[] dbContent=dryRunCache.getDatabaseForPreview(null);
-  assertThat(new String(dbContent)).isEqualTo("fake db content 1");
+  String path=dryRunCache.getPathToDatabaseFile(null);
+  assertThat(FileUtils.readFileToString(new File(path))).isEqualTo("fake db content 1");
   Thread.sleep(100);
   when(propertiesDao.selectGlobalProperty(PreviewCache.SONAR_PREVIEW_CACHE_LAST_UPDATE_KEY)).thenReturn(new PropertyDto().setValue("" + System.currentTimeMillis()));
-  dbContent=dryRunCache.getDatabaseForPreview(null);
-  assertThat(new String(dbContent)).isEqualTo("fake db content 2");
+  path=dryRunCache.getPathToDatabaseFile(null);
+  assertThat(FileUtils.readFileToString(new File(path))).isEqualTo("fake db content 2");
   verify(dryRunDatabaseFactory,times(2)).createNewDatabaseForDryRun(anyLong(),any(File.class),anyString());
 }
