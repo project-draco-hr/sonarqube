@@ -1,4 +1,17 @@
 {
-  UserDoc user=index.getNullableByScmAccount(scmAccount);
-  return user != null ? user.login() : null;
+  List<UserDoc> users=index.getAtMostThreeUsersForScmAccount(scmAccount);
+  if (users.isEmpty()) {
+    return null;
+  }
+  if (users.size() == 1) {
+    return users.get(0).login();
+  }
+  Collection<String> logins=Collections2.transform(users,new Function<UserDoc,String>(){
+    @Override public String apply(    UserDoc input){
+      return input.login();
+    }
+  }
+);
+  log.warn(String.format("Multiple users share the SCM account '%s': %s",scmAccount,Joiner.on(", ").join(logins)));
+  return null;
 }
