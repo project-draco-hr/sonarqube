@@ -1,0 +1,18 @@
+{
+  String reportFileDirStr=settings.getString(HTML_REPORT_LOCATION_KEY);
+  File reportFileDir=new File(reportFileDirStr);
+  if (!reportFileDir.isAbsolute()) {
+    reportFileDir=new File(fs.workDir(),reportFileDirStr);
+  }
+  if (reportFileDirStr.endsWith(".html")) {
+    LOG.warn(HTML_REPORT_LOCATION_KEY + " should indicate a directory. Using parent folder.");
+    reportFileDir=reportFileDir.getParentFile();
+  }
+  try {
+    FileUtils.forceMkdir(reportFileDir);
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Fail to create the directory " + reportFileDirStr,e);
+  }
+  return reportFileDir;
+}

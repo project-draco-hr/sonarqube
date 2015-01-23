@@ -1,0 +1,18 @@
+{
+  if (!component.isFile()) {
+    return Collections.emptyList();
+  }
+  try {
+    InputFile inputFile=(InputFile)inputPathCache.getInputPath(component);
+    List<String> lines=FileUtils.readLines(inputFile.file(),fs.encoding());
+    List<String> escapedLines=new ArrayList<String>(lines.size());
+    for (    String line : lines) {
+      escapedLines.add(StringEscapeUtils.escapeHtml(line));
+    }
+    return escapedLines;
+  }
+ catch (  IOException e) {
+    LOG.warn("Unable to read source code of resource {}",component,e);
+    return Collections.emptyList();
+  }
+}
