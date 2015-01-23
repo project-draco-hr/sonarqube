@@ -1,0 +1,60 @@
+{
+  Set<String> allComponentUuids=Sets.newHashSet();
+  if (componentUuids != null || componentRootUuids != null) {
+    if (components != null || componentRoots != null) {
+      throw new IllegalArgumentException("components and componentUuids cannot be set simultaneously");
+    }
+    allComponentUuids.addAll((Collection<String>)ObjectUtils.defaultIfNull(componentUuids,Sets.newHashSet()));
+    allComponentUuids.addAll((Collection<String>)ObjectUtils.defaultIfNull(componentRootUuids,Sets.newHashSet()));
+  }
+ else {
+    Set<String> allComponents=Sets.newHashSet();
+    allComponents.addAll((Collection<String>)ObjectUtils.defaultIfNull(components,Sets.newHashSet()));
+    allComponents.addAll((Collection<String>)ObjectUtils.defaultIfNull(componentRoots,Sets.newHashSet()));
+    allComponentUuids.addAll(componentUuids(session,allComponents));
+  }
+  if (allComponentUuids.isEmpty()) {
+    addComponentsBelowView(builder,session,projects,projectUuids,moduleUuids,directories,fileUuids);
+  }
+ else {
+    Set<String> qualifiers=componentService.getDistinctQualifiers(session,allComponentUuids);
+    if (qualifiers.isEmpty()) {
+      builder.componentUuids(allComponentUuids);
+      return;
+    }
+    if (qualifiers.size() > 1) {
+      throw new IllegalArgumentException("All components must have the same qualifier, found " + Joiner.on(',').join(qualifiers));
+    }
+    String uniqueQualifier=qualifiers.iterator().next();
+    if (Qualifiers.VIEW.equals(uniqueQualifier)) {
+      addComponentsBelowView(builder,session,projects,projectUuids,moduleUuids,directories,fileUuids);
+    }
+ else     if ("DEV".equals(uniqueQualifier)) {
+    }
+ else     if (Qualifiers.PROJECT.equals(uniqueQualifier)) {
+      builder.projectUuids(allComponentUuids);
+      addComponentsBelowModule(builder,moduleUuids,directories,fileUuids);
+    }
+ else     if (Qualifiers.MODULE.equals(uniqueQualifier)) {
+      builder.moduleRootUuids(allComponentUuids);
+      addComponentsBelowModule(builder,moduleUuids,directories,fileUuids);
+    }
+ else     if (Qualifiers.DIRECTORY.equals(uniqueQualifier)) {
+      Collection<String> directoryModuleUuids=Sets.newHashSet();
+      Collection<String> directoryPaths=Sets.newHashSet();
+      for (      ComponentDto directory : componentService.getByUuids(session,allComponentUuids)) {
+        directoryModuleUuids.add(directory.moduleUuid());
+        directoryPaths.add(directory.path());
+      }
+      builder.moduleUuids(directoryModuleUuids);
+      builder.directories(directoryPaths);
+      addComponentsBelowDirectory(builder,fileUuids);
+    }
+ else     if (Qualifiers.FILE.equals(uniqueQualifier)) {
+      builder.fileUuids(allComponentUuids);
+    }
+ else {
+      throw new IllegalArgumentException("Unable to set search root context for components " + Joiner.on(',').join(allComponentUuids));
+    }
+  }
+}

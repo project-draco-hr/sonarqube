@@ -1,17 +1,31 @@
 {
-  Collection<String> componentUuids=query.componentUuids();
-  if (BooleanUtils.isTrue(query.onComponentOnly())) {
-    Set<String> allComponents=Sets.newHashSet();
-    allComponents.addAll(query.projectUuids());
-    allComponents.addAll(query.moduleUuids());
-    allComponents.addAll(componentUuids);
-    filters.put(IssueIndexDefinition.FIELD_ISSUE_COMPONENT_UUID,matchFilter(IssueIndexDefinition.FIELD_ISSUE_COMPONENT_UUID,allComponents));
+  FilterBuilder projectFilter=matchFilter(IssueIndexDefinition.FIELD_ISSUE_PROJECT_UUID,query.projectUuids());
+  FilterBuilder moduleRootFilter=moduleRootFilter(query.moduleRootUuids());
+  FilterBuilder moduleFilter=matchFilter(IssueIndexDefinition.FIELD_ISSUE_MODULE_UUID,query.moduleUuids());
+  FilterBuilder directoryRootFilter=directoryFilter(query.moduleUuids(),query.directories());
+  FilterBuilder directoryFilter=matchFilter(IssueIndexDefinition.FIELD_ISSUE_DIRECTORY_PATH,query.directories());
+  FilterBuilder fileFilter=matchFilter(IssueIndexDefinition.FIELD_ISSUE_COMPONENT_UUID,query.fileUuids());
+  FilterBuilder componentFilter=matchFilter(IssueIndexDefinition.FIELD_ISSUE_COMPONENT_UUID,query.componentUuids());
+  if (projectFilter != null) {
+    filters.put("__componentRoot",projectFilter);
+    filters.put(IssueIndexDefinition.FIELD_ISSUE_MODULE_UUID,moduleFilter);
+    filters.put(IssueIndexDefinition.FIELD_ISSUE_DIRECTORY_PATH,directoryFilter);
+    filters.put(IssueIndexDefinition.FIELD_ISSUE_COMPONENT_UUID,fileFilter);
   }
- else {
-    filters.put(IssueIndexDefinition.FIELD_ISSUE_PROJECT_UUID,matchFilter(IssueIndexDefinition.FIELD_ISSUE_PROJECT_UUID,query.projectUuids()));
-    filters.put(IssueIndexDefinition.FIELD_ISSUE_MODULE_UUID,matchFilter(IssueIndexDefinition.FIELD_ISSUE_MODULE_UUID,query.moduleUuids()));
-    FilterBuilder compositeFilter=componentFilter(componentUuids);
-    filters.put(IssueIndexDefinition.FIELD_ISSUE_COMPONENT_UUID,compositeFilter);
-    filters.put(IssueIndexDefinition.FIELD_ISSUE_DIRECTORY_PATH,matchFilter(IssueIndexDefinition.FIELD_ISSUE_DIRECTORY_PATH,query.directories()));
+ else   if (moduleRootFilter != null) {
+    filters.put("__componentRoot",moduleRootFilter);
+    filters.put(IssueIndexDefinition.FIELD_ISSUE_MODULE_UUID,moduleFilter);
+    filters.put(IssueIndexDefinition.FIELD_ISSUE_DIRECTORY_PATH,directoryFilter);
+    filters.put(IssueIndexDefinition.FIELD_ISSUE_COMPONENT_UUID,fileFilter);
+  }
+ else   if (directoryRootFilter != null) {
+    filters.put("__componentRoot",directoryRootFilter);
+    filters.put(IssueIndexDefinition.FIELD_ISSUE_COMPONENT_UUID,fileFilter);
+  }
+ else   if (fileFilter != null) {
+    filters.put("__componentRoot",fileFilter);
+  }
+ else   if (componentFilter != null) {
+    filters.put("__componentRoot",componentFilter);
   }
 }

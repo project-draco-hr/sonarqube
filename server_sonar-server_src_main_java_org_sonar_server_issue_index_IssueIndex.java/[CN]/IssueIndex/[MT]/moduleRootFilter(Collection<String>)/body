@@ -1,0 +1,20 @@
+{
+  if (componentUuids == null || componentUuids.isEmpty()) {
+    return null;
+  }
+  FilterBuilder componentFilter=matchFilter(IssueIndexDefinition.FIELD_ISSUE_COMPONENT_UUID,componentUuids);
+  FilterBuilder modulePathFilter=matchFilter(IssueIndexDefinition.FIELD_ISSUE_MODULE_PATH,componentUuids);
+  FilterBuilder compositeFilter=null;
+  if (componentFilter != null) {
+    if (modulePathFilter != null) {
+      compositeFilter=FilterBuilders.orFilter(componentFilter,modulePathFilter);
+    }
+ else {
+      compositeFilter=componentFilter;
+    }
+  }
+ else   if (modulePathFilter != null) {
+    compositeFilter=modulePathFilter;
+  }
+  return compositeFilter;
+}

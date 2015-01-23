@@ -4,9 +4,9 @@
   ComponentDto subModule=ComponentTesting.newModuleDto(module);
   ComponentDto file=ComponentTesting.newFileDto(subModule);
   indexIssues(IssueTesting.newDoc("ISSUE3",module),IssueTesting.newDoc("ISSUE5",subModule),IssueTesting.newDoc("ISSUE2",file));
-  assertThat(index.search(IssueQuery.builder().moduleUuids(newArrayList(file.uuid())).build(),new QueryContext()).getHits()).isEmpty();
-  assertThat(index.search(IssueQuery.builder().moduleUuids(newArrayList(module.uuid())).build(),new QueryContext()).getHits()).hasSize(1);
-  assertThat(index.search(IssueQuery.builder().moduleUuids(newArrayList(subModule.uuid())).build(),new QueryContext()).getHits()).hasSize(1);
-  assertThat(index.search(IssueQuery.builder().moduleUuids(newArrayList(project.uuid())).build(),new QueryContext()).getHits()).hasSize(1);
-  assertThat(index.search(IssueQuery.builder().moduleUuids(newArrayList("unknown")).build(),new QueryContext()).getHits()).isEmpty();
+  assertThat(index.search(IssueQuery.builder().projectUuids(newArrayList(project.uuid())).moduleUuids(newArrayList(file.uuid())).build(),new QueryContext()).getHits()).isEmpty();
+  assertThat(index.search(IssueQuery.builder().projectUuids(newArrayList(project.uuid())).moduleUuids(newArrayList(module.uuid())).build(),new QueryContext()).getHits()).hasSize(1);
+  assertThat(index.search(IssueQuery.builder().projectUuids(newArrayList(project.uuid())).moduleUuids(newArrayList(subModule.uuid())).build(),new QueryContext()).getHits()).hasSize(1);
+  assertThat(index.search(IssueQuery.builder().projectUuids(newArrayList(project.uuid())).moduleUuids(newArrayList(project.uuid())).build(),new QueryContext()).getHits()).hasSize(1);
+  assertThat(index.search(IssueQuery.builder().projectUuids(newArrayList(project.uuid())).moduleUuids(newArrayList("unknown")).build(),new QueryContext()).getHits()).isEmpty();
 }
