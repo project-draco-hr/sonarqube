@@ -1,0 +1,30 @@
+{
+  Resource r=batchResource.resource();
+  BatchOutput.ReportComponent.Builder builder=BatchOutput.ReportComponent.newBuilder();
+  builder.setRef(batchResource.batchId());
+  builder.setSnapshotId(batchResource.snapshotId());
+  builder.setUuid(r.getUuid());
+  builder.setType(getType(r));
+  if (ResourceUtils.isFile(r)) {
+    builder.setIsTest(ResourceUtils.isUnitTestClass(r));
+  }
+  String name=getName(r);
+  if (name != null) {
+    builder.setName(name);
+  }
+  String path=r.getPath();
+  if (path != null) {
+    builder.setPath(path);
+  }
+  String lang=getLanguageKey(r);
+  if (lang != null) {
+    builder.setLanguage(lang);
+  }
+  for (  BatchResource child : batchResource.children()) {
+    builder.addChildRefs(child.batchId());
+  }
+  writer.writeComponent(builder.build());
+  for (  BatchResource child : batchResource.children()) {
+    recursiveWriteComponent(child,writer);
+  }
+}

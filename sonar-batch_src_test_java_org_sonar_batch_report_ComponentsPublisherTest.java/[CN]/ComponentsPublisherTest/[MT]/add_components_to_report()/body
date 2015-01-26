@@ -1,0 +1,34 @@
+{
+  Project root=new Project("foo").setName("Root project").setAnalysisDate(DateUtils.parseDate(("2012-12-12")));
+  root.setId(1).setUuid("PROJECT_UUID");
+  resourceCache.add(root,null).setSnapshot(new Snapshot().setId(11));
+  Project module1=new Project("module1").setName("Module1");
+  module1.setParent(root);
+  module1.setId(2).setUuid("MODULE_UUID");
+  resourceCache.add(module1,root).setSnapshot(new Snapshot().setId(12));
+  Directory dir=Directory.create("src");
+  dir.setEffectiveKey("foo:src");
+  dir.setId(3).setUuid("DIR_UUID");
+  resourceCache.add(dir,module1).setSnapshot(new Snapshot().setId(13));
+  org.sonar.api.resources.File file=org.sonar.api.resources.File.create("src/Foo.java","Foo.java",Java.INSTANCE,false);
+  file.setEffectiveKey("foo:src/Foo.java");
+  file.setId(4).setUuid("FILE_UUID");
+  resourceCache.add(file,dir).setSnapshot(new Snapshot().setId(14));
+  org.sonar.api.resources.File fileWithoutLang=org.sonar.api.resources.File.create("src/make","make",null,false);
+  fileWithoutLang.setEffectiveKey("foo:src/make");
+  fileWithoutLang.setId(5).setUuid("FILE_WITHOUT_LANG_UUID");
+  resourceCache.add(fileWithoutLang,dir).setSnapshot(new Snapshot().setId(15));
+  org.sonar.api.resources.File testFile=org.sonar.api.resources.File.create("test/FooTest.java","FooTest.java",Java.INSTANCE,true);
+  testFile.setEffectiveKey("foo:test/FooTest.java");
+  testFile.setId(6).setUuid("TEST_FILE_UUID");
+  resourceCache.add(testFile,dir).setSnapshot(new Snapshot().setId(16));
+  BatchOutputWriter writer=new BatchOutputWriter(temp.newFolder());
+  publisher.publish(writer);
+  assertThat(writer.hasComponentData(FileStructure.Domain.COMPONENT,1)).isTrue();
+  assertThat(writer.hasComponentData(FileStructure.Domain.COMPONENT,2)).isTrue();
+  assertThat(writer.hasComponentData(FileStructure.Domain.COMPONENT,3)).isTrue();
+  assertThat(writer.hasComponentData(FileStructure.Domain.COMPONENT,4)).isTrue();
+  assertThat(writer.hasComponentData(FileStructure.Domain.COMPONENT,5)).isTrue();
+  assertThat(writer.hasComponentData(FileStructure.Domain.COMPONENT,6)).isTrue();
+  assertThat(writer.hasComponentData(FileStructure.Domain.COMPONENT,7)).isFalse();
+}

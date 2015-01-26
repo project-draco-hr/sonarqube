@@ -1,4 +1,66 @@
 {
-  BatchResource batchResource=resourceCache.get(issue.componentKey());
-  return new ReportIssue().setKey(issue.key()).setComponentBatchId(batchResource != null ? batchResource.batchId() : null).setNew(issue.isNew()).setLine(issue.line()).setMessage(issue.message()).setEffortToFix(issue.effortToFix()).setDebt(issue.debtInMinutes()).setResolution(issue.resolution()).setStatus(issue.status()).setSeverity(issue.severity()).setChecksum(issue.checksum()).setManualSeverity(issue.manualSeverity()).setReporter(issue.reporter()).setAssignee(issue.assignee()).setRuleKey(issue.ruleKey().repository(),issue.ruleKey().rule()).setActionPlanKey(issue.actionPlanKey()).setAttributes(KeyValueFormat.format(issue.attributes())).setAuthorLogin(issue.authorLogin()).setCreationDate(issue.creationDate()).setCloseDate(issue.closeDate()).setUpdateDate(issue.updateDate()).setSelectedAt(issue.selectedAt()).setDiffFields(toString(issue.currentChange())).setTags(issue.tags()).setMustSendNotification(issue.mustSendNotifications()).setChanged(issue.isChanged());
+  BatchOutput.ReportIssue.Builder builder=BatchOutput.ReportIssue.newBuilder();
+  builder.setUuid(issue.key());
+  builder.setIsNew(issue.isNew());
+  builder.setSeverity(Constants.Severity.valueOf(issue.severity()));
+  builder.setRuleRepository(issue.ruleKey().repository());
+  builder.setRuleKey(issue.ruleKey().rule());
+  builder.setAttributes(KeyValueFormat.format(issue.attributes()));
+  builder.addAllTags(issue.tags());
+  builder.setMustSendNotification(issue.mustSendNotifications());
+  builder.setIsChanged(issue.isChanged());
+  Integer line=issue.line();
+  if (line != null) {
+    builder.setLine(line);
+  }
+  builder.setMsg(issue.message());
+  if (issue.effortToFix() != null) {
+    builder.setEffortToFix(issue.effortToFix());
+  }
+  if (issue.debtInMinutes() != null) {
+    builder.setDebtInMinutes(issue.debtInMinutes());
+  }
+  if (issue.resolution() != null) {
+    builder.setResolution(issue.resolution());
+  }
+  if (issue.status() != null) {
+    builder.setStatus(issue.status());
+  }
+  if (issue.checksum() != null) {
+    builder.setChecksum(issue.checksum());
+  }
+  builder.setManualSeverity(issue.manualSeverity());
+  if (issue.reporter() != null) {
+    builder.setReporter(issue.reporter());
+  }
+  if (issue.assignee() != null) {
+    builder.setAssignee(issue.assignee());
+  }
+  if (issue.actionPlanKey() != null) {
+    builder.setActionPlanKey(issue.actionPlanKey());
+  }
+  if (issue.authorLogin() != null) {
+    builder.setAuthorLogin(issue.authorLogin());
+  }
+  String diff=diffsToString(issue.currentChange());
+  if (diff != null) {
+    builder.setDiffFields(diff);
+  }
+  Date creationDate=issue.creationDate();
+  if (creationDate != null) {
+    builder.setCreationDate(creationDate.getTime());
+  }
+  Long selectedAt=issue.selectedAt();
+  if (selectedAt != null) {
+    builder.setSelectedAt(selectedAt);
+  }
+  Date closeDate=issue.closeDate();
+  if (closeDate != null) {
+    builder.setCloseDate(closeDate.getTime());
+  }
+  Date updateDate=issue.updateDate();
+  if (updateDate != null) {
+    builder.setUpdateDate(updateDate.getTime());
+  }
+  return builder.build();
 }

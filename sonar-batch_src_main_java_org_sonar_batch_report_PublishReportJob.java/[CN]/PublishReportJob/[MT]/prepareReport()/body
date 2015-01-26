@@ -2,18 +2,18 @@
   try {
     long startTime=System.currentTimeMillis();
     File reportDir=temp.newDir("batch-report");
-    ReportHelper reportHelper=ReportHelper.create(reportDir);
+    BatchOutputWriter writer=new BatchOutputWriter(reportDir);
     for (    ReportPublisher publisher : publishers) {
-      publisher.export(reportHelper);
+      publisher.publish(writer);
     }
     long stopTime=System.currentTimeMillis();
-    LOG.debug("Analysis reports generated in " + (stopTime - startTime) + "ms");
+    LOG.info("Analysis reports generated in " + (stopTime - startTime) + "ms, dir size="+ FileUtils.byteCountToDisplaySize(FileUtils.sizeOfDirectory(reportDir)));
     startTime=System.currentTimeMillis();
     File reportZip=temp.newFile("batch-report",".zip");
     ZipUtils.zipDir(reportDir,reportZip);
     FileUtils.deleteDirectory(reportDir);
     stopTime=System.currentTimeMillis();
-    LOG.debug("Analysis reports compressed in " + (stopTime - startTime) + "ms, zip size="+ FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(reportZip)));
+    LOG.info("Analysis reports compressed in " + (stopTime - startTime) + "ms, zip size="+ FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(reportZip)));
     return reportZip;
   }
  catch (  IOException e) {

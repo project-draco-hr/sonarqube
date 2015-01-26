@@ -1,10 +1,15 @@
 {
   File foo=FileUtils.toFile(getClass().getResource("/org/sonar/api/utils/ZipUtilsTest/shouldZipDirectory/foo.txt"));
   File dir=foo.getParentFile();
-  File zip=new File("target/tmp/shouldZipDirectory.zip");
+  File zip=temp.newFile();
   ZipUtils.zipDir(dir,zip);
-  assertThat(zip).exists();
+  assertThat(zip).exists().isFile();
   assertThat(zip.length()).isGreaterThan(1L);
   Iterator<? extends ZipEntry> zipEntries=Iterators.forEnumeration(new ZipFile(zip).entries());
   assertThat(zipEntries).hasSize(4);
+  File unzipDir=temp.newFolder();
+  ZipUtils.unzip(zip,unzipDir);
+  assertThat(new File(unzipDir,"bar.txt")).exists().isFile();
+  assertThat(new File(unzipDir,"foo.txt")).exists().isFile();
+  assertThat(new File(unzipDir,"dir1/hello.properties")).exists().isFile();
 }
