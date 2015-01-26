@@ -2,10 +2,14 @@
   CSVParser csvParser=null;
   try {
     csvParser=new CSVParser(input,CSVFormat.DEFAULT);
-    authors.clear();
     for (    CSVRecord csvRecord : csvParser) {
+      Date revisionDate=DateUtils.parseDateTimeQuietly(csvRecord.get(FileSourceDto.CSV_INDEX_SCM_DATE));
       String author=csvRecord.get(FileSourceDto.CSV_INDEX_SCM_AUTHOR);
       authors.add(author);
+      if (revisionDate != null && revisionDate.getTime() > lastCommitDate) {
+        lastCommitDate=revisionDate.getTime();
+        lastCommitAuthor=author;
+      }
     }
     return null;
   }
