@@ -1,16 +1,16 @@
 {
-  File deployedDriver=null;
-  String driverPath=settings.getString("sonar.jdbc.driverPath");
-  if (driverPath != null) {
-    File driver=new File(driverPath);
-    deployedDriver=new File(fileSystem.getDeployDir(),driver.getName());
-    if (!deployedDriver.exists() || FileUtils.sizeOf(deployedDriver) != FileUtils.sizeOf(driver)) {
-      try {
-        FileUtils.copyFile(driver,deployedDriver);
-      }
- catch (      IOException e) {
-        throw new IllegalStateException(String.format("Can not copy the JDBC driver from %s to %s",driver,deployedDriver),e);
-      }
+  String driverPath=settings.getString(ProcessConstants.JDBC_DRIVER_PATH);
+  if (driverPath == null) {
+    return;
+  }
+  File driver=new File(driverPath);
+  File deployedDriver=new File(fileSystem.getDeployDir(),driver.getName());
+  if (!deployedDriver.exists() || FileUtils.sizeOf(deployedDriver) != FileUtils.sizeOf(driver)) {
+    try {
+      FileUtils.copyFile(driver,deployedDriver);
+    }
+ catch (    IOException e) {
+      throw new IllegalStateException(String.format("Can not copy the JDBC driver from %s to %s",driver,deployedDriver),e);
     }
   }
   File deployedDriverIndex=fileSystem.getDeployedJdbcDriverIndex();

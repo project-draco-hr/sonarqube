@@ -1,0 +1,19 @@
+{
+  pi.execute(module);
+  eventBus.fireEvent(new ProjectAnalysisEvent(module,true));
+  executeMavenPhase(module);
+  executeInitializersPhase();
+  if (phases.isEnabled(Phases.Phase.SENSOR)) {
+    indexFs();
+    profileVerifier.execute();
+    initIssueExclusions();
+    sensorsExecutor.execute(sensorContext);
+  }
+  if (module.isRoot()) {
+    localIssueTracking();
+    issuesReport();
+    publishReportJob();
+  }
+  cleanMemory();
+  eventBus.fireEvent(new ProjectAnalysisEvent(module,false));
+}
