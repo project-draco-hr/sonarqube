@@ -1,0 +1,12 @@
+{
+  NewIndex index=context.create(INDEX);
+  boolean clusterMode=settings.getBoolean(ProcessConstants.CLUSTER_ACTIVATE);
+  if (clusterMode) {
+    index.getSettings().put(IndexMetaData.SETTING_NUMBER_OF_SHARDS,4);
+    index.getSettings().put(IndexMetaData.SETTING_NUMBER_OF_REPLICAS,1);
+  }
+  NewIndex.NewIndexType mapping=index.createType(TYPE_VIEW);
+  mapping.setAttribute("_id",ImmutableMap.of("path",FIELD_UUID));
+  mapping.stringFieldBuilder(FIELD_UUID).build();
+  mapping.stringFieldBuilder(FIELD_PROJECTS).build();
+}

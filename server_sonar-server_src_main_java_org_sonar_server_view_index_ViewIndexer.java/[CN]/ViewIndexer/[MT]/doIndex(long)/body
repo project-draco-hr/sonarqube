@@ -1,0 +1,17 @@
+{
+  long count=esClient.prepareCount(ViewIndexDefinition.INDEX).setTypes(ViewIndexDefinition.TYPE_VIEW).get().getCount();
+  if (count == 0) {
+    DbSession dbSession=dbClient.openSession(false);
+    try {
+      Map<String,String> viewAndProjectViewUuidMap=newHashMap();
+      for (      Map<String,String> viewsMap : dbClient.componentDao().selectAllViewsAndSubViews(dbSession)) {
+        viewAndProjectViewUuidMap.put(viewsMap.get("uuid"),viewsMap.get("projectUuid"));
+      }
+      index(dbSession,viewAndProjectViewUuidMap);
+    }
+  finally {
+      dbSession.close();
+    }
+  }
+  return 0L;
+}

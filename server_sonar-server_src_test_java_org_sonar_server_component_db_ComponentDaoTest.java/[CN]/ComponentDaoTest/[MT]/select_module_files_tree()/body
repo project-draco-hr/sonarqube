@@ -1,0 +1,20 @@
+{
+  setupData("select_module_files_tree");
+  List<FilePathWithHashDto> files=dao.selectModuleFilesTree(session,"ABCD");
+  assertThat(files).extracting("uuid").containsOnly("EFGHI","HIJK");
+  assertThat(files).extracting("moduleUuid").containsOnly("EFGH","FGHI");
+  assertThat(files).extracting("srcHash").containsOnly("srcEFGHI","srcHIJK");
+  assertThat(files).extracting("path").containsOnly("src/org/struts/pom.xml","src/org/struts/RequestContext.java");
+  files=dao.selectModuleFilesTree(session,"EFGH");
+  assertThat(files).extracting("uuid").containsOnly("EFGHI","HIJK");
+  assertThat(files).extracting("moduleUuid").containsOnly("EFGH","FGHI");
+  assertThat(files).extracting("srcHash").containsOnly("srcEFGHI","srcHIJK");
+  assertThat(files).extracting("path").containsOnly("src/org/struts/pom.xml","src/org/struts/RequestContext.java");
+  files=dao.selectModuleFilesTree(session,"FGHI");
+  assertThat(files).extracting("uuid").containsOnly("HIJK");
+  assertThat(files).extracting("moduleUuid").containsOnly("FGHI");
+  assertThat(files).extracting("srcHash").containsOnly("srcHIJK");
+  assertThat(files).extracting("path").containsOnly("src/org/struts/RequestContext.java");
+  assertThat(dao.selectModuleFilesTree(session,"GHIJ")).isEmpty();
+  assertThat(dao.selectModuleFilesTree(session,"unknown")).isEmpty();
+}

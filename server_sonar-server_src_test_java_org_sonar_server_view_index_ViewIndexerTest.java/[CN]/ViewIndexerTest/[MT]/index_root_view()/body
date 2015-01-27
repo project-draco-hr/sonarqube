@@ -1,0 +1,14 @@
+{
+  dbTester.prepareDbUnit(getClass(),"index.xml");
+  indexer.index("EFGH");
+  List<ViewDoc> docs=esTester.getDocuments("views","view",ViewDoc.class);
+  assertThat(docs).hasSize(2);
+  Map<String,ViewDoc> viewsByUuid=Maps.uniqueIndex(docs,new Function<ViewDoc,String>(){
+    @Override public String apply(    ViewDoc doc){
+      return doc.uuid();
+    }
+  }
+);
+  assertThat(viewsByUuid.get("EFGH").projects()).containsOnly("GHIJ","HIJK");
+  assertThat(viewsByUuid.get("FGHI").projects()).containsOnly("HIJK");
+}
