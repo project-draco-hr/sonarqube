@@ -1,13 +1,10 @@
 {
   File tempFile=temp.newFile();
   FileUtils.write(tempFile,"foo\r\nbar\r\nbaz",Charsets.UTF_8,true);
-  FileMetadata.Metadata metadata=new FileMetadata().read(tempFile,Charsets.UTF_8);
+  FileMetadata.Metadata metadata=new FileMetadata(mode).read(tempFile,Charsets.UTF_8);
   assertThat(metadata.lines).isEqualTo(3);
   assertThat(metadata.nonBlankLines).isEqualTo(3);
   assertThat(metadata.hash).isEqualTo(md5Hex("foo\nbar\nbaz"));
   assertThat(metadata.originalLineOffsets).containsOnly(0,5,10);
-  assertThat(metadata.lineHashes[0]).containsOnly(md5("foo"));
-  assertThat(metadata.lineHashes[1]).containsOnly(md5("bar"));
-  assertThat(metadata.lineHashes[2]).containsOnly(md5("baz"));
   assertThat(metadata.empty).isFalse();
 }

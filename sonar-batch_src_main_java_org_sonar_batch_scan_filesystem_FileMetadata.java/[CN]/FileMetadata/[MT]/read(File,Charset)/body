@@ -3,8 +3,13 @@
   LineCounter lineCounter=new LineCounter();
   FileHashComputer fileHashComputer=new FileHashComputer();
   LineOffsetCounter lineOffsetCounter=new LineOffsetCounter();
-  LineHashesComputer lineHashesComputer=new LineHashesComputer();
-  CharHandler[] handlers=new CharHandler[]{lineCounter,fileHashComputer,lineOffsetCounter,lineHashesComputer};
+  CharHandler[] handlers;
+  if (analysisMode.isPreview()) {
+    handlers=new CharHandler[]{lineCounter,fileHashComputer};
+  }
+ else {
+    handlers=new CharHandler[]{lineCounter,fileHashComputer,lineOffsetCounter};
+  }
   try (BOMInputStream bomIn=new BOMInputStream(new FileInputStream(file),ByteOrderMark.UTF_8,ByteOrderMark.UTF_16LE,ByteOrderMark.UTF_16BE,ByteOrderMark.UTF_32LE,ByteOrderMark.UTF_32BE);Reader reader=new BufferedReader(new InputStreamReader(bomIn,encoding))){
     int i=reader.read();
     boolean afterCR=false;
@@ -43,7 +48,7 @@
     for (    CharHandler handler : handlers) {
       handler.eof();
     }
-    return new Metadata(lineCounter.lines(),lineCounter.nonBlankLines(),fileHashComputer.getHash(),lineOffsetCounter.getOriginalLineOffsets(),lineHashesComputer.lineHashes(),lineCounter.isEmpty());
+    return new Metadata(lineCounter.lines(),lineCounter.nonBlankLines(),fileHashComputer.getHash(),lineOffsetCounter.getOriginalLineOffsets(),lineCounter.isEmpty());
   }
  catch (  IOException e) {
     throw new IllegalStateException(String.format("Fail to read file '%s' with encoding '%s'",file.getAbsolutePath(),encoding),e);

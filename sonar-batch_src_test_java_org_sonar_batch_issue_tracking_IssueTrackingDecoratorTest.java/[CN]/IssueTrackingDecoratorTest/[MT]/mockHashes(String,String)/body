@@ -1,7 +1,10 @@
 {
   DefaultInputFile inputFile=mock(DefaultInputFile.class);
-  byte[][] hashes=computeHashes(newSource);
-  when(inputFile.lineHashes()).thenReturn(hashes);
+  java.io.File f=temp.newFile();
+  when(inputFile.path()).thenReturn(f.toPath());
+  when(inputFile.charset()).thenReturn(Charsets.UTF_8);
+  when(inputFile.lines()).thenReturn(newSource.split("\n").length);
+  FileUtils.write(f,newSource,Charsets.UTF_8);
   when(inputFile.key()).thenReturn("foo:Action.java");
   when(inputPathCache.getFile("foo","Action.java")).thenReturn(inputFile);
   when(lastSnapshots.getLineHashes("foo:Action.java")).thenReturn(computeHexHashes(originalSource));

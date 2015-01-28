@@ -1,0 +1,22 @@
+{
+  inputFile.setType(type);
+  inputFile.setModuleBaseDir(fs.baseDir().toPath());
+  inputFile.setCharset(fs.encoding());
+  String lang=langDetection.language(inputFile);
+  if (lang == null && !settings.getBoolean(CoreProperties.IMPORT_UNKNOWN_FILES_KEY)) {
+    return null;
+  }
+  inputFile.setLanguage(lang);
+  InputFileMetadata result=new InputFileMetadata();
+  FileMetadata.Metadata metadata=fileMetadata.read(inputFile.file(),fs.encoding());
+  inputFile.setLines(metadata.lines);
+  result.setNonBlankLines(metadata.nonBlankLines);
+  result.setHash(metadata.hash);
+  result.setOriginalLineOffsets(metadata.originalLineOffsets);
+  result.setEmpty(metadata.empty);
+  inputFile.setStatus(statusDetection.status(inputFile.moduleKey(),inputFile.relativePath(),metadata.hash));
+  if (analysisMode.isIncremental() && inputFile.status() == InputFile.Status.SAME) {
+    return null;
+  }
+  return result;
+}

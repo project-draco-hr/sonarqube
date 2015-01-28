@@ -1,11 +1,12 @@
 {
+  Languages languages=new Languages(cobolLanguage);
+  ComponentIndexer indexer=createIndexer(languages);
+  DefaultModuleFileSystem fs=new DefaultModuleFileSystem(project,null,mock(FileIndexer.class),initializer,indexer);
   fs.add(newInputFile("src/foo/bar/Foo.cbl","","foo/bar/Foo.cbl","cobol",false));
   fs.add(newInputFile("src2/foo/bar/Foo.cbl","","foo/bar/Foo.cbl","cobol",false));
   fs.add(newInputFile("src/test/foo/bar/FooTest.cbl","","foo/bar/FooTest.cbl","cobol",true));
-  Languages languages=new Languages(cobolLanguage);
-  ComponentIndexer indexer=createIndexer(languages);
-  indexer.execute(fs);
-  verify(sonarIndex).index(org.sonar.api.resources.File.create("/src/foo/bar/Foo.cbl","foo/bar/Foo.cbl",cobolLanguage,false));
-  verify(sonarIndex).index(org.sonar.api.resources.File.create("/src2/foo/bar/Foo.cbl","foo/bar/Foo.cbl",cobolLanguage,false));
-  verify(sonarIndex).index(org.sonar.api.resources.File.create("/src/test/foo/bar/FooTest.cbl","foo/bar/FooTest.cbl",cobolLanguage,true));
+  fs.index();
+  verify(sonarIndex).index(org.sonar.api.resources.File.create("/src/foo/bar/Foo.cbl",cobolLanguage,false));
+  verify(sonarIndex).index(org.sonar.api.resources.File.create("/src2/foo/bar/Foo.cbl",cobolLanguage,false));
+  verify(sonarIndex).index(org.sonar.api.resources.File.create("/src/test/foo/bar/FooTest.cbl",cobolLanguage,true));
 }

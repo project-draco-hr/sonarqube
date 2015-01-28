@@ -1,12 +1,13 @@
 {
+  Languages languages=new Languages(Java.INSTANCE);
+  ComponentIndexer indexer=createIndexer(languages);
+  DefaultModuleFileSystem fs=new DefaultModuleFileSystem(project,null,mock(FileIndexer.class),initializer,indexer);
   fs.add(newInputFile("src/main/java/foo/bar/Foo.java","","foo/bar/Foo.java","java",false));
   fs.add(newInputFile("src/main/java2/foo/bar/Foo.java","","foo/bar/Foo.java","java",false));
   fs.add(newInputFile("src/test/java/foo/bar/FooTest.java","","foo/bar/FooTest.java","java",true));
-  Languages languages=new Languages(Java.INSTANCE);
-  ComponentIndexer indexer=createIndexer(languages);
-  indexer.execute(fs);
-  verify(sonarIndex).index(org.sonar.api.resources.File.create("src/main/java/foo/bar/Foo.java","foo/bar/Foo.java",Java.INSTANCE,false));
-  verify(sonarIndex).index(org.sonar.api.resources.File.create("src/main/java2/foo/bar/Foo.java","foo/bar/Foo.java",Java.INSTANCE,false));
+  fs.index();
+  verify(sonarIndex).index(org.sonar.api.resources.File.create("src/main/java/foo/bar/Foo.java",Java.INSTANCE,false));
+  verify(sonarIndex).index(org.sonar.api.resources.File.create("src/main/java2/foo/bar/Foo.java",Java.INSTANCE,false));
   verify(sonarIndex).index(argThat(new ArgumentMatcher<org.sonar.api.resources.File>(){
     @Override public boolean matches(    Object arg0){
       org.sonar.api.resources.File javaFile=(org.sonar.api.resources.File)arg0;
