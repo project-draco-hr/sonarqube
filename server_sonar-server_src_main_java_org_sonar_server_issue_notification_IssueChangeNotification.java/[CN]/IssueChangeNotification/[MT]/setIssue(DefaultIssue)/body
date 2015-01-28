@@ -1,0 +1,19 @@
+{
+  setFieldValue("key",issue.key());
+  setFieldValue("reporter",issue.reporter());
+  setFieldValue("assignee",issue.assignee());
+  setFieldValue("message",issue.message());
+  setFieldValue("componentKey",issue.componentKey());
+  FieldDiffs currentChange=issue.currentChange();
+  if (currentChange != null) {
+    for (    Map.Entry<String,FieldDiffs.Diff> entry : currentChange.diffs().entrySet()) {
+      String type=entry.getKey();
+      FieldDiffs.Diff diff=entry.getValue();
+      Serializable newValue=diff.newValue();
+      Serializable oldValue=diff.oldValue();
+      setFieldValue("old." + type,oldValue != null ? oldValue.toString() : null);
+      setFieldValue("new." + type,newValue != null ? newValue.toString() : null);
+    }
+  }
+  return this;
+}

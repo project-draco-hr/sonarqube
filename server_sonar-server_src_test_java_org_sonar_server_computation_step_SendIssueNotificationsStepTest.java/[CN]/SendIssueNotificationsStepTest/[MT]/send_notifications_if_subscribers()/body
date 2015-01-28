@@ -1,0 +1,10 @@
+{
+  IssueCache issueCache=new IssueCache(temp.newFile(),System2.INSTANCE);
+  issueCache.newAppender().append(new DefaultIssue().setSeverity(Severity.BLOCKER)).close();
+  when(context.getProject().uuid()).thenReturn("PROJECT_UUID");
+  when(notifService.hasProjectSubscribersForTypes("PROJECT_UUID",SendIssueNotificationsStep.NOTIF_TYPES)).thenReturn(true);
+  SendIssueNotificationsStep step=new SendIssueNotificationsStep(issueCache,ruleCache,notifService);
+  step.execute(context);
+  verify(notifService).deliver(any(NewIssuesNotification.class));
+  verify(notifService,atLeastOnce()).deliver(any(IssueChangeNotification.class));
+}

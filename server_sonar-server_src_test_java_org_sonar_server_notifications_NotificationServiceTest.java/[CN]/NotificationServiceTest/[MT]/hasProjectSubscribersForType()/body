@@ -1,0 +1,9 @@
+{
+  setUpMocks();
+  PropertiesDao dao=mock(PropertiesDao.class);
+  when(dbClient.propertiesDao()).thenReturn(dao);
+  when(dao.hasProjectNotificationSubscribersForDispatchers("PROJECT_UUID",Arrays.asList("CommentOnIssueAssignedToMe","CommentOnIssueCreatedByMe"))).thenReturn(false);
+  assertThat(service.hasProjectSubscribersForTypes("PROJECT_UUID",Sets.newHashSet("issue-changes"))).isFalse();
+  when(dao.hasProjectNotificationSubscribersForDispatchers("PROJECT_UUID",Arrays.asList("CommentOnIssueAssignedToMe","CommentOnIssueCreatedByMe"))).thenReturn(true);
+  assertThat(service.hasProjectSubscribersForTypes("PROJECT_UUID",Sets.newHashSet("issue-changes"))).isTrue();
+}
