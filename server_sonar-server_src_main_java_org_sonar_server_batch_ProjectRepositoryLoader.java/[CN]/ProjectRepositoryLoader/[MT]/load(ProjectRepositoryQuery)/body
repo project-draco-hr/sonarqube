@@ -7,7 +7,9 @@
     String projectKey=query.getModuleKey();
     ComponentDto module=dbClient.componentDao().getNullableByKey(session,query.getModuleKey());
     if (module != null) {
-      UserSession.get().checkComponentPermission(UserRole.USER,query.getModuleKey(),"You're not authorized to access to project '" + module.name() + "', please contact your SonarQube administrator.");
+      if (query.isPreview()) {
+        UserSession.get().checkComponentPermission(UserRole.USER,query.getModuleKey(),"You're not authorized to access to project '" + module.name() + "', please contact your SonarQube administrator.");
+      }
       ComponentDto project=getProject(module,session);
       if (!project.key().equals(module.key())) {
         addSettings(ref,module.getKey(),getSettingsFromParents(module,hasScanPerm,session));
