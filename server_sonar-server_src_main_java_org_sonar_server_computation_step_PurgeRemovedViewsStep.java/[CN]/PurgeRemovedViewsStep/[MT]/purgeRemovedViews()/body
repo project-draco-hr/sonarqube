@@ -1,0 +1,18 @@
+{
+  DbSession session=dbClient.openSession(false);
+  try {
+    List<UuidWithProjectUuidDto> uuidWithProjectUuidDtos=dbClient.componentDao().selectAllViewsAndSubViews(session);
+    Set<String> viewUuidsInDb=newHashSet(Iterables.transform(uuidWithProjectUuidDtos,new Function<UuidWithProjectUuidDto,String>(){
+      @Override public String apply(      @Nullable UuidWithProjectUuidDto input){
+        return input != null ? input.getUuid() : null;
+      }
+    }
+));
+    Set<String> viewUuidsInIndex=newHashSet(index.findAllViewUuids());
+    Set<String> viewsToRemove=Sets.difference(viewUuidsInIndex,viewUuidsInDb);
+    index.delete(viewsToRemove);
+  }
+  finally {
+    session.close();
+  }
+}

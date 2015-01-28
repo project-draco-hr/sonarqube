@@ -1,0 +1,17 @@
+{
+  when(context.getProject()).thenReturn(ComponentTesting.newProjectDto("DBCA").setQualifier(Qualifiers.VIEW));
+  esTester.putDocuments(ViewIndexDefinition.INDEX,ViewIndexDefinition.TYPE_VIEW,new ViewDoc().setUuid("ABCD").getFields(),new ViewDoc().setUuid("BCDE").getFields(),new ViewDoc().setUuid("CDEF").getFields());
+  ComponentDto view=ComponentTesting.newProjectDto("ABCD").setQualifier(Qualifiers.VIEW);
+  ComponentDto subView=ComponentTesting.newModuleDto(view,"BCDE").setQualifier(Qualifiers.SUBVIEW);
+  dbClient.componentDao().insert(session,view,subView);
+  session.commit();
+  step.execute(context);
+  List<SearchHit> results=esTester.getDocuments(ViewIndexDefinition.INDEX,ViewIndexDefinition.TYPE_VIEW);
+  List<String> viewUuids=newArrayList(Iterables.transform(results,new Function<SearchHit,String>(){
+    @Override public String apply(    SearchHit input){
+      return new ViewDoc(input.getSource()).uuid();
+    }
+  }
+));
+  assertThat(viewUuids).containsOnly("ABCD","BCDE");
+}

@@ -1,0 +1,16 @@
+{
+  SearchRequestBuilder esSearch=esClient.prepareSearch(ViewIndexDefinition.INDEX).setTypes(ViewIndexDefinition.TYPE_VIEW).setSearchType(SearchType.SCAN).setScroll(TimeValue.timeValueMinutes(SCROLL_TIME_IN_MINUTES)).setFetchSource(ViewIndexDefinition.FIELD_UUID,null).setSize(100).setQuery(QueryBuilders.matchAllQuery());
+  SearchResponse response=esSearch.get();
+  List<String> result=newArrayList();
+  while (true) {
+    List<SearchHit> hits=newArrayList(response.getHits());
+    for (    SearchHit hit : hits) {
+      result.add((String)hit.getSource().get(ViewIndexDefinition.FIELD_UUID));
+    }
+    response=esClient.prepareSearchScroll(response.getScrollId()).setScroll(TimeValue.timeValueMinutes(SCROLL_TIME_IN_MINUTES)).get();
+    if (response.getHits().getHits().length == 0) {
+      break;
+    }
+  }
+  return result;
+}
