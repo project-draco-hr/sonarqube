@@ -1,12 +1,8 @@
 {
-  if (uuids.isEmpty()) {
-    return Collections.emptyList();
+  return DaoUtils.partitionSelect(uuids,new DaoUtils.Function<ComponentDto,String>(){
+    @Override public List<ComponentDto> execute(    List<String> partition){
+      return mapper(session).findByUuids(partition);
+    }
   }
-  List<ComponentDto> components=newArrayList();
-  List<List<String>> partitionList=Lists.partition(newArrayList(uuids),1000);
-  for (  List<String> partition : partitionList) {
-    List<ComponentDto> dtos=mapper(session).findByUuids(partition);
-    components.addAll(dtos);
-  }
-  return components;
+);
 }

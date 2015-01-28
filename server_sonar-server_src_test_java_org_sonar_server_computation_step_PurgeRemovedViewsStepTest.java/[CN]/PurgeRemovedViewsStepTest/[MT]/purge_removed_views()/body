@@ -6,12 +6,6 @@
   dbClient.componentDao().insert(session,view,subView);
   session.commit();
   step.execute(context);
-  List<SearchHit> results=esTester.getDocuments(ViewIndexDefinition.INDEX,ViewIndexDefinition.TYPE_VIEW);
-  List<String> viewUuids=newArrayList(Iterables.transform(results,new Function<SearchHit,String>(){
-    @Override public String apply(    SearchHit input){
-      return new ViewDoc(input.getSource()).uuid();
-    }
-  }
-));
+  List<String> viewUuids=esTester.getDocumentFields(ViewIndexDefinition.INDEX,ViewIndexDefinition.TYPE_VIEW,ViewIndexDefinition.FIELD_UUID);
   assertThat(viewUuids).containsOnly("ABCD","BCDE");
 }
