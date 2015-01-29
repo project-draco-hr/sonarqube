@@ -4,7 +4,7 @@
   builder.onComponentOnly(effectiveOnComponentOnly);
   if (allComponentUuids.isEmpty()) {
     builder.setContextualized(false);
-    addComponentsBelowView(builder,session,projects,projectUuids,moduleUuids,directories,fileUuids);
+    addComponentsBelowView(builder,session,authors,projects,projectUuids,moduleUuids,directories,fileUuids);
   }
  else {
     if (effectiveOnComponentOnly) {
@@ -33,9 +33,11 @@
         filteredViewUuids.add(UNKNOWN);
       }
       builder.viewUuids(filteredViewUuids);
-      addComponentsBelowView(builder,session,projects,projectUuids,moduleUuids,directories,fileUuids);
+      addComponentsBelowView(builder,session,authors,projects,projectUuids,moduleUuids,directories,fileUuids);
     }
  else     if ("DEV".equals(uniqueQualifier)) {
+      Collection<String> actualAuthors=authors == null ? authorDao.selectScmAccountsByDeveloperUuids(allComponentUuids) : authors;
+      addComponentsBelowView(builder,session,actualAuthors,projects,projectUuids,moduleUuids,directories,fileUuids);
     }
  else     if (Qualifiers.PROJECT.equals(uniqueQualifier)) {
       builder.projectUuids(allComponentUuids);
