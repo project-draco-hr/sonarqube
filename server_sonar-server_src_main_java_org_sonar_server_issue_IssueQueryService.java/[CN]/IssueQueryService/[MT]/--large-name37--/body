@@ -22,7 +22,17 @@
       throw new IllegalArgumentException("All components must have the same qualifier, found " + Joiner.on(',').join(qualifiers));
     }
     String uniqueQualifier=qualifiers.iterator().next();
-    if (Qualifiers.VIEW.equals(uniqueQualifier)) {
+    if (Qualifiers.VIEW.equals(uniqueQualifier) || Qualifiers.SUBVIEW.equals(uniqueQualifier)) {
+      List<String> filteredViewUuids=newArrayList();
+      for (      String viewUuid : allComponentUuids) {
+        if ((Qualifiers.VIEW.equals(uniqueQualifier) && UserSession.get().hasProjectPermissionByUuid(UserRole.USER,viewUuid)) || (Qualifiers.SUBVIEW.equals(uniqueQualifier) && UserSession.get().hasComponentUuidPermission(UserRole.USER,viewUuid))) {
+          filteredViewUuids.add(viewUuid);
+        }
+      }
+      if (filteredViewUuids.isEmpty()) {
+        filteredViewUuids.add(UNKNOWN);
+      }
+      builder.viewUuids(filteredViewUuids);
       addComponentsBelowView(builder,session,projects,projectUuids,moduleUuids,directories,fileUuids);
     }
  else     if ("DEV".equals(uniqueQualifier)) {

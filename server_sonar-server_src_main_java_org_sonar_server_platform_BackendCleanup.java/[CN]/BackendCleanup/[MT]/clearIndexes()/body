@@ -1,6 +1,12 @@
 {
   LoggerFactory.getLogger(getClass()).info("Truncate Elasticsearch indices");
-  searchClient.prepareDeleteByQuery(searchClient.prepareState().get().getState().getMetaData().concreteAllIndices()).setQuery(QueryBuilders.matchAllQuery()).get();
-  searchClient.prepareRefresh(searchClient.prepareState().get().getState().getMetaData().concreteAllIndices()).setForce(true).get();
-  searchClient.prepareFlush(searchClient.prepareState().get().getState().getMetaData().concreteAllIndices()).get();
+  try {
+    searchClient.admin().indices().clearCache(new ClearIndicesCacheRequest()).get();
+    searchClient.prepareDeleteByQuery(searchClient.prepareState().get().getState().getMetaData().concreteAllIndices()).setQuery(QueryBuilders.matchAllQuery()).get();
+    searchClient.prepareRefresh(searchClient.prepareState().get().getState().getMetaData().concreteAllIndices()).setForce(true).get();
+    searchClient.prepareFlush(searchClient.prepareState().get().getState().getMetaData().concreteAllIndices()).get();
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Unable to clear indexes",e);
+  }
 }
