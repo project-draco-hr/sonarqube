@@ -1,0 +1,33 @@
+{
+  boolean effectiveOnComponentOnly=false;
+  if (componentRootUuids != null) {
+    if (componentRoots != null) {
+      throw new IllegalArgumentException("componentRoots and componentRootUuids cannot be set simultaneously");
+    }
+    allComponentUuids.addAll(componentRootUuids);
+    effectiveOnComponentOnly=false;
+  }
+ else   if (componentRoots != null) {
+    allComponentUuids.addAll(componentUuids(session,componentRoots));
+    effectiveOnComponentOnly=false;
+  }
+ else   if (components != null) {
+    if (componentUuids != null) {
+      throw new IllegalArgumentException("components and componentUuids cannot be set simultaneously");
+    }
+    allComponentUuids.addAll(componentUuids(session,components));
+    effectiveOnComponentOnly=true;
+  }
+ else   if (componentUuids != null) {
+    if (componentKeys != null) {
+      throw new IllegalArgumentException("componentUuids and componentKeys cannot be set simultaneously");
+    }
+    allComponentUuids.addAll(componentUuids);
+    effectiveOnComponentOnly=BooleanUtils.isTrue(onComponentOnly);
+  }
+ else   if (componentKeys != null) {
+    allComponentUuids.addAll(componentUuids(session,componentKeys));
+    effectiveOnComponentOnly=BooleanUtils.isTrue(onComponentOnly);
+  }
+  return effectiveOnComponentOnly;
+}
