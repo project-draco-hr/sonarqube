@@ -1,0 +1,25 @@
+{
+  Props props=new Props(new Properties());
+  File home=temp.newFolder();
+  File webDir=new File(home,"web");
+  FileUtils.write(new File(home,"web/WEB-INF/web.xml"),"<web-app/>");
+  props.set("sonar.path.home",home.getAbsolutePath());
+  props.set("sonar.path.web",webDir.getAbsolutePath());
+  int httpPort=NetworkUtils.freePort();
+  int ajpPort=NetworkUtils.freePort();
+  props.set("sonar.web.port",String.valueOf(httpPort));
+  props.set("sonar.ajp.port",String.valueOf(ajpPort));
+  EmbeddedTomcat tomcat=new EmbeddedTomcat(props);
+  assertThat(tomcat.isReady()).isFalse();
+  tomcat.start();
+  assertThat(tomcat.isReady()).isTrue();
+  URL url=new URL("http://" + Inet4Address.getLocalHost().getHostAddress() + ":"+ httpPort);
+  url.openConnection().connect();
+  tomcat.terminate();
+  try {
+    url.openConnection().connect();
+    fail();
+  }
+ catch (  ConnectException e) {
+  }
+}
