@@ -1,0 +1,13 @@
+{
+  Connector connector=mock(Connector.class,Mockito.RETURNS_DEEP_STUBS);
+  when(tomcat.getService().findConnectors()).thenReturn(new Connector[]{connector});
+  when(connector.getScheme()).thenReturn("https");
+  when(connector.getProtocol()).thenReturn("HTTP/1.1");
+  when(connector.getPort()).thenReturn(1234);
+  AbstractHttp11JsseProtocol protocol=mock(AbstractHttp11JsseProtocol.class);
+  when(connector.getProtocolHandler()).thenReturn(protocol);
+  when(protocol.getCiphersUsed()).thenReturn(new String[]{"SSL_RSA","TLS_RSA_WITH_RC4"});
+  sut.log(tomcat);
+  verify(logger).info("HTTPS connector enabled on port 1234 | ciphers=SSL_RSA,TLS_RSA_WITH_RC4");
+  verifyNoMoreInteractions(logger);
+}

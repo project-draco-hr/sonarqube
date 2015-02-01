@@ -1,7 +1,9 @@
 {
   ServletContext context=mock(ServletContext.class);
-  ClassLoader classloader=mock(ClassLoader.class);
   JarScannerCallback callback=mock(JarScannerCallback.class);
-  new NullJarScanner().scan(context,classloader,callback,new HashSet<String>());
-  verifyZeroInteractions(context,classloader,callback);
+  NullJarScanner scanner=new NullJarScanner();
+  scanner.scan(JarScanType.PLUGGABILITY,context,callback);
+  verifyZeroInteractions(context,callback);
+  scanner.setJarScanFilter(mock(JarScanFilter.class));
+  assertThat(scanner.getJarScanFilter()).isNull();
 }
