@@ -7,19 +7,8 @@
   setSorting(query,esSearch);
   setPagination(options,esSearch);
   QueryBuilder esQuery=QueryBuilders.matchAllQuery();
-  BoolFilterBuilder esFilter=FilterBuilders.boolFilter();
   Map<String,FilterBuilder> filters=getFilters(query,options);
-  for (  FilterBuilder filter : filters.values()) {
-    if (filter != null) {
-      esFilter.must(filter);
-    }
-  }
-  if (esFilter.hasClauses()) {
-    esSearch.setQuery(QueryBuilders.filteredQuery(esQuery,esFilter));
-  }
- else {
-    esSearch.setQuery(esQuery);
-  }
+  setQueryFilter(esSearch,esQuery,filters);
   setFacets(query,options,filters,esQuery,esSearch);
   SearchResponse response=esSearch.get();
   return new Result<>(this,response);

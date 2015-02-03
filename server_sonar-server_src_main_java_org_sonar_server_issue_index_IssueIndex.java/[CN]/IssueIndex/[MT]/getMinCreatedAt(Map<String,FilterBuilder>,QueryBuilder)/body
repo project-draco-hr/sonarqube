@@ -1,0 +1,8 @@
+{
+  String facetNameAndField=IssueIndexDefinition.FIELD_ISSUE_FUNC_CREATED_AT;
+  SearchRequestBuilder minCount=getClient().prepareSearch(IssueIndexDefinition.INDEX).setTypes(IssueIndexDefinition.TYPE_ISSUE).setSearchType(SearchType.COUNT);
+  setQueryFilter(minCount,esQuery,filters);
+  minCount.addAggregation(AggregationBuilders.min(facetNameAndField).field(facetNameAndField));
+  Min minValue=minCount.get().getAggregations().get(facetNameAndField);
+  return Double.valueOf(minValue.getValue()).longValue();
+}
