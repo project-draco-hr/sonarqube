@@ -1,0 +1,15 @@
+{
+  dbTester.prepareDbUnit(getClass(),"shared.xml");
+  DbClient dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),new ComponentDao());
+  when(steps.orderedSteps()).thenReturn(Arrays.asList(projectStep1,projectStep2,viewStep));
+  ComputationService sut=new ComputationService(dbClient,steps,activityService);
+  AnalysisReportDto report=AnalysisReportDto.newForTests(1L);
+  report.setProjectKey("PROJECT_KEY");
+  assertThat(report.getStatus()).isNull();
+  sut.process(report);
+  assertThat(report.getStatus()).isEqualTo(AnalysisReportDto.Status.SUCCESS);
+  verify(projectStep1).execute(any(ComputationContext.class));
+  verify(projectStep2).execute(any(ComputationContext.class));
+  verify(viewStep,never()).execute(any(ComputationContext.class));
+  verify(activityService).write(any(DbSession.class),eq(Activity.Type.ANALYSIS_REPORT),any(AnalysisReportLog.class));
+}

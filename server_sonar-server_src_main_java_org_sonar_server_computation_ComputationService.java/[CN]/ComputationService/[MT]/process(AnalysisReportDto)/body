@@ -1,14 +1,14 @@
 {
   TimeProfiler profiler=new TimeProfiler(LOG).start(String.format("#%s - %s - processing analysis report",report.getId(),report.getProjectKey()));
   ComponentDto project=loadProject(report);
-  File reportDir=tempFolder.newDir();
   try {
-    decompressReport(report,reportDir);
-    ComputationContext context=new ComputationContext(report,project,new BatchOutputReader(reportDir));
+    ComputationContext context=new ComputationContext(report,project);
     for (    ComputationStep step : steps.orderedSteps()) {
-      TimeProfiler stepProfiler=new TimeProfiler(LOG).start(step.getDescription());
-      step.execute(context);
-      stepProfiler.stop();
+      if (ArrayUtils.contains(step.supportedProjectQualifiers(),context.getProject().qualifier())) {
+        TimeProfiler stepProfiler=new TimeProfiler(LOG).start(step.getDescription());
+        step.execute(context);
+        stepProfiler.stop();
+      }
     }
     report.succeed();
   }
@@ -17,7 +17,6 @@
     throw Throwables.propagate(e);
   }
  finally {
-    FileUtils.deleteQuietly(reportDir);
     logActivity(report,project);
     profiler.stop();
   }

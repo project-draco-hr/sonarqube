@@ -1,5 +1,15 @@
 {
-  int rootComponentRef=context.getReportReader().readMetadata().getRootComponentRef();
-  processComponent(context,rootComponentRef);
-  issueComputation.afterReportProcessing();
+  File reportDir=tempFolder.newDir();
+  try {
+    extractReport(context.getReportDto(),reportDir);
+    BatchOutputReader reader=new BatchOutputReader(reportDir);
+    BatchOutput.ReportMetadata reportMetadata=reader.readMetadata();
+    context.setReportMetadata(reportMetadata);
+    int rootComponentRef=reportMetadata.getRootComponentRef();
+    recursivelyProcessComponent(reader,context,rootComponentRef);
+    issueComputation.afterReportProcessing();
+  }
+  finally {
+    FileUtils.deleteQuietly(reportDir);
+  }
 }

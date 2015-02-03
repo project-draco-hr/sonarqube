@@ -1,0 +1,12 @@
+{
+  long startTime=System.currentTimeMillis();
+  DbSession session=dbClient.openSession(false);
+  try {
+    dbClient.analysisReportDao().selectAndDecompressToDir(session,report.getId(),toDir);
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+  long stopTime=System.currentTimeMillis();
+  LOG.info(String.format("Report extracted in %dms | uncompressed size=%s | project=%s",stopTime - startTime,FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(toDir)),report.getProjectKey()));
+}
