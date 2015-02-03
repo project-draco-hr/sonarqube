@@ -1,0 +1,26 @@
+{
+  setupLineMeasure(CoreMetrics.SCM_AUTHORS_BY_LINE,"1=him;2=her");
+  setupLineMeasure(CoreMetrics.SCM_LAST_COMMIT_DATETIMES_BY_LINE,"1=2014-10-11T16:44:02+0100;2=2014-10-12T16:44:02+0100;3=2014-10-13T16:44:02+0100");
+  setupLineMeasure(CoreMetrics.SCM_REVISIONS_BY_LINE,"1=ABC;2=234;3=345");
+  setupLineMeasure(CoreMetrics.COVERAGE_LINE_HITS_DATA,"1=10;3=4");
+  setupLineMeasure(CoreMetrics.CONDITIONS_BY_LINE,"1=10;3=4");
+  setupLineMeasure(CoreMetrics.CONDITIONS_BY_LINE,"1=10;3=4");
+  setupLineMeasure(CoreMetrics.COVERED_CONDITIONS_BY_LINE,"1=10;3=4");
+  setupLineMeasure(CoreMetrics.IT_COVERAGE_LINE_HITS_DATA,"1=11;2=4");
+  setupLineMeasure(CoreMetrics.IT_COVERED_CONDITIONS_BY_LINE,"1=10;3=4");
+  setupLineMeasure(CoreMetrics.IT_CONDITIONS_BY_LINE,"1=10;3=4");
+  setupLineMeasure(CoreMetrics.OVERALL_COVERAGE_LINE_HITS_DATA,"1=10;3=4");
+  setupLineMeasure(CoreMetrics.OVERALL_CONDITIONS_BY_LINE,"1=10;3=4");
+  setupLineMeasure(CoreMetrics.OVERALL_COVERED_CONDITIONS_BY_LINE,"1=10;3=4");
+  sut.applyLineMeasures(inputFile,output);
+  FileSourceDb.Data data=output.build();
+  assertThat(data.getLines(0).getUtLineHits()).isEqualTo(10);
+  assertThat(data.getLines(0).getItLineHits()).isEqualTo(11);
+  assertThat(data.getLines(0).getScmRevision()).isEqualTo("ABC");
+  assertThat(data.getLines(0).getScmAuthor()).isEqualTo("him");
+  assertThat(data.getLines(1).hasUtLineHits()).isFalse();
+  assertThat(data.getLines(1).getItLineHits()).isEqualTo(4);
+  assertThat(data.getLines(1).getScmAuthor()).isEqualTo("her");
+  assertThat(data.getLines(2).getUtLineHits()).isEqualTo(4);
+  assertThat(data.getLines(2).hasScmAuthor()).isFalse();
+}

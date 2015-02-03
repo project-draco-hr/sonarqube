@@ -1,0 +1,14 @@
+{
+  MassUpdate update=context.prepareMassUpdate().rowPluralName("issues");
+  update.select("SELECT id,data FROM file_sources WHERE binary_data is null");
+  update.update("UPDATE file_sources SET binary_data=? WHERE id=?");
+  update.execute(new MassUpdate.Handler(){
+    @Override public boolean handle(    Select.Row row,    SqlStatement update) throws SQLException {
+      Long fileSourceId=row.getLong(1);
+      update.setBytes(1,toBinary(fileSourceId,row.getString(2)));
+      update.setLong(2,fileSourceId);
+      return true;
+    }
+  }
+);
+}
