@@ -1,7 +1,11 @@
 {
+  Date now=system.newDate();
+  SimpleDateFormat tzFormat=new SimpleDateFormat("XX");
+  tzFormat.setTimeZone(TimeZone.getDefault());
+  String timeZoneString=tzFormat.format(now);
   Interval bucketSize=Interval.YEAR;
   long startTime=query.createdAfter() == null ? 0L : query.createdAfter().getTime();
-  long endTime=query.createdBefore() == null ? system.newDate().getTime() : query.createdBefore().getTime();
+  long endTime=query.createdBefore() == null ? now.getTime() : query.createdBefore().getTime();
   Duration timeSpan=new Duration(startTime,endTime);
   if (timeSpan.isShorterThan(TWENTY_DAYS)) {
     bucketSize=Interval.DAY;
@@ -12,5 +16,5 @@
  else   if (timeSpan.isShorterThan(TWENTY_MONTHS)) {
     bucketSize=Interval.MONTH;
   }
-  return AggregationBuilders.dateHistogram(IssueFilterParameters.CREATED_AT).field(IssueIndexDefinition.FIELD_ISSUE_FUNC_CREATED_AT).interval(bucketSize).minDocCount(0L).format(DateUtils.DATETIME_FORMAT).preZone(TimeZone.getDefault().getID());
+  return AggregationBuilders.dateHistogram(IssueFilterParameters.CREATED_AT).field(IssueIndexDefinition.FIELD_ISSUE_FUNC_CREATED_AT).interval(bucketSize).minDocCount(0L).format(DateUtils.DATETIME_FORMAT).preZone(timeZoneString).postZone(timeZoneString);
 }
