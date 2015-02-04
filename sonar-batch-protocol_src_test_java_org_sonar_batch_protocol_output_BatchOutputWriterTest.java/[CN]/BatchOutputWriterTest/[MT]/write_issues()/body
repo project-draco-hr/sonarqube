@@ -2,12 +2,12 @@
   File dir=temp.newFolder();
   BatchOutputWriter writer=new BatchOutputWriter(dir);
   assertThat(writer.hasComponentData(FileStructure.Domain.ISSUES,1)).isFalse();
-  BatchOutput.ReportIssue issue=BatchOutput.ReportIssue.newBuilder().setUuid("ISSUE_A").setLine(50).setMsg("the message").build();
+  BatchReport.Issue issue=BatchReport.Issue.newBuilder().setUuid("ISSUE_A").setLine(50).setMsg("the message").build();
   writer.writeComponentIssues(1,Arrays.asList(issue));
   assertThat(writer.hasComponentData(FileStructure.Domain.ISSUES,1)).isTrue();
   File file=writer.getFileStructure().fileFor(FileStructure.Domain.ISSUES,1);
   assertThat(file).exists().isFile();
-  BatchOutput.ReportIssues read=ProtobufUtil.readFile(file,BatchOutput.ReportIssues.PARSER);
+  BatchReport.Issues read=ProtobufUtil.readFile(file,BatchReport.Issues.PARSER);
   assertThat(read.getComponentRef()).isEqualTo(1);
   assertThat(read.getListCount()).isEqualTo(1);
 }
