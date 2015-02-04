@@ -1,0 +1,18 @@
+{
+  final long now=system2.now();
+  MassUpdate massUpdate=context.prepareMassUpdate();
+  massUpdate.select("SELECT i.issue_creation_date, i.issue_update_date, i.issue_close_date, i.id FROM issues i WHERE issue_creation_date_ms IS NULL");
+  massUpdate.update("UPDATE issues SET issue_creation_date_ms=?, issue_update_date_ms=?, issue_close_date_ms=? WHERE id=?");
+  massUpdate.rowPluralName("issues");
+  massUpdate.execute(new MassUpdate.Handler(){
+    @Override public boolean handle(    Select.Row row,    SqlStatement update) throws SQLException {
+      for (int i=1; i <= 3; i++) {
+        update.setLong(i,row.getDate(i) == null ? null : Math.min(now,row.getDate(i).getTime()));
+      }
+      Long id=row.getLong(4);
+      update.setLong(4,id);
+      return true;
+    }
+  }
+);
+}
