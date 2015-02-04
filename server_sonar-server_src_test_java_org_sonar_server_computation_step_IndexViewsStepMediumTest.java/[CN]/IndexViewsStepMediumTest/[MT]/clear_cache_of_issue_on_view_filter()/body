@@ -1,0 +1,20 @@
+{
+  String viewUuid="ABCD";
+  when(context.getProject()).thenReturn(ComponentTesting.newProjectDto(viewUuid).setQualifier(Qualifiers.VIEW));
+  RuleDto rule=RuleTesting.newXooX1();
+  tester.get(RuleDao.class).insert(dbSession,rule);
+  ComponentDto project1=addProjectWithIssue(rule);
+  ComponentDto view=ComponentTesting.newView("ABCD");
+  ComponentDto techProject1=ComponentTesting.newTechnicalProject("CDEF",project1,view);
+  tester.get(ComponentDao.class).insert(dbSession,view,techProject1);
+  dbSession.commit();
+  tester.get(ViewIndexer.class).index(viewUuid);
+  assertThat(tester.get(IssueIndex.class).search(IssueQuery.builder().viewUuids(newArrayList(viewUuid)).build(),new QueryContext()).getHits()).hasSize(1);
+  ComponentDto project2=addProjectWithIssue(rule);
+  ComponentDto techProject2=ComponentTesting.newTechnicalProject("EFGH",project2,view);
+  tester.get(ComponentDao.class).insert(dbSession,techProject2);
+  dbSession.commit();
+  assertThat(tester.get(IssueIndex.class).search(IssueQuery.builder().viewUuids(newArrayList(viewUuid)).build(),new QueryContext()).getHits()).hasSize(1);
+  step.execute(context);
+  assertThat(tester.get(IssueIndex.class).search(IssueQuery.builder().viewUuids(newArrayList(viewUuid)).build(),new QueryContext()).getHits()).hasSize(2);
+}
