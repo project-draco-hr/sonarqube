@@ -1,8 +1,13 @@
 {
   StringBuilder sb=new StringBuilder();
   sb.append("HTTPS connector enabled on port ").append(connector.getPort());
-  ProtocolHandler protocol=connector.getProtocolHandler();
-  String[] ciphers=((AbstractHttp11JsseProtocol)protocol).getCiphersUsed();
-  sb.append(" | ciphers=").append(StringUtils.join(ciphers,","));
+  AbstractHttp11JsseProtocol protocol=(AbstractHttp11JsseProtocol)connector.getProtocolHandler();
+  sb.append(" | ciphers=");
+  if (props.contains(Connectors.PROP_HTTPS_CIPHERS)) {
+    sb.append(StringUtils.join(protocol.getCiphersUsed(),","));
+  }
+ else {
+    sb.append("JVM defaults");
+  }
   log.info(sb.toString());
 }
