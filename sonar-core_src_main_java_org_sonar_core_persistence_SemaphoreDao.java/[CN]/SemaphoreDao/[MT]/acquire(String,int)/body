@@ -1,22 +1,16 @@
 {
-  Preconditions.checkArgument(!Strings.isNullOrEmpty(name),SEMAPHORE_NAME_MUST_NOT_BE_EMPTY);
-  Preconditions.checkArgument(maxAgeInSeconds >= 0,"Semaphore max age must be positive: " + maxAgeInSeconds);
-  SqlSession session=mybatis.openSession(false);
-  try {
-    SemaphoreMapper mapper=session.getMapper(SemaphoreMapper.class);
-    Date dbNow=mapper.now();
-    SemaphoreDto semaphore=tryToInsert(name,dbNow,session);
+  checkArgument(!Strings.isNullOrEmpty(name),SEMAPHORE_NAME_MUST_NOT_BE_EMPTY);
+  checkArgument(maxAgeInSeconds >= 0,"Semaphore max age must be positive: " + maxAgeInSeconds);
+  try (SqlSession session=mybatis.openSession(false)){
+    SemaphoreDto semaphore=tryToInsert(name,system.now(),session);
     boolean isAcquired;
     if (semaphore == null) {
       semaphore=selectSemaphore(name,session);
-      isAcquired=acquireIfOutdated(name,maxAgeInSeconds,session,mapper);
+      isAcquired=acquireIfOutdated(name,maxAgeInSeconds,session);
     }
  else {
       isAcquired=true;
     }
-    return createLock(semaphore,session,isAcquired);
+    return createLock(semaphore,isAcquired);
   }
-  finally {
-    MyBatis.closeQuietly(session);
-  }
-}
+ }

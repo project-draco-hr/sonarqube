@@ -1,11 +1,7 @@
 {
-  Preconditions.checkArgument(!Strings.isNullOrEmpty(name),SEMAPHORE_NAME_MUST_NOT_BE_EMPTY);
-  SqlSession session=mybatis.openSession(false);
-  try {
-    session.getMapper(SemaphoreMapper.class).release(name);
+  checkArgument(!Strings.isNullOrEmpty(name),SEMAPHORE_NAME_MUST_NOT_BE_EMPTY);
+  try (SqlSession session=mybatis.openSession(false)){
+    mapper(session).release(name);
     session.commit();
   }
-  finally {
-    MyBatis.closeQuietly(session);
-  }
-}
+ }
