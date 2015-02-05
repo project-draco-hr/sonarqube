@@ -1,0 +1,14 @@
+{
+  RuleDto rule=newRule();
+  ComponentDto project=newProject();
+  ComponentDto file=newFile(project);
+  saveIssue(IssueTesting.newDto(rule,file,project).setAuthorLogin("luke.skywalker"));
+  saveIssue(IssueTesting.newDto(rule,file,project).setAuthorLogin("luke@skywalker.name"));
+  saveIssue(IssueTesting.newDto(rule,file,project));
+  saveIssue(IssueTesting.newDto(rule,file,project).setAuthorLogin("anakin@skywalker.name"));
+  assertThat(service.listAuthors(null,5)).containsExactly("anakin@skywalker.name","luke.skywalker","luke@skywalker.name");
+  assertThat(service.listAuthors(null,2)).containsExactly("anakin@skywalker.name","luke.skywalker");
+  assertThat(service.listAuthors("uke",5)).containsExactly("luke.skywalker","luke@skywalker.name");
+  assertThat(service.listAuthors(null,1)).containsExactly("anakin@skywalker.name");
+  assertThat(service.listAuthors(null,Integer.MAX_VALUE)).containsExactly("anakin@skywalker.name","luke.skywalker","luke@skywalker.name");
+}
