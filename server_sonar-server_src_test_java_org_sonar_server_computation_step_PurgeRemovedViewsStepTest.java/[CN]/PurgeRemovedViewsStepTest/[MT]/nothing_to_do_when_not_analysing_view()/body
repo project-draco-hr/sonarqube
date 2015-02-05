@@ -1,0 +1,8 @@
+{
+  when(context.getProject()).thenReturn(ComponentTesting.newProjectDto("DBCA"));
+  esTester.putDocuments(ViewIndexDefinition.INDEX,ViewIndexDefinition.TYPE_VIEW,new ViewDoc().setUuid("ABCD"),new ViewDoc().setUuid("BCDE"));
+  dbClient.componentDao().insert(session,ComponentTesting.newProjectDto("ABCD").setQualifier(Qualifiers.VIEW));
+  session.commit();
+  step.execute(context);
+  assertThat(esTester.countDocuments(ViewIndexDefinition.INDEX,ViewIndexDefinition.TYPE_VIEW)).isEqualTo(2);
+}

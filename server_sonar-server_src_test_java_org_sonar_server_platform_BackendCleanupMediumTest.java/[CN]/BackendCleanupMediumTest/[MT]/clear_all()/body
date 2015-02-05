@@ -1,10 +1,12 @@
 {
+  dbTester.prepareDbUnit(getClass(),"shared.xml");
+  esTester.putDocuments(IssueIndexDefinition.INDEX,IssueIndexDefinition.TYPE_ISSUE,IssueTesting.newDoc());
+  esTester.putDocuments(IndexDefinition.RULE.getIndexName(),IndexDefinition.RULE.getIndexType(),newRuleDoc());
   backendCleanup.clearAll();
-  session.commit();
-  assertThat(tester.get(ComponentDao.class).getNullableByKey(session,project.key())).isNull();
-  assertThat(tester.get(ComponentDao.class).getNullableByKey(session,file.key())).isNull();
-  assertThat(tester.get(IssueDao.class).selectNullableByKey(session,file.key())).isNull();
-  assertThat(tester.get(RuleDao.class).getNullableByKey(session,rule.getKey())).isNull();
-  assertThat(tester.get(IssueIndex.class).getNullableByKey(issue.getKey())).isNull();
-  assertThat(tester.get(RuleIndex.class).getNullableByKey(rule.getKey())).isNull();
+  assertThat(esTester.countDocuments(IssueIndexDefinition.INDEX,IssueIndexDefinition.TYPE_ISSUE)).isEqualTo(0);
+  assertThat(esTester.countDocuments(IndexDefinition.RULE.getIndexName(),IndexDefinition.RULE.getIndexType())).isEqualTo(0);
+  assertThat(dbTester.countRowsOfTable("projects")).isEqualTo(0);
+  assertThat(dbTester.countRowsOfTable("snapshots")).isEqualTo(0);
+  assertThat(dbTester.countRowsOfTable("rules")).isEqualTo(0);
+  assertThat(dbTester.countRowsOfTable("properties")).isEqualTo(0);
 }

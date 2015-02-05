@@ -1,0 +1,10 @@
+{
+  final BulkIndexer bulk=new BulkIndexer(esClient,ViewIndexDefinition.INDEX);
+  bulk.start();
+  for (  Map.Entry<String,String> entry : viewAndProjectViewUuidMap.entrySet()) {
+    String viewUuid=entry.getKey();
+    List<String> projects=dbClient.componentDao().selectProjectsFromView(dbSession,viewUuid,entry.getValue());
+    doIndex(bulk,new ViewDoc().setUuid(viewUuid).setProjects(projects),needClearCache);
+  }
+  bulk.stop();
+}

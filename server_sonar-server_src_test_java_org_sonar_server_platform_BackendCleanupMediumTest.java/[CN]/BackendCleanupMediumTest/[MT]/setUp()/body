@@ -1,22 +1,3 @@
 {
-  tester.clearDbAndIndexes();
-  db=tester.get(DbClient.class);
-  session=db.openSession(false);
-  backendCleanup=tester.get(BackendCleanup.class);
-  rule=RuleTesting.newXooX1();
-  tester.get(RuleDao.class).insert(session,rule);
-  project=ComponentTesting.newProjectDto().setKey("MyProject");
-  tester.get(ComponentDao.class).insert(session,project);
-  SnapshotDto projectSnapshot=SnapshotTesting.createForProject(project);
-  db.snapshotDao().insert(session,projectSnapshot);
-  file=ComponentTesting.newFileDto(project).setKey("MyComponent");
-  tester.get(ComponentDao.class).insert(session,file);
-  db.snapshotDao().insert(session,SnapshotTesting.createForComponent(file,projectSnapshot));
-  session.commit();
-  MockUserSession.set().setLogin("admin").setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
-  tester.get(InternalPermissionService.class).addPermission(new PermissionChange().setComponentKey(project.getKey()).setGroup(DefaultGroups.ANYONE).setPermission(UserRole.USER));
-  issue=IssueTesting.newDto(rule,file,project);
-  tester.get(IssueDao.class).insert(session,issue);
-  session.commit();
-  tester.get(IssueIndexer.class).indexAll();
+  backendCleanup=new BackendCleanup(esTester.client(),dbTester.myBatis());
 }
