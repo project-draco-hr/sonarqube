@@ -1,12 +1,12 @@
 {
   Map<String,Long> result=newLinkedHashMap();
-  List<FacetValue> facetValues=indexClient.get(IssueIndex.class).listAssignees(query);
-  for (  FacetValue facetValue : facetValues) {
-    if ("_notAssigned_".equals(facetValue.getKey())) {
-      result.put(null,facetValue.getValue());
+  Map<String,Long> buckets=issueIndex.searchForAssignees(query);
+  for (  Map.Entry<String,Long> bucket : buckets.entrySet()) {
+    if ("_notAssigned_".equals(bucket.getKey())) {
+      result.put(null,bucket.getValue());
     }
  else {
-      result.put(facetValue.getKey(),facetValue.getValue());
+      result.put(bucket.getKey(),bucket.getValue());
     }
   }
   return result;

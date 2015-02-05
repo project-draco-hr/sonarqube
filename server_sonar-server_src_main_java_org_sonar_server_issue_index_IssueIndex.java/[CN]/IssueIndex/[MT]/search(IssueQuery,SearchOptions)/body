@@ -1,0 +1,21 @@
+{
+  SearchRequestBuilder requestBuilder=getClient().prepareSearch(IssueIndexDefinition.INDEX).setTypes(IssueIndexDefinition.TYPE_ISSUE);
+  configureSorting(query,requestBuilder);
+  configurePagination(options,requestBuilder);
+  QueryBuilder esQuery=QueryBuilders.matchAllQuery();
+  BoolFilterBuilder esFilter=FilterBuilders.boolFilter();
+  Map<String,FilterBuilder> filters=createFilters(query);
+  for (  FilterBuilder filter : filters.values()) {
+    if (filter != null) {
+      esFilter.must(filter);
+    }
+  }
+  if (esFilter.hasClauses()) {
+    requestBuilder.setQuery(QueryBuilders.filteredQuery(esQuery,esFilter));
+  }
+ else {
+    requestBuilder.setQuery(esQuery);
+  }
+  configureStickyFacets(query,options,filters,esQuery,requestBuilder);
+  return new SearchResult<>(requestBuilder.get(),DOC_CONVERTER);
+}

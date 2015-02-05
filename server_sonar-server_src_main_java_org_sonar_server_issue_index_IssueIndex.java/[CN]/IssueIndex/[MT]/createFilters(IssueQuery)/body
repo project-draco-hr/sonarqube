@@ -1,0 +1,39 @@
+{
+  Map<String,FilterBuilder> filters=new HashMap<>();
+  filters.put("__authorization",createAuthorizationFilter(query));
+  String isAssigned="__isAssigned";
+  if (BooleanUtils.isTrue(query.assigned())) {
+    filters.put(isAssigned,FilterBuilders.existsFilter(IssueIndexDefinition.FIELD_ISSUE_ASSIGNEE));
+  }
+ else   if (BooleanUtils.isFalse(query.assigned())) {
+    filters.put(isAssigned,FilterBuilders.missingFilter(IssueIndexDefinition.FIELD_ISSUE_ASSIGNEE));
+  }
+  String isPlanned="__isPlanned";
+  if (BooleanUtils.isTrue(query.planned())) {
+    filters.put(isPlanned,FilterBuilders.existsFilter(IssueIndexDefinition.FIELD_ISSUE_ACTION_PLAN));
+  }
+ else   if (BooleanUtils.isFalse(query.planned())) {
+    filters.put(isPlanned,FilterBuilders.missingFilter(IssueIndexDefinition.FIELD_ISSUE_ACTION_PLAN));
+  }
+  String isResolved="__isResolved";
+  if (BooleanUtils.isTrue(query.resolved())) {
+    filters.put(isResolved,FilterBuilders.existsFilter(IssueIndexDefinition.FIELD_ISSUE_RESOLUTION));
+  }
+ else   if (BooleanUtils.isFalse(query.resolved())) {
+    filters.put(isResolved,FilterBuilders.missingFilter(IssueIndexDefinition.FIELD_ISSUE_RESOLUTION));
+  }
+  filters.put(IssueIndexDefinition.FIELD_ISSUE_KEY,createTermsFilter(IssueIndexDefinition.FIELD_ISSUE_KEY,query.issueKeys()));
+  filters.put(IssueIndexDefinition.FIELD_ISSUE_ACTION_PLAN,createTermsFilter(IssueIndexDefinition.FIELD_ISSUE_ACTION_PLAN,query.actionPlans()));
+  filters.put(IssueIndexDefinition.FIELD_ISSUE_ASSIGNEE,createTermsFilter(IssueIndexDefinition.FIELD_ISSUE_ASSIGNEE,query.assignees()));
+  addComponentRelatedFilters(query,filters);
+  filters.put(IssueIndexDefinition.FIELD_ISSUE_LANGUAGE,createTermsFilter(IssueIndexDefinition.FIELD_ISSUE_LANGUAGE,query.languages()));
+  filters.put(IssueIndexDefinition.FIELD_ISSUE_TAGS,createTermsFilter(IssueIndexDefinition.FIELD_ISSUE_TAGS,query.tags()));
+  filters.put(IssueIndexDefinition.FIELD_ISSUE_RESOLUTION,createTermsFilter(IssueIndexDefinition.FIELD_ISSUE_RESOLUTION,query.resolutions()));
+  filters.put(IssueIndexDefinition.FIELD_ISSUE_REPORTER,createTermsFilter(IssueIndexDefinition.FIELD_ISSUE_REPORTER,query.reporters()));
+  filters.put(IssueIndexDefinition.FIELD_ISSUE_AUTHOR_LOGIN,createTermsFilter(IssueIndexDefinition.FIELD_ISSUE_AUTHOR_LOGIN,query.authors()));
+  filters.put(IssueIndexDefinition.FIELD_ISSUE_RULE_KEY,createTermsFilter(IssueIndexDefinition.FIELD_ISSUE_RULE_KEY,query.rules()));
+  filters.put(IssueIndexDefinition.FIELD_ISSUE_SEVERITY,createTermsFilter(IssueIndexDefinition.FIELD_ISSUE_SEVERITY,query.severities()));
+  filters.put(IssueIndexDefinition.FIELD_ISSUE_STATUS,createTermsFilter(IssueIndexDefinition.FIELD_ISSUE_STATUS,query.statuses()));
+  addDatesFilter(filters,query);
+  return filters;
+}

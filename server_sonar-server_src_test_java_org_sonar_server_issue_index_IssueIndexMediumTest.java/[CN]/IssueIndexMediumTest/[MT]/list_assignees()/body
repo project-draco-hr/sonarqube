@@ -2,12 +2,16 @@
   ComponentDto project=ComponentTesting.newProjectDto();
   ComponentDto file=ComponentTesting.newFileDto(project);
   indexIssues(IssueTesting.newDoc("ISSUE1",file).setAssignee("steph").setStatus(Issue.STATUS_OPEN),IssueTesting.newDoc("ISSUE2",file).setAssignee("simon").setStatus(Issue.STATUS_OPEN),IssueTesting.newDoc("ISSUE3",file).setAssignee(null).setStatus(Issue.STATUS_OPEN),IssueTesting.newDoc("ISSUE4",file).setAssignee("steph").setStatus(Issue.STATUS_OPEN),IssueTesting.newDoc("ISSUE5",file).setAssignee("julien").setStatus(Issue.STATUS_CLOSED));
-  List<FacetValue> results=index.listAssignees(IssueQuery.builder().statuses(newArrayList(Issue.STATUS_OPEN)).build());
+  LinkedHashMap<String,Long> results=index.searchForAssignees(IssueQuery.builder().statuses(newArrayList(Issue.STATUS_OPEN)).build());
   assertThat(results).hasSize(3);
-  assertThat(results.get(0).getKey()).isEqualTo("steph");
-  assertThat(results.get(0).getValue()).isEqualTo(2);
-  assertThat(results.get(1).getKey()).isEqualTo("simon");
-  assertThat(results.get(1).getValue()).isEqualTo(1);
-  assertThat(results.get(2).getKey()).isEqualTo("_notAssigned_");
-  assertThat(results.get(2).getValue()).isEqualTo(1);
+  Iterator<Map.Entry<String,Long>> buckets=results.entrySet().iterator();
+  Map.Entry<String,Long> bucket=buckets.next();
+  assertThat(bucket.getKey()).isEqualTo("steph");
+  assertThat(bucket.getValue()).isEqualTo(2L);
+  bucket=buckets.next();
+  assertThat(bucket.getKey()).isEqualTo("simon");
+  assertThat(bucket.getValue()).isEqualTo(1L);
+  bucket=buckets.next();
+  assertThat(bucket.getKey()).isEqualTo("_notAssigned_");
+  assertThat(bucket.getValue()).isEqualTo(1L);
 }

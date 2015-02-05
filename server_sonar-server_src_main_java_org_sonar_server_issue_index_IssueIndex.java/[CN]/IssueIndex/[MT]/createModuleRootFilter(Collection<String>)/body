@@ -1,0 +1,21 @@
+{
+  if (componentUuids.isEmpty()) {
+    return null;
+  }
+  FilterBuilder componentFilter=createTermsFilter(IssueIndexDefinition.FIELD_ISSUE_COMPONENT_UUID,componentUuids);
+  FilterBuilder modulePathFilter=createTermsFilter(IssueIndexDefinition.FIELD_ISSUE_MODULE_PATH,componentUuids);
+  FilterBuilder compositeFilter=null;
+  if (componentFilter != null) {
+    if (modulePathFilter != null) {
+      compositeFilter=FilterBuilders.orFilter(componentFilter,modulePathFilter);
+    }
+ else {
+      compositeFilter=componentFilter;
+    }
+  }
+ else   if (modulePathFilter != null) {
+    compositeFilter=modulePathFilter;
+  }
+  System.out.println("compositeFilter:" + compositeFilter);
+  return compositeFilter;
+}

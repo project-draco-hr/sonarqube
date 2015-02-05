@@ -4,20 +4,20 @@
   ComponentDto file=newFile(project);
   MockUserSession.set().setLogin("john");
   IssueDto issue=saveIssue(IssueTesting.newDto(rule,file,project));
-  assertThat(indexClient.get(IssueIndex.class).getByKey(issue.getKey()).tags()).isEmpty();
+  assertThat(IssueIndex.getByKey(issue.getKey()).tags()).isEmpty();
   service.setTags(issue.getKey(),ImmutableSet.of("bug","Convention"));
-  assertThat(indexClient.get(IssueIndex.class).getByKey(issue.getKey()).tags()).containsOnly("bug","convention");
+  assertThat(IssueIndex.getByKey(issue.getKey()).tags()).containsOnly("bug","convention");
   service.setTags(issue.getKey(),Sets.newHashSet("security",null,"","convention"));
-  assertThat(indexClient.get(IssueIndex.class).getByKey(issue.getKey()).tags()).containsOnly("security","convention");
+  assertThat(IssueIndex.getByKey(issue.getKey()).tags()).containsOnly("security","convention");
   try {
     service.setTags(issue.getKey(),ImmutableSet.of("pol op"));
   }
  catch (  Exception exception) {
     assertThat(exception).isInstanceOf(IllegalArgumentException.class);
   }
-  assertThat(indexClient.get(IssueIndex.class).getByKey(issue.getKey()).tags()).containsOnly("security","convention");
+  assertThat(IssueIndex.getByKey(issue.getKey()).tags()).containsOnly("security","convention");
   service.setTags(issue.getKey(),ImmutableSet.of("convention","security"));
-  assertThat(indexClient.get(IssueIndex.class).getByKey(issue.getKey()).tags()).containsOnly("security","convention");
+  assertThat(IssueIndex.getByKey(issue.getKey()).tags()).containsOnly("security","convention");
   service.setTags(issue.getKey(),ImmutableSet.<String>of());
-  assertThat(indexClient.get(IssueIndex.class).getByKey(issue.getKey()).tags()).isEmpty();
+  assertThat(IssueIndex.getByKey(issue.getKey()).tags()).isEmpty();
 }

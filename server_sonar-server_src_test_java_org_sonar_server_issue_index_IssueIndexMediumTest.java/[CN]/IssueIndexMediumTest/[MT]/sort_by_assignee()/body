@@ -3,13 +3,13 @@
   ComponentDto file=ComponentTesting.newFileDto(project);
   indexIssues(IssueTesting.newDoc("ISSUE1",file).setAssignee("steph"),IssueTesting.newDoc("ISSUE2",file).setAssignee("simon"));
   IssueQuery.Builder query=IssueQuery.builder().sort(IssueQuery.SORT_BY_ASSIGNEE).asc(true);
-  Result<Issue> result=index.search(query.build(),new QueryContext());
-  assertThat(result.getHits()).hasSize(2);
-  assertThat(result.getHits().get(0).assignee()).isEqualTo("simon");
-  assertThat(result.getHits().get(1).assignee()).isEqualTo("steph");
+  SearchResult<IssueDoc> result=index.search(query.build(),new SearchOptions());
+  assertThat(result.getDocs()).hasSize(2);
+  assertThat(result.getDocs().get(0).assignee()).isEqualTo("simon");
+  assertThat(result.getDocs().get(1).assignee()).isEqualTo("steph");
   query=IssueQuery.builder().sort(IssueQuery.SORT_BY_ASSIGNEE).asc(false);
-  result=index.search(query.build(),new QueryContext());
-  assertThat(result.getHits()).hasSize(2);
-  assertThat(result.getHits().get(0).assignee()).isEqualTo("steph");
-  assertThat(result.getHits().get(1).assignee()).isEqualTo("simon");
+  result=index.search(query.build(),new SearchOptions());
+  assertThat(result.getDocs()).hasSize(2);
+  assertThat(result.getDocs().get(0).assignee()).isEqualTo("steph");
+  assertThat(result.getDocs().get(1).assignee()).isEqualTo("simon");
 }

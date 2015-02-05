@@ -8,15 +8,14 @@
   indexIssue(IssueTesting.newDoc("ISSUE1",file1),"sonar-users",null);
   indexIssue(IssueTesting.newDoc("ISSUE2",file2),"sonar-admins",null);
   indexIssue(IssueTesting.newDoc("ISSUE3",file3),null,null);
-  IssueQuery.Builder query=IssueQuery.builder();
   MockUserSession.set().setUserGroups("sonar-users");
-  assertThat(index.search(query.build(),new QueryContext()).getHits()).hasSize(1);
+  assertThat(index.search(IssueQuery.builder().build(),new SearchOptions()).getDocs()).hasSize(1);
   MockUserSession.set().setUserGroups("sonar-admins");
-  assertThat(index.search(query.build(),new QueryContext()).getHits()).hasSize(1);
+  assertThat(index.search(IssueQuery.builder().build(),new SearchOptions()).getDocs()).hasSize(1);
   MockUserSession.set().setUserGroups("sonar-users","sonar-admins");
-  assertThat(index.search(query.build(),new QueryContext()).getHits()).hasSize(2);
+  assertThat(index.search(IssueQuery.builder().build(),new SearchOptions()).getDocs()).hasSize(2);
   MockUserSession.set().setUserGroups("another group");
-  assertThat(index.search(query.build(),new QueryContext()).getHits()).isEmpty();
+  assertThat(index.search(IssueQuery.builder().build(),new SearchOptions()).getDocs()).isEmpty();
   MockUserSession.set().setUserGroups("sonar-users","sonar-admins");
-  assertThat(index.search(query.projectUuids(newArrayList(project3.uuid())).build(),new QueryContext()).getHits()).isEmpty();
+  assertThat(index.search(IssueQuery.builder().projectUuids(newArrayList(project3.uuid())).build(),new SearchOptions()).getDocs()).isEmpty();
 }

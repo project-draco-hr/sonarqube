@@ -4,11 +4,11 @@
   ComponentDto file=newFile(project);
   saveIssue(IssueTesting.newDto(rule,file,project).setActionPlanKey("P1"));
   saveIssue(IssueTesting.newDto(rule,file,project).setActionPlanKey("P2").setResolution("NONE"));
-  org.sonar.server.search.Result<Issue> result=service.search(IssueQuery.builder().build(),new QueryContext());
-  assertThat(result.getHits()).hasSize(2);
-  assertThat(result.getFacets()).isEmpty();
-  result=service.search(IssueQuery.builder().build(),new QueryContext().addFacets(Arrays.asList("actionPlans","assignees")));
-  assertThat(result.getFacets().keySet()).hasSize(2);
-  assertThat(result.getFacetKeys("actionPlans")).hasSize(2);
-  assertThat(result.getFacetKeys("assignees")).hasSize(1);
+  SearchResult<IssueDoc> result=service.search(IssueQuery.builder().build(),new SearchOptions());
+  assertThat(result.getDocs()).hasSize(2);
+  assertThat(result.getFacets().getNames()).isEmpty();
+  result=service.search(IssueQuery.builder().build(),new SearchOptions().addFacets("actionPlans","assignees"));
+  assertThat(result.getFacets().getNames()).hasSize(2);
+  assertThat(result.getFacets().get("actionPlans")).hasSize(2);
+  assertThat(result.getFacets().get("assignees")).hasSize(1);
 }
