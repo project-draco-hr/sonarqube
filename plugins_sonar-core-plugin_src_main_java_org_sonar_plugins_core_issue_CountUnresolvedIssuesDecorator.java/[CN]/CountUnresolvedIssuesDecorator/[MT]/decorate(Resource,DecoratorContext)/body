@@ -3,14 +3,17 @@
   if (issuable != null) {
     Collection<Issue> issues=issuable.issues();
     boolean shouldSaveNewMetrics=shouldSaveNewMetrics(context);
-    Multiset<String> severityBag=HashMultiset.create();
-    ListMultimap<String,Issue> issuesPerSeverity=ArrayListMultimap.create();
+    Multiset<RulePriority> severityBag=HashMultiset.create();
+    Map<RulePriority,Multiset<RuleKey>> rulesPerSeverity=Maps.newHashMap();
+    ListMultimap<RulePriority,Issue> issuesPerSeverity=ArrayListMultimap.create();
     int countOpen=0;
     int countReopened=0;
     int countConfirmed=0;
     for (    Issue issue : issues) {
-      severityBag.add(issue.severity());
-      issuesPerSeverity.put(issue.severity(),issue);
+      severityBag.add(RulePriority.valueOf(issue.severity()));
+      Multiset<RuleKey> rulesBag=initRules(rulesPerSeverity,RulePriority.valueOf(issue.severity()));
+      rulesBag.add(issue.ruleKey());
+      issuesPerSeverity.put(RulePriority.valueOf(issue.severity()),issue);
       if (Issue.STATUS_OPEN.equals(issue.status())) {
         countOpen++;
       }
@@ -21,9 +24,11 @@
         countConfirmed++;
       }
     }
-    for (    String severity : Severity.ALL) {
-      saveIssuesForSeverity(context,severity,severityBag);
-      saveNewIssuesForSeverity(context,severity,issuesPerSeverity,shouldSaveNewMetrics);
+    for (    RulePriority ruleSeverity : RulePriority.values()) {
+      saveIssuesForSeverity(context,ruleSeverity,severityBag);
+      saveIssuesPerRules(context,ruleSeverity,rulesPerSeverity);
+      saveNewIssuesForSeverity(context,ruleSeverity,issuesPerSeverity,shouldSaveNewMetrics);
+      saveNewIssuesPerRule(context,ruleSeverity,issues,shouldSaveNewMetrics);
     }
     saveTotalIssues(context,issues);
     saveNewIssues(context,issues,shouldSaveNewMetrics);
