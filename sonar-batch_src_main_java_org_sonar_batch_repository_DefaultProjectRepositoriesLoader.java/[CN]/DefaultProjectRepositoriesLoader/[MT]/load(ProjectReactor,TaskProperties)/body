@@ -6,31 +6,5 @@
     url+="&profile=" + ServerClient.encodeForUrl(taskProperties.properties().get(ModuleQProfiles.SONAR_PROFILE_PROP));
   }
   url+="&preview=" + analysisMode.isPreview();
-  ProjectRepositories ref=ProjectRepositories.fromJson(serverClient.request(url));
-  if (session != null) {
-    for (    ProjectDefinition module : reactor.getProjects()) {
-      for (      Entry<String,FileData> fileDataByPaths : ref.fileDataByPath(module.getKeyWithBranch()).entrySet()) {
-        String path=fileDataByPaths.getKey();
-        FileData fileData=fileDataByPaths.getValue();
-        String lastCommits=null;
-        String revisions=null;
-        String authors=null;
-        List<Object[]> measuresByKey=query(projectKey + ":" + path,CoreMetrics.SCM_LAST_COMMIT_DATETIMES_BY_LINE_KEY,CoreMetrics.SCM_REVISIONS_BY_LINE_KEY,CoreMetrics.SCM_AUTHORS_BY_LINE_KEY);
-        for (        Object[] measureByKey : measuresByKey) {
-          if (measureByKey[0].equals(CoreMetrics.SCM_LAST_COMMIT_DATETIMES_BY_LINE_KEY)) {
-            lastCommits=((MeasureModel)measureByKey[1]).getData(CoreMetrics.SCM_LAST_COMMIT_DATETIMES_BY_LINE);
-          }
- else           if (measureByKey[0].equals(CoreMetrics.SCM_REVISIONS_BY_LINE_KEY)) {
-            revisions=((MeasureModel)measureByKey[1]).getData(CoreMetrics.SCM_REVISIONS_BY_LINE);
-          }
- else           if (measureByKey[0].equals(CoreMetrics.SCM_AUTHORS_BY_LINE_KEY)) {
-            authors=((MeasureModel)measureByKey[1]).getData(CoreMetrics.SCM_AUTHORS_BY_LINE);
-          }
-        }
-        ref.addFileData(module.getKeyWithBranch(),path,new FileData(fileData.hash(),authors == null,lastCommits,revisions,authors));
-      }
-    }
-    ref.setLastAnalysisDate(lastSnapshotCreationDate(projectKey));
-  }
-  return ref;
+  return ProjectRepositories.fromJson(serverClient.request(url));
 }
