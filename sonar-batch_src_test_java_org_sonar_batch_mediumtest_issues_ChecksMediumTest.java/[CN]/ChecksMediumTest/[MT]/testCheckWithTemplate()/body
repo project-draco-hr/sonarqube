@@ -1,0 +1,25 @@
+{
+  File baseDir=temp.newFolder();
+  File srcDir=new File(baseDir,"src");
+  srcDir.mkdir();
+  File xooFile=new File(srcDir,"sample.xoo");
+  FileUtils.write(xooFile,"foo");
+  TaskResult result=tester.newTask().properties(ImmutableMap.<String,String>builder().put("sonar.task","scan").put("sonar.projectBaseDir",baseDir.getAbsolutePath()).put("sonar.projectKey","com.foo.project").put("sonar.projectName","Foo Project").put("sonar.projectVersion","1.0-SNAPSHOT").put("sonar.projectDescription","Description of Foo Project").put("sonar.sources","src").build()).start();
+  assertThat(result.issues()).hasSize(2);
+  boolean foundIssueAtLine1=false;
+  boolean foundIssueAtLine2=false;
+  for (  Issue issue : result.issues()) {
+    if (issue.line() == 1) {
+      foundIssueAtLine1=true;
+      assertThat(issue.inputPath()).isEqualTo(new DefaultInputFile("com.foo.project","src/sample.xoo"));
+      assertThat(issue.message()).isEqualTo("A template rule");
+    }
+    if (issue.line() == 2) {
+      foundIssueAtLine2=true;
+      assertThat(issue.inputPath()).isEqualTo(new DefaultInputFile("com.foo.project","src/sample.xoo"));
+      assertThat(issue.message()).isEqualTo("Another template rule");
+    }
+  }
+  assertThat(foundIssueAtLine1).isTrue();
+  assertThat(foundIssueAtLine2).isTrue();
+}
