@@ -1,0 +1,11 @@
+{
+  String devUuid="DEV:anakin.skywalker";
+  String login1="anakin@skywalker.name";
+  String login2="darth.vader";
+  Map<String,Object> map=newHashMap();
+  map.put("componentUuids",newArrayList(devUuid));
+  when(componentService.getDistinctQualifiers(isA(DbSession.class),anyCollection())).thenReturn(Sets.newHashSet("DEV"));
+  when(authorDao.selectScmAccountsByDeveloperUuids(isA(DbSession.class),anyCollection())).thenReturn(Lists.newArrayList(login1,login2));
+  IssueQuery query=issueQueryService.createFromMap(map);
+  assertThat(query.authors()).containsExactly(login1,login2);
+}
