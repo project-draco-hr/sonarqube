@@ -1,8 +1,9 @@
 {
   String componentUuid=request.mandatoryParam("componentUuid");
+  IssueQuery query=queryService.createFromMap(ImmutableMap.<String,Object>of("componentUuids",componentUuid,"resolved",false));
   int pageSize=request.mandatoryParamAsInt("ps");
   JsonWriter json=response.newJsonWriter().beginObject().name("tags").beginArray();
-  for (  Map.Entry<String,Long> tag : service.listTagsForComponent(componentUuid,pageSize).entrySet()) {
+  for (  Map.Entry<String,Long> tag : service.listTagsForComponent(query,pageSize).entrySet()) {
     json.beginObject().prop("key",tag.getKey()).prop("value",tag.getValue()).endObject();
   }
   json.endArray().endObject().close();
