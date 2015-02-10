@@ -1,24 +1,20 @@
 {
   List<DuplicationGroup> groups=duplicationCache.byComponent(inputFileKey);
   if (groups != null) {
-    Multimap<Integer,Integer> duplicationsPerLine=ArrayListMultimap.create();
     int blockId=1;
     for (Iterator<DuplicationGroup> it=groups.iterator(); it.hasNext(); ) {
       DuplicationGroup group=it.next();
-      addBlock(blockId,group.originBlock(),duplicationsPerLine);
+      addBlock(blockId,group.originBlock(),to);
       blockId++;
       for (Iterator<DuplicationGroup.Block> dupsIt=group.duplicates().iterator(); dupsIt.hasNext(); ) {
         DuplicationGroup.Block dups=dupsIt.next();
         if (inputFileKey.equals(dups.resourceKey())) {
-          addBlock(blockId,dups,duplicationsPerLine);
+          addBlock(blockId,dups,to);
           blockId++;
         }
         dupsIt.remove();
       }
       it.remove();
-    }
-    for (    Map.Entry<Integer,Collection<Integer>> entry : duplicationsPerLine.asMap().entrySet()) {
-      to.getLinesBuilder(entry.getKey() - 1).addAllDuplications(entry.getValue());
     }
   }
 }
