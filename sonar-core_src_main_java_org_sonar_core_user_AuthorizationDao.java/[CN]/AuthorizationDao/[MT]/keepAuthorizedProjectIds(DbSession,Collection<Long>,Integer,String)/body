@@ -1,0 +1,16 @@
+{
+  if (componentIds.isEmpty()) {
+    return Collections.emptySet();
+  }
+  return DaoUtils.executeLargeInputs(componentIds,new Function<List<Long>,List<Long>>(){
+    @Override public List<Long> apply(    List<Long> partition){
+      if (userId == null) {
+        return session.getMapper(AuthorizationMapper.class).keepAuthorizedProjectIdsForAnonymous(role,componentIds);
+      }
+ else {
+        return session.getMapper(AuthorizationMapper.class).keepAuthorizedProjectIdsForUser(userId,role,componentIds);
+      }
+    }
+  }
+);
+}
