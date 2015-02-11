@@ -1,0 +1,12 @@
+{
+  Map<String,Long> tags=ImmutableMap.<String,Long>builder().put("convention",2771L).put("brain-overload",998L).put("cwe",89L).put("bug",32L).put("cert",2L).build();
+  IssueQuery query=mock(IssueQuery.class);
+  ArgumentCaptor<Map> captor=ArgumentCaptor.forClass(Map.class);
+  when(queryService.createFromMap(captor.capture())).thenReturn(query);
+  when(service.listTagsForComponent(query,5)).thenReturn(tags);
+  String componentUuid="polop";
+  String createdAfter="2011-04-25";
+  tester.newGetRequest("api/issues","component_tags").setParam("componentUuid",componentUuid).setParam("createdAfter",createdAfter).setParam("ps","5").execute().assertJson(getClass(),"component-tags.json");
+  assertThat(captor.getValue()).containsEntry("componentUuids",componentUuid).containsEntry("resolved",false).containsEntry("createdAfter",createdAfter);
+  verify(service).listTagsForComponent(query,5);
+}
