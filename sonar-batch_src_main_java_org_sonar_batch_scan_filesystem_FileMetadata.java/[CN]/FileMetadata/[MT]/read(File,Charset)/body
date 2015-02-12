@@ -1,56 +1,12 @@
 {
-  char c=(char)0;
-  LineCounter lineCounter=new LineCounter();
+  LineCounter lineCounter=new LineCounter(file,encoding);
   FileHashComputer fileHashComputer=new FileHashComputer();
   LineOffsetCounter lineOffsetCounter=new LineOffsetCounter();
-  CharHandler[] handlers;
-  if (analysisMode.isPreview()) {
-    handlers=new CharHandler[]{lineCounter,fileHashComputer};
+  if (!analysisMode.isPreview()) {
+    scanFile(file,encoding,lineCounter,fileHashComputer,lineOffsetCounter);
   }
  else {
-    handlers=new CharHandler[]{lineCounter,fileHashComputer,lineOffsetCounter};
+    scanFile(file,encoding,lineCounter,fileHashComputer);
   }
-  try (BOMInputStream bomIn=new BOMInputStream(new FileInputStream(file),ByteOrderMark.UTF_8,ByteOrderMark.UTF_16LE,ByteOrderMark.UTF_16BE,ByteOrderMark.UTF_32LE,ByteOrderMark.UTF_32BE);Reader reader=new BufferedReader(new InputStreamReader(bomIn,encoding))){
-    int i=reader.read();
-    boolean afterCR=false;
-    while (i != -1) {
-      c=(char)i;
-      if (afterCR) {
-        for (        CharHandler handler : handlers) {
-          if (c != CARRIAGE_RETURN && c != LINE_FEED) {
-            handler.handleIgnoreEoL(c);
-          }
-          handler.handleAll(c);
-          handler.newLine();
-        }
-        afterCR=c == CARRIAGE_RETURN;
-      }
- else       if (c == LINE_FEED) {
-        for (        CharHandler handler : handlers) {
-          handler.handleAll(c);
-          handler.newLine();
-        }
-      }
- else       if (c == CARRIAGE_RETURN) {
-        afterCR=true;
-        for (        CharHandler handler : handlers) {
-          handler.handleAll(c);
-        }
-      }
- else {
-        for (        CharHandler handler : handlers) {
-          handler.handleIgnoreEoL(c);
-          handler.handleAll(c);
-        }
-      }
-      i=reader.read();
-    }
-    for (    CharHandler handler : handlers) {
-      handler.eof();
-    }
-    return new Metadata(lineCounter.lines(),lineCounter.nonBlankLines(),fileHashComputer.getHash(),lineOffsetCounter.getOriginalLineOffsets(),lineCounter.isEmpty());
-  }
- catch (  IOException e) {
-    throw new IllegalStateException(String.format("Fail to read file '%s' with encoding '%s'",file.getAbsolutePath(),encoding),e);
-  }
+  return new Metadata(lineCounter.lines(),lineCounter.nonBlankLines(),fileHashComputer.getHash(),lineOffsetCounter.getOriginalLineOffsets(),lineCounter.isEmpty());
 }
