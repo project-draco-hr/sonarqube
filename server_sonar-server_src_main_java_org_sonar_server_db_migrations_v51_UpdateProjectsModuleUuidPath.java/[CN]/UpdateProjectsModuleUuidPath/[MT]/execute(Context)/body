@@ -1,18 +1,6 @@
 {
-  MassUpdate update=context.prepareMassUpdate().rowPluralName("projects");
-  update.select("SELECT p.id, p.module_uuid_path FROM projects p");
+  MassUpdate update=context.prepareMassUpdate().rowPluralName("components");
+  update.select("SELECT p.id, p.module_uuid_path, p.uuid, p.scope, p.qualifier FROM projects p");
   update.update("UPDATE projects SET module_uuid_path=? WHERE id=?");
-  update.execute(new Handler(){
-    @Override public boolean handle(    Row row,    SqlStatement update) throws SQLException {
-      Long id=row.getLong(1);
-      String moduleUuidPath=row.getString(2);
-      if (needUpdate(moduleUuidPath)) {
-        update.setString(1,newModuleUuidPath(moduleUuidPath));
-        update.setLong(2,id);
-        return true;
-      }
-      return false;
-    }
-  }
-);
+  update.execute(new ModuleUuidPathUpdateHandler());
 }
