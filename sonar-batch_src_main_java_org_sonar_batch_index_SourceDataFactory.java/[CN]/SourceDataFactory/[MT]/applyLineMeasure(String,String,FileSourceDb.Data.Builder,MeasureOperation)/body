@@ -4,10 +4,13 @@
     for (    Measure measure : measures) {
       Map<Integer,String> lineMeasures=KeyValueFormat.parseIntString((String)measure.value());
       for (      Map.Entry<Integer,String> lineMeasure : lineMeasures.entrySet()) {
-        String value=lineMeasure.getValue();
-        if (StringUtils.isNotEmpty(value)) {
-          FileSourceDb.Line.Builder lineBuilder=to.getLinesBuilder(lineMeasure.getKey() - 1);
-          op.apply(value,lineBuilder);
+        int lineIdx=lineMeasure.getKey();
+        if (lineIdx <= to.getLinesCount()) {
+          String value=lineMeasure.getValue();
+          if (StringUtils.isNotEmpty(value)) {
+            FileSourceDb.Line.Builder lineBuilder=to.getLinesBuilder(lineIdx - 1);
+            op.apply(value,lineBuilder);
+          }
         }
       }
     }
