@@ -1,0 +1,10 @@
+{
+  LoggerContext ctx=sut.getRootContext();
+  LogbackHelper.RollingPolicy policy=sut.createRollingPolicy(ctx,props,"sonar");
+  FileAppender appender=policy.createAppender("SONAR_FILE");
+  assertThat(appender).isInstanceOf(RollingFileAppender.class);
+  RollingFileAppender fileAppender=(RollingFileAppender)appender;
+  TimeBasedRollingPolicy triggeringPolicy=(TimeBasedRollingPolicy)fileAppender.getTriggeringPolicy();
+  assertThat(triggeringPolicy.getMaxHistory()).isEqualTo(7);
+  assertThat(triggeringPolicy.getFileNamePattern()).isEqualTo("sonar.%d{yyyy-MM-dd}.log");
+}

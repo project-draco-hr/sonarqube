@@ -1,0 +1,13 @@
+{
+  Logger logger=mock(Logger.class);
+  TomcatAccessLog.LifecycleLogger listener=new TomcatAccessLog.LifecycleLogger(logger);
+  LifecycleEvent event=new LifecycleEvent(mock(Lifecycle.class),"before_init",null);
+  listener.lifecycleEvent(event);
+  verifyZeroInteractions(logger);
+  event=new LifecycleEvent(mock(Lifecycle.class),"after_start",null);
+  listener.lifecycleEvent(event);
+  verify(logger).info("Web server is started");
+  event=new LifecycleEvent(mock(Lifecycle.class),"after_destroy",null);
+  listener.lifecycleEvent(event);
+  verify(logger).info("Web server is stopped");
+}
