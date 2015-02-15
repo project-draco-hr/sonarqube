@@ -2,10 +2,11 @@
   RollingFileAppender appender=new RollingFileAppender();
   appender.setContext(context);
   appender.setName(appenderName);
-  appender.setFile(new File(logsDir,filenamePrefix + ".log").getAbsolutePath());
+  String filePath=new File(logsDir,filenamePrefix + ".log").getAbsolutePath();
+  appender.setFile(filePath);
   TimeBasedRollingPolicy rollingPolicy=new TimeBasedRollingPolicy();
   rollingPolicy.setContext(context);
-  rollingPolicy.setFileNamePattern(filenamePrefix + ".%d{" + datePattern+ "}.log");
+  rollingPolicy.setFileNamePattern(StringUtils.replace(filePath,filenamePrefix + ".log",filenamePrefix + ".%d{" + datePattern+ "}.log"));
   rollingPolicy.setMaxHistory(maxFiles);
   rollingPolicy.setParent(appender);
   rollingPolicy.start();
