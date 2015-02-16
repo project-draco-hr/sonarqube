@@ -1,0 +1,13 @@
+{
+  File source=new File(baseDir,"src/foo.xoo");
+  FileUtils.write(source,"token1 token2 token3\ntoken4");
+  DefaultInputFile inputFile=new DefaultInputFile("foo","src/foo.xoo").setLanguage("xoo");
+  fileSystem.add(inputFile);
+  XooTokenizer tokenizer=new XooTokenizer(fileSystem);
+  SourceCode sourceCode=mock(SourceCode.class);
+  when(sourceCode.getFileName()).thenReturn(inputFile.absolutePath());
+  Tokens cpdTokens=new Tokens();
+  tokenizer.tokenize(sourceCode,cpdTokens);
+  assertThat(cpdTokens.getTokens()).hasSize(5);
+  assertThat(cpdTokens.getTokens().get(3)).isEqualTo(new TokenEntry("token4","src/foo.xoo",2));
+}

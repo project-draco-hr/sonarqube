@@ -1,8 +1,10 @@
 {
   setupData("empty");
-  DuplicationGroup.Block originBlock=new DuplicationGroup.Block("foo:org/foo/Bar.java",1,4);
-  DuplicationGroup group=new DuplicationGroup(originBlock).addDuplicate(new DuplicationGroup.Block("foo:org/foo/Foo.java",5,9));
-  when(duplicationCache.entries()).thenReturn(Arrays.<Cache.Entry<List<DuplicationGroup>>>asList(new Cache.Entry(new String[]{"foo:org/foo/Bar.java"},Arrays.asList(group))));
+  Duplication.Block originBlock=new Duplication.Block("foo:org/foo/Bar.java",1,4);
+  DefaultDuplication group=new DefaultDuplication().setOriginBlock(originBlock);
+  group.duplicates().add(new Duplication.Block("foo:org/foo/Foo.java",5,9));
+  when(duplicationCache.componentKeys()).thenReturn(Arrays.asList("foo:org/foo/Bar.java"));
+  when(duplicationCache.byComponent("foo:org/foo/Bar.java")).thenReturn(Arrays.asList(group));
   duplicationPersister.persist();
   checkTables("shouldInsertDuplication","project_measures");
 }

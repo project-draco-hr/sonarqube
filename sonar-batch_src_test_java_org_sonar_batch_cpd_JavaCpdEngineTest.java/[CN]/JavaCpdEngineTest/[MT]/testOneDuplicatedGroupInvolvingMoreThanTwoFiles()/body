@@ -4,10 +4,5 @@
   verify(storage).store(new DefaultMeasure().forMetric(CoreMetrics.DUPLICATED_FILES).onFile(inputFile).withValue(1));
   verify(storage).store(new DefaultMeasure().forMetric(CoreMetrics.DUPLICATED_BLOCKS).onFile(inputFile).withValue(1));
   verify(storage).store(new DefaultMeasure().forMetric(CoreMetrics.DUPLICATED_LINES).onFile(inputFile).withValue(200));
-  InOrder inOrder=Mockito.inOrder(duplicationBuilder);
-  inOrder.verify(duplicationBuilder).originBlock(5,204);
-  inOrder.verify(duplicationBuilder).isDuplicatedBy("key2",15,214);
-  inOrder.verify(duplicationBuilder).isDuplicatedBy("key3",25,224);
-  inOrder.verify(duplicationBuilder).build();
-  verify(context).saveDuplications(inputFile,Arrays.asList(new DuplicationGroup(new DuplicationGroup.Block("foo:src/main/java/Foo.java",5,200)).addDuplicate(new DuplicationGroup.Block("key2",15,200)).addDuplicate(new DuplicationGroup.Block("key3",25,200))));
+  verify(storage).store(new DefaultDuplication().originBlock(inputFile,5,204).isDuplicatedBy("key2",15,214).isDuplicatedBy("key3",25,224));
 }

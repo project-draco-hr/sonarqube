@@ -1,20 +1,16 @@
 {
-  List<DuplicationGroup> groups=duplicationCache.byComponent(inputFileKey);
-  if (groups != null) {
-    int blockId=1;
-    for (Iterator<DuplicationGroup> it=groups.iterator(); it.hasNext(); ) {
-      DuplicationGroup group=it.next();
-      addBlock(blockId,group.originBlock(),to);
-      blockId++;
-      for (Iterator<DuplicationGroup.Block> dupsIt=group.duplicates().iterator(); dupsIt.hasNext(); ) {
-        DuplicationGroup.Block dups=dupsIt.next();
-        if (inputFileKey.equals(dups.resourceKey())) {
-          addBlock(blockId,dups,to);
-          blockId++;
-        }
-        dupsIt.remove();
+  Iterable<DefaultDuplication> groups=duplicationCache.byComponent(inputFileKey);
+  int blockId=1;
+  for (Iterator<DefaultDuplication> it=groups.iterator(); it.hasNext(); ) {
+    Duplication group=it.next();
+    addBlock(blockId,group.originBlock(),to);
+    blockId++;
+    for (Iterator<Duplication.Block> dupsIt=group.duplicates().iterator(); dupsIt.hasNext(); ) {
+      Duplication.Block dups=dupsIt.next();
+      if (inputFileKey.equals(dups.resourceKey())) {
+        addBlock(blockId,dups,to);
+        blockId++;
       }
-      it.remove();
     }
   }
 }

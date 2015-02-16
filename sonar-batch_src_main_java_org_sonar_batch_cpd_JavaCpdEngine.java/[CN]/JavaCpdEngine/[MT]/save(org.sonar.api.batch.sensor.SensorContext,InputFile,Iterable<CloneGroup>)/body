@@ -12,14 +12,15 @@
   ((DefaultMeasure<Integer>)context.<Integer>newMeasure().forMetric(CoreMetrics.DUPLICATED_FILES).onFile(inputFile).withValue(1)).setFromCore().save();
   ((DefaultMeasure<Integer>)context.<Integer>newMeasure().forMetric(CoreMetrics.DUPLICATED_LINES).onFile(inputFile).withValue(duplicatedLines.size())).setFromCore().save();
   ((DefaultMeasure<Integer>)context.<Integer>newMeasure().forMetric(CoreMetrics.DUPLICATED_BLOCKS).onFile(inputFile).withValue(duplicatedBlocks)).setFromCore().save();
-  DuplicationBuilder builder=context.duplicationBuilder(inputFile);
   for (  CloneGroup duplication : duplications) {
-    builder.originBlock(duplication.getOriginPart().getStartLine(),duplication.getOriginPart().getEndLine());
+    NewDuplication builder=context.newDuplication();
+    ClonePart originPart=duplication.getOriginPart();
+    builder.originBlock(inputFile,originPart.getStartLine(),originPart.getEndLine());
     for (    ClonePart part : duplication.getCloneParts()) {
-      if (!part.equals(duplication.getOriginPart())) {
-        ((DefaultDuplicationBuilder)builder).isDuplicatedBy(part.getResourceId(),part.getStartLine(),part.getEndLine());
+      if (!part.equals(originPart)) {
+        ((DefaultDuplication)builder).isDuplicatedBy(part.getResourceId(),part.getStartLine(),part.getEndLine());
       }
     }
+    builder.save();
   }
-  context.saveDuplications(inputFile,builder.build());
 }
