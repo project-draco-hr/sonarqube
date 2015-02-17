@@ -1,9 +1,10 @@
 {
   for (  org.sonar.batch.protocol.input.QProfile qProfile : ref.qProfiles()) {
-    for (    ActiveRule activeRule : qProfileLoader.findActiveRulesByProfile(qProfile.key())) {
-      Rule rule=ruleService.getNonNullByKey(activeRule.key().ruleKey());
+    Map<RuleKey,ActiveRule> activeRules=activeRuleByRuleKey(qProfileLoader.findActiveRulesByProfile(qProfile.key()));
+    for (    Rule rule : ruleService.search(new RuleQuery().setQProfileKey(qProfile.key()).setActivation(true),new QueryContext()).getHits()) {
       RuleKey templateKey=rule.templateKey();
-      org.sonar.batch.protocol.input.ActiveRule inputActiveRule=new org.sonar.batch.protocol.input.ActiveRule(activeRule.key().ruleKey().repository(),activeRule.key().ruleKey().rule(),templateKey != null ? templateKey.rule() : null,rule.name(),activeRule.severity(),rule.internalKey(),qProfile.language());
+      ActiveRule activeRule=activeRules.get(rule.key());
+      org.sonar.batch.protocol.input.ActiveRule inputActiveRule=new org.sonar.batch.protocol.input.ActiveRule(rule.key().repository(),rule.key().rule(),templateKey != null ? templateKey.rule() : null,rule.name(),activeRule.severity(),rule.internalKey(),qProfile.language());
       for (      Map.Entry<String,String> entry : activeRule.params().entrySet()) {
         inputActiveRule.addParam(entry.getKey(),entry.getValue());
       }
