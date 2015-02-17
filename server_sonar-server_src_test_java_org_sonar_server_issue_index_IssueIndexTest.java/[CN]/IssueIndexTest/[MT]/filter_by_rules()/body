@@ -1,0 +1,8 @@
+{
+  ComponentDto project=ComponentTesting.newProjectDto();
+  ComponentDto file=ComponentTesting.newFileDto(project);
+  RuleKey ruleKey=RuleKey.of("repo","X1");
+  indexIssues(IssueTesting.newDoc("ISSUE1",file).setRuleKey(ruleKey.toString()));
+  assertThat(index.search(IssueQuery.builder().rules(newArrayList(ruleKey)).build(),new SearchOptions()).getDocs()).hasSize(1);
+  assertThat(index.search(IssueQuery.builder().rules(newArrayList(RuleKey.of("rule","without issue"))).build(),new SearchOptions()).getDocs()).isEmpty();
+}

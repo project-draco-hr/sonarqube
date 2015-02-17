@@ -1,0 +1,24 @@
+{
+  performanceStats=new ArrayList<Performance>();
+  long indexCount=nodesStats.getIndices().getIndexing().getTotal().getIndexCount();
+  long indexTotalTime=nodesStats.getIndices().getIndexing().getTotal().getIndexTimeInMillis();
+  performanceStats.add(new Performance("Average Indexing Time").setWarnThreshold(10).setErrorThreshold(50).setMessage("Too complex documents or low IO/CPU").setValue(indexCount > 0L ? indexTotalTime / (double)indexCount : 0.0));
+  long queryCount=nodesStats.getIndices().getSearch().getTotal().getQueryCount();
+  long queryTotalTime=nodesStats.getIndices().getSearch().getTotal().getQueryTimeInMillis();
+  performanceStats.add(new Performance("Average Querying Time").setWarnThreshold(50).setErrorThreshold(500).setMessage("Inefficient query and/or filters").setValue(queryCount > 0L ? queryTotalTime / (double)queryCount : 0.0));
+  long fetchCount=nodesStats.getIndices().getSearch().getTotal().getFetchCount();
+  long fetchTotalTime=nodesStats.getIndices().getSearch().getTotal().getFetchTimeInMillis();
+  performanceStats.add(new Performance("Average Fetching Time").setWarnThreshold(8).setErrorThreshold(15).setMessage("Slow IO, fetch-size too large or documents too big").setValue(fetchCount > 0L ? fetchTotalTime / (double)fetchCount : 0.0));
+  long getCount=nodesStats.getIndices().getGet().getCount();
+  long getTotalTime=nodesStats.getIndices().getGet().getTimeInMillis();
+  performanceStats.add(new Performance("Average Get Time").setWarnThreshold(5).setErrorThreshold(10).setMessage("Slow IO").setValue(getCount > 0L ? getTotalTime / (double)getCount : 0.0));
+  long refreshCount=nodesStats.getIndices().getRefresh().getTotal();
+  long refreshTotalTime=nodesStats.getIndices().getRefresh().getTotalTimeInMillis();
+  performanceStats.add(new Performance("Average Refreshing Time").setWarnThreshold(10).setErrorThreshold(20).setMessage("Slow IO").setValue(refreshCount > 0L ? refreshTotalTime / (double)refreshCount : 0.0));
+  fieldCacheMemory=nodesStats.getIndices().getFieldData().getMemorySizeInBytes();
+  long fieldCacheEviction=nodesStats.getIndices().getFieldData().getEvictions();
+  performanceStats.add(new Performance("Field Cache Eviction Count").setWarnThreshold(1).setErrorThreshold(1).setMessage("Insufficient RAM available for queries").setValue(fieldCacheEviction));
+  filterCacheMemory=nodesStats.getIndices().getFilterCache().getMemorySizeInBytes();
+  long filterCacheEviction=nodesStats.getIndices().getFilterCache().getEvictions();
+  performanceStats.add(new Performance("Filter Cache Eviction Count").setWarnThreshold(1).setErrorThreshold(1).setMessage("Insufficient RAM or too many orphaned filters").setValue(filterCacheEviction));
+}

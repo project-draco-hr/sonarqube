@@ -1,55 +1,33 @@
 {
   String projectUuid=rs.getString(1);
   String fileUuid=rs.getString(2);
-  Long updatedAt=SqlUtil.getLong(rs,3);
-  if (updatedAt == null) {
-    updatedAt=System.currentTimeMillis();
-  }
+  long updatedAt=rs.getLong(3);
   Date updatedDate=new Date(updatedAt);
   SourceFile result=new SourceFile(fileUuid,updatedAt);
-  Reader csv=rs.getCharacterStream(4);
-  if (csv == null) {
-    return result;
-  }
-  int line=1;
-  CSVParser csvParser=null;
-  try {
-    csvParser=new CSVParser(csv,CSVFormat.DEFAULT);
-    for (    CSVRecord csvRecord : csvParser) {
-      SourceLineDoc doc=new SourceLineDoc(Maps.<String,Object>newHashMap());
-      doc.setProjectUuid(projectUuid);
-      doc.setFileUuid(fileUuid);
-      doc.setLine(line);
-      doc.setUpdateDate(updatedDate);
-      doc.setScmRevision(csvRecord.get(FileSourceDto.CSV_INDEX_SCM_REVISION));
-      doc.setScmAuthor(csvRecord.get(FileSourceDto.CSV_INDEX_SCM_AUTHOR));
-      doc.setScmDate(DateUtils.parseDateTimeQuietly(csvRecord.get(FileSourceDto.CSV_INDEX_SCM_DATE)));
-      doc.setUtLineHits(parseIntegerFromRecord(csvRecord.get(FileSourceDto.CSV_INDEX_UT_LINE_HITS)));
-      doc.setUtConditions(parseIntegerFromRecord(csvRecord.get(FileSourceDto.CSV_INDEX_UT_CONDITIONS)));
-      doc.setUtCoveredConditions(parseIntegerFromRecord(csvRecord.get(FileSourceDto.CSV_INDEX_UT_COVERED_CONDITIONS)));
-      doc.setItLineHits(parseIntegerFromRecord(csvRecord.get(FileSourceDto.CSV_INDEX_IT_LINE_HITS)));
-      doc.setItConditions(parseIntegerFromRecord(csvRecord.get(FileSourceDto.CSV_INDEX_IT_CONDITIONS)));
-      doc.setItCoveredConditions(parseIntegerFromRecord(csvRecord.get(FileSourceDto.CSV_INDEX_IT_COVERED_CONDITIONS)));
-      doc.setOverallLineHits(parseIntegerFromRecord(csvRecord.get(FileSourceDto.CSV_INDEX_OVERALL_LINE_HITS)));
-      doc.setOverallConditions(parseIntegerFromRecord(csvRecord.get(FileSourceDto.CSV_INDEX_OVERALL_CONDITIONS)));
-      doc.setOverallCoveredConditions(parseIntegerFromRecord(csvRecord.get(FileSourceDto.CSV_INDEX_OVERALL_COVERED_CONDITIONS)));
-      doc.setHighlighting(csvRecord.get(FileSourceDto.CSV_INDEX_HIGHLIGHTING));
-      doc.setSymbols(csvRecord.get(FileSourceDto.CSV_INDEX_SYMBOLS));
-      doc.setDuplications(parseDuplications(csvRecord.get(FileSourceDto.CSV_INDEX_DUPLICATIONS)));
-      doc.setSource(csvRecord.get(csvRecord.size() - 1));
-      result.addLine(doc);
-      line++;
-    }
-  }
- catch (  IOException ioError) {
-    throw new IllegalStateException("Impossible to open stream for file_sources.data with file_uuid " + fileUuid,ioError);
-  }
-catch (  ArrayIndexOutOfBoundsException lineError) {
-    throw new IllegalStateException(String.format("Impossible to parse source line data, stuck at line %d",line),lineError);
-  }
- finally {
-    IOUtils.closeQuietly(csv);
-    IOUtils.closeQuietly(csvParser);
+  FileSourceDb.Data data=FileSourceDto.decodeData(rs.getBinaryStream(4));
+  for (  FileSourceDb.Line line : data.getLinesList()) {
+    SourceLineDoc doc=new SourceLineDoc();
+    doc.setProjectUuid(projectUuid);
+    doc.setFileUuid(fileUuid);
+    doc.setLine(line.getLine());
+    doc.setUpdateDate(updatedDate);
+    doc.setScmRevision(line.getScmRevision());
+    doc.setScmAuthor(line.getScmAuthor());
+    doc.setScmDate(line.hasScmDate() ? new Date(line.getScmDate()) : null);
+    doc.setUtLineHits(line.hasUtLineHits() ? line.getUtLineHits() : null);
+    doc.setUtConditions(line.hasUtConditions() ? line.getUtConditions() : null);
+    doc.setUtCoveredConditions(line.hasUtCoveredConditions() ? line.getUtCoveredConditions() : null);
+    doc.setItLineHits(line.hasItLineHits() ? line.getItLineHits() : null);
+    doc.setItConditions(line.hasItConditions() ? line.getItConditions() : null);
+    doc.setItCoveredConditions(line.hasItCoveredConditions() ? line.getItCoveredConditions() : null);
+    doc.setOverallLineHits(line.hasOverallLineHits() ? line.getOverallLineHits() : null);
+    doc.setOverallConditions(line.hasOverallConditions() ? line.getOverallConditions() : null);
+    doc.setOverallCoveredConditions(line.hasOverallCoveredConditions() ? line.getOverallCoveredConditions() : null);
+    doc.setHighlighting(line.hasHighlighting() ? line.getHighlighting() : null);
+    doc.setSymbols(line.hasSymbols() ? line.getSymbols() : null);
+    doc.setDuplications(line.getDuplicationsList());
+    doc.setSource(line.hasSource() ? line.getSource() : null);
+    result.addLine(doc);
   }
   return result;
 }

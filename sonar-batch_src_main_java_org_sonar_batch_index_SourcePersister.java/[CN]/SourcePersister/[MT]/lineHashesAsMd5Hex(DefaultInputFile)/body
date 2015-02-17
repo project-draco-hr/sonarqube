@@ -1,13 +1,16 @@
 {
-  if (inputFile.lines() == 0) {
+  if (f.lines() == 0) {
     return null;
   }
-  StringBuilder result=new StringBuilder(inputFile.lines() * (32 + 1));
-  for (  byte[] lineHash : inputFile.lineHashes()) {
-    if (result.length() > 0) {
-      result.append("\n");
+  final StringBuilder result=new StringBuilder(f.lines() * (32 + 1));
+  FileMetadata.computeLineHashesForIssueTracking(f,new LineHashConsumer(){
+    @Override public void consume(    int lineIdx,    @Nullable byte[] hash){
+      if (lineIdx > 1) {
+        result.append("\n");
+      }
+      result.append(hash != null ? Hex.encodeHexString(hash) : "");
     }
-    result.append(lineHash != null ? Hex.encodeHexString(lineHash) : "");
   }
+);
   return result.toString();
 }

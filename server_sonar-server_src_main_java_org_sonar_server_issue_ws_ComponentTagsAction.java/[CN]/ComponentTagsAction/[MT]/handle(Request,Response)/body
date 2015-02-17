@@ -1,8 +1,12 @@
 {
-  String componentUuid=request.mandatoryParam("componentUuid");
-  int pageSize=request.mandatoryParamAsInt("ps");
+  Builder<String,Object> paramBuilder=ImmutableMap.<String,Object>builder().put(IssueFilterParameters.COMPONENT_UUIDS,request.mandatoryParam(PARAM_COMPONENT_UUID)).put(IssueFilterParameters.RESOLVED,false);
+  if (request.hasParam(PARAM_CREATED_AT)) {
+    paramBuilder.put(IssueFilterParameters.CREATED_AFTER,request.param(PARAM_CREATED_AT));
+  }
+  IssueQuery query=queryService.createFromMap(paramBuilder.build());
+  int pageSize=request.mandatoryParamAsInt(PARAM_PAGE_SIZE);
   JsonWriter json=response.newJsonWriter().beginObject().name("tags").beginArray();
-  for (  Map.Entry<String,Long> tag : service.listTagsForComponent(componentUuid,pageSize).entrySet()) {
+  for (  Map.Entry<String,Long> tag : service.listTagsForComponent(query,pageSize).entrySet()) {
     json.beginObject().prop("key",tag.getKey()).prop("value",tag.getValue()).endObject();
   }
   json.endArray().endObject().close();

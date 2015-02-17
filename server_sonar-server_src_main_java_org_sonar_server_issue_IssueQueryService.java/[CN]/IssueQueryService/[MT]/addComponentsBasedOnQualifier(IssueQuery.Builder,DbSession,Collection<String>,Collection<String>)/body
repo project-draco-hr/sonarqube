@@ -1,0 +1,52 @@
+{
+  Set<String> qualifiers=componentService.getDistinctQualifiers(session,componentUuids);
+  if (qualifiers.isEmpty()) {
+    builder.componentUuids(componentUuids);
+    return;
+  }
+  if (qualifiers.size() > 1) {
+    throw new IllegalArgumentException("All components must have the same qualifier, found " + Joiner.on(',').join(qualifiers));
+  }
+  String uniqueQualifier=qualifiers.iterator().next();
+switch (uniqueQualifier) {
+case Qualifiers.VIEW:
+case Qualifiers.SUBVIEW:
+    List<String> filteredViewUuids=newArrayList();
+  for (  String viewUuid : componentUuids) {
+    if ((Qualifiers.VIEW.equals(uniqueQualifier) && UserSession.get().hasProjectPermissionByUuid(UserRole.USER,viewUuid)) || (Qualifiers.SUBVIEW.equals(uniqueQualifier) && UserSession.get().hasComponentUuidPermission(UserRole.USER,viewUuid))) {
+      filteredViewUuids.add(viewUuid);
+    }
+  }
+if (filteredViewUuids.isEmpty()) {
+  filteredViewUuids.add(UNKNOWN);
+}
+builder.viewUuids(filteredViewUuids);
+break;
+case "DEV":
+Collection<String> actualAuthors=authors == null ? dbClient.authorDao().selectScmAccountsByDeveloperUuids(session,componentUuids) : authors;
+builder.authors(actualAuthors);
+break;
+case Qualifiers.PROJECT:
+builder.projectUuids(componentUuids);
+break;
+case Qualifiers.MODULE:
+builder.moduleRootUuids(componentUuids);
+break;
+case Qualifiers.DIRECTORY:
+Collection<String> directoryModuleUuids=Sets.newHashSet();
+Collection<String> directoryPaths=Sets.newHashSet();
+for (ComponentDto directory : componentService.getByUuids(session,componentUuids)) {
+directoryModuleUuids.add(directory.moduleUuid());
+directoryPaths.add(directory.path());
+}
+builder.moduleUuids(directoryModuleUuids);
+builder.directories(directoryPaths);
+break;
+case Qualifiers.FILE:
+case Qualifiers.UNIT_TEST_FILE:
+builder.fileUuids(componentUuids);
+break;
+default :
+throw new IllegalArgumentException("Unable to set search root context for components " + Joiner.on(',').join(componentUuids));
+}
+}

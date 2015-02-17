@@ -1,0 +1,11 @@
+{
+  SearchHits hits=mock(SearchHits.class,Mockito.RETURNS_MOCKS);
+  when(hits.getHits()).thenReturn(new SearchHit[]{mock(SearchHit.class)});
+  List<BaseDoc> docs=EsUtils.convertToDocs(hits,new Function<Map<String,Object>,BaseDoc>(){
+    @Override public BaseDoc apply(    Map<String,Object> input){
+      return new IssueDoc(input);
+    }
+  }
+);
+  assertThat(docs).hasSize(1);
+}

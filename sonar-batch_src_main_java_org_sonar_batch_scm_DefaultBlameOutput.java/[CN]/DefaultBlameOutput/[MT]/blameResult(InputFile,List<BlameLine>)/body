@@ -2,7 +2,10 @@
   Preconditions.checkNotNull(file);
   Preconditions.checkNotNull(lines);
   Preconditions.checkArgument(allFilesToBlame.contains(file),"It was not expected to blame file " + file.relativePath());
-  Preconditions.checkArgument(lines.size() == file.lines(),"Expected one blame result per line but provider returned " + lines.size() + " blame lines while file "+ file.relativePath()+ " has "+ file.lines()+ " lines");
+  if (lines.size() != file.lines()) {
+    LOG.debug("Ignoring blame result since provider returned " + lines.size() + " blame lines but file "+ file.relativePath()+ " has "+ file.lines()+ " lines");
+    return;
+  }
   PropertiesBuilder<Integer,String> authors=propertiesBuilder(CoreMetrics.SCM_AUTHORS_BY_LINE);
   PropertiesBuilder<Integer,String> dates=propertiesBuilder(CoreMetrics.SCM_LAST_COMMIT_DATETIMES_BY_LINE);
   PropertiesBuilder<Integer,String> revisions=propertiesBuilder(CoreMetrics.SCM_REVISIONS_BY_LINE);

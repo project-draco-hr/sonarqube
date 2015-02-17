@@ -2,9 +2,9 @@
   try (DbSession session=mybatis.openSession(false)){
     MeasureMapper mapper=session.getMapper(MeasureMapper.class);
     Metric duplicationMetricWithId=metricFinder.findByKey(CoreMetrics.DUPLICATIONS_DATA_KEY);
-    for (    Entry<List<DuplicationGroup>> entry : duplicationCache.entries()) {
-      String effectiveKey=entry.key()[0].toString();
-      Measure measure=new Measure(duplicationMetricWithId,DuplicationUtils.toXml(entry.value())).setPersistenceMode(PersistenceMode.DATABASE);
+    for (    String effectiveKey : duplicationCache.componentKeys()) {
+      Iterable<DefaultDuplication> dups=duplicationCache.byComponent(effectiveKey);
+      Measure measure=new Measure(duplicationMetricWithId,DuplicationUtils.toXml(dups)).setPersistenceMode(PersistenceMode.DATABASE);
       BatchResource batchResource=resourceCache.get(effectiveKey);
       if (MeasurePersister.shouldPersistMeasure(batchResource.resource(),measure)) {
         MeasureModel measureModel=MeasurePersister.model(measure,ruleFinder).setSnapshotId(batchResource.snapshotId());

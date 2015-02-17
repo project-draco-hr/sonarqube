@@ -1,0 +1,10 @@
+{
+  SearchRequestBuilder requestBuilder=getClient().prepareSearch(IssueIndexDefinition.INDEX).setTypes(IssueIndexDefinition.TYPE_ISSUE);
+  requestBuilder.setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),createBoolFilter(query)));
+  TermsBuilder aggreg=AggregationBuilders.terms("_ref").field(fieldName).size(maxNumberOfTags).order(termsOrder).minDocCount(1L);
+  if (textQuery != null) {
+    aggreg.include(String.format(".*%s.*",textQuery));
+  }
+  SearchResponse searchResponse=requestBuilder.addAggregation(aggreg).get();
+  return searchResponse.getAggregations().get("_ref");
+}

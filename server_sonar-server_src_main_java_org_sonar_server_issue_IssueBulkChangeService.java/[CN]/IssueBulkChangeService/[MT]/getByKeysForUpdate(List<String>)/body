@@ -1,22 +1,26 @@
 {
-  List<Issue> authorizedIndexIssues=issueService.search(IssueQuery.builder().issueKeys(issueKeys).build(),new QueryContext().setMaxLimit()).getHits();
-  List<String> authorizedIssueKeys=newArrayList(Iterables.transform(authorizedIndexIssues,new Function<Issue,String>(){
-    @Override public String apply(    @Nullable Issue input){
-      return input != null ? input.key() : null;
+  SearchOptions options=new SearchOptions().setLimit(SearchOptions.MAX_LIMIT);
+  List<IssueDoc> authorizedIssues=issueService.search(IssueQuery.builder().issueKeys(issueKeys).build(),options).getDocs();
+  Collection<String> authorizedKeys=Collections2.transform(authorizedIssues,new Function<IssueDoc,String>(){
+    @Override public String apply(    IssueDoc input){
+      return input.key();
     }
   }
-));
-  DbSession session=dbClient.openSession(false);
-  try {
-    List<IssueDto> issueDtos=dbClient.issueDao().selectByKeys(session,authorizedIssueKeys);
-    return newArrayList(Iterables.transform(issueDtos,new Function<IssueDto,Issue>(){
-      @Override public Issue apply(      @Nullable IssueDto input){
-        return input != null ? input.toDefaultIssue() : null;
+);
+  if (!authorizedKeys.isEmpty()) {
+    DbSession session=dbClient.openSession(false);
+    try {
+      List<IssueDto> dtos=dbClient.issueDao().selectByKeys(session,Lists.newArrayList(authorizedKeys));
+      return Collections2.transform(dtos,new Function<IssueDto,Issue>(){
+        @Override public Issue apply(        @Nullable IssueDto input){
+          return input != null ? input.toDefaultIssue() : null;
+        }
       }
+);
     }
-));
-  }
   finally {
-    session.close();
+      MyBatis.closeQuietly(session);
+    }
   }
+  return Collections.emptyList();
 }

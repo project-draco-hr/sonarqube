@@ -1,0 +1,27 @@
+{
+  boolean effectiveOnComponentOnly=false;
+  failIfBothParametersSet(componentRootUuids,componentRoots,"componentRoots and componentRootUuids cannot be set simultaneously");
+  failIfBothParametersSet(componentUuids,components,"components and componentUuids cannot be set simultaneously");
+  failIfBothParametersSet(componentKeys,componentUuids,"componentKeys and componentUuids cannot be set simultaneously");
+  if (componentRootUuids != null) {
+    allComponentUuids.addAll(componentRootUuids);
+    effectiveOnComponentOnly=false;
+  }
+ else   if (componentRoots != null) {
+    allComponentUuids.addAll(componentUuids(session,componentRoots));
+    effectiveOnComponentOnly=false;
+  }
+ else   if (components != null) {
+    allComponentUuids.addAll(componentUuids(session,components));
+    effectiveOnComponentOnly=true;
+  }
+ else   if (componentUuids != null) {
+    allComponentUuids.addAll(componentUuids);
+    effectiveOnComponentOnly=BooleanUtils.isTrue(onComponentOnly);
+  }
+ else   if (componentKeys != null) {
+    allComponentUuids.addAll(componentUuids(session,componentKeys));
+    effectiveOnComponentOnly=BooleanUtils.isTrue(onComponentOnly);
+  }
+  return effectiveOnComponentOnly;
+}

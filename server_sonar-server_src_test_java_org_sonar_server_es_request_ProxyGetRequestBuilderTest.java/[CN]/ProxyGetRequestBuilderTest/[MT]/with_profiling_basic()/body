@@ -1,12 +1,4 @@
 {
-  Profiling profiling=new Profiling(new Settings().setProperty(Profiling.CONFIG_PROFILING_LEVEL,Profiling.Level.BASIC.name()));
-  SearchClient searchClient=new SearchClient(new Settings(),profiling);
-  try {
-    searchClient.prepareGet().setIndex(IndexDefinition.RULE.getIndexName()).setType(IndexDefinition.RULE.getIndexType()).setId("ruleKey").get();
-    fail();
-  }
- catch (  IllegalStateException e) {
-    assertThat(e.getMessage()).isEqualTo("Fail to execute ES get request for key 'ruleKey' on index 'rules' on type 'rule'");
-  }
-  searchClient.stop();
+  esTester.setProfilingLevel(Profiling.Level.FULL);
+  esTester.client().prepareGet().setIndex(FakeIndexDefinition.INDEX).setType(FakeIndexDefinition.TYPE).setId("ruleKey").get();
 }

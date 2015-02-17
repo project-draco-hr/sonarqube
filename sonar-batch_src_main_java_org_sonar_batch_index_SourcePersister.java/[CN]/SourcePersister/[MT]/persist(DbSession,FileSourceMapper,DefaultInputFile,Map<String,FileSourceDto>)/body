@@ -1,0 +1,19 @@
+{
+  String fileUuid=resourceCache.get(inputFile.key()).resource().getUuid();
+  InputFileMetadata metadata=inputPathCache.getFileMetadata(inputFile.moduleKey(),inputFile.relativePath());
+  byte[] data=computeData(inputFile,metadata);
+  String dataHash=DigestUtils.md5Hex(data);
+  FileSourceDto previousDto=previousDtosByUuid.get(fileUuid);
+  if (previousDto == null) {
+    FileSourceDto dto=new FileSourceDto().setProjectUuid(projectTree.getRootProject().getUuid()).setFileUuid(fileUuid).setBinaryData(data).setDataHash(dataHash).setSrcHash(metadata.hash()).setLineHashes(lineHashesAsMd5Hex(inputFile)).setCreatedAt(system2.now()).setUpdatedAt(system2.now());
+    mapper.insert(dto);
+    session.commit();
+  }
+ else {
+    if (!dataHash.equals(previousDto.getDataHash()) || !metadata.hash().equals(previousDto.getSrcHash())) {
+      previousDto.setBinaryData(data).setDataHash(dataHash).setSrcHash(metadata.hash()).setLineHashes(lineHashesAsMd5Hex(inputFile)).setUpdatedAt(system2.now());
+      mapper.update(previousDto);
+      session.commit();
+    }
+  }
+}

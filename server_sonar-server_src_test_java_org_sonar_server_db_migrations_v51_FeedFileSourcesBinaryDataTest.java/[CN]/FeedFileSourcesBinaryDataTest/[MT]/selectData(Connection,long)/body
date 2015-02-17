@@ -1,0 +1,15 @@
+{
+  PreparedStatement pstmt=connection.prepareStatement("select binary_data from file_sources where id=?");
+  ResultSet rs=null;
+  try {
+    pstmt.setLong(1,fileSourceId);
+    rs=pstmt.executeQuery();
+    rs.next();
+    InputStream data=rs.getBinaryStream(1);
+    return FileSourceDto.decodeData(data);
+  }
+  finally {
+    DbUtils.closeQuietly(rs);
+    DbUtils.closeQuietly(pstmt);
+  }
+}

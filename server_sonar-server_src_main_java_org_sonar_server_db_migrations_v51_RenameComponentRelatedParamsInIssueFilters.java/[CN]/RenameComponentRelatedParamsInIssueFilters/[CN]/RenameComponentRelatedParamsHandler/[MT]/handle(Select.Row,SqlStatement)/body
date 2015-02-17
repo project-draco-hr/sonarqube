@@ -2,29 +2,13 @@
   String data=row.getString(2);
   String[] fields=StringUtils.split(data,FIELD_SEPARATOR);
   List<String> fieldsToKeep=Lists.newArrayList();
-  SortedSet<String> components=Sets.newTreeSet();
-  SortedSet<String> componentUuids=Sets.newTreeSet();
-  Splitter componentSplitter=Splitter.on(",");
-  Joiner componentJoiner=Joiner.on(",");
   for (  String field : fields) {
-    if (field.startsWith(COMPONENTS) || field.startsWith(COMPONENT_ROOTS)) {
-      components.addAll(Lists.newArrayList(componentSplitter.split(field.substring(field.indexOf("=") + 1))));
-    }
- else     if (field.startsWith(COMPONENT_UUIDS) || field.startsWith(COMPONENT_ROOT_UUIDS)) {
-      componentUuids.addAll(Lists.newArrayList(componentSplitter.split(field.substring(field.indexOf("=") + 1))));
-    }
- else     if (field.startsWith(PROJECTS)) {
-      fieldsToKeep.add(field.replace(PROJECTS,"projectKeys="));
+    if (field.startsWith(COMPONENT_UUIDS) || field.startsWith(COMPONENT_ROOT_UUIDS)) {
+      fieldsToKeep.add(field.replace(COMPONENT_UUIDS,"fileUuids=").replace(COMPONENT_ROOT_UUIDS,"moduleUuids="));
     }
  else {
       fieldsToKeep.add(field);
     }
-  }
-  if (!components.isEmpty()) {
-    fieldsToKeep.add("componentKeys=" + componentJoiner.join(components));
-  }
-  if (!componentUuids.isEmpty()) {
-    fieldsToKeep.add("componentUuids=" + componentJoiner.join(componentUuids));
   }
   update.setString(1,StringUtils.join(fieldsToKeep,FIELD_SEPARATOR));
   update.setDate(2,now);

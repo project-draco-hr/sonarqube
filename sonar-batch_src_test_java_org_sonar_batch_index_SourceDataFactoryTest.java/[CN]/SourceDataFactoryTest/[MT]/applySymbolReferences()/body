@@ -1,0 +1,16 @@
+{
+  DefaultSymbolTableBuilder symbolBuilder=new DefaultSymbolTableBuilder(inputFile.key(),null);
+  org.sonar.api.batch.sensor.symbol.Symbol s1=symbolBuilder.newSymbol(1,2);
+  symbolBuilder.newReference(s1,4);
+  symbolBuilder.newReference(s1,11);
+  org.sonar.api.batch.sensor.symbol.Symbol s2=symbolBuilder.newSymbol(4,6);
+  symbolBuilder.newReference(s2,0);
+  symbolBuilder.newReference(s2,7);
+  when(componentDataCache.getData(inputFile.key(),SnapshotDataTypes.SYMBOL_HIGHLIGHTING)).thenReturn(symbolBuilder.build());
+  metadata.setOriginalLineOffsets(new int[]{0,4,7});
+  sut.applySymbolReferences(inputFile,metadata,output);
+  FileSourceDb.Data data=output.build();
+  assertThat(data.getLines(0).getSymbols()).isEqualTo("1,2,1;0,2,2");
+  assertThat(data.getLines(1).getSymbols()).isEqualTo("0,1,1;0,2,2");
+  assertThat(data.getLines(2).getSymbols()).isEqualTo("4,5,1;0,2,2");
+}
