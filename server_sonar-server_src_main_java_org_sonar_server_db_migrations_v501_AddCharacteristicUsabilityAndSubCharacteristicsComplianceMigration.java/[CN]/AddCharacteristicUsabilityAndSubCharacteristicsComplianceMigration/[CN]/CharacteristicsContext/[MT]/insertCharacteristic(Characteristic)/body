@@ -1,0 +1,11 @@
+{
+  if (characteristic.getParentId() == null) {
+    LOGGER.info("Insert new characteristic '{}'",characteristic.getKey());
+  }
+ else {
+    LOGGER.info("Insert new sub characteristic '{}'",characteristic.getKey());
+  }
+  context.prepareUpsert("INSERT INTO characteristics (kee, name, parent_id, characteristic_order, enabled, created_at) VALUES (?, ?, ?, ?, ?, ?)").setString(1,characteristic.getKey()).setString(2,characteristic.getName()).setInt(3,characteristic.getParentId()).setInt(4,characteristic.getOrder()).setBoolean(5,true).setDate(6,now).execute().commit();
+  characteristic.setId(selectCharacteristicId(characteristic.getKey()));
+  characteristics.add(characteristic);
+}
