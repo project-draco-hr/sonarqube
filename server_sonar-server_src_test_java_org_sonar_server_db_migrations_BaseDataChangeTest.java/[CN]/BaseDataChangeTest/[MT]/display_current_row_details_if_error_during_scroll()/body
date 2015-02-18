@@ -1,0 +1,18 @@
+{
+  db.prepareDbUnit(getClass(),"persons.xml");
+  thrown.expect(IllegalStateException.class);
+  thrown.expectMessage("Error during processing of row: [id=1]");
+  new BaseDataChange(db.database()){
+    @Override public void execute(    Context context) throws SQLException {
+      final Upsert upsert=context.prepareUpsert("update persons set login=?, age=? where id=?");
+      context.prepareSelect("select id from persons").scroll(new Select.RowHandler(){
+        @Override public void handle(        Select.Row row) throws SQLException {
+          throw new IllegalStateException("Unexpected error");
+        }
+      }
+);
+      upsert.commit().close();
+    }
+  }
+.execute();
+}
