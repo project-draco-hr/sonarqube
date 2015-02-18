@@ -7,13 +7,16 @@
       chain.doFilter(request,response);
     }
  else {
-      StopWatch watch=getProfiling().start("http",Level.BASIC);
+      Profiler profiler=Profiler.createIfDebug(Logger).start();
       try {
         chain.doFilter(request,response);
       }
   finally {
-        String queryString=httpRequest.getQueryString();
-        watch.stop(queryString == null ? MESSAGE_WITHOUT_QUERY : MESSAGE_WITH_QUERY,httpRequest.getMethod(),requestUri,queryString);
+        if (profiler.isDebugEnabled()) {
+          String queryString=httpRequest.getQueryString();
+          String message=String.format(queryString == null ? MESSAGE_WITHOUT_QUERY : MESSAGE_WITH_QUERY,httpRequest.getMethod(),requestUri,queryString);
+          profiler.stopDebug(message);
+        }
       }
     }
   }

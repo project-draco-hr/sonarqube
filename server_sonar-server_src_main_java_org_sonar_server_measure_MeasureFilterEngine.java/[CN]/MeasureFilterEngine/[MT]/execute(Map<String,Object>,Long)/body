@@ -1,13 +1,12 @@
 {
-  StopWatch watch=profiling.start("measures",Level.BASIC);
-  StopWatch sqlWatch=null;
+  Profiler profiler=Profiler.createIfDebug(LOG).start();
   MeasureFilterResult result=new MeasureFilterResult();
   MeasureFilterContext context=new MeasureFilterContext();
   context.setUserId(userId);
   context.setData(String.format("{%s}",Joiner.on('|').withKeyValueSeparator("=").join(filterMap)));
   try {
+    profiler.addContext("request",context.getData());
     MeasureFilter filter=factory.create(filterMap);
-    sqlWatch=profiling.start("sql",Level.FULL);
     List<MeasureFilterRow> rows=executor.execute(filter,context);
     result.setRows(rows);
   }
@@ -20,10 +19,8 @@ catch (  Exception e) {
     LOG.error("Fail to execute measure filter: " + context,e);
   }
  finally {
-    if (sqlWatch != null) {
-      sqlWatch.stop(context.getSql());
-    }
-    watch.stop(log(context,result));
+    profiler.addContext("result",result.toString());
+    profiler.stopDebug("Measure filter executed");
   }
   return result;
 }

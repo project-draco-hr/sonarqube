@@ -1,5 +1,5 @@
 {
-  TimeProfiler profiler=new TimeProfiler().start("Register rules");
+  Profiler profiler=Profiler.create(LOG).startInfo("Register rules");
   DbSession session=dbClient.openSession(false);
   try {
     Map<RuleKey,RuleDto> allRules=loadRules(session);
@@ -16,9 +16,9 @@
     List<RuleDto> activeRules=processRemainingDbRules(allRules.values(),session);
     removeActiveRulesOnStillExistingRepositories(session,activeRules,context);
     session.commit();
+    profiler.stopDebug();
   }
   finally {
     session.close();
-    profiler.stop();
   }
 }
