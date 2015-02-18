@@ -1,0 +1,21 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  Connection connection=dbSession.getConnection();
+  try {
+    DatabaseMetaData metadata=connection.getMetaData();
+    attributes.put("Database",metadata.getDatabaseProductName());
+    attributes.put("Database Version",metadata.getDatabaseProductVersion());
+    attributes.put("Username",metadata.getUserName());
+    attributes.put("URL",metadata.getURL());
+    attributes.put("Driver",metadata.getDriverName());
+    attributes.put("Driver Version",metadata.getDriverVersion());
+    attributes.put("Version Status",getMigrationStatus());
+  }
+ catch (  SQLException e) {
+    throw new IllegalStateException("Fail to get DB metadata",e);
+  }
+ finally {
+    DbUtils.closeQuietly(connection);
+    MyBatis.closeQuietly(dbSession);
+  }
+}
