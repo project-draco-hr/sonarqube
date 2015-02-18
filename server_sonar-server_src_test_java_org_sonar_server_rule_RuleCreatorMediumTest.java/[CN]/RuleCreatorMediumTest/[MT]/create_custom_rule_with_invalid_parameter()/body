@@ -1,0 +1,12 @@
+{
+  RuleDto templateRule=createTemplateRuleWithIntArrayParam();
+  NewRule newRule=NewRule.createForCustomRule("CUSTOM_RULE",templateRule.getKey()).setName("My custom").setMarkdownDescription("Some description").setSeverity(Severity.MAJOR).setStatus(RuleStatus.READY).setParameters(ImmutableMap.of("myIntegers","1,polop,2"));
+  try {
+    creator.create(newRule);
+    Fail.failBecauseExceptionWasNotThrown(BadRequestException.class);
+  }
+ catch (  BadRequestException iae) {
+    assertThat(iae).hasMessage("errors.type.notInteger");
+  }
+  dbSession.clearCache();
+}

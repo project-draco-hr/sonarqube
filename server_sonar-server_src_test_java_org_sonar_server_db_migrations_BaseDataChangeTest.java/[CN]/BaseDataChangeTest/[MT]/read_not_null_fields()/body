@@ -1,0 +1,22 @@
+{
+  db.prepareDbUnit(getClass(),"persons.xml");
+  final List<Object[]> persons=new ArrayList<Object[]>();
+  new BaseDataChange(db.database()){
+    @Override public void execute(    Context context) throws SQLException {
+      persons.addAll(context.prepareSelect("select id,login,age,enabled,updated_at,coeff from persons where id=2").list(new Select.RowReader<Object[]>(){
+        @Override public Object[] read(        Select.Row row) throws SQLException {
+          return new Object[]{row.getLong(1),row.getString(2),row.getInt(3),row.getBoolean(4),row.getDate(5),row.getDouble(6)};
+        }
+      }
+));
+    }
+  }
+.execute();
+  assertThat(persons).hasSize(1);
+  assertThat(persons.get(0)[0]).isEqualTo(2L);
+  assertThat(persons.get(0)[1]).isEqualTo("emmerik");
+  assertThat(persons.get(0)[2]).isEqualTo(14);
+  assertThat(persons.get(0)[3]).isEqualTo(true);
+  assertThat(persons.get(0)[4]).isNotNull();
+  assertThat(persons.get(0)[5]).isEqualTo(5.2);
+}
