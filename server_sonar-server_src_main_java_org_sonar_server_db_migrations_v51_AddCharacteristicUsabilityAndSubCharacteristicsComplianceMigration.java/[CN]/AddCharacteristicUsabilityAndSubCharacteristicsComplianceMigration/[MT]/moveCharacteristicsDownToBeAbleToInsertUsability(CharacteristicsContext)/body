@@ -1,0 +1,19 @@
+{
+  Characteristic security=characteristicsContext.findCharacteristicByKey("SECURITY");
+  Characteristic usability=characteristicsContext.findCharacteristicByKey("USABILITY");
+  int usabilityOder=1;
+  int indexToStart=0;
+  if (security != null) {
+    indexToStart=characteristicsContext.characteristics().indexOf(security) + 1;
+    usabilityOder=security.getOrder() + 1;
+  }
+  if (usability == null || usability.getOrder() != usabilityOder) {
+    for (int i=indexToStart; i < characteristicsContext.characteristics().size(); i++) {
+      Characteristic characteristic=characteristicsContext.characteristics().get(i);
+      if (characteristic.getParentId() == null) {
+        characteristicsContext.updateCharacteristicOrder(characteristic.getKey(),characteristic.getOrder() + 1);
+      }
+    }
+  }
+  return usabilityOder;
+}
