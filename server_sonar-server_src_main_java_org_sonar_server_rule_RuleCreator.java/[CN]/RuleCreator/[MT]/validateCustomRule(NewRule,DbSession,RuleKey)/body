@@ -1,0 +1,27 @@
+{
+  Errors errors=new Errors();
+  validateRuleKey(errors,newRule.ruleKey());
+  validateName(errors,newRule);
+  validateDescription(errors,newRule);
+  String severity=newRule.severity();
+  if (Strings.isNullOrEmpty(severity)) {
+    errors.add(Message.of("coding_rules.validation.missing_severity"));
+  }
+ else   if (!Severity.ALL.contains(severity)) {
+    errors.add(Message.of("coding_rules.validation.invalid_severity",severity));
+  }
+  if (newRule.status() == null) {
+    errors.add(Message.of("coding_rules.validation.missing_status"));
+  }
+  for (  RuleParamDto ruleParam : dbClient.ruleDao().findRuleParamsByRuleKey(dbSession,templateKey)) {
+    try {
+      validateParam(ruleParam,newRule.parameter(ruleParam.getName()));
+    }
+ catch (    BadRequestException validationError) {
+      errors.add(validationError.errors());
+    }
+  }
+  if (!errors.isEmpty()) {
+    throw new BadRequestException(errors);
+  }
+}

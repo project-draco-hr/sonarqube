@@ -1,8 +1,12 @@
 {
-  validateRuleKey(newRule.ruleKey());
-  validateName(newRule);
-  validateDescription(newRule);
+  Errors errors=new Errors();
+  validateRuleKey(errors,newRule.ruleKey());
+  validateName(errors,newRule);
+  validateDescription(errors,newRule);
   if (!newRule.parameters().isEmpty()) {
-    throw new IllegalArgumentException("No parameter can be set on a manual rule");
+    errors.add(Message.of("coding_rules.validation.manual_rule_params"));
+  }
+  if (!errors.isEmpty()) {
+    throw new BadRequestException(errors);
   }
 }
