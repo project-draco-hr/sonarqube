@@ -1,0 +1,16 @@
+{
+  db.prepareDbUnit(getClass(),"persons.xml");
+  thrown.expect(IllegalStateException.class);
+  thrown.expectMessage("Error during processing of row: [id=2]");
+  new BaseDataChange(db.database()){
+    @Override public void execute(    Context context) throws SQLException {
+      context.prepareSelect("select id from persons where id>=?").setLong(1,2L).get(new RowReader<Long>(){
+        @Override public Long read(        Row row) throws SQLException {
+          throw new IllegalStateException("Unexpected error");
+        }
+      }
+);
+    }
+  }
+.execute();
+}
