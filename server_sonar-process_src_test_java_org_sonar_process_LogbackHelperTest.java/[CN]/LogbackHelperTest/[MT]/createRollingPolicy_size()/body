@@ -1,0 +1,14 @@
+{
+  props.set("sonar.log.rollingPolicy","size:1MB");
+  props.set("sonar.log.maxFiles","20");
+  LoggerContext ctx=sut.getRootContext();
+  LogbackHelper.RollingPolicy policy=sut.createRollingPolicy(ctx,props,"sonar");
+  Appender appender=policy.createAppender("SONAR_FILE");
+  assertThat(appender).isInstanceOf(RollingFileAppender.class);
+  RollingFileAppender fileAppender=(RollingFileAppender)appender;
+  FixedWindowRollingPolicy rollingPolicy=(FixedWindowRollingPolicy)fileAppender.getRollingPolicy();
+  assertThat(rollingPolicy.getMaxIndex()).isEqualTo(20);
+  assertThat(rollingPolicy.getFileNamePattern()).endsWith("sonar.%i.log");
+  SizeBasedTriggeringPolicy triggeringPolicy=(SizeBasedTriggeringPolicy)fileAppender.getTriggeringPolicy();
+  assertThat(triggeringPolicy.getMaxFileSize()).isEqualTo("1MB");
+}

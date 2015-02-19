@@ -1,0 +1,7 @@
+{
+  logTester.setLevel(LoggerLevel.DEBUG);
+  SearchResponse response=esTester.client().prepareSearch(FakeIndexDefinition.INDEX).setSearchType(SearchType.SCAN).setScroll(TimeValue.timeValueMinutes(1)).get();
+  logTester.clear();
+  esTester.client().prepareSearchScroll(response.getScrollId()).get();
+  assertThat(logTester.logs()).isEmpty();
+}

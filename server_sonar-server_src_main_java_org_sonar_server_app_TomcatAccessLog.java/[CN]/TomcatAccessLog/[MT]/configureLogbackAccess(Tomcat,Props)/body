@@ -1,0 +1,16 @@
+{
+  if (props.valueAsBoolean(PROPERTY_ENABLE,true)) {
+    ProgrammaticLogbackValve valve=new ProgrammaticLogbackValve();
+    LogbackHelper helper=new LogbackHelper();
+    LogbackHelper.RollingPolicy policy=helper.createRollingPolicy(valve,props,"access");
+    FileAppender appender=policy.createAppender("ACCESS_LOG");
+    PatternLayoutEncoder fileEncoder=new PatternLayoutEncoder();
+    fileEncoder.setContext(valve);
+    fileEncoder.setPattern(props.value(PROPERTY_PATTERN,"combined"));
+    fileEncoder.start();
+    appender.setEncoder(fileEncoder);
+    appender.start();
+    valve.addAppender(appender);
+    tomcat.getHost().getPipeline().addValve(valve);
+  }
+}

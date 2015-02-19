@@ -1,26 +1,22 @@
 {
-  TimeProfiler profiler=new TimeProfiler(LOG).start("Load previous issues");
-  try {
-    this.issuesCache=caches.createCache("previousIssues");
-    previousIssuesLoader.load(reactor,new Function<PreviousIssue,Void>(){
-      @Override public Void apply(      @Nullable PreviousIssue issue){
-        if (issue == null) {
-          return null;
-        }
-        String componentKey=issue.componentKey();
-        BatchResource r=resourceCache.get(componentKey);
-        if (r == null) {
-          issuesCache.put(0,issue.key(),issue);
-        }
- else {
-          issuesCache.put(r.batchId(),issue.key(),issue);
-        }
+  Profiler profiler=Profiler.create(LOG).startInfo("Load previous issues");
+  this.issuesCache=caches.createCache("previousIssues");
+  previousIssuesLoader.load(reactor,new Function<PreviousIssue,Void>(){
+    @Override public Void apply(    @Nullable PreviousIssue issue){
+      if (issue == null) {
         return null;
       }
+      String componentKey=issue.componentKey();
+      BatchResource r=resourceCache.get(componentKey);
+      if (r == null) {
+        issuesCache.put(0,issue.key(),issue);
+      }
+ else {
+        issuesCache.put(r.batchId(),issue.key(),issue);
+      }
+      return null;
     }
+  }
 );
-  }
-  finally {
-    profiler.stop();
-  }
+  profiler.stopDebug();
 }

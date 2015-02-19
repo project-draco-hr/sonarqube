@@ -1,19 +1,13 @@
 {
   if (method.getName().startsWith("execute")) {
-    StopWatch watch=PROFILING.start();
+    Profiler profiler=Profiler.create(ProfiledDataSource.SQL_LOGGER).start();
     Object result=null;
     try {
       result=InvocationUtils.invokeQuietly(statement,method,args);
     }
   finally {
-      StringBuilder sqlBuilder=new StringBuilder().append(sql);
-      if (!arguments.isEmpty()) {
-        sqlBuilder.append(" - parameters are: ");
-        for (        Object arg : arguments) {
-          sqlBuilder.append(PARAM_PREFIX).append(arg).append(PARAM_SUFFIX).append(PARAM_SEPARATOR);
-        }
-      }
-      PROFILING.stop(watch,StringUtils.removeEnd(sqlBuilder.toString(),PARAM_SEPARATOR));
+      profiler.addContext("sql",StringUtils.remove(sql,'\n'));
+      profiler.stopTrace("");
     }
     return result;
   }

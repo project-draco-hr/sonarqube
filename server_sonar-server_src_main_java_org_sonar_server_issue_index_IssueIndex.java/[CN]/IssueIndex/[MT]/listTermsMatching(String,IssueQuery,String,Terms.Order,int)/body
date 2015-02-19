@@ -3,7 +3,7 @@
   requestBuilder.setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),createBoolFilter(query)));
   TermsBuilder aggreg=AggregationBuilders.terms("_ref").field(fieldName).size(maxNumberOfTags).order(termsOrder).minDocCount(1L);
   if (textQuery != null) {
-    aggreg.include(String.format(".*%s.*",textQuery));
+    aggreg.include(String.format(SUBSTRING_MATCH_REGEXP,textQuery));
   }
   SearchResponse searchResponse=requestBuilder.addAggregation(aggreg).get();
   return searchResponse.getAggregations().get("_ref");

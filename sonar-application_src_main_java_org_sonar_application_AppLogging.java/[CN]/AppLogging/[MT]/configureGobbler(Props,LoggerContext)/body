@@ -1,0 +1,14 @@
+{
+  LogbackHelper.RollingPolicy rollingPolicy=helper.createRollingPolicy(ctx,props,"sonar");
+  FileAppender fileAppender=rollingPolicy.createAppender(GOBBLER_APPENDER);
+  fileAppender.setContext(ctx);
+  PatternLayoutEncoder fileEncoder=new PatternLayoutEncoder();
+  fileEncoder.setContext(ctx);
+  fileEncoder.setPattern("%msg%n");
+  fileEncoder.start();
+  fileAppender.setEncoder(fileEncoder);
+  fileAppender.start();
+  Logger gobblerLogger=ctx.getLogger(GOBBLER_LOGGER);
+  gobblerLogger.setAdditive(false);
+  gobblerLogger.addAppender(fileAppender);
+}

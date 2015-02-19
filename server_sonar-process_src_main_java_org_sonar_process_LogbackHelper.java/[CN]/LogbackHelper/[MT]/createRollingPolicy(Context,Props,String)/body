@@ -1,0 +1,17 @@
+{
+  String rollingPolicy=props.value(ROLLING_POLICY_PROPERTY,"time:yyyy-MM-dd");
+  int maxFiles=props.valueAsInt(MAX_FILES_PROPERTY,7);
+  File logsDir=props.nonNullValueAsFile(ProcessConstants.PATH_LOGS);
+  if (rollingPolicy.startsWith("time:")) {
+    return new TimeRollingPolicy(ctx,filenamePrefix,logsDir,maxFiles,StringUtils.substringAfter(rollingPolicy,"time:"));
+  }
+ else   if (rollingPolicy.startsWith("size:")) {
+    return new SizeRollingPolicy(ctx,filenamePrefix,logsDir,maxFiles,StringUtils.substringAfter(rollingPolicy,"size:"));
+  }
+ else   if (rollingPolicy.equals("none")) {
+    return new NoRollingPolicy(ctx,filenamePrefix,logsDir,maxFiles);
+  }
+ else {
+    throw new MessageException(String.format("Unsupported value for property %s: %s",ROLLING_POLICY_PROPERTY,rollingPolicy));
+  }
+}

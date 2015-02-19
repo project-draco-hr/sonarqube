@@ -1,0 +1,10 @@
+{
+  props.set("sonar.log.rollingPolicy","time:yyyy-MM");
+  props.set("sonar.log.maxFiles","20");
+  LoggerContext ctx=sut.getRootContext();
+  LogbackHelper.RollingPolicy policy=sut.createRollingPolicy(ctx,props,"sonar");
+  RollingFileAppender appender=(RollingFileAppender)policy.createAppender("SONAR_FILE");
+  TimeBasedRollingPolicy triggeringPolicy=(TimeBasedRollingPolicy)appender.getTriggeringPolicy();
+  assertThat(triggeringPolicy.getMaxHistory()).isEqualTo(20);
+  assertThat(triggeringPolicy.getFileNamePattern()).endsWith("sonar.%d{yyyy-MM}.log");
+}
