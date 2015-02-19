@@ -1,10 +1,9 @@
 {
   File dir=temp.newFolder();
-  ProcessCommands commands=new ProcessCommands(dir,"web");
+  ProcessCommands commands=new ProcessCommands(dir,1);
+  assertThat(commands.mappedByteBuffer.get(commands.offset() + 1)).isNotEqualTo(ProcessCommands.STOP);
   assertThat(commands.askedForStop()).isFalse();
-  assertThat(commands.getStopFile()).doesNotExist();
   commands.askForStop();
   assertThat(commands.askedForStop()).isTrue();
-  assertThat(commands.getStopFile()).exists().isFile();
-  assertThat(commands.getStopFile().getName()).isEqualTo("web.stop");
+  assertThat(commands.mappedByteBuffer.get(commands.offset() + 1)).isEqualTo(ProcessCommands.STOP);
 }
