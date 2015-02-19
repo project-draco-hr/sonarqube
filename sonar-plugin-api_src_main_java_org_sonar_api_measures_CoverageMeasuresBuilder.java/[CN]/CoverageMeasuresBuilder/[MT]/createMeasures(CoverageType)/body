@@ -1,0 +1,15 @@
+{
+  Collection<Measure> measures=Lists.newArrayList();
+  if (getLinesToCover() > 0) {
+    measures.add(new Measure(type.linesToCover,(double)getLinesToCover()));
+    measures.add(new Measure(type.uncoveredLines,(double)(getLinesToCover() - getCoveredLines())));
+    measures.add(new Measure(type.lineHits).setData(KeyValueFormat.format(hitsByLine)).setPersistenceMode(PersistenceMode.DATABASE));
+  }
+  if (getConditions() > 0) {
+    measures.add(new Measure(type.conditionsToCover,(double)getConditions()));
+    measures.add(new Measure(type.uncoveredConditions,(double)(getConditions() - getCoveredConditions())));
+    measures.add(createConditionsByLine(type));
+    measures.add(createCoveredConditionsByLine(type));
+  }
+  return measures;
+}
