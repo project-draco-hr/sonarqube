@@ -1,0 +1,23 @@
+{
+  RulesProfile defProfile=RulesProfile.create("Basic",ServerTester.Xoo.KEY);
+  defProfile.activateRule(org.sonar.api.rules.Rule.create("xoo","x1"),null);
+  register(new Rules(){
+    @Override public void init(    RulesDefinition.NewRepository repository){
+      RulesDefinition.NewRule x1=repository.createRule("x1").setName("x1 name").setHtmlDescription("x1 desc").setSeverity(Severity.MAJOR);
+      x1.createParam("acceptWhitespace").setDefaultValue("false").setType(RuleParamType.BOOLEAN).setDescription("Accept whitespaces on the line");
+    }
+  }
+,defProfile);
+  QualityProfileDto profile=tester.get(QualityProfileDao.class).getByNameAndLanguage("Basic",ServerTester.Xoo.KEY,dbSession);
+  ActiveRuleKey activeRuleKey=ActiveRuleKey.of(profile.getKey(),RuleKey.of("xoo","x1"));
+  register(new Rules(){
+    @Override public void init(    RulesDefinition.NewRepository repository){
+      RulesDefinition.NewRule x1=repository.createRule("x1").setName("x1 name").setHtmlDescription("x1 desc").setSeverity(Severity.MAJOR);
+      x1.createParam("acceptWhitespace").setDefaultValue("true").setType(RuleParamType.BOOLEAN).setDescription("Accept whitespaces on the line");
+    }
+  }
+,defProfile);
+  reset.resetLanguage(ServerTester.Xoo.KEY);
+  ActiveRule activeRule=tester.get(ActiveRuleIndex.class).getNullableByKey(activeRuleKey);
+  assertThat(activeRule.params()).isEqualTo(ImmutableMap.of("acceptWhitespace","true"));
+}

@@ -10,8 +10,15 @@
         for (        ActiveRule activeRule : def.getActiveRules()) {
           RuleActivation activation=new RuleActivation(RuleKey.of(activeRule.getRepositoryKey(),activeRule.getRuleKey()));
           activation.setSeverity(activeRule.getSeverity().name());
-          for (          ActiveRuleParam param : activeRule.getActiveRuleParams()) {
-            activation.setParameter(param.getParamKey(),param.getValue());
+          if (!activeRule.getActiveRuleParams().isEmpty()) {
+            for (            ActiveRuleParam param : activeRule.getActiveRuleParams()) {
+              activation.setParameter(param.getParamKey(),param.getValue());
+            }
+          }
+ else {
+            for (            RuleParamDto param : db.ruleDao().findRuleParamsByRuleKey(dbSession,activeRule.getRule().ruleKey())) {
+              activation.setParameter(param.getName(),param.getDefaultValue());
+            }
           }
           activations.add(activation);
         }
