@@ -14,16 +14,12 @@
     }
   }
   BulkRequestBuilder bulkRequestBuilder=searchClient.prepareBulk();
-  long normTime=processActionsIntoQueries(bulkRequestBuilder,actions);
+  processActionsIntoQueries(bulkRequestBuilder,actions);
   if (bulkRequestBuilder.numberOfActions() > 0) {
-    long indexTime=System.currentTimeMillis();
     BulkResponse response=bulkRequestBuilder.setRefresh(false).get();
-    indexTime=System.currentTimeMillis() - indexTime;
-    long refreshTime=0;
     if (refreshRequired) {
-      refreshTime=this.refreshRequiredIndex(indices);
+      this.refreshRequiredIndex(indices);
     }
-    LOGGER.debug("-- submitted {} items with {}ms in normalization, {}ms indexing and {}ms refresh({}). Total: {}ms",bulkRequestBuilder.numberOfActions(),normTime,indexTime,refreshTime,indices,(normTime + indexTime + refreshTime));
     if (response.hasFailures()) {
       throw new IllegalStateException("Errors while indexing stack: " + response.buildFailureMessage());
     }
