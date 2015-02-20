@@ -2,12 +2,8 @@
   File symbol=new File(baseDir,"src/foo.xoo.highlighting");
   FileUtils.write(symbol,"1:4:k\n12:15:cppd\n\n#comment");
   DefaultInputFile inputFile=new DefaultInputFile("foo","src/foo.xoo").setLanguage("xoo");
-  fileSystem.add(inputFile);
-  NewHighlighting builder=mock(NewHighlighting.class);
-  when(context.newHighlighting()).thenReturn(builder);
-  when(builder.onFile(any(InputFile.class))).thenReturn(builder);
+  context.fileSystem().add(inputFile);
   sensor.execute(context);
-  verify(builder).highlight(1,4,TypeOfText.KEYWORD);
-  verify(builder).highlight(12,15,TypeOfText.CPP_DOC);
-  verify(builder).save();
+  assertThat(context.highlightingTypeFor("foo:src/foo.xoo",2)).containsOnly(TypeOfText.KEYWORD);
+  assertThat(context.highlightingTypeFor("foo:src/foo.xoo",13)).containsOnly(TypeOfText.CPP_DOC);
 }
