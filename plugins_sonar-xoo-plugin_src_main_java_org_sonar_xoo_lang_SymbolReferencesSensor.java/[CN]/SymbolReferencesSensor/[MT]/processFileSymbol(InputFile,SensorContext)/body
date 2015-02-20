@@ -6,7 +6,8 @@
     try {
       List<String> lines=FileUtils.readLines(symbolFile,context.fileSystem().encoding().name());
       int lineNumber=0;
-      SymbolTableBuilder symbolTableBuilder=context.symbolTableBuilder(inputFile);
+      Symbolizable symbolizable=perspectives.as(Symbolizable.class,inputFile);
+      Symbolizable.SymbolTableBuilder symbolTableBuilder=symbolizable.newSymbolTableBuilder();
       for (      String line : lines) {
         lineNumber++;
         if (StringUtils.isBlank(line) || line.startsWith("#")) {
@@ -14,7 +15,7 @@
         }
         processLine(symbolFile,lineNumber,symbolTableBuilder,line);
       }
-      symbolTableBuilder.done();
+      symbolizable.setSymbolTable(symbolTableBuilder.build());
     }
  catch (    IOException e) {
       throw new IllegalStateException(e);
