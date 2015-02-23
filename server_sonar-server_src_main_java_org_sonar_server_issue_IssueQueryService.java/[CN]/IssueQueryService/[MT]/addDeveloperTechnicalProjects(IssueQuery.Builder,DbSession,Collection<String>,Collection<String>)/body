@@ -1,0 +1,25 @@
+{
+  Collection<ComponentDto> technicalProjects=dbClient.componentDao().getByUuids(session,componentUuids);
+  Collection<String> developerUuids=Collections2.transform(technicalProjects,new Function<ComponentDto,String>(){
+    @Override public String apply(    ComponentDto input){
+      return input.projectUuid();
+    }
+  }
+);
+  Collection<String> authorsFromProjects=authorsFromParamsOrFromDeveloper(session,developerUuids,authors);
+  builder.authors(authorsFromProjects);
+  Collection<Long> projectIds=Collections2.transform(technicalProjects,new Function<ComponentDto,Long>(){
+    @Override public Long apply(    ComponentDto input){
+      return input.getCopyResourceId();
+    }
+  }
+);
+  List<ComponentDto> originalProjects=dbClient.componentDao().getByIds(session,projectIds);
+  Collection<String> projectUuids=Collections2.transform(originalProjects,new Function<ComponentDto,String>(){
+    @Override public String apply(    ComponentDto input){
+      return input.uuid();
+    }
+  }
+);
+  builder.projectUuids(projectUuids);
+}
