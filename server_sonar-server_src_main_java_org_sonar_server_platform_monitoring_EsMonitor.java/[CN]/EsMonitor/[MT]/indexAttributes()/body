@@ -1,0 +1,12 @@
+{
+  LinkedHashMap<String,LinkedHashMap<String,Object>> indices=new LinkedHashMap<>();
+  IndicesStatsResponse indicesStats=esClient.prepareStats().all().get();
+  for (  Map.Entry<String,IndexStats> indexStats : indicesStats.getIndices().entrySet()) {
+    LinkedHashMap<String,Object> attributes=new LinkedHashMap<>();
+    indices.put(indexStats.getKey(),attributes);
+    attributes.put("Docs",indexStats.getValue().getPrimaries().getDocs().getCount());
+    attributes.put("Shards",indexStats.getValue().getShards().length);
+    attributes.put("Store Size",byteCountToDisplaySize(indexStats.getValue().getPrimaries().getStore().getSizeInBytes()));
+  }
+  return indices;
+}
