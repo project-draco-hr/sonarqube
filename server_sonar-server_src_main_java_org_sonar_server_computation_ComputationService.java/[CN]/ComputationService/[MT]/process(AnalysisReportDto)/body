@@ -1,13 +1,13 @@
 {
-  TimeProfiler profiler=new TimeProfiler(LOG).start(String.format("#%s - %s - processing analysis report",report.getId(),report.getProjectKey()));
+  Profiler profiler=Profiler.create(LOG).startInfo(String.format("#%s - %s - processing analysis report",report.getId(),report.getProjectKey()));
   ComponentDto project=loadProject(report);
   try {
     ComputationContext context=new ComputationContext(report,project);
     for (    ComputationStep step : steps.orderedSteps()) {
       if (ArrayUtils.contains(step.supportedProjectQualifiers(),context.getProject().qualifier())) {
-        TimeProfiler stepProfiler=new TimeProfiler(LOG).start(step.getDescription());
+        Profiler stepProfiler=Profiler.create(LOG).startInfo(step.getDescription());
         step.execute(context);
-        stepProfiler.stop();
+        stepProfiler.stopInfo();
       }
     }
     report.succeed();
@@ -18,6 +18,6 @@
   }
  finally {
     logActivity(report,project);
-    profiler.stop();
+    profiler.stopInfo();
   }
 }
