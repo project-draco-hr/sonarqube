@@ -49,16 +49,16 @@
   if (template != null) {
     filters.put(RuleNormalizer.RuleField.TEMPLATE_KEY.field(),FilterBuilders.termFilter(RuleNormalizer.RuleField.TEMPLATE_KEY.field(),template));
   }
-  BoolFilterBuilder childrenFilter=FilterBuilders.boolFilter();
+  BoolFilterBuilder childrenFilter=FilterBuilders.boolFilter().cache(false);
   this.addTermFilter(childrenFilter,ActiveRuleNormalizer.ActiveRuleField.PROFILE_KEY.field(),query.getQProfileKey());
   this.addTermFilter(childrenFilter,ActiveRuleNormalizer.ActiveRuleField.INHERITANCE.field(),query.getInheritance());
   this.addTermFilter(childrenFilter,ActiveRuleNormalizer.ActiveRuleField.SEVERITY.field(),query.getActiveSeverities());
-  QueryBuilder childQuery;
+  FilterBuilder childQuery;
   if (childrenFilter.hasClauses()) {
-    childQuery=QueryBuilders.constantScoreQuery(childrenFilter);
+    childQuery=childrenFilter;
   }
  else {
-    childQuery=QueryBuilders.matchAllQuery();
+    childQuery=FilterBuilders.matchAllFilter();
   }
   if (Boolean.TRUE.equals(query.getActivation())) {
     filters.put("activation",FilterBuilders.hasChildFilter(IndexDefinition.ACTIVE_RULE.getIndexType(),childQuery));
