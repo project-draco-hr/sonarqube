@@ -10,6 +10,7 @@
   dbClient.propertiesDao().setProperty(new PropertyDto().setKey(DbCleanerConstants.WEEKS_BEFORE_DELETING_ALL_SNAPSHOTS).setValue("52"));
   dbSession.commit();
   ComputationContext context=new ComputationContext(report,project);
+  context.setProjectSettings(new ProjectSettingsFactory(tester.get(Settings.class),tester.get(PropertiesDao.class)).newProjectSettings(project.getId()));
   sut.execute(context);
   assertThat(dbClient.snapshotDao().getNullableByKey(dbSession,snapshot.getId())).isNotNull();
 }
