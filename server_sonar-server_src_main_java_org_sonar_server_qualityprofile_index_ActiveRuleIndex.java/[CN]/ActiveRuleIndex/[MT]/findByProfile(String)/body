@@ -1,9 +1,5 @@
 {
-  SearchRequestBuilder request=getClient().prepareSearch(getIndexName()).setQuery(QueryBuilders.filteredQuery(QueryBuilders.termsQuery(ActiveRuleNormalizer.ActiveRuleField.PROFILE_KEY.field(),key),FilterBuilders.boolFilter().mustNot(FilterBuilders.hasParentFilter(this.getParentType(),FilterBuilders.termFilter(RuleNormalizer.RuleField.STATUS.field(),RuleStatus.REMOVED.name()))))).setRouting(key).setSize(Integer.MAX_VALUE);
+  SearchRequestBuilder request=getClient().prepareSearch(getIndexName()).setTypes(IndexDefinition.ACTIVE_RULE.getIndexType()).setSearchType(SearchType.SCAN).setScroll(TimeValue.timeValueMinutes(SCROLL_TIME_IN_MINUTES)).setSize(100).setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),FilterBuilders.boolFilter().must(FilterBuilders.termFilter(ActiveRuleNormalizer.ActiveRuleField.PROFILE_KEY.field(),key)).mustNot(FilterBuilders.hasParentFilter(this.getParentType(),FilterBuilders.termFilter(RuleNormalizer.RuleField.STATUS.field(),RuleStatus.REMOVED.name()))))).setRouting(key);
   SearchResponse response=request.get();
-  List<ActiveRule> activeRules=new ArrayList<ActiveRule>();
-  for (  SearchHit hit : response.getHits()) {
-    activeRules.add(toDoc(hit.getSource()));
-  }
-  return activeRules;
+  return scroll(response.getScrollId());
 }

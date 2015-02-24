@@ -1,25 +1,14 @@
 {
   return new Iterator<DOMAIN>(){
-    private final Queue<SearchHit> hits=new ArrayDeque<SearchHit>();
-    private void fillQueue(){
-      try {
-        SearchScrollRequestBuilder esRequest=client.prepareSearchScroll(scrollId).setScroll(TimeValue.timeValueMinutes(3));
-        Collections.addAll(hits,esRequest.get().getHits().getHits());
-      }
- catch (      Exception e) {
-        throw new IllegalStateException("Error while filling in the scroll buffer",e);
-      }
-    }
+    private final Queue<SearchHit> hits=new ArrayDeque<>();
     @Override public boolean hasNext(){
       if (hits.isEmpty()) {
-        fillQueue();
+        SearchScrollRequestBuilder esRequest=client.prepareSearchScroll(scrollId).setScroll(TimeValue.timeValueMinutes(SCROLL_TIME_IN_MINUTES));
+        Collections.addAll(hits,esRequest.get().getHits().getHits());
       }
       return !hits.isEmpty();
     }
     @Override public DOMAIN next(){
-      if (!hasNext()) {
-        throw new NoSuchElementException();
-      }
       return toDoc(hits.poll().getSource());
     }
     @Override public void remove(){
