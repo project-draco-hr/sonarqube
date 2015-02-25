@@ -1,0 +1,11 @@
+{
+  dbTester.prepareDbUnit(getClass(),"extract_file_path.xml");
+  IssueResultSetIterator it=IssueResultSetIterator.create(client,connection,0L);
+  Map<String,IssueDoc> issuesByKey=issuesByKey(it);
+  it.close();
+  assertThat(issuesByKey).hasSize(4);
+  assertThat(issuesByKey.get("ABC").filePath()).isEqualTo("src/main/java/Action.java");
+  assertThat(issuesByKey.get("DEF").filePath()).isEqualTo("pom.xml");
+  assertThat(issuesByKey.get("EFG").filePath()).isNull();
+  assertThat(issuesByKey.get("FGH").filePath()).isNull();
+}

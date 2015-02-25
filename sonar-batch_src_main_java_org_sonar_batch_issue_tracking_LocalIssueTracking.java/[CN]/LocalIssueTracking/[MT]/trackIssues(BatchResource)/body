@@ -4,9 +4,12 @@
     issues.add((DefaultIssue)issue);
   }
   issueCache.clear(component.resource().getEffectiveKey());
-  Collection<PreviousIssue> previousIssues=new ArrayList<>();
-  for (  org.sonar.batch.protocol.input.issues.PreviousIssue previousIssue : previousIssueCache.byComponent(component)) {
-    previousIssues.add(new PreviousIssueFromWs(previousIssue));
+  if (analysisMode.isIncremental() && !component.isFile()) {
+    return;
+  }
+  Collection<ServerIssue> previousIssues=new ArrayList<>();
+  for (  org.sonar.batch.protocol.input.BatchInput.ServerIssue previousIssue : serverIssueRepository.byComponent(component)) {
+    previousIssues.add(new ServerIssueFromWs(previousIssue));
   }
   SourceHashHolder sourceHashHolder=null;
   if (component.isFile()) {

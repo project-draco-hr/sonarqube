@@ -1,0 +1,22 @@
+{
+  ComponentDto project=ComponentTesting.newProjectDto("PROJECT");
+  ComponentDto file=ComponentTesting.newFileDto(project).setPath("src/File.xoo");
+  IssueDoc issue=IssueTesting.newDoc("ISSUE",file).setRuleKey("squid:S001").setChecksum("12345").setAssignee("john").setLine(11).setMessage("the message").setSeverity(Severity.BLOCKER).setManualSeverity(true).setStatus(Issue.STATUS_RESOLVED).setResolution(Issue.RESOLUTION_FIXED).setFuncCreationDate(new Date());
+  indexIssues(issue);
+  List<IssueDoc> issues=Lists.newArrayList(index.selectIssuesForBatch(file));
+  assertThat(issues).hasSize(1);
+  IssueDoc result=issues.get(0);
+  assertThat(result.key()).isEqualTo("ISSUE");
+  assertThat(result.moduleUuid()).isEqualTo("PROJECT");
+  assertThat(result.filePath()).isEqualTo("src/File.xoo");
+  assertThat(result.ruleKey()).isEqualTo(RuleKey.of("squid","S001"));
+  assertThat(result.checksum()).isEqualTo("12345");
+  assertThat(result.assignee()).isEqualTo("john");
+  assertThat(result.line()).isEqualTo(11);
+  assertThat(result.message()).isEqualTo("the message");
+  assertThat(result.severity()).isEqualTo(Severity.BLOCKER);
+  assertThat(result.isManualSeverity()).isTrue();
+  assertThat(result.status()).isEqualTo(Issue.STATUS_RESOLVED);
+  assertThat(result.resolution()).isEqualTo(Issue.RESOLUTION_FIXED);
+  assertThat(result.creationDate()).isNotNull();
+}

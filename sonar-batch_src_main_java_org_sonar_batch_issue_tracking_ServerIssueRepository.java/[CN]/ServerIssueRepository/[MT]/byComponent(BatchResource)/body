@@ -1,0 +1,24 @@
+{
+  if (analysisMode.isIncremental()) {
+    if (!component.isFile()) {
+      throw new UnsupportedOperationException("Incremental mode should only get issues on files");
+    }
+    Profiler profiler=Profiler.create(LOG).startInfo("Load server issues for " + component.resource().getPath());
+    final List<ServerIssue> result=new ArrayList<>();
+    previousIssuesLoader.load(component.key(),new Function<ServerIssue,Void>(){
+      @Override public Void apply(      @Nullable ServerIssue issue){
+        if (issue == null) {
+          return null;
+        }
+        result.add(issue);
+        return null;
+      }
+    }
+,true);
+    profiler.stopDebug();
+    return result;
+  }
+ else {
+    return issuesCache.values(component.batchId());
+  }
+}

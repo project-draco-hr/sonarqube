@@ -1,0 +1,12 @@
+{
+  ComponentDto project1=ComponentTesting.newProjectDto().setKey("project1");
+  ComponentDto project2=ComponentTesting.newProjectDto().setKey("project2");
+  ComponentDto file1=ComponentTesting.newFileDto(project1).setKey("file1");
+  ComponentDto file2=ComponentTesting.newFileDto(project2).setKey("file2");
+  indexIssue(IssueTesting.newDoc("ISSUE1",file1),"sonar-users",null);
+  indexIssue(IssueTesting.newDoc("ISSUE3",file2),null,null);
+  MockUserSession.set().setUserGroups("sonar-users");
+  assertThat(Lists.newArrayList(index.selectIssuesForBatch(project1))).hasSize(1);
+  MockUserSession.set().setUserGroups("another group");
+  assertThat(Lists.newArrayList(index.selectIssuesForBatch(project2))).isEmpty();
+}

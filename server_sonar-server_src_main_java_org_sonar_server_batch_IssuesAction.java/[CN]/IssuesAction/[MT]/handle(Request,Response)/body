@@ -1,22 +1,17 @@
 {
   UserSession.get().checkGlobalPermission(GlobalPermissions.PREVIEW_EXECUTION);
   final String moduleKey=request.mandatoryParam(PARAM_KEY);
-  response.stream().setMediaType(MimeTypes.JSON);
-  PreviousIssueHelper previousIssueHelper=PreviousIssueHelper.create(new OutputStreamWriter(response.stream().output(),Charsets.UTF_8));
+  response.stream().setMediaType(MimeTypes.PROTOBUF);
   DbSession session=dbClient.openSession(false);
   try {
-    ComponentDto moduleOrProject=dbClient.componentDao().getByKey(session,moduleKey);
-    UserSession.get().checkComponentPermission(UserRole.USER,moduleKey);
-    BatchIssueResultHandler batchIssueResultHandler=new BatchIssueResultHandler(previousIssueHelper);
-    if (moduleOrProject.isRootProject()) {
-      dbClient.issueDao().selectNonClosedIssuesByProjectUuid(session,moduleOrProject.uuid(),batchIssueResultHandler);
-    }
- else {
-      dbClient.issueDao().selectNonClosedIssuesByModuleUuid(session,moduleOrProject.uuid(),batchIssueResultHandler);
+    ComponentDto component=dbClient.componentDao().getByKey(session,moduleKey);
+    Map<String,String> keysByUUid=keysByUUid(session,component);
+    BatchInput.ServerIssue.Builder issueBuilder=BatchInput.ServerIssue.newBuilder();
+    for (Iterator<IssueDoc> issueDocIterator=issueIndex.selectIssuesForBatch(component); issueDocIterator.hasNext(); ) {
+      handleIssue(issueDocIterator.next(),issueBuilder,keysByUUid,response.stream().output());
     }
   }
   finally {
-    previousIssueHelper.close();
     MyBatis.closeQuietly(session);
   }
 }

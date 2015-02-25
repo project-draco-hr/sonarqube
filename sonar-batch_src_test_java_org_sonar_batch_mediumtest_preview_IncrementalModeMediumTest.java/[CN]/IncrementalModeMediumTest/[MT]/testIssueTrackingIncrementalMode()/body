@@ -1,0 +1,25 @@
+{
+  File baseDir=temp.newFolder();
+  File srcDir=new File(baseDir,"src");
+  srcDir.mkdir();
+  File xooFile=new File(srcDir,"sample.xoo");
+  FileUtils.write(xooFile,SAMPLE_CONTENT);
+  TaskResult result=tester.newTask().properties(ImmutableMap.<String,String>builder().put("sonar.task","scan").put("sonar.projectBaseDir",baseDir.getAbsolutePath()).put("sonar.projectKey","sample").put("sonar.projectName","Foo Project").put("sonar.projectVersion","1.0-SNAPSHOT").put("sonar.projectDescription","Description of Foo Project").put("sonar.sources","src").build()).start();
+  int newIssues=0;
+  int openIssues=0;
+  int resolvedIssue=0;
+  for (  Issue issue : result.issues()) {
+    if (issue.isNew()) {
+      newIssues++;
+    }
+ else     if (issue.resolution() != null) {
+      resolvedIssue++;
+    }
+ else {
+      openIssues++;
+    }
+  }
+  assertThat(newIssues).isEqualTo(3);
+  assertThat(openIssues).isEqualTo(2);
+  assertThat(resolvedIssue).isEqualTo(1);
+}
