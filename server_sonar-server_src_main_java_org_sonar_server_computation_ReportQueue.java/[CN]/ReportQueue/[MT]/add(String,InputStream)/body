@@ -1,0 +1,20 @@
+{
+  String uuid=Uuids.create();
+  File file=reportFileForUuid(uuid);
+  DbSession session=dbClient.openSession(false);
+  try {
+    checkThatProjectExistsInDatabase(projectKey,session);
+    FileUtils.copyInputStreamToFile(reportData,file);
+    AnalysisReportDto dto=new AnalysisReportDto().setProjectKey(projectKey).setStatus(PENDING).setUuid(uuid);
+    dbClient.analysisReportDao().insert(session,dto);
+    session.commit();
+    return new Item(dto,file);
+  }
+ catch (  Exception e) {
+    FileUtils.deleteQuietly(file);
+    throw new IllegalStateException("Fail to store analysis report of project " + projectKey,e);
+  }
+ finally {
+    MyBatis.closeQuietly(session);
+  }
+}

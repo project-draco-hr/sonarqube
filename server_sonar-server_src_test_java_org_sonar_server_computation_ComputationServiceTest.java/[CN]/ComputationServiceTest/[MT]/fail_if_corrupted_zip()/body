@@ -1,0 +1,14 @@
+{
+  AnalysisReportDto dto=AnalysisReportDto.newForTests(1L).setProjectKey("P1").setUuid("U1");
+  File zip=tempFolder.newFile();
+  FileUtils.write(zip,"not a file");
+  try {
+    sut.process(new ReportQueue.Item(dto,zip));
+    fail();
+  }
+ catch (  IllegalStateException e) {
+    assertThat(e.getMessage()).startsWith("Fail to unzip " + zip.getAbsolutePath() + " into ");
+    assertThat(dto.getStatus()).isEqualTo(AnalysisReportDto.Status.FAILED);
+    assertThat(dto.getFinishedAt()).isNotNull();
+  }
+}

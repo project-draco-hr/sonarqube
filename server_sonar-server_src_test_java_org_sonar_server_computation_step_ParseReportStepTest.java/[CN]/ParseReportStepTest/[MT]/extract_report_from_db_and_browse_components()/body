@@ -1,10 +1,7 @@
 {
-  AnalysisReportDto reportDto=prepareAnalysisReportInDb();
-  IssueComputation issueComputation=mock(IssueComputation.class);
-  DbClient dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),new AnalysisReportDao());
-  ParseReportStep step=new ParseReportStep(issueComputation,dbClient,new DefaultTempFolder(temp.newFolder()));
-  ComputationContext context=new ComputationContext(reportDto,mock(ComponentDto.class));
-  step.execute(context);
+  File reportDir=generateReport();
+  ComputationContext context=new ComputationContext(new BatchReportReader(reportDir),mock(ComponentDto.class));
+  sut.execute(context);
   verify(issueComputation).processComponentIssues(context,"PROJECT_UUID",Collections.<BatchReport.Issue>emptyList());
   verify(issueComputation).processComponentIssues(context,"FILE1_UUID",Collections.<BatchReport.Issue>emptyList());
   verify(issueComputation).processComponentIssues(context,"FILE2_UUID",Collections.<BatchReport.Issue>emptyList());

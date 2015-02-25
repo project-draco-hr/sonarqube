@@ -1,6 +1,8 @@
 {
   db.prepareDbUnit(getClass(),"snapshots.xml");
-  ComputationContext context=new ComputationContext(AnalysisReportDto.newForTests(1L).setSnapshotId(1L),ComponentTesting.newProjectDto());
+  BatchReport.Metadata metadata=BatchReport.Metadata.newBuilder().setSnapshotId(1L).build();
+  ComputationContext context=mock(ComputationContext.class);
+  when(context.getReportMetadata()).thenReturn(metadata);
   sut.execute(context);
   db.assertDbUnit(getClass(),"snapshots-result.xml","snapshots");
 }

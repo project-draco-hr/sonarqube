@@ -1,17 +1,17 @@
 {
   insertPermissionsForProject(DEFAULT_PROJECT_KEY);
-  queue.add(DEFAULT_PROJECT_KEY,123L,IOUtils.toInputStream(DEFAULT_REPORT_DATA));
-  queue.add(DEFAULT_PROJECT_KEY,123L,IOUtils.toInputStream(DEFAULT_REPORT_DATA));
-  queue.add(DEFAULT_PROJECT_KEY,123L,IOUtils.toInputStream(DEFAULT_REPORT_DATA));
+  queue.add(DEFAULT_PROJECT_KEY,IOUtils.toInputStream(DEFAULT_REPORT_DATA));
+  queue.add(DEFAULT_PROJECT_KEY,IOUtils.toInputStream(DEFAULT_REPORT_DATA));
+  queue.add(DEFAULT_PROJECT_KEY,IOUtils.toInputStream(DEFAULT_REPORT_DATA));
   List<AnalysisReportDto> reports=queue.all();
   ComponentDto project=ComponentTesting.newProjectDto().setName(DEFAULT_PROJECT_NAME).setKey(DEFAULT_PROJECT_KEY);
   for (  AnalysisReportDto report : reports) {
     report.succeed();
-    activityService.write(session,Activity.Type.ANALYSIS_REPORT,new AnalysisReportLog(report,project));
+    activityService.write(session,Activity.Type.ANALYSIS_REPORT,new ReportActivity(report,project));
   }
   session.commit();
   userSession.setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
-  WsTester.TestRequest request=wsTester.newGetRequest(ComputationWebService.API_ENDPOINT,HistoryWsAction.SEARCH_ACTION);
+  WsTester.TestRequest request=wsTester.newGetRequest(ComputationWebService.API_ENDPOINT,"history");
   WsTester.Result result=request.execute();
   assertThat(result).isNotNull();
   result.assertJson(getClass(),"list_history_reports.json",false);

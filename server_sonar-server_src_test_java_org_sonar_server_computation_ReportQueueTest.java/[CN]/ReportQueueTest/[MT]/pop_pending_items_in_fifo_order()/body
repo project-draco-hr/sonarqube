@@ -1,0 +1,15 @@
+{
+  sut.add("P1",generateData());
+  sut.add("P2",generateData());
+  sut.add("P3",generateData());
+  ReportQueue.Item item=sut.pop();
+  assertThat(item.dto.getProjectKey()).isEqualTo("P1");
+  assertThat(item.zipFile).exists().isFile().hasExtension("zip");
+  assertThat(item.dto.getStatus()).isEqualTo(WORKING);
+  assertThat(sut.pop().dto.getProjectKey()).isEqualTo("P2");
+  assertThat(sut.pop().dto.getProjectKey()).isEqualTo("P3");
+  assertThat(sut.pop()).isNull();
+  List<AnalysisReportDto> reports=sut.all();
+  assertThat(reports).hasSize(3);
+  assertThat(reports).extracting("status").containsOnly(WORKING);
+}

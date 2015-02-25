@@ -1,0 +1,13 @@
+{
+  dataDir=temp.newFolder();
+  settings.setProperty(ProcessConstants.PATH_DATA,dataDir.getAbsolutePath());
+  when(system.now()).thenReturn(NOW);
+  DbClient dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),new ComponentDao(),new AnalysisReportDao(system));
+  sut=new ReportQueue(dbClient,settings);
+  try (DbSession session=dbClient.openSession(false)){
+    dbClient.componentDao().insert(session,ComponentTesting.newProjectDto().setKey("P1"));
+    dbClient.componentDao().insert(session,ComponentTesting.newProjectDto().setKey("P2"));
+    dbClient.componentDao().insert(session,ComponentTesting.newProjectDto().setKey("P3"));
+    session.commit();
+  }
+ }
