@@ -7,19 +7,9 @@
   if (analysisMode.isIncremental() && !component.isFile()) {
     return;
   }
-  Collection<ServerIssue> previousIssues=new ArrayList<>();
-  for (  org.sonar.batch.protocol.input.BatchInput.ServerIssue previousIssue : serverIssueRepository.byComponent(component)) {
-    previousIssues.add(new ServerIssueFromWs(previousIssue));
-  }
-  SourceHashHolder sourceHashHolder=null;
-  if (component.isFile()) {
-    DefaultInputFile file=(DefaultInputFile)inputPathCache.getInputPath(component);
-    if (file == null) {
-      throw new IllegalStateException("Resource " + component.resource() + " was not found in InputPath cache");
-    }
-    sourceHashHolder=new SourceHashHolder((DefaultInputFile)file,lastLineHashes);
-  }
-  IssueTrackingResult trackingResult=tracking.track(sourceHashHolder,previousIssues,issues);
+  Collection<ServerIssue> serverIssues=loadServerIssues(component);
+  SourceHashHolder sourceHashHolder=loadSourceHashes(component);
+  IssueTrackingResult trackingResult=tracking.track(sourceHashHolder,serverIssues,issues);
   addUnmatched(trackingResult.unmatched(),sourceHashHolder,issues);
   mergeMatched(trackingResult);
   if (ResourceUtils.isRootProject(component.resource())) {
