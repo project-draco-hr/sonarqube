@@ -4,7 +4,7 @@
   ComponentDto file=ComponentTesting.newFileDto(module,"CDEF").setKey(FILE_KEY).setPath(null);
   componentDao.insert(session,project,module,file);
   session.commit();
-  indexIssues(IssueTesting.newDoc("EFGH",file).setRuleKey("squid:AvoidCycle").setSeverity("BLOCKER").setStatus("RESOLVED").setResolution(null).setManualSeverity(false).setMessage(null).setLine(null).setChecksum("123456").setAssignee(null));
+  indexIssues(IssueTesting.newDoc("EFGH",file).setRuleKey("squid:AvoidCycle").setSeverity("BLOCKER").setStatus("RESOLVED").setResolution(null).setManualSeverity(false).setMessage(null).setLine(null).setChecksum(null).setAssignee(null));
   MockUserSession.set().setLogin("henry").setGlobalPermissions(GlobalPermissions.PREVIEW_EXECUTION);
   WsTester.TestRequest request=tester.newGetRequest("batch","issues").setParam("key",PROJECT_KEY);
   ServerIssue serverIssue=ServerIssue.parseDelimitedFrom(new ByteArrayInputStream(request.execute().output()));
@@ -19,6 +19,6 @@
   assertThat(serverIssue.getStatus()).isEqualTo("RESOLVED");
   assertThat(serverIssue.getSeverity()).isEqualTo(Severity.BLOCKER);
   assertThat(serverIssue.getManualSeverity()).isFalse();
-  assertThat(serverIssue.getChecksum()).isEqualTo("123456");
+  assertThat(serverIssue.hasChecksum()).isFalse();
   assertThat(serverIssue.hasAssigneeLogin()).isFalse();
 }
