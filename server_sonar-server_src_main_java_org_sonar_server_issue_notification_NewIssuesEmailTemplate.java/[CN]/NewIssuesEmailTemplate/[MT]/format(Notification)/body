@@ -3,19 +3,12 @@
     return null;
   }
   String projectName=notification.getFieldValue(FIELD_PROJECT_NAME);
-  StringBuilder sb=new StringBuilder();
-  sb.append("Project: ").append(projectName).append("\n\n");
-  sb.append(notification.getFieldValue("count")).append(" new issues").append("\n\n");
-  sb.append("   ");
-  for (Iterator<String> severityIterator=Lists.reverse(Severity.ALL).iterator(); severityIterator.hasNext(); ) {
-    String severity=severityIterator.next();
-    String severityLabel=i18n.message(getLocale(),"severity." + severity,severity);
-    sb.append(severityLabel).append(": ").append(notification.getFieldValue("count-" + severity));
-    if (severityIterator.hasNext()) {
-      sb.append("   ");
-    }
-  }
-  sb.append('\n');
-  appendFooter(sb,notification);
-  return new EmailMessage().setMessageId("new-issues/" + notification.getFieldValue(FIELD_PROJECT_KEY)).setSubject(projectName + ": new issues").setMessage(sb.toString());
+  StringBuilder message=new StringBuilder();
+  message.append("Project: ").append(projectName).append("\n\n");
+  appendSeverity(message,notification);
+  appendAssignees(message,notification);
+  appendTags(message,notification);
+  appendComponents(message,notification);
+  appendFooter(message,notification);
+  return new EmailMessage().setMessageId("new-issues/" + notification.getFieldValue(FIELD_PROJECT_KEY)).setSubject(projectName + ": " + notification.getFieldValue(METRIC.SEVERITY + ".count")+ " new issues").setMessage(message.toString());
 }

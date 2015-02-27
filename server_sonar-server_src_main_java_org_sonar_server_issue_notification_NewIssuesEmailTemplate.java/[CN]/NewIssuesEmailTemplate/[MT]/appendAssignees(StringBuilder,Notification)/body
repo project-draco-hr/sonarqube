@@ -1,0 +1,18 @@
+{
+  if (notification.getFieldValue(METRIC.LOGIN + ".1.label") == null) {
+    return;
+  }
+  message.append("   Assignee - ");
+  int i=1;
+  while (notification.getFieldValue(METRIC.LOGIN + "." + i+ ".label") != null && i <= 5) {
+    String login=notification.getFieldValue(METRIC.LOGIN + "." + i+ ".label");
+    UserDoc user=userIndex.getNullableByLogin(login);
+    String name=user == null ? null : user.name();
+    message.append(Objects.firstNonNull(name,login)).append(": ").append(notification.getFieldValue(METRIC.LOGIN + "." + i+ ".count"));
+    if (i < 5) {
+      message.append("   ");
+    }
+    i+=1;
+  }
+  message.append("\n");
+}
