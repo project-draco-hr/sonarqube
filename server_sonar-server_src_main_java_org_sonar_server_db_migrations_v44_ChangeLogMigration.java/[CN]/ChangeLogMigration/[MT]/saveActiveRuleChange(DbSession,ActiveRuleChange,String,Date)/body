@@ -1,7 +1,12 @@
 {
-  ActivityDto activity=ActivityDto.createFor(ruleChange);
-  activity.setType(Activity.Type.QPROFILE);
-  activity.setAuthor(author);
-  activity.setCreatedAt(currentTimeStamp);
-  dao.insert(session,activity);
+  Activity activity=ruleChange.toActivity();
+  ActivityDto dto=new ActivityDto();
+  dto.setKey(Uuids.create());
+  dto.setType(Activity.Type.QPROFILE.name());
+  dto.setAction(activity.getAction());
+  dto.setMessage(activity.getMessage());
+  dto.setAuthor(author);
+  dto.setData(KeyValueFormat.format(activity.getData()));
+  dto.setCreatedAt(currentTimeStamp);
+  dao.insert(session,dto);
 }

@@ -1,9 +1,7 @@
 {
-  tester.get(ActivityService.class).write(dbSession,Activity.Type.QPROFILE,ActiveRuleChange.createFor(ActiveRuleChange.Type.ACTIVATED,ActiveRuleKey.of("java-default",RuleTesting.XOO_X1)));
-  tester.get(ActivityService.class).write(dbSession,Activity.Type.QPROFILE,ActiveRuleChange.createFor(ActiveRuleChange.Type.ACTIVATED,ActiveRuleKey.of("java-toto",RuleTesting.XOO_X1)));
-  dbSession.commit();
-  assertThat(service.searchActivities(new QProfileActivityQuery(),new QueryContext()).getHits()).hasSize(2);
-  List<QProfileActivity> result=service.searchActivities(new QProfileActivityQuery().setQprofileKeys(ImmutableSet.of("java-default")),new QueryContext()).getHits();
+  tester.get(ActivityService.class).save(ActiveRuleChange.createFor(ActiveRuleChange.Type.ACTIVATED,ActiveRuleKey.of("java-default",RuleTesting.XOO_X1)).toActivity());
+  tester.get(ActivityService.class).save(ActiveRuleChange.createFor(ActiveRuleChange.Type.ACTIVATED,ActiveRuleKey.of("java-toto",RuleTesting.XOO_X1)).toActivity());
+  assertThat(service.searchActivities(new QProfileActivityQuery(),new SearchOptions()).getHits()).hasSize(2);
+  List<QProfileActivity> result=service.searchActivities(new QProfileActivityQuery().setQprofileKey("java-default"),new SearchOptions()).getHits();
   assertThat(result).hasSize(1);
-  assertThat(service.searchActivities(new QProfileActivityQuery().setQprofileKeys(ImmutableSet.of("java-default","java-toto")),new QueryContext()).getHits()).hasSize(2);
 }

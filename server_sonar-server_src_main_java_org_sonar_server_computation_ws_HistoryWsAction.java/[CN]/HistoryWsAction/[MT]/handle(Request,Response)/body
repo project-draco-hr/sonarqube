@@ -1,12 +1,12 @@
 {
-  checkUserRights();
-  ActivityQuery query=activityService.newActivityQuery();
-  query.setTypes(Arrays.asList(Activity.Type.ANALYSIS_REPORT));
-  SearchOptions searchOptions=SearchOptions.create(request);
-  QueryContext queryContext=mapping.newQueryOptions(searchOptions);
-  Result<Activity> results=activityService.search(query,queryContext);
+  UserSession.get().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+  ActivityQuery query=new ActivityQuery();
+  query.setTypes(Arrays.asList(Activity.Type.ANALYSIS_REPORT.name()));
+  SearchOptions options=new SearchOptions();
+  options.setPage(request.mandatoryParamAsInt(IssuesWs.Param.PAGE),request.mandatoryParamAsInt(IssuesWs.Param.PAGE_SIZE));
+  SearchResult<ActivityDoc> results=activityIndex.search(query,options);
   JsonWriter json=response.newJsonWriter().beginObject();
-  searchOptions.writeStatistics(json,results);
+  options.writeJson(json,results.getTotal());
   writeReports(results,json);
   json.endObject().close();
 }

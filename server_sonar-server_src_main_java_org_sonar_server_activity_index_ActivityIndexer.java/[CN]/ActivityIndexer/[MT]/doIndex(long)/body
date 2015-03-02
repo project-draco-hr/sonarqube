@@ -1,0 +1,15 @@
+{
+  final BulkIndexer bulk=new BulkIndexer(esClient,ActivityIndexDefinition.INDEX);
+  bulk.setLarge(lastUpdatedAt == 0L);
+  DbSession dbSession=dbClient.openSession(false);
+  Connection dbConnection=dbSession.getConnection();
+  try {
+    ActivityResultSetIterator rowIt=ActivityResultSetIterator.create(dbClient,dbConnection,lastUpdatedAt);
+    long maxUpdatedAt=doIndex(bulk,rowIt);
+    rowIt.close();
+    return maxUpdatedAt;
+  }
+  finally {
+    dbSession.close();
+  }
+}

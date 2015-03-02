@@ -1,0 +1,16 @@
+{
+  dbTester.prepareDbUnit(getClass(),"traverse.xml");
+  ActivityResultSetIterator it=ActivityResultSetIterator.create(client,connection,0L);
+  assertThat(it.hasNext()).isTrue();
+  ActivityDoc doc=it.next();
+  assertThat(doc).isNotNull();
+  assertThat(doc.getKey()).isEqualTo("UUID1");
+  assertThat(doc.getAction()).isEqualTo("THE_ACTION");
+  assertThat(doc.getMessage()).isEqualTo("THE_MSG");
+  assertThat(doc.getDetails()).containsOnly(MapEntry.entry("foo","bar"));
+  assertThat(doc.getLogin()).isEqualTo("THE_AUTHOR");
+  assertThat(it.hasNext()).isTrue();
+  assertThat(it.next()).isNotNull();
+  assertThat(it.hasNext()).isFalse();
+  it.close();
+}
