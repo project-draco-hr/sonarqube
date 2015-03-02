@@ -1,11 +1,16 @@
 {
+  Collection<Object> deletedComponentKeys=issueCache.componentKeys();
   for (  BatchResource resource : resourceCache.all()) {
-    Iterable<DefaultIssue> issues=issueCache.byComponent(resource.resource().getEffectiveKey());
+    String componentKey=resource.resource().getEffectiveKey();
+    Iterable<DefaultIssue> issues=issueCache.byComponent(componentKey);
     writer.writeComponentIssues(resource.batchId(),Iterables.transform(issues,new Function<DefaultIssue,BatchReport.Issue>(){
       @Override public BatchReport.Issue apply(      DefaultIssue input){
         return toReportIssue(input);
       }
     }
 ));
+    deletedComponentKeys.remove(componentKey);
   }
+  int count=exportIssuesOfDeletedComponents(deletedComponentKeys,writer);
+  exportMetadata(writer,count);
 }
