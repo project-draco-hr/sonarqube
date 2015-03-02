@@ -1,0 +1,10 @@
+{
+  List<SnapshotDto> snapshots=dbClient.snapshotDao().findSnapshotAndChildrenOfProjectScope(session,dbClient.snapshotDao().getByKey(session,reportSnapshotId));
+  for (  SnapshotDto snapshot : snapshots) {
+    SnapshotDto previousLastSnapshot=dbClient.snapshotDao().getLastSnapshot(session,snapshot);
+    if (previousLastSnapshot != null) {
+      dbClient.snapshotDao().updateSnapshotAndChildrenLastFlag(session,previousLastSnapshot,false);
+      session.commit();
+    }
+  }
+}

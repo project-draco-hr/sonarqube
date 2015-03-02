@@ -1,15 +1,15 @@
 {
-  dbTester.prepareDbUnit(getClass(),"shared.xml");
-  DbClient dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),new ComponentDao());
+  logTester.setLevel(LoggerLevel.INFO);
   when(steps.orderedSteps()).thenReturn(Arrays.asList(projectStep1,projectStep2,viewStep));
-  ComputationService sut=new ComputationService(dbClient,steps,activityService,mock(ProjectSettingsFactory.class,Mockito.RETURNS_DEEP_STUBS));
-  AnalysisReportDto report=AnalysisReportDto.newForTests(1L);
-  report.setProjectKey("PROJECT_KEY");
-  assertThat(report.getStatus()).isNull();
-  sut.process(report);
-  assertThat(report.getStatus()).isEqualTo(AnalysisReportDto.Status.SUCCESS);
+  AnalysisReportDto dto=AnalysisReportDto.newForTests(1L).setProjectKey("P1").setUuid("U1");
+  File zip=generateZip();
+  sut.process(new ReportQueue.Item(dto,zip));
+  assertThat(dto.getStatus()).isEqualTo(AnalysisReportDto.Status.SUCCESS);
+  assertThat(dto.getFinishedAt()).isNotNull();
+  assertThat(logTester.logs(LoggerLevel.INFO)).hasSize(1);
+  assertThat(logTester.logs(LoggerLevel.INFO).get(0)).startsWith("Analysis of project P1 (report 1) (done) | time=");
   verify(projectStep1).execute(any(ComputationContext.class));
   verify(projectStep2).execute(any(ComputationContext.class));
   verify(viewStep,never()).execute(any(ComputationContext.class));
-  verify(activityService).write(any(DbSession.class),eq(Activity.Type.ANALYSIS_REPORT),any(AnalysisReportLog.class));
+  verify(activityService).write(any(DbSession.class),eq(Activity.Type.ANALYSIS_REPORT),any(ReportActivity.class));
 }

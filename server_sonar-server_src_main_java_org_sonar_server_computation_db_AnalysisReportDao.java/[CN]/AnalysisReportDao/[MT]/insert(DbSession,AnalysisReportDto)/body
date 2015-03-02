@@ -1,26 +1,6 @@
 {
   report.setCreatedAt(system2.now());
   report.setUpdatedAt(system2.now());
-  Connection connection=session.getConnection();
-  PreparedStatement ps=null;
-  try {
-    ps=connection.prepareStatement("insert into analysis_reports " + " (project_key, snapshot_id, report_status, report_data, created_at, updated_at, started_at, finished_at)" + " values (?, ?, ?, ?, ?, ?, ?, ?)");
-    ps.setString(1,report.getProjectKey());
-    ps.setLong(2,report.getSnapshotId());
-    ps.setString(3,report.getStatus().toString());
-    setData(ps,4,report.getData());
-    ps.setLong(5,report.getCreatedAt());
-    setLong(ps,6,report.getUpdatedAt());
-    setLong(ps,7,report.getStartedAt());
-    setLong(ps,8,report.getFinishedAt());
-    ps.executeUpdate();
-    connection.commit();
-  }
- catch (  SQLException|IOException e) {
-    throw new IllegalStateException(String.format("Failed to insert %s in the database",report),e);
-  }
- finally {
-    DatabaseUtils.closeQuietly(ps);
-  }
+  mapper(session).insert(report);
   return report;
 }
