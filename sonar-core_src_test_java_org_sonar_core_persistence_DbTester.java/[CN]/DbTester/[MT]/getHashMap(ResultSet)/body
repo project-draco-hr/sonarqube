@@ -5,7 +5,11 @@
   while (resultSet.next()) {
     Map<String,Object> columns=newHashMap();
     for (int i=1; i <= colCount; i++) {
-      columns.put(metaData.getColumnLabel(i),resultSet.getObject(i));
+      Object value=resultSet.getObject(i);
+      if (value instanceof Clob) {
+        value=IOUtils.toString(((Clob)value).getAsciiStream());
+      }
+      columns.put(metaData.getColumnLabel(i),value);
     }
     rows.add(columns);
   }
