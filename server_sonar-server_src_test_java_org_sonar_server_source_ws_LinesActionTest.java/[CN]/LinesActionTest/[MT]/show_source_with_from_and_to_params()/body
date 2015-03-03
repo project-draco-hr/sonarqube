@@ -1,24 +1,10 @@
 {
+  String projectUuid="abcd";
   String fileUuid="efgh";
-  Map<String,Object> fieldMap=Maps.newHashMap();
-  fieldMap.put(SourceLineIndexDefinition.FIELD_PROJECT_UUID,"abcd");
-  fieldMap.put(SourceLineIndexDefinition.FIELD_FILE_UUID,"efgh");
-  fieldMap.put(SourceLineIndexDefinition.FIELD_LINE,3);
-  fieldMap.put(SourceLineIndexDefinition.FIELD_SCM_REVISION,"cafebabe");
-  fieldMap.put(SourceLineIndexDefinition.FIELD_SCM_DATE,null);
-  fieldMap.put(SourceLineIndexDefinition.FIELD_SCM_AUTHOR,"polop");
-  fieldMap.put(SourceLineIndexDefinition.FIELD_SOURCE,"}");
-  fieldMap.put(SourceLineIndexDefinition.FIELD_HIGHLIGHTING,"");
-  fieldMap.put(SourceLineIndexDefinition.FIELD_SYMBOLS,"");
-  fieldMap.put(SourceLineIndexDefinition.FIELD_OVERALL_LINE_HITS,null);
-  fieldMap.put(SourceLineIndexDefinition.FIELD_OVERALL_CONDITIONS,null);
-  fieldMap.put(SourceLineIndexDefinition.FIELD_OVERALL_COVERED_CONDITIONS,null);
-  fieldMap.put(SourceLineIndexDefinition.FIELD_DUPLICATIONS,null);
-  fieldMap.put(BaseNormalizer.UPDATED_AT_FIELD,new Date());
   String componentKey="componentKey";
-  when(componentService.getByUuid(fileUuid)).thenReturn(new ComponentDto().setKey(componentKey));
-  MockUserSession.set().setLogin("login").addComponentPermission(UserRole.CODEVIEWER,"polop",componentKey);
-  when(sourceLineIndex.getLines(fileUuid,3,3)).thenReturn(newArrayList(new SourceLineDoc(fieldMap)));
+  when(componentService.getByUuid(fileUuid)).thenReturn(new ComponentDto().setKey(componentKey).setProjectUuid(projectUuid));
+  MockUserSession.set().setLogin("login").addProjectUuidPermissions(UserRole.CODEVIEWER,projectUuid);
+  when(sourceLineIndex.getLines(fileUuid,3,3)).thenReturn(newArrayList(new SourceLineDoc().setProjectUuid(projectUuid).setFileUuid(fileUuid).setLine(3).setScmRevision("cafebabe").setScmDate(null).setScmAuthor("polop").setSource("}").setHighlighting("").setSymbols("").setUtLineHits(null).setUtConditions(null).setUtCoveredConditions(null).setItLineHits(null).setItConditions(null).setItCoveredConditions(null).setDuplications(null).setUpdateDate(new Date())));
   WsTester.TestRequest request=tester.newGetRequest("api/sources","lines").setParam("uuid",fileUuid).setParam("from","3").setParam("to","3");
   request.execute().assertJson(getClass(),"show_source_with_params_from_and_to.json");
 }

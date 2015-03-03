@@ -6,8 +6,10 @@
   db.debtCharacteristicDao().insert(char11,dbSession);
   dao.insert(dbSession,RuleTesting.newDto(RuleKey.of("findbugs","S001")).setSubCharacteristicId(null).setRemediationFunction(null).setDefaultSubCharacteristicId(char11.getId()).setDefaultRemediationFunction("LINEAR").setDefaultRemediationCoefficient("2h"));
   dao.insert(dbSession,RuleTesting.newDto(RuleKey.of("pmd","S002")).setSubCharacteristicId(char11.getId()).setRemediationFunction("LINEAR").setRemediationCoefficient("2h").setDefaultSubCharacteristicId(null).setDefaultRemediationFunction(null));
+  dao.insert(dbSession,RuleTesting.newDto(RuleKey.of("xoo","S001")).setSubCharacteristicId(null).setRemediationFunction(null).setRemediationCoefficient(null).setDefaultSubCharacteristicId(null).setDefaultRemediationFunction(null).setDefaultRemediationCoefficient(null));
+  dao.insert(dbSession,RuleTesting.newDto(RuleKey.of("xoo","S002")).setSubCharacteristicId(-1).setRemediationFunction(null).setRemediationCoefficient(null).setDefaultSubCharacteristicId(null).setDefaultRemediationFunction(null).setDefaultRemediationCoefficient(null));
   dbSession.commit();
-  assertThat(index.search(new RuleQuery(),new QueryContext()).getTotal()).isEqualTo(2);
-  assertThat(db.debtCharacteristicDao().selectCharacteristics()).hasSize(2);
+  assertThat(index.search(new RuleQuery().setHasDebtCharacteristic(null),new QueryContext()).getTotal()).isEqualTo(4);
   assertThat(index.search(new RuleQuery().setHasDebtCharacteristic(true),new QueryContext()).getTotal()).isEqualTo(2);
+  assertThat(index.search(new RuleQuery().setHasDebtCharacteristic(false),new QueryContext()).getTotal()).isEqualTo(2);
 }
