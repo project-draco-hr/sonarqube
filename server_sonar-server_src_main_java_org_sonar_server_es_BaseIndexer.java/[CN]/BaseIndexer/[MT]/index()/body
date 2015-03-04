@@ -1,18 +1,20 @@
 {
-  final long requestedAt=System.currentTimeMillis();
-  Future submit=executor.submit(new Runnable(){
-    @Override public void run(){
-      if (requestedAt > lastUpdatedAt) {
-        long l=doIndex(lastUpdatedAt);
-        lastUpdatedAt=Math.max(l,lastUpdatedAt);
+  if (enabled) {
+    final long requestedAt=System.currentTimeMillis();
+    Future submit=executor.submit(new Runnable(){
+      @Override public void run(){
+        if (requestedAt > lastUpdatedAt) {
+          long l=doIndex(lastUpdatedAt);
+          lastUpdatedAt=Math.max(l,lastUpdatedAt);
+        }
       }
     }
-  }
 );
-  try {
-    Uninterruptibles.getUninterruptibly(submit);
-  }
- catch (  ExecutionException e) {
-    Throwables.propagate(e);
+    try {
+      Uninterruptibles.getUninterruptibly(submit);
+    }
+ catch (    ExecutionException e) {
+      Throwables.propagate(e);
+    }
   }
 }
