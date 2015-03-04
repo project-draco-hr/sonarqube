@@ -1,0 +1,15 @@
+{
+  List<IssueFilterDto> userFilters=selectUserIssueFilters(issueFilter.getUserLogin());
+  IssueFilterDto userFilterSameName=findFilterWithSameName(userFilters,issueFilter.getName());
+  if (userFilterSameName != null && !userFilterSameName.getId().equals(issueFilter.getId())) {
+    throw new BadRequestException("Name already exists");
+  }
+  if (issueFilter.isShared()) {
+    List<IssueFilterDto> sharedFilters=selectSharedFilters();
+    IssueFilterDto sharedFilterWithSameName=findFilterWithSameName(sharedFilters,issueFilter.getName());
+    if (sharedFilterWithSameName != null && !sharedFilterWithSameName.getId().equals(issueFilter.getId())) {
+      throw new BadRequestException("Other users already share filters with the same name");
+    }
+    verifyCurrentUserCanShareFilter(issueFilter,issueFilter.getUserLogin());
+  }
+}

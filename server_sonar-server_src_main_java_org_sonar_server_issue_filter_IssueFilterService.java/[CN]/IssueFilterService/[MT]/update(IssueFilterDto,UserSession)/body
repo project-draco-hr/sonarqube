@@ -1,0 +1,14 @@
+{
+  String login=getLoggedLogin(userSession);
+  IssueFilterDto existingFilterDto=findIssueFilterDto(issueFilter.getId(),login);
+  verifyCurrentUserCanModifyFilter(existingFilterDto,login);
+  verifyCurrentUserCanChangeFilterSharingFilter(issueFilter,existingFilterDto,login);
+  if (!isFilterOwnedByUser(existingFilterDto,issueFilter.getUserLogin())) {
+    verifyCurrentUserCanChangeFilterOwnership(login);
+  }
+  validateFilter(issueFilter);
+  deleteOtherFavoriteFiltersIfFilterBecomeUnshared(existingFilterDto,issueFilter);
+  issueFilter.setUpdatedAt(new Date());
+  filterDao.update(issueFilter);
+  return issueFilter;
+}
