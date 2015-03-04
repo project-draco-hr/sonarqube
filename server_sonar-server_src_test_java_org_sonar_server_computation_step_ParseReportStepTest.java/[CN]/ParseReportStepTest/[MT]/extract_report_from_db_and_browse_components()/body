@@ -2,9 +2,11 @@
   File reportDir=generateReport();
   ComputationContext context=new ComputationContext(new BatchReportReader(reportDir),mock(ComponentDto.class));
   sut.execute(context);
+  assertThat(context.getReportMetadata().getRootComponentRef()).isEqualTo(1);
+  assertThat(context.getReportMetadata().getDeletedComponentsCount()).isEqualTo(1);
   verify(issueComputation).processComponentIssues(context,"PROJECT_UUID",Collections.<BatchReport.Issue>emptyList());
   verify(issueComputation).processComponentIssues(context,"FILE1_UUID",Collections.<BatchReport.Issue>emptyList());
   verify(issueComputation).processComponentIssues(context,"FILE2_UUID",Collections.<BatchReport.Issue>emptyList());
+  verify(issueComputation).processComponentIssues(context,"DELETED_UUID",ISSUES_ON_DELETED_COMPONENT);
   verify(issueComputation).afterReportProcessing();
-  assertThat(context.getReportMetadata().getRootComponentRef()).isEqualTo(1);
 }

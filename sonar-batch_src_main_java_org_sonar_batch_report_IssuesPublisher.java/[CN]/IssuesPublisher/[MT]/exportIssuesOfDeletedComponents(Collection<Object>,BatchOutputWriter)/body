@@ -1,0 +1,18 @@
+{
+  int deletedComponentCount=0;
+  for (  Object componentKey : deletedComponentKeys) {
+    deletedComponentCount++;
+    Iterable<DefaultIssue> issues=issueCache.byComponent(componentKey.toString());
+    Iterator<DefaultIssue> iterator=issues.iterator();
+    if (iterator.hasNext()) {
+      String componentUuid=iterator.next().componentUuid();
+      writer.writeDeletedComponentIssues(deletedComponentCount,componentUuid,Iterables.transform(issues,new Function<DefaultIssue,BatchReport.Issue>(){
+        @Override public BatchReport.Issue apply(        DefaultIssue input){
+          return toReportIssue(input);
+        }
+      }
+));
+    }
+  }
+  return deletedComponentCount;
+}
