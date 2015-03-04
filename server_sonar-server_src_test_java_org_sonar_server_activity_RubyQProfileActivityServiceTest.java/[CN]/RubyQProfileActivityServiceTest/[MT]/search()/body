@@ -4,12 +4,12 @@
   Result<QProfileActivity> result=mock(Result.class);
   when(result.getHits()).thenReturn(Lists.<QProfileActivity>newArrayList());
   when(result.getTotal()).thenReturn(10L);
-  when(service.searchActivities(any(QProfileActivityQuery.class),any(QueryContext.class))).thenReturn(result);
-  rubyQProfileActivityService.search(ImmutableMap.<String,Object>of("profileKeys","PROFILE_KEY","since",since,"to",to));
+  when(service.searchActivities(any(QProfileActivityQuery.class),any(SearchOptions.class))).thenReturn(result);
+  rubyQProfileActivityService.search(ImmutableMap.<String,Object>of("profileKey","PROFILE_KEY","since",since,"to",to));
   verify(service).searchActivities(activityArgumentCaptor.capture(),queryOptionsArgumentCaptor.capture());
   assertThat(queryOptionsArgumentCaptor.getValue().getLimit()).isEqualTo(50);
-  assertThat(activityArgumentCaptor.getValue().getQprofileKeys()).containsOnly("PROFILE_KEY");
-  assertThat(activityArgumentCaptor.getValue().getTypes()).containsOnly(Activity.Type.QPROFILE);
+  assertThat(activityArgumentCaptor.getValue().getQprofileKey()).isEqualTo("PROFILE_KEY");
+  assertThat(activityArgumentCaptor.getValue().getTypes()).containsOnly(Activity.Type.QPROFILE.name());
   assertThat(activityArgumentCaptor.getValue().getSince()).isEqualTo(since);
   assertThat(activityArgumentCaptor.getValue().getTo()).isEqualTo(to);
 }
