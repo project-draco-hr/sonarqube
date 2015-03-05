@@ -1,0 +1,10 @@
+{
+  Multimap<String,NotificationChannel> recipients=HashMultimap.create();
+  recipients.put("user1",emailChannel);
+  recipients.put("user2",twitterChannel);
+  when(notificationManager.findNotificationSubscribers(sut,"struts")).thenReturn(recipients);
+  Notification notification=new Notification(MyNewIssuesNotification.TYPE).setFieldValue("projectKey","struts").setFieldValue("assignee","user1");
+  sut.performDispatch(notification,context);
+  verify(context).addUser("user1",emailChannel);
+  verifyNoMoreInteractions(context);
+}

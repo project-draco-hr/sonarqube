@@ -1,0 +1,19 @@
+{
+  EmailSettings settings=mock(EmailSettings.class);
+  when(settings.getServerBaseURL()).thenReturn("http://nemo.sonarsource.org");
+  i18n=mock(DefaultI18n.class);
+  date=new Date();
+  userIndex=mock(UserIndex.class);
+  when(userIndex.getNullableByLogin(anyString())).thenAnswer(new Answer<UserDoc>(){
+    @Override public UserDoc answer(    InvocationOnMock invocationOnMock) throws Throwable {
+      return new UserDoc().setName((String)invocationOnMock.getArguments()[0]);
+    }
+  }
+);
+  when(i18n.message(any(Locale.class),eq("severity.BLOCKER"),anyString())).thenReturn("Blocker");
+  when(i18n.message(any(Locale.class),eq("severity.CRITICAL"),anyString())).thenReturn("Critical");
+  when(i18n.message(any(Locale.class),eq("severity.MAJOR"),anyString())).thenReturn("Major");
+  when(i18n.message(any(Locale.class),eq("severity.MINOR"),anyString())).thenReturn("Minor");
+  when(i18n.message(any(Locale.class),eq("severity.INFO"),anyString())).thenReturn("Info");
+  sut=new MyNewIssuesEmailTemplate(settings,i18n);
+}

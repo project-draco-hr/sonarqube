@@ -1,11 +1,15 @@
 {
-  if (stats.hasIssues()) {
+  if (statistics.hasIssues()) {
+    NewIssuesStatistics.Stats globalStatistics=statistics.globalStatistics();
     ComponentDto project=context.getProject();
-    NewIssuesNotification notification=new NewIssuesNotification();
-    notification.setProject(project);
-    notification.setAnalysisDate(new Date(context.getReportMetadata().getAnalysisDate()));
-    notification.setStatistics(project,stats);
-    notification.setDebt(durations.encode(stats.debt()));
+    NewIssuesNotification notification=newIssuesNotificationFactory.newNewIssuesNotication().setProject(project).setAnalysisDate(new Date(context.getReportMetadata().getAnalysisDate())).setStatistics(project,globalStatistics).setDebt(globalStatistics.debt());
     service.deliver(notification);
+    for (    Map.Entry<String,NewIssuesStatistics.Stats> assigneeAndStatisticsTuple : statistics.assigneesStatistics().entrySet()) {
+      String assignee=assigneeAndStatisticsTuple.getKey();
+      NewIssuesStatistics.Stats assigneeStatistics=assigneeAndStatisticsTuple.getValue();
+      MyNewIssuesNotification myNewIssuesNotification=newIssuesNotificationFactory.newMyNewIssuesNotification().setAssignee(assignee);
+      myNewIssuesNotification.setProject(project).setAnalysisDate(new Date(context.getReportMetadata().getAnalysisDate())).setStatistics(project,assigneeStatistics).setDebt(assigneeStatistics.debt());
+      service.deliver(myNewIssuesNotification);
+    }
   }
 }

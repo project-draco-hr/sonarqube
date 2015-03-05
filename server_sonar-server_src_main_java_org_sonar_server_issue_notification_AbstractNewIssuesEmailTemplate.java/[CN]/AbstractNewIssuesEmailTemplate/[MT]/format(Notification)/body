@@ -1,0 +1,14 @@
+{
+  if (shouldNotFormat(notification)) {
+    return null;
+  }
+  String projectName=checkNotNull(notification.getFieldValue(FIELD_PROJECT_NAME));
+  StringBuilder message=new StringBuilder();
+  message.append("Project: ").append(projectName).append(NEW_LINE).append(NEW_LINE);
+  appendSeverity(message,notification);
+  appendAssignees(message,notification);
+  appendTags(message,notification);
+  appendComponents(message,notification);
+  appendFooter(message,notification);
+  return new EmailMessage().setMessageId(notification.getType() + "/" + notification.getFieldValue(FIELD_PROJECT_KEY)).setSubject(subject(notification,projectName)).setMessage(message.toString());
+}
