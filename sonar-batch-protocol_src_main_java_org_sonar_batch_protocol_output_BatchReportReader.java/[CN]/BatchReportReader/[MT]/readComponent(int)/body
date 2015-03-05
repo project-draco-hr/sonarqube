@@ -1,7 +1,7 @@
 {
   File file=fileStructure.fileFor(FileStructure.Domain.COMPONENT,componentRef);
-  if (file.exists() && file.isFile()) {
-    return ProtobufUtil.readFile(file,BatchReport.Component.PARSER);
+  if (!file.exists() || !file.isFile()) {
+    throw new IllegalStateException("Unable to find report for component #" + componentRef + ". File does not exist: "+ file);
   }
-  return null;
+  return ProtobufUtil.readFile(file,BatchReport.Component.PARSER);
 }
