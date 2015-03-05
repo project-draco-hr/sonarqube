@@ -10,11 +10,8 @@
   if (assigneesFromRequest != null) {
     assignees.addAll(assigneesFromRequest);
   }
-  UserSession userSession=UserSession.get();
-  if (userSession.isLoggedIn()) {
-    assignees.add(userSession.login());
-  }
   addMandatoryFacetValues(results,IssueFilterParameters.ASSIGNEES,assignees);
+  addMandatoryFacetValues(results,IssueFilterParameters.ASSIGNED_TO_ME,Arrays.asList(UserSession.get().login()));
   addMandatoryFacetValues(results,IssueFilterParameters.REPORTERS,request.paramAsStrings(IssueFilterParameters.REPORTERS));
   addMandatoryFacetValues(results,IssueFilterParameters.RULES,request.paramAsStrings(IssueFilterParameters.RULES));
   addMandatoryFacetValues(results,IssueFilterParameters.LANGUAGES,request.paramAsStrings(IssueFilterParameters.LANGUAGES));
@@ -41,7 +38,9 @@
         json.prop("count",bucket.getValue());
         json.endObject();
       }
-      addZeroFacetsForSelectedItems(request,facetName,itemsFromFacets,json);
+      if (!IssueFilterParameters.ASSIGNED_TO_ME.equals(facetName)) {
+        addZeroFacetsForSelectedItems(request,facetName,itemsFromFacets,json);
+      }
     }
     json.endArray().endObject();
   }
