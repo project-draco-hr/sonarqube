@@ -1,7 +1,12 @@
 {
-  String fileKey=request.mandatoryParam("key");
-  UserSession.get().checkComponentPermission(UserRole.CODEVIEWER,fileKey);
+  String fileKey=request.param("key");
+  String fileUuid=request.param("uuid");
+  Preconditions.checkArgument(fileKey != null || fileUuid != null,"At least one of 'key' or 'uuid' must be provided");
   DbSession session=dbClient.openSession(false);
+  if (fileKey == null) {
+    fileKey=componentDao.getByUuid(session,fileUuid).key();
+  }
+  UserSession.get().checkComponentPermission(UserRole.CODEVIEWER,fileKey);
   try {
     ComponentDto component=findComponent(fileKey,session);
     JsonWriter json=response.newJsonWriter().beginObject();

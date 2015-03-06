@@ -1,4 +1,6 @@
 {
+  String uuid="1234";
+  when(componentService.getByUuid(uuid)).thenReturn(new ComponentDto().setKey(FILE_KEY));
   MockUserSession.set().addComponentPermission(UserRole.CODEVIEWER,"SonarQube",FILE_KEY);
   String key1="org.foo.BarTest.java";
   String name1="src/test/java/org/foo/BarTest.java";
@@ -12,6 +14,6 @@
   ComponentDto component2=new ComponentDto().setKey(key2).setLongName(name2).setUuid(uuid2);
   when(testable.testCasesOfLine(10)).thenReturn(newArrayList(testCase1,testCase2));
   when(componentDao.getByKeys(Matchers.isA(DbSession.class),Matchers.anyCollectionOf(String.class))).thenReturn(newArrayList(component1,component2));
-  WsTester.TestRequest request=tester.newGetRequest("api/tests","test_cases").setParam("key",FILE_KEY).setParam("line","10");
+  WsTester.TestRequest request=tester.newGetRequest("api/tests","test_cases").setParam("uuid",uuid).setParam("line","10");
   request.execute().assertJson(EXPECTED_JSON);
 }
