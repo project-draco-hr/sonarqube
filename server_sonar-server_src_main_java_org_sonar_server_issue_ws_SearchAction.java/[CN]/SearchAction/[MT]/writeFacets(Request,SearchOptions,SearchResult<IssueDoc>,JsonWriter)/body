@@ -9,9 +9,10 @@
   List<String> assigneesFromRequest=request.paramAsStrings(IssueFilterParameters.ASSIGNEES);
   if (assigneesFromRequest != null) {
     assignees.addAll(assigneesFromRequest);
+    assignees.remove(IssueQueryService.LOGIN_MYSELF);
   }
   addMandatoryFacetValues(results,IssueFilterParameters.ASSIGNEES,assignees);
-  addMandatoryFacetValues(results,IssueFilterParameters.ASSIGNED_TO_ME,Arrays.asList(UserSession.get().login()));
+  addMandatoryFacetValues(results,IssueFilterParameters.FACET_ASSIGNED_TO_ME,Arrays.asList(UserSession.get().login()));
   addMandatoryFacetValues(results,IssueFilterParameters.REPORTERS,request.paramAsStrings(IssueFilterParameters.REPORTERS));
   addMandatoryFacetValues(results,IssueFilterParameters.RULES,request.paramAsStrings(IssueFilterParameters.RULES));
   addMandatoryFacetValues(results,IssueFilterParameters.LANGUAGES,request.paramAsStrings(IssueFilterParameters.LANGUAGES));
@@ -38,7 +39,7 @@
         json.prop("count",bucket.getValue());
         json.endObject();
       }
-      if (!IssueFilterParameters.ASSIGNED_TO_ME.equals(facetName)) {
+      if (!IssueFilterParameters.FACET_ASSIGNED_TO_ME.equals(facetName)) {
         addZeroFacetsForSelectedItems(request,facetName,itemsFromFacets,json);
       }
     }
