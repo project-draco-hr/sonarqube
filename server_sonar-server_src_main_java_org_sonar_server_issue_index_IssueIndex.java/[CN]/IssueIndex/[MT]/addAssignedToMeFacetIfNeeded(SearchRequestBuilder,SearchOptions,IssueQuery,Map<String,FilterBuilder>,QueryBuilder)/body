@@ -5,8 +5,8 @@
   }
   String fieldName=IssueIndexDefinition.FIELD_ISSUE_ASSIGNEE;
   String facetName=IssueFilterParameters.FACET_ASSIGNED_TO_ME;
-  Map<String,FilterBuilder> assigneeFilters=Maps.newHashMap(filters);
-  StickyFacetBuilder assignedToMeFacetBuilder=new StickyFacetBuilder(queryBuilder,assigneeFilters);
-  BoolFilterBuilder facetFilter=assignedToMeFacetBuilder.getStickyFacetFilter("__assigned_to_me");
-  builder.addAggregation(AggregationBuilders.filter(facetName).filter(facetFilter).subAggregation(AggregationBuilders.terms(facetName + "__terms").field(fieldName).include(login)));
+  StickyFacetBuilder assignedToMeFacetBuilder=new StickyFacetBuilder(queryBuilder,filters);
+  BoolFilterBuilder facetFilter=assignedToMeFacetBuilder.getStickyFacetFilter("__isAssigned",fieldName);
+  FilterAggregationBuilder facetTopAggregation=AggregationBuilders.filter(facetName + "__filter").filter(facetFilter).subAggregation(AggregationBuilders.terms(facetName + "__terms").field(fieldName).include(login));
+  builder.addAggregation(AggregationBuilders.global(facetName).subAggregation(facetTopAggregation));
 }

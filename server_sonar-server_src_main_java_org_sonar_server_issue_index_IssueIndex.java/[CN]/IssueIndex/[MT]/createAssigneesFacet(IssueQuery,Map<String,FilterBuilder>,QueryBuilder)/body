@@ -7,8 +7,9 @@
   StickyFacetBuilder assigneeFacetBuilder=new StickyFacetBuilder(queryBuilder,assigneeFilters);
   BoolFilterBuilder facetFilter=assigneeFacetBuilder.getStickyFacetFilter(fieldName);
   FilterAggregationBuilder facetTopAggregation=assigneeFacetBuilder.buildTopFacetAggregation(fieldName,facetName,facetFilter,DEFAULT_FACET_SIZE);
-  if (!query.assignees().isEmpty()) {
-    facetTopAggregation=assigneeFacetBuilder.addSelectedItemsToFacet(fieldName,facetName,facetTopAggregation,query.assignees());
+  Collection<String> assigneesEscaped=escapeValuesForFacetInclusion(query.assignees());
+  if (!assigneesEscaped.isEmpty()) {
+    facetTopAggregation=assigneeFacetBuilder.addSelectedItemsToFacet(fieldName,facetName,facetTopAggregation,assigneesEscaped);
   }
   facetTopAggregation.subAggregation(AggregationBuilders.missing(facetName + FACET_SUFFIX_MISSING).field(fieldName));
   return AggregationBuilders.global(facetName).subAggregation(facetTopAggregation);
