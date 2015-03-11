@@ -2,19 +2,21 @@
   SearchRequestBuilder requestBuilder=getClient().prepareSearch(IssueIndexDefinition.INDEX,IndexDefinition.RULE.getIndexName()).setTypes(IssueIndexDefinition.TYPE_ISSUE,IndexDefinition.RULE.getIndexType());
   requestBuilder.setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),createBoolFilter(query)));
   GlobalBuilder topAggreg=AggregationBuilders.global("tags");
-  TermsBuilder issueTags=AggregationBuilders.terms("tags__issues").field(IssueIndexDefinition.FIELD_ISSUE_TAGS).size(maxNumberOfTags).order(Terms.Order.term(true)).minDocCount(1L);
+  String tagsOnIssuesSubAggregation="tags__issues";
+  String tagsOnRulesSubAggregation="tags__rules";
+  TermsBuilder issueTags=AggregationBuilders.terms(tagsOnIssuesSubAggregation).field(IssueIndexDefinition.FIELD_ISSUE_TAGS).size(maxNumberOfTags).order(Terms.Order.term(true)).minDocCount(1L);
   if (textQuery != null) {
     issueTags.include(String.format(SUBSTRING_MATCH_REGEXP,textQuery));
   }
-  TermsBuilder ruleTags=AggregationBuilders.terms("tags__rules").field(RuleNormalizer.RuleField.ALL_TAGS.field()).size(maxNumberOfTags).order(Terms.Order.term(true)).minDocCount(1L);
+  TermsBuilder ruleTags=AggregationBuilders.terms(tagsOnRulesSubAggregation).field(RuleNormalizer.RuleField.ALL_TAGS.field()).size(maxNumberOfTags).order(Terms.Order.term(true)).minDocCount(1L);
   if (textQuery != null) {
     ruleTags.include(String.format(SUBSTRING_MATCH_REGEXP,textQuery));
   }
   SearchResponse searchResponse=requestBuilder.addAggregation(topAggreg.subAggregation(issueTags).subAggregation(ruleTags)).get();
   Global allTags=searchResponse.getAggregations().get("tags");
   SortedSet<String> result=Sets.newTreeSet();
-  Terms issuesResult=allTags.getAggregations().get("tags__issues");
-  Terms rulesResult=allTags.getAggregations().get("tags__rules");
+  Terms issuesResult=allTags.getAggregations().get(tagsOnIssuesSubAggregation);
+  Terms rulesResult=allTags.getAggregations().get(tagsOnRulesSubAggregation);
   result.addAll(EsUtils.termsKeys(issuesResult));
   result.addAll(EsUtils.termsKeys(rulesResult));
   List<String> resultAsList=Lists.newArrayList(result);
