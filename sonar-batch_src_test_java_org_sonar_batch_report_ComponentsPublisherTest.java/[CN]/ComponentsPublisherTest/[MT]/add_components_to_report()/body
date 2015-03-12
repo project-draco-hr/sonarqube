@@ -6,6 +6,7 @@
   module1.setParent(root);
   module1.setId(2).setUuid("MODULE_UUID");
   resourceCache.add(module1,root).setSnapshot(new Snapshot().setId(12));
+  reactor.getRoot().addSubProject(ProjectDefinition.create().setKey("module1"));
   Directory dir=Directory.create("src");
   dir.setEffectiveKey("foo:src");
   dir.setId(3).setUuid("DIR_UUID");
@@ -22,7 +23,8 @@
   testFile.setEffectiveKey("foo:test/FooTest.java");
   testFile.setId(6).setUuid("TEST_FILE_UUID");
   resourceCache.add(testFile,dir).setSnapshot(new Snapshot().setId(16));
-  BatchReportWriter writer=new BatchReportWriter(temp.newFolder());
+  File outputDir=temp.newFolder();
+  BatchReportWriter writer=new BatchReportWriter(outputDir);
   publisher.publish(writer);
   assertThat(writer.hasComponentData(FileStructure.Domain.COMPONENT,1)).isTrue();
   assertThat(writer.hasComponentData(FileStructure.Domain.COMPONENT,2)).isTrue();
@@ -31,4 +33,7 @@
   assertThat(writer.hasComponentData(FileStructure.Domain.COMPONENT,5)).isTrue();
   assertThat(writer.hasComponentData(FileStructure.Domain.COMPONENT,6)).isTrue();
   assertThat(writer.hasComponentData(FileStructure.Domain.COMPONENT,7)).isFalse();
+  BatchReportReader reader=new BatchReportReader(outputDir);
+  Component rootProtobuf=reader.readComponent(1);
+  assertThat(rootProtobuf.getLinksCount()).isEqualTo(0);
 }
