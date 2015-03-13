@@ -1,6 +1,6 @@
 {
-  SourceLineDoc line1=new SourceLineDoc(ImmutableMap.<String,Object>builder().put(FIELD_PROJECT_UUID,file.projectUuid()).put(FIELD_FILE_UUID,file.uuid()).put(FIELD_LINE,line).put(FIELD_UPDATED_AT,new Date()).put(FIELD_SCM_AUTHOR,scmAuthor).build());
-  SourceLineResultSetIterator.SourceFile sourceFile=new SourceLineResultSetIterator.SourceFile(file.uuid(),System.currentTimeMillis());
-  sourceFile.addLine(line1);
-  tester.get(SourceLineIndexer.class).index(Iterators.singletonIterator(sourceFile));
+  FileSourceDb.Data.Builder dataBuilder=FileSourceDb.Data.newBuilder();
+  dataBuilder.addLinesBuilder().setLine(line).setScmAuthor(scmAuthor).build();
+  SourceFileResultSetIterator.Row row=SourceFileResultSetIterator.toRow(file.projectUuid(),file.uuid(),new Date(),dataBuilder.build());
+  tester.get(SourceLineIndexer.class).index(Iterators.singletonIterator(row));
 }
