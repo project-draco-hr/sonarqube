@@ -1,14 +1,16 @@
 {
   File dir=temp.newFolder();
   initFiles(dir);
-  BatchReportReader reader=new BatchReportReader(dir);
-  Metadata readMetadata=reader.readMetadata();
+  sut=new BatchReportReader(dir);
+  Metadata readMetadata=sut.readMetadata();
   assertThat(readMetadata.getAnalysisDate()).isEqualTo(15000000L);
   assertThat(readMetadata.getDeletedComponentsCount()).isEqualTo(1);
-  assertThat(reader.readComponentIssues(1)).hasSize(1);
-  assertThat(reader.readComponentIssues(200)).isEmpty();
-  assertThat(reader.readComponent(1).getUuid()).isEqualTo("UUID_A");
-  Issues deletedComponentIssues=reader.readDeletedComponentIssues(1);
+  assertThat(sut.readComponentIssues(1)).hasSize(1);
+  assertThat(sut.readComponentIssues(200)).isEmpty();
+  assertThat(sut.readComponent(1).getUuid()).isEqualTo("UUID_A");
+  Issues deletedComponentIssues=sut.readDeletedComponentIssues(1);
   assertThat(deletedComponentIssues.getComponentUuid()).isEqualTo("compUuid");
   assertThat(deletedComponentIssues.getIssueList()).hasSize(1);
+  assertThat(sut.readComponentMeasures(1)).hasSize(1);
+  assertThat(sut.readComponentMeasures(1).get(0).getStringValue()).isEqualTo("value_a");
 }
