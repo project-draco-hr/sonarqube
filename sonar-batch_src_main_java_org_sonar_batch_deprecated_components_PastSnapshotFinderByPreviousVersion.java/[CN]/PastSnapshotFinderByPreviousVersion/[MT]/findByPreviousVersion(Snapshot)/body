@@ -1,7 +1,7 @@
 {
   String currentVersion=projectSnapshot.getVersion();
   Integer resourceId=projectSnapshot.getResourceId();
-  String hql="from " + Event.class.getSimpleName() + " where name<>:version AND category='Version' AND resourceId=:resourceId ORDER BY date DESC";
+  String hql="select e from " + Event.class.getSimpleName() + " e "+ " join e.resource component where e.name<>:version AND e.category='Version' AND component.id=:resourceId ORDER BY e.date DESC";
   List<Event> events=session.createQuery(hql).setParameter("version",currentVersion).setParameter("resourceId",resourceId).setMaxResults(1).getResultList();
   if (events.isEmpty()) {
     return new PastSnapshot(CoreProperties.TIMEMACHINE_MODE_PREVIOUS_VERSION);
