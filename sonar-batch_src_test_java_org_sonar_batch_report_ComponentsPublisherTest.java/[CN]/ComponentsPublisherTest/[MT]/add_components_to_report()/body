@@ -8,19 +8,19 @@
   resourceCache.add(module1,root).setSnapshot(new Snapshot().setId(12));
   reactor.getRoot().addSubProject(ProjectDefinition.create().setKey("module1"));
   Directory dir=Directory.create("src");
-  dir.setEffectiveKey("foo:src");
+  dir.setEffectiveKey("module1:src");
   dir.setId(3).setUuid("DIR_UUID");
   resourceCache.add(dir,module1).setSnapshot(new Snapshot().setId(13));
   org.sonar.api.resources.File file=org.sonar.api.resources.File.create("src/Foo.java",Java.INSTANCE,false);
-  file.setEffectiveKey("foo:src/Foo.java");
+  file.setEffectiveKey("module1:src/Foo.java");
   file.setId(4).setUuid("FILE_UUID");
   resourceCache.add(file,dir).setSnapshot(new Snapshot().setId(14));
   org.sonar.api.resources.File fileWithoutLang=org.sonar.api.resources.File.create("src/make",null,false);
-  fileWithoutLang.setEffectiveKey("foo:src/make");
+  fileWithoutLang.setEffectiveKey("module1:src/make");
   fileWithoutLang.setId(5).setUuid("FILE_WITHOUT_LANG_UUID");
   resourceCache.add(fileWithoutLang,dir).setSnapshot(new Snapshot().setId(15));
   org.sonar.api.resources.File testFile=org.sonar.api.resources.File.create("test/FooTest.java",Java.INSTANCE,true);
-  testFile.setEffectiveKey("foo:test/FooTest.java");
+  testFile.setEffectiveKey("module1:test/FooTest.java");
   testFile.setId(6).setUuid("TEST_FILE_UUID");
   resourceCache.add(testFile,dir).setSnapshot(new Snapshot().setId(16));
   File outputDir=temp.newFolder();
@@ -35,5 +35,8 @@
   assertThat(writer.hasComponentData(FileStructure.Domain.COMPONENT,7)).isFalse();
   BatchReportReader reader=new BatchReportReader(outputDir);
   Component rootProtobuf=reader.readComponent(1);
+  assertThat(rootProtobuf.getVersion()).isEqualTo("1.0");
   assertThat(rootProtobuf.getLinkCount()).isEqualTo(0);
+  Component module1Protobuf=reader.readComponent(2);
+  assertThat(module1Protobuf.getVersion()).isEqualTo("1.0");
 }
