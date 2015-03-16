@@ -1,0 +1,12 @@
+{
+  List<Rule> rules=newArrayList(mock(Rule.class));
+  Result serviceResult=mock(Result.class);
+  when(serviceResult.scroll()).thenReturn(rules.iterator());
+  when(ruleService.search(any(RuleQuery.class),any(QueryContext.class))).thenReturn(serviceResult);
+  HashMap<String,Object> params=newHashMap();
+  params.put("pageSize","-1");
+  PagedResult<Rule> result=service.find(params);
+  verify(serviceResult).scroll();
+  verify(ruleService).search(ruleQueryCaptor.capture(),optionsCaptor.capture());
+  assertThat(result.paging().pageSize()).isEqualTo(Integer.MAX_VALUE);
+}
