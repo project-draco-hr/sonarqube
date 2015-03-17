@@ -1,0 +1,21 @@
+{
+  StringBuilder sql=new StringBuilder().append("ALTER TABLE ").append(tableName).append(" ");
+switch (dialect.getId()) {
+case PostgreSql.ID:
+case MySql.ID:
+    dropColumns(sql,"DROP COLUMN ");
+  break;
+case MsSql.ID:
+sql.append("DROP COLUMN ");
+dropColumns(sql,"");
+break;
+case Oracle.ID:
+sql.append("DROP (");
+dropColumns(sql,"");
+sql.append(")");
+break;
+default :
+throw new IllegalStateException(String.format("Unsupported database '%s'",dialect.getId()));
+}
+return sql.toString();
+}
