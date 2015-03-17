@@ -2,10 +2,5 @@
   dbTester.prepareDbUnit(getClass(),"empty.xml");
   dao.insert(session,new ComponentLinkDto().setComponentUuid("ABCD").setType("homepage").setName("Home").setHref("http://www.sonarqube.org"));
   session.commit();
-  Map<String,Object> result=dbTester.selectFirst("select id as \"id\", component_uuid as \"componentUuid\", link_type as \"type\", name as \"name\", href as \"href\" from project_links");
-  assertThat(result.get("id")).isNotNull();
-  assertThat(result.get("componentUuid")).isEqualTo("ABCD");
-  assertThat(result.get("type")).isEqualTo("homepage");
-  assertThat(result.get("name")).isEqualTo("Home");
-  assertThat(result.get("href")).isEqualTo("http://www.sonarqube.org");
+  dbTester.assertDbUnit(getClass(),"insert-result.xml",new String[]{"id"},"project_links");
 }
