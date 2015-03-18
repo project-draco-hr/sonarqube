@@ -1,13 +1,19 @@
 {
+  if (bulkRequest.numberOfActions() > 0) {
+    executeBulk();
+  }
   try {
-    if (bulkRequest.numberOfActions() > 0) {
-      executeBulk(bulkRequest);
+    if (semaphore.tryAcquire(concurrentRequests,10,TimeUnit.MINUTES)) {
+      semaphore.release(concurrentRequests);
     }
   }
-  finally {
-    progress.stop();
+ catch (  InterruptedException e) {
+    throw new IllegalStateException("Elasticsearch bulk requests still being executed after 10 minutes",e);
   }
-  client.prepareRefresh(indexName).get();
+  progress.stop();
+  if (!disableRefresh) {
+    client.prepareRefresh(indexName).get();
+  }
   if (large) {
     client.prepareOptimize(indexName).get();
     updateSettings(largeInitialSettings);

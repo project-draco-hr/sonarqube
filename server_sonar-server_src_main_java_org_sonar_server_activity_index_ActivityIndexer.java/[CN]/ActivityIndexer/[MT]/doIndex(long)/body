@@ -4,10 +4,14 @@
   DbSession dbSession=dbClient.openSession(false);
   Connection dbConnection=dbSession.getConnection();
   try {
-    ActivityResultSetIterator rowIt=ActivityResultSetIterator.create(dbClient,dbConnection,lastUpdatedAt);
-    long maxUpdatedAt=doIndex(bulk,rowIt);
-    rowIt.close();
-    return maxUpdatedAt;
+    ActivityResultSetIterator it=ActivityResultSetIterator.create(dbClient,dbConnection,lastUpdatedAt);
+    bulk.start();
+    while (it.hasNext()) {
+      bulk.add(it.next());
+    }
+    bulk.stop();
+    it.close();
+    return it.getMaxRowDate();
   }
   finally {
     dbSession.close();

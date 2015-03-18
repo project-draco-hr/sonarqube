@@ -1,0 +1,8 @@
+{
+  searchRequest.setScroll(TimeValue.timeValueMinutes(5)).setSearchType(SearchType.SCAN).setFetchSource(false);
+  SearchResponse searchResponse=searchRequest.get();
+  searchResponse=client.prepareSearchScroll(searchResponse.getScrollId()).get();
+  for (  SearchHit hit : searchResponse.getHits()) {
+    add(client.prepareDelete(hit.index(),hit.type(),hit.getId()).request());
+  }
+}

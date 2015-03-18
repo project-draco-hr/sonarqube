@@ -1,9 +1,9 @@
 {
   Integer bigValue=Short.MAX_VALUE * 2;
-  SourceLineDoc line1=new SourceLineDoc(ImmutableMap.<String,Object>builder().put(FIELD_PROJECT_UUID,"abcd").put(FIELD_FILE_UUID,"efgh").put(FIELD_LINE,1).put(FIELD_SOURCE,"package org.sonar.server.source;").put(FIELD_UT_LINE_HITS,bigValue).put(FIELD_UT_CONDITIONS,bigValue).put(FIELD_UT_COVERED_CONDITIONS,bigValue).put(FIELD_IT_LINE_HITS,bigValue).put(FIELD_IT_CONDITIONS,bigValue).put(FIELD_IT_COVERED_CONDITIONS,bigValue).put(FIELD_OVERALL_LINE_HITS,bigValue).put(FIELD_OVERALL_CONDITIONS,bigValue).put(FIELD_OVERALL_COVERED_CONDITIONS,bigValue).put(FIELD_UPDATED_AT,new Date()).build());
-  SourceLineResultSetIterator.SourceFile file=new SourceLineResultSetIterator.SourceFile("efgh",System.currentTimeMillis());
-  file.addLine(line1);
-  indexer.index(Iterators.singletonIterator(file));
+  FileSourceDb.Data.Builder dataBuilder=FileSourceDb.Data.newBuilder();
+  dataBuilder.addLinesBuilder().setLine(1).setScmRevision("cafebabe").setScmAuthor("polop").setScmDate(DateUtils.parseDateTime("2014-01-01T12:34:56+0100").getTime()).setSource("package org.sonar.server.source;").setUtLineHits(bigValue).setUtConditions(bigValue).setUtCoveredConditions(bigValue).setItLineHits(bigValue).setItConditions(bigValue).setItCoveredConditions(bigValue).setOverallLineHits(bigValue).setOverallConditions(bigValue).setOverallCoveredConditions(bigValue).build();
+  SourceFileResultSetIterator.Row row=SourceFileResultSetIterator.toRow("P1","F1",new Date(),dataBuilder.build());
+  indexer.index(Iterators.singletonIterator(row));
   List<SearchHit> hits=getDocuments();
   assertThat(hits).hasSize(1);
   Map<String,Object> document=hits.get(0).getSource();
