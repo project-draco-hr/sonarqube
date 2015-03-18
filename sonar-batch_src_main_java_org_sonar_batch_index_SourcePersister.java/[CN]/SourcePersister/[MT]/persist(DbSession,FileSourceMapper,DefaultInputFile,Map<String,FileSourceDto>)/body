@@ -5,7 +5,7 @@
   String dataHash=DigestUtils.md5Hex(data);
   FileSourceDto previousDto=previousDtosByUuid.get(fileUuid);
   if (previousDto == null) {
-    FileSourceDto dto=new FileSourceDto().setProjectUuid(projectTree.getRootProject().getUuid()).setFileUuid(fileUuid).setBinaryData(data).setDataHash(dataHash).setSrcHash(metadata.hash()).setLineHashes(lineHashesAsMd5Hex(inputFile)).setCreatedAt(system2.now()).setUpdatedAt(system2.now());
+    FileSourceDto dto=new FileSourceDto().setProjectUuid(projectTree.getRootProject().getUuid()).setFileUuid(fileUuid).setBinaryData(data).setDataHash(dataHash).setSrcHash(metadata.hash()).setLineHashes(lineHashesAsMd5Hex(inputFile)).setCreatedAt(system2.now()).setUpdatedAt(0L);
     mapper.insert(dto);
     session.commit();
   }
@@ -13,7 +13,7 @@
     if (!dataHash.equals(previousDto.getDataHash()) || !metadata.hash().equals(previousDto.getSrcHash())) {
       previousDto.setBinaryData(data).setDataHash(dataHash).setSrcHash(metadata.hash()).setLineHashes(lineHashesAsMd5Hex(inputFile));
       if (!dataHash.equals(previousDto.getDataHash())) {
-        previousDto.setUpdatedAt(system2.now());
+        previousDto.setUpdatedAt(0L);
       }
       mapper.update(previousDto);
       session.commit();
