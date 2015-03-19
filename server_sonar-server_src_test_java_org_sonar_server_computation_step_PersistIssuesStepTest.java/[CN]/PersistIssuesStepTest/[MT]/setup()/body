@@ -1,0 +1,9 @@
+{
+  dbTester.truncateTables();
+  session=dbTester.myBatis().openSession(false);
+  dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),new IssueDao(dbTester.myBatis()),new RuleDao());
+  issueCache=new IssueCache(temp.newFile(),System2.INSTANCE);
+  system2=mock(System2.class);
+  when(system2.now()).thenReturn(1400000000000L);
+  step=new PersistIssuesStep(dbClient,system2,new UpdateConflictResolver(),new RuleCache(new RuleCacheLoader(dbClient)),issueCache);
+}
