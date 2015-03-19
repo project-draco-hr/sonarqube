@@ -3,9 +3,8 @@
   when(jsonReport.getIssues()).thenReturn(Lists.newArrayList(issue));
   User user1=new User("julien","Julien");
   User user2=new User("simon","Simon");
-  when(userRepository.loadFromWs(anyListOf(String.class))).thenReturn(Lists.<User>newArrayList(user1,user2));
+  when(userRepository.loadFromWs(anyListOf(String.class))).thenReturn(Lists.newArrayList(user1,user2));
   StringWriter writer=new StringWriter();
   jsonReport.writeJson(writer);
-  String expected=Resources.toString(Resources.getResource("org/sonar/batch/scan/report/JsonReportTest/report.json"),Charsets.UTF_8);
-  JSONAssert.assertEquals(expected,writer.toString(),false);
+  JsonAssert.assertJson(writer.toString()).isSimilarTo(Resources.getResource("org/sonar/batch/scan/report/JsonReportTest/report.json"));
 }
