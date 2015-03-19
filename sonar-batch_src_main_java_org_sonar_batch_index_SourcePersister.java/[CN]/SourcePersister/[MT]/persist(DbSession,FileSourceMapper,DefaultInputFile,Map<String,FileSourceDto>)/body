@@ -10,9 +10,11 @@
     session.commit();
   }
  else {
-    if (!dataHash.equals(previousDto.getDataHash()) || !metadata.hash().equals(previousDto.getSrcHash())) {
+    boolean binaryDataUpdated=!dataHash.equals(previousDto.getDataHash());
+    boolean srcHashUpdated=!metadata.hash().equals(previousDto.getSrcHash());
+    if (binaryDataUpdated || srcHashUpdated) {
       previousDto.setBinaryData(data).setDataHash(dataHash).setSrcHash(metadata.hash()).setLineHashes(lineHashesAsMd5Hex(inputFile));
-      if (!dataHash.equals(previousDto.getDataHash())) {
+      if (binaryDataUpdated) {
         previousDto.setUpdatedAt(0L);
       }
       mapper.update(previousDto);
