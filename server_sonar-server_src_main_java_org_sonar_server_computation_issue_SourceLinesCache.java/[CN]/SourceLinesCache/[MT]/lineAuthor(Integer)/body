@@ -1,11 +1,12 @@
 {
   loadIfNeeded();
-  if (lineId == null) {
+  if (lineIndex == null) {
     return lastCommitAuthor;
   }
   String author=null;
-  if (lineId <= authors.size()) {
-    author=authors.get(lineId - 1);
+  if (lineIndex < scm.getChangesetIndexByLineCount()) {
+    BatchReport.Scm.Changeset changeset=scm.getChangeset(scm.getChangesetIndexByLine(lineIndex));
+    author=changeset.hasAuthor() ? changeset.getAuthor() : null;
   }
   return StringUtils.defaultIfEmpty(author,lastCommitAuthor);
 }

@@ -1,0 +1,17 @@
+{
+  List<SourceLineDoc> lines=index.getLines(currentFileUuid);
+  Map<String,BatchReport.Scm.Changeset> changesetByRevision=new HashMap<>();
+  BatchReport.Scm.Builder scmBuilder=BatchReport.Scm.newBuilder().setComponentRef(currentFileReportRef);
+  for (  SourceLineDoc sourceLine : lines) {
+    if (changesetByRevision.get(sourceLine.scmRevision()) == null) {
+      BatchReport.Scm.Changeset changeset=BatchReport.Scm.Changeset.newBuilder().setAuthor(sourceLine.scmAuthor()).setDate(sourceLine.scmDate().getTime()).setRevision(sourceLine.scmRevision()).build();
+      scmBuilder.addChangeset(changeset);
+      scmBuilder.addChangesetIndexByLine(scmBuilder.getChangesetCount() - 1);
+      changesetByRevision.put(sourceLine.scmRevision(),changeset);
+    }
+ else {
+      scmBuilder.addChangesetIndexByLine(scmBuilder.getChangesetList().indexOf(changesetByRevision.get(sourceLine.scmRevision())));
+    }
+  }
+  return scmBuilder.build();
+}
