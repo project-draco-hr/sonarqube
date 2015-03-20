@@ -1,0 +1,11 @@
+{
+  setupData("multi-modules");
+  List<ComponentDto> modules=dao.selectEnabledDescendantModules(session,"ABCD");
+  assertThat(modules).extracting("uuid").containsOnly("ABCD","EFGH","FGHI");
+  modules=dao.selectEnabledDescendantModules(session,"EFGH");
+  assertThat(modules).extracting("uuid").containsOnly("EFGH","FGHI");
+  modules=dao.selectEnabledDescendantModules(session,"FGHI");
+  assertThat(modules).extracting("uuid").containsOnly("FGHI");
+  assertThat(dao.selectEnabledDescendantModules(session,"GHIJ")).isEmpty();
+  assertThat(dao.selectEnabledDescendantModules(session,"unknown")).isEmpty();
+}

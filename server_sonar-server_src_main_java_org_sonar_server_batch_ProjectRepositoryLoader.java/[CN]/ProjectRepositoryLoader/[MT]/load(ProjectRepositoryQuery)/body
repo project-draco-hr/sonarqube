@@ -15,10 +15,10 @@
         addSettings(ref,module.getKey(),getSettingsFromParents(module,hasScanPerm,session));
         projectKey=project.key();
       }
-      List<ComponentDto> modulesTree=dbClient.componentDao().selectModulesTree(session,module.uuid());
+      List<ComponentDto> modulesTree=dbClient.componentDao().selectEnabledDescendantModules(session,module.uuid());
       Map<String,String> moduleUuidsByKey=moduleUuidsByKey(module,modulesTree);
       Map<String,Long> moduleIdsByKey=moduleIdsByKey(module,modulesTree);
-      List<PropertyDto> modulesTreeSettings=dbClient.propertiesDao().selectModulePropertiesTree(module.uuid(),session);
+      List<PropertyDto> modulesTreeSettings=dbClient.propertiesDao().selectEnabledDescendantModuleProperties(module.uuid(),session);
       TreeModuleSettings treeModuleSettings=new TreeModuleSettings(moduleUuidsByKey,moduleIdsByKey,modulesTree,modulesTreeSettings,module);
       addSettingsToChildrenModules(ref,query.getModuleKey(),Maps.<String,String>newHashMap(),treeModuleSettings,hasScanPerm,session);
       addFileData(session,ref,modulesTree,module.uuid());
