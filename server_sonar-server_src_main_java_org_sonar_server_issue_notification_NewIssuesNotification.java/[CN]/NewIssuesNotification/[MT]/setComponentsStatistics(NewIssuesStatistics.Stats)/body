@@ -1,7 +1,8 @@
 {
   METRIC metric=METRIC.COMPONENT;
   List<Multiset.Entry<String>> componentStats=stats.statsForMetric(metric);
-  try (DbSession dbSession=dbClient.openSession(false)){
+  DbSession dbSession=dbClient.openSession(false);
+  try {
     for (int i=0; i < 5 && i < componentStats.size(); i++) {
       String uuid=componentStats.get(i).getElement();
       String componentName=dbClient.componentDao().getByUuid(dbSession,uuid).name();
@@ -9,4 +10,7 @@
       setFieldValue(metric + "." + (i + 1)+ COUNT,String.valueOf(componentStats.get(i).getCount()));
     }
   }
- }
+  finally {
+    MyBatis.closeQuietly(dbSession);
+  }
+}
