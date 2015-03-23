@@ -1,0 +1,20 @@
+{
+  Table<String,String,String> profilesByLanguageAndName=HashBasedTable.create();
+  PreparedStatement selectStatement=readSession.getConnection().prepareStatement("SELECT kee, name, language FROM rules_profiles");
+  try {
+    ResultSet profiles=selectStatement.executeQuery();
+    String key;
+    String name;
+    String language;
+    while (profiles.next()) {
+      key=profiles.getString(1);
+      name=profiles.getString(2);
+      language=profiles.getString(3);
+      profilesByLanguageAndName.put(language,name,key);
+    }
+  }
+  finally {
+    selectStatement.close();
+  }
+  return profilesByLanguageAndName;
+}

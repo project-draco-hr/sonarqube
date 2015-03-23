@@ -1,0 +1,54 @@
+{
+  ProgressLogger progress=ProgressLogger.create(getClass(),counter);
+  progress.start();
+  final DbSession readSession=db.openSession(false);
+  final DbSession writeSession=db.openSession(true);
+  PreparedStatement selectStatement=readSession.getConnection().prepareStatement("SELECT prop.id, prop.prop_key, prop.text_value, prop.resource_id, proj.uuid " + "FROM properties prop " + "LEFT OUTER JOIN projects proj ON prop.resource_id = proj.id "+ "WHERE prop.prop_key LIKE 'sonar.profile.%'");
+  PreparedStatement deleteProperty=writeSession.getConnection().prepareStatement("DELETE FROM properties WHERE id = ?");
+  try {
+    Table<String,String,String> profileKeysByLanguageThenName=getProfileKeysByLanguageThenName(readSession);
+    ResultSet profileProperties=selectStatement.executeQuery();
+    Long id;
+    String profileLanguage;
+    String profileName;
+    Long projectId;
+    String projectUuid;
+    while (profileProperties.next()) {
+      id=profileProperties.getLong(1);
+      profileLanguage=extractLanguage(profileProperties.getString(2));
+      profileName=profileProperties.getString(3);
+      projectId=profileProperties.getLong(4);
+      projectUuid=profileProperties.getString(5);
+      if (profileKeysByLanguageThenName.contains(profileLanguage,profileName)) {
+        String profileKey=profileKeysByLanguageThenName.get(profileLanguage,profileName);
+        if (projectUuid == null) {
+          if (projectId == null || projectId == 0L) {
+            setProfileIsDefault(profileKey,writeSession);
+          }
+ else {
+            LOGGER.warn(String.format("Profile with language '%s' and name '%s' is associated with unknown project '%d', ignored",profileLanguage,profileName,projectId));
+          }
+        }
+ else {
+          associateProjectWithProfile(projectUuid,profileKey,writeSession);
+        }
+      }
+ else {
+        LOGGER.warn(String.format("Unable to find profile with language '%s' and name '%s', ignored",profileLanguage,profileName));
+      }
+      deleteProperty.setLong(1,id);
+      deleteProperty.execute();
+      counter.getAndIncrement();
+    }
+    writeSession.commit(true);
+    readSession.commit(true);
+    progress.log();
+  }
+  finally {
+    deleteProperty.close();
+    selectStatement.close();
+    readSession.close();
+    writeSession.close();
+    progress.stop();
+  }
+}
