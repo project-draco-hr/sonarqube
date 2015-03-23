@@ -1,0 +1,17 @@
+{
+  final Table<String,String,String> profilesByLanguageAndName=HashBasedTable.create();
+  Select selectProfiles=context.prepareSelect("SELECT kee, name, language FROM rules_profiles");
+  try {
+    selectProfiles.list(new RowReader<Void>(){
+      @Override public Void read(      Row row) throws SQLException {
+        profilesByLanguageAndName.put(row.getString(3),row.getString(2),row.getString(1));
+        return null;
+      }
+    }
+);
+  }
+  finally {
+    selectProfiles.close();
+  }
+  return profilesByLanguageAndName;
+}

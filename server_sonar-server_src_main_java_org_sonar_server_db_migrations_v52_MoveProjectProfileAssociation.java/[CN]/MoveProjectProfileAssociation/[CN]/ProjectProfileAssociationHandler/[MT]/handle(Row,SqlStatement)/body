@@ -1,0 +1,26 @@
+{
+  Long id=row.getLong(1);
+  String profileLanguage=extractLanguage(row.getString(2));
+  String profileName=row.getString(3);
+  Long projectId=row.getLong(4);
+  String projectUuid=row.getString(5);
+  if (profileKeysByLanguageThenName.contains(profileLanguage,profileName)) {
+    String profileKey=profileKeysByLanguageThenName.get(profileLanguage,profileName);
+    if (projectUuid == null) {
+      if (projectId == null || projectId == 0L) {
+        setDefaultProfile.setBoolean(1,true).setString(2,profileKey).execute();
+      }
+ else {
+        LOGGER.warn(String.format("Profile with language '%s' and name '%s' is associated with unknown project '%d', ignored",profileLanguage,profileName,projectId));
+      }
+    }
+ else {
+      associateProjectToProfile.setString(1,projectUuid).setString(2,profileKey).execute();
+    }
+  }
+ else {
+    LOGGER.warn(String.format("Unable to find profile with language '%s' and name '%s', ignored",profileLanguage,profileName));
+  }
+  update.setLong(1,id);
+  return true;
+}
