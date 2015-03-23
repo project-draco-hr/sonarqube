@@ -2,10 +2,8 @@
   db.qualityProfileDao().insert(dbSession,QProfileTesting.newXooP1());
   dbSession.commit();
   dbSession.clearCache();
-  assertThat(db.propertiesDao().selectGlobalProperty("sonar.profile.xoo")).isNull();
-  assertThat(factory.getDefault("xoo")).isNull();
+  assertThat(db.qualityProfileDao().getByKey(dbSession,XOO_P1_KEY).isDefault()).isFalse();
   factory.setDefault(XOO_P1_KEY);
   dbSession.clearCache();
-  assertThat(db.propertiesDao().selectGlobalProperty("sonar.profile.xoo").getValue()).isEqualTo("P1");
-  assertThat(factory.getDefault("xoo").getKey()).isEqualTo(XOO_P1_KEY);
+  assertThat(db.qualityProfileDao().getByKey(dbSession,XOO_P1_KEY).isDefault()).isTrue();
 }

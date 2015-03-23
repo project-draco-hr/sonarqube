@@ -1,9 +1,12 @@
 {
   tester=new ServerTester().addXoo().addComponents(new SimpleProfileDefinition("one",true),new SimpleProfileDefinition("two",false));
   tester.start();
-  PropertiesDao propertiesDao=dbClient().propertiesDao();
-  propertiesDao.updateProperties("sonar.profile.xoo","one","two");
-  verifyProperty("sonar.profile.xoo","two");
+  QualityProfileDao profileDao=dbClient().qualityProfileDao();
+  DbSession session=dbClient().openSession(false);
+  QualityProfileDto profileTwo=profileDao.getByNameAndLanguage("two","xoo",session);
+  tester.get(QProfileFactory.class).setDefault(session,profileTwo.getKee());
+  session.commit();
+  verifyDefaultProfile("xoo","two");
   tester.get(Platform.class).restart();
-  verifyProperty("sonar.profile.xoo","two");
+  verifyDefaultProfile("xoo","two");
 }

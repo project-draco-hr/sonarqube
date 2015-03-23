@@ -3,8 +3,11 @@
   try {
     ComponentDto project=db.componentDao().getById(projectId,session);
     checkPermission(userSession,project.key());
-    db.propertiesDao().deleteProjectProperty(QProfileProjectLookup.PROFILE_PROPERTY_PREFIX + language,project.getId(),session);
-    session.commit();
+    QualityProfileDto associatedProfile=db.qualityProfileDao().getByProjectAndLanguage(project.getKey(),language,session);
+    if (associatedProfile != null) {
+      db.qualityProfileDao().deleteProjectProfileAssociation(project.uuid(),associatedProfile.getKey(),session);
+      session.commit();
+    }
   }
   finally {
     MyBatis.closeQuietly(session);

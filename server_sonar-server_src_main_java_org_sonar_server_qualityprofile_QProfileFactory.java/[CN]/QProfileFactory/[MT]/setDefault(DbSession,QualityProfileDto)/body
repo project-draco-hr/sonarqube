@@ -1,4 +1,7 @@
 {
-  PropertyDto property=new PropertyDto().setKey(PROFILE_PROPERTY_PREFIX + profile.getLanguage()).setValue(profile.getName());
-  db.propertiesDao().setProperty(property,session);
+  QualityProfileDto previousDefault=db.qualityProfileDao().getDefaultProfile(profile.getLanguage(),session);
+  if (previousDefault != null) {
+    db.qualityProfileDao().update(session,previousDefault.setDefault(false));
+  }
+  db.qualityProfileDao().update(session,profile.setDefault(true));
 }

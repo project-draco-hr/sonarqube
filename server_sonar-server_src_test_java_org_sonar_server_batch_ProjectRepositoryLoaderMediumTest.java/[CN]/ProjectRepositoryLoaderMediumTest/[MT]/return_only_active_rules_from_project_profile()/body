@@ -8,7 +8,7 @@
   QualityProfileDto profileDto1=QProfileTesting.newDto(QProfileName.createFor(ServerTester.Xoo.KEY,"SonarQube way"),"abcd");
   QualityProfileDto profileDto2=QProfileTesting.newDto(QProfileName.createFor(ServerTester.Xoo.KEY,"Another profile"),"efgh");
   tester.get(DbClient.class).qualityProfileDao().insert(dbSession,profileDto1,profileDto2);
-  tester.get(DbClient.class).propertiesDao().setProperty(new PropertyDto().setKey("sonar.profile.xoo").setResourceId(project.getId()).setValue(profileDto1.getName()),dbSession);
+  tester.get(DbClient.class).qualityProfileDao().insertProjectProfileAssociation(project.uuid(),profileDto1.getKee(),dbSession);
   tester.get(RuleActivator.class).activate(dbSession,new RuleActivation(ruleKey1).setSeverity(Severity.MINOR),profileDto1.getKey());
   tester.get(RuleActivator.class).activate(dbSession,new RuleActivation(ruleKey1).setSeverity(Severity.BLOCKER),profileDto2.getKey());
   tester.get(RuleActivator.class).activate(dbSession,new RuleActivation(ruleKey2).setSeverity(Severity.BLOCKER),profileDto2.getKey());
