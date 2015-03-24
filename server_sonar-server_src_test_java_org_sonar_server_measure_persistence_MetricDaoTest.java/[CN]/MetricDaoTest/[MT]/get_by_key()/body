@@ -1,18 +1,23 @@
 {
-  setupData("shared");
-  MetricDto result=dao.getNullableByKey(session,"coverage");
+  dbTester.prepareDbUnit(getClass(),"shared.xml");
+  MetricDto result=dao.selectByKey(session,"coverage");
   assertThat(result.getId()).isEqualTo(2);
-  assertThat(result.getName()).isEqualTo("coverage");
-  assertThat(result.getValueType()).isEqualTo("PERCENT");
+  assertThat(result.getKey()).isEqualTo("coverage");
+  assertThat(result.getShortName()).isEqualTo("Coverage");
   assertThat(result.getDescription()).isEqualTo("Coverage by unit tests");
+  assertThat(result.getDomain()).isEqualTo("Tests");
+  assertThat(result.getValueType()).isEqualTo("PERCENT");
+  assertThat(result.getOrigin()).isEqualTo("JAV");
   assertThat(result.getDirection()).isEqualTo(1);
   assertThat(result.isQualitative()).isTrue();
   assertThat(result.isUserManaged()).isFalse();
   assertThat(result.getWorstValue()).isEqualTo(0d);
   assertThat(result.getBestValue()).isEqualTo(100d);
   assertThat(result.isOptimizedBestValue()).isFalse();
+  assertThat(result.isDeleteHistoricalData()).isFalse();
+  assertThat(result.isHidden()).isFalse();
   assertThat(result.isEnabled()).isTrue();
-  result=dao.getNullableByKey(session,"disabled");
+  result=dao.selectByKey(session,"disabled");
   assertThat(result.getId()).isEqualTo(3);
   assertThat(result.isEnabled()).isFalse();
 }

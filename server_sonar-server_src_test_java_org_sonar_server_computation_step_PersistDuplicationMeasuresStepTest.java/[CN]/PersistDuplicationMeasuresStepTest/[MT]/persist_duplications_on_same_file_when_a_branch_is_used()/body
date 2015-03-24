@@ -1,0 +1,15 @@
+{
+  saveDuplicationMetric();
+  File reportDir=temp.newFolder();
+  BatchReportWriter writer=new BatchReportWriter(reportDir);
+  writer.writeMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).setProjectKey("PROJECT_KEY").setBranch("origin/master").setAnalysisDate(150000000L).build());
+  writer.writeComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setUuid("UUID_A").setKey("PROJECT_KEY").setSnapshotId(10L).addChildRef(2).build());
+  writer.writeComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.FILE).setUuid("UUID_B").setSnapshotId(11L).setPath("file").build());
+  BatchReport.Duplication duplication=BatchReport.Duplication.newBuilder().setOriginBlock(BatchReport.DuplicationBlock.newBuilder().setOtherComponentRef(2).setStartLine(1).setEndLine(5).build()).addDuplicatedBy(BatchReport.DuplicationBlock.newBuilder().setOtherComponentRef(2).setStartLine(6).setEndLine(10).build()).build();
+  writer.writeComponentDuplications(2,newArrayList(duplication));
+  sut.execute(new ComputationContext(new BatchReportReader(reportDir),ComponentTesting.newProjectDto("PROJECT")));
+  assertThat(dbTester.countRowsOfTable("project_measures")).isEqualTo(1);
+  Map<String,Object> dto=dbTester.selectFirst("select snapshot_id as \"snapshotId\", text_value as \"textValue\" from project_measures");
+  assertThat(dto.get("snapshotId")).isEqualTo(11L);
+  assertThat(dto.get("textValue")).isEqualTo("<duplications><g><b s=\"1\" l=\"4\" r=\"PROJECT_KEY:file:origin/master\"/><b s=\"6\" l=\"4\" r=\"PROJECT_KEY:file:origin/master\"/></g></duplications>");
+}

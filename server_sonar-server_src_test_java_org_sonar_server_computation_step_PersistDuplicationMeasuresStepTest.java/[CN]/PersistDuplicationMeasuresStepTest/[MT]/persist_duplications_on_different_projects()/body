@@ -1,0 +1,11 @@
+{
+  saveDuplicationMetric();
+  BatchReportWriter writer=initReportWithProjectAndFile();
+  BatchReport.Duplication duplication=BatchReport.Duplication.newBuilder().setOriginBlock(BatchReport.DuplicationBlock.newBuilder().setOtherComponentRef(2).setStartLine(1).setEndLine(5).build()).addDuplicatedBy(BatchReport.DuplicationBlock.newBuilder().setComponentKey("PROJECT2_KEY:file2").setStartLine(6).setEndLine(10).build()).build();
+  writer.writeComponentDuplications(2,newArrayList(duplication));
+  sut.execute(new ComputationContext(new BatchReportReader(reportDir),ComponentTesting.newProjectDto("PROJECT")));
+  assertThat(dbTester.countRowsOfTable("project_measures")).isEqualTo(1);
+  Map<String,Object> dto=dbTester.selectFirst("select snapshot_id as \"snapshotId\", text_value as \"textValue\" from project_measures");
+  assertThat(dto.get("snapshotId")).isEqualTo(11L);
+  assertThat(dto.get("textValue")).isEqualTo("<duplications><g><b s=\"1\" l=\"4\" r=\"PROJECT_KEY:file\"/><b s=\"6\" l=\"4\" r=\"PROJECT2_KEY:file2\"/></g></duplications>");
+}
