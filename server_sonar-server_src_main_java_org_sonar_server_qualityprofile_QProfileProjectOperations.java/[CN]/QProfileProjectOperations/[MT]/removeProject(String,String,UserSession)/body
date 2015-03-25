@@ -1,0 +1,13 @@
+{
+  DbSession session=db.openSession(false);
+  try {
+    ComponentDto project=db.componentDao().getByUuid(session,projectUuid);
+    checkPermission(userSession,project.key());
+    QualityProfileDto qualityProfile=findNotNull(profileKey,session);
+    db.qualityProfileDao().deleteProjectProfileAssociation(project.uuid(),qualityProfile.getKey(),session);
+    session.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

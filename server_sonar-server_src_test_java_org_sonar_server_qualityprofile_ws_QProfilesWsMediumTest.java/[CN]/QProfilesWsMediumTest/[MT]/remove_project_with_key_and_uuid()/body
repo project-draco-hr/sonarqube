@@ -1,0 +1,10 @@
+{
+  ComponentDto project=new ComponentDto().setId(1L).setUuid("ABCD").setKey("org.codehaus.sonar:sonar").setName("SonarQube").setLongName("SonarQube").setQualifier("TRK").setScope("TRK").setEnabled(true);
+  db.componentDao().insert(session,project);
+  QualityProfileDto profile=QProfileTesting.newXooP1();
+  db.qualityProfileDao().insert(session,profile);
+  db.qualityProfileDao().insertProjectProfileAssociation(project.uuid(),profile.getKee(),session);
+  session.commit();
+  wsTester.newPostRequest(QProfilesWs.API_ENDPOINT,"remove_project").setParam("profileKey",profile.getKee()).setParam("projectUuid",project.uuid()).execute().assertNoContent();
+  assertThat(tester.get(QProfileFactory.class).getByProjectAndLanguage(session,project.getKey(),"xoo")).isNull();
+}
