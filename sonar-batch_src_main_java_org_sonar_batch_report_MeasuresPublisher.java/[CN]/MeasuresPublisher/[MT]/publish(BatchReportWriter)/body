@@ -9,19 +9,12 @@
     }
 );
     Iterable<org.sonar.batch.protocol.output.BatchReport.Measure> reportMeasures=Iterables.transform(batchMeasures,new Function<Measure,BatchReport.Measure>(){
-      private BatchReport.Measure.Builder builder=BatchReport.Measure.newBuilder();
+      private final BatchReport.Measure.Builder builder=BatchReport.Measure.newBuilder();
       @Override public BatchReport.Measure apply(      Measure input){
         return toReportMeasure(builder,input);
       }
     }
 );
-    Iterable<DefaultDuplication> dups=duplicationCache.byComponent(resource.resource().getEffectiveKey());
-    if (dups.iterator().hasNext()) {
-      org.sonar.batch.protocol.output.BatchReport.Measure dupMeasure=toReportMeasure(BatchReport.Measure.newBuilder(),dups);
-      writer.writeComponentMeasures(resource.batchId(),Iterables.concat(Arrays.asList(dupMeasure),reportMeasures));
-    }
- else {
-      writer.writeComponentMeasures(resource.batchId(),reportMeasures);
-    }
+    writer.writeComponentMeasures(resource.batchId(),reportMeasures);
   }
 }
