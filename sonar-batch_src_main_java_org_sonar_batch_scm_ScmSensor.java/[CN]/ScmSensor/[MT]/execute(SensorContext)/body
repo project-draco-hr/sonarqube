@@ -1,17 +1,17 @@
 {
   if (configuration.isDisabled()) {
-    LOG.info("SCM Sensor is disabled");
+    LOG.info("SCM Publisher is disabled");
     return;
   }
   if (configuration.provider() == null) {
     LOG.info("No SCM system was detected. You can use the '" + CoreProperties.SCM_PROVIDER_KEY + "' property to explicitly specify it.");
     return;
   }
-  List<InputFile> filesToBlame=collectFilesToBlame(context);
+  List<InputFile> filesToBlame=collectFilesToBlame();
   if (!filesToBlame.isEmpty()) {
     String key=configuration.provider().key();
     LOG.info("SCM provider for this project is: " + key);
-    DefaultBlameOutput output=new DefaultBlameOutput(context,filesToBlame);
+    DefaultBlameOutput output=new DefaultBlameOutput(publishReportJob.getWriter(),resourceCache,filesToBlame);
     configuration.provider().blameCommand().blame(new DefaultBlameInput(fs,filesToBlame),output);
     output.finish();
   }

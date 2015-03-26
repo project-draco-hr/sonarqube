@@ -1,8 +1,8 @@
 {
-  Measure lastCommits=context.getMeasure(CoreMetrics.SCM_LAST_COMMIT_DATETIMES_BY_LINE);
+  BatchReportReader reader=new BatchReportReader(publishReportJob.getReportDir());
+  Scm componentScm=reader.readComponentScm(resourceCache.get(context.getResource()).batchId());
   Measure hitsByLineMeasure=context.getMeasure(getCoverageLineHitsDataMetric());
-  if (lastCommits != null && lastCommits.hasData() && hitsByLineMeasure != null && hitsByLineMeasure.hasData()) {
-    Map<Integer,Date> datesByLine=KeyValueFormat.parseIntDateTime(lastCommits.getData());
+  if (componentScm != null && hitsByLineMeasure != null && hitsByLineMeasure.hasData()) {
     Map<Integer,Integer> hitsByLine=parseCountByLine(hitsByLineMeasure);
     Map<Integer,Integer> conditionsByLine=parseCountByLine(context.getMeasure(getConditionsByLineMetric()));
     Map<Integer,Integer> coveredConditionsByLine=parseCountByLine(context.getMeasure(getCoveredConditionsByLineMetric()));
@@ -12,7 +12,8 @@
       int hits=entry.getValue();
       int conditions=(Integer)ObjectUtils.defaultIfNull(conditionsByLine.get(lineId),0);
       int coveredConditions=(Integer)ObjectUtils.defaultIfNull(coveredConditionsByLine.get(lineId),0);
-      Date date=datesByLine.get(lineId);
+      Changeset changeset=componentScm.getChangeset(componentScm.getChangesetIndexByLine(lineId - 1));
+      Date date=changeset.hasDate() ? new Date(changeset.getDate()) : null;
       for (      PeriodStruct struct : structs) {
         struct.analyze(date,hits,conditions,coveredConditions);
       }

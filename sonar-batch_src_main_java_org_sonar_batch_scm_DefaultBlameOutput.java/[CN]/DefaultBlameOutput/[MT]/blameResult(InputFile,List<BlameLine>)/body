@@ -6,18 +6,25 @@
     LOG.debug("Ignoring blame result since provider returned " + lines.size() + " blame lines but file "+ file.relativePath()+ " has "+ file.lines()+ " lines");
     return;
   }
-  PropertiesBuilder<Integer,String> authors=propertiesBuilder(CoreMetrics.SCM_AUTHORS_BY_LINE);
-  PropertiesBuilder<Integer,String> dates=propertiesBuilder(CoreMetrics.SCM_LAST_COMMIT_DATETIMES_BY_LINE);
-  PropertiesBuilder<Integer,String> revisions=propertiesBuilder(CoreMetrics.SCM_REVISIONS_BY_LINE);
-  int lineNumber=1;
+  BatchResource batchComponent=componentCache.get(file);
+  Builder scmBuilder=BatchReport.Scm.newBuilder();
+  scmBuilder.setComponentRef(batchComponent.batchId());
+  Map<String,Integer> changesetsIdByRevision=new HashMap<>();
   for (  BlameLine line : lines) {
-    authors.add(lineNumber,normalizeString(line.author()));
-    Date date=line.date();
-    dates.add(lineNumber,date != null ? DateUtils.formatDateTime(date) : "");
-    revisions.add(lineNumber,line.revision());
-    lineNumber++;
+    if (StringUtils.isNotBlank(line.revision())) {
+      Integer changesetId=changesetsIdByRevision.get(line.revision());
+      if (changesetId == null) {
+        addChangeset(scmBuilder,line);
+        changesetId=scmBuilder.getChangesetCount() - 1;
+        changesetsIdByRevision.put(line.revision(),changesetId);
+      }
+      scmBuilder.addChangesetIndexByLine(changesetId);
+    }
+ else {
+      addChangeset(scmBuilder,line);
+    }
   }
-  ScmSensor.saveMeasures(context,file,authors.buildData(),dates.buildData(),revisions.buildData());
+  writer.writeComponentScm(scmBuilder.build());
   allFilesToBlame.remove(file);
   count++;
   progressReport.message(count + "/" + total+ " files analyzed, last one was "+ file.absolutePath());

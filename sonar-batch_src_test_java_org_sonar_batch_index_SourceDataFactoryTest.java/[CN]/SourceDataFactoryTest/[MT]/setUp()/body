@@ -1,4 +1,11 @@
 {
+  PublishReportJob publishReportJob=mock(PublishReportJob.class);
+  reportDir=temp.newFolder();
+  when(publishReportJob.getReportDir()).thenReturn(reportDir);
+  ResourceCache resourceCache=new ResourceCache();
+  resourceCache.add(org.sonar.api.resources.File.create("src/Foo.java").setEffectiveKey("module_key:src/Foo.java"),null);
+  when(measureCache.byMetric(anyString(),anyString())).thenReturn(Collections.<Measure>emptyList());
+  sut=new SourceDataFactory(measureCache,componentDataCache,duplicationCache,colorizers,publishReportJob,resourceCache);
   File baseDir=temp.newFolder();
   DefaultFileSystem fs=new DefaultFileSystem(baseDir.toPath());
   inputFile=new DefaultInputFile("module_key","src/Foo.java").setLines(3).setCharset(Charsets.UTF_8);

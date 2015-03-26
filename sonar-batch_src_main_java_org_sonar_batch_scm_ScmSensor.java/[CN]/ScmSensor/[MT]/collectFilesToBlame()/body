@@ -1,0 +1,18 @@
+{
+  if (configuration.forceReloadAll()) {
+    LOG.warn("Forced reloading of SCM data for all files.");
+  }
+  List<InputFile> filesToBlame=new LinkedList<InputFile>();
+  for (  InputFile f : inputPathCache.allFiles()) {
+    if (configuration.forceReloadAll()) {
+      addIfNotEmpty(filesToBlame,(DefaultInputFile)f);
+    }
+ else {
+      FileData fileData=projectReferentials.fileData(projectDefinition.getKeyWithBranch(),f.relativePath());
+      if (f.status() != Status.SAME || fileData == null || fileData.needBlame()) {
+        addIfNotEmpty(filesToBlame,(DefaultInputFile)f);
+      }
+    }
+  }
+  return filesToBlame;
+}
