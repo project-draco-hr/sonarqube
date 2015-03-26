@@ -4,7 +4,7 @@
   massUpdate.select("SELECT prop.id, prop.prop_key, prop.text_value, prop.resource_id, proj.uuid " + "FROM properties prop " + "LEFT OUTER JOIN projects proj ON prop.resource_id = proj.id "+ "WHERE prop.prop_key LIKE 'sonar.profile.%'");
   massUpdate.update("DELETE FROM properties WHERE id = ?");
   final Upsert setDefaultProfile=context.prepareUpsert("UPDATE rules_profiles SET is_default = ? WHERE kee = ?");
-  final Upsert associateProjectToProfile=context.prepareUpsert("INSERT INTO project_profiles (project_uuid, profile_key) VALUES (?, ?)");
+  final Upsert associateProjectToProfile=context.prepareUpsert("INSERT INTO project_qprofiles (project_uuid, profile_key) VALUES (?, ?)");
   try {
     massUpdate.execute(new ProjectProfileAssociationHandler(setDefaultProfile,associateProjectToProfile,profileKeysByLanguageThenName));
   }
