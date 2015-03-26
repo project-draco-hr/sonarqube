@@ -1,0 +1,15 @@
+{
+  String profileKey="polop-palap-xoo-12345";
+  final String response="<polop><palap/></polop>";
+  doAnswer(new Answer<Void>(){
+    @Override public Void answer(    InvocationOnMock invocation) throws Throwable {
+      Writer w=(Writer)invocation.getArguments()[1];
+      new PrintWriter(w).print(response);
+      w.close();
+      return null;
+    }
+  }
+).when(backuper).backup(eq(profileKey),any(Writer.class));
+  Result result=tester.newGetRequest("api/qualityprofiles","backup").setParam("key",profileKey).execute();
+  assertThat(result.outputAsString()).isEqualTo(response);
+}
