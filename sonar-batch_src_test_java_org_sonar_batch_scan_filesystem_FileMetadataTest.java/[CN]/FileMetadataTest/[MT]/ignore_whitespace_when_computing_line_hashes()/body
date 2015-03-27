@@ -1,8 +1,23 @@
 {
   File tempFile=temp.newFile();
   FileUtils.write(tempFile," foo\nb ar\r\nbaz \t",Charsets.UTF_8,true);
-  FileMetadata.Metadata metadata=new FileMetadata(mode).read(tempFile,Charsets.UTF_8);
-  assertThat(metadata.lines).isEqualTo(3);
-  assertThat(metadata.nonBlankLines).isEqualTo(3);
-  assertThat(metadata.hash).isEqualTo(md5Hex(" foo\nb ar\nbaz \t"));
+  DefaultInputFile f=new DefaultInputFile("foo",tempFile.getName());
+  f.setModuleBaseDir(tempFile.getParentFile().toPath());
+  f.setCharset(Charsets.UTF_8);
+  FileMetadata.computeLineHashesForIssueTracking(f,new LineHashConsumer(){
+    @Override public void consume(    int lineIdx,    @Nullable byte[] hash){
+switch (lineIdx) {
+case 1:
+        assertThat(Hex.encodeHexString(hash)).isEqualTo(md5Hex("foo"));
+      break;
+case 2:
+    assertThat(Hex.encodeHexString(hash)).isEqualTo(md5Hex("bar"));
+  break;
+case 3:
+assertThat(Hex.encodeHexString(hash)).isEqualTo(md5Hex("baz"));
+break;
+}
+}
+}
+);
 }
