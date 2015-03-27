@@ -1,8 +1,14 @@
 {
-  searchRequest.setScroll(TimeValue.timeValueMinutes(5)).setSearchType(SearchType.SCAN).setFetchSource(false);
+  searchRequest.setScroll(TimeValue.timeValueMinutes(5)).setSearchType(SearchType.SCAN).setSize(100).setFetchSource(false);
   SearchResponse searchResponse=searchRequest.get();
-  searchResponse=client.prepareSearchScroll(searchResponse.getScrollId()).get();
-  for (  SearchHit hit : searchResponse.getHits()) {
-    add(client.prepareDelete(hit.index(),hit.type(),hit.getId()).request());
+  while (true) {
+    searchResponse=client.prepareSearchScroll(searchResponse.getScrollId()).setScroll(TimeValue.timeValueMinutes(5)).get();
+    SearchHit[] hits=searchResponse.getHits().getHits();
+    for (    SearchHit hit : hits) {
+      add(client.prepareDelete(hit.index(),hit.type(),hit.getId()).request());
+    }
+    if (hits.length == 0) {
+      break;
+    }
   }
 }

@@ -1,0 +1,13 @@
+{
+  int max=500;
+  int removeFrom=200;
+  Map[] docs=new Map[max];
+  for (int i=0; i < max; i++) {
+    docs[i]=ImmutableMap.of(FakeIndexDefinition.INT_FIELD,i);
+  }
+  esTester.putDocuments(FakeIndexDefinition.INDEX,FakeIndexDefinition.TYPE,docs);
+  assertThat(count()).isEqualTo(max);
+  SearchRequestBuilder req=esTester.client().prepareSearch(FakeIndexDefinition.INDEX).setTypes(FakeIndexDefinition.TYPE).setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),FilterBuilders.rangeFilter(FakeIndexDefinition.INT_FIELD).gte(removeFrom)));
+  BulkIndexer.delete(esTester.client(),FakeIndexDefinition.INDEX,req);
+  assertThat(count()).isEqualTo(removeFrom);
+}
