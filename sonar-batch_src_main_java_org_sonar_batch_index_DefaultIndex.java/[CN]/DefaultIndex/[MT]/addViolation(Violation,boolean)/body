@@ -1,0 +1,22 @@
+{
+  Resource resource=violation.getResource();
+  if (resource == null) {
+    violation.setResource(currentProject);
+  }
+ else   if (!Scopes.isHigherThanOrEquals(resource,Scopes.FILE)) {
+    throw new IllegalArgumentException("Violations are only supported on files, directories and project");
+  }
+  Rule rule=violation.getRule();
+  if (rule == null) {
+    LOG.warn("Rule is null. Ignoring violation {}",violation);
+    return;
+  }
+  Bucket bucket=getBucket(resource);
+  if (bucket == null) {
+    LOG.warn("Resource is not indexed. Ignoring violation {}",violation);
+    return;
+  }
+  violation.setSeverity(null);
+  violation.setResource(bucket.getResource());
+  moduleIssues.initAndAddViolation(violation);
+}
