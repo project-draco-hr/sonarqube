@@ -1,3 +1,9 @@
 {
-  return context.prepareSelect("SELECT c.id FROM characteristics c WHERE c.kee = ? AND c.enabled=?").setString(1,key).setBoolean(2,true).get(Select.LONG_READER).intValue();
+  Long id=context.prepareSelect("SELECT c.id FROM characteristics c WHERE c.kee = ? AND c.enabled=?").setString(1,key).setBoolean(2,true).get(Select.LONG_READER);
+  if (id != null) {
+    return id.intValue();
+  }
+ else {
+    throw new IllegalStateException(String.format("Characteristic '%s' could not be inserted",key));
+  }
 }
