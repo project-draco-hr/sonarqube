@@ -2,22 +2,5 @@
   final BulkRequestBuilder req=this.bulkRequest;
   this.bulkRequest=client.prepareBulk().setRefresh(false);
   semaphore.acquireUninterruptibly();
-  req.execute(new ActionListener<BulkResponse>(){
-    @Override public void onResponse(    BulkResponse response){
-      semaphore.release();
-      counter.addAndGet(response.getItems().length);
-      for (      BulkItemResponse item : response.getItems()) {
-        if (item.isFailed()) {
-          StringBuilder sb=new StringBuilder();
-          String msg=sb.append("index [").append(item.getIndex()).append("], type [").append(item.getType()).append("], id [").append(item.getId()).append("], message [").append(item.getFailureMessage()).append("]").toString();
-          LOGGER.error(msg);
-        }
-      }
-    }
-    @Override public void onFailure(    Throwable e){
-      semaphore.release();
-      LOGGER.error("Fail to execute bulk index request: " + req,e);
-    }
-  }
-);
+  req.execute(new BulkResponseActionListener(req));
 }
