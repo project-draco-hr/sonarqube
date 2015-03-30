@@ -1,9 +1,13 @@
 {
   Profiler profiler=Profiler.create(LOG).startDebug(String.format("Analysis of project %s (report %d)",item.dto.getProjectKey(),item.dto.getId()));
-  ComponentDto project=loadProject(item);
+  ComponentDto project=null;
   try {
+    project=loadProject(item);
     File reportDir=extractReportInDir(item);
     BatchReportReader reader=new BatchReportReader(reportDir);
+    if (isSnapshotMissing(item,reader.readMetadata().getSnapshotId())) {
+      return;
+    }
     ComputationContext context=new ComputationContext(reader,project);
     context.setProjectSettings(projectSettingsFactory.newProjectSettings(project.getId()));
     for (    ComputationStep step : steps.orderedSteps()) {
@@ -13,10 +17,10 @@
         stepProfiler.stopDebug();
       }
     }
-    item.dto.succeed();
+    item.dto.setStatus(SUCCESS);
   }
  catch (  Throwable e) {
-    item.dto.fail();
+    item.dto.setStatus(FAILED);
     throw Throwables.propagate(e);
   }
  finally {
