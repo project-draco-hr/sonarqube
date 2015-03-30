@@ -1,0 +1,12 @@
+{
+  MockUserSession.set().setLogin("obiwan").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN);
+  try {
+    tester.newPostRequest("api/qualityprofiles","set_default").setParam("profileKey","unknown-profile-666").execute();
+    Fail.failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+  }
+ catch (  IllegalArgumentException nfe) {
+    assertThat(nfe).hasMessage("Quality profile not found: unknown-profile-666");
+    checkDefaultProfile("xoo1","sonar-way-xoo1-12345");
+    checkDefaultProfile("xoo2","my-sonar-way-xoo2-34567");
+  }
+}
