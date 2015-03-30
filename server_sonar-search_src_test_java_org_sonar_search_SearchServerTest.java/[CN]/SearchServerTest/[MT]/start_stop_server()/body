@@ -1,13 +1,17 @@
 {
   Props props=new Props(new Properties());
-  props.set(ProcessConstants.SEARCH_PORT,String.valueOf(port));
-  props.set(ProcessConstants.CLUSTER_NAME,CLUSTER_NAME);
-  props.set(ProcessConstants.CLUSTER_NODE_NAME,"test");
-  props.set(ProcessConstants.PATH_HOME,temp.newFolder().getAbsolutePath());
+  String host=InetAddress.getLocalHost().getHostAddress();
+  props.set(ProcessProperties.SEARCH_HOST,host);
+  props.set(ProcessProperties.SEARCH_PORT,String.valueOf(port));
+  props.set(ProcessProperties.CLUSTER_NAME,CLUSTER_NAME);
+  props.set(ProcessProperties.CLUSTER_NODE_NAME,"test");
+  props.set(ProcessProperties.PATH_HOME,temp.newFolder().getAbsolutePath());
   searchServer=new SearchServer(props);
   searchServer.start();
   assertThat(searchServer.isReady()).isTrue();
-  client=getSearchClient();
+  Settings settings=ImmutableSettings.settingsBuilder().put("cluster.name",CLUSTER_NAME).build();
+  client=new TransportClient(settings).addTransportAddress(new InetSocketTransportAddress(host,port));
+  assertThat(client.admin().cluster().prepareClusterStats().get().getStatus()).isEqualTo(ClusterHealthStatus.GREEN);
   searchServer.stop();
   searchServer.awaitStop();
   searchServer=null;
