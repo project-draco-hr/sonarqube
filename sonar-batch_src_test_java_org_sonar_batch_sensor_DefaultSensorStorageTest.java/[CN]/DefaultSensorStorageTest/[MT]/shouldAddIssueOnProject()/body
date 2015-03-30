@@ -1,10 +1,8 @@
 {
-  ArgumentCaptor<Issue> argumentCaptor=ArgumentCaptor.forClass(Issue.class);
-  Issuable issuable=mock(Issuable.class);
-  when(resourcePerspectives.as(Issuable.class,(Resource)project)).thenReturn(issuable);
-  when(issuable.addIssue(argumentCaptor.capture())).thenReturn(true);
+  ArgumentCaptor<org.sonar.api.issue.internal.DefaultIssue> argumentCaptor=ArgumentCaptor.forClass(org.sonar.api.issue.internal.DefaultIssue.class);
   sensorStorage.store(new DefaultIssue().onProject().forRule(RuleKey.of("foo","bar")).message("Foo").overrideSeverity(Severity.BLOCKER).effortToFix(10.0));
-  Issue issue=argumentCaptor.getValue();
+  verify(moduleIssues).initAndAddIssue(argumentCaptor.capture());
+  org.sonar.api.issue.internal.DefaultIssue issue=argumentCaptor.getValue();
   assertThat(issue.ruleKey()).isEqualTo(RuleKey.of("foo","bar"));
   assertThat(issue.message()).isEqualTo("Foo");
   assertThat(issue.line()).isNull();

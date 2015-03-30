@@ -1,0 +1,39 @@
+{
+  DefaultInputFile file=new DefaultInputFile("ABCDE","src/Foo.php");
+  file.setLines(2);
+  file.setOriginalLineOffsets(new int[]{0,10});
+  file.setLastValidOffset(15);
+  assertThat(file.newPointer(1,0).line()).isEqualTo(1);
+  assertThat(file.newPointer(1,0).lineOffset()).isEqualTo(0);
+  file.newPointer(1,9);
+  file.newPointer(2,0);
+  file.newPointer(2,5);
+  try {
+    file.newPointer(0,1);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).hasMessage("0 is not a valid line for a file");
+  }
+  try {
+    file.newPointer(3,1);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).hasMessage("3 is not a valid line for pointer. File [moduleKey=ABCDE, relative=src/Foo.php, basedir=null] has 2 line(s)");
+  }
+  try {
+    file.newPointer(1,-1);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).hasMessage("-1 is not a valid line offset for a file");
+  }
+  try {
+    file.newPointer(1,10);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).hasMessage("10 is not a valid line offset for pointer. File [moduleKey=ABCDE, relative=src/Foo.php, basedir=null] has 9 character(s) at line 1");
+  }
+}

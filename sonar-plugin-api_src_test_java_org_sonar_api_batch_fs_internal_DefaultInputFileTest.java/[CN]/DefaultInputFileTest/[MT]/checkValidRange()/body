@@ -1,0 +1,18 @@
+{
+  DefaultInputFile file=new DefaultInputFile("ABCDE","src/Foo.php");
+  file.setLines(2);
+  file.setOriginalLineOffsets(new int[]{0,10});
+  file.setLastValidOffset(15);
+  assertThat(file.newRange(file.newPointer(1,0),file.newPointer(2,1)).start().line()).isEqualTo(1);
+  file.newRange(file.newPointer(1,0),file.newPointer(1,1));
+  file.newRange(file.newPointer(1,0),file.newPointer(1,9));
+  file.newRange(file.newPointer(1,0),file.newPointer(2,0));
+  assertThat(file.newRange(file.newPointer(1,0),file.newPointer(2,5))).isEqualTo(file.newRange(0,15));
+  try {
+    file.newRange(file.newPointer(1,0),file.newPointer(1,0));
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).hasMessage("Start pointer [line=1, lineOffset=0] should be before end pointer [line=1, lineOffset=0]");
+  }
+}

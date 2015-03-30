@@ -7,17 +7,10 @@
     return null;
   }
   inputFile.setLanguage(lang);
-  InputFileMetadata result=new InputFileMetadata();
-  FileMetadata.Metadata metadata=fileMetadata.read(inputFile.file(),fs.encoding());
-  inputFile.setLines(metadata.lines);
-  inputFile.setLastValidOffset(metadata.lastValidOffset);
-  result.setNonBlankLines(metadata.nonBlankLines);
-  result.setHash(metadata.hash);
-  result.setOriginalLineOffsets(metadata.originalLineOffsets);
-  result.setEmpty(metadata.empty);
-  inputFile.setStatus(statusDetection.status(inputFile.moduleKey(),inputFile.relativePath(),metadata.hash));
+  inputFile.initMetadata(fileMetadata.readMetadata(inputFile.file(),fs.encoding()));
+  inputFile.setStatus(statusDetection.status(inputFile.moduleKey(),inputFile.relativePath(),inputFile.hash()));
   if (analysisMode.isIncremental() && inputFile.status() == InputFile.Status.SAME) {
     return null;
   }
-  return result;
+  return inputFile;
 }

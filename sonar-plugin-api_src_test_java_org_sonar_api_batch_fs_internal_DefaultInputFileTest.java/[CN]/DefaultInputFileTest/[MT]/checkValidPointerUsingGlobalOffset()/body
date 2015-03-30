@@ -1,0 +1,28 @@
+{
+  DefaultInputFile file=new DefaultInputFile("ABCDE","src/Foo.php");
+  file.setLines(2);
+  file.setOriginalLineOffsets(new int[]{0,10});
+  file.setLastValidOffset(15);
+  assertThat(file.newPointer(0).line()).isEqualTo(1);
+  assertThat(file.newPointer(0).lineOffset()).isEqualTo(0);
+  assertThat(file.newPointer(9).line()).isEqualTo(1);
+  assertThat(file.newPointer(9).lineOffset()).isEqualTo(9);
+  assertThat(file.newPointer(10).line()).isEqualTo(2);
+  assertThat(file.newPointer(10).lineOffset()).isEqualTo(0);
+  assertThat(file.newPointer(15).line()).isEqualTo(2);
+  assertThat(file.newPointer(15).lineOffset()).isEqualTo(5);
+  try {
+    file.newPointer(-1);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).hasMessage("-1 is not a valid offset for a file");
+  }
+  try {
+    file.newPointer(16);
+    fail();
+  }
+ catch (  Exception e) {
+    assertThat(e).hasMessage("16 is not a valid offset for file [moduleKey=ABCDE, relative=src/Foo.php, basedir=null]. Max offset is 15");
+  }
+}
