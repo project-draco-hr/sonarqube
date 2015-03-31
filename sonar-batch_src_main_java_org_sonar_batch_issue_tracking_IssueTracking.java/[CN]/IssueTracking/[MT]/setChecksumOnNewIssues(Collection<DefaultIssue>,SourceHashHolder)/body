@@ -2,10 +2,12 @@
   if (issues.isEmpty()) {
     return;
   }
+  FileHashes hashedSource=sourceHashHolder.getHashedSource();
   for (  DefaultIssue issue : issues) {
     Integer line=issue.line();
     if (line != null) {
-      issue.setChecksum(sourceHashHolder.getHashedSource().getHash(line));
+      Preconditions.checkState(line <= hashedSource.length(),"Invalid line number for issue %s. File has only %s line(s)",issue,hashedSource.length());
+      issue.setChecksum(hashedSource.getHash(line));
     }
   }
 }
