@@ -1,8 +1,9 @@
 {
   BatchReportWriter writer=initReport();
-  writer.writeFileCoverage(BatchReport.Coverage.newBuilder().setFileRef(FILE_REF).addAllConditionsByLine(Arrays.asList(10,0,4)).addAllUtHitsByLine(Arrays.asList(true,false,false)).addAllItHitsByLine(Arrays.asList(false,true,true)).addAllUtCoveredConditionsByLine(Arrays.asList(1,0,4)).addAllItCoveredConditionsByLine(Arrays.asList(1,0,5)).addAllOverallCoveredConditionsByLine(Arrays.asList(1,0,5)).build());
+  writer.writeFileCoverage(FILE_REF,newArrayList(BatchReport.Coverage.newBuilder().setLine(1).setConditions(10).setUtHits(true).setUtCoveredConditions(1).setItHits(false).setItCoveredConditions(1).setOverallCoveredConditions(1).build(),BatchReport.Coverage.newBuilder().setLine(2).setConditions(0).setUtHits(false).setUtCoveredConditions(0).setItHits(true).setItCoveredConditions(0).setOverallCoveredConditions(0).build(),BatchReport.Coverage.newBuilder().setLine(3).setConditions(4).setUtHits(false).setUtCoveredConditions(4).setItHits(true).setItCoveredConditions(5).setOverallCoveredConditions(5).build()));
   step.execute(new ComputationContext(new BatchReportReader(reportDir),mock(ComponentDto.class)));
   FileSourceDb.Data data=step.getFileSourceData();
+  assertThat(data.getLinesList()).hasSize(3);
   assertThat(data.getLines(0).getUtLineHits()).isEqualTo(1);
   assertThat(data.getLines(0).hasItLineHits()).isFalse();
   assertThat(data.getLines(1).hasUtLineHits()).isFalse();

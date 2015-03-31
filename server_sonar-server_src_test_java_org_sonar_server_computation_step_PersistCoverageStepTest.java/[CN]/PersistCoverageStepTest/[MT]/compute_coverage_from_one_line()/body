@@ -1,8 +1,9 @@
 {
   BatchReportWriter writer=initReport();
-  writer.writeFileCoverage(BatchReport.Coverage.newBuilder().setFileRef(FILE_REF).addAllConditionsByLine(Arrays.asList(10)).addAllUtHitsByLine(Arrays.asList(true)).addAllUtCoveredConditionsByLine(Arrays.asList(2)).addAllItHitsByLine(Arrays.asList(false)).addAllItCoveredConditionsByLine(Arrays.asList(3)).addAllOverallCoveredConditionsByLine(Arrays.asList(4)).build());
+  writer.writeFileCoverage(FILE_REF,newArrayList(BatchReport.Coverage.newBuilder().setLine(1).setConditions(10).setUtHits(true).setUtCoveredConditions(2).setItHits(false).setItCoveredConditions(3).setOverallCoveredConditions(4).build()));
   step.execute(new ComputationContext(new BatchReportReader(reportDir),mock(ComponentDto.class)));
   FileSourceDb.Data data=step.getFileSourceData();
+  assertThat(data.getLinesList()).hasSize(1);
   assertThat(data.getLines(0).getUtLineHits()).isEqualTo(1);
   assertThat(data.getLines(0).getUtConditions()).isEqualTo(10);
   assertThat(data.getLines(0).getUtCoveredConditions()).isEqualTo(2);
