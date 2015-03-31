@@ -1,21 +1,7 @@
 {
-  Language xoo1=new AbstractLanguage("xoo1","Xoo1"){
-    @Override public String[] getFileSuffixes(){
-      return new String[]{"xoo1"};
-    }
-  }
-;
-  Language xoo2=new AbstractLanguage("xoo2","Xoo2"){
-    @Override public String[] getFileSuffixes(){
-      return new String[]{"xoo2"};
-    }
-  }
-;
   QProfileService profileService=mock(QProfileService.class);
   RuleService ruleService=mock(RuleService.class);
   I18n i18n=mock(I18n.class);
-  xoo1=createLanguage("xoo1");
-  xoo2=createLanguage("xoo2");
-  Languages languages=new Languages(xoo1,xoo2);
-  controller=new WsTester(new QProfilesWs(new RuleActivationActions(profileService),new BulkRuleActivationActions(profileService,ruleService,i18n),new ProjectAssociationActions(null,null,null,languages),new QProfileRestoreBuiltInAction(mock(QProfileService.class)),new QProfileSearchAction(new Languages(xoo1,xoo2),null,null))).controller(QProfilesWs.API_ENDPOINT);
+  Languages languages=LanguageTesting.newLanguages(xoo1Key,xoo2Key);
+  controller=new WsTester(new QProfilesWs(new RuleActivationActions(profileService),new BulkRuleActivationActions(profileService,ruleService,i18n),new ProjectAssociationActions(null,null,null,languages),new QProfileRestoreBuiltInAction(null),new QProfileSearchAction(languages,null,null),new QProfileSetDefaultAction(languages,null,null))).controller(QProfilesWs.API_ENDPOINT);
 }
