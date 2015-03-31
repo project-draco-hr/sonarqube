@@ -4,6 +4,11 @@
     String defaultProfileName=nameOfDefaultProfile(profileDefs);
     LOGGER.info("Set default " + language + " profile: "+ defaultProfileName);
     QualityProfileDto newDefaultProfile=dbClient.qualityProfileDao().getByNameAndLanguage(defaultProfileName,language,session);
-    dbClient.qualityProfileDao().update(session,newDefaultProfile.setDefault(true));
+    if (newDefaultProfile == null) {
+      throw new IllegalStateException("Could not find declared default profile '%s' for language '%s'");
+    }
+ else {
+      dbClient.qualityProfileDao().update(session,newDefaultProfile.setDefault(true));
+    }
   }
 }
