@@ -1,0 +1,43 @@
+{
+  String profileKey=request.mandatoryParam(PARAM_KEY);
+  DbSession session=dbClient.openSession(false);
+  try {
+    checkProfileExists(profileKey,session);
+    String selected=request.param(PARAM_SELECTED);
+    String query=request.param(PARAM_QUERY);
+    int pageSize=request.mandatoryParamAsInt(PARAM_PAGE_SIZE);
+    int page=request.mandatoryParamAsInt(PARAM_PAGE);
+    List<ProjectQprofileAssociationDto> projects=loadProjects(profileKey,session,selected,query);
+    Collections.sort(projects,new Comparator<ProjectQprofileAssociationDto>(){
+      @Override public int compare(      ProjectQprofileAssociationDto o1,      ProjectQprofileAssociationDto o2){
+        return new CompareToBuilder().append(o1.getProjectName(),o2.getProjectName()).append(o1.getProjectUuid(),o2.getProjectUuid()).toComparison();
+      }
+    }
+);
+    Collection<Long> projectIds=Collections2.transform(projects,new NonNullInputFunction<ProjectQprofileAssociationDto,Long>(){
+      @Override protected Long doApply(      ProjectQprofileAssociationDto input){
+        return input.getProjectId();
+      }
+    }
+);
+    final Collection<Long> authorizedProjectIds=dbClient.authorizationDao().keepAuthorizedProjectIds(session,projectIds,UserSession.get().userId(),UserRole.USER);
+    Iterable<ProjectQprofileAssociationDto> authorizedProjects=Iterables.filter(projects,new Predicate<ProjectQprofileAssociationDto>(){
+      @Override public boolean apply(      ProjectQprofileAssociationDto input){
+        return authorizedProjectIds.contains(input.getProjectId());
+      }
+    }
+);
+    Paging paging=Paging.create(pageSize,page,authorizedProjectIds.size());
+    List<ProjectQprofileAssociationDto> pagedAuthorizedProjects=Lists.newArrayList(authorizedProjects);
+    if (pagedAuthorizedProjects.size() <= paging.offset()) {
+      pagedAuthorizedProjects=Lists.newArrayList();
+    }
+ else     if (pagedAuthorizedProjects.size() > paging.pageSize()) {
+      pagedAuthorizedProjects=pagedAuthorizedProjects.subList(paging.offset(),paging.offset() + pageSize);
+    }
+    writeProjects(response.newJsonWriter(),pagedAuthorizedProjects,paging);
+  }
+  finally {
+    session.close();
+  }
+}

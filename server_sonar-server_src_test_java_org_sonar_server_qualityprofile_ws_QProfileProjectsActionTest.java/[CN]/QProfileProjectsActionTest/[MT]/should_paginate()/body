@@ -1,0 +1,14 @@
+{
+  project1=newProject("ABCD","Project One");
+  project2=newProject("BCDE","Project Two");
+  project3=newProject("CDEF","Project Three");
+  project4=newProject("DEFA","Project Four");
+  dbClient.componentDao().insert(session,project1,project2,project3,project4);
+  addBrowsePermissionToAnyone(session,project1,project2,project3,project4);
+  associateProjectsWithProfile(session,xooP1,project1,project2,project3,project4);
+  session.commit();
+  newRequest().setParam("key",xooP1.getKey()).setParam("selected","selected").setParam("pageSize","2").execute().assertJson(this.getClass(),"selected_page1.json");
+  newRequest().setParam("key",xooP1.getKey()).setParam("selected","selected").setParam("pageSize","2").setParam("page","2").execute().assertJson(this.getClass(),"selected_page2.json");
+  newRequest().setParam("key",xooP1.getKey()).setParam("selected","selected").setParam("pageSize","2").setParam("page","3").execute().assertJson(this.getClass(),"empty.json");
+  newRequest().setParam("key",xooP1.getKey()).setParam("selected","selected").setParam("pageSize","2").setParam("page","4").execute().assertJson(this.getClass(),"empty.json");
+}
