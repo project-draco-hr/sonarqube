@@ -4,22 +4,29 @@
   assertThat(writer.hasComponentData(FileStructure.Domain.COVERAGE,1)).isFalse();
   writer.writeFileCoverage(1,Arrays.asList(BatchReport.Coverage.newBuilder().setLine(1).setConditions(1).setUtHits(true).setItHits(false).setUtCoveredConditions(1).setItCoveredConditions(1).setOverallCoveredConditions(1).build(),BatchReport.Coverage.newBuilder().setLine(2).setConditions(5).setUtHits(false).setItHits(false).setUtCoveredConditions(4).setItCoveredConditions(5).setOverallCoveredConditions(5).build()));
   assertThat(writer.hasComponentData(FileStructure.Domain.COVERAGE,1)).isTrue();
-  List<BatchReport.Coverage> coverageList=newArrayList(new BatchReportReader(dir).readFileCoverage(1));
-  assertThat(coverageList).hasSize(2);
-  BatchReport.Coverage coverage=coverageList.get(0);
-  assertThat(coverage.getLine()).isEqualTo(1);
-  assertThat(coverage.getConditions()).isEqualTo(1);
-  assertThat(coverage.getUtHits()).isTrue();
-  assertThat(coverage.getItHits()).isFalse();
-  assertThat(coverage.getUtCoveredConditions()).isEqualTo(1);
-  assertThat(coverage.getItCoveredConditions()).isEqualTo(1);
-  assertThat(coverage.getOverallCoveredConditions()).isEqualTo(1);
-  coverage=coverageList.get(1);
-  assertThat(coverage.getLine()).isEqualTo(2);
-  assertThat(coverage.getConditions()).isEqualTo(5);
-  assertThat(coverage.getUtHits()).isFalse();
-  assertThat(coverage.getItHits()).isFalse();
-  assertThat(coverage.getUtCoveredConditions()).isEqualTo(4);
-  assertThat(coverage.getItCoveredConditions()).isEqualTo(5);
-  assertThat(coverage.getOverallCoveredConditions()).isEqualTo(5);
+  ReportStream coverageReportStream=null;
+  try {
+    coverageReportStream=new BatchReportReader(dir).readFileCoverage(1);
+    List<BatchReport.Coverage> coverageList=newArrayList(coverageReportStream);
+    assertThat(coverageList).hasSize(2);
+    BatchReport.Coverage coverage=coverageList.get(0);
+    assertThat(coverage.getLine()).isEqualTo(1);
+    assertThat(coverage.getConditions()).isEqualTo(1);
+    assertThat(coverage.getUtHits()).isTrue();
+    assertThat(coverage.getItHits()).isFalse();
+    assertThat(coverage.getUtCoveredConditions()).isEqualTo(1);
+    assertThat(coverage.getItCoveredConditions()).isEqualTo(1);
+    assertThat(coverage.getOverallCoveredConditions()).isEqualTo(1);
+    coverage=coverageList.get(1);
+    assertThat(coverage.getLine()).isEqualTo(2);
+    assertThat(coverage.getConditions()).isEqualTo(5);
+    assertThat(coverage.getUtHits()).isFalse();
+    assertThat(coverage.getItHits()).isFalse();
+    assertThat(coverage.getUtCoveredConditions()).isEqualTo(4);
+    assertThat(coverage.getItCoveredConditions()).isEqualTo(5);
+    assertThat(coverage.getOverallCoveredConditions()).isEqualTo(5);
+  }
+  finally {
+    IOUtils.closeQuietly(coverageReportStream);
+  }
 }
