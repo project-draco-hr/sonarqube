@@ -1,0 +1,15 @@
+{
+  File dir=temp.newFolder();
+  BatchReportWriter writer=new BatchReportWriter(dir);
+  File file=writer.getFileStructure().fileFor(FileStructure.Domain.SOURCE,1);
+  assertThat(file.exists());
+  FileUtils.writeLines(file,Lists.newArrayList("line1","line2"));
+  FileStream fileStream=null;
+  try {
+    fileStream=new BatchReportReader(dir).readSourceLines(1);
+    assertThat(fileStream).hasSize(2);
+  }
+  finally {
+    fileStream.close();
+  }
+}
