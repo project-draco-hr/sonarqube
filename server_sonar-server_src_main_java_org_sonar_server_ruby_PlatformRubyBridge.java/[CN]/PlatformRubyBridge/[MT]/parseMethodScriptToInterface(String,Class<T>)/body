@@ -1,0 +1,13 @@
+{
+  try (InputStream in=getClass().getResourceAsStream(fileName)){
+    Ruby rubyRuntime=rackBridge.getRubyRuntime();
+    JavaEmbedUtils.EvalUnit evalUnit=adapter.parse(rubyRuntime,in,fileName,0);
+    IRubyObject rubyObject=evalUnit.run();
+    Object receiver=JavaEmbedUtils.rubyToJava(rubyObject);
+    T wrapper=getInstance(rubyRuntime,receiver,clazz);
+    return wrapper;
+  }
+ catch (  IOException e) {
+    throw new RuntimeException("Failed to load script " + fileName,e);
+  }
+}
