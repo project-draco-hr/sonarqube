@@ -1,0 +1,40 @@
+{
+  char c=(char)0;
+  int i=reader.read();
+  boolean afterCR=false;
+  while (i != -1) {
+    c=(char)i;
+    if (afterCR) {
+      for (      CharHandler handler : handlers) {
+        if (c != CARRIAGE_RETURN && c != LINE_FEED) {
+          handler.handleIgnoreEoL(c);
+        }
+        handler.handleAll(c);
+        handler.newLine();
+      }
+      afterCR=c == CARRIAGE_RETURN;
+    }
+ else     if (c == LINE_FEED) {
+      for (      CharHandler handler : handlers) {
+        handler.handleAll(c);
+        handler.newLine();
+      }
+    }
+ else     if (c == CARRIAGE_RETURN) {
+      afterCR=true;
+      for (      CharHandler handler : handlers) {
+        handler.handleAll(c);
+      }
+    }
+ else {
+      for (      CharHandler handler : handlers) {
+        handler.handleIgnoreEoL(c);
+        handler.handleAll(c);
+      }
+    }
+    i=reader.read();
+  }
+  for (  CharHandler handler : handlers) {
+    handler.eof();
+  }
+}

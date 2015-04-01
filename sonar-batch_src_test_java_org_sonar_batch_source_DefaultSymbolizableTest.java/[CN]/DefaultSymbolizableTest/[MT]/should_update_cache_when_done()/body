@@ -1,8 +1,7 @@
 {
-  Component component=mock(Component.class);
-  when(component.key()).thenReturn("myComponent");
-  ComponentDataCache cache=mock(ComponentDataCache.class);
-  DefaultSymbolizable symbolPerspective=new DefaultSymbolizable(cache,component);
+  DefaultSensorStorage sensorStorage=mock(DefaultSensorStorage.class);
+  DefaultInputFile inputFile=new DefaultInputFile("foo","src/Foo.php").initMetadata(new FileMetadata().readMetadata(new StringReader(Strings.repeat("azerty\n",20))));
+  DefaultSymbolizable symbolPerspective=new DefaultSymbolizable(inputFile,sensorStorage);
   Symbolizable.SymbolTableBuilder symbolTableBuilder=symbolPerspective.newSymbolTableBuilder();
   Symbol firstSymbol=symbolTableBuilder.newSymbol(4,8);
   symbolTableBuilder.newReference(firstSymbol,12);
@@ -13,5 +12,7 @@
   symbolTableBuilder.newReference(otherSymbol,108);
   Symbolizable.SymbolTable symbolTable=symbolTableBuilder.build();
   symbolPerspective.setSymbolTable(symbolTable);
-  verify(cache).setData(eq("myComponent"),eq(SnapshotDataTypes.SYMBOL_HIGHLIGHTING),any(SymbolData.class));
+  ArgumentCaptor<Map> argCaptor=ArgumentCaptor.forClass(Map.class);
+  verify(sensorStorage).store(eq(inputFile),argCaptor.capture());
+  assertThat(argCaptor.getValue().keySet()).hasSize(2);
 }

@@ -3,9 +3,15 @@
   for (  DefaultIssue issue : container.getComponentByType(IssueCache.class).all()) {
     issues.add(issue);
   }
+  if (!container.getComponentByType(AnalysisMode.class).isPreview()) {
+    ReportPublisher reportPublisher=container.getComponentByType(ReportPublisher.class);
+    reader=new BatchReportReader(reportPublisher.getReportDir());
+    Metadata readMetadata=getReportReader().readMetadata();
+    int rootComponentRef=readMetadata.getRootComponentRef();
+    storeReportComponents(rootComponentRef,null,readMetadata.hasBranch() ? readMetadata.getBranch() : null);
+  }
   storeFs(container);
   storeMeasures(container);
-  storeComponentData(container);
   storeDuplication(container);
   storeDependencies(container);
 }

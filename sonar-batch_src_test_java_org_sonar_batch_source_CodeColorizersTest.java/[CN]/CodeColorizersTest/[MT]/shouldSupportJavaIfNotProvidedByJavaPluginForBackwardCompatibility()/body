@@ -1,6 +1,19 @@
 {
   CodeColorizers codeColorizers=new CodeColorizers(Arrays.<CodeColorizerFormat>asList());
   File javaFile=new File(this.getClass().getResource("CodeColorizersTest/Person.java").toURI());
-  SyntaxHighlightingData syntaxHighlighting=codeColorizers.toSyntaxHighlighting(javaFile,Charsets.UTF_8,"java");
-  assertThat(syntaxHighlighting.writeString()).isEqualTo(HIGHLIGHTING_JAVA);
+  NewHighlighting highlighting=mock(NewHighlighting.class);
+  codeColorizers.toSyntaxHighlighting(javaFile,Charsets.UTF_8,"java",highlighting);
+  verify(highlighting).highlight(0,4,TypeOfText.STRUCTURED_COMMENT);
+  verify(highlighting).highlight(5,11,TypeOfText.STRUCTURED_COMMENT);
+  verify(highlighting).highlight(12,15,TypeOfText.STRUCTURED_COMMENT);
+  verify(highlighting).highlight(16,22,TypeOfText.KEYWORD);
+  verify(highlighting).highlight(23,28,TypeOfText.KEYWORD);
+  verify(highlighting).highlight(43,50,TypeOfText.KEYWORD);
+  verify(highlighting).highlight(51,54,TypeOfText.KEYWORD);
+  verify(highlighting).highlight(67,78,TypeOfText.ANNOTATION);
+  verify(highlighting).highlight(81,87,TypeOfText.KEYWORD);
+  verify(highlighting).highlight(88,92,TypeOfText.KEYWORD);
+  verify(highlighting).highlight(97,100,TypeOfText.KEYWORD);
+  verify(highlighting).highlight(142,146,TypeOfText.KEYWORD);
+  verify(highlighting).highlight(162,170,TypeOfText.COMMENT);
 }

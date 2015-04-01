@@ -1,7 +1,13 @@
 {
   boolean supported=SUPPORTED_QUALIFIERS.contains(component.qualifier());
   if (supported && component instanceof ResourceComponent) {
-    return new DefaultHighlightable(component,cache);
+    BatchResource batchComponent=cache.get(component.key());
+    if (batchComponent != null) {
+      InputFile path=(InputFile)batchComponent.inputPath();
+      if (path != null) {
+        return new DefaultHighlightable((DefaultInputFile)path,sensorStorage);
+      }
+    }
   }
   return null;
 }

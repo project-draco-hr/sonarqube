@@ -1,0 +1,22 @@
+{
+  BatchReportReader reader=new BatchReportReader(reportPublisher.getReportDir());
+  List<HighlightingRule> highlightingRules=reader.readComponentSyntaxHighlighting(resourceCache.get(inputFile).batchId());
+  if (highlightingRules.isEmpty()) {
+    return;
+  }
+  StringBuilder[] highlightingPerLine=new StringBuilder[inputFile.lines()];
+  RuleItemWriter ruleItemWriter=new RuleItemWriter();
+  int currentLineIdx=1;
+  for (  HighlightingRule rule : highlightingRules) {
+    while (currentLineIdx < inputFile.lines() && rule.getRange().getStartLine() > currentLineIdx) {
+      currentLineIdx++;
+    }
+    writeDataPerLine(inputFile.originalLineOffsets(),rule,rule.getRange(),highlightingPerLine,ruleItemWriter);
+  }
+  for (int i=0; i < highlightingPerLine.length; i++) {
+    StringBuilder sb=highlightingPerLine[i];
+    if (sb != null) {
+      to.getLinesBuilder(i).setHighlighting(sb.toString());
+    }
+  }
+}

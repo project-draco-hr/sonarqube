@@ -1,12 +1,13 @@
 {
-  SymbolData data=symbolTablePerFile.get(file);
-  if (data == null) {
-    return null;
+  int ref=reportComponents.get(((DefaultInputFile)file).key()).getRef();
+  List<Symbol> symbols=getReportReader().readComponentSymbols(ref);
+  if (symbols.isEmpty()) {
+    return Collections.emptyList();
   }
-  for (  Symbol symbol : data.referencesBySymbol().keySet()) {
-    if (symbol.getDeclarationStartOffset() == symbolStartOffset && symbol.getDeclarationEndOffset() == symbolEndOffset) {
-      return data.referencesBySymbol().get(symbol);
+  for (  Symbol symbol : symbols) {
+    if (symbol.getDeclaration().getStartLine() == symbolStartLine && symbol.getDeclaration().getStartOffset() == symbolStartLineOffset) {
+      return symbol.getReferenceList();
     }
   }
-  return null;
+  return Collections.emptyList();
 }

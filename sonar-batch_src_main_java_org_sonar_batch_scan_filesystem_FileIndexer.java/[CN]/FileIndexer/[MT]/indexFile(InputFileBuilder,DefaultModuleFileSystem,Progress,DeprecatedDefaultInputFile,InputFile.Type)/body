@@ -1,12 +1,11 @@
 {
   tasks.add(executorService.submit(new Callable<Void>(){
     @Override public Void call(){
-      InputFileMetadata metadata=inputFileBuilder.completeAndComputeMetadata(inputFile,type);
-      if (metadata != null && accept(inputFile)) {
-        fs.add(inputFile);
-        status.markAsIndexed(inputFile);
-        inputPathCache.put(inputFile.moduleKey(),inputFile.relativePath(),metadata);
-        File parentDir=inputFile.file().getParentFile();
+      DeprecatedDefaultInputFile completedInputFile=inputFileBuilder.completeAndComputeMetadata(inputFile,type);
+      if (completedInputFile != null && accept(completedInputFile)) {
+        fs.add(completedInputFile);
+        status.markAsIndexed(completedInputFile);
+        File parentDir=completedInputFile.file().getParentFile();
         String relativePath=new PathResolver().relativePath(fs.baseDir(),parentDir);
         if (relativePath != null) {
           DefaultInputDir inputDir=new DefaultInputDir(fs.moduleKey(),relativePath);

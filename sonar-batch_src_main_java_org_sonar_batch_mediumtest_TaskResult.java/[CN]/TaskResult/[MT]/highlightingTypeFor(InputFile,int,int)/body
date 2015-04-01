@@ -1,0 +1,16 @@
+{
+  int ref=reportComponents.get(((DefaultInputFile)file).key()).getRef();
+  List<HighlightingRule> syntaxHighlightingRules=getReportReader().readComponentSyntaxHighlighting(ref);
+  if (syntaxHighlightingRules.isEmpty()) {
+    return Collections.emptyList();
+  }
+  TextPointer pointer=file.newPointer(line,lineOffset);
+  List<TypeOfText> result=new ArrayList<TypeOfText>();
+  for (  HighlightingRule sortedRule : syntaxHighlightingRules) {
+    TextRange ruleRange=toRange(file,sortedRule.getRange());
+    if (ruleRange.start().compareTo(pointer) <= 0 && ruleRange.end().compareTo(pointer) > 0) {
+      result.add(BatchReportUtils.toBatchType(sortedRule.getType()));
+    }
+  }
+  return result;
+}

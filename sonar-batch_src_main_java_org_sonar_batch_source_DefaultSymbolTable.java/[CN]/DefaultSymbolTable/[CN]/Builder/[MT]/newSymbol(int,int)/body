@@ -1,5 +1,11 @@
 {
-  Symbol symbol=new DefaultSymbol(fromOffset,toOffset);
-  referencesBySymbol.put(symbol,new TreeSet<Integer>());
+  TextRange declarationRange=inputFile.newRange(fromOffset,toOffset);
+  DefaultSymbol symbol=new DefaultSymbol(declarationRange,toOffset - fromOffset);
+  referencesBySymbol.put(symbol,new TreeSet<TextRange>(new Comparator<TextRange>(){
+    @Override public int compare(    TextRange o1,    TextRange o2){
+      return o1.start().compareTo(o2.start());
+    }
+  }
+));
   return symbol;
 }

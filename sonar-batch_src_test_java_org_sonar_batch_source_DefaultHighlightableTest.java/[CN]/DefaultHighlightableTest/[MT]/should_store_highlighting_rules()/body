@@ -1,5 +1,9 @@
 {
-  DefaultHighlightable highlightablePerspective=new DefaultHighlightable(mock(Component.class),null);
-  highlightablePerspective.newHighlighting().highlight(0,10,"k").highlight(20,30,"cppd");
-  assertThat(highlightablePerspective.getHighlightingRules().getSyntaxHighlightingRuleSet()).hasSize(2);
+  SensorStorage sensorStorage=mock(SensorStorage.class);
+  DefaultInputFile inputFile=new DefaultInputFile("foo","src/Foo.php").initMetadata(new FileMetadata().readMetadata(new StringReader("azerty\nbla bla")));
+  DefaultHighlightable highlightablePerspective=new DefaultHighlightable(inputFile,sensorStorage);
+  highlightablePerspective.newHighlighting().highlight(0,6,"k").highlight(7,10,"cppd").done();
+  ArgumentCaptor<DefaultHighlighting> argCaptor=ArgumentCaptor.forClass(DefaultHighlighting.class);
+  verify(sensorStorage).store(argCaptor.capture());
+  assertThat(argCaptor.getValue().getSyntaxHighlightingRuleSet()).hasSize(2);
 }
