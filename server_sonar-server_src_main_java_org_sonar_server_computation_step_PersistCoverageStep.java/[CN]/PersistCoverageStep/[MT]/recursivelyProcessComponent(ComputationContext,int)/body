@@ -2,9 +2,10 @@
   BatchReportReader reportReader=context.getReportReader();
   BatchReport.Component component=reportReader.readComponent(componentRef);
   if (component.getType().equals(Constants.ComponentType.FILE)) {
-    Iterable<BatchReport.Coverage> coverageList=reportReader.readFileCoverage(componentRef);
-    if (coverageList != null) {
-      processCoverage(component,coverageList);
+    File coverageFile=reportReader.readFileCoverage(componentRef);
+    if (coverageFile != null) {
+      ReportIterator<BatchReport.Coverage> coverageReport=new ReportIterator<>(coverageFile,BatchReport.Coverage.PARSER);
+      processCoverage(component,coverageReport);
     }
   }
   for (  Integer childRef : component.getChildRefList()) {
