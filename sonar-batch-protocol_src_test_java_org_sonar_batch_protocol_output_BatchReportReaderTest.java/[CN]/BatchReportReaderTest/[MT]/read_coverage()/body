@@ -5,8 +5,7 @@
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(1).build());
   writer.writeFileCoverage(1,Arrays.asList(BatchReport.Coverage.newBuilder().setLine(1).setConditions(1).setUtHits(true).setItHits(false).setUtCoveredConditions(1).setItCoveredConditions(1).setOverallCoveredConditions(1).build(),BatchReport.Coverage.newBuilder().setLine(2).setConditions(5).setUtHits(false).setItHits(false).setUtCoveredConditions(4).setItCoveredConditions(5).setOverallCoveredConditions(5).build()));
   sut=new BatchReportReader(dir);
-  InputStream inputStream=FileUtils.openInputStream(new BatchReportReader(dir).readFileCoverage(1));
-  try {
+  try (InputStream inputStream=FileUtils.openInputStream(new BatchReportReader(dir).readFileCoverage(1))){
     BatchReport.Coverage coverage=BatchReport.Coverage.PARSER.parseDelimitedFrom(inputStream);
     assertThat(coverage.getLine()).isEqualTo(1);
     assertThat(coverage.getConditions()).isEqualTo(1);
@@ -24,7 +23,4 @@
     assertThat(coverage.getItCoveredConditions()).isEqualTo(5);
     assertThat(coverage.getOverallCoveredConditions()).isEqualTo(5);
   }
-  finally {
-    inputStream.close();
-  }
-}
+ }
