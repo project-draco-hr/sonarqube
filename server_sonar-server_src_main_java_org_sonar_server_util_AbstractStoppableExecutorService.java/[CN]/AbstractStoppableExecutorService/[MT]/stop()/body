@@ -1,0 +1,15 @@
+{
+  delegate.shutdown();
+  try {
+    if (!delegate.awaitTermination(5,TimeUnit.SECONDS)) {
+      delegate.shutdownNow();
+      if (!delegate.awaitTermination(5,TimeUnit.SECONDS)) {
+        Loggers.get(getClass()).error(format("Pool %s did not terminate",getClass().getSimpleName()));
+      }
+    }
+  }
+ catch (  InterruptedException ie) {
+    Loggers.get(getClass()).error(format("Termination of pool %s failed",getClass().getSimpleName()),ie);
+    delegate.shutdownNow();
+  }
+}
