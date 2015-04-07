@@ -1,0 +1,28 @@
+{
+  if (this.running.get()) {
+    return;
+  }
+  running.getAndSet(true);
+  executorService.execute(new Runnable(){
+    @Override public void run(){
+      status=Status.RUNNING;
+      startDate=new Date();
+      failureError=null;
+      try {
+        Loggers.get(PlatformDatabaseMigration.class).info("Starting DB Migration at {}",startDate);
+        rubyBridge.databaseMigration().trigger();
+        Loggers.get(PlatformDatabaseMigration.class).info("DB Migration ended successfully at {}",new Date());
+        status=Status.SUCCEEDED;
+      }
+ catch (      Throwable t) {
+        Loggers.get(PlatformDatabaseMigration.class).error("DB Migration failed and ended at " + startDate + " with an exception",t);
+        status=Status.FAILED;
+        failureError=t;
+      }
+ finally {
+        running.getAndSet(false);
+      }
+    }
+  }
+);
+}

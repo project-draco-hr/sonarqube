@@ -1,0 +1,13 @@
+{
+  mockTriggerThrowsError();
+  underTest.startIt();
+  assertThat(underTest.status()).isEqualTo(DatabaseMigration.Status.FAILED);
+  assertThat(underTest.failureError()).isSameAs(AN_ERROR);
+  Date firstStartDate=underTest.startedAt();
+  assertThat(firstStartDate).isNotNull();
+  mockTriggerDoesNothing();
+  underTest.startIt();
+  assertThat(underTest.status()).isEqualTo(DatabaseMigration.Status.SUCCEEDED);
+  assertThat(underTest.failureError()).isNull();
+  assertThat(underTest.startedAt()).isNotSameAs(firstStartDate);
+}
