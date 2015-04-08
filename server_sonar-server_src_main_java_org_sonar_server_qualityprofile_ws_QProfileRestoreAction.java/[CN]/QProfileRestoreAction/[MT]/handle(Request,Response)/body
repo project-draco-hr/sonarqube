@@ -1,7 +1,12 @@
 {
   UserSession.get().checkLoggedIn().checkGlobalPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN);
   InputStream backup=request.paramAsInputStream(PARAM_BACKUP);
-  Preconditions.checkArgument(backup != null,"A backup file must be provided");
-  backuper.restore(new InputStreamReader(backup,Charsets.UTF_8),null);
-  response.noContent();
+  try {
+    Preconditions.checkArgument(backup != null,"A backup file must be provided");
+    backuper.restore(new InputStreamReader(backup,Charsets.UTF_8),null);
+    response.noContent();
+  }
+  finally {
+    IOUtils.closeQuietly(backup);
+  }
 }
