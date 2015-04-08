@@ -1,0 +1,22 @@
+{
+  RuleDto rule1=createRule("xoo","rule1");
+  RuleDto rule2=createRule("xoo","rule2");
+  RuleDto rule3=createRule("xoo","rule3");
+  QualityProfileDto groupWide=createProfile("xoo","My Group Profile","xoo-my-group-profile-01234");
+  createActiveRule(rule1,groupWide);
+  createActiveRule(rule2,groupWide);
+  session.commit();
+  QualityProfileDto companyWide=createProfile("xoo","My Company Profile","xoo-my-company-profile-12345");
+  setParent(groupWide,companyWide);
+  QualityProfileDto buWide=createProfile("xoo","My BU Profile","xoo-my-bu-profile-23456");
+  setParent(companyWide,buWide);
+  overrideActiveRuleSeverity(rule1,buWide,Severity.CRITICAL);
+  QualityProfileDto forProject1=createProfile("xoo","For Project One","xoo-for-project-one-34567");
+  setParent(buWide,forProject1);
+  createActiveRule(rule3,forProject1);
+  session.commit();
+  QualityProfileDto forProject2=createProfile("xoo","For Project Two","xoo-for-project-two-45678");
+  setParent(buWide,forProject2);
+  overrideActiveRuleSeverity(rule2,forProject2,Severity.CRITICAL);
+  wsTester.newGetRequest("api/qualityprofiles","inheritance").setParam("profileKey",buWide.getKee()).execute().assertJson(getClass(),"inheritance-buWide.json");
+}
