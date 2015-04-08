@@ -1,0 +1,10 @@
+{
+  Date yesterday=DateTime.now().minusDays(1).toDate();
+  Date tomorrow=DateTime.now().plusDays(1).toDate();
+  MockUserSession.set().setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN).setLogin("david");
+  tester.get(ActivityService.class).save(ActiveRuleChange.createFor(ActiveRuleChange.Type.ACTIVATED,ActiveRuleKey.of(XOO_P1_KEY,RuleTesting.XOO_X1)).setSeverity(Severity.MAJOR).setParameter("max","10").toActivity());
+  wsTester.newGetRequest(QProfilesWs.API_ENDPOINT,"changelog").setParam("profileKey",XOO_P1_KEY).setParam("since",DateUtils.formatDate(yesterday)).execute().assertJson(getClass(),"changelog_nominal.json");
+  wsTester.newGetRequest(QProfilesWs.API_ENDPOINT,"changelog").setParam("profileKey",XOO_P1_KEY).setParam("since",DateUtils.formatDate(tomorrow)).execute().assertJson(getClass(),"changelog_empty.json");
+  wsTester.newGetRequest(QProfilesWs.API_ENDPOINT,"changelog").setParam("profileKey",XOO_P1_KEY).setParam("to",DateUtils.formatDate(yesterday)).execute().assertJson(getClass(),"changelog_empty.json");
+  wsTester.newGetRequest(QProfilesWs.API_ENDPOINT,"changelog").setParam("profileKey",XOO_P1_KEY).setParam("to",DateUtils.formatDate(tomorrow)).execute().assertJson(getClass(),"changelog_nominal.json");
+}

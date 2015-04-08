@@ -1,0 +1,26 @@
+{
+  DbSession session=dbClient.openSession(false);
+  try {
+    String profileKey=QProfileIdentificationParamUtils.getProfileKeyFromParameters(request,profileFactory,session);
+    if (dbClient.qualityProfileDao().getByKey(session,profileKey) == null) {
+      throw new NotFoundException(String.format("Could not find a profile with key '%s'",profileKey));
+    }
+    QProfileActivityQuery query=new QProfileActivityQuery().setQprofileKey(profileKey);
+    Date since=request.paramAsDate(PARAM_SINCE);
+    if (since != null) {
+      query.setSince(since);
+    }
+    Date to=request.paramAsDate(PARAM_TO);
+    if (to != null) {
+      query.setTo(to);
+    }
+    SearchOptions options=new SearchOptions();
+    int page=request.mandatoryParamAsInt(Param.PAGE);
+    options.setPage(page,request.mandatoryParamAsInt(Param.PAGE_SIZE));
+    Result<QProfileActivity> result=service.searchActivities(query,options);
+    writeResponse(response.newJsonWriter(),result,Paging.create(options.getLimit(),page,(int)result.getTotal()));
+  }
+  finally {
+    session.close();
+  }
+}
