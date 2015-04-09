@@ -7,12 +7,10 @@
     QProfileResult result=new QProfileResult();
     QualityProfileDto profile=profileFactory.create(dbSession,QProfileName.createFor(language,name));
     result.setProfile(profile);
-    if (importers.length > 0) {
-      for (      ProfileImporter importer : importers) {
-        InputStream contentToImport=request.paramAsInputStream(getBackupParamName(importer.getKey()));
-        if (contentToImport != null) {
-          result.add(exporters.importXml(profile,importer.getKey(),contentToImport,dbSession));
-        }
+    for (    ProfileImporter importer : importers) {
+      InputStream contentToImport=request.paramAsInputStream(getBackupParamName(importer.getKey()));
+      if (contentToImport != null) {
+        result.add(exporters.importXml(profile,importer.getKey(),contentToImport,dbSession));
       }
     }
     dbSession.commit();
