@@ -1,0 +1,21 @@
+{
+  int line=lineBuilder.getLine();
+  StringBuilder highlighting=new StringBuilder();
+  incrementHighlightingListMatchingLine(line);
+  for (Iterator<BatchReport.SyntaxHighlighting> syntaxHighlightingIterator=highlightingList.iterator(); syntaxHighlightingIterator.hasNext(); ) {
+    BatchReport.SyntaxHighlighting syntaxHighlighting=syntaxHighlightingIterator.next();
+    BatchReport.Range range=syntaxHighlighting.getRange();
+    if (range.getStartLine() <= line) {
+      if (highlighting.length() > 0) {
+        highlighting.append(ITEM_SEPARATOR);
+      }
+      highlighting.append(convertHighlightingToString(syntaxHighlighting,line,lineBuilder.getSource()));
+      if (range.getEndLine() == line) {
+        syntaxHighlightingIterator.remove();
+      }
+    }
+  }
+  if (highlighting.length() > 0) {
+    lineBuilder.setHighlighting(highlighting.toString());
+  }
+}
