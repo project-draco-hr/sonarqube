@@ -1,0 +1,11 @@
+{
+  BatchReportWriter writer=initReport();
+  writer.writeComponent(BatchReport.Component.newBuilder().setRef(FILE_REF).setType(Constants.ComponentType.FILE).setUuid(FILE_UUID).setLines(2).build());
+  File sourceFile=writer.getFileStructure().fileFor(FileStructure.Domain.SOURCE,FILE_REF);
+  FileUtils.writeLines(sourceFile,Lists.newArrayList("line\t1","line2"));
+  sut.execute(new ComputationContext(new BatchReportReader(reportDir),ComponentTesting.newProjectDto(PROJECT_UUID)));
+  assertThat(dbTester.countRowsOfTable("file_sources")).isEqualTo(1);
+  FileSourceDto fileSourceDto=dbClient.fileSourceDao().select("FILE");
+  assertThat(fileSourceDto.getLineHashes()).isEqualTo("137f72c3708c6bd0de00a0e5a69c699b\ne6251bcf1a7dc3ba5e7933e325bbe605\n");
+  assertThat(fileSourceDto.getSrcHash()).isEqualTo("fe1ac2747e8393015698f2724d8d2835");
+}

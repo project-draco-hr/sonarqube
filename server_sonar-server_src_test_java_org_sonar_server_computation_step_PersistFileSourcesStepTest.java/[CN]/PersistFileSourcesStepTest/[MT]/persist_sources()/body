@@ -1,0 +1,22 @@
+{
+  BatchReportWriter writer=initReport();
+  writer.writeComponent(BatchReport.Component.newBuilder().setRef(FILE_REF).setType(Constants.ComponentType.FILE).setUuid(FILE_UUID).setLines(2).build());
+  File sourceFile=writer.getFileStructure().fileFor(FileStructure.Domain.SOURCE,FILE_REF);
+  FileUtils.writeLines(sourceFile,Lists.newArrayList("line1","line2"));
+  sut.execute(new ComputationContext(new BatchReportReader(reportDir),ComponentTesting.newProjectDto(PROJECT_UUID)));
+  assertThat(dbTester.countRowsOfTable("file_sources")).isEqualTo(1);
+  FileSourceDto fileSourceDto=dbClient.fileSourceDao().select(FILE_UUID);
+  assertThat(fileSourceDto.getProjectUuid()).isEqualTo(PROJECT_UUID);
+  assertThat(fileSourceDto.getFileUuid()).isEqualTo(FILE_UUID);
+  assertThat(fileSourceDto.getBinaryData()).isNotEmpty();
+  assertThat(fileSourceDto.getDataHash()).isNotEmpty();
+  assertThat(fileSourceDto.getLineHashes()).isNotEmpty();
+  assertThat(fileSourceDto.getCreatedAt()).isEqualTo(now);
+  assertThat(fileSourceDto.getUpdatedAt()).isEqualTo(0L);
+  FileSourceDb.Data data=FileSourceDto.decodeData(fileSourceDto.getBinaryData());
+  assertThat(data.getLinesCount()).isEqualTo(2);
+  assertThat(data.getLines(0).getLine()).isEqualTo(1);
+  assertThat(data.getLines(0).getSource()).isEqualTo("line1");
+  assertThat(data.getLines(1).getLine()).isEqualTo(2);
+  assertThat(data.getLines(1).getSource()).isEqualTo("line2");
+}

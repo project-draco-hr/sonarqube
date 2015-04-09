@@ -1,0 +1,25 @@
+{
+  FileSourceDb.Data fileData=fileSourceData.getFileSourceData();
+  byte[] data=FileSourceDto.encodeData(fileData);
+  String dataHash=DigestUtils.md5Hex(data);
+  String srcHash=fileSourceData.getSrcHash();
+  String lineHashes=fileSourceData.getLineHashes();
+  FileSourceDto previousDto=fileSourcesContext.previousFileSourcesByUuid.get(component.getUuid());
+  if (previousDto == null) {
+    FileSourceDto dto=new FileSourceDto().setProjectUuid(fileSourcesContext.context.getProject().uuid()).setFileUuid(component.getUuid()).setBinaryData(data).setSrcHash(srcHash).setDataHash(dataHash).setLineHashes(lineHashes).setCreatedAt(system2.now()).setUpdatedAt(0L);
+    dbClient.fileSourceDao().insert(fileSourcesContext.session,dto);
+    fileSourcesContext.session.commit();
+  }
+ else {
+    boolean binaryDataUpdated=!dataHash.equals(previousDto.getDataHash());
+    boolean srcHashUpdated=!srcHash.equals(previousDto.getSrcHash());
+    if (binaryDataUpdated || srcHashUpdated) {
+      previousDto.setBinaryData(data).setDataHash(dataHash).setSrcHash(srcHash).setLineHashes(lineHashes);
+      if (binaryDataUpdated) {
+        previousDto.setUpdatedAt(0L);
+      }
+      dbClient.fileSourceDao().update(previousDto);
+      fileSourcesContext.session.commit();
+    }
+  }
+}

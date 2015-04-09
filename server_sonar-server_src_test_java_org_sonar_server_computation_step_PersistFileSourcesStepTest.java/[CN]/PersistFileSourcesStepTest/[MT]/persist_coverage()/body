@@ -1,0 +1,21 @@
+{
+  BatchReportWriter writer=initReport();
+  writer.writeComponent(BatchReport.Component.newBuilder().setRef(FILE_REF).setType(Constants.ComponentType.FILE).setUuid(FILE_UUID).setLines(1).build());
+  writer.writeFileCoverage(FILE_REF,newArrayList(BatchReport.Coverage.newBuilder().setLine(1).setConditions(10).setUtHits(true).setUtCoveredConditions(2).setItHits(true).setItCoveredConditions(3).setOverallCoveredConditions(4).build()));
+  File sourceFile=writer.getFileStructure().fileFor(FileStructure.Domain.SOURCE,FILE_REF);
+  FileUtils.writeLines(sourceFile,Lists.newArrayList("line1"));
+  sut.execute(new ComputationContext(new BatchReportReader(reportDir),ComponentTesting.newProjectDto(PROJECT_UUID)));
+  assertThat(dbTester.countRowsOfTable("file_sources")).isEqualTo(1);
+  FileSourceDto fileSourceDto=dbClient.fileSourceDao().select(FILE_UUID);
+  FileSourceDb.Data data=FileSourceDto.decodeData(fileSourceDto.getBinaryData());
+  assertThat(data.getLinesList()).hasSize(1);
+  assertThat(data.getLines(0).getUtLineHits()).isEqualTo(1);
+  assertThat(data.getLines(0).getUtConditions()).isEqualTo(10);
+  assertThat(data.getLines(0).getUtCoveredConditions()).isEqualTo(2);
+  assertThat(data.getLines(0).hasItLineHits()).isTrue();
+  assertThat(data.getLines(0).getItConditions()).isEqualTo(10);
+  assertThat(data.getLines(0).getItCoveredConditions()).isEqualTo(3);
+  assertThat(data.getLines(0).getOverallLineHits()).isEqualTo(1);
+  assertThat(data.getLines(0).getOverallConditions()).isEqualTo(10);
+  assertThat(data.getLines(0).getOverallCoveredConditions()).isEqualTo(4);
+}

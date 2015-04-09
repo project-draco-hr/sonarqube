@@ -1,0 +1,15 @@
+{
+  long past=150000L;
+  dbClient.fileSourceDao().insert(session,new FileSourceDto().setProjectUuid(PROJECT_UUID).setFileUuid(FILE_UUID).setLineHashes("6438c669e0d0de98e6929c2cc0fac474\n").setDataHash("6cad150e3d065976c230cddc5a09efaa").setBinaryData(FileSourceDto.encodeData(FileSourceDb.Data.newBuilder().addLines(FileSourceDb.Line.newBuilder().setLine(1).setSource("line").build()).build())).setCreatedAt(past).setUpdatedAt(past));
+  session.commit();
+  BatchReportWriter writer=initReport();
+  writer.writeComponent(BatchReport.Component.newBuilder().setRef(FILE_REF).setType(Constants.ComponentType.FILE).setUuid(FILE_UUID).setLines(1).build());
+  File sourceFile=writer.getFileStructure().fileFor(FileStructure.Domain.SOURCE,FILE_REF);
+  FileUtils.writeLines(sourceFile,Lists.newArrayList("line"));
+  sut.execute(new ComputationContext(new BatchReportReader(reportDir),ComponentTesting.newProjectDto(PROJECT_UUID)));
+  assertThat(dbTester.countRowsOfTable("file_sources")).isEqualTo(1);
+  FileSourceDto fileSourceDto=dbClient.fileSourceDao().select(FILE_UUID);
+  assertThat(fileSourceDto.getCreatedAt()).isEqualTo(past);
+  assertThat(fileSourceDto.getUpdatedAt()).isEqualTo(past);
+  assertThat(fileSourceDto.getSrcHash()).isEqualTo("5b4bd9815cdb17b8ceae19eb1810c34c");
+}
