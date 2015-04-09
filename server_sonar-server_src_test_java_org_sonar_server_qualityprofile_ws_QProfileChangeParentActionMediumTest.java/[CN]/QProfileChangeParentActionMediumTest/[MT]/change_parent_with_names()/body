@@ -18,4 +18,8 @@
   List<ActiveRuleDto> activeRules2=db.activeRuleDao().findByProfileKey(session,child.getKey());
   assertThat(activeRules2).hasSize(1);
   assertThat(activeRules2.get(0).getKey().ruleKey().rule()).isEqualTo("rule2");
+  wsTester.newGetRequest(QProfilesWs.API_ENDPOINT,"change_parent").setParam(QProfileIdentificationParamUtils.PARAM_LANGUAGE,"xoo").setParam(QProfileIdentificationParamUtils.PARAM_PROFILE_NAME,child.getName()).setParam("parentName","").execute();
+  session.clearCache();
+  List<ActiveRuleDto> activeRules=db.activeRuleDao().findByProfileKey(session,child.getKey());
+  assertThat(activeRules).isEmpty();
 }
