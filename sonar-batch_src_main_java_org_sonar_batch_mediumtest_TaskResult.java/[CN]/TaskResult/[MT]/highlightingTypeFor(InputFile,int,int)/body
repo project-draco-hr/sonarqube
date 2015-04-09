@@ -1,16 +1,28 @@
 {
   int ref=reportComponents.get(((DefaultInputFile)file).key()).getRef();
-  List<HighlightingRule> syntaxHighlightingRules=getReportReader().readComponentSyntaxHighlighting(ref);
-  if (syntaxHighlightingRules.isEmpty()) {
+  File highlightingFile=reader.readComponentSyntaxHighlighting(ref);
+  if (highlightingFile == null) {
     return Collections.emptyList();
   }
   TextPointer pointer=file.newPointer(line,lineOffset);
   List<TypeOfText> result=new ArrayList<TypeOfText>();
-  for (  HighlightingRule sortedRule : syntaxHighlightingRules) {
-    TextRange ruleRange=toRange(file,sortedRule.getRange());
-    if (ruleRange.start().compareTo(pointer) <= 0 && ruleRange.end().compareTo(pointer) > 0) {
-      result.add(BatchReportUtils.toBatchType(sortedRule.getType()));
+  InputStream inputStream=null;
+  try {
+    inputStream=FileUtils.openInputStream(highlightingFile);
+    BatchReport.SyntaxHighlighting rule=BatchReport.SyntaxHighlighting.PARSER.parseDelimitedFrom(inputStream);
+    while (rule != null) {
+      TextRange ruleRange=toRange(file,rule.getRange());
+      if (ruleRange.start().compareTo(pointer) <= 0 && ruleRange.end().compareTo(pointer) > 0) {
+        result.add(BatchReportUtils.toBatchType(rule.getType()));
+      }
+      rule=BatchReport.SyntaxHighlighting.PARSER.parseDelimitedFrom(inputStream);
     }
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Can't read syntax highlighting for " + file.absolutePath());
+  }
+ finally {
+    IOUtils.closeQuietly(inputStream);
   }
   return result;
 }
