@@ -1,11 +1,9 @@
 {
-  File dir=temp.newFolder();
-  BatchReportWriter writer=new BatchReportWriter(dir);
-  assertThat(writer.hasComponentData(FileStructure.Domain.DUPLICATIONS,1)).isFalse();
+  assertThat(sut.hasComponentData(FileStructure.Domain.DUPLICATIONS,1)).isFalse();
   BatchReport.Duplication duplication=BatchReport.Duplication.newBuilder().setOriginPosition(Range.newBuilder().setStartLine(1).setEndLine(5).build()).addDuplicate(BatchReport.Duplicate.newBuilder().setOtherFileKey("COMPONENT_A").setOtherFileRef(2).setRange(Range.newBuilder().setStartLine(6).setEndLine(10).build()).build()).build();
-  writer.writeComponentDuplications(1,Arrays.asList(duplication));
-  assertThat(writer.hasComponentData(FileStructure.Domain.DUPLICATIONS,1)).isTrue();
-  File file=writer.getFileStructure().fileFor(FileStructure.Domain.DUPLICATIONS,1);
+  sut.writeComponentDuplications(1,Arrays.asList(duplication));
+  assertThat(sut.hasComponentData(FileStructure.Domain.DUPLICATIONS,1)).isTrue();
+  File file=sut.getFileStructure().fileFor(FileStructure.Domain.DUPLICATIONS,1);
   assertThat(file).exists().isFile();
   BatchReport.Duplications duplications=ProtobufUtil.readFile(file,BatchReport.Duplications.PARSER);
   assertThat(duplications.getComponentRef()).isEqualTo(1);

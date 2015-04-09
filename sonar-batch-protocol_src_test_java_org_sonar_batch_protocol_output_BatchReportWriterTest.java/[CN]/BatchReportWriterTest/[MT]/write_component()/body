@@ -1,11 +1,9 @@
 {
-  File dir=temp.newFolder();
-  BatchReportWriter writer=new BatchReportWriter(dir);
-  assertThat(writer.hasComponentData(FileStructure.Domain.COMPONENT,1)).isFalse();
+  assertThat(sut.hasComponentData(FileStructure.Domain.COMPONENT,1)).isFalse();
   BatchReport.Component.Builder component=BatchReport.Component.newBuilder().setRef(1).setLanguage("java").setPath("src/Foo.java").setUuid("UUID_A").setType(Constants.ComponentType.FILE).setIsTest(false).addChildRef(5).addChildRef(42);
-  writer.writeComponent(component.build());
-  assertThat(writer.hasComponentData(FileStructure.Domain.COMPONENT,1)).isTrue();
-  File file=writer.getFileStructure().fileFor(FileStructure.Domain.COMPONENT,1);
+  sut.writeComponent(component.build());
+  assertThat(sut.hasComponentData(FileStructure.Domain.COMPONENT,1)).isTrue();
+  File file=sut.getFileStructure().fileFor(FileStructure.Domain.COMPONENT,1);
   assertThat(file).exists().isFile();
   BatchReport.Component read=ProtobufUtil.readFile(file,BatchReport.Component.PARSER);
   assertThat(read.getRef()).isEqualTo(1);

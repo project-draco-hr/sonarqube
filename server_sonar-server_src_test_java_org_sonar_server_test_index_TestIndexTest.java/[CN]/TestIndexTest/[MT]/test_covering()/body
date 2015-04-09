@@ -1,0 +1,11 @@
+{
+  List<Map<String,Object>> coverageBlocks=new ArrayList<>();
+  coverageBlocks.add(newCoverageBlock("1"));
+  coverageBlocks.add(newCoverageBlock("2"));
+  coverageBlocks.add(newCoverageBlock("3"));
+  es.putDocuments(TestIndexDefinition.INDEX,TestIndexDefinition.TYPE,newTestDoc("1",newCoverageBlock("3"),newCoverageBlock("4"),newCoverageBlock("5")),newTestDoc("1",newCoverageBlock("5"),newCoverageBlock("6"),newCoverageBlock("7")));
+  List<TestDoc> result=sut.testsCovering("main-uuid-5",82);
+  assertThat(result).hasSize(2);
+  assertThat(result.get(0).name()).isEqualTo("name-1");
+  assertThat(result.get(0).coverageBlocks().get(0).get("uuid")).isEqualTo("main-uuid-3");
+}

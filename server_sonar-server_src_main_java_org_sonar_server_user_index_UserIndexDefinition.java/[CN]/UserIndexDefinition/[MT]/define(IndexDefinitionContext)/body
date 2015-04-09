@@ -1,10 +1,6 @@
 {
   NewIndex index=context.create(INDEX);
-  boolean clusterMode=settings.getBoolean(ProcessProperties.CLUSTER_ACTIVATE);
-  if (clusterMode) {
-    index.getSettings().put(IndexMetaData.SETTING_NUMBER_OF_SHARDS,4);
-    index.getSettings().put(IndexMetaData.SETTING_NUMBER_OF_REPLICAS,1);
-  }
+  EsUtils.setShards(index,settings);
   NewIndex.NewIndexType mapping=index.createType(TYPE_USER);
   mapping.setAttribute("_id",ImmutableMap.of("path",FIELD_LOGIN));
   mapping.stringFieldBuilder(FIELD_LOGIN).build();

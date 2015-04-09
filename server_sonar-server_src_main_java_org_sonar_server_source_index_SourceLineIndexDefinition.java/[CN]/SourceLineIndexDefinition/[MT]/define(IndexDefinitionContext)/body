@@ -1,11 +1,7 @@
 {
   NewIndex index=context.create(INDEX);
-  index.getSettings().put("index.refresh_interval","-1");
-  boolean clusterMode=settings.getBoolean(ProcessProperties.CLUSTER_ACTIVATE);
-  if (clusterMode) {
-    index.getSettings().put(IndexMetaData.SETTING_NUMBER_OF_SHARDS,4);
-    index.getSettings().put(IndexMetaData.SETTING_NUMBER_OF_REPLICAS,1);
-  }
+  EsUtils.refreshHandledByIndexer(index);
+  EsUtils.setShards(index,settings);
   NewIndex.NewIndexType mapping=index.createType(TYPE);
   mapping.setAttribute("_routing",ImmutableMap.of("required",true,"path",FIELD_PROJECT_UUID));
   mapping.stringFieldBuilder(FIELD_PROJECT_UUID).build();

@@ -1,12 +1,8 @@
 {
   NewIndex index=context.create(INDEX);
-  index.getSettings().put("index.refresh_interval","-1");
   index.getSettings().put("analysis.analyzer.default.type","keyword");
-  boolean clusterMode=settings.getBoolean(ProcessProperties.CLUSTER_ACTIVATE);
-  if (clusterMode) {
-    index.getSettings().put(IndexMetaData.SETTING_NUMBER_OF_SHARDS,4);
-    index.getSettings().put(IndexMetaData.SETTING_NUMBER_OF_REPLICAS,1);
-  }
+  EsUtils.refreshHandledByIndexer(index);
+  EsUtils.setShards(index,settings);
   NewIndex.NewIndexType mapping=index.createType(TYPE);
   mapping.setAttribute("_id",ImmutableMap.of("path",FIELD_KEY));
   mapping.stringFieldBuilder(FIELD_KEY).build();
