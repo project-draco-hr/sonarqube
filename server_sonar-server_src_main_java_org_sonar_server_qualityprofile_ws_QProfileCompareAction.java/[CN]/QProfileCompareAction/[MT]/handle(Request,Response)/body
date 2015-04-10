@@ -1,0 +1,13 @@
+{
+  String leftKey=request.mandatoryParam(PARAM_LEFT_KEY);
+  String rightKey=request.mandatoryParam(PARAM_RIGHT_KEY);
+  QProfileComparisonResult result=comparator.compare(leftKey,rightKey);
+  List<Rule> referencedRules=ruleService.getByKeys(result.collectRuleKeys());
+  Map<RuleKey,Rule> rulesByKey=Maps.uniqueIndex(referencedRules,new NonNullInputFunction<Rule,RuleKey>(){
+    @Override protected RuleKey doApply(    Rule input){
+      return input.key();
+    }
+  }
+);
+  writeResult(response.newJsonWriter(),result,rulesByKey);
+}

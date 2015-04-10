@@ -1,0 +1,20 @@
+{
+  RuleDto rule1=createRule("xoo","rule1");
+  RuleDto rule2=createRule("xoo","rule2");
+  RuleDto rule3=createRule("xoo","rule3");
+  RuleDto rule4=createRuleWithParam("xoo","rule4");
+  RuleDto rule5=createRule("xoo","rule5");
+  QualityProfileDto profile1=createProfile("xoo","Profile 1","xoo-profile-1-01234");
+  createActiveRule(rule1,profile1);
+  createActiveRule(rule2,profile1);
+  createActiveRuleWithParam(rule4,profile1,"polop");
+  createActiveRuleWithSeverity(rule5,profile1,Severity.MINOR);
+  session.commit();
+  QualityProfileDto profile2=createProfile("xoo","Profile 2","xoo-profile-2-12345");
+  createActiveRule(rule1,profile2);
+  createActiveRule(rule3,profile2);
+  createActiveRuleWithParam(rule4,profile2,"palap");
+  createActiveRuleWithSeverity(rule5,profile2,Severity.MAJOR);
+  session.commit();
+  wsTester.newGetRequest("api/qualityprofiles","compare").setParam("leftKey",profile1.getKey()).setParam("rightKey",profile2.getKey()).execute().assertJson(this.getClass(),"compare_nominal.json");
+}
