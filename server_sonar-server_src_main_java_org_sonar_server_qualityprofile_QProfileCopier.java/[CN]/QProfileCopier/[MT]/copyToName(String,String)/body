@@ -1,7 +1,12 @@
 {
-  QProfileName to=prepareTarget(fromProfileKey,toName);
+  QualityProfileDto to=prepareTarget(fromProfileKey,toName);
   File backupFile=temp.newFile();
-  backup(fromProfileKey,backupFile);
-  restore(backupFile,to);
-  FileUtils.deleteQuietly(backupFile);
+  try {
+    backup(fromProfileKey,backupFile);
+    restore(backupFile,QProfileName.createFor(to.getLanguage(),to.getName()));
+    return to;
+  }
+  finally {
+    FileUtils.deleteQuietly(backupFile);
+  }
 }
