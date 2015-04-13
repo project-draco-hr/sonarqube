@@ -3,13 +3,15 @@
   BatchReport.Component component=reportReader.readComponent(componentRef);
   if (component.getType().equals(Constants.ComponentType.FILE)) {
     LineIterator linesIterator=sourceLinesIterator(reportReader.readFileSource(componentRef));
+    LineReaders lineReaders=new LineReaders(reportReader,componentRef);
     try {
-      ComputeFileSourceData computeFileSourceData=new ComputeFileSourceData(linesIterator,dataLineReaders(reportReader,componentRef),component.getLines());
+      ComputeFileSourceData computeFileSourceData=new ComputeFileSourceData(linesIterator,lineReaders.readers(),component.getLines());
       ComputeFileSourceData.Data fileSourceData=computeFileSourceData.compute();
       persistSource(fileSourcesContext,fileSourceData,component);
     }
   finally {
       linesIterator.close();
+      lineReaders.close();
     }
   }
   for (  Integer childRef : component.getChildRefList()) {

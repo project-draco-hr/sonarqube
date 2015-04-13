@@ -1,0 +1,18 @@
+{
+  File coverageFile=reportReader.readComponentCoverage(componentRef);
+  BatchReport.Scm scmReport=reportReader.readComponentScm(componentRef);
+  File highlightingFile=reportReader.readComponentSyntaxHighlighting(componentRef);
+  if (coverageFile != null) {
+    ReportIterator<BatchReport.Coverage> coverageReportIterator=new ReportIterator<>(coverageFile,BatchReport.Coverage.PARSER);
+    reportIterators.add(coverageReportIterator);
+    lineReaders.add(new CoverageLineReader(coverageReportIterator));
+  }
+  if (scmReport != null) {
+    lineReaders.add(new ScmLineReader(scmReport));
+  }
+  if (highlightingFile != null) {
+    ReportIterator<BatchReport.SyntaxHighlighting> syntaxHighlightingReportIterator=new ReportIterator<>(highlightingFile,BatchReport.SyntaxHighlighting.PARSER);
+    reportIterators.add(syntaxHighlightingReportIterator);
+    lineReaders.add(new HighlightingLineReader(syntaxHighlightingReportIterator));
+  }
+}
