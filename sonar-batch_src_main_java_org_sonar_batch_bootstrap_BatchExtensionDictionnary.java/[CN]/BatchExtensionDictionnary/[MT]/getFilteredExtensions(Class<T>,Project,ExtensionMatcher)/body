@@ -2,7 +2,7 @@
   List<T> result=Lists.newArrayList();
   for (  Object extension : getExtensions(type)) {
     if (org.sonar.api.batch.Sensor.class.equals(type) && extension instanceof Sensor) {
-      extension=new SensorWrapper((Sensor)extension,context,analyzerOptimizer);
+      extension=new SensorWrapper((Sensor)extension,sensorContext,sensorOptimizer);
     }
     if (shouldKeep(type,extension,project,matcher)) {
       result.add((T)extension);
@@ -10,7 +10,15 @@
   }
   if (org.sonar.api.batch.Sensor.class.equals(type)) {
     for (    Object extension : getExtensions(Sensor.class)) {
-      extension=new SensorWrapper((Sensor)extension,context,analyzerOptimizer);
+      extension=new SensorWrapper((Sensor)extension,sensorContext,sensorOptimizer);
+      if (shouldKeep(type,extension,project,matcher)) {
+        result.add((T)extension);
+      }
+    }
+  }
+  if (org.sonar.api.batch.PostJob.class.equals(type)) {
+    for (    Object extension : getExtensions(PostJob.class)) {
+      extension=new PostJobWrapper((PostJob)extension,postJobContext,postJobOptimizer);
       if (shouldKeep(type,extension,project,matcher)) {
         result.add((T)extension);
       }
