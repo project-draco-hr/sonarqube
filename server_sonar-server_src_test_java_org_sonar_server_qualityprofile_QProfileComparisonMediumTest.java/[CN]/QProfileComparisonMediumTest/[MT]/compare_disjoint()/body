@@ -1,0 +1,13 @@
+{
+  ruleActivator.activate(dbSession,new RuleActivation(xooRule1.getKey()),left);
+  ruleActivator.activate(dbSession,new RuleActivation(xooRule2.getKey()),right);
+  dbSession.commit();
+  QProfileComparisonResult result=comparison.compare(left.getKey(),right.getKey());
+  assertThat(result.left().getKey()).isEqualTo(left.getKey());
+  assertThat(result.right().getKey()).isEqualTo(right.getKey());
+  assertThat(result.same()).isEmpty();
+  assertThat(result.inLeft()).isNotEmpty().containsOnlyKeys(xooRule1.getKey());
+  assertThat(result.inRight()).isNotEmpty().containsOnlyKeys(xooRule2.getKey());
+  assertThat(result.modified()).isEmpty();
+  assertThat(result.collectRuleKeys()).containsOnly(xooRule1.getKey(),xooRule2.getKey());
+}
