@@ -1,0 +1,14 @@
+{
+  QualityProfileDto profile=QProfileTesting.newXooP1();
+  qualityProfileDao.insert(session,profile);
+  session.commit();
+  doAnswer(new Answer<Void>(){
+    @Override public Void answer(    InvocationOnMock invocation) throws Throwable {
+      invocation.getArgumentAt(1,Writer.class).write("As exported by SQ !");
+      return null;
+    }
+  }
+).when(backuper).backup(Matchers.eq(profile.getKey()),Matchers.any(Writer.class));
+  Result result=wsTester.newGetRequest("api/qualityprofiles","export").setParam("language",profile.getLanguage()).setParam("name",profile.getName()).execute();
+  assertThat(result.outputAsString()).isEqualTo("As exported by SQ !");
+}

@@ -1,0 +1,38 @@
+{
+  String name=request.param(PARAM_PROFILE_NAME);
+  String language=request.mandatoryParam(PARAM_LANGUAGE);
+  String format=null;
+  if (!exporters.exportersForLanguage(language).isEmpty()) {
+    format=request.param(PARAM_FORMAT);
+  }
+  DbSession dbSession=dbClient.openSession(false);
+  Stream stream=response.stream();
+  OutputStream output=stream.output();
+  Writer writer=new OutputStreamWriter(output);
+  try {
+    QualityProfileDto profile=null;
+    if (name == null) {
+      profile=profileFactory.getDefault(dbSession,language);
+    }
+ else {
+      profile=profileFactory.getByNameAndLanguage(dbSession,name,language);
+    }
+    if (profile == null) {
+      throw new NotFoundException(String.format("Could not find profile with name '%s' for language '%s'",name,language));
+    }
+    String profileKey=profile.getKey();
+    if (format == null) {
+      stream.setMediaType(QProfileBackuper.MEDIA_TYPE_XML);
+      backuper.backup(profileKey,writer);
+    }
+ else {
+      stream.setMediaType(exporters.mimeType(format));
+      exporters.export(profileKey,format,writer);
+    }
+  }
+  finally {
+    IOUtils.closeQuietly(writer);
+    IOUtils.closeQuietly(output);
+    dbSession.close();
+  }
+}

@@ -1,0 +1,14 @@
+{
+  NewAction create=controller.createAction("export").setSince("5.2").setDescription("Export a quality profile.").setHandler(this);
+  create.createParam(PARAM_PROFILE_NAME).setDescription("The name of the quality profile to export. If left empty, will export the default profile for the language.").setExampleValue("My Sonar way");
+  create.createParam(PARAM_LANGUAGE).setDescription("The language for the quality profile.").setExampleValue(LanguageParamUtils.getExampleValue(languages)).setPossibleValues(LanguageParamUtils.getLanguageKeys(languages)).setRequired(true);
+  List<String> exporterKeys=Lists.newArrayList();
+  for (  Language lang : languages.all()) {
+    for (    ProfileExporter exporter : exporters.exportersForLanguage(lang.getKey())) {
+      exporterKeys.add(exporter.getKey());
+    }
+  }
+  if (!exporterKeys.isEmpty()) {
+    create.createParam(PARAM_FORMAT).setDescription("Output format. If left empty, the same format as api/qualityprofiles/backup is used.").setPossibleValues(exporterKeys);
+  }
+}
