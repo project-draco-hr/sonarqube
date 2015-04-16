@@ -1,5 +1,7 @@
 {
   List<RuleActivation> activations=Lists.newArrayList();
+  Set<RuleKey> activatedKeys=Sets.newHashSet();
+  List<RuleKey> duplicatedKeys=Lists.newArrayList();
   while (rulesCursor.getNext() != null) {
     SMInputCursor ruleCursor=rulesCursor.childElementCursor();
     String repositoryKey=null, key=null, severity=null;
@@ -21,10 +23,17 @@
       }
     }
     RuleKey ruleKey=RuleKey.of(repositoryKey,key);
+    if (activatedKeys.contains(ruleKey)) {
+      duplicatedKeys.add(ruleKey);
+    }
+    activatedKeys.add(ruleKey);
     RuleActivation activation=new RuleActivation(ruleKey);
     activation.setSeverity(severity);
     activation.setParameters(parameters);
     activations.add(activation);
+  }
+  if (!duplicatedKeys.isEmpty()) {
+    throw new IllegalArgumentException("The quality profile cannot be restored as it contains duplicates for the following rules: " + RULEKEY_JOINER.join(duplicatedKeys));
   }
   return activations;
 }
