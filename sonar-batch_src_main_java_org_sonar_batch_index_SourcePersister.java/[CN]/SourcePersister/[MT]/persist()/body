@@ -1,19 +1,2 @@
 {
-  try (DbSession session=mybatis.openSession(false)){
-    final Map<String,FileSourceDto> previousDtosByUuid=new HashMap<>();
-    session.select("org.sonar.core.source.db.FileSourceMapper.selectHashesForProject",projectTree.getRootProject().getUuid(),new ResultHandler(){
-      @Override public void handleResult(      ResultContext context){
-        FileSourceDto dto=(FileSourceDto)context.getResultObject();
-        previousDtosByUuid.put(dto.getFileUuid(),dto);
-      }
-    }
-);
-    FileSourceMapper mapper=session.getMapper(FileSourceMapper.class);
-    for (    InputFile inputFile : inputPathCache.allFiles()) {
-      persist(session,mapper,(DefaultInputFile)inputFile,previousDtosByUuid);
-    }
-  }
- catch (  Exception e) {
-    throw new IllegalStateException("Unable to save file sources",e);
-  }
 }
