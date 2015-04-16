@@ -1,0 +1,18 @@
+{
+  Connection connection=db.getDataSource().getConnection();
+  try {
+    int majorVersion=connection.getMetaData().getDatabaseMajorVersion();
+    if (majorVersion < ORACLE_MIN_MAJOR_VERSION) {
+      throw MessageException.of(String.format("Unsupported Oracle version: %s. Minimal required version is %d.",connection.getMetaData().getDatabaseProductVersion(),ORACLE_MIN_MAJOR_VERSION));
+    }
+    String driverVersion=connection.getMetaData().getDriverVersion();
+    String[] parts=StringUtils.split(driverVersion,".");
+    int intVersion=Integer.parseInt(parts[0]) * 100 + Integer.parseInt(parts[1]);
+    if (intVersion < 1102) {
+      throw MessageException.of(String.format("Unsupported Oracle JDBC driver version: %s. Minimal required version is 11.2.",driverVersion));
+    }
+  }
+  finally {
+    DbUtils.closeQuietly(connection);
+  }
+}
