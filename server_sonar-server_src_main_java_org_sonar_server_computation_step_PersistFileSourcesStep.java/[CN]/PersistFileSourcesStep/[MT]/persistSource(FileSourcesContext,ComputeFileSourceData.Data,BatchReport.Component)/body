@@ -6,7 +6,7 @@
   String lineHashes=fileSourceData.getLineHashes();
   FileSourceDto previousDto=fileSourcesContext.previousFileSourcesByUuid.get(component.getUuid());
   if (previousDto == null) {
-    FileSourceDto dto=new FileSourceDto().setProjectUuid(fileSourcesContext.context.getProject().uuid()).setFileUuid(component.getUuid()).setBinaryData(data).setSrcHash(srcHash).setDataHash(dataHash).setLineHashes(lineHashes).setCreatedAt(system2.now()).setUpdatedAt(0L);
+    FileSourceDto dto=new FileSourceDto().setProjectUuid(fileSourcesContext.context.getProject().uuid()).setFileUuid(component.getUuid()).setBinaryData(data).setSrcHash(srcHash).setDataHash(dataHash).setLineHashes(lineHashes).setCreatedAt(system2.now()).setUpdatedAt(system2.now());
     dbClient.fileSourceDao().insert(fileSourcesContext.session,dto);
     fileSourcesContext.session.commit();
   }
@@ -16,7 +16,7 @@
     if (binaryDataUpdated || srcHashUpdated) {
       previousDto.setBinaryData(data).setDataHash(dataHash).setSrcHash(srcHash).setLineHashes(lineHashes);
       if (binaryDataUpdated) {
-        previousDto.setUpdatedAt(0L);
+        previousDto.setUpdatedAt(system2.now());
       }
       dbClient.fileSourceDao().update(previousDto);
       fileSourcesContext.session.commit();

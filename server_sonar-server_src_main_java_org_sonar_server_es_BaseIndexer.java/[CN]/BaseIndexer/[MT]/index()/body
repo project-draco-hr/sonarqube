@@ -1,20 +1,8 @@
 {
-  if (enabled) {
-    final long requestedAt=System.currentTimeMillis();
-    Future submit=executor.submit(new Runnable(){
-      @Override public void run(){
-        if (requestedAt > lastUpdatedAt) {
-          long l=doIndex(lastUpdatedAt);
-          lastUpdatedAt=Math.max(l,lastUpdatedAt);
-        }
-      }
-    }
-);
-    try {
-      Uninterruptibles.getUninterruptibly(submit);
-    }
- catch (    ExecutionException e) {
-      Throwables.propagate(e);
+  index(new IndexerTask(){
+    @Override public long index(    long lastUpdatedAt){
+      return doIndex(lastUpdatedAt);
     }
   }
+);
 }

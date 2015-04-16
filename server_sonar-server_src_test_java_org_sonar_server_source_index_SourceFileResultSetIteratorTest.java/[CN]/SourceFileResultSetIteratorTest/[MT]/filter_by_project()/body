@@ -1,0 +1,11 @@
+{
+  db.prepareDbUnit(getClass(),"filter_by_project.xml");
+  FileSourceDb.Data.Builder dataBuilder=FileSourceDb.Data.newBuilder();
+  dataBuilder.addLinesBuilder().setLine(1).build();
+  FileSourceTesting.updateDataColumn(connection,"F1",dataBuilder.build());
+  iterator=SourceFileResultSetIterator.create(dbClient,connection,0L,"P1");
+  SourceFileResultSetIterator.Row row=iterator.next();
+  assertThat(row.getProjectUuid()).isEqualTo("P1");
+  assertThat(row.getFileUuid()).isEqualTo("F1");
+  assertThat(iterator.hasNext()).isFalse();
+}

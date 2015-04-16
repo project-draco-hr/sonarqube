@@ -1,15 +1,3 @@
 {
-  final BulkIndexer bulk=new BulkIndexer(esClient,SourceLineIndexDefinition.INDEX);
-  bulk.setLarge(lastUpdatedAt == 0L);
-  DbSession dbSession=dbClient.openSession(false);
-  Connection dbConnection=dbSession.getConnection();
-  try {
-    SourceFileResultSetIterator rowIt=SourceFileResultSetIterator.create(dbClient,dbConnection,lastUpdatedAt);
-    long maxUpdatedAt=doIndex(bulk,rowIt);
-    rowIt.close();
-    return maxUpdatedAt;
-  }
-  finally {
-    dbSession.close();
-  }
+  return doIndex(lastUpdatedAt,null);
 }

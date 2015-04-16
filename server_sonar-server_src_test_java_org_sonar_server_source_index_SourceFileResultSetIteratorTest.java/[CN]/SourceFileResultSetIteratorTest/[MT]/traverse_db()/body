@@ -1,9 +1,9 @@
 {
   db.prepareDbUnit(getClass(),"shared.xml");
   FileSourceTesting.updateDataColumn(connection,"F1",FileSourceTesting.newFakeData(3).build());
-  SourceFileResultSetIterator it=SourceFileResultSetIterator.create(dbClient,connection,0L);
-  assertThat(it.hasNext()).isTrue();
-  SourceFileResultSetIterator.Row row=it.next();
+  iterator=SourceFileResultSetIterator.create(dbClient,connection,0L,null);
+  assertThat(iterator.hasNext()).isTrue();
+  SourceFileResultSetIterator.Row row=iterator.next();
   assertThat(row.getProjectUuid()).isEqualTo("P1");
   assertThat(row.getFileUuid()).isEqualTo("F1");
   assertThat(row.getUpdatedAt()).isEqualTo(1416239042000L);
@@ -11,5 +11,4 @@
   UpdateRequest firstRequest=row.getLineUpdateRequests().get(0);
   Map<String,Object> doc=firstRequest.doc().sourceAsMap();
   assertThat(doc).contains(MapEntry.entry(SourceLineIndexDefinition.FIELD_PROJECT_UUID,"P1"),MapEntry.entry(SourceLineIndexDefinition.FIELD_FILE_UUID,"F1"),MapEntry.entry(SourceLineIndexDefinition.FIELD_LINE,1),MapEntry.entry(SourceLineIndexDefinition.FIELD_SCM_REVISION,"REVISION_1"),MapEntry.entry(SourceLineIndexDefinition.FIELD_SCM_AUTHOR,"AUTHOR_1"),MapEntry.entry(SourceLineIndexDefinition.FIELD_HIGHLIGHTING,"HIGHLIGHTING_1"),MapEntry.entry(SourceLineIndexDefinition.FIELD_SYMBOLS,"SYMBOLS_1"),MapEntry.entry(SourceLineIndexDefinition.FIELD_UT_LINE_HITS,1),MapEntry.entry(SourceLineIndexDefinition.FIELD_UT_CONDITIONS,2),MapEntry.entry(SourceLineIndexDefinition.FIELD_UT_COVERED_CONDITIONS,3),MapEntry.entry(SourceLineIndexDefinition.FIELD_IT_LINE_HITS,4),MapEntry.entry(SourceLineIndexDefinition.FIELD_IT_CONDITIONS,5),MapEntry.entry(SourceLineIndexDefinition.FIELD_IT_COVERED_CONDITIONS,6),MapEntry.entry(SourceLineIndexDefinition.FIELD_OVERALL_LINE_HITS,7),MapEntry.entry(SourceLineIndexDefinition.FIELD_OVERALL_CONDITIONS,8),MapEntry.entry(SourceLineIndexDefinition.FIELD_OVERALL_COVERED_CONDITIONS,9));
-  it.close();
 }
