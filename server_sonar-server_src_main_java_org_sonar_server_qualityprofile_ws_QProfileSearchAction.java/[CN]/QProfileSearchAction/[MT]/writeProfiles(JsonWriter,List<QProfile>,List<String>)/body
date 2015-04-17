@@ -6,6 +6,7 @@
   }
 );
   Map<String,Long> activeRuleCountByKey=profileLoader.countAllActiveRules();
+  Map<String,Long> projectCountByKey=qualityProfileDao.countProjectsByProfileKey();
   json.name("profiles").beginArray();
   for (  QProfile profile : profiles) {
     if (languages.get(profile.language()) == null) {
@@ -13,7 +14,11 @@
     }
     String key=profile.key();
     Long activeRuleCount=activeRuleCountByKey.containsKey(key) ? activeRuleCountByKey.get(key) : 0L;
+    Long projectCount=projectCountByKey.containsKey(key) ? projectCountByKey.get(key) : 0L;
     json.beginObject().prop(FIELD_KEY,nullUnlessNeeded(FIELD_KEY,key,fields)).prop(FIELD_NAME,nullUnlessNeeded(FIELD_NAME,profile.name(),fields)).prop(FIELD_ACTIVE_RULE_COUNT,nullUnlessNeeded(FIELD_ACTIVE_RULE_COUNT,activeRuleCount,fields));
+    if (!profile.isDefault()) {
+      json.prop(FIELD_PROJECT_COUNT,nullUnlessNeeded(FIELD_PROJECT_COUNT,projectCount,fields));
+    }
     writeLanguageFields(json,profile,fields);
     writeParentFields(json,profile,fields,profilesByKey);
     if (fieldIsNeeded(FIELD_IS_INHERITED,fields)) {
