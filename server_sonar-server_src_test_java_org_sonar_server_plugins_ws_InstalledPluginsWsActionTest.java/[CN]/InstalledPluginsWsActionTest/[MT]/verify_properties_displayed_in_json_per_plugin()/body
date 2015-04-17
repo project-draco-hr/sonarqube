@@ -1,5 +1,6 @@
 {
-  when(pluginRepository.getMetadata()).thenReturn(of(plugin("plugKey","plugName",10)));
+  String jarFilename=getClass().getSimpleName() + "/" + "some.jar";
+  when(pluginRepository.getMetadata()).thenReturn(of((PluginMetadata)DefaultPluginMetadata.create("plugKey").setName("plugName").setCore(false).setDescription("desc_it").setVersion(valueOf(10)).setLicense("license_hey").setOrganization("org_name").setOrganizationUrl("org_url").setHomepage("homepage_url").setIssueTrackerUrl("issueTracker_url").setFile(new File(getClass().getResource(jarFilename).toURI()))));
   underTest.handle(request,response);
-  assertJson(response.outputAsString()).isSimilarTo("{" + "  \"plugins\":" + "  ["+ "    {"+ "      \"key\": \"plugKey\","+ "      \"name\": \"plugName\","+ "      \"version\": \"10\""+ "    }"+ "  ]"+ "}");
+  assertJson(response.outputAsString()).isSimilarTo("{" + "  \"plugins\":" + "  ["+ "    {"+ "      \"key\": \"plugKey\","+ "      \"name\": \"plugName\","+ "      \"description\": \"desc_it\","+ "      \"version\": \"10\","+ "      \"license\": \"license_hey\","+ "      \"organizationName\": \"org_name\","+ "      \"organizationUrl\": \"org_url\","+ "      \"urls\":"+ "      {"+ "        \"homepage\": \"homepage_url\","+ "        \"issueTracker\": \"issueTracker_url\""+ "      },"+ "      \"artifact\":"+ "      {"+ "        \"name\": \"some.jar\""+ "      }"+ "    }"+ "  ]"+ "}");
 }
