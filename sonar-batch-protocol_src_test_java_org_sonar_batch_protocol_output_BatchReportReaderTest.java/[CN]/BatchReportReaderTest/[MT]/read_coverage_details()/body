@@ -1,0 +1,11 @@
+{
+  initFiles(dir);
+  BatchReportWriter writer=new BatchReportWriter(dir);
+  writer.writeCoverageDetails(1,Arrays.asList(BatchReport.CoverageDetail.newBuilder().setTestName("test-name").addCoveredFile(BatchReport.CoverageDetail.CoveredFile.newBuilder().addAllCoveredLine(Arrays.asList(1,2,3,5,7)).setFileRef(2)).build()));
+  try (InputStream inputStream=FileUtils.openInputStream(sut.readCoverageDetails(1))){
+    BatchReport.CoverageDetail coverageDetail=BatchReport.CoverageDetail.PARSER.parseDelimitedFrom(inputStream);
+    assertThat(coverageDetail.getTestName()).isEqualTo("test-name");
+    assertThat(coverageDetail.getCoveredFile(0).getFileRef()).isEqualTo(2);
+    assertThat(coverageDetail.getCoveredFile(0).getCoveredLineList()).containsExactly(1,2,3,5,7);
+  }
+ }
