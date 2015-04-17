@@ -1,18 +1,17 @@
 {
   NewIndex index=context.create(INDEX);
-  EsUtils.refreshHandledByIndexer(index);
-  EsUtils.setShards(index,settings);
+  index.refreshHandledByIndexer();
+  index.setShards(settings);
   NewIndex.NewIndexType nestedMapping=index.createType(TYPE);
-  nestedMapping.stringFieldBuilder(FIELD_COVERAGE_BLOCK_KEY).build();
   nestedMapping.stringFieldBuilder(FIELD_COVERAGE_BLOCK_UUID).build();
   nestedMapping.createIntegerField(FIELD_COVERAGE_BLOCK_LINES);
-  nestedMapping.createIntegerField(FIELD_COVERAGE_BLOCK_COVERED_LINES);
   NewIndex.NewIndexType mapping=index.createType(TYPE);
   mapping.stringFieldBuilder(FIELD_UUID).build();
   mapping.stringFieldBuilder(FIELD_NAME).build();
   mapping.stringFieldBuilder(FIELD_STATUS).disableSearch().build();
+  mapping.stringFieldBuilder(FIELD_TYPE).disableSearch().build();
+  mapping.createLongField(FIELD_DURATION_IN_MS);
   mapping.stringFieldBuilder(FIELD_MESSAGE).disableSearch().build();
   mapping.stringFieldBuilder(FIELD_STACKTRACE).disableSearch().build();
-  mapping.stringFieldBuilder(FIELD_TYPE).disableSearch().build();
   mapping.nestedObjectBuilder(FIELD_COVERAGE_BLOCKS,nestedMapping).build();
 }
