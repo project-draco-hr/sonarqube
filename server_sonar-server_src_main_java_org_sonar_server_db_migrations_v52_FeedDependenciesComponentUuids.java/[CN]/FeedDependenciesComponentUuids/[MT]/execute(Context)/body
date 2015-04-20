@@ -1,0 +1,14 @@
+{
+  MassUpdate update=context.prepareMassUpdate().rowPluralName("dependencies");
+  update.select("SELECT from_component.uuid, to_component.uuid, dependency.id " + "FROM dependencies dependency " + "INNER JOIN projects from_component ON from_component.id=dependency.from_resource_id "+ "INNER JOIN projects to_component ON to_component.id=dependency.to_resource_id "+ "WHERE dependency.from_component_uuid IS NULL");
+  update.update("UPDATE dependencies SET from_component_uuid=?, to_component_uuid=? WHERE id=?");
+  update.execute(new MassUpdate.Handler(){
+    @Override public boolean handle(    Select.Row row,    SqlStatement update) throws SQLException {
+      update.setString(1,row.getString(1));
+      update.setString(2,row.getString(2));
+      update.setLong(3,row.getLong(3));
+      return true;
+    }
+  }
+);
+}
