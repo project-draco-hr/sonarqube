@@ -1,18 +1,12 @@
 {
-  setupData("fixture");
+  dbtester.prepareDbUnit(getClass(),"fixture.xml");
   final List<DependencyDto> dependencies=Lists.newArrayList();
-  SqlSession session=getMyBatis().openSession();
-  try {
-    session.getMapper(DependencyMapper.class).selectAll(new ResultHandler(){
-      public void handleResult(      ResultContext context){
-        dependencies.add((DependencyDto)context.getResultObject());
-      }
+  session.getMapper(DependencyMapper.class).selectAll(new ResultHandler(){
+    public void handleResult(    ResultContext context){
+      dependencies.add((DependencyDto)context.getResultObject());
     }
+  }
 );
-  }
-  finally {
-    MyBatis.closeQuietly(session);
-  }
   assertThat(dependencies).hasSize(2);
   DependencyDto dep=dependencies.get(0);
   assertThat(dep.getId()).isEqualTo(1L);
