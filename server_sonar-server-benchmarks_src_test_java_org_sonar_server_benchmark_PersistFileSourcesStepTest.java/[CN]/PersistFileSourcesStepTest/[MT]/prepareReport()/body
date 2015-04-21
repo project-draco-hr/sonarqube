@@ -1,0 +1,13 @@
+{
+  LOGGER.info("Create report");
+  File reportDir=temp.newFolder();
+  BatchReportWriter writer=new BatchReportWriter(reportDir);
+  writer.writeMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).build());
+  BatchReport.Component.Builder project=BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setUuid(PROJECT_UUID);
+  for (int fileRef=2; fileRef <= NUMBER_OF_FILES + 1; fileRef++) {
+    generateFileReport(writer,fileRef);
+    project.addChildRef(fileRef);
+  }
+  writer.writeComponent(project.build());
+  return reportDir;
+}

@@ -1,0 +1,13 @@
+{
+  LineData lineData=new LineData();
+  for (int line=1; line <= NUMBER_OF_LINES; line++) {
+    lineData.generateLineData(line);
+  }
+  writer.writeComponent(BatchReport.Component.newBuilder().setRef(fileRef).setType(Constants.ComponentType.FILE).setUuid(Uuids.create()).setLines(NUMBER_OF_LINES).build());
+  FileUtils.writeLines(writer.getSourceFile(fileRef),lineData.lines);
+  writer.writeComponentCoverage(fileRef,lineData.coverages);
+  writer.writeComponentChangesets(lineData.changesetsBuilder.setComponentRef(fileRef).build());
+  writer.writeComponentSyntaxHighlighting(fileRef,lineData.highlightings);
+  writer.writeComponentSymbols(fileRef,lineData.symbols);
+  writer.writeComponentDuplications(fileRef,lineData.duplications);
+}
