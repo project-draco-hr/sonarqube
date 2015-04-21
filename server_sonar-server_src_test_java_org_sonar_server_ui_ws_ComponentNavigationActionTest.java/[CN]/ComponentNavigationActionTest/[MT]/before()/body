@@ -1,0 +1,17 @@
+{
+  dbTester.truncateTables();
+  System2 system=mock(System2.class);
+  userDao=new UserDao(dbTester.myBatis(),system);
+  dashboardDao=new DashboardDao(dbTester.myBatis());
+  activeDashboardDao=new ActiveDashboardDao(dbTester.myBatis());
+  dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),userDao,dashboardDao,activeDashboardDao,new ComponentDao(system),new SnapshotDao(system),new PropertiesDao(dbTester.myBatis()),new MeasureDao());
+  i18n=mock(I18n.class);
+  when(i18n.message(any(Locale.class),any(String.class),any(String.class))).thenAnswer(new Answer<String>(){
+    @Override public String answer(    InvocationOnMock invocation) throws Throwable {
+      return invocation.getArgumentAt(2,String.class);
+    }
+  }
+);
+  projectConfigurationPages=new ProjectConfigurationPagesStub();
+  session=dbClient.openSession(false);
+}

@@ -1,0 +1,15 @@
+{
+  json.name("breadcrumbs").beginArray();
+  List<ComponentDto> componentPath=Lists.newArrayList(component);
+  if (snapshot != null) {
+    SnapshotDto currentSnapshot=snapshot;
+    while (currentSnapshot.getParentId() != null) {
+      currentSnapshot=dbClient.snapshotDao().getByKey(session,currentSnapshot.getParentId());
+      componentPath.add(0,dbClient.componentDao().getById(currentSnapshot.getResourceId(),session));
+    }
+  }
+  for (  ComponentDto crumbComponent : componentPath) {
+    json.beginObject().prop("key",crumbComponent.key()).prop("name",crumbComponent.name()).prop("qualifier",crumbComponent.qualifier()).endObject();
+  }
+  json.endArray();
+}

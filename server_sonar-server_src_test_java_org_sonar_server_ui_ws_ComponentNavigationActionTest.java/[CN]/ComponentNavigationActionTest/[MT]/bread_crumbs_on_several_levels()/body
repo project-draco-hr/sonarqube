@@ -1,0 +1,15 @@
+{
+  ComponentDto project=ComponentTesting.newProjectDto("abcd").setKey("polop").setName("Polop");
+  ComponentDto module=ComponentTesting.newModuleDto("bcde",project).setKey("palap").setName("Palap");
+  ComponentDto directory=ComponentTesting.newDirectory(module,"src/main/xoo");
+  ComponentDto file=ComponentTesting.newFileDto(module,"cdef").setName("Source.xoo").setKey("palap:src/main/xoo/Source.xoo").setPath(directory.path());
+  dbClient.componentDao().insert(session,project,module,directory,file);
+  SnapshotDto projectSnapshot=dbClient.snapshotDao().insert(session,new SnapshotDto().setLast(true).setQualifier(project.qualifier()).setResourceId(project.getId()).setRootProjectId(project.getId()).setScope(project.scope()));
+  SnapshotDto moduleSnapshot=dbClient.snapshotDao().insert(session,new SnapshotDto().setLast(true).setQualifier(module.qualifier()).setResourceId(module.getId()).setRootProjectId(project.getId()).setScope(module.scope()).setParentId(projectSnapshot.getId()));
+  SnapshotDto directorySnapshot=dbClient.snapshotDao().insert(session,new SnapshotDto().setLast(true).setQualifier(directory.qualifier()).setResourceId(directory.getId()).setRootProjectId(project.getId()).setScope(directory.scope()).setParentId(moduleSnapshot.getId()));
+  dbClient.snapshotDao().insert(session,new SnapshotDto().setLast(true).setQualifier(file.qualifier()).setResourceId(file.getId()).setRootProjectId(project.getId()).setScope(file.scope()).setParentId(directorySnapshot.getId()));
+  session.commit();
+  MockUserSession.set().addProjectUuidPermissions(UserRole.USER,"abcd");
+  wsTester=new WsTester(new NavigationWs(new ComponentNavigationAction(dbClient,activeDashboardDao,new Views(),i18n,projectConfigurationPages)));
+  wsTester.newGetRequest("api/navigation","component").setParam("componentKey","palap:src/main/xoo/Source.xoo").execute().assertJson(getClass(),"breadcrumbs.json");
+}

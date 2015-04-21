@@ -1,0 +1,7 @@
+{
+  dbClient.componentDao().insert(session,ComponentTesting.newProjectDto("abcd").setKey("polop").setName("Polop"));
+  session.commit();
+  MockUserSession.set().addProjectUuidPermissions(UserRole.USER,"abcd");
+  wsTester=new WsTester(new NavigationWs(new ComponentNavigationAction(dbClient,activeDashboardDao,new Views(),i18n,projectConfigurationPages)));
+  wsTester.newGetRequest("api/navigation","component").setParam("componentKey","polop").execute().assertJson(getClass(),"no_snapshot.json");
+}

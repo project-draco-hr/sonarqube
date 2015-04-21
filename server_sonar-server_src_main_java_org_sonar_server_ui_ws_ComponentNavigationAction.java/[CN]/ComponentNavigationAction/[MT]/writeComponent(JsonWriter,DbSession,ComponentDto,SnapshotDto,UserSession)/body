@@ -1,0 +1,11 @@
+{
+  json.prop("key",component.key()).prop("uuid",component.uuid()).prop("name",component.name()).prop("isComparable",projectConfiguration.componentTypeHasProperty(component,ComponentConfigurationPages.PROPERTY_COMPARABLE)).prop("canBeFavorite",userSession.isLoggedIn()).prop("isFavorite",isFavourite(session,component,userSession));
+  List<DashboardDto> dashboards=activeDashboardDao.selectProjectDashboardsForUserLogin(session,userSession.login());
+  writeDashboards(json,component,dashboards,userSession.locale());
+  if (snapshot != null) {
+    json.prop("version",snapshot.getVersion()).prop("date",DateUtils.formatDateTime(new Date(snapshot.getCreatedAt())));
+    String[] availableMeasures=dbClient.measureDao().selectMetricKeysForSnapshot(session,snapshot.getId()).toArray(new String[0]);
+    List<ViewProxy<Page>> pages=views.getPages(NavigationSection.RESOURCE,component.scope(),component.qualifier(),component.language(),availableMeasures);
+    writeExtensions(json,component,pages,userSession.locale());
+  }
+}

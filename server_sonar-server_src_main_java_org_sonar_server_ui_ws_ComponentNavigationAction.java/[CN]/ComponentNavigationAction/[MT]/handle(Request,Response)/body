@@ -1,0 +1,21 @@
+{
+  String componentKey=request.mandatoryParam(PARAM_COMPONENT_KEY);
+  UserSession userSession=UserSession.get();
+  DbSession session=dbClient.openSession(false);
+  try {
+    ComponentDto component=dbClient.componentDao().getByKey(session,componentKey);
+    userSession.checkProjectUuidPermission(UserRole.USER,component.projectUuid());
+    SnapshotDto snapshot=dbClient.snapshotDao().getLastSnapshot(session,new SnapshotDto().setResourceId(component.getId()));
+    JsonWriter json=response.newJsonWriter();
+    json.beginObject();
+    writeComponent(json,session,component,snapshot,userSession);
+    if (userSession.hasProjectPermissionByUuid(UserRole.ADMIN,component.projectUuid()) || userSession.hasGlobalPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN)) {
+      writeConfiguration(json,component,userSession);
+    }
+    writeBreadCrumbs(json,session,component,snapshot);
+    json.endObject().close();
+  }
+  finally {
+    session.close();
+  }
+}
