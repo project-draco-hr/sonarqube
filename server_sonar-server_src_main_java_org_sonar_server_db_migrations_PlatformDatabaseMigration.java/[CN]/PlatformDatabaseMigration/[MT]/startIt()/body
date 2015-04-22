@@ -1,12 +1,14 @@
 {
   if (lock.isLocked() || this.running.get()) {
+    LOGGER.trace("{}: lock is already taken or process is already running",Thread.currentThread().getName());
     return;
   }
-  lock.lock();
-  try {
-    startAsynchronousDBMigration();
-  }
+  if (lock.tryLock()) {
+    try {
+      startAsynchronousDBMigration();
+    }
   finally {
-    lock.unlock();
+      lock.unlock();
+    }
   }
 }
