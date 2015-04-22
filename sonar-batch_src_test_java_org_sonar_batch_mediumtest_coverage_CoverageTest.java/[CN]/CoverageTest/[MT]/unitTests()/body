@@ -1,0 +1,21 @@
+{
+  File baseDir=temp.newFolder();
+  File srcDir=new File(baseDir,"src");
+  srcDir.mkdir();
+  File xooFile=new File(srcDir,"sample.xoo");
+  File xooUtCoverageFile=new File(srcDir,"sample.xoo.coverage");
+  FileUtils.write(xooFile,"function foo() {\n  if (a && b) {\nalert('hello');\n}\n}");
+  FileUtils.write(xooUtCoverageFile,"2:2:2:1\n3:1");
+  TaskResult result=tester.newTask().properties(ImmutableMap.<String,String>builder().put("sonar.task","scan").put("sonar.projectBaseDir",baseDir.getAbsolutePath()).put("sonar.projectKey","com.foo.project").put("sonar.projectName","Foo Project").put("sonar.projectVersion","1.0-SNAPSHOT").put("sonar.projectDescription","Description of Foo Project").put("sonar.sources","src").build()).start();
+  InputFile file=result.inputFile("src/sample.xoo");
+  assertThat(result.coverageFor(file,2).getUtHits()).isTrue();
+  assertThat(result.coverageFor(file,2).getItHits()).isFalse();
+  assertThat(result.coverageFor(file,2).getConditions()).isEqualTo(2);
+  assertThat(result.coverageFor(file,2).getUtCoveredConditions()).isEqualTo(1);
+  assertThat(result.coverageFor(file,2).getItCoveredConditions()).isEqualTo(0);
+  assertThat(result.coverageFor(file,2).getOverallCoveredConditions()).isEqualTo(0);
+  assertThat(result.measures()).contains(new DefaultMeasure<Integer>().forMetric(CoreMetrics.LINES_TO_COVER).onFile(new DefaultInputFile("com.foo.project","src/sample.xoo")).withValue(2));
+  assertThat(result.measures()).contains(new DefaultMeasure<Integer>().forMetric(CoreMetrics.UNCOVERED_LINES).onFile(new DefaultInputFile("com.foo.project","src/sample.xoo")).withValue(0));
+  assertThat(result.measures()).contains(new DefaultMeasure<Integer>().forMetric(CoreMetrics.CONDITIONS_TO_COVER).onFile(new DefaultInputFile("com.foo.project","src/sample.xoo")).withValue(2));
+  assertThat(result.measures()).contains(new DefaultMeasure<String>().forMetric(CoreMetrics.COVERED_CONDITIONS_BY_LINE).onFile(new DefaultInputFile("com.foo.project","src/sample.xoo")).withValue("2=1"));
+}

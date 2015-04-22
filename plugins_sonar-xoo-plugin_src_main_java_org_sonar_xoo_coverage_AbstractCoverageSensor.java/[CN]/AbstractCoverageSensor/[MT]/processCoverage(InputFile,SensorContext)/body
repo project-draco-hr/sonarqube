@@ -1,0 +1,38 @@
+{
+  File coverageFile=new File(inputFile.file().getParentFile(),inputFile.file().getName() + getCoverageExtension());
+  if (coverageFile.exists()) {
+    LOG.debug("Processing " + coverageFile.getAbsolutePath());
+    try {
+      List<String> lines=FileUtils.readLines(coverageFile,context.fileSystem().encoding().name());
+      NewCoverage coverageBuilder=context.newCoverage().onFile(inputFile).ofType(getCoverageType());
+      int lineNumber=0;
+      for (      String line : lines) {
+        lineNumber++;
+        if (StringUtils.isBlank(line)) {
+          continue;
+        }
+        if (line.startsWith("#")) {
+          continue;
+        }
+        try {
+          Iterator<String> split=Splitter.on(":").split(line).iterator();
+          int lineId=Integer.parseInt(split.next());
+          int lineHits=Integer.parseInt(split.next());
+          coverageBuilder.lineHits(lineId,lineHits);
+          if (split.hasNext()) {
+            int conditions=Integer.parseInt(split.next());
+            int coveredConditions=Integer.parseInt(split.next());
+            coverageBuilder.conditions(lineId,conditions,coveredConditions);
+          }
+        }
+ catch (        Exception e) {
+          throw new IllegalStateException("Error processing line " + lineNumber + " of file "+ coverageFile.getAbsolutePath(),e);
+        }
+      }
+      coverageBuilder.save();
+    }
+ catch (    IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+}

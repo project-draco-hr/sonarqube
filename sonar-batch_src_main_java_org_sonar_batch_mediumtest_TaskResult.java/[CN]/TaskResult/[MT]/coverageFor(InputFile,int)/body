@@ -1,0 +1,16 @@
+{
+  int ref=reportComponents.get(((DefaultInputFile)file).key()).getRef();
+  try (InputStream inputStream=FileUtils.openInputStream(getReportReader().readComponentCoverage(ref))){
+    BatchReport.Coverage coverage=BatchReport.Coverage.PARSER.parseDelimitedFrom(inputStream);
+    while (coverage != null) {
+      if (coverage.getLine() == line) {
+        return coverage;
+      }
+      coverage=BatchReport.Coverage.PARSER.parseDelimitedFrom(inputStream);
+    }
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException(e);
+  }
+  return null;
+}

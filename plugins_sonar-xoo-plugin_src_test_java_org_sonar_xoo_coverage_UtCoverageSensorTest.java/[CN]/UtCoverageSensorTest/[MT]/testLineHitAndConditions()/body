@@ -1,0 +1,14 @@
+{
+  File coverage=new File(baseDir,"src/foo.xoo.coverage");
+  FileUtils.write(coverage,"1:3:4:2");
+  DefaultInputFile inputFile=new DefaultInputFile("foo","src/foo.xoo").setLanguage("xoo");
+  context.fileSystem().add(inputFile);
+  sensor.execute(context);
+  assertThat(context.lineHits("foo:src/foo.xoo",CoverageType.UNIT,1)).isEqualTo(3);
+  assertThat(context.conditions("foo:src/foo.xoo",CoverageType.UNIT,1)).isEqualTo(4);
+  assertThat(context.conditions("foo:src/foo.xoo",CoverageType.IT,1)).isNull();
+  assertThat(context.conditions("foo:src/foo.xoo",CoverageType.OVERALL,1)).isNull();
+  assertThat(context.coveredConditions("foo:src/foo.xoo",CoverageType.UNIT,1)).isEqualTo(2);
+  assertThat(context.coveredConditions("foo:src/foo.xoo",CoverageType.IT,1)).isNull();
+  assertThat(context.coveredConditions("foo:src/foo.xoo",CoverageType.OVERALL,1)).isNull();
+}
