@@ -1,0 +1,42 @@
+{
+  File testExecutionFile=new File(inputFile.file().getParentFile(),inputFile.file().getName() + TEST_EXTENSION);
+  if (testExecutionFile.exists()) {
+    LOG.debug("Processing " + testExecutionFile.getAbsolutePath());
+    try {
+      List<String> lines=FileUtils.readLines(testExecutionFile,fs.encoding().name());
+      int lineNumber=0;
+      MutableTestPlan testPlan=perspectives.as(MutableTestPlan.class,inputFile);
+      for (      String line : lines) {
+        lineNumber++;
+        if (StringUtils.isBlank(line)) {
+          continue;
+        }
+        if (line.startsWith("#")) {
+          continue;
+        }
+        try {
+          Iterator<String> split=Splitter.on(":").split(line).iterator();
+          String name=split.next();
+          String durationStr=split.next();
+          Long duration=StringUtils.isNotBlank(durationStr) ? Long.parseLong(durationStr) : null;
+          String msg=split.next();
+          String stack=split.next();
+          String status=split.next();
+          String type=split.next();
+          MutableTestCase testCase=testPlan.addTestCase(name);
+          testCase.setDurationInMs(duration);
+          testCase.setMessage(msg);
+          testCase.setStackTrace(stack);
+          testCase.setStatus(Status.valueOf(status));
+          testCase.setType(type);
+        }
+ catch (        Exception e) {
+          throw new IllegalStateException("Error processing line " + lineNumber + " of file "+ testExecutionFile.getAbsolutePath(),e);
+        }
+      }
+    }
+ catch (    IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+}
