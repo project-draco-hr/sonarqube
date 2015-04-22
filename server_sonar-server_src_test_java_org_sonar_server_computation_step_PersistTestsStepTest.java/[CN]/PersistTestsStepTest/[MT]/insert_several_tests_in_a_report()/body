@@ -1,0 +1,21 @@
+{
+  BatchReportWriter writer=new BatchReportWriter(reportDir);
+  List<BatchReport.Test> batchTests=Arrays.asList(newTest(1),newTest(2));
+  writer.writeTests(TEST_FILE_REF_1,batchTests);
+  List<CoverageDetail> coverageDetails=Arrays.asList(newCoverageDetail(1,MAIN_FILE_REF_1));
+  writer.writeCoverageDetails(TEST_FILE_REF_1,coverageDetails);
+  sut.execute(new ComputationContext(new BatchReportReader(reportDir),ComponentTesting.newProjectDto(PROJECT_UUID)));
+  FileSourceDto dto=dbClient.fileSourceDao().selectTest(TEST_FILE_UUID_1);
+  assertThat(dto.getCreatedAt()).isEqualTo(now);
+  assertThat(dto.getUpdatedAt()).isEqualTo(now);
+  assertThat(dto.getProjectUuid()).isEqualTo(PROJECT_UUID);
+  assertThat(dto.getFileUuid()).isEqualTo(TEST_FILE_UUID_1);
+  assertThat(dto.getTestData()).hasSize(2);
+  FileSourceDb.Test test1=dto.getTestData().get(0);
+  assertThat(test1.getName()).isEqualTo("name#1");
+  assertThat(test1.getCoveredFileCount()).isEqualTo(1);
+  assertThat(test1.getCoveredFile(0).getFileUuid()).isEqualTo(MAIN_FILE_UUID_1);
+  FileSourceDb.Test test2=dto.getTestData().get(1);
+  assertThat(test2.getName()).isEqualTo("name#2");
+  assertThat(test2.getCoveredFileList()).isEmpty();
+}

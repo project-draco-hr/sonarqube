@@ -1,0 +1,14 @@
+{
+  ListMultimap<String,FileSourceDb.Test.CoveredFile> coveredFilesByName=loadCoverageDetails(component.getRef(),context);
+  List<FileSourceDb.Test> tests=buildDbTests(component,context,coveredFilesByName);
+  FileSourceDto existingDto=context.existingFileSourcesByUuid.get(component.getUuid());
+  long now=system.now();
+  if (existingDto != null) {
+    existingDto.setTestData(tests).setUpdatedAt(now);
+    dbClient.fileSourceDao().update(context.session,existingDto);
+  }
+ else {
+    FileSourceDto newDto=new FileSourceDto().setTestData(tests).setFileUuid(component.getUuid()).setProjectUuid(context.context.getProject().uuid()).setDataType(Type.TEST).setCreatedAt(now).setUpdatedAt(now);
+    dbClient.fileSourceDao().insert(context.session,newDto);
+  }
+}

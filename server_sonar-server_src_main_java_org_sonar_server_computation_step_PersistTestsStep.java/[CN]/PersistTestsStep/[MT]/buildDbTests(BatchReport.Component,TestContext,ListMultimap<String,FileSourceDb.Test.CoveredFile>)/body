@@ -1,0 +1,28 @@
+{
+  List<FileSourceDb.Test> tests=new ArrayList<>();
+  ReportIterator<BatchReport.Test> testIterator=new ReportIterator<>(context.reader.readTests(component.getRef()),BatchReport.Test.PARSER);
+  while (testIterator.hasNext()) {
+    BatchReport.Test batchTest=testIterator.next();
+    FileSourceDb.Test.Builder dbTest=FileSourceDb.Test.newBuilder();
+    dbTest.setType(batchTest.getType());
+    dbTest.setName(batchTest.getName());
+    if (batchTest.hasStacktrace()) {
+      dbTest.setStacktrace(batchTest.getStacktrace());
+    }
+    if (batchTest.hasStatus()) {
+      dbTest.setStatus(batchTest.getStatus());
+    }
+    if (batchTest.hasMsg()) {
+      dbTest.setMsg(batchTest.getMsg());
+    }
+    if (batchTest.hasExecutionTimeMs()) {
+      dbTest.setExecutionTimeMs(batchTest.getExecutionTimeMs());
+    }
+    List<FileSourceDb.Test.CoveredFile> coveredFiles=coveredFilesByName == null ? null : coveredFilesByName.get(batchTest.getName());
+    if (coveredFiles != null) {
+      dbTest.addAllCoveredFile(coveredFiles);
+    }
+    tests.add(dbTest.build());
+  }
+  return tests;
+}

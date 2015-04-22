@@ -3,7 +3,7 @@
   DbSession session=dbClient.openSession(false);
   try {
     final Map<String,FileSourceDto> previousFileSourcesByUuid=new HashMap<>();
-    session.select("org.sonar.core.source.db.FileSourceMapper.selectHashesForProject",context.getProject().uuid(),new ResultHandler(){
+    session.select("org.sonar.core.source.db.FileSourceMapper.selectHashesForProject",ImmutableMap.of("projectUuid",context.getProject().uuid(),"dataType",Type.SOURCE),new ResultHandler(){
       @Override public void handleResult(      ResultContext context){
         FileSourceDto dto=(FileSourceDto)context.getResultObject();
         previousFileSourcesByUuid.put(dto.getFileUuid(),dto);

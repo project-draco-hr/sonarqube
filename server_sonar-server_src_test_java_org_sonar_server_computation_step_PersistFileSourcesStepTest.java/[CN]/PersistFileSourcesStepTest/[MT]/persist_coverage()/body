@@ -3,8 +3,8 @@
   writer.writeComponentCoverage(FILE_REF,newArrayList(BatchReport.Coverage.newBuilder().setLine(1).setConditions(10).setUtHits(true).setUtCoveredConditions(2).setItHits(true).setItCoveredConditions(3).setOverallCoveredConditions(4).build()));
   sut.execute(new ComputationContext(new BatchReportReader(reportDir),ComponentTesting.newProjectDto(PROJECT_UUID)));
   assertThat(dbTester.countRowsOfTable("file_sources")).isEqualTo(1);
-  FileSourceDto fileSourceDto=dbClient.fileSourceDao().select(FILE_UUID);
-  FileSourceDb.Data data=FileSourceDto.decodeData(fileSourceDto.getBinaryData());
+  FileSourceDto fileSourceDto=dbClient.fileSourceDao().selectSource(FILE_UUID);
+  FileSourceDb.Data data=FileSourceDto.decodeSourceData(fileSourceDto.getBinaryData());
   assertThat(data.getLinesList()).hasSize(1);
   assertThat(data.getLines(0).getUtLineHits()).isEqualTo(1);
   assertThat(data.getLines(0).getUtConditions()).isEqualTo(10);

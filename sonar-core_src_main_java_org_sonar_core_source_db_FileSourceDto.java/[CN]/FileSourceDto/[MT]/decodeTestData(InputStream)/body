@@ -1,0 +1,22 @@
+{
+  LZ4BlockInputStream lz4Input=null;
+  List<Test> tests=new ArrayList<>();
+  try {
+    lz4Input=new LZ4BlockInputStream(binaryInput);
+    Test currentTest;
+    do {
+      currentTest=Test.parseDelimitedFrom(lz4Input);
+      if (currentTest != null) {
+        tests.add(currentTest);
+      }
+    }
+ while (currentTest != null);
+    return tests;
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Fail to decompress and deserialize source data",e);
+  }
+ finally {
+    IOUtils.closeQuietly(lz4Input);
+  }
+}

@@ -1,0 +1,11 @@
+{
+  BatchReportWriter writer=new BatchReportWriter(reportDir);
+  List<BatchReport.Test> batchTests=Arrays.asList(newTest(1),newTest(2));
+  writer.writeTests(TEST_FILE_REF_1,batchTests);
+  sut.execute(new ComputationContext(new BatchReportReader(reportDir),ComponentTesting.newProjectDto(PROJECT_UUID)));
+  FileSourceDto dto=dbClient.fileSourceDao().selectTest(TEST_FILE_UUID_1);
+  assertThat(dto.getFileUuid()).isEqualTo(TEST_FILE_UUID_1);
+  List<FileSourceDb.Test> tests=dto.getTestData();
+  assertThat(tests).hasSize(2);
+  assertThat(tests.get(0).getCoveredFileList()).isEmpty();
+}

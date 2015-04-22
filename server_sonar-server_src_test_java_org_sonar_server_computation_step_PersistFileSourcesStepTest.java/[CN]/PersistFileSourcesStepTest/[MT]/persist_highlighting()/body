@@ -3,8 +3,8 @@
   writer.writeComponentSyntaxHighlighting(FILE_REF,newArrayList(BatchReport.SyntaxHighlighting.newBuilder().setRange(BatchReport.Range.newBuilder().setStartLine(1).setEndLine(1).setStartOffset(2).setEndOffset(4).build()).setType(Constants.HighlightingType.ANNOTATION).build()));
   sut.execute(new ComputationContext(new BatchReportReader(reportDir),ComponentTesting.newProjectDto(PROJECT_UUID)));
   assertThat(dbTester.countRowsOfTable("file_sources")).isEqualTo(1);
-  FileSourceDto fileSourceDto=dbClient.fileSourceDao().select(FILE_UUID);
-  FileSourceDb.Data data=FileSourceDto.decodeData(fileSourceDto.getBinaryData());
+  FileSourceDto fileSourceDto=dbClient.fileSourceDao().selectSource(FILE_UUID);
+  FileSourceDb.Data data=FileSourceDto.decodeSourceData(fileSourceDto.getBinaryData());
   assertThat(data.getLinesList()).hasSize(1);
   assertThat(data.getLines(0).getHighlighting()).isEqualTo("2,4,a");
 }
