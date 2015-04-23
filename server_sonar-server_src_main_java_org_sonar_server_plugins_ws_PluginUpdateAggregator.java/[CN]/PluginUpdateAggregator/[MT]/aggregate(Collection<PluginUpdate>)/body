@@ -1,0 +1,16 @@
+{
+  if (pluginUpdates == null || pluginUpdates.isEmpty()) {
+    return Collections.emptyList();
+  }
+  Map<Plugin,PluginUpdateAggregateBuilder> builders=Maps.newHashMap();
+  for (  PluginUpdate pluginUpdate : pluginUpdates) {
+    Plugin plugin=pluginUpdate.getPlugin();
+    PluginUpdateAggregateBuilder builder=builders.get(plugin);
+    if (builder == null) {
+      builder=PluginUpdateAggregateBuilder.builderFor(plugin);
+      builders.put(plugin,builder);
+    }
+    builder.add(pluginUpdate);
+  }
+  return Lists.newArrayList(transform(builders.values(),BuilderToPluginUpdateAggregate.INSTANCE));
+}
