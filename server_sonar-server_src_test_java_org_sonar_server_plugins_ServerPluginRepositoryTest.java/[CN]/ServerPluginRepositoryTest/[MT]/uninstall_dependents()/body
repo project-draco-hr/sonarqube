@@ -1,0 +1,11 @@
+{
+  File base=copyTestPluginTo("test-base-plugin",fs.getInstalledPluginsDir());
+  File extension=copyTestPluginTo("test-require-plugin",fs.getInstalledPluginsDir());
+  underTest.start();
+  assertThat(underTest.getPluginInfos()).hasSize(2);
+  underTest.uninstall("testbase");
+  assertThat(base).doesNotExist();
+  assertThat(extension).doesNotExist();
+  assertThat(underTest.getUninstalledPluginFilenames()).containsOnly(base.getName(),extension.getName());
+  assertThat(underTest.getUninstalledPlugins()).extracting("key").containsOnly("testbase","testrequire");
+}

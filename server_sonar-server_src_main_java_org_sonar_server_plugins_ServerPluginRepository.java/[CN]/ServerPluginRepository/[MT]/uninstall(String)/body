@@ -1,0 +1,21 @@
+{
+  for (  PluginInfo otherPlugin : pluginInfosByKeys.values()) {
+    if (!otherPlugin.getKey().equals(pluginKey)) {
+      for (      PluginInfo.RequiredPlugin requiredPlugin : otherPlugin.getRequiredPlugins()) {
+        if (requiredPlugin.getKey().equals(pluginKey)) {
+          uninstall(otherPlugin.getKey());
+        }
+      }
+    }
+  }
+  PluginInfo info=pluginInfosByKeys.get(pluginKey);
+  if (!info.isCore()) {
+    try {
+      File masterFile=new File(fs.getInstalledPluginsDir(),info.getFile().getName());
+      moveFileToDirectory(masterFile,uninstalledPluginsDir(),true);
+    }
+ catch (    IOException e) {
+      throw new IllegalStateException("Fail to uninstall plugin [" + pluginKey + "]",e);
+    }
+  }
+}

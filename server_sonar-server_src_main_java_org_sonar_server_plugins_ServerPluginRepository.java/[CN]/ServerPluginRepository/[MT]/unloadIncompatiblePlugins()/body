@@ -1,0 +1,31 @@
+{
+  List<String> removedKeys=new ArrayList<>();
+  do {
+    removedKeys.clear();
+    for (    PluginInfo plugin : pluginInfosByKeys.values()) {
+      if (!Strings.isNullOrEmpty(plugin.getBasePlugin()) && !pluginInfosByKeys.containsKey(plugin.getBasePlugin())) {
+        LOG.warn("Plugin {} [{}] is ignored because its base plugin [{}] is not installed",plugin.getName(),plugin.getKey(),plugin.getBasePlugin());
+        removedKeys.add(plugin.getKey());
+      }
+      if (!plugin.isCompatibleWith(server.getVersion())) {
+        LOG.warn("Plugin {} [{}] is ignored because it requires at least SonarQube {}",plugin.getName(),plugin.getKey(),plugin.getMinimalSqVersion());
+        removedKeys.add(plugin.getKey());
+      }
+      for (      PluginInfo.RequiredPlugin requiredPlugin : plugin.getRequiredPlugins()) {
+        PluginInfo available=pluginInfosByKeys.get(requiredPlugin.getKey());
+        if (available == null) {
+          LOG.warn("Plugin {} [{}] is ignored because the required plugin [{}] is not installed",plugin.getName(),plugin.getKey(),requiredPlugin.getKey());
+          removedKeys.add(plugin.getKey());
+        }
+ else         if (requiredPlugin.getMinimalVersion().compareToIgnoreQualifier(available.getVersion()) > 0) {
+          LOG.warn("Plugin {} [{}] is ignored because the version {}??of required plugin [{}] is not supported",plugin.getName(),plugin.getKey(),requiredPlugin.getKey(),requiredPlugin.getMinimalVersion());
+          removedKeys.add(plugin.getKey());
+        }
+      }
+    }
+    for (    String removedKey : removedKeys) {
+      pluginInfosByKeys.remove(removedKey);
+    }
+  }
+ while (!removedKeys.isEmpty());
+}

@@ -1,8 +1,10 @@
 {
-  Object component=null;
-  Class<?> componentClass=get(ServerPluginRepository.class).getClass(pluginKey,className);
-  if (componentClass != null) {
-    component=get(componentClass);
+  Plugin plugin=get(PluginRepository.class).getPluginInstance(pluginKey);
+  try {
+    Class componentClass=plugin.getClass().getClassLoader().loadClass(className);
+    return get(componentClass);
   }
-  return component;
+ catch (  ClassNotFoundException e) {
+    throw new IllegalStateException(String.format("Class [%s] not found in plugin [%s]",className,pluginKey),e);
+  }
 }

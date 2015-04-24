@@ -1,0 +1,29 @@
+{
+  File destDir=fs.getInstalledPluginsDir();
+  File destFile=new File(destDir,sourceFile.getName());
+  if (destFile.exists()) {
+    deleteQuietly(destFile);
+  }
+  try {
+    if (deleteSource) {
+      moveFile(sourceFile,destFile);
+    }
+ else {
+      copyFile(sourceFile,destFile,true);
+    }
+  }
+ catch (  IOException e) {
+    LOG.error(format("Fail to move or copy plugin: %s to %s",sourceFile.getAbsolutePath(),destFile.getAbsolutePath()),e);
+  }
+  PluginInfo info=PluginInfo.create(destFile);
+  PluginInfo existing=pluginInfosByKeys.put(info.getKey(),info);
+  if (existing != null) {
+    if (!existing.getFile().getName().equals(destFile.getName())) {
+      deleteQuietly(existing.getFile());
+    }
+    LOG.info("Plugin {} [{}] updated to version {}",info.getName(),info.getKey(),info.getVersion());
+  }
+ else {
+    LOG.info("Plugin {} [{}] installed",info.getName(),info.getKey());
+  }
+}

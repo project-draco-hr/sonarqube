@@ -2,14 +2,12 @@
   if (contributingPluginKeyToClassLoader == null) {
     contributingPluginKeyToClassLoader=Maps.newTreeMap();
     contributingPluginKeyToClassLoader.put(DEFAULT_MODEL,getClass().getClassLoader());
-    for (    PluginMetadata metadata : pluginRepository.getMetadata()) {
-      String pluginKey=metadata.getKey();
-      Plugin plugin=pluginRepository.getPlugin(pluginKey);
-      if (plugin != null) {
-        ClassLoader classLoader=plugin.getClass().getClassLoader();
-        if (classLoader.getResource(getXMLFilePath(pluginKey)) != null) {
-          contributingPluginKeyToClassLoader.put(pluginKey,classLoader);
-        }
+    for (    PluginInfo pluginInfo : pluginRepository.getPluginInfos()) {
+      String pluginKey=pluginInfo.getKey();
+      Plugin plugin=pluginRepository.getPluginInstance(pluginKey);
+      ClassLoader classLoader=plugin.getClass().getClassLoader();
+      if (classLoader.getResource(getXMLFilePath(pluginKey)) != null) {
+        contributingPluginKeyToClassLoader.put(pluginKey,classLoader);
       }
     }
   }

@@ -1,0 +1,10 @@
+{
+  copyTestPluginTo("test-base-plugin",fs.getBundledPluginsDir());
+  copyTestPluginTo("test-core-plugin",fs.getCorePluginsDir());
+  when(upgradeStatus.isFreshInstall()).thenReturn(true);
+  underTest.start();
+  assertThat(underTest.getPluginInfosByKeys()).containsOnlyKeys("core","testbase");
+  assertThat(underTest.getPluginInstance("core").getClass().getName()).isEqualTo("CorePlugin");
+  assertThat(underTest.getPluginInstance("testbase").getClass().getName()).isEqualTo("BasePlugin");
+  assertThat(underTest.hasPlugin("testbase")).isTrue();
+}

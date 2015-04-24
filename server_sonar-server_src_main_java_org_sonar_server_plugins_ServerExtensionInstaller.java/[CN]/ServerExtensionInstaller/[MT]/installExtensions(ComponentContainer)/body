@@ -1,19 +1,20 @@
 {
-  ListMultimap<PluginMetadata,Object> installedExtensionsByPlugin=ArrayListMultimap.create();
-  for (  PluginMetadata pluginMetadata : pluginRepository.getMetadata()) {
-    Plugin plugin=pluginRepository.getPlugin(pluginMetadata.getKey());
-    container.addExtension(pluginMetadata,plugin);
+  ListMultimap<PluginInfo,Object> installedExtensionsByPlugin=ArrayListMultimap.create();
+  for (  PluginInfo pluginInfo : pluginRepository.getPluginInfos()) {
+    String pluginKey=pluginInfo.getKey();
+    Plugin plugin=pluginRepository.getPluginInstance(pluginKey);
+    container.addExtension(pluginInfo,plugin);
     for (    Object extension : plugin.getExtensions()) {
-      if (installExtension(container,pluginMetadata,extension,true) != null) {
-        installedExtensionsByPlugin.put(pluginMetadata,extension);
+      if (installExtension(container,pluginInfo,extension,true) != null) {
+        installedExtensionsByPlugin.put(pluginInfo,extension);
       }
  else {
-        container.declareExtension(pluginMetadata,extension);
+        container.declareExtension(pluginInfo,extension);
       }
     }
   }
-  for (  Map.Entry<PluginMetadata,Object> entry : installedExtensionsByPlugin.entries()) {
-    PluginMetadata plugin=entry.getKey();
+  for (  Map.Entry<PluginInfo,Object> entry : installedExtensionsByPlugin.entries()) {
+    PluginInfo plugin=entry.getKey();
     Object extension=entry.getValue();
     if (isExtensionProvider(extension)) {
       ExtensionProvider provider=(ExtensionProvider)container.getComponentByKey(extension);

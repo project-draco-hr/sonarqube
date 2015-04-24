@@ -1,0 +1,15 @@
+{
+  File deployDir=temp.newFolder();
+  when(fs.getDeployedPluginsDir()).thenReturn(deployDir);
+  File jar=TestProjectUtils.jarOf("test-libs-plugin");
+  PluginInfo info=PluginInfo.create(jar);
+  UnzippedPlugin unzipped=underTest.unzip(info);
+  File pluginDeployDir=new File(deployDir,"testlibs");
+  assertThat(unzipped.getKey()).isEqualTo("testlibs");
+  assertThat(unzipped.getMain()).isFile().exists().hasParent(pluginDeployDir);
+  assertThat(unzipped.getLibs()).extracting("name").containsOnly("commons-daemon-1.0.15.jar","commons-email-20030310.165926.jar");
+  for (  File lib : unzipped.getLibs()) {
+    assertThat(lib).exists().isFile();
+    assertThat(lib.getCanonicalPath()).startsWith(pluginDeployDir.getCanonicalPath());
+  }
+}

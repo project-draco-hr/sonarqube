@@ -1,0 +1,15 @@
+{
+  File jarFile=temp.newFile();
+  final File toDir=temp.newFolder();
+  PluginInfo pluginInfo=new PluginInfo().setFile(jarFile);
+  PluginUnzipper unzipper=new PluginUnzipper(){
+    @Override public UnzippedPlugin unzip(    PluginInfo info){
+      return UnzippedPlugin.createFromUnzippedDir("foo",info.getFile(),toDir);
+    }
+  }
+;
+  UnzippedPlugin unzipped=unzipper.unzip(pluginInfo);
+  assertThat(unzipped.getKey()).isEqualTo("foo");
+  assertThat(unzipped.getLibs()).isEmpty();
+  assertThat(unzipped.getMain()).isSameAs(jarFile);
+}

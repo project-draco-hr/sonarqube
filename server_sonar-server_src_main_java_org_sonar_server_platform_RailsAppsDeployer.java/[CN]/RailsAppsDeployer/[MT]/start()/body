@@ -1,16 +1,14 @@
 {
-  LOG.info("Deploy Ruby on Rails applications");
+  LOG.info("Deploying Ruby on Rails applications");
   File appsDir=prepareRailsDirectory();
-  for (  PluginMetadata pluginMetadata : pluginRepository.getMetadata()) {
-    String pluginKey=pluginMetadata.getKey();
-    Plugin plugin=pluginRepository.getPlugin(pluginKey);
-    if (plugin != null) {
-      try {
-        deployRailsApp(appsDir,pluginKey,plugin.getClass().getClassLoader());
-      }
- catch (      Exception e) {
-        throw new IllegalStateException("Fail to deploy Ruby on Rails application: " + pluginKey,e);
-      }
+  for (  PluginInfo pluginInfo : pluginRepository.getPluginInfos()) {
+    String pluginKey=pluginInfo.getKey();
+    Plugin plugin=pluginRepository.getPluginInstance(pluginKey);
+    try {
+      deployRailsApp(appsDir,pluginKey,plugin.getClass().getClassLoader());
+    }
+ catch (    Exception e) {
+      throw new IllegalStateException(String.format("Fail to deploy Ruby on Rails application of plugin [%s]",pluginKey),e);
     }
   }
 }

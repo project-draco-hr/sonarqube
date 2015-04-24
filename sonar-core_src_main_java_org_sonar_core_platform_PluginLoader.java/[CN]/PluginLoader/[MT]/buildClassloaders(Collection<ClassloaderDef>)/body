@@ -1,0 +1,13 @@
+{
+  ClassloaderBuilder builder=new ClassloaderBuilder();
+  for (  ClassloaderDef def : defs) {
+    builder.newClassloader(def.basePluginKey,getClass().getClassLoader()).setExportMask(def.basePluginKey,def.mask).setLoadingOrder(def.basePluginKey,def.selfFirstStrategy ? SELF_FIRST : LoadingOrder.PARENT_FIRST);
+    for (    File file : def.files) {
+      builder.addURL(def.basePluginKey,fileToUrl(file));
+    }
+  }
+  Map<String,ClassLoader> classloadersByBasePluginKey=builder.build();
+  for (  ClassloaderDef def : defs) {
+    def.classloader=classloadersByBasePluginKey.get(def.basePluginKey);
+  }
+}

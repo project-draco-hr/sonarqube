@@ -1,0 +1,16 @@
+{
+  String url="/deploy/plugins/index.txt";
+  try {
+    LOG.debug("Download index of plugins");
+    String indexContent=server.request(url);
+    String[] rows=StringUtils.split(indexContent,CharUtils.LF);
+    List<RemotePlugin> result=Lists.newArrayList();
+    for (    String row : rows) {
+      result.add(RemotePlugin.unmarshal(row));
+    }
+    return result;
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Fail to download list of plugins: " + url,e);
+  }
+}

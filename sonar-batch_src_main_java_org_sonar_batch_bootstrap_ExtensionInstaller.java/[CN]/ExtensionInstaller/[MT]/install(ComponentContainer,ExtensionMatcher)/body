@@ -2,11 +2,10 @@
   for (  Object o : BatchComponents.all(analysisMode)) {
     doInstall(container,matcher,null,o);
   }
-  for (  Map.Entry<PluginMetadata,Plugin> entry : pluginRepository.getPluginsByMetadata().entrySet()) {
-    PluginMetadata metadata=entry.getKey();
-    Plugin plugin=entry.getValue();
+  for (  PluginInfo pluginInfo : pluginRepository.getPluginInfos()) {
+    Plugin plugin=pluginRepository.getPluginInstance(pluginInfo.getKey());
     for (    Object extension : plugin.getExtensions()) {
-      doInstall(container,matcher,metadata,extension);
+      doInstall(container,matcher,pluginInfo,extension);
     }
   }
   List<ExtensionProvider> providers=container.getComponentsByType(ExtensionProvider.class);
