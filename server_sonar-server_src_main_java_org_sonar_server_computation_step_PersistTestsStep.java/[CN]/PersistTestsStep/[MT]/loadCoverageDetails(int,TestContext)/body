@@ -1,16 +1,32 @@
 {
+  Table<String,String,FileSourceDb.Test.CoveredFile.Builder> nameToCoveredFiles=HashBasedTable.create();
   File coverageDetailsFile=context.reader.readCoverageDetails(testFileRef);
   if (coverageDetailsFile == null) {
-    return null;
+    return nameToCoveredFiles;
   }
-  ListMultimap<String,FileSourceDb.Test.CoveredFile> nameToCoveredFiles=ArrayListMultimap.create();
   ReportIterator<BatchReport.CoverageDetail> coverageIterator=new ReportIterator<>(coverageDetailsFile,BatchReport.CoverageDetail.PARSER);
-  while (coverageIterator.hasNext()) {
-    BatchReport.CoverageDetail batchCoverageDetail=coverageIterator.next();
-    for (    BatchReport.CoverageDetail.CoveredFile batchCoveredFile : batchCoverageDetail.getCoveredFileList()) {
-      FileSourceDb.Test.CoveredFile.Builder dbCoveredFile=FileSourceDb.Test.CoveredFile.newBuilder().setFileUuid(context.getUuid(batchCoveredFile.getFileRef())).addAllCoveredLine(batchCoveredFile.getCoveredLineList());
-      nameToCoveredFiles.put(batchCoverageDetail.getTestName(),dbCoveredFile.build());
+  try {
+    while (coverageIterator.hasNext()) {
+      BatchReport.CoverageDetail batchCoverageDetail=coverageIterator.next();
+      for (      BatchReport.CoverageDetail.CoveredFile batchCoveredFile : batchCoverageDetail.getCoveredFileList()) {
+        String testName=batchCoverageDetail.getTestName();
+        String mainFileUuid=context.getUuid(batchCoveredFile.getFileRef());
+        FileSourceDb.Test.CoveredFile.Builder existingDbCoveredFile=nameToCoveredFiles.get(testName,mainFileUuid);
+        List<Integer> batchCoveredLines=batchCoveredFile.getCoveredLineList();
+        if (existingDbCoveredFile == null) {
+          FileSourceDb.Test.CoveredFile.Builder dbCoveredFile=FileSourceDb.Test.CoveredFile.newBuilder().setFileUuid(context.getUuid(batchCoveredFile.getFileRef())).addAllCoveredLine(batchCoveredLines);
+          nameToCoveredFiles.put(testName,mainFileUuid,dbCoveredFile);
+        }
+ else {
+          List<Integer> remainingBatchCoveredLines=new ArrayList<>(batchCoveredLines);
+          remainingBatchCoveredLines.removeAll(existingDbCoveredFile.getCoveredLineList());
+          existingDbCoveredFile.addAllCoveredLine(batchCoveredLines);
+        }
+      }
     }
+  }
+  finally {
+    coverageIterator.close();
   }
   return nameToCoveredFiles;
 }

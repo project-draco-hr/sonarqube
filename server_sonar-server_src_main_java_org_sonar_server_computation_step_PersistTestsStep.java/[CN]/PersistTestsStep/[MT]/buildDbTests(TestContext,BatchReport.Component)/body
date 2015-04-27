@@ -1,0 +1,33 @@
+{
+  Multimap<String,FileSourceDb.Test.Builder> tests=ArrayListMultimap.create();
+  File testsFile=context.reader.readTests(component.getRef());
+  if (testsFile == null) {
+    return tests;
+  }
+  ReportIterator<BatchReport.Test> testIterator=new ReportIterator<>(testsFile,BatchReport.Test.PARSER);
+  try {
+    while (testIterator.hasNext()) {
+      BatchReport.Test batchTest=testIterator.next();
+      FileSourceDb.Test.Builder dbTest=FileSourceDb.Test.newBuilder();
+      dbTest.setUuid(Uuids.create());
+      dbTest.setName(batchTest.getName());
+      if (batchTest.hasStacktrace()) {
+        dbTest.setStacktrace(batchTest.getStacktrace());
+      }
+      if (batchTest.hasStatus()) {
+        dbTest.setStatus(batchTest.getStatus());
+      }
+      if (batchTest.hasMsg()) {
+        dbTest.setMsg(batchTest.getMsg());
+      }
+      if (batchTest.hasDurationInMs()) {
+        dbTest.setExecutionTimeMs(batchTest.getDurationInMs());
+      }
+      tests.put(dbTest.getName(),dbTest);
+    }
+  }
+  finally {
+    testIterator.close();
+  }
+  return tests;
+}
