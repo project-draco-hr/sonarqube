@@ -1,0 +1,16 @@
+{
+  int ref=reportComponents.get(((DefaultInputFile)testFile).key()).getRef();
+  try (InputStream inputStream=FileUtils.openInputStream(getReportReader().readTests(ref))){
+    BatchReport.Test test=BatchReport.Test.PARSER.parseDelimitedFrom(inputStream);
+    while (test != null) {
+      if (test.getName().equals(testName)) {
+        return test;
+      }
+      test=BatchReport.Test.PARSER.parseDelimitedFrom(inputStream);
+    }
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException(e);
+  }
+  return null;
+}

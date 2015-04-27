@@ -1,0 +1,44 @@
+{
+  File testExecutionFile=new File(inputFile.file().getParentFile(),inputFile.file().getName() + TEST_EXTENSION);
+  if (testExecutionFile.exists()) {
+    LOG.debug("Processing " + testExecutionFile.getAbsolutePath());
+    try {
+      List<String> lines=FileUtils.readLines(testExecutionFile,fs.encoding().name());
+      int lineNumber=0;
+      MutableTestPlan testPlan=perspectives.as(MutableTestPlan.class,inputFile);
+      for (      String line : lines) {
+        lineNumber++;
+        if (StringUtils.isBlank(line)) {
+          continue;
+        }
+        if (line.startsWith("#")) {
+          continue;
+        }
+        try {
+          Iterator<String> split=Splitter.on(";").split(line).iterator();
+          String name=split.next();
+          while (split.hasNext()) {
+            String coveredBlockStr=split.next();
+            Iterator<String> splitCoveredBlock=Splitter.on(",").split(coveredBlockStr).iterator();
+            String componentPath=splitCoveredBlock.next();
+            InputFile coveredFile=context.fileSystem().inputFile(context.fileSystem().predicates().hasPath(componentPath));
+            MutableTestable testable=perspectives.as(MutableTestable.class,coveredFile);
+            List<Integer> coveredLines=new ArrayList<>();
+            while (splitCoveredBlock.hasNext()) {
+              coveredLines.add(Integer.parseInt(splitCoveredBlock.next()));
+            }
+            for (            MutableTestCase testCase : testPlan.testCasesByName(name)) {
+              testCase.setCoverageBlock(testable,coveredLines);
+            }
+          }
+        }
+ catch (        Exception e) {
+          throw new IllegalStateException("Error processing line " + lineNumber + " of file "+ testExecutionFile.getAbsolutePath(),e);
+        }
+      }
+    }
+ catch (    IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+}
