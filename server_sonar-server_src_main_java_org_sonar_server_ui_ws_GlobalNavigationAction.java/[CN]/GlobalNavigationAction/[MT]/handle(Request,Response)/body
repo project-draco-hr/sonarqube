@@ -1,6 +1,9 @@
 {
   UserSession userSession=UserSession.get();
   List<DashboardDto> dashboards=activeDashboardDao.selectGlobalDashboardsForUserLogin(userSession.login());
+  if (dashboards.isEmpty()) {
+    dashboards=activeDashboardDao.selectGlobalDashboardsForUserLogin(ANONYMOUS);
+  }
   JsonWriter json=response.newJsonWriter().beginObject();
   writeDashboards(json,dashboards);
   writePages(json);
