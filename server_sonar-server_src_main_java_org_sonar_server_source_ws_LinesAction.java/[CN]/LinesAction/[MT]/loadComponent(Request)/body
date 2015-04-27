@@ -1,0 +1,17 @@
+{
+  DbSession session=dbClient.openSession(false);
+  try {
+    String fileUuid=request.param(PARAM_UUID);
+    if (fileUuid != null) {
+      return dbClient.componentDao().getByUuid(session,fileUuid);
+    }
+    String fileKey=request.param(PARAM_KEY);
+    if (fileKey != null) {
+      return dbClient.componentDao().getByKey(session,fileKey);
+    }
+    throw new IllegalArgumentException(String.format("Param %s or param %s is missing",PARAM_UUID,PARAM_KEY));
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

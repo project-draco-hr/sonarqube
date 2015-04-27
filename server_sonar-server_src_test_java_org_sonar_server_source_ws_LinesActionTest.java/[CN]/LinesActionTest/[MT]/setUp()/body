@@ -1,9 +1,11 @@
 {
-  tester=new WsTester(new SourcesWs(new LinesAction(sourceLineIndex,htmlSourceDecorator,componentService)));
-  when(htmlSourceDecorator.getDecoratedSourceAsHtml(anyString(),anyString(),anyString())).thenAnswer(new Answer<String>(){
-    @Override public String answer(    InvocationOnMock invocation) throws Throwable {
-      return "<span class=\"" + invocation.getArguments()[1] + " sym-"+ invocation.getArguments()[2]+ "\">"+ StringEscapeUtils.escapeHtml((String)invocation.getArguments()[0])+ "</span>";
-    }
-  }
-);
+  dbTester.truncateTables();
+  esTester.truncateIndices();
+  htmlSourceDecorator=new HtmlSourceDecorator();
+  sourceLineIndex=new SourceLineIndex(esTester.client());
+  componentDao=new ComponentDao();
+  DbClient dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),componentDao);
+  session=dbClient.openSession(false);
+  wsTester=new WsTester(new SourcesWs(new LinesAction(dbClient,sourceLineIndex,htmlSourceDecorator)));
+  MockUserSession.set();
 }

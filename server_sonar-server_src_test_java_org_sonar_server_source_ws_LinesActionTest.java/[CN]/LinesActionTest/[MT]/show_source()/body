@@ -1,18 +1,15 @@
 {
-  String projectUuid="abcd";
-  String componentUuid="efgh";
+  newFile();
   Date updatedAt=new Date();
   String scmDate="2014-01-01T12:34:56.789Z";
-  SourceLineDoc line1=new SourceLineDoc().setProjectUuid(projectUuid).setFileUuid(componentUuid).setLine(1).setScmRevision("cafebabe").setScmAuthor("polop").setSource("class Polop {").setHighlighting("h1").setSymbols("palap").setUtLineHits(3).setUtConditions(2).setUtCoveredConditions(1).setItLineHits(3).setItConditions(2).setItCoveredConditions(1).setDuplications(ImmutableList.<Integer>of()).setUpdateDate(updatedAt);
+  SourceLineDoc line1=new SourceLineDoc().setProjectUuid(PROJECT_UUID).setFileUuid(FILE_UUID).setLine(1).setScmRevision("cafebabe").setScmAuthor("polop").setSource("package org.polop;").setHighlighting("0,7,k").setSymbols("8,17,42").setUtLineHits(3).setUtConditions(2).setUtCoveredConditions(1).setItLineHits(3).setItConditions(2).setItCoveredConditions(1).setDuplications(ImmutableList.<Integer>of()).setUpdateDate(updatedAt);
   line1.setField(SourceLineIndexDefinition.FIELD_SCM_DATE,scmDate);
-  SourceLineDoc line2=new SourceLineDoc().setProjectUuid(projectUuid).setFileUuid(componentUuid).setLine(2).setScmRevision("cafebabe").setScmAuthor("polop").setSource("  // Empty").setHighlighting("h2").setSymbols("pulup").setUtLineHits(3).setUtConditions(2).setUtCoveredConditions(1).setItLineHits(null).setItConditions(null).setItCoveredConditions(null).setDuplications(ImmutableList.<Integer>of(1)).setUpdateDate(updatedAt);
+  SourceLineDoc line2=new SourceLineDoc().setProjectUuid(PROJECT_UUID).setFileUuid(FILE_UUID).setLine(2).setScmRevision("cafebabe").setScmAuthor("polop").setSource("abc").setHighlighting("0,5,c").setSymbols("").setUtLineHits(3).setUtConditions(2).setUtCoveredConditions(1).setItLineHits(null).setItConditions(null).setItCoveredConditions(null).setDuplications(ImmutableList.of(1)).setUpdateDate(updatedAt);
   line2.setField(SourceLineIndexDefinition.FIELD_SCM_DATE,scmDate);
-  SourceLineDoc line3=new SourceLineDoc().setProjectUuid(projectUuid).setFileUuid(componentUuid).setLine(3).setScmRevision("cafebabe").setScmAuthor("polop").setSource("}").setHighlighting("h3").setSymbols("pylyp").setUtLineHits(null).setUtConditions(null).setUtCoveredConditions(null).setItLineHits(3).setItConditions(2).setItCoveredConditions(1).setDuplications(ImmutableList.<Integer>of()).setUpdateDate(updatedAt);
+  SourceLineDoc line3=new SourceLineDoc().setProjectUuid(PROJECT_UUID).setFileUuid(FILE_UUID).setLine(3).setScmRevision("cafebabe").setScmAuthor("polop").setSource("}").setHighlighting(null).setSymbols(null).setUtLineHits(null).setUtConditions(null).setUtCoveredConditions(null).setItLineHits(3).setItConditions(2).setItCoveredConditions(1).setDuplications(ImmutableList.<Integer>of()).setUpdateDate(updatedAt);
   line3.setField(SourceLineIndexDefinition.FIELD_SCM_DATE,scmDate);
-  when(sourceLineIndex.getLines(eq(componentUuid),anyInt(),anyInt())).thenReturn(newArrayList(line1,line2,line3));
-  String componentKey="componentKey";
-  when(componentService.getByUuid(componentUuid)).thenReturn(new ComponentDto().setKey(componentKey).setProjectUuid(projectUuid));
-  MockUserSession.set().setLogin("login").addProjectUuidPermissions(UserRole.CODEVIEWER,projectUuid);
-  WsTester.TestRequest request=tester.newGetRequest("api/sources","lines").setParam("uuid",componentUuid);
+  esTester.putDocuments(SourceLineIndexDefinition.INDEX,SourceLineIndexDefinition.TYPE,line1,line2,line3);
+  MockUserSession.set().setLogin("login").addProjectUuidPermissions(UserRole.CODEVIEWER,PROJECT_UUID);
+  WsTester.TestRequest request=wsTester.newGetRequest("api/sources","lines").setParam("uuid",FILE_UUID);
   request.execute().assertJson(getClass(),"show_source.json");
 }
