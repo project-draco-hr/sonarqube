@@ -7,9 +7,10 @@
     readSession.select("org.sonar.core.persistence.migration.v50.Migration50Mapper.selectRootProjects",new ResultHandler(){
       @Override public void handleResult(      ResultContext context){
         Component project=(Component)context.getResultObject();
-        Map<Long,String> uuidByComponentId=newHashMap();
-        migrateEnabledComponents(readSession,writeSession,project,uuidByComponentId);
-        migrateDisabledComponents(readSession,writeSession,project,uuidByComponentId);
+        List<Component> components=readSession.getMapper(Migration50Mapper.class).selectComponentChildrenForProjects(project.getId());
+        MigrationContext migrationContext=new MigrationContext(readSession,writeSession,project,components);
+        migrateEnabledComponents(migrationContext);
+        migrateDisabledComponents(migrationContext);
       }
     }
 );

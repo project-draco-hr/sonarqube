@@ -1,22 +1,22 @@
 {
+  component.setUuid(getOrCreateUuid(component));
+  component.setProjectUuid(getOrCreateUuid(project));
   String snapshotPath=component.getSnapshotPath();
   StringBuilder moduleUuidPath=new StringBuilder();
-  Component lastModule=null;
+  String lastModuleUuid=null;
   if (!Strings.isNullOrEmpty(snapshotPath)) {
     for (    String s : Splitter.on(".").omitEmptyStrings().split(snapshotPath)) {
       Long snapshotId=Long.valueOf(s);
       Component currentComponent=componentsBySnapshotId.get(snapshotId);
-      if (currentComponent.getScope().equals(Scopes.PROJECT)) {
-        lastModule=currentComponent;
-        moduleUuidPath.append(currentComponent.getUuid()).append(".");
+      if (currentComponent != null && currentComponent.getScope().equals(Scopes.PROJECT)) {
+        lastModuleUuid=getOrCreateUuid(currentComponent);
+        moduleUuidPath.append(lastModuleUuid).append(".");
       }
     }
   }
-  if (moduleUuidPath.length() > 0) {
+  if (moduleUuidPath.length() > 0 && lastModuleUuid != null) {
     moduleUuidPath.deleteCharAt(moduleUuidPath.length() - 1);
     component.setModuleUuidPath(moduleUuidPath.toString());
-  }
-  if (lastModule != null) {
-    component.setModuleUuid(getOrCreateUuid(lastModule,uuidByComponentId));
+    component.setModuleUuid(lastModuleUuid);
   }
 }

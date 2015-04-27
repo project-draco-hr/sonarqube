@@ -1,0 +1,15 @@
+{
+  db.prepareDbUnit(getClass(),"not_fail_when_module_has_no_root_id.xml");
+  migration.execute();
+  session.commit();
+  Component root=mapper.selectComponentByKey("org.struts:struts");
+  assertThat(root.getUuid()).isNotNull();
+  assertThat(root.getProjectUuid()).isEqualTo(root.getUuid());
+  assertThat(root.getModuleUuid()).isNull();
+  assertThat(root.getModuleUuidPath()).isEmpty();
+  Component module=mapper.selectComponentByKey("org.struts:struts-core");
+  assertThat(module.getUuid()).isNotNull();
+  assertThat(module.getProjectUuid()).isEqualTo(module.getUuid());
+  assertThat(module.getModuleUuid()).isNull();
+  assertThat(module.getModuleUuidPath()).isEmpty();
+}
