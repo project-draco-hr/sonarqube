@@ -1,15 +1,15 @@
 {
   boolean isAdmin=userSession.hasProjectPermissionByUuid(UserRole.ADMIN,component.projectUuid());
   Locale locale=userSession.locale();
-  json.name("configuration").beginArray();
-  for (  ConfigPage page : projectConfiguration.getConfigPages(component,userSession)) {
-    json.beginObject().prop("url",page.url()).prop("name",page.name()).endObject();
-  }
+  json.name("configuration").beginObject();
+  writeConfigPageAccess(json,isAdmin,component,userSession);
   if (isAdmin) {
+    json.name("extensions").beginArray();
     List<ViewProxy<Page>> configPages=views.getPages(NavigationSection.RESOURCE_CONFIGURATION,component.scope(),component.qualifier(),component.language(),null);
     for (    ViewProxy<Page> page : configPages) {
       writePage(json,getPageUrl(page,component),i18n.message(locale,page.getId() + ".page",page.getTitle()));
     }
+    json.endArray();
   }
-  json.endArray();
+  json.endObject();
 }

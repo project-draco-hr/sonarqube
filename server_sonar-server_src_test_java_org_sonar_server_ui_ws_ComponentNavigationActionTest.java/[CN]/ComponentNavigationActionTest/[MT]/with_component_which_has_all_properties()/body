@@ -1,0 +1,11 @@
+{
+  int userId=42;
+  ComponentDto project=ComponentTesting.newProjectDto("abcd").setKey("polop").setName("Polop");
+  dbClient.componentDao().insert(session,project);
+  session.commit();
+  MockUserSession.set().setLogin("obiwan").setUserId(userId).addProjectUuidPermissions(UserRole.USER,"abcd").addProjectUuidPermissions(UserRole.ADMIN,"abcd");
+  ResourceType projectResourceType=ResourceType.builder(project.qualifier()).setProperty("comparable",true).setProperty("configurable",true).setProperty("hasRolePolicy",true).setProperty("modifiable_history",true).setProperty("updatable_key",true).setProperty("deletable",true).build();
+  when(resourceTypes.get(project.qualifier())).thenReturn(projectResourceType);
+  wsTester=new WsTester(new NavigationWs(new ComponentNavigationAction(dbClient,activeDashboardDao,new Views(),i18n,resourceTypes)));
+  wsTester.newGetRequest("api/navigation","component").setParam("componentKey","polop").execute().assertJson(getClass(),"with_all_properties.json");
+}

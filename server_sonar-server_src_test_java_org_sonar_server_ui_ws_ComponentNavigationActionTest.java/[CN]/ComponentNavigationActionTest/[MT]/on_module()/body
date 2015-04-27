@@ -1,0 +1,10 @@
+{
+  int userId=42;
+  ComponentDto project=ComponentTesting.newProjectDto("abcd").setKey("polop").setName("Polop");
+  ComponentDto module=ComponentTesting.newModuleDto("bcde",project).setKey("palap").setName("Palap");
+  dbClient.componentDao().insert(session,project,module);
+  session.commit();
+  MockUserSession.set().setLogin("obiwan").setUserId(userId).addProjectUuidPermissions(UserRole.USER,"abcd").addProjectUuidPermissions(UserRole.ADMIN,"abcd");
+  wsTester=new WsTester(new NavigationWs(new ComponentNavigationAction(dbClient,activeDashboardDao,new Views(),i18n,resourceTypes)));
+  wsTester.newGetRequest("api/navigation","component").setParam("componentKey","palap").execute().assertJson(getClass(),"on_module.json");
+}
