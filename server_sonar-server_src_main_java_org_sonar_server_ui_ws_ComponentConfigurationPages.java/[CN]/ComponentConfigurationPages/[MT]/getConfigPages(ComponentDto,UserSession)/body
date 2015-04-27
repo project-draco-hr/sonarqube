@@ -9,10 +9,15 @@
   configPages.add(new ConfigPage(isProject,String.format("/project/qualitygate?id=%s",componentKey),i18n.message(locale,"project_quality_gate.page",null)));
   configPages.add(new ConfigPage(isAdmin,String.format("/manual_measures/index?id=%s",componentKey),i18n.message(locale,"manual_measures.page",null)));
   configPages.add(new ConfigPage(isAdmin && isProject,String.format("/action_plans/index?id=%s",componentKey),i18n.message(locale,"action_plans.page",null)));
-  configPages.add(new ConfigPage(isAdmin && isProject,String.format("/project/links?id=%s",componentKey),i18n.message(locale,"action_plans.page",null)));
+  configPages.add(new ConfigPage(isAdmin && isProject,String.format("/project/links?id=%s",componentKey),i18n.message(locale,"project_links.page",null)));
   configPages.add(new ConfigPage(componentTypeHasProperty(component,PROPERTY_HAS_ROLE_POLICY),String.format("/project_roles/index?id=%s",componentKey),i18n.message(locale,"permissions.page",null)));
   configPages.add(new ConfigPage(componentTypeHasProperty(component,PROPERTY_MODIFIABLE_HISTORY),String.format("/project/history?id=%s",componentKey),i18n.message(locale,"project_history.page",null)));
   configPages.add(new ConfigPage(componentTypeHasProperty(component,PROPERTY_UPDATABLE_KEY),String.format("/project/key?id=%s",componentKey),i18n.message(locale,"update_key.page",null)));
   configPages.add(new ConfigPage(componentTypeHasProperty(component,PROPERTY_DELETABLE),String.format("/project/deletion?id=%s",componentKey),i18n.message(locale,"deletion.page",null)));
-  return configPages;
+  return Collections2.filter(configPages,new Predicate<ConfigPage>(){
+    @Override public boolean apply(    ConfigPage input){
+      return input.visible;
+    }
+  }
+);
 }

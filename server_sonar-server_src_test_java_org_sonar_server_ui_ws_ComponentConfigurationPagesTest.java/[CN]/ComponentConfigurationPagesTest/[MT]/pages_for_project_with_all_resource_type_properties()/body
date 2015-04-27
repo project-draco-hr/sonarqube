@@ -1,0 +1,8 @@
+{
+  String uuid="abcd";
+  ComponentDto component=ComponentTesting.newProjectDto(uuid);
+  UserSession userSession=MockUserSession.set().setLogin("obiwan").addProjectUuidPermissions(UserRole.ADMIN,uuid);
+  when(resourceTypes.get(component.qualifier())).thenReturn(ResourceType.builder(component.qualifier()).setProperty("configurable",true).setProperty("hasRolePolicy",true).setProperty("modifiable_history",true).setProperty("updatable_key",true).setProperty("deletable",true).build());
+  Collection<ConfigPage> pages=new ComponentConfigurationPages(i18n,resourceTypes).getConfigPages(component,userSession);
+  assertThat(pages).extracting("name").containsExactly("project_settings.page","project_quality_profiles.page","project_quality_gate.page","manual_measures.page","action_plans.page","project_links.page","permissions.page","project_history.page","update_key.page","deletion.page");
+}
