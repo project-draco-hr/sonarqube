@@ -9,7 +9,9 @@
         }
       }
 );
-      throw new NotFoundException("The following component keys do not match any component:\n" + Joiner.on('\n').join(CollectionUtils.subtract(componentKeys,foundKeys)));
+      Set<String> missingKeys=Sets.newHashSet(componentKeys);
+      missingKeys.removeAll(foundKeys);
+      throw new NotFoundException("The following component keys do not match any component:\n" + Joiner.on('\n').join(missingKeys));
     }
     for (    ComponentDto component : components) {
       componentUuids.add(component.uuid());
