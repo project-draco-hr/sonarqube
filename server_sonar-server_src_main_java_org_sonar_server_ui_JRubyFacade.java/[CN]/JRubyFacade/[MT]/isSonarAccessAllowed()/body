@@ -1,0 +1,20 @@
+{
+  ComponentContainer container=Platform.getInstance().getContainer();
+  DatabaseMigration databaseMigration=container.getComponentByType(DatabaseMigration.class);
+  if (databaseMigration.status() == DatabaseMigration.Status.RUNNING || databaseMigration.status() == DatabaseMigration.Status.FAILED) {
+    return false;
+  }
+  if (databaseMigration.status() == DatabaseMigration.Status.SUCCEEDED) {
+    return true;
+  }
+  DatabaseVersion databaseVersion=container.getComponentByType(DatabaseVersion.class);
+  Integer currentVersion=databaseVersion.getVersion();
+  if (currentVersion == null) {
+    throw new IllegalStateException("Version can not be retrieved from Database. Database is either blank or corrupted");
+  }
+  if (currentVersion >= DatabaseVersion.LAST_VERSION) {
+    return true;
+  }
+  Database database=container.getComponentByType(Database.class);
+  return !database.getDialect().supportsMigration();
+}
