@@ -1,6 +1,11 @@
 {
   when(rubyBridge.databaseMigration()).thenReturn(rubyDatabaseMigration);
+  when(rubyBridge.railsRoutes()).thenReturn(rubyRailsRoutes);
   underTest.startIt();
-  verify(rubyBridge).databaseMigration();
-  verify(rubyDatabaseMigration).trigger();
+  inOrder.verify(rubyBridge).databaseMigration();
+  inOrder.verify(rubyDatabaseMigration).trigger();
+  inOrder.verify(platform).doStart();
+  inOrder.verify(rubyBridge).railsRoutes();
+  inOrder.verify(rubyRailsRoutes).recreate();
+  inOrder.verifyNoMoreInteractions();
 }
