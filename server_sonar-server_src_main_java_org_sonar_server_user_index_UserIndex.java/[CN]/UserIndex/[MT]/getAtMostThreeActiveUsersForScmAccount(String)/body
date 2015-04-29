@@ -3,7 +3,7 @@
   if (!StringUtils.isEmpty(scmAccount)) {
     SearchRequestBuilder request=esClient.prepareSearch(UserIndexDefinition.INDEX).setTypes(UserIndexDefinition.TYPE_USER).setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),FilterBuilders.boolFilter().must(FilterBuilders.termFilter(UserIndexDefinition.FIELD_ACTIVE,true)).should(FilterBuilders.termFilter(UserIndexDefinition.FIELD_LOGIN,scmAccount)).should(FilterBuilders.termFilter(UserIndexDefinition.FIELD_EMAIL,scmAccount)).should(FilterBuilders.termFilter(UserIndexDefinition.FIELD_SCM_ACCOUNTS,scmAccount)))).setSize(3);
     for (    SearchHit hit : request.get().getHits().getHits()) {
-      result.add(new UserDoc(hit.sourceAsMap()));
+      result.add(DOC_CONVERTER.apply(hit.sourceAsMap()));
     }
   }
   return result;
