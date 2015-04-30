@@ -1,0 +1,12 @@
+{
+  dbTester.truncateTables();
+  session=dbTester.myBatis().openSession(false);
+  dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),new FileDependencyDao());
+  system2=mock(System2.class);
+  when(system2.now()).thenReturn(now);
+  File reportDir=temp.newFolder();
+  writer=new BatchReportWriter(reportDir);
+  writer.writeMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).setSnapshotId(PROJECT_SNAPSHOT_ID).build());
+  context=new ComputationContext(new BatchReportReader(reportDir),ComponentTesting.newProjectDto(PROJECT_UUID));
+  sut=new PersistFileDependenciesStep(dbClient,system2);
+}
