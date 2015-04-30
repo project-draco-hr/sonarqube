@@ -1,0 +1,12 @@
+{
+  dbClient.fileDependencyDao().insert(session,new FileDependencyDto().setFromComponentUuid(UNKNOWN_UUID).setToComponentUuid(FILE2_UUID).setFromParentUuid(DIR1_UUID).setToParentUuid(DIR2_UUID).setRootProjectSnapshotId(projectSnapshotId).setWeight(2).setCreatedAt(1000L));
+  session.commit();
+  MockUserSession.set().addProjectUuidPermissions(UserRole.USER,PROJECT_UUID);
+  try {
+    tester.newGetRequest("api/dependencies","show").setParam("fromParentUuid",DIR1_UUID).setParam("toParentUuid",DIR2_UUID).execute().assertJson(getClass(),"return_file_dependencies.json");
+    failBecauseExceptionWasNotThrown(IllegalStateException.class);
+  }
+ catch (  IllegalStateException e) {
+    assertThat(e).hasMessage("Component with uuid 'UNKNOWN' does not exists");
+  }
+}
