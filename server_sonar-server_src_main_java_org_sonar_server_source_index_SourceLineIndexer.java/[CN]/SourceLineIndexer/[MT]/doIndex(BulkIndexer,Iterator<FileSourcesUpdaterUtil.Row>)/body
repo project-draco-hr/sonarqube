@@ -1,0 +1,14 @@
+{
+  long maxUpdatedAt=0L;
+  bulk.start();
+  while (dbRows.hasNext()) {
+    FileSourcesUpdaterUtil.Row row=dbRows.next();
+    addDeleteRequestsForLinesGreaterThan(bulk,row);
+    for (    UpdateRequest updateRequest : row.getUpdateRequests()) {
+      bulk.add(updateRequest);
+    }
+    maxUpdatedAt=Math.max(maxUpdatedAt,row.getUpdatedAt());
+  }
+  bulk.stop();
+  return maxUpdatedAt;
+}

@@ -1,0 +1,13 @@
+{
+  db.prepareDbUnit(getClass(),"shared.xml");
+  TestTesting.updateDataColumn(connection,"F1",TestTesting.newFakeTests(3));
+  sut=TestResultSetIterator.create(dbClient,connection,0L,null);
+  FileSourcesUpdaterUtil.Row row=sut.next();
+  assertThat(row.getProjectUuid()).isEqualTo("P1");
+  assertThat(row.getFileUuid()).isEqualTo("F1");
+  assertThat(row.getUpdatedAt()).isEqualTo(1416239042000L);
+  assertThat(row.getUpdateRequests()).hasSize(3);
+  UpdateRequest firstRequest=row.getUpdateRequests().get(0);
+  Map<String,Object> doc=firstRequest.doc().sourceAsMap();
+  assertThat(doc).contains(MapEntry.entry(TestIndexDefinition.FIELD_PROJECT_UUID,"P1"),MapEntry.entry(TestIndexDefinition.FIELD_FILE_UUID,"F1"),MapEntry.entry(TestIndexDefinition.FIELD_TEST_UUID,"TEST_FILE_UUID_1"),MapEntry.entry(TestIndexDefinition.FIELD_STATUS,"FAILURE"),MapEntry.entry(TestIndexDefinition.FIELD_MESSAGE,"MESSAGE_1"),MapEntry.entry(TestIndexDefinition.FIELD_DURATION_IN_MS,1),MapEntry.entry(TestIndexDefinition.FIELD_STACKTRACE,"STACKTRACE_1"),MapEntry.entry(TestIndexDefinition.FIELD_NAME,"NAME_1"));
+}

@@ -1,0 +1,12 @@
+{
+  dbTester.prepareDbUnit(getClass(),"index_source.xml");
+  Connection connection=dbTester.openConnection();
+  TestTesting.updateDataColumn(connection,"FILE1_UUID",TestTesting.newRandomTests(1));
+  connection.close();
+  step().execute(new ComputationContext(mock(BatchReportReader.class),ComponentTesting.newProjectDto("ABCD")));
+  List<SearchHit> docs=esTester.getDocuments(TestIndexDefinition.INDEX,TestIndexDefinition.TYPE);
+  assertThat(docs).hasSize(1);
+  TestDoc doc=new TestDoc(docs.get(0).sourceAsMap());
+  assertThat(doc.projectUuid()).isEqualTo("ABCD");
+  assertThat(doc.fileUuid()).isEqualTo("FILE1_UUID");
+}
