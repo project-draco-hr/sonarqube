@@ -21,7 +21,8 @@
       List<PropertyDto> modulesTreeSettings=dbClient.propertiesDao().selectEnabledDescendantModuleProperties(module.uuid(),session);
       TreeModuleSettings treeModuleSettings=new TreeModuleSettings(moduleUuidsByKey,moduleIdsByKey,modulesTree,modulesTreeSettings,module);
       addSettingsToChildrenModules(ref,query.getModuleKey(),Maps.<String,String>newHashMap(),treeModuleSettings,hasScanPerm,session);
-      addFileData(session,ref,modulesTree,module.uuid());
+      List<FilePathWithHashDto> files=module.isRootProject() ? dbClient.componentDao().selectEnabledFilesFromProject(session,module.uuid()) : dbClient.componentDao().selectEnabledDescendantFiles(session,module.uuid());
+      addFileData(session,ref,modulesTree,files);
       ref.setLastAnalysisDate(new Date());
     }
  else {
