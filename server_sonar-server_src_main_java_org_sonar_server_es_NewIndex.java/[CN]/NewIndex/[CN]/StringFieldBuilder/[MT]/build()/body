@@ -1,18 +1,9 @@
 {
   validate();
   Map<String,Object> hash=new TreeMap<>();
-  if (multiField) {
+  if (!subFields.isEmpty()) {
     hash.put("type","multi_field");
-    Map<String,Object> multiFields=new TreeMap<>();
-    if (sortable) {
-      multiFields.put(IndexField.SORT_SUFFIX,ImmutableSortedMap.of("type","string","index","analyzed","analyzer","sortable"));
-    }
-    if (wordSearch) {
-      multiFields.put(IndexField.SEARCH_WORDS_SUFFIX,ImmutableSortedMap.of("type","string","index","analyzed","index_analyzer","index_words","search_analyzer","search_words"));
-    }
-    if (gramSearch) {
-      multiFields.put(IndexField.SEARCH_PARTIAL_SUFFIX,ImmutableSortedMap.of("type","string","index","analyzed","index_analyzer","index_grams","search_analyzer","search_grams"));
-    }
+    Map<String,Object> multiFields=new TreeMap<>(subFields);
     multiFields.put(fieldName,ImmutableMap.of("type","string","index","not_analyzed","omit_norms","true","doc_values",docValues));
     hash.put("fields",multiFields);
   }
