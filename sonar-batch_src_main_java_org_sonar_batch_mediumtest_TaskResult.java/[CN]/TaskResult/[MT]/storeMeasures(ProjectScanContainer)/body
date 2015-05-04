@@ -1,17 +1,22 @@
 {
-  InputPathCache inputFileCache=container.getComponentByType(InputPathCache.class);
+  ResourceCache resourceCache=container.getComponentByType(ResourceCache.class);
   for (  Entry<Measure> measureEntry : container.getComponentByType(MeasureCache.class).entries()) {
     String componentKey=measureEntry.key()[0].toString();
-    InputFile file=inputFileCache.getFile(StringUtils.substringBeforeLast(componentKey,":"),StringUtils.substringAfterLast(componentKey,":"));
+    InputPath path=resourceCache.get(componentKey).inputPath();
     Measure oldMeasure=measureEntry.value();
     DefaultMeasure<Serializable> newMeasure=new DefaultMeasure<>().forMetric(oldMeasure.getMetric());
-    if (file != null) {
-      newMeasure.onFile(file);
+    if (path != null) {
+      if (path instanceof InputFile) {
+        newMeasure.onFile((InputFile)path);
+      }
+ else {
+        continue;
+      }
     }
  else {
       newMeasure.onProject();
     }
     newMeasure.withValue(oldMeasure.value());
-    measures.add(newMeasure);
+    measures.put(componentKey,newMeasure);
   }
 }
