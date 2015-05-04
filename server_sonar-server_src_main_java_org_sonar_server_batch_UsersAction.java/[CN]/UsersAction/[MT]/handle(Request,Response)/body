@@ -1,0 +1,15 @@
+{
+  UserSession.get().checkGlobalPermission(GlobalPermissions.PREVIEW_EXECUTION);
+  List<String> logins=request.mandatoryParamAsStrings(PARAM_LOGINS);
+  response.stream().setMediaType(MimeTypes.PROTOBUF);
+  BatchInput.User.Builder userBuilder=BatchInput.User.newBuilder();
+  OutputStream output=response.stream().output();
+  try {
+    for (Iterator<UserDoc> userDocIterator=userIndex.selectUsersForBatch(logins); userDocIterator.hasNext(); ) {
+      handleUser(userDocIterator.next(),userBuilder,output);
+    }
+  }
+  finally {
+    output.close();
+  }
+}

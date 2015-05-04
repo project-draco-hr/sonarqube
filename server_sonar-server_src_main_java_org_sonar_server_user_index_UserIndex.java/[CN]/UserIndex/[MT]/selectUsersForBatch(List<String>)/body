@@ -1,0 +1,6 @@
+{
+  BoolFilterBuilder filter=FilterBuilders.boolFilter().must(FilterBuilders.termsFilter(UserIndexDefinition.FIELD_LOGIN,logins));
+  SearchRequestBuilder requestBuilder=esClient.prepareSearch(UserIndexDefinition.INDEX).setTypes(UserIndexDefinition.TYPE_USER).setSearchType(SearchType.SCAN).addSort(SortBuilders.fieldSort(UserIndexDefinition.FIELD_LOGIN).order(SortOrder.ASC)).setScroll(TimeValue.timeValueMinutes(SCROLL_TIME_IN_MINUTES)).setSize(10000).setFetchSource(new String[]{UserIndexDefinition.FIELD_LOGIN,UserIndexDefinition.FIELD_NAME},null).setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),filter));
+  SearchResponse response=requestBuilder.get();
+  return scroll(response.getScrollId());
+}
