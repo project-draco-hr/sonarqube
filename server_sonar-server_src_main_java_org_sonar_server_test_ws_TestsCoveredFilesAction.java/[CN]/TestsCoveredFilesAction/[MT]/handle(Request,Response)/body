@@ -1,11 +1,11 @@
 {
-  String fileKey=request.mandatoryParam(KEY);
-  UserSession.get().checkComponentPermission(UserRole.CODEVIEWER,fileKey);
-  String test=request.mandatoryParam(TEST);
-  MutableTestPlan testPlan=snapshotPerspectives.as(MutableTestPlan.class,fileKey);
+  String testUuid=request.mandatoryParam(TEST_UUID);
+  UserSession.get().checkComponentUuidPermission(UserRole.CODEVIEWER,index.searchByTestUuid(testUuid).fileUuid());
+  List<CoveredFileDoc> coveredFiles=index.coveredFiles(testUuid);
+  Map<String,ComponentDto> componentsByUuid=buildComponentsByUuid(coveredFiles);
   JsonWriter json=response.newJsonWriter().beginObject();
-  if (testPlan != null) {
-    writeTests(testPlan,test,json);
+  if (!coveredFiles.isEmpty()) {
+    writeTests(coveredFiles,componentsByUuid,json);
   }
   json.endObject().close();
 }

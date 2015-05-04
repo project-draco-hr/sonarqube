@@ -1,0 +1,22 @@
+{
+  String testUuid=request.param(TEST_UUID);
+  String testFileUuid=request.param(TEST_FILE_UUID);
+  String testFileKey=request.param(TEST_FILE_KEY);
+  String sourceFileUuid=request.param(SOURCE_FILE_UUID);
+  Integer sourceFileLineNumber=request.paramAsInt(SOURCE_FILE_LINE_NUMBER);
+  SearchOptions searchOptions=new SearchOptions().setPage(request.mandatoryParamAsInt(WebService.Param.PAGE),request.mandatoryParamAsInt(WebService.Param.PAGE_SIZE));
+  DbSession dbSession=dbClient.openSession(false);
+  SearchResult<TestDoc> tests;
+  Map<String,ComponentDto> componentsByTestFileUuid;
+  try {
+    tests=searchTests(dbSession,testUuid,testFileUuid,testFileKey,sourceFileUuid,sourceFileLineNumber,searchOptions);
+    componentsByTestFileUuid=buildComponentsByTestFileUuid(dbSession,tests.getDocs());
+  }
+  finally {
+    MyBatis.closeQuietly(dbSession);
+  }
+  JsonWriter json=response.newJsonWriter().beginObject();
+  writeTests(tests.getDocs(),componentsByTestFileUuid,json);
+  searchOptions.writeJson(json,tests.getTotal());
+  json.endObject().close();
+}

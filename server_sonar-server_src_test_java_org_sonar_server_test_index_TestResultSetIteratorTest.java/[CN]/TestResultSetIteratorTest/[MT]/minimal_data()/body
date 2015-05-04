@@ -3,7 +3,7 @@
   List<FileSourceDb.Test> tests=Arrays.asList(FileSourceDb.Test.newBuilder().setUuid("U1").setName("N1").build());
   TestTesting.updateDataColumn(connection,"F1",tests);
   sut=TestResultSetIterator.create(dbClient,connection,0L,null);
-  FileSourcesUpdaterUtil.Row row=sut.next();
+  FileSourcesUpdaterHelper.Row row=sut.next();
   assertThat(row.getProjectUuid()).isEqualTo("P1");
   assertThat(row.getFileUuid()).isEqualTo("F1");
   assertThat(row.getUpdatedAt()).isEqualTo(1416239042000L);
@@ -11,5 +11,5 @@
   UpdateRequest firstRequest=row.getUpdateRequests().get(0);
   Map<String,Object> doc=firstRequest.doc().sourceAsMap();
   assertThat(doc).contains(MapEntry.entry(TestIndexDefinition.FIELD_PROJECT_UUID,"P1"),MapEntry.entry(TestIndexDefinition.FIELD_FILE_UUID,"F1"),MapEntry.entry(TestIndexDefinition.FIELD_TEST_UUID,"U1"),MapEntry.entry(TestIndexDefinition.FIELD_NAME,"N1"));
-  assertThat(doc).containsKeys(TestIndexDefinition.FIELD_DURATION_IN_MS,TestIndexDefinition.FIELD_STACKTRACE,TestIndexDefinition.FIELD_MESSAGE,TestIndexDefinition.FIELD_STATUS,TestIndexDefinition.FIELD_COVERAGE_BLOCKS);
+  assertThat(doc).containsKeys(TestIndexDefinition.FIELD_DURATION_IN_MS,TestIndexDefinition.FIELD_STACKTRACE,TestIndexDefinition.FIELD_MESSAGE,TestIndexDefinition.FIELD_STATUS,TestIndexDefinition.FIELD_COVERED_FILES);
 }

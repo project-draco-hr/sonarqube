@@ -1,0 +1,22 @@
+{
+  List<String> sourceFileUuids=Lists.transform(coveredFiles,new Function<CoveredFileDoc,String>(){
+    @Override public String apply(    CoveredFileDoc coveredFile){
+      return coveredFile.fileUuid();
+    }
+  }
+);
+  DbSession dbSession=dbClient.openSession(false);
+  List<ComponentDto> components;
+  try {
+    components=dbClient.componentDao().getByUuids(dbSession,sourceFileUuids);
+  }
+  finally {
+    MyBatis.closeQuietly(dbSession);
+  }
+  return Maps.uniqueIndex(components,new Function<ComponentDto,String>(){
+    @Override public String apply(    ComponentDto component){
+      return component.uuid();
+    }
+  }
+);
+}
