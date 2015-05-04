@@ -8,7 +8,7 @@
   FileUtils.write(xooFile2,duplicatedStuff);
   TaskResult result=tester.newTask().properties(builder.put("sonar.sources","src").put("sonar.cpd.xoo.minimumTokens","10").put("sonar.verbose","true").build()).start();
   assertThat(result.inputFiles()).hasSize(2);
-  assertThat(result.measures()).hasSize(11);
+  assertThat(result.measures("com.foo.project:src/sample1.xoo")).extracting("metric.key","value").contains(tuple("duplicated_blocks",1),tuple("duplicated_files",1),tuple("duplicated_lines",17));
   InputFile inputFile1=result.inputFile("src/sample1.xoo");
   InputFile inputFile2=result.inputFile("src/sample2.xoo");
   List<Duplication> duplicationGroupsFile1=result.duplicationsFor(inputFile1);
