@@ -1,18 +1,4 @@
 {
-  Map<String,Object> userDocMap=newHashMap();
-  userDocMap.put("login","john");
-  userDocMap.put("name","John");
-  userDocMap.put("email","john@email.com");
-  userDocMap.put("scmAccounts",newArrayList("jn"));
-  userDocMap.put("active",true);
-  userDocMap.put("createdAt",15000L);
-  userDocMap.put("updatedAt",15000L);
-  when(index.getByLogin("john")).thenReturn(new UserDoc(userDocMap));
-  tester.newPostRequest("api/users","update").setParam("login","john").setParam("name","John").execute();
-  verify(updater).update(userCaptor.capture());
-  assertThat(userCaptor.getValue().isNameChanged()).isTrue();
-  assertThat(userCaptor.getValue().isEmailChanged()).isFalse();
-  assertThat(userCaptor.getValue().isScmAccountsChanged()).isFalse();
-  assertThat(userCaptor.getValue().isPasswordChanged()).isFalse();
-  assertThat(userCaptor.getValue().isPasswordChanged()).isFalse();
+  createUser();
+  tester.newPostRequest("api/users","update").setParam("login","john").setParam("name","Jon Snow").execute().assertJson(getClass(),"update_name.json");
 }
