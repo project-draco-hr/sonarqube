@@ -1,0 +1,17 @@
+{
+  dbTester.truncateTables();
+  esTester.truncateIndices();
+  System2 system2=new System2();
+  UserDao userDao=new UserDao(dbTester.myBatis(),system2);
+  UserGroupDao userGroupDao=new UserGroupDao();
+  GroupDao groupDao=new GroupDao();
+  dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),userDao,userGroupDao,groupDao);
+  session=dbClient.openSession(false);
+  groupDao.insert(session,new GroupDto().setName("sonar-users"));
+  session.commit();
+  userIndexer=(UserIndexer)new UserIndexer(dbClient,esTester.client()).setEnabled(true);
+  index=new UserIndex(esTester.client());
+  tester=new WsTester(new UsersWs(new ChangePasswordAction(new UserUpdater(mock(NewUserNotifier.class),settings,dbClient,userIndexer,system2))));
+  controller=tester.controller("api/users");
+  MockUserSession.set().setLogin("admin").setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
+}

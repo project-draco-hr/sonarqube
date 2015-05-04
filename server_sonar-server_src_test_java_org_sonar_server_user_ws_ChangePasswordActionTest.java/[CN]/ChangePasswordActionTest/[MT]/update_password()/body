@@ -1,0 +1,9 @@
+{
+  createUser();
+  session.clearCache();
+  String originalPassword=dbClient.userDao().selectByLogin(session,"john").getCryptedPassword();
+  tester.newPostRequest("api/users","change_password").setParam("login","john").setParam("password","Valar Morghulis").setParam("password_confirmation","Valar Morghulis").execute().assertNoContent();
+  session.clearCache();
+  String newPassword=dbClient.userDao().selectByLogin(session,"john").getCryptedPassword();
+  assertThat(newPassword).isNotEqualTo(originalPassword);
+}
