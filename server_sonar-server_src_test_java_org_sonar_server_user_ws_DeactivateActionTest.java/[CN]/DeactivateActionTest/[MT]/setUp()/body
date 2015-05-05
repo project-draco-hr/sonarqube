@@ -1,0 +1,13 @@
+{
+  dbTester.truncateTables();
+  esTester.truncateIndices();
+  System2 system2=new System2();
+  UserDao userDao=new UserDao(dbTester.myBatis(),system2);
+  dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),userDao);
+  session=dbClient.openSession(false);
+  session.commit();
+  userIndexer=(UserIndexer)new UserIndexer(dbClient,esTester.client()).setEnabled(true);
+  index=new UserIndex(esTester.client());
+  tester=new WsTester(new UsersWs(new DeactivateAction(index,new UserUpdater(mock(NewUserNotifier.class),settings,dbClient,userIndexer,system2))));
+  controller=tester.controller("api/users");
+}
