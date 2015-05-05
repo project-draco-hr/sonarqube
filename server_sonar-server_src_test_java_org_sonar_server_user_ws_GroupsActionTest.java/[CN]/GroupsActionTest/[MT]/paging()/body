@@ -1,0 +1,9 @@
+{
+  UserDto user=createUser();
+  GroupDto usersGroup=createGroup("sonar-users","Sonar Users");
+  createGroup("sonar-admins","Sonar Admins");
+  addUserToGroup(user,usersGroup);
+  session.commit();
+  tester.newGetRequest("api/users","groups").setParam("login","john").setParam("ps","1").execute().assertJson(getClass(),"all_page1.json");
+  tester.newGetRequest("api/users","groups").setParam("login","john").setParam("ps","1").setParam("p","2").execute().assertJson(getClass(),"all_page2.json");
+}

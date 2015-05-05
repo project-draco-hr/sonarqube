@@ -1,0 +1,15 @@
+{
+  dbTester.prepareDbUnit(getClass(),"shared.xml");
+  DbSession session=dbTester.myBatis().openSession(false);
+  try {
+    assertThat(dao.countGroups(session,GroupMembershipQuery.builder().login("arthur").membership(GroupMembershipQuery.IN).build(),200L)).isEqualTo(3);
+    assertThat(dao.countGroups(session,GroupMembershipQuery.builder().login("arthur").membership(GroupMembershipQuery.OUT).build(),200L)).isZero();
+    assertThat(dao.countGroups(session,GroupMembershipQuery.builder().login("arthur").membership(GroupMembershipQuery.IN).build(),201L)).isEqualTo(1);
+    assertThat(dao.countGroups(session,GroupMembershipQuery.builder().login("arthur").membership(GroupMembershipQuery.OUT).build(),201L)).isEqualTo(2);
+    assertThat(dao.countGroups(session,GroupMembershipQuery.builder().login("arthur").membership(GroupMembershipQuery.IN).build(),999L)).isZero();
+    assertThat(dao.countGroups(session,GroupMembershipQuery.builder().login("arthur").membership(GroupMembershipQuery.OUT).build(),2999L)).isEqualTo(3);
+  }
+  finally {
+    session.close();
+  }
+}

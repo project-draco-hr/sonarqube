@@ -1,0 +1,22 @@
+{
+  String login=request.mandatoryParam(PARAM_LOGIN);
+  int pageSize=request.mandatoryParamAsInt(Param.PAGE_SIZE);
+  int page=request.mandatoryParamAsInt(Param.PAGE);
+  String queryString=request.param(PARAM_QUERY);
+  String selected=request.param(PARAM_SELECTED);
+  GroupMembershipQuery query=GroupMembershipQuery.builder().login(login).groupSearch(queryString).membership(getMembership(selected)).pageIndex(page).pageSize(pageSize).build();
+  DbSession session=dbClient.openSession(false);
+  try {
+    UserDto user=dbClient.userDao().selectByLogin(session,login);
+    int total=dbClient.groupMembershipDao().countGroups(session,query,user.getId());
+    Paging paging=Paging.create(pageSize,page,total);
+    List<GroupMembershipDto> groups=dbClient.groupMembershipDao().selectGroups(session,query,user.getId(),paging.offset(),pageSize);
+    JsonWriter json=response.newJsonWriter().beginObject();
+    writeGroups(json,groups);
+    writePaging(json,paging);
+    json.endObject().close();
+  }
+  finally {
+    session.close();
+  }
+}
