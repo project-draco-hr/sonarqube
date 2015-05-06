@@ -4,6 +4,8 @@
   addIssueNTimes(newIssue2(),3);
   when(dbClient.componentDao().getByUuid(any(DbSession.class),eq("file-uuid")).name()).thenReturn("file-name");
   when(dbClient.componentDao().getByUuid(any(DbSession.class),eq("directory-uuid")).name()).thenReturn("directory-name");
+  when(ruleIndex.getByKey(RuleKey.of("SonarQube","rule-the-world"))).thenReturn(newRule("Rule the World","Java"));
+  when(ruleIndex.getByKey(RuleKey.of("SonarQube","rule-the-universe"))).thenReturn(newRule("Rule the Universe","Clojure"));
   sut.setStatistics(component,stats);
   assertThat(sut.getFieldValue(SEVERITY + ".INFO.count")).isEqualTo("5");
   assertThat(sut.getFieldValue(SEVERITY + ".BLOCKER.count")).isEqualTo("3");
@@ -11,13 +13,17 @@
   assertThat(sut.getFieldValue(ASSIGNEE + ".1.count")).isEqualTo("5");
   assertThat(sut.getFieldValue(ASSIGNEE + ".2.label")).isEqualTo("keenan");
   assertThat(sut.getFieldValue(ASSIGNEE + ".2.count")).isEqualTo("3");
-  assertThat(sut.getFieldValue(TAGS + ".1.label")).isEqualTo("owasp");
-  assertThat(sut.getFieldValue(TAGS + ".1.count")).isEqualTo("8");
-  assertThat(sut.getFieldValue(TAGS + ".2.label")).isEqualTo("bug");
-  assertThat(sut.getFieldValue(TAGS + ".2.count")).isEqualTo("5");
+  assertThat(sut.getFieldValue(TAG + ".1.label")).isEqualTo("owasp");
+  assertThat(sut.getFieldValue(TAG + ".1.count")).isEqualTo("8");
+  assertThat(sut.getFieldValue(TAG + ".2.label")).isEqualTo("bug");
+  assertThat(sut.getFieldValue(TAG + ".2.count")).isEqualTo("5");
   assertThat(sut.getFieldValue(COMPONENT + ".1.label")).isEqualTo("file-name");
   assertThat(sut.getFieldValue(COMPONENT + ".1.count")).isEqualTo("5");
   assertThat(sut.getFieldValue(COMPONENT + ".2.label")).isEqualTo("directory-name");
   assertThat(sut.getFieldValue(COMPONENT + ".2.count")).isEqualTo("3");
+  assertThat(sut.getFieldValue(RULE + ".1.label")).isEqualTo("Rule the World (Java)");
+  assertThat(sut.getFieldValue(RULE + ".1.count")).isEqualTo("5");
+  assertThat(sut.getFieldValue(RULE + ".2.label")).isEqualTo("Rule the Universe (Clojure)");
+  assertThat(sut.getFieldValue(RULE + ".2.count")).isEqualTo("3");
   assertThat(sut.getDefaultMessage()).startsWith("8 new issues on project-long-name");
 }

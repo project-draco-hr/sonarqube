@@ -1,10 +1,10 @@
 {
-  Metric metric=Metric.ASSIGNEE;
+  Metric metric=Metric.RULE;
   List<Multiset.Entry<String>> metricStats=stats.statsForMetric(metric);
   for (int i=0; i < 5 && i < metricStats.size(); i++) {
-    String login=metricStats.get(i).getElement();
-    UserDoc user=userIndex.getNullableByLogin(login);
-    String name=user == null ? login : user.name();
+    String ruleKey=metricStats.get(i).getElement();
+    Rule rule=ruleIndex.getByKey(RuleKey.parse(ruleKey));
+    String name=rule.name() + " (" + rule.language()+ ")";
     setFieldValue(metric + DOT + (i + 1)+ LABEL,name);
     setFieldValue(metric + DOT + (i + 1)+ COUNT,String.valueOf(metricStats.get(i).getCount()));
   }
