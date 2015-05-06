@@ -2,8 +2,25 @@
   if (userLogins.isEmpty()) {
     return Collections.emptyList();
   }
-  String url="/api/users/search?format=json&includeDeactivated=true&logins=" + Joiner.on(',').join(userLogins);
-  String json=serverClient.request(url);
-  Users users=GsonHelper.create().fromJson(json,Users.class);
-  return users.getUsers();
+  InputSupplier<InputStream> request=serverClient.doRequest("/batch/users?logins=" + Joiner.on(',').join(Lists.transform(userLogins,new Function<String,String>(){
+    @Override public String apply(    String input){
+      return ServerClient.encodeForUrl(input);
+    }
+  }
+)),"GET",null);
+  List<BatchInput.User> users=new ArrayList<>();
+  try (InputStream is=request.getInput()){
+    BatchInput.User user=BatchInput.User.parseDelimitedFrom(is);
+    while (user != null) {
+      users.add(user);
+      user=BatchInput.User.parseDelimitedFrom(is);
+    }
+  }
+ catch (  HttpDownloader.HttpException e) {
+    throw serverClient.handleHttpException(e);
+  }
+catch (  IOException e) {
+    throw new IllegalStateException("Unable to get user details from server",e);
+  }
+  return users;
 }
