@@ -1,21 +1,18 @@
 {
-  for (  PluginInfo otherPlugin : pluginInfosByKeys.values()) {
-    if (!otherPlugin.getKey().equals(pluginKey)) {
-      for (      PluginInfo.RequiredPlugin requiredPlugin : otherPlugin.getRequiredPlugins()) {
-        if (requiredPlugin.getKey().equals(pluginKey)) {
-          uninstall(otherPlugin.getKey());
-        }
+  Set<String> uninstallKeys=new HashSet<>();
+  uninstallKeys.add(pluginKey);
+  appendDependentPluginKeys(pluginKey,uninstallKeys);
+  for (  String uninstallKey : uninstallKeys) {
+    PluginInfo info=pluginInfosByKeys.get(uninstallKey);
+    if (!info.isCore()) {
+      try {
+        LOG.info("Uninstalling plugin {} [{}]",info.getName(),info.getKey());
+        File masterFile=new File(fs.getInstalledPluginsDir(),info.getNonNullJarFile().getName());
+        moveFileToDirectory(masterFile,uninstalledPluginsDir(),true);
       }
-    }
-  }
-  PluginInfo info=pluginInfosByKeys.get(pluginKey);
-  if (!info.isCore()) {
-    try {
-      File masterFile=new File(fs.getInstalledPluginsDir(),info.getFile().getName());
-      moveFileToDirectory(masterFile,uninstalledPluginsDir(),true);
-    }
- catch (    IOException e) {
-      throw new IllegalStateException("Fail to uninstall plugin [" + pluginKey + "]",e);
+ catch (      IOException e) {
+        throw new IllegalStateException(format("Fail to uninstall plugin %s [%s]",info.getName(),info.getKey()),e);
+      }
     }
   }
 }

@@ -13,13 +13,13 @@
     }
   }
  catch (  IOException e) {
-    LOG.error(format("Fail to move or copy plugin: %s to %s",sourceFile.getAbsolutePath(),destFile.getAbsolutePath()),e);
+    throw new IllegalStateException(format("Fail to move or copy plugin: %s to %s",sourceFile.getAbsolutePath(),destFile.getAbsolutePath()),e);
   }
   PluginInfo info=PluginInfo.create(destFile);
   PluginInfo existing=pluginInfosByKeys.put(info.getKey(),info);
   if (existing != null) {
-    if (!existing.getFile().getName().equals(destFile.getName())) {
-      deleteQuietly(existing.getFile());
+    if (!existing.getNonNullJarFile().getName().equals(destFile.getName())) {
+      deleteQuietly(existing.getNonNullJarFile());
     }
     LOG.info("Plugin {} [{}] updated to version {}",info.getName(),info.getKey(),info.getVersion());
   }

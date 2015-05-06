@@ -1,11 +1,11 @@
 {
   Map<String,Plugin> instancesByPluginKey=new HashMap<>();
   for (  ClassloaderDef def : defs) {
-    for (    Map.Entry<String,String> entry : def.mainClassesByPluginKey.entrySet()) {
+    for (    Map.Entry<String,String> entry : def.getMainClassesByPluginKey().entrySet()) {
       String pluginKey=entry.getKey();
       String mainClass=entry.getValue();
       try {
-        instancesByPluginKey.put(pluginKey,(Plugin)def.classloader.loadClass(mainClass).newInstance());
+        instancesByPluginKey.put(pluginKey,(Plugin)def.getBuiltClassloader().loadClass(mainClass).newInstance());
       }
  catch (      UnsupportedClassVersionError e) {
         throw new IllegalStateException(String.format("The plugin [%s] does not support Java %s",pluginKey,SystemUtils.JAVA_VERSION_TRIMMED),e);

@@ -7,16 +7,16 @@
       def=new ClassloaderDef(baseKey);
       classloadersByBasePlugin.put(baseKey,def);
     }
-    UnzippedPlugin unzippedPlugin=unzipper.unzip(info);
-    def.files.add(unzippedPlugin.getMain());
-    def.files.addAll(unzippedPlugin.getLibs());
-    def.mainClassesByPluginKey.put(info.getKey(),info.getMainClass());
+    ExplodedPlugin explodedPlugin=exploder.explode(info);
+    def.addFiles(asList(explodedPlugin.getMain()));
+    def.addFiles(explodedPlugin.getLibs());
+    def.addMainClass(info.getKey(),info.getMainClass());
     for (    String defaultSharedResource : DEFAULT_SHARED_RESOURCES) {
-      def.mask.addInclusion(defaultSharedResource + info.getKey() + "/");
+      def.getMask().addInclusion(defaultSharedResource + info.getKey() + "/");
     }
     if (Strings.isNullOrEmpty(info.getBasePlugin())) {
-      def.selfFirstStrategy=info.isUseChildFirstClassLoader();
+      def.setSelfFirstStrategy(info.isUseChildFirstClassLoader());
     }
   }
-  return classloadersByBasePlugin;
+  return classloadersByBasePlugin.values();
 }

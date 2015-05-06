@@ -1,0 +1,25 @@
+{
+  if (Strings.isNullOrEmpty(plugin.getMainClass()) && Strings.isNullOrEmpty(plugin.getBasePlugin())) {
+    LOG.warn("Plugin {} [{}] is ignored because entry point class is not defined",plugin.getName(),plugin.getKey());
+    return false;
+  }
+  if (!plugin.isCompatibleWith(server.getVersion())) {
+    throw MessageException.of(format("Plugin %s [%s] requires at least SonarQube %s",plugin.getName(),plugin.getKey(),plugin.getMinimalSqVersion()));
+  }
+  if (!Strings.isNullOrEmpty(plugin.getBasePlugin()) && !allPluginsByKeys.containsKey(plugin.getBasePlugin())) {
+    LOG.warn("Plugin {} [{}] is ignored because its base plugin [{}] is not installed",plugin.getName(),plugin.getKey(),plugin.getBasePlugin());
+    return false;
+  }
+  for (  PluginInfo.RequiredPlugin requiredPlugin : plugin.getRequiredPlugins()) {
+    PluginInfo available=allPluginsByKeys.get(requiredPlugin.getKey());
+    if (available == null) {
+      LOG.warn("Plugin {} [{}] is ignored because the required plugin [{}] is not installed",plugin.getName(),plugin.getKey(),requiredPlugin.getKey());
+      return false;
+    }
+    if (requiredPlugin.getMinimalVersion().compareToIgnoreQualifier(available.getVersion()) > 0) {
+      LOG.warn("Plugin {} [{}] is ignored because the version {}??of required plugin [{}] is not supported",plugin.getName(),plugin.getKey(),requiredPlugin.getKey(),requiredPlugin.getMinimalVersion());
+      return false;
+    }
+  }
+  return true;
+}
