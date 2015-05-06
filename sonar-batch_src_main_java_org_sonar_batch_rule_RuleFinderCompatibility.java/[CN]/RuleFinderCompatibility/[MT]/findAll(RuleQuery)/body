@@ -1,3 +1,23 @@
 {
+  if (query.getConfigKey() != null) {
+    if (query.getRepositoryKey() != null && query.getKey() == null) {
+      Rule rule=toRule(activeRules.findByInternalKey(query.getRepositoryKey(),query.getConfigKey()));
+      return rule != null ? Arrays.asList(rule) : Collections.<Rule>emptyList();
+    }
+  }
+ else   if (query.getRepositoryKey() != null) {
+    if (query.getKey() != null) {
+      Rule rule=toRule(activeRules.find(RuleKey.of(query.getRepositoryKey(),query.getKey())));
+      return rule != null ? Arrays.asList(rule) : Collections.<Rule>emptyList();
+    }
+ else {
+      return Collections2.transform(activeRules.findByRepository(query.getRepositoryKey()),new Function<ActiveRule,Rule>(){
+        @Override public Rule apply(        ActiveRule input){
+          return toRule(input);
+        }
+      }
+);
+    }
+  }
   throw new UnsupportedOperationException("Unable to find rule by query");
 }
