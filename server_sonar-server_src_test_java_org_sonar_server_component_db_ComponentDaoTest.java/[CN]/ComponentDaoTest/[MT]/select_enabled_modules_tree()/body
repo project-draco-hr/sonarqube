@@ -1,11 +1,11 @@
 {
-  setupData("multi-modules");
-  List<ComponentDto> modules=dao.selectEnabledDescendantModules(session,"ABCD");
+  db.prepareDbUnit(getClass(),"multi-modules.xml");
+  List<ComponentDto> modules=sut.selectEnabledDescendantModules(session,"ABCD");
   assertThat(modules).extracting("uuid").containsOnly("ABCD","EFGH","FGHI");
-  modules=dao.selectEnabledDescendantModules(session,"EFGH");
+  modules=sut.selectEnabledDescendantModules(session,"EFGH");
   assertThat(modules).extracting("uuid").containsOnly("EFGH","FGHI");
-  modules=dao.selectEnabledDescendantModules(session,"FGHI");
+  modules=sut.selectEnabledDescendantModules(session,"FGHI");
   assertThat(modules).extracting("uuid").containsOnly("FGHI");
-  assertThat(dao.selectEnabledDescendantModules(session,"GHIJ")).isEmpty();
-  assertThat(dao.selectEnabledDescendantModules(session,"unknown")).isEmpty();
+  assertThat(sut.selectEnabledDescendantModules(session,"GHIJ")).isEmpty();
+  assertThat(sut.selectEnabledDescendantModules(session,"unknown")).isEmpty();
 }

@@ -1,0 +1,10 @@
+{
+  MockUserSession.set().setGlobalPermissions(UserRole.ADMIN);
+  componentDao.insert(dbSession,newProvisionedProject("1"),newProvisionedProject("2"));
+  dbSession.commit();
+  String jsonOutput=ws.newGetRequest("api/projects","provisioned").setParam(Param.TEXT_QUERY,"provisioned-name-2").execute().outputAsString();
+  assertThat(jsonOutput).contains("provisioned-name-2","provisioned-uuid-2").doesNotContain("provisioned-uuid-1");
+  assertThat(componentDao.countProvisionedProjects(dbSession,"name-2")).isEqualTo(1);
+  assertThat(componentDao.countProvisionedProjects(dbSession,"key-2")).isEqualTo(1);
+  assertThat(componentDao.countProvisionedProjects(dbSession,"visioned-name-")).isEqualTo(2);
+}

@@ -1,9 +1,9 @@
 {
   when(system2.now()).thenReturn(DateUtils.parseDate("2014-06-18").getTime());
-  setupData("empty");
+  db.prepareDbUnit(getClass(),"empty.xml");
   ComponentDto componentDto=new ComponentDto().setId(1L).setUuid("GHIJ").setProjectUuid("ABCD").setModuleUuid("EFGH").setModuleUuidPath(".ABCD.EFGH.").setKey("org.struts:struts-core:src/org/struts/RequestContext.java").setDeprecatedKey("org.struts:struts-core:src/org/struts/RequestContext.java").setName("RequestContext.java").setLongName("org.struts.RequestContext").setQualifier("FIL").setScope("FIL").setLanguage("java").setPath("src/org/struts/RequestContext.java").setParentProjectId(3L).setCopyResourceId(5L).setEnabled(true).setAuthorizationUpdatedAt(123456789L);
-  dao.insert(session,componentDto);
+  sut.insert(session,componentDto);
   session.commit();
   assertThat(componentDto.getId()).isNotNull();
-  checkTables("insert","projects");
+  db.assertDbUnit(getClass(),"insert-result.xml","projects");
 }

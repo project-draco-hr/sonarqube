@@ -1,0 +1,10 @@
+{
+  MockUserSession.set().setGlobalPermissions(UserRole.ADMIN);
+  for (int i=1; i <= 10; i++) {
+    componentDao.insert(dbSession,newProvisionedProject(String.valueOf(i)));
+  }
+  dbSession.commit();
+  WsTester.TestRequest request=ws.newGetRequest("api/projects","provisioned").setParam(Param.PAGE,"3").setParam(Param.PAGE_SIZE,"4");
+  String jsonOutput=request.execute().outputAsString();
+  assertThat(StringUtils.countMatches(jsonOutput,"provisioned-uuid-")).isEqualTo(2);
+}

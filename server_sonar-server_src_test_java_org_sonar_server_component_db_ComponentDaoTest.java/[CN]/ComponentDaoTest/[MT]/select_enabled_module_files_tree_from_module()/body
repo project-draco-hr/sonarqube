@@ -1,20 +1,20 @@
 {
-  setupData("select_module_files_tree");
-  List<FilePathWithHashDto> files=dao.selectEnabledDescendantFiles(session,"ABCD");
+  db.prepareDbUnit(getClass(),"select_module_files_tree.xml");
+  List<FilePathWithHashDto> files=sut.selectEnabledDescendantFiles(session,"ABCD");
   assertThat(files).extracting("uuid").containsOnly("EFGHI","HIJK");
   assertThat(files).extracting("moduleUuid").containsOnly("EFGH","FGHI");
   assertThat(files).extracting("srcHash").containsOnly("srcEFGHI","srcHIJK");
   assertThat(files).extracting("path").containsOnly("src/org/struts/pom.xml","src/org/struts/RequestContext.java");
-  files=dao.selectEnabledDescendantFiles(session,"EFGH");
+  files=sut.selectEnabledDescendantFiles(session,"EFGH");
   assertThat(files).extracting("uuid").containsOnly("EFGHI","HIJK");
   assertThat(files).extracting("moduleUuid").containsOnly("EFGH","FGHI");
   assertThat(files).extracting("srcHash").containsOnly("srcEFGHI","srcHIJK");
   assertThat(files).extracting("path").containsOnly("src/org/struts/pom.xml","src/org/struts/RequestContext.java");
-  files=dao.selectEnabledDescendantFiles(session,"FGHI");
+  files=sut.selectEnabledDescendantFiles(session,"FGHI");
   assertThat(files).extracting("uuid").containsOnly("HIJK");
   assertThat(files).extracting("moduleUuid").containsOnly("FGHI");
   assertThat(files).extracting("srcHash").containsOnly("srcHIJK");
   assertThat(files).extracting("path").containsOnly("src/org/struts/RequestContext.java");
-  assertThat(dao.selectEnabledDescendantFiles(session,"GHIJ")).isEmpty();
-  assertThat(dao.selectEnabledDescendantFiles(session,"unknown")).isEmpty();
+  assertThat(sut.selectEnabledDescendantFiles(session,"GHIJ")).isEmpty();
+  assertThat(sut.selectEnabledDescendantFiles(session,"unknown")).isEmpty();
 }
