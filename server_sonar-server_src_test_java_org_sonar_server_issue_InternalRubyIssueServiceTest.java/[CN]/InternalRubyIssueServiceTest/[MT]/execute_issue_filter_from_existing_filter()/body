@@ -8,13 +8,13 @@
   overrideProps.put("resolved",true);
   overrideProps.put("pageSize",20);
   overrideProps.put("pageIndex",2);
-  IssueQuery query=IssueQuery.builder().build();
+  IssueQuery query=IssueQuery.builder(userSessionRule).build();
   when(issueQueryService.createFromMap(eq(overrideProps))).thenReturn(query);
   service.execute(10L,overrideProps);
   ArgumentCaptor<IssueQuery> issueQueryArgumentCaptor=ArgumentCaptor.forClass(IssueQuery.class);
   ArgumentCaptor<SearchOptions> contextArgumentCaptor=ArgumentCaptor.forClass(SearchOptions.class);
   verify(issueFilterService).execute(issueQueryArgumentCaptor.capture(),contextArgumentCaptor.capture());
-  verify(issueFilterService).find(eq(10L),any(UserSession.class));
+  verify(issueFilterService).find(eq(10L),any(ThreadLocalUserSession.class));
   SearchOptions searchOptions=contextArgumentCaptor.getValue();
   assertThat(searchOptions.getLimit()).isEqualTo(20);
   assertThat(searchOptions.getPage()).isEqualTo(2);

@@ -9,13 +9,13 @@
   db.activeRuleDao().insert(dbSession,ActiveRuleDto.createFor(qualityProfileDto1,rule1).setSeverity("BLOCKER"),ActiveRuleDto.createFor(qualityProfileDto2,rule1).setSeverity("BLOCKER"),ActiveRuleDto.createFor(qualityProfileDto1,rule2).setSeverity("CRITICAL"));
   dbSession.commit();
   dbSession.clearCache();
-  Result<Rule> result=index.search(new RuleQuery().setActivation(true).setQProfileKey(qualityProfileDto1.getKey()),new QueryContext());
+  Result<Rule> result=index.search(new RuleQuery().setActivation(true).setQProfileKey(qualityProfileDto1.getKey()),new QueryContext(userSessionRule));
   assertThat(result.getHits()).hasSize(2);
-  result=index.search(new RuleQuery().setActivation(true).setQProfileKey(qualityProfileDto1.getKey()).setActiveSeverities(Arrays.asList("CRITICAL")),new QueryContext().addFacets(Arrays.asList(RuleIndex.FACET_ACTIVE_SEVERITIES)));
+  result=index.search(new RuleQuery().setActivation(true).setQProfileKey(qualityProfileDto1.getKey()).setActiveSeverities(Arrays.asList("CRITICAL")),new QueryContext(userSessionRule).addFacets(Arrays.asList(RuleIndex.FACET_ACTIVE_SEVERITIES)));
   assertThat(result.getHits()).hasSize(1);
   assertThat(result.getHits().get(0).name()).isEqualTo(rule2.getName());
   assertThat(result.getFacetValues(RuleIndex.FACET_ACTIVE_SEVERITIES)).containsOnly(new FacetValue("BLOCKER",1),new FacetValue("CRITICAL",1));
-  result=index.search(new RuleQuery(),new QueryContext().addFacets(Arrays.asList(RuleIndex.FACET_ACTIVE_SEVERITIES)));
+  result=index.search(new RuleQuery(),new QueryContext(userSessionRule).addFacets(Arrays.asList(RuleIndex.FACET_ACTIVE_SEVERITIES)));
   assertThat(result.getHits()).hasSize(3);
   assertThat(result.getFacetValues(RuleIndex.FACET_ACTIVE_SEVERITIES)).containsOnly(new FacetValue("BLOCKER",2),new FacetValue("CRITICAL",1));
 }

@@ -2,9 +2,9 @@
   QualityProfileDao profileDao=new QualityProfileDao(db.myBatis(),mock(System2.class));
   DbClient dbClient=new DbClient(db.database(),db.myBatis(),profileDao);
   String xooKey="xoo";
-  WsTester wsTester=new WsTester(new QProfilesWs(mock(RuleActivationActions.class),mock(BulkRuleActivationActions.class),mock(ProjectAssociationActions.class),new QProfileCreateAction(dbClient,new QProfileFactory(dbClient),null,LanguageTesting.newLanguages(xooKey))));
+  WsTester wsTester=new WsTester(new QProfilesWs(mock(RuleActivationActions.class),mock(BulkRuleActivationActions.class),mock(ProjectAssociationActions.class),new QProfileCreateAction(dbClient,new QProfileFactory(dbClient),null,LanguageTesting.newLanguages(xooKey),userSessionRule)));
   Action create=wsTester.controller("api/qualityprofiles").action("create");
   assertThat(create.params()).hasSize(2);
-  MockUserSession.set().setLogin("anakin").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN);
+  userSessionRule.logon("anakin").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN);
   wsTester.newPostRequest("api/qualityprofiles","create").setParam("language",xooKey).setParam("name","Yeehaw!").execute().assertJson(getClass(),"create-no-importer.json");
 }

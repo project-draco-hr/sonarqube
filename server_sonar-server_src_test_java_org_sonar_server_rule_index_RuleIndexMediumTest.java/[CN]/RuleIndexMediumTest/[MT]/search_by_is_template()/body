@@ -3,18 +3,18 @@
   dao.insert(dbSession,RuleTesting.newDto(RuleKey.of("java","S002")).setIsTemplate(true));
   dbSession.commit();
   RuleQuery query=new RuleQuery();
-  Result<Rule> results=index.search(query,new QueryContext());
+  Result<Rule> results=index.search(query,new QueryContext(userSessionRule));
   assertThat(results.getHits()).hasSize(2);
   query=new RuleQuery().setIsTemplate(true);
-  results=index.search(query,new QueryContext());
+  results=index.search(query,new QueryContext(userSessionRule));
   assertThat(results.getHits()).hasSize(1);
   assertThat(Iterables.getFirst(results.getHits(),null).key().rule()).isEqualTo("S002");
   assertThat(Iterables.getFirst(results.getHits(),null).isTemplate()).isTrue();
   query=new RuleQuery().setIsTemplate(false);
-  results=index.search(query,new QueryContext());
+  results=index.search(query,new QueryContext(userSessionRule));
   assertThat(results.getHits()).hasSize(1);
   assertThat(Iterables.getFirst(results.getHits(),null).isTemplate()).isFalse();
   assertThat(Iterables.getFirst(results.getHits(),null).key().rule()).isEqualTo("S001");
   query=new RuleQuery().setIsTemplate(null);
-  assertThat(index.search(query,new QueryContext()).getHits()).hasSize(2);
+  assertThat(index.search(query,new QueryContext(userSessionRule)).getHits()).hasSize(2);
 }

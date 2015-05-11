@@ -15,7 +15,7 @@
     query.setQProfileKey(profile);
     query.setActivation(true);
   }
-  QueryContext options=new QueryContext();
+  QueryContext options=new QueryContext(userSession);
   Integer pageSize=RubyUtils.toInteger(params.get("pageSize"));
   int size=pageSize != null ? pageSize : 50;
   if (size > -1) {
@@ -26,7 +26,7 @@
     return new PagedResult<>(result.getHits(),PagingResult.create(options.getLimit(),pageIndex,result.getTotal()));
   }
  else {
-    List<Rule> rules=newArrayList(service.search(query,new QueryContext().setScroll(true)).scroll());
+    List<Rule> rules=newArrayList(service.search(query,new QueryContext(userSession).setScroll(true)).scroll());
     return new PagedResult<>(rules,PagingResult.create(Integer.MAX_VALUE,1,rules.size()));
   }
 }

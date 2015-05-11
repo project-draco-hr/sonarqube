@@ -4,11 +4,11 @@
   dao.insert(dbSession,RuleTesting.newDto(RuleKey.of("javascript","S002")).setTags(ImmutableSet.of("tag1","tag2"))).setSystemTags(ImmutableSet.<String>of());
   dbSession.commit();
   RuleQuery query=new RuleQuery();
-  Result result=index.search(query,new QueryContext());
+  Result result=index.search(query,new QueryContext(userSessionRule));
   assertThat(result.getFacets()).isEmpty();
-  result=index.search(new RuleQuery().setQueryText("aeiou"),new QueryContext().addFacets(Arrays.asList("repositories")));
+  result=index.search(new RuleQuery().setQueryText("aeiou"),new QueryContext(userSessionRule).addFacets(Arrays.asList("repositories")));
   assertThat(result.getFacets()).isEmpty();
-  result=index.search(query,new QueryContext().addFacets(Arrays.asList("repositories","tags")));
+  result=index.search(query,new QueryContext(userSessionRule).addFacets(Arrays.asList("repositories","tags")));
   assertThat(result.getFacets()).isNotNull();
   assertThat(result.getFacets()).hasSize(2);
   Collection<FacetValue> repoFacets=result.getFacetValues("repositories");

@@ -1,10 +1,10 @@
 {
   Locale locale=Locale.PRC;
-  MockUserSession.set().setLocale(locale);
+  userSessionRule.setLocale(locale);
   Date now=new Date();
   Date aBitLater=new Date(now.getTime() + 1000);
   when(server.getStartedAt()).thenReturn(now);
-  Result result=new WsTester(new L10nWs(i18n,server)).newGetRequest("api/l10n","index").setParam("ts",DateUtils.formatDateTime(aBitLater)).execute();
+  Result result=new WsTester(new L10nWs(i18n,server,userSessionRule)).newGetRequest("api/l10n","index").setParam("ts",DateUtils.formatDateTime(aBitLater)).execute();
   verifyZeroInteractions(i18n);
   verify(server).getStartedAt();
   result.assertNotModified();

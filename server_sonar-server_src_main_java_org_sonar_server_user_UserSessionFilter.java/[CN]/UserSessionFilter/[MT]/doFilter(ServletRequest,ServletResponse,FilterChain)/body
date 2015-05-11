@@ -3,6 +3,12 @@
     chain.doFilter(servletRequest,servletResponse);
   }
   finally {
-    UserSession.remove();
+    ThreadLocalUserSession userSession=platform.getContainer().getComponentByType(ThreadLocalUserSession.class);
+    if (userSession == null) {
+      Loggers.get(UserSessionFilter.class).error("Can not retrieve ThreadLocalUserSession from Platform");
+    }
+ else {
+      userSession.remove();
+    }
   }
 }

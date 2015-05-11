@@ -4,7 +4,7 @@
   ComponentDto project=dbClient.componentDao().insert(session,ComponentTesting.newProjectDto("abcd").setKey("polop").setName("Polop"));
   dbClient.snapshotDao().insert(session,new SnapshotDto().setCreatedAt(snapshotDate.getTime()).setVersion("3.14").setLast(true).setQualifier(project.qualifier()).setResourceId(project.getId()).setRootProjectId(project.getId()).setScope(project.scope()));
   session.commit();
-  MockUserSession.set().setLogin("obiwan").setUserId(userId).addProjectUuidPermissions(UserRole.USER,"abcd");
-  wsTester=new WsTester(new NavigationWs(new ComponentNavigationAction(dbClient,activeDashboardDao,new Views(),i18n,resourceTypes)));
+  userSessionRule.logon("obiwan").setUserId(userId).addProjectUuidPermissions(UserRole.USER,"abcd");
+  wsTester=new WsTester(new NavigationWs(new ComponentNavigationAction(dbClient,activeDashboardDao,new Views(userSessionRule),i18n,resourceTypes,userSessionRule)));
   wsTester.newGetRequest("api/navigation","component").setParam("componentKey","polop").execute().assertJson(getClass(),"with_snapshot_and_connected_user.json");
 }

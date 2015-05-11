@@ -2,7 +2,7 @@
   ComponentDto project=ComponentTesting.newProjectDto();
   ComponentDto file=ComponentTesting.newFileDto(project);
   indexIssues(IssueTesting.newDoc("ISSUE1",file).setResolution(Issue.RESOLUTION_FALSE_POSITIVE),IssueTesting.newDoc("ISSUE2",file).setResolution(Issue.RESOLUTION_FALSE_POSITIVE),IssueTesting.newDoc("ISSUE3",file).setResolution(Issue.RESOLUTION_FIXED));
-  SearchResult<IssueDoc> result=index.search(IssueQuery.builder().build(),new SearchOptions().addFacets(newArrayList("resolutions")));
+  SearchResult<IssueDoc> result=index.search(IssueQuery.builder(userSessionRule).build(),new SearchOptions().addFacets(newArrayList("resolutions")));
   assertThat(result.getFacets().getNames()).containsOnly("resolutions");
   assertThat(result.getFacets().get("resolutions")).containsOnly(entry("FALSE-POSITIVE",2L),entry("FIXED",1L));
 }

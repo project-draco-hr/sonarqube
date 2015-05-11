@@ -1,7 +1,7 @@
 {
   throwable.expect(UnauthorizedException.class);
-  MockUserSession.set().setLogin(null);
-  issueCommentService.addComment("myIssue","my comment",MockUserSession.get());
+  userSessionRule.anonymous();
+  issueCommentService.addComment("myIssue","my comment",userSessionRule);
   verify(updater,never()).addComment(any(DefaultIssue.class),anyString(),any(IssueChangeContext.class));
   verifyZeroInteractions(issueService);
 }

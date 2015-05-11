@@ -2,10 +2,10 @@
   HttpServletRequest httpRequest=mock(HttpServletRequest.class);
   ServletResponse httpResponse=mock(ServletResponse.class);
   FilterChain chain=mock(FilterChain.class);
-  MockUserSession.set().setUserId(123).setLogin("karadoc");
-  assertThat(UserSession.hasSession()).isTrue();
-  UserSessionFilter filter=new UserSessionFilter();
+  threadLocalUserSession.set(new MockUserSession("karadoc").setUserId(123));
+  assertThat(threadLocalUserSession.hasSession()).isTrue();
+  UserSessionFilter filter=new UserSessionFilter(platform);
   filter.doFilter(httpRequest,httpResponse,chain);
   verify(chain).doFilter(httpRequest,httpResponse);
-  assertThat(UserSession.hasSession()).isFalse();
+  assertThat(threadLocalUserSession.hasSession()).isFalse();
 }

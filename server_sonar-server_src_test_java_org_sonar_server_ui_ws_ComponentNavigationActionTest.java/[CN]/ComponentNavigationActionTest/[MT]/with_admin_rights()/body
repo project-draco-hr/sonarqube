@@ -3,7 +3,7 @@
   int userId=42;
   dbClient.componentDao().insert(session,ComponentTesting.newProjectDto("abcd").setKey("polop").setName("Polop").setLanguage(language));
   session.commit();
-  MockUserSession.set().setLogin("obiwan").setUserId(userId).addProjectUuidPermissions(UserRole.USER,"abcd").addProjectUuidPermissions(UserRole.ADMIN,"abcd");
+  userSessionRule.logon("obiwan").setUserId(userId).addProjectUuidPermissions(UserRole.USER,"abcd").addProjectUuidPermissions(UserRole.ADMIN,"abcd");
 @NavigationSection(NavigationSection.RESOURCE_CONFIGURATION) @ResourceScope(Scopes.PROJECT) @ResourceQualifier(Qualifiers.PROJECT) @ResourceLanguage(language) class FirstPage implements Page {
     @Override public String getTitle(){
       return "First Page";
@@ -22,6 +22,6 @@
     }
   }
   Page page2=new SecondPage();
-  wsTester=new WsTester(new NavigationWs(new ComponentNavigationAction(dbClient,activeDashboardDao,new Views(new Page[]{page1,page2}),i18n,resourceTypes)));
+  wsTester=new WsTester(new NavigationWs(new ComponentNavigationAction(dbClient,activeDashboardDao,new Views(userSessionRule,new Page[]{page1,page2}),i18n,resourceTypes,userSessionRule)));
   wsTester.newGetRequest("api/navigation","component").setParam("componentKey","polop").execute().assertJson(getClass(),"with_admin_rights.json");
 }

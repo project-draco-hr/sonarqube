@@ -1,5 +1,5 @@
 {
-  boolean hasScanPerm=UserSession.get().hasGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
+  boolean hasScanPerm=userSession.hasGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
   checkPermission(query.isPreview());
   DbSession session=dbClient.openSession(false);
   try {
@@ -7,7 +7,7 @@
     String projectKey=query.getModuleKey();
     ComponentDto module=dbClient.componentDao().getNullableByKey(session,query.getModuleKey());
     if (module != null) {
-      if (query.isPreview() && !UserSession.get().hasProjectPermissionByUuid(UserRole.USER,module.projectUuid())) {
+      if (query.isPreview() && !userSession.hasProjectPermissionByUuid(UserRole.USER,module.projectUuid())) {
         throw new ForbiddenException("You're not authorized to access to project '" + module.name() + "', please contact your SonarQube administrator.");
       }
       ComponentDto project=getProject(module,session);

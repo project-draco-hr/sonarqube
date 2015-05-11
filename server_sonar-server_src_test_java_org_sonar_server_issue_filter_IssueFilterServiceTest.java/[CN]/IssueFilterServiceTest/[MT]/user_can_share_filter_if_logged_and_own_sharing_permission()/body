@@ -1,10 +1,9 @@
 {
   when(authorizationDao.selectGlobalPermissions("john")).thenReturn(newArrayList(GlobalPermissions.DASHBOARD_SHARING));
-  UserSession userSession=MockUserSession.create().setLogin("john");
+  UserSession userSession=new MockUserSession("john");
   assertThat(service.canShareFilter(userSession)).isTrue();
-  userSession=MockUserSession.create().setLogin(null);
-  assertThat(service.canShareFilter(userSession)).isFalse();
+  assertThat(service.canShareFilter(new AnonymousMockUserSession())).isFalse();
   when(authorizationDao.selectGlobalPermissions("john")).thenReturn(Collections.<String>emptyList());
-  userSession=MockUserSession.create().setLogin("john");
+  userSession=new MockUserSession("john");
   assertThat(service.canShareFilter(userSession)).isFalse();
 }

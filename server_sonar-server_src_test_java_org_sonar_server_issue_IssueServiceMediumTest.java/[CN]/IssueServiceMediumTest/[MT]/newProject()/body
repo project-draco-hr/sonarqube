@@ -1,9 +1,9 @@
 {
   ComponentDto project=ComponentTesting.newProjectDto();
   tester.get(ComponentDao.class).insert(session,project);
-  MockUserSession.set().setLogin("admin").addProjectPermissions(UserRole.USER,project.key()).setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
+  userSessionRule.logon("admin").addProjectPermissions(UserRole.USER,project.key()).setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
   session.commit();
   tester.get(InternalPermissionService.class).addPermission(new PermissionChange().setComponentKey(project.getKey()).setGroup(DefaultGroups.ANYONE).setPermission(UserRole.USER));
-  MockUserSession.set();
+  userSessionRule.logon();
   return project;
 }

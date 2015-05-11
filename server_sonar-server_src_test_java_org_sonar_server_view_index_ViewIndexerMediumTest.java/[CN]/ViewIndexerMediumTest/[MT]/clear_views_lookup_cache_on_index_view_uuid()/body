@@ -8,12 +8,12 @@
   tester.get(ComponentDao.class).insert(dbSession,view,techProject1);
   dbSession.commit();
   indexer.index(viewUuid);
-  SearchResult<IssueDoc> docs=tester.get(IssueIndex.class).search(IssueQuery.builder().viewUuids(newArrayList(viewUuid)).build(),new SearchOptions());
+  SearchResult<IssueDoc> docs=tester.get(IssueIndex.class).search(IssueQuery.builder(userSessionRule).viewUuids(newArrayList(viewUuid)).build(),new SearchOptions());
   assertThat(docs.getDocs()).hasSize(1);
   ComponentDto project2=addProjectWithIssue(rule);
   ComponentDto techProject2=ComponentTesting.newProjectCopy("EFGH",project2,view);
   tester.get(ComponentDao.class).insert(dbSession,techProject2);
   dbSession.commit();
   indexer.index(viewUuid);
-  assertThat(tester.get(IssueIndex.class).search(IssueQuery.builder().viewUuids(newArrayList(viewUuid)).build(),new SearchOptions()).getDocs()).hasSize(2);
+  assertThat(tester.get(IssueIndex.class).search(IssueQuery.builder(userSessionRule).viewUuids(newArrayList(viewUuid)).build(),new SearchOptions()).getDocs()).hasSize(2);
 }

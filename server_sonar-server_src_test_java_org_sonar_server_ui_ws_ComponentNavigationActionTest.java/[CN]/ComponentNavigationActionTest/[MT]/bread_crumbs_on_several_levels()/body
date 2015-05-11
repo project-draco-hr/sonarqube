@@ -9,7 +9,7 @@
   SnapshotDto directorySnapshot=dbClient.snapshotDao().insert(session,new SnapshotDto().setLast(true).setQualifier(directory.qualifier()).setResourceId(directory.getId()).setRootProjectId(project.getId()).setScope(directory.scope()).setParentId(moduleSnapshot.getId()));
   dbClient.snapshotDao().insert(session,new SnapshotDto().setLast(true).setQualifier(file.qualifier()).setResourceId(file.getId()).setRootProjectId(project.getId()).setScope(file.scope()).setParentId(directorySnapshot.getId()));
   session.commit();
-  MockUserSession.set().addProjectUuidPermissions(UserRole.USER,"abcd");
-  wsTester=new WsTester(new NavigationWs(new ComponentNavigationAction(dbClient,activeDashboardDao,new Views(),i18n,resourceTypes)));
+  userSessionRule.addProjectUuidPermissions(UserRole.USER,"abcd");
+  wsTester=new WsTester(new NavigationWs(new ComponentNavigationAction(dbClient,activeDashboardDao,new Views(userSessionRule),i18n,resourceTypes,userSessionRule)));
   wsTester.newGetRequest("api/navigation","component").setParam("componentKey","palap:src/main/xoo/Source.xoo").execute().assertJson(getClass(),"breadcrumbs.json");
 }

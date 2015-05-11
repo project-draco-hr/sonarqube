@@ -3,7 +3,7 @@
   int userId=42;
   dbClient.componentDao().insert(session,ComponentTesting.newProjectDto("abcd").setKey("polop").setName("Polop").setLanguage(language));
   session.commit();
-  MockUserSession.set().setLogin("obiwan").setUserId(userId).addProjectUuidPermissions(UserRole.USER,"abcd").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN);
+  userSessionRule.logon("obiwan").setUserId(userId).addProjectUuidPermissions(UserRole.USER,"abcd").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN);
 @NavigationSection(NavigationSection.RESOURCE_CONFIGURATION) class FirstPage implements Page {
     @Override public String getTitle(){
       return "First Page";
@@ -13,6 +13,6 @@
     }
   }
   Page page=new FirstPage();
-  wsTester=new WsTester(new NavigationWs(new ComponentNavigationAction(dbClient,activeDashboardDao,new Views(new Page[]{page}),i18n,resourceTypes)));
+  wsTester=new WsTester(new NavigationWs(new ComponentNavigationAction(dbClient,activeDashboardDao,new Views(userSessionRule,new Page[]{page}),i18n,resourceTypes,userSessionRule)));
   wsTester.newGetRequest("api/navigation","component").setParam("componentKey","polop").execute().assertJson(getClass(),"quality_profile_admin.json");
 }

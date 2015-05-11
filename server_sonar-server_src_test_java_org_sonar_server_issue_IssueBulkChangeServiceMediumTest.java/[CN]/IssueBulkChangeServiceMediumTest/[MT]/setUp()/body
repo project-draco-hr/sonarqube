@@ -13,7 +13,7 @@
   tester.get(ComponentDao.class).insert(session,file);
   tester.get(SnapshotDao.class).insert(session,SnapshotTesting.createForComponent(file,projectSnapshot));
   session.commit();
-  MockUserSession.set().setLogin("admin").setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
+  userSessionRule.logon("admin").setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
   tester.get(InternalPermissionService.class).addPermission(new PermissionChange().setComponentKey(project.getKey()).setGroup(DefaultGroups.ANYONE).setPermission(UserRole.USER));
-  userSession=MockUserSession.set().setLogin("john").addProjectPermissions(UserRole.USER,project.key());
+  userSession=userSessionRule.logon("john").addProjectPermissions(UserRole.USER,project.key());
 }

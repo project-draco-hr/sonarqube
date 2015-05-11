@@ -1,14 +1,14 @@
 {
   dao.insert(dbSession,RuleTesting.newDto(RuleKey.of("javascript","S001")));
   dbSession.commit();
-  QueryContext options=new QueryContext().setFieldsToReturn(null);
+  QueryContext options=new QueryContext(userSessionRule).setFieldsToReturn(null);
   Result<Rule> results=index.search(new RuleQuery(),options);
   assertThat(results.getHits()).hasSize(1);
   Rule hit=Iterables.getFirst(results.getHits(),null);
   assertThat(hit.key()).isNotNull();
   assertThat(hit.htmlDescription()).isNotNull();
   assertThat(hit.name()).isNotNull();
-  options=new QueryContext().setFieldsToReturn(Collections.<String>emptyList());
+  options=new QueryContext(userSessionRule).setFieldsToReturn(Collections.<String>emptyList());
   results=index.search(new RuleQuery(),options);
   assertThat(results.getHits()).hasSize(1);
   hit=Iterables.getFirst(results.getHits(),null);

@@ -9,7 +9,7 @@
   db.issueDao().insert(session,issue);
   session.commit();
   tester.get(IssueIndexer.class).indexAll();
-  MockUserSession.set().setLogin("john");
+  userSessionRule.logon("john");
   WsTester.Result result=wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).setParam("extra_fields","actions,transitions,assigneeName,reporterName,actionPlanName").execute();
   result.assertJson(this.getClass(),"issue_with_extra_fields.json");
 }

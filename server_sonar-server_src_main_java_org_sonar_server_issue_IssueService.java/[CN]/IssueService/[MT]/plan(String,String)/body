@@ -4,13 +4,13 @@
   try {
     ActionPlan actionPlan=null;
     if (!Strings.isNullOrEmpty(actionPlanKey)) {
-      actionPlan=actionPlanService.findByKey(actionPlanKey,UserSession.get());
+      actionPlan=actionPlanService.findByKey(actionPlanKey,userSession);
       if (actionPlan == null) {
         throw new NotFoundException("Unknown action plan: " + actionPlanKey);
       }
     }
     DefaultIssue issue=getByKeyForUpdate(session,issueKey).toDefaultIssue();
-    IssueChangeContext context=IssueChangeContext.createUser(new Date(),UserSession.get().login());
+    IssueChangeContext context=IssueChangeContext.createUser(new Date(),userSession.login());
     if (issueUpdater.plan(issue,actionPlan,context)) {
       saveIssue(session,issue,context,null);
     }

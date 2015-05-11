@@ -9,14 +9,14 @@
   db.activeRuleDao().insert(dbSession,ActiveRuleDto.createFor(qualityProfileDto1,rule1).setSeverity("BLOCKER"),ActiveRuleDto.createFor(qualityProfileDto2,rule1).setSeverity("BLOCKER"),ActiveRuleDto.createFor(qualityProfileDto1,rule2).setSeverity("BLOCKER"));
   dbSession.commit();
   dbSession.clearCache();
-  Result<Rule> result=index.search(new RuleQuery().setActivation(true),new QueryContext());
+  Result<Rule> result=index.search(new RuleQuery().setActivation(true),new QueryContext(userSessionRule));
   assertThat(result.getHits()).hasSize(2);
-  result=index.search(new RuleQuery().setActivation(false),new QueryContext());
+  result=index.search(new RuleQuery().setActivation(false),new QueryContext(userSessionRule));
   assertThat(result.getHits()).hasSize(1);
   assertThat(result.getHits().get(0).name()).isEqualTo(rule3.getName());
-  index.search(new RuleQuery().setActivation(false).setQProfileKey(qualityProfileDto2.getKey()),new QueryContext());
+  index.search(new RuleQuery().setActivation(false).setQProfileKey(qualityProfileDto2.getKey()),new QueryContext(userSessionRule));
   assertThat(result.getHits()).hasSize(1);
-  result=index.search(new RuleQuery().setActivation(true).setQProfileKey(qualityProfileDto2.getKey()),new QueryContext());
+  result=index.search(new RuleQuery().setActivation(true).setQProfileKey(qualityProfileDto2.getKey()),new QueryContext(userSessionRule));
   assertThat(result.getHits()).hasSize(1);
   assertThat(result.getHits().get(0).name()).isEqualTo(rule1.getName());
 }

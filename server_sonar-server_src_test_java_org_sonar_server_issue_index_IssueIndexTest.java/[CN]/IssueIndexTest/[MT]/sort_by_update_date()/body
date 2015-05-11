@@ -2,12 +2,12 @@
   ComponentDto project=ComponentTesting.newProjectDto();
   ComponentDto file=ComponentTesting.newFileDto(project);
   indexIssues(IssueTesting.newDoc("ISSUE1",file).setFuncUpdateDate(DateUtils.parseDateTime("2014-09-23T00:00:00+0100")),IssueTesting.newDoc("ISSUE2",file).setFuncUpdateDate(DateUtils.parseDateTime("2014-09-24T00:00:00+0100")));
-  IssueQuery.Builder query=IssueQuery.builder().sort(IssueQuery.SORT_BY_UPDATE_DATE).asc(true);
+  IssueQuery.Builder query=IssueQuery.builder(userSessionRule).sort(IssueQuery.SORT_BY_UPDATE_DATE).asc(true);
   SearchResult<IssueDoc> result=index.search(query.build(),new SearchOptions());
   assertThat(result.getDocs()).hasSize(2);
   assertThat(result.getDocs().get(0).updateDate()).isEqualTo(DateUtils.parseDateTime("2014-09-23T00:00:00+0100"));
   assertThat(result.getDocs().get(1).updateDate()).isEqualTo(DateUtils.parseDateTime("2014-09-24T00:00:00+0100"));
-  query=IssueQuery.builder().sort(IssueQuery.SORT_BY_UPDATE_DATE).asc(false);
+  query=IssueQuery.builder(userSessionRule).sort(IssueQuery.SORT_BY_UPDATE_DATE).asc(false);
   result=index.search(query.build(),new SearchOptions());
   assertThat(result.getDocs()).hasSize(2);
   assertThat(result.getDocs().get(0).updateDate()).isEqualTo(DateUtils.parseDateTime("2014-09-24T00:00:00+0100"));

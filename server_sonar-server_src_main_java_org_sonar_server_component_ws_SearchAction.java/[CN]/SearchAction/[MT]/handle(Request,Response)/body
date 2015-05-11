@@ -9,9 +9,9 @@
   DbSession session=dbClient.openSession(false);
   try {
     ComponentDto componentDto=dbClient.componentDao().getByUuid(session,viewOrSubUuid);
-    UserSession.get().checkProjectUuidPermission(UserRole.USER,componentDto.projectUuid());
+    userSession.checkProjectUuidPermission(UserRole.USER,componentDto.projectUuid());
     Set<Long> projectIds=newLinkedHashSet(dbClient.componentIndexDao().selectProjectIdsFromQueryAndViewOrSubViewUuid(session,query,componentDto.uuid()));
-    Collection<Long> authorizedProjectIds=dbClient.authorizationDao().keepAuthorizedProjectIds(session,projectIds,UserSession.get().userId(),UserRole.USER);
+    Collection<Long> authorizedProjectIds=dbClient.authorizationDao().keepAuthorizedProjectIds(session,projectIds,userSession.userId(),UserRole.USER);
     SearchOptions options=new SearchOptions();
     options.setPage(request.mandatoryParamAsInt(PAGE),request.mandatoryParamAsInt(PAGE_SIZE));
     Set<Long> pagedProjectIds=pagedProjectIds(authorizedProjectIds,options);

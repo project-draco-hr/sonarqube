@@ -9,7 +9,7 @@
   dao.insert(dbSession,RuleTesting.newDto(RuleKey.of("xoo","S001")).setSubCharacteristicId(null).setRemediationFunction(null).setRemediationCoefficient(null).setDefaultSubCharacteristicId(null).setDefaultRemediationFunction(null).setDefaultRemediationCoefficient(null));
   dao.insert(dbSession,RuleTesting.newDto(RuleKey.of("xoo","S002")).setSubCharacteristicId(-1).setRemediationFunction(null).setRemediationCoefficient(null).setDefaultSubCharacteristicId(null).setDefaultRemediationFunction(null).setDefaultRemediationCoefficient(null));
   dbSession.commit();
-  QueryContext withDebtCharFacet=new QueryContext().addFacets(Arrays.asList(RuleIndex.FACET_DEBT_CHARACTERISTICS));
+  QueryContext withDebtCharFacet=new QueryContext(userSessionRule).addFacets(Arrays.asList(RuleIndex.FACET_DEBT_CHARACTERISTICS));
   Result<Rule> result1=index.search(new RuleQuery(),withDebtCharFacet);
   assertThat(result1.getFacetValues(RuleIndex.FACET_DEBT_CHARACTERISTICS)).containsOnly(new FacetValue("c1",2L),new FacetValue("c11",2L),new FacetValue("",1L),new FacetValue("NONE",1L));
   Result<Rule> result2=index.search(new RuleQuery().setDebtCharacteristics(Arrays.asList("c1")),withDebtCharFacet);

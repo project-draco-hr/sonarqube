@@ -4,7 +4,7 @@
   try {
     ComponentDto component=dbClient.componentDao().getByKey(session,componentKey);
     ComponentDto project=dbClient.componentDao().getByUuid(session,component.projectUuid());
-    UserSession.get().checkProjectPermission(UserRole.USER,project.getKey());
+    userSession.checkProjectPermission(UserRole.USER,project.getKey());
     if (!ruleKey.isManual()) {
       throw new IllegalArgumentException("Issues can be created only on rules marked as 'manual': " + ruleKey);
     }
@@ -12,7 +12,7 @@
     if (rule == null) {
       throw new IllegalArgumentException("Unknown rule: " + ruleKey);
     }
-    DefaultIssue issue=new DefaultIssueBuilder().componentKey(component.getKey()).projectKey(project.getKey()).line(line).message(!Strings.isNullOrEmpty(message) ? message : rule.getName()).severity(Objects.firstNonNull(severity,Severity.MAJOR)).effortToFix(effortToFix).ruleKey(ruleKey).reporter(UserSession.get().login()).assignee(findSourceLineUser(component.uuid(),line)).build();
+    DefaultIssue issue=new DefaultIssueBuilder().componentKey(component.getKey()).projectKey(project.getKey()).line(line).message(!Strings.isNullOrEmpty(message) ? message : rule.getName()).severity(Objects.firstNonNull(severity,Severity.MAJOR)).effortToFix(effortToFix).ruleKey(ruleKey).reporter(userSession.login()).assignee(findSourceLineUser(component.uuid(),line)).build();
     Date now=new Date();
     issue.setCreationDate(now);
     issue.setUpdateDate(now);

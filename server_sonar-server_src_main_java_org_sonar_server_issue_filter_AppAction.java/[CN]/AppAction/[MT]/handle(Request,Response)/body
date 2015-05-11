@@ -1,19 +1,18 @@
 {
-  UserSession session=UserSession.get();
   JsonWriter json=response.newJsonWriter();
   json.beginObject();
   Integer filterId=request.paramAsInt("id");
   IssueFilterDto filter=null;
   if (filterId != null && filterId >= 0) {
-    filter=service.find((long)filterId,session);
+    filter=service.find((long)filterId,userSession);
   }
-  json.prop("canManageFilters",session.isLoggedIn());
-  json.prop("canBulkChange",session.isLoggedIn());
+  json.prop("canManageFilters",userSession.isLoggedIn());
+  json.prop("canBulkChange",userSession.isLoggedIn());
   if (filter != null) {
-    issueFilterWriter.write(session,filter,json);
+    issueFilterWriter.write(userSession,filter,json);
   }
-  if (session.isLoggedIn()) {
-    List<IssueFilterDto> favorites=service.findFavoriteFilters(session);
+  if (userSession.isLoggedIn()) {
+    List<IssueFilterDto> favorites=service.findFavoriteFilters(userSession);
     json.name("favorites").beginArray();
     for (    IssueFilterDto favorite : favorites) {
       json.beginObject().prop("id",favorite.getId()).prop("name",favorite.getName()).endObject();

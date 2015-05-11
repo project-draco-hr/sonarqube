@@ -8,14 +8,14 @@
   indexIssue(IssueTesting.newDoc("ISSUE1",file1),"sonar-users",null);
   indexIssue(IssueTesting.newDoc("ISSUE2",file2),"sonar-admins",null);
   indexIssue(IssueTesting.newDoc("ISSUE3",file3),null,null);
-  MockUserSession.set().setUserGroups("sonar-users");
-  assertThat(index.search(IssueQuery.builder().build(),new SearchOptions()).getDocs()).hasSize(1);
-  MockUserSession.set().setUserGroups("sonar-admins");
-  assertThat(index.search(IssueQuery.builder().build(),new SearchOptions()).getDocs()).hasSize(1);
-  MockUserSession.set().setUserGroups("sonar-users","sonar-admins");
-  assertThat(index.search(IssueQuery.builder().build(),new SearchOptions()).getDocs()).hasSize(2);
-  MockUserSession.set().setUserGroups("another group");
-  assertThat(index.search(IssueQuery.builder().build(),new SearchOptions()).getDocs()).isEmpty();
-  MockUserSession.set().setUserGroups("sonar-users","sonar-admins");
-  assertThat(index.search(IssueQuery.builder().projectUuids(newArrayList(project3.uuid())).build(),new SearchOptions()).getDocs()).isEmpty();
+  userSessionRule.logon().setUserGroups("sonar-users");
+  assertThat(index.search(IssueQuery.builder(userSessionRule).build(),new SearchOptions()).getDocs()).hasSize(1);
+  userSessionRule.logon().setUserGroups("sonar-admins");
+  assertThat(index.search(IssueQuery.builder(userSessionRule).build(),new SearchOptions()).getDocs()).hasSize(1);
+  userSessionRule.logon().setUserGroups("sonar-users","sonar-admins");
+  assertThat(index.search(IssueQuery.builder(userSessionRule).build(),new SearchOptions()).getDocs()).hasSize(2);
+  userSessionRule.logon().setUserGroups("another group");
+  assertThat(index.search(IssueQuery.builder(userSessionRule).build(),new SearchOptions()).getDocs()).isEmpty();
+  userSessionRule.logon().setUserGroups("sonar-users","sonar-admins");
+  assertThat(index.search(IssueQuery.builder(userSessionRule).projectUuids(newArrayList(project3.uuid())).build(),new SearchOptions()).getDocs()).isEmpty();
 }

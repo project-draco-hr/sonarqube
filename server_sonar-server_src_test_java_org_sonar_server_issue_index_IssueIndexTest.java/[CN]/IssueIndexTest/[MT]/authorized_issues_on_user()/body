@@ -8,12 +8,12 @@
   indexIssue(IssueTesting.newDoc("ISSUE1",file1),null,"john");
   indexIssue(IssueTesting.newDoc("ISSUE2",file2),null,"max");
   indexIssue(IssueTesting.newDoc("ISSUE3",file3),null,null);
-  MockUserSession.set().setLogin("john");
-  assertThat(index.search(IssueQuery.builder().build(),new SearchOptions()).getDocs()).hasSize(1);
-  MockUserSession.set().setLogin("max");
-  assertThat(index.search(IssueQuery.builder().build(),new SearchOptions()).getDocs()).hasSize(1);
-  MockUserSession.set().setLogin("another guy");
-  assertThat(index.search(IssueQuery.builder().build(),new SearchOptions()).getDocs()).hasSize(0);
-  MockUserSession.set().setLogin("john");
-  assertThat(index.search(IssueQuery.builder().projectUuids(newArrayList(project3.key())).build(),new SearchOptions()).getDocs()).hasSize(0);
+  userSessionRule.logon("john");
+  assertThat(index.search(IssueQuery.builder(userSessionRule).build(),new SearchOptions()).getDocs()).hasSize(1);
+  userSessionRule.logon("max");
+  assertThat(index.search(IssueQuery.builder(userSessionRule).build(),new SearchOptions()).getDocs()).hasSize(1);
+  userSessionRule.logon("another guy");
+  assertThat(index.search(IssueQuery.builder(userSessionRule).build(),new SearchOptions()).getDocs()).hasSize(0);
+  userSessionRule.logon("john");
+  assertThat(index.search(IssueQuery.builder(userSessionRule).projectUuids(newArrayList(project3.key())).build(),new SearchOptions()).getDocs()).hasSize(0);
 }

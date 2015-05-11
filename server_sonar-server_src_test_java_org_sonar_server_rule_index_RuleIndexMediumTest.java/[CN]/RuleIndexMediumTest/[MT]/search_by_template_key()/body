@@ -4,13 +4,13 @@
   dao.insert(dbSession,RuleTesting.newDto(RuleKey.of("java","S001_MY_CUSTOM")).setTemplateId(templateRule.getId()));
   dbSession.commit();
   RuleQuery query=new RuleQuery();
-  Result<Rule> results=index.search(query,new QueryContext());
+  Result<Rule> results=index.search(query,new QueryContext(userSessionRule));
   assertThat(results.getHits()).hasSize(2);
   query=new RuleQuery().setTemplateKey("java:S001");
-  results=index.search(query,new QueryContext());
+  results=index.search(query,new QueryContext(userSessionRule));
   assertThat(results.getHits()).hasSize(1);
   assertThat(Iterables.getFirst(results.getHits(),null).key().rule()).isEqualTo("S001_MY_CUSTOM");
   assertThat(Iterables.getFirst(results.getHits(),null).templateKey()).isEqualTo(RuleKey.of("java","S001"));
   query=new RuleQuery().setTemplateKey(null);
-  assertThat(index.search(query,new QueryContext()).getHits()).hasSize(2);
+  assertThat(index.search(query,new QueryContext(userSessionRule)).getHits()).hasSize(2);
 }

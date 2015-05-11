@@ -3,8 +3,8 @@
   dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),new QualityProfileDao(dbTester.myBatis(),mock(System2.class)),new ComponentDao(),new AuthorizationDao(dbTester.myBatis()));
   roleDao=new RoleDao();
   session=dbClient.openSession(false);
-  wsTester=new WsTester(new QProfilesWs(mock(RuleActivationActions.class),mock(BulkRuleActivationActions.class),mock(ProjectAssociationActions.class),new QProfileProjectsAction(dbClient)));
-  MockUserSession.set().setLogin("obiwan").setUserId(userId.intValue());
+  wsTester=new WsTester(new QProfilesWs(mock(RuleActivationActions.class),mock(BulkRuleActivationActions.class),mock(ProjectAssociationActions.class),new QProfileProjectsAction(dbClient,userSessionRule)));
+  userSessionRule.logon("obiwan").setUserId(userId.intValue());
   new UserDao(dbTester.myBatis(),mock(System2.class)).insert(session,new UserDto().setActive(true).setId(userId).setLogin("obiwan"));
   createProfiles();
   session.commit();
