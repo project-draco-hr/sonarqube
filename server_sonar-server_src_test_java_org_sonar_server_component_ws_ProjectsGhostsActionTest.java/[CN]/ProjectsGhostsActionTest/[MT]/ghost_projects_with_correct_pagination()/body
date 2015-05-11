@@ -1,0 +1,9 @@
+{
+  userSessionRule.setGlobalPermissions(UserRole.ADMIN);
+  for (int i=1; i <= 10; i++) {
+    insertNewGhostProject(String.valueOf(i));
+  }
+  WsTester.Result result=ws.newGetRequest("api/projects","ghosts").setParam(Param.PAGE,"3").setParam(Param.PAGE_SIZE,"4").execute();
+  result.assertJson(getClass(),"pagination.json");
+  assertThat(StringUtils.countMatches(result.outputAsString(),"ghost-uuid-")).isEqualTo(2);
+}

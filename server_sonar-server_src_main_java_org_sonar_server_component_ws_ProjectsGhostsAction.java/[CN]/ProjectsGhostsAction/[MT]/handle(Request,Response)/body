@@ -1,0 +1,18 @@
+{
+  userSession.checkGlobalPermission(UserRole.ADMIN);
+  DbSession dbSession=dbClient.openSession(false);
+  SearchOptions searchOptions=new SearchOptions().setPage(request.mandatoryParamAsInt(Param.PAGE),request.mandatoryParamAsInt(Param.PAGE_SIZE));
+  Set<String> desiredFields=fieldsToReturn(request.paramAsStrings(Param.FIELDS));
+  String query=request.param(Param.TEXT_QUERY);
+  try {
+    long nbOfProjects=dbClient.componentDao().countGhostProjects(dbSession,query);
+    List<ComponentDto> projects=dbClient.componentDao().selectGhostProjects(dbSession,query,searchOptions);
+    JsonWriter json=response.newJsonWriter().beginObject();
+    writeProjects(json,projects,desiredFields);
+    searchOptions.writeJson(json,nbOfProjects);
+    json.endObject().close();
+  }
+  finally {
+    MyBatis.closeQuietly(dbSession);
+  }
+}

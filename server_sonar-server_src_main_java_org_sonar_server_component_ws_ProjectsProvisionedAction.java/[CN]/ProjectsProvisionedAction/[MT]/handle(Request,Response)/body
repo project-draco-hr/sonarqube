@@ -1,0 +1,18 @@
+{
+  userSession.checkGlobalPermission(UserRole.ADMIN,"You need admin rights.");
+  SearchOptions options=new SearchOptions().setPage(request.mandatoryParamAsInt(Param.PAGE),request.mandatoryParamAsInt(Param.PAGE_SIZE));
+  Set<String> desiredFields=desiredFields(request);
+  String query=request.param(Param.TEXT_QUERY);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    List<ComponentDto> projects=dbClient.componentDao().selectProvisionedProjects(dbSession,options,query);
+    int nbOfProjects=dbClient.componentDao().countProvisionedProjects(dbSession,query);
+    JsonWriter json=response.newJsonWriter().beginObject();
+    writeProjects(projects,json,desiredFields);
+    options.writeJson(json,nbOfProjects);
+    json.endObject().close();
+  }
+  finally {
+    MyBatis.closeQuietly(dbSession);
+  }
+}
