@@ -1,7 +1,8 @@
 {
   ClassloaderBuilder builder=new ClassloaderBuilder();
+  builder.newClassloader(API_CLASSLOADER_KEY,baseClassloader());
   for (  ClassloaderDef def : defs) {
-    builder.newClassloader(def.getBasePluginKey(),getClass().getClassLoader()).setExportMask(def.getBasePluginKey(),def.getMask()).setLoadingOrder(def.getBasePluginKey(),def.isSelfFirstStrategy() ? SELF_FIRST : LoadingOrder.PARENT_FIRST);
+    builder.newClassloader(def.getBasePluginKey()).setParent(def.getBasePluginKey(),API_CLASSLOADER_KEY,new Mask()).setExportMask(def.getBasePluginKey(),def.getMask()).setLoadingOrder(def.getBasePluginKey(),def.isSelfFirstStrategy() ? SELF_FIRST : PARENT_FIRST);
     for (    File file : def.getFiles()) {
       builder.addURL(def.getBasePluginKey(),fileToUrl(file));
     }
