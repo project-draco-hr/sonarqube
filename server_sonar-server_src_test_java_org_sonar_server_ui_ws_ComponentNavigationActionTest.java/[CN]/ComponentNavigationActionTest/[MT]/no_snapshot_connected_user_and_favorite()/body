@@ -3,7 +3,7 @@
   ComponentDto project=dbClient.componentDao().insert(session,ComponentTesting.newProjectDto("abcd").setKey("polop").setName("Polop"));
   dbClient.propertiesDao().setProperty(new PropertyDto().setKey("favourite").setResourceId(project.getId()).setUserId((long)userId),session);
   session.commit();
-  userSessionRule.logon("obiwan").setUserId(userId).addProjectUuidPermissions(UserRole.USER,"abcd");
+  userSessionRule.login("obiwan").setUserId(userId).addProjectUuidPermissions(UserRole.USER,"abcd");
   wsTester=new WsTester(new NavigationWs(new ComponentNavigationAction(dbClient,activeDashboardDao,new Views(userSessionRule),i18n,resourceTypes,userSessionRule)));
   wsTester.newGetRequest("api/navigation","component").setParam("componentKey","polop").execute().assertJson(getClass(),"no_snapshot_user_favourite.json");
 }

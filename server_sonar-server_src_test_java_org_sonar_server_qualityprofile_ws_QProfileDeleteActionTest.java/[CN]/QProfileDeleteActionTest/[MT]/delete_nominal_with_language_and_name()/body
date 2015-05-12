@@ -5,7 +5,7 @@
   qualityProfileDao.insert(session,QualityProfileDto.createFor(profileKey).setLanguage(xoo1.getKey()).setName("Sonar way"));
   qualityProfileDao.insertProjectProfileAssociation(project.uuid(),profileKey,session);
   session.commit();
-  userSessionRule.logon("obiwan").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN);
+  userSessionRule.login("obiwan").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN);
   tester.newPostRequest("api/qualityprofiles","delete").setParam("profileName","Sonar way").setParam("language",xoo1.getKey()).execute().assertNoContent();
   assertThat(qualityProfileDao.getByKey(session,"sonar-way-xoo1-12345")).isNull();
   assertThat(qualityProfileDao.selectProjects("Sonar way",xoo1.getName())).isEmpty();
