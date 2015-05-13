@@ -1,10 +1,15 @@
 {
-  try (OutputStream out=new BufferedOutputStream(new FileOutputStream(file,true))){
+  OutputStream out=null;
+  try {
+    out=new BufferedOutputStream(new FileOutputStream(file,true));
     for (    MESSAGE message : messages) {
       message.writeDelimitedTo(out);
     }
   }
  catch (  IOException e) {
     throw new IllegalStateException("Failed to read file: " + file,e);
+  }
+ finally {
+    IOUtils.closeQuietly(out);
   }
 }

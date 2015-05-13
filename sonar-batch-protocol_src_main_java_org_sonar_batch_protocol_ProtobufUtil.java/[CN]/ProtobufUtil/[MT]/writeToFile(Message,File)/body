@@ -1,8 +1,13 @@
 {
-  try (OutputStream out=new BufferedOutputStream(new FileOutputStream(toFile,false))){
+  OutputStream out=null;
+  try {
+    out=new BufferedOutputStream(new FileOutputStream(toFile,false));
     message.writeTo(out);
   }
  catch (  IOException e) {
     throw new IllegalStateException("Unable to write protocol buffer data to file " + toFile,e);
+  }
+ finally {
+    IOUtils.closeQuietly(out);
   }
 }
