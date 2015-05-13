@@ -10,7 +10,8 @@
       throw new BadRequestException(formatMessage("Could not create %s, key already exists: %s",newComponent.qualifier(),keyWithBranch));
     }
     String uuid=Uuids.create();
-    ComponentDto component=dbClient.componentDao().insert(session,new ComponentDto().setUuid(uuid).setModuleUuid(null).setModuleUuidPath(ComponentDto.MODULE_UUID_PATH_SEP + uuid + ComponentDto.MODULE_UUID_PATH_SEP).setProjectUuid(uuid).setKey(keyWithBranch).setDeprecatedKey(keyWithBranch).setName(newComponent.name()).setLongName(newComponent.name()).setScope(Scopes.PROJECT).setQualifier(newComponent.qualifier()).setCreatedAt(new Date()));
+    ComponentDto component=new ComponentDto().setUuid(uuid).setModuleUuid(null).setModuleUuidPath(ComponentDto.MODULE_UUID_PATH_SEP + uuid + ComponentDto.MODULE_UUID_PATH_SEP).setProjectUuid(uuid).setKey(keyWithBranch).setDeprecatedKey(keyWithBranch).setName(newComponent.name()).setLongName(newComponent.name()).setScope(Scopes.PROJECT).setQualifier(newComponent.qualifier()).setCreatedAt(new Date(system2.now()));
+    dbClient.componentDao().insert(session,component);
     resourceIndexerDao.indexResource(session,component.getId());
     session.commit();
     permissionService.applyDefaultPermissionTemplate(component.key());
