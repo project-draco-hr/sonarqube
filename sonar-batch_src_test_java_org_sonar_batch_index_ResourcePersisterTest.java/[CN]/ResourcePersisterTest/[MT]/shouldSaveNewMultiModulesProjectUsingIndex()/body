@@ -6,14 +6,13 @@
   when(projectTree.getProjectDefinition(moduleA)).thenReturn(ProjectDefinition.create().setBaseDir(new java.io.File(baseDir,"moduleA")));
   when(projectTree.getProjectDefinition(moduleB)).thenReturn(ProjectDefinition.create().setBaseDir(new java.io.File(baseDir,"moduleB")));
   when(projectTree.getProjectDefinition(moduleB1)).thenReturn(ProjectDefinition.create().setBaseDir(new java.io.File(baseDir,"moduleB/moduleB1")));
-  DefaultIndex index=new DefaultIndex(resourceCache,null,projectTree,mock(MetricFinder.class),mock(MeasureCache.class));
+  DefaultIndex index=new DefaultIndex(resourceCache,projectTree,mock(MetricFinder.class),mock(MeasureCache.class));
   index.start();
   Resource file=File.create("src/main/java/org/Foo.java");
   index.setCurrentProject(moduleB1,null);
   index.index(file);
-  index.addResource(new Library(moduleA.getKey(),"1.0"));
   persister.persist();
-  checkTables("shouldSaveNewMultiModulesProjectAndLibrary",new String[]{"build_date","created_at","authorization_updated_at","uuid","project_uuid","module_uuid","module_uuid_path"},"projects","snapshots");
+  checkTables("shouldSaveNewMultiModulesProjectUsingIndex",new String[]{"build_date","created_at","authorization_updated_at","uuid","project_uuid","module_uuid","module_uuid_path"},"projects","snapshots");
   enableSnapshot(1001);
   enableSnapshot(1002);
   enableSnapshot(1003);
