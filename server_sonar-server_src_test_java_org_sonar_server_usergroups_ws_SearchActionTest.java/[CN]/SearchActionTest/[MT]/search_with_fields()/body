@@ -1,0 +1,9 @@
+{
+  insertGroups("sonar-users");
+  session.commit();
+  assertThat(tester.newGetRequest("api/usergroups","search").execute().outputAsString()).contains("id").contains("name").contains("description").contains("membersCount");
+  assertThat(tester.newGetRequest("api/usergroups","search").setParam(Param.FIELDS,"").execute().outputAsString()).contains("id").contains("name").contains("description").contains("membersCount");
+  assertThat(tester.newGetRequest("api/usergroups","search").setParam(Param.FIELDS,"name").execute().outputAsString()).contains("id").contains("name").doesNotContain("description").doesNotContain("membersCount");
+  assertThat(tester.newGetRequest("api/usergroups","search").setParam(Param.FIELDS,"description").execute().outputAsString()).contains("id").doesNotContain("name").contains("description").doesNotContain("membersCount");
+  assertThat(tester.newGetRequest("api/usergroups","search").setParam(Param.FIELDS,"membersCount").execute().outputAsString()).contains("id").doesNotContain("name").doesNotContain("description").contains("membersCount");
+}

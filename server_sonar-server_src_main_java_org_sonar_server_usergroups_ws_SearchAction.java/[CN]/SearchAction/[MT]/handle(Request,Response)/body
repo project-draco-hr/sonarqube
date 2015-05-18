@@ -1,0 +1,26 @@
+{
+  int page=request.mandatoryParamAsInt(Param.PAGE);
+  int pageSize=request.mandatoryParamAsInt(Param.PAGE_SIZE);
+  SearchOptions options=new SearchOptions().setPage(page,pageSize);
+  String query=StringUtils.defaultIfBlank(request.param(Param.TEXT_QUERY),"");
+  Set<String> fields=neededFields(request);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    int limit=dbClient.groupDao().countByQuery(dbSession,query);
+    List<GroupDto> groups=dbClient.groupDao().selectByQuery(dbSession,query,options.getOffset(),pageSize);
+    Collection<Long> groupIds=Collections2.transform(groups,new Function<GroupDto,Long>(){
+      @Override public Long apply(      @Nonnull GroupDto input){
+        return input.getId();
+      }
+    }
+);
+    Map<String,Integer> userCountByGroup=dbClient.groupMembershipDao().countUsersByGroups(dbSession,groupIds);
+    JsonWriter json=response.newJsonWriter().beginObject();
+    options.writeJson(json,limit);
+    writeGroups(json,groups,userCountByGroup,fields);
+    json.endObject().close();
+  }
+  finally {
+    MyBatis.closeQuietly(dbSession);
+  }
+}
