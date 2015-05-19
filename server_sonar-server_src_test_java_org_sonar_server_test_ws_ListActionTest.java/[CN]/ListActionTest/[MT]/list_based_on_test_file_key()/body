@@ -1,0 +1,8 @@
+{
+  userSessionRule.addComponentPermission(UserRole.CODEVIEWER,TestFile1.PROJECT_UUID,TestFile1.KEY);
+  dbClient.componentDao().insert(dbSession,TestFile1.newDto());
+  dbSession.commit();
+  es.putDocuments(TestIndexDefinition.INDEX,TestIndexDefinition.TYPE,new TestDoc().setUuid(TestFile1.UUID).setName(TestFile1.NAME).setFileUuid(TestFile1.FILE_UUID).setDurationInMs(TestFile1.DURATION_IN_MS).setCoveredFiles(TestFile1.COVERED_FILES).setStatus(TestFile1.STATUS).setMessage(TestFile1.MESSAGE).setStackTrace(TestFile1.STACKTRACE));
+  WsTester.TestRequest request=ws.newGetRequest("api/tests","list").setParam(ListAction.TEST_FILE_KEY,TestFile1.KEY);
+  request.execute().assertJson(getClass(),"list-test-uuid.json");
+}
