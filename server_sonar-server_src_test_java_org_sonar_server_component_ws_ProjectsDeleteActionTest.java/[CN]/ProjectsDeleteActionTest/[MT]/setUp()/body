@@ -1,0 +1,14 @@
+{
+  ComponentDao componentDao=new ComponentDao();
+  ResourceDao resourceDao=new ResourceDao(db.myBatis(),System2.INSTANCE);
+  PurgeDao purgeDao=new PurgeDao(db.myBatis(),resourceDao,new PurgeProfiler(),System2.INSTANCE);
+  dbClient=new DbClient(db.database(),db.myBatis(),componentDao,purgeDao,new RuleDao(System2.INSTANCE),new IssueDao(db.myBatis()),new SnapshotDao(System2.INSTANCE));
+  dbSession=dbClient.openSession(false);
+  resourceType=mock(ResourceType.class);
+  when(resourceType.getBooleanProperty(anyString())).thenReturn(true);
+  ResourceTypes mockResourceTypes=mock(ResourceTypes.class);
+  when(mockResourceTypes.get(anyString())).thenReturn(resourceType);
+  ws=new WsTester(new ProjectsWs(new ProjectsDeleteAction(new ComponentCleanerService(dbClient,new IssueAuthorizationIndexer(dbClient,es.client()),new IssueIndexer(dbClient,es.client()),new SourceLineIndexer(dbClient,es.client()),new TestIndexer(dbClient,es.client()),mockResourceTypes),dbClient,userSessionRule)));
+  db.truncateTables();
+  es.truncateIndices();
+}

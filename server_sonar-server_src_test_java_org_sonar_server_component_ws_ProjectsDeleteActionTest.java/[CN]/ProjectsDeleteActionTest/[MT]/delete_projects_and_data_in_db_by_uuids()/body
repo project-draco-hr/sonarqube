@@ -1,0 +1,17 @@
+{
+  userSessionRule.setGlobalPermissions(UserRole.ADMIN);
+  long snapshotId1=insertNewProjectInDbAndReturnSnapshotId(1);
+  long snapshotId2=insertNewProjectInDbAndReturnSnapshotId(2);
+  long snapshotId3=insertNewProjectInDbAndReturnSnapshotId(3);
+  long snapshotId4=insertNewProjectInDbAndReturnSnapshotId(4);
+  ws.newGetRequest("api/projects","delete").setParam("uuids","project-uuid-1, project-uuid-3, project-uuid-4").execute();
+  dbSession.commit();
+  assertThat(dbClient.componentDao().selectByUuids(dbSession,Arrays.asList("project-uuid-1","project-uuid-3","project-uuid-4"))).isEmpty();
+  assertThat(dbClient.componentDao().selectByUuid(dbSession,"project-uuid-2")).isNotNull();
+  assertThat(dbClient.snapshotDao().getNullableByKey(dbSession,snapshotId1)).isNull();
+  assertThat(dbClient.snapshotDao().getNullableByKey(dbSession,snapshotId3)).isNull();
+  assertThat(dbClient.snapshotDao().getNullableByKey(dbSession,snapshotId4)).isNull();
+  assertThat(dbClient.snapshotDao().getNullableByKey(dbSession,snapshotId2)).isNotNull();
+  assertThat(dbClient.issueDao().selectByKeys(dbSession,Arrays.asList("issue-key-1","issue-key-3","issue-key-4"))).isEmpty();
+  assertThat(dbClient.issueDao().selectByKey(dbSession,"issue-key-2")).isNotNull();
+}

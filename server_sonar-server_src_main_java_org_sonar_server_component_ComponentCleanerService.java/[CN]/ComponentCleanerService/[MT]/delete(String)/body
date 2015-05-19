@@ -2,12 +2,7 @@
   DbSession dbSession=dbClient.openSession(false);
   try {
     ComponentDto project=dbClient.componentDao().selectByKey(dbSession,projectKey);
-    if (!Scopes.PROJECT.equals(project.scope())) {
-      throw new IllegalArgumentException("Only projects can be deleted");
-    }
-    purgeDao.deleteResourceTree(new IdUuidPair(project.getId(),project.uuid()));
-    dbSession.commit();
-    deleteFromIndices(project.uuid());
+    delete(dbSession,project);
   }
   finally {
     MyBatis.closeQuietly(dbSession);

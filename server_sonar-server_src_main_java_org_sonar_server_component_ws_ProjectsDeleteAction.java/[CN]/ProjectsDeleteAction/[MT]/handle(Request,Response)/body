@@ -1,0 +1,14 @@
+{
+  userSession.checkGlobalPermission(UserRole.ADMIN);
+  List<String> uuids=request.paramAsStrings(PARAM_UUIDS);
+  List<String> keys=request.paramAsStrings(PARAM_KEYS);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    List<ComponentDto> projects=searchProjects(dbSession,uuids,keys);
+    componentCleanerService.delete(dbSession,projects);
+  }
+  finally {
+    MyBatis.closeQuietly(dbSession);
+  }
+  response.noContent();
+}

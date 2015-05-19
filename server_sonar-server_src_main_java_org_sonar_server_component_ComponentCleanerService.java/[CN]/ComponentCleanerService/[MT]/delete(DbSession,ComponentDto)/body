@@ -1,0 +1,8 @@
+{
+  if (hasNotProjectScope(project) || isNotDeletable(project)) {
+    throw new IllegalArgumentException("Only projects can be deleted");
+  }
+  dbClient.purgeDao().deleteResourceTree(dbSession,new IdUuidPair(project.getId(),project.uuid()));
+  dbSession.commit();
+  deleteFromIndices(project.uuid());
+}
