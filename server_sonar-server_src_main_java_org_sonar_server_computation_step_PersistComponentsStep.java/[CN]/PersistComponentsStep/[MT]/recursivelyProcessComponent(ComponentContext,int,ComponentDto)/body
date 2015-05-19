@@ -1,0 +1,9 @@
+{
+  BatchReportReader reportReader=componentContext.context.getReportReader();
+  BatchReport.Component reportComponent=reportReader.readComponent(componentRef);
+  ComponentDto componentDto=processComponent(componentContext,reportComponent,moduleParent);
+  for (  Integer childRef : reportComponent.getChildRefList()) {
+    ComponentDto nextModuleParent=!reportComponent.getType().equals(Constants.ComponentType.PROJECT) && !reportComponent.getType().equals(Constants.ComponentType.MODULE) ? moduleParent : componentDto;
+    recursivelyProcessComponent(componentContext,childRef,nextModuleParent);
+  }
+}

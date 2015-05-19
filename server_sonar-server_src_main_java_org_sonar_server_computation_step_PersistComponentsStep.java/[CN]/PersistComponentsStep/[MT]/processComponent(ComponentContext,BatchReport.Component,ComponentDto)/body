@@ -1,0 +1,18 @@
+{
+  String path=reportComponent.hasPath() ? reportComponent.getPath() : null;
+  String branch=componentContext.context.getReportMetadata().hasBranch() ? componentContext.context.getReportMetadata().getBranch() : null;
+  String componentKey=reportComponent.hasKey() || moduleParent == null ? ComponentKeys.createKey(reportComponent.getKey(),branch) : ComponentKeys.createEffectiveKey(moduleParent.getKey(),path);
+  ComponentDto existingComponent=componentContext.componentDtosByKey.get(componentKey);
+  if (existingComponent == null) {
+    ComponentDto component=createComponent(reportComponent,componentKey,Uuids.create(),moduleParent);
+    dbClient.componentDao().insert(componentContext.dbSession,component);
+    return component;
+  }
+ else {
+    ComponentDto component=createComponent(reportComponent,componentKey,existingComponent.uuid(),moduleParent);
+    if (updateComponent(existingComponent,component)) {
+      dbClient.componentDao().update(componentContext.dbSession,existingComponent);
+    }
+    return existingComponent;
+  }
+}

@@ -1,0 +1,36 @@
+{
+  ComponentDto component=new ComponentDto();
+  component.setUuid(uuid);
+  component.setKey(componentKey);
+  component.setDeprecatedKey(componentKey);
+  component.setEnabled(true);
+  component.setScope(getScope(reportComponent));
+  component.setQualifier(getQualifier(reportComponent));
+  component.setName(getFileName(reportComponent));
+  if (isProjectOrModule(reportComponent)) {
+    component.setLongName(component.name());
+    if (reportComponent.hasDescription()) {
+      component.setDescription(reportComponent.getDescription());
+    }
+  }
+ else {
+    component.setLongName(reportComponent.getPath());
+    if (reportComponent.hasPath()) {
+      component.setPath(reportComponent.getPath());
+    }
+    if (reportComponent.hasLanguage()) {
+      component.setLanguage(reportComponent.getLanguage());
+    }
+  }
+  if (parentModule != null) {
+    component.setParentProjectId(parentModule.getId());
+    component.setProjectUuid(parentModule.projectUuid());
+    component.setModuleUuid(parentModule.uuid());
+    component.setModuleUuidPath(reportComponent.getType().equals(Constants.ComponentType.MODULE) ? parentModule.moduleUuidPath() + component.uuid() + ComponentDto.MODULE_UUID_PATH_SEP : parentModule.moduleUuidPath());
+  }
+ else {
+    component.setProjectUuid(uuid);
+    component.setModuleUuidPath(ComponentDto.MODULE_UUID_PATH_SEP + component.uuid() + ComponentDto.MODULE_UUID_PATH_SEP);
+  }
+  return component;
+}

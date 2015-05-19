@@ -1,0 +1,13 @@
+{
+  DbSession session=dbClient.openSession(false);
+  try {
+    List<ComponentDto> components=dbClient.componentDao().selectComponentsFromProjectUuid(session,context.getProject().uuid());
+    Map<String,ComponentDto> componentDtosByKey=componentDtosByKey(components);
+    Map<Integer,Component> componentsByRef=new HashMap<>();
+    int rootComponentRef=context.getReportMetadata().getRootComponentRef();
+    recursivelyProcessComponent(context,rootComponentRef,context.getReportReader().readComponent(rootComponentRef),componentDtosByKey,componentsByRef);
+  }
+  finally {
+    session.close();
+  }
+}
