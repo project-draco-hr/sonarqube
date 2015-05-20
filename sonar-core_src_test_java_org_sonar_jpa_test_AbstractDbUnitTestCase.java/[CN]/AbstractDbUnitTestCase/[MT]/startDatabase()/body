@@ -3,9 +3,13 @@
     database=new H2Database("sonarHibernate",true);
     database.start();
     databaseCommands=DatabaseCommands.forDialect(database.getDialect());
-    dbConnector=new MemoryDatabaseConnector(database);
-    dbConnector.start();
     myBatis=new MyBatis(database,new Logback(),new NullQueue());
     myBatis.start();
+    try (SqlSession session=myBatis.openSession(false)){
+      session.getMapper(SchemaMigrationMapper.class).insert(String.valueOf(DatabaseVersion.LAST_VERSION));
+      session.commit();
+    }
+     dbConnector=new DefaultDatabaseConnector(database);
+    dbConnector.start();
   }
 }
