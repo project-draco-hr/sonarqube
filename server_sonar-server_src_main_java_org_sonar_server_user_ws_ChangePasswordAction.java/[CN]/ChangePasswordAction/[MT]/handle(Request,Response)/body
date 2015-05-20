@@ -1,6 +1,9 @@
 {
-  userSession.checkLoggedIn().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+  userSession.checkLoggedIn();
   String login=request.mandatoryParam(PARAM_LOGIN);
+  if (!login.equals(userSession.getLogin())) {
+    userSession.checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+  }
   String password=request.mandatoryParam(PARAM_PASSWORD);
   UpdateUser updateUser=UpdateUser.create(login).setPassword(password).setPasswordConfirmation(password);
   userUpdater.update(updateUser);
