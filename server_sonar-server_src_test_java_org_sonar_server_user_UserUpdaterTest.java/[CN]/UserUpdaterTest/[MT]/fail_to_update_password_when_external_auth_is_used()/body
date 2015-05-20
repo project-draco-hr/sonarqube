@@ -1,0 +1,11 @@
+{
+  db.prepareDbUnit(getClass(),"update_user.xml");
+  createDefaultGroup();
+  when(realmFactory.hasExternalAuthentication()).thenReturn(true);
+  try {
+    userUpdater.update(UpdateUser.create("marius").setPassword("password2").setPasswordConfirmation("password2"));
+  }
+ catch (  BadRequestException e) {
+    assertThat(e.errors().messages()).containsOnly(Message.of("user.password_cant_be_changed_on_external_auth"));
+  }
+}
