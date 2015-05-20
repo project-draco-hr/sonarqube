@@ -1,18 +1,18 @@
 {
-  for (  final BatchResource resource : resourceCache.all()) {
-    if (!resource.isFile()) {
+  for (  final BatchComponent component : componentCache.all()) {
+    if (!component.isFile()) {
       continue;
     }
-    DefaultInputFile inputFile=(DefaultInputFile)resource.inputPath();
+    DefaultInputFile inputFile=(DefaultInputFile)component.inputPath();
     if (inputFile.type() != Type.TEST) {
       continue;
     }
-    final MutableTestPlan testPlan=testPlanBuilder.get(MutableTestPlan.class,inputFile.key());
+    final MutableTestPlan testPlan=testPlanBuilder.loadPerspective(MutableTestPlan.class,component);
     if (testPlan == null || Iterables.isEmpty(testPlan.testCases())) {
       continue;
     }
     final Set<String> testNamesWithCoverage=new HashSet<>();
-    writer.writeTests(resource.batchId(),Iterables.transform(testPlan.testCases(),new TestConverter(testNamesWithCoverage)));
-    writer.writeCoverageDetails(resource.batchId(),Iterables.transform(testNamesWithCoverage,new TestCoverageConverter(testPlan)));
+    writer.writeTests(component.batchId(),Iterables.transform(testPlan.testCases(),new TestConverter(testNamesWithCoverage)));
+    writer.writeCoverageDetails(component.batchId(),Iterables.transform(testNamesWithCoverage,new TestCoverageConverter(testPlan)));
   }
 }
