@@ -1,8 +1,16 @@
 {
+  List<UserDto> userDtos=Lists.newArrayList();
   long createdAt=System.currentTimeMillis();
   UserDoc[] users=new UserDoc[numberOfUsers];
   for (int index=0; index < numberOfUsers; index++) {
-    users[index]=new UserDoc().setActive(true).setCreatedAt(createdAt).setEmail(String.format("user-%d@mail.com",index)).setLogin(String.format("user-%d",index)).setName(String.format("User %d",index)).setScmAccounts(Arrays.asList(String.format("user-%d",index))).setUpdatedAt(createdAt);
+    String email=String.format("user-%d@mail.com",index);
+    String login=String.format("user-%d",index);
+    String name=String.format("User %d",index);
+    List<String> scmAccounts=Arrays.asList(String.format("user-%d",index));
+    userDtos.add(dbClient.userDao().insert(session,new UserDto().setActive(true).setCreatedAt(createdAt).setEmail(email).setLogin(login).setName(name).setScmAccounts(scmAccounts).setUpdatedAt(createdAt)));
+    users[index]=new UserDoc().setActive(true).setCreatedAt(createdAt).setEmail(email).setLogin(login).setName(name).setScmAccounts(scmAccounts).setUpdatedAt(createdAt);
   }
+  session.commit();
   esTester.putDocuments(UserIndexDefinition.INDEX,UserIndexDefinition.TYPE_USER,users);
+  return userDtos;
 }

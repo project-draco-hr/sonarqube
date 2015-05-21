@@ -1,0 +1,14 @@
+{
+  final Map<String,Integer> result=Maps.newHashMap();
+  DaoUtils.executeLargeInputs(logins,new NonNullInputFunction<List<String>,List<UserGroupCount>>(){
+    @Override protected List<UserGroupCount> doApply(    List<String> input){
+      List<UserGroupCount> groupCounts=mapper(session).countGroupsByLogins(input);
+      for (      UserGroupCount count : groupCounts) {
+        result.put(count.login(),count.groupCount());
+      }
+      return groupCounts;
+    }
+  }
+);
+  return result;
+}

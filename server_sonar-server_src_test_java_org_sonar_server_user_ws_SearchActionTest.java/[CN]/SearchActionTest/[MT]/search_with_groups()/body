@@ -1,0 +1,9 @@
+{
+  List<UserDto> users=injectUsers(1);
+  GroupDto group1=dbClient.groupDao().insert(session,new GroupDto().setName("sonar-users"));
+  GroupDto group2=dbClient.groupDao().insert(session,new GroupDto().setName("sonar-admins"));
+  dbClient.userGroupDao().insert(session,new UserGroupDto().setGroupId(group1.getId()).setUserId(users.get(0).getId()));
+  dbClient.userGroupDao().insert(session,new UserGroupDto().setGroupId(group2.getId()).setUserId(users.get(0).getId()));
+  session.commit();
+  tester.newGetRequest("api/users","search").execute().assertJson(getClass(),"user_with_groups.json");
+}

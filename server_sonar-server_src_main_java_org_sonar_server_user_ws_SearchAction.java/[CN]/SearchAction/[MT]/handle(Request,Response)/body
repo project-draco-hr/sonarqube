@@ -2,8 +2,22 @@
   SearchOptions options=new SearchOptions().setPage(request.mandatoryParamAsInt(Param.PAGE),request.mandatoryParamAsInt(Param.PAGE_SIZE));
   List<String> fields=request.paramAsStrings(Param.FIELDS);
   SearchResult<UserDoc> result=userIndex.search(request.param(Param.TEXT_QUERY),options);
+  Map<String,Integer> groupsByLogin=Maps.newHashMap();
+  DbSession session=dbClient.openSession(false);
+  try {
+    Collection<String> logins=Collections2.transform(result.getDocs(),new Function<UserDoc,String>(){
+      @Override public String apply(      @Nonnull UserDoc input){
+        return input.login();
+      }
+    }
+);
+    groupsByLogin=dbClient.groupMembershipDao().countGroupsByLogins(session,logins);
+  }
+  finally {
+    session.close();
+  }
   JsonWriter json=response.newJsonWriter().beginObject();
   options.writeJson(json,result.getTotal());
-  writeUsers(json,result,fields);
+  writeUsers(json,result,fields,groupsByLogin);
   json.endObject().close();
 }
