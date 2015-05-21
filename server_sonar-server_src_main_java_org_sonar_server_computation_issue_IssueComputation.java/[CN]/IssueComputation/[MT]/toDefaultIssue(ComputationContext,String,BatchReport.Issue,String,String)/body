@@ -1,0 +1,36 @@
+{
+  DefaultIssue target=new DefaultIssue();
+  target.setKey(issue.getUuid());
+  target.setComponentUuid(componentUuid);
+  target.setRuleKey(RuleKey.of(issue.getRuleRepository(),issue.getRuleKey()));
+  target.setSeverity(issue.getSeverity().name());
+  target.setManualSeverity(issue.getManualSeverity());
+  target.setMessage(issue.hasMsg() ? issue.getMsg() : null);
+  target.setLine(issue.hasLine() ? issue.getLine() : null);
+  target.setProjectUuid(projectUuid);
+  target.setProjectKey(projectKey);
+  target.setEffortToFix(issue.hasEffortToFix() ? issue.getEffortToFix() : null);
+  target.setDebt(issue.hasDebtInMinutes() ? Duration.create(issue.getDebtInMinutes()) : null);
+  if (issue.hasDiffFields()) {
+    FieldDiffs fieldDiffs=FieldDiffs.parse(issue.getDiffFields());
+    fieldDiffs.setCreationDate(new Date(context.getReportMetadata().getAnalysisDate()));
+    target.setCurrentChange(fieldDiffs);
+  }
+  target.setStatus(issue.getStatus());
+  target.setTags(issue.getTagList());
+  target.setResolution(issue.hasResolution() ? issue.getResolution() : null);
+  target.setReporter(issue.hasReporter() ? issue.getReporter() : null);
+  target.setAssignee(issue.hasAssignee() ? issue.getAssignee() : null);
+  target.setChecksum(issue.hasChecksum() ? issue.getChecksum() : null);
+  target.setAttributes(issue.hasAttributes() ? KeyValueFormat.parse(issue.getAttributes()) : null);
+  target.setAuthorLogin(issue.hasAuthorLogin() ? issue.getAuthorLogin() : null);
+  target.setActionPlanKey(issue.hasActionPlanKey() ? issue.getActionPlanKey() : null);
+  target.setCreationDate(issue.hasCreationDate() ? new Date(issue.getCreationDate()) : null);
+  target.setUpdateDate(issue.hasUpdateDate() ? new Date(issue.getUpdateDate()) : null);
+  target.setCloseDate(issue.hasCloseDate() ? new Date(issue.getCloseDate()) : null);
+  target.setChanged(issue.getIsChanged());
+  target.setNew(issue.getIsNew());
+  target.setSelectedAt(issue.hasSelectedAt() ? issue.getSelectedAt() : null);
+  target.setSendNotifications(issue.getMustSendNotification());
+  return target;
+}

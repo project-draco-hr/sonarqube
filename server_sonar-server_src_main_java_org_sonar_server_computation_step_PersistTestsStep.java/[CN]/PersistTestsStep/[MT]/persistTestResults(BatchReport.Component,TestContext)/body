@@ -8,14 +8,15 @@
   if (tests.isEmpty()) {
     return;
   }
-  FileSourceDto existingDto=context.existingFileSourcesByUuid.get(component.getUuid());
+  String componentUuid=context.getUuid(component.getRef());
+  FileSourceDto existingDto=context.existingFileSourcesByUuid.get(componentUuid);
   long now=system.now();
   if (existingDto != null) {
     existingDto.setTestData(tests).setUpdatedAt(now);
     dbClient.fileSourceDao().update(context.session,existingDto);
   }
  else {
-    FileSourceDto newDto=new FileSourceDto().setTestData(tests).setFileUuid(component.getUuid()).setProjectUuid(context.context.getProject().uuid()).setDataType(Type.TEST).setCreatedAt(now).setUpdatedAt(now);
+    FileSourceDto newDto=new FileSourceDto().setTestData(tests).setFileUuid(componentUuid).setProjectUuid(context.getUuid(context.context.getReportMetadata().getRootComponentRef())).setDataType(Type.TEST).setCreatedAt(now).setUpdatedAt(now);
     dbClient.fileSourceDao().insert(context.session,newDto);
   }
 }

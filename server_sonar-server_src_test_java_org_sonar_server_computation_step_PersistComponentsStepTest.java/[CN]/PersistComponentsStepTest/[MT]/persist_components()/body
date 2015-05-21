@@ -1,4 +1,8 @@
 {
+  computeComponentsRefCache.addComponent(1,new ComputeComponentsRefCache.ComputeComponent("PROJECT_KEY","ABCD"));
+  computeComponentsRefCache.addComponent(2,new ComputeComponentsRefCache.ComputeComponent("MODULE_KEY","BCDE"));
+  computeComponentsRefCache.addComponent(3,new ComputeComponentsRefCache.ComputeComponent("MODULE_KEY:src/main/java/dir","CDEF"));
+  computeComponentsRefCache.addComponent(4,new ComputeComponentsRefCache.ComputeComponent("MODULE_KEY:src/main/java/dir/Foo.java","DEFG"));
   File reportDir=temp.newFolder();
   BatchReportWriter writer=new BatchReportWriter(reportDir);
   writer.writeMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).build());
@@ -12,7 +16,7 @@
   assertThat(project).isNotNull();
   assertThat(project.name()).isEqualTo("Project");
   assertThat(project.description()).isEqualTo("Project description");
-  assertThat(project.uuid()).isNotNull();
+  assertThat(project.uuid()).isEqualTo("ABCD");
   assertThat(project.moduleUuid()).isNull();
   assertThat(project.moduleUuidPath()).isEqualTo("." + project.uuid() + ".");
   assertThat(project.projectUuid()).isEqualTo(project.uuid());
@@ -23,7 +27,7 @@
   assertThat(module).isNotNull();
   assertThat(module.name()).isEqualTo("Module");
   assertThat(module.description()).isEqualTo("Module description");
-  assertThat(module.uuid()).isNotNull();
+  assertThat(module.uuid()).isEqualTo("BCDE");
   assertThat(module.moduleUuid()).isEqualTo(project.uuid());
   assertThat(module.moduleUuidPath()).isEqualTo(project.moduleUuidPath() + module.uuid() + ".");
   assertThat(module.projectUuid()).isEqualTo(project.uuid());
@@ -34,7 +38,7 @@
   assertThat(directory).isNotNull();
   assertThat(directory.name()).isEqualTo("src/main/java/dir");
   assertThat(directory.path()).isEqualTo("src/main/java/dir");
-  assertThat(directory.uuid()).isNotNull();
+  assertThat(directory.uuid()).isEqualTo("CDEF");
   assertThat(directory.moduleUuid()).isEqualTo(module.uuid());
   assertThat(directory.moduleUuidPath()).isEqualTo(module.moduleUuidPath());
   assertThat(directory.projectUuid()).isEqualTo(project.uuid());
@@ -46,11 +50,15 @@
   assertThat(file.name()).isEqualTo("Foo.java");
   assertThat(file.path()).isEqualTo("src/main/java/dir/Foo.java");
   assertThat(file.language()).isEqualTo("java");
-  assertThat(file.uuid()).isNotNull();
+  assertThat(file.uuid()).isEqualTo("DEFG");
   assertThat(file.moduleUuid()).isEqualTo(module.uuid());
   assertThat(file.moduleUuidPath()).isEqualTo(module.moduleUuidPath());
   assertThat(file.projectUuid()).isEqualTo(project.uuid());
   assertThat(file.qualifier()).isEqualTo("FIL");
   assertThat(file.scope()).isEqualTo("FIL");
   assertThat(file.parentProjectId()).isEqualTo(module.getId());
+  assertThat(dbComponentsRefCache.getByRef(1).getId()).isEqualTo(project.getId());
+  assertThat(dbComponentsRefCache.getByRef(2).getId()).isEqualTo(module.getId());
+  assertThat(dbComponentsRefCache.getByRef(3).getId()).isEqualTo(directory.getId());
+  assertThat(dbComponentsRefCache.getByRef(4).getId()).isEqualTo(file.getId());
 }

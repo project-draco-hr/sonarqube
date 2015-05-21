@@ -1,17 +1,29 @@
 {
+  ComponentDto project=addComponent(1,"project-key");
+  ComponentDto file=addComponent(2,"file-key");
   File dir=temp.newFolder();
   BatchReportWriter report=new BatchReportWriter(dir);
-  when(dbClient.measureDao()).thenReturn(measureDao);
   report.writeMetadata(BatchReport.Metadata.newBuilder().setAnalysisDate(new Date().getTime()).setRootComponentRef(1).setProjectKey("project-key").setSnapshotId(3).build());
   report.writeComponent(defaultComponent().addChildRef(2).build());
   report.writeComponent(defaultComponent().setRef(2).build());
-  report.writeComponentMeasures(1,Arrays.asList(BatchReport.Measure.newBuilder().setValueType(Constants.MeasureValueType.STRING).setStringValue("measure-data").setVariationValue1(1.1d).setVariationValue2(2.2d).setVariationValue3(3.3d).setVariationValue4(4.4d).setVariationValue5(5.5d).setAlertStatus("measure-alert-status").setAlertText("measure-alert-text").setDescription("measure-description").setSeverity(Constants.Severity.INFO).setMetricKey("metric-key").setRuleKey("repo:rule-key").setCharactericId(123456).build()));
-  report.writeComponentMeasures(2,Arrays.asList(BatchReport.Measure.newBuilder().setValueType(Constants.MeasureValueType.DOUBLE).setDoubleValue(123.123d).setVariationValue1(1.1d).setVariationValue2(2.2d).setVariationValue3(3.3d).setVariationValue4(4.4d).setVariationValue5(5.5d).setAlertStatus("measure-alert-status").setAlertText("measure-alert-text").setDescription("measure-description").setSeverity(Constants.Severity.BLOCKER).setMetricKey("metric-key").setRuleKey("repo:rule-key").setCharactericId(123456).build()));
+  report.writeComponentMeasures(1,Arrays.asList(BatchReport.Measure.newBuilder().setValueType(MeasureValueType.STRING).setStringValue("measure-data").setVariationValue1(1.1d).setVariationValue2(2.2d).setVariationValue3(3.3d).setVariationValue4(4.4d).setVariationValue5(5.5d).setAlertStatus("WARN").setAlertText("Open issues > 0").setDescription("measure-description").setSeverity(Constants.Severity.INFO).setMetricKey(METRIC_KEY).setRuleKey(RULE_KEY.toString()).setCharactericId(123456).build()));
+  report.writeComponentMeasures(2,Arrays.asList(BatchReport.Measure.newBuilder().setValueType(MeasureValueType.DOUBLE).setDoubleValue(123.123d).setVariationValue1(1.1d).setVariationValue2(2.2d).setVariationValue3(3.3d).setVariationValue4(4.4d).setVariationValue5(5.5d).setAlertStatus("ERROR").setAlertText("Blocker issues variation > 0").setDescription("measure-description").setSeverity(Constants.Severity.BLOCKER).setMetricKey(METRIC_KEY).setRuleKey(RULE_KEY.toString()).setCharactericId(123456).build()));
   sut.execute(new ComputationContext(new BatchReportReader(dir),mock(ComponentDto.class)));
-  ArgumentCaptor<MeasureDto> argument=ArgumentCaptor.forClass(MeasureDto.class);
-  verify(measureDao,times(2)).insert(any(DbSession.class),argument.capture());
-  assertThat(argument.getValue().getValue()).isEqualTo(123.123d,Offset.offset(0.0001d));
-  assertThat(argument.getValue().getMetricId()).isEqualTo(654);
-  assertThat(argument.getValue().getRuleId()).isEqualTo(987);
-  assertThat(argument.getValue().getSeverity()).isEqualTo(Severity.BLOCKER);
+  session.commit();
+  assertThat(dbTester.countRowsOfTable("project_measures")).isEqualTo(2);
+  List<Map<String,Object>> dtos=dbTester.select("select snapshot_id as \"snapshotId\", project_id as \"componentId\", metric_id as \"metricId\", rule_id as \"ruleId\", value as \"value\", text_value as \"textValue\", " + "rule_priority as \"severity\" from project_measures");
+  Map<String,Object> dto=dtos.get(0);
+  assertThat(dto.get("snapshotId")).isNotNull();
+  assertThat(dto.get("componentId")).isEqualTo(project.getId());
+  assertThat(dto.get("metricId")).isEqualTo(metric.getId().longValue());
+  assertThat(dto.get("ruleId")).isEqualTo(rule.getId().longValue());
+  assertThat(dto.get("textValue")).isEqualTo("measure-data");
+  assertThat(dto.get("severity")).isEqualTo(0L);
+  dto=dtos.get(1);
+  assertThat(dto.get("snapshotId")).isNotNull();
+  assertThat(dto.get("componentId")).isEqualTo(file.getId());
+  assertThat(dto.get("metricId")).isEqualTo(metric.getId().longValue());
+  assertThat(dto.get("ruleId")).isEqualTo(rule.getId().longValue());
+  assertThat(dto.get("value")).isEqualTo(123.123d);
+  assertThat(dto.get("severity")).isEqualTo(4L);
 }

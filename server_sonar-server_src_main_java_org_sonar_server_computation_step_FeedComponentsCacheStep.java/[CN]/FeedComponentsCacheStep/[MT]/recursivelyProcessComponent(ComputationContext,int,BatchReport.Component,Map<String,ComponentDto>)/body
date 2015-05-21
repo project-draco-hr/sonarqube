@@ -1,0 +1,18 @@
+{
+  BatchReportReader reportReader=context.getReportReader();
+  BatchReport.Component reportComponent=reportReader.readComponent(componentRef);
+  String path=reportComponent.hasPath() ? reportComponent.getPath() : null;
+  String branch=context.getReportMetadata().hasBranch() ? context.getReportMetadata().getBranch() : null;
+  String componentKey=reportComponent.hasKey() ? ComponentKeys.createKey(reportComponent.getKey(),branch) : ComponentKeys.createKey(nearestModule.getKey(),path,branch);
+  ComponentDto componentDto=componentDtosByKey.get(componentKey);
+  if (componentDto == null) {
+    computeComponentsRefCache.addComponent(componentRef,new ComputeComponentsRefCache.ComputeComponent(componentKey,Uuids.create()));
+  }
+ else {
+    computeComponentsRefCache.addComponent(componentRef,new ComputeComponentsRefCache.ComputeComponent(componentKey,componentDto.uuid()));
+  }
+  for (  Integer childRef : reportComponent.getChildRefList()) {
+    BatchReport.Component nextModuleParent=!reportComponent.getType().equals(Constants.ComponentType.PROJECT) && !reportComponent.getType().equals(Constants.ComponentType.MODULE) ? nearestModule : reportComponent;
+    recursivelyProcessComponent(context,childRef,nextModuleParent,componentDtosByKey);
+  }
+}

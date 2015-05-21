@@ -1,8 +1,14 @@
 {
+  computeComponentsRefCache.addComponent(1,new ComputeComponentsRefCache.ComputeComponent("PROJECT_KEY","ABCD"));
+  computeComponentsRefCache.addComponent(2,new ComputeComponentsRefCache.ComputeComponent("MODULE_A","EDCB"));
+  computeComponentsRefCache.addComponent(3,new ComputeComponentsRefCache.ComputeComponent("MODULE_B","BCDE"));
+  computeComponentsRefCache.addComponent(4,new ComputeComponentsRefCache.ComputeComponent("MODULE_B:src/main/java/dir","CDEF"));
+  computeComponentsRefCache.addComponent(5,new ComputeComponentsRefCache.ComputeComponent("MODULE_B:src/main/java/dir/Foo.java","DEFG"));
   ComponentDto project=ComponentTesting.newProjectDto("ABCD").setKey("PROJECT_KEY").setName("Project");
   dbClient.componentDao().insert(session,project);
+  ComponentDto moduleA=ComponentTesting.newModuleDto("EDCB",project).setKey("MODULE_A").setName("Module A");
   ComponentDto moduleB=ComponentTesting.newModuleDto("BCDE",project).setKey("MODULE_B").setName("Module B");
-  dbClient.componentDao().insert(session,moduleB);
+  dbClient.componentDao().insert(session,moduleA,moduleB);
   ComponentDto directory=ComponentTesting.newDirectory(moduleB,"src/main/java/dir").setUuid("CDEF").setKey("MODULE_B:src/main/java/dir");
   ComponentDto file=ComponentTesting.newFileDto(moduleB,"DEFG").setPath("src/main/java/dir/Foo.java").setName("Foo.java").setKey("MODULE_B:src/main/java/dir/Foo.java");
   dbClient.componentDao().insert(session,directory,file);
@@ -17,15 +23,15 @@
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(5).setType(Constants.ComponentType.FILE).setPath("src/main/java/dir/Foo.java").build());
   sut.execute(new ComputationContext(new BatchReportReader(reportDir),project));
   assertThat(dbTester.countRowsOfTable("projects")).isEqualTo(5);
-  ComponentDto moduleA=dbClient.componentDao().selectNullableByKey(session,"MODULE_A");
-  assertThat(moduleA).isNotNull();
+  ComponentDto moduleAreloaded=dbClient.componentDao().selectNullableByKey(session,"MODULE_A");
+  assertThat(moduleAreloaded).isNotNull();
   ComponentDto moduleBReloaded=dbClient.componentDao().selectNullableByKey(session,"MODULE_B");
   assertThat(moduleBReloaded).isNotNull();
   assertThat(moduleBReloaded.uuid()).isEqualTo(moduleB.uuid());
-  assertThat(moduleBReloaded.moduleUuid()).isEqualTo(moduleA.uuid());
-  assertThat(moduleBReloaded.moduleUuidPath()).isEqualTo(moduleA.moduleUuidPath() + moduleBReloaded.uuid() + ".");
+  assertThat(moduleBReloaded.moduleUuid()).isEqualTo(moduleAreloaded.uuid());
+  assertThat(moduleBReloaded.moduleUuidPath()).isEqualTo(moduleAreloaded.moduleUuidPath() + moduleBReloaded.uuid() + ".");
   assertThat(moduleBReloaded.projectUuid()).isEqualTo(project.uuid());
-  assertThat(moduleBReloaded.parentProjectId()).isEqualTo(moduleA.getId());
+  assertThat(moduleBReloaded.parentProjectId()).isEqualTo(moduleAreloaded.getId());
   ComponentDto directoryReloaded=dbClient.componentDao().selectNullableByKey(session,"MODULE_B:src/main/java/dir");
   assertThat(directoryReloaded).isNotNull();
   assertThat(directoryReloaded.uuid()).isEqualTo(directory.uuid());

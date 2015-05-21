@@ -1,10 +1,10 @@
 {
-  String path=reportComponent.hasPath() ? reportComponent.getPath() : null;
-  String branch=componentContext.context.getReportMetadata().hasBranch() ? componentContext.context.getReportMetadata().getBranch() : null;
-  String componentKey=reportComponent.hasKey() || moduleParent == null ? ComponentKeys.createKey(reportComponent.getKey(),branch) : ComponentKeys.createEffectiveKey(moduleParent.getKey(),path);
+  ComputeComponentsRefCache.ComputeComponent cacheComputeComponent=computeComponentsRefCache.getByRef(reportComponent.getRef());
+  String componentKey=cacheComputeComponent.getKey();
+  String componentUuid=cacheComputeComponent.getUuid();
   ComponentDto existingComponent=componentContext.componentDtosByKey.get(componentKey);
   if (existingComponent == null) {
-    ComponentDto component=createComponent(reportComponent,componentKey,Uuids.create(),moduleParent);
+    ComponentDto component=createComponent(reportComponent,componentKey,componentUuid,moduleParent);
     dbClient.componentDao().insert(componentContext.dbSession,component);
     return component;
   }

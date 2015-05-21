@@ -1,7 +1,8 @@
 {
   DbSession session=dbClient.openSession(true);
   try {
-    projectCleaner.purge(session,new IdUuidPair(context.getProject().getId(),context.getProject().uuid()),context.getProjectSettings());
+    DbComponentsRefCache.DbComponent project=dbComponentsRefCache.getByRef(context.getReportMetadata().getRootComponentRef());
+    projectCleaner.purge(session,new IdUuidPair(project.getId(),project.getUuid()),context.getProjectSettings());
     session.commit();
   }
   finally {
