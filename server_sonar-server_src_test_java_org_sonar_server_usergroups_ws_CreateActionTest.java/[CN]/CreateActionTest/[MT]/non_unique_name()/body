@@ -1,0 +1,9 @@
+{
+  String groupName="conflicting-name";
+  groupDao.insert(session,new GroupDto().setName(groupName));
+  session.commit();
+  expectedException.expect(ServerException.class);
+  expectedException.expectMessage("already taken");
+  loginAsAdmin();
+  tester.newPostRequest("api/usergroups","create").setParam("name",groupName).execute().assertStatus(HttpURLConnection.HTTP_CONFLICT);
+}
