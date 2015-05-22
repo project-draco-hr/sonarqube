@@ -1,15 +1,16 @@
 {
-  ReportQueue.Item item=sut.add("P1",generateData());
+  ReportQueue.Item item=sut.add("P1","Project 1",generateData());
   assertThat(item).isNotNull();
   assertThat(item.zipFile).isFile().exists().hasContent("some data").hasParent(new File(dataDir,"analysis"));
   assertThat(item.dto.getUuid()).isNotEmpty();
   assertThat(item.dto.getId()).isGreaterThan(0L);
-  List<AnalysisReportDto> reports=sut.selectByProjectKey("P1");
+  List<AnalysisReportDto> reports=dbClient.analysisReportDao().selectByProjectKey(session,"P1");
   assertThat(reports).hasSize(1);
   AnalysisReportDto report=reports.get(0);
   assertThat(reports).hasSize(1);
   assertThat(report.getStatus()).isEqualTo(PENDING);
   assertThat(report.getProjectKey()).isEqualTo("P1");
+  assertThat(report.getProjectName()).isEqualTo("Project 1");
   assertThat(report.getUuid()).isNotEmpty();
   assertThat(report.getId()).isGreaterThan(0L);
   assertThat(report.getCreatedAt()).isEqualTo(NOW);

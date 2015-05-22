@@ -1,9 +1,10 @@
 {
   userSession.checkGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
   String projectKey=request.mandatoryParam(PARAM_PROJECT_KEY);
+  String projectName=request.mandatoryParam(PARAM_PROJECT_NAME);
   InputStream reportData=request.paramAsInputStream(PARAM_REPORT_DATA);
   try {
-    ReportQueue.Item item=queue.add(projectKey,reportData);
+    ReportQueue.Item item=queue.add(projectKey,projectName,reportData);
     workerLauncher.startAnalysisTaskNow();
     response.newJsonWriter().beginObject().prop("key",String.valueOf(item.dto.getId())).endObject().close();
   }
