@@ -1,0 +1,17 @@
+{
+  SearchOptions searchOptions=new SearchOptions().setPage(request.mandatoryParamAsInt(Param.PAGE),request.mandatoryParamAsInt(Param.PAGE_SIZE));
+  Boolean isCustom=request.paramAsBoolean(PARAM_IS_CUSTOM);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    List<MetricDto> metrics=dbClient.metricDao().selectEnabled(dbSession,isCustom,searchOptions);
+    JsonWriter json=response.newJsonWriter();
+    json.beginObject();
+    Set<String> desiredFields=desiredFields(request.paramAsStrings(Param.FIELDS));
+    writeMetrics(json,metrics,desiredFields);
+    json.endObject();
+    json.close();
+  }
+  finally {
+    MyBatis.closeQuietly(dbSession);
+  }
+}
