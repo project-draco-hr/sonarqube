@@ -2,7 +2,7 @@
   SearchOptions options=new SearchOptions().setPage(request.mandatoryParamAsInt(Param.PAGE),request.mandatoryParamAsInt(Param.PAGE_SIZE));
   List<String> fields=request.paramAsStrings(Param.FIELDS);
   SearchResult<UserDoc> result=userIndex.search(request.param(Param.TEXT_QUERY),options);
-  Map<String,Integer> groupsByLogin=Maps.newHashMap();
+  Multimap<String,String> groupsByLogin=Multimaps.forMap(Maps.<String,String>newHashMap());
   DbSession session=dbClient.openSession(false);
   try {
     Collection<String> logins=Collections2.transform(result.getDocs(),new Function<UserDoc,String>(){
@@ -11,7 +11,7 @@
       }
     }
 );
-    groupsByLogin=dbClient.groupMembershipDao().countGroupsByLogins(session,logins);
+    groupsByLogin=dbClient.groupMembershipDao().selectGroupsByLogins(session,logins);
   }
   finally {
     session.close();

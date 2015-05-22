@@ -1,0 +1,14 @@
+{
+  final Multimap<String,String> result=ArrayListMultimap.create();
+  DaoUtils.executeLargeInputs(logins,new NonNullInputFunction<List<String>,List<LoginGroup>>(){
+    @Override protected List<LoginGroup> doApply(    List<String> input){
+      List<LoginGroup> groupMemberships=mapper(session).selectGroupsByLogins(input);
+      for (      LoginGroup membership : groupMemberships) {
+        result.put(membership.login(),membership.groupName());
+      }
+      return groupMemberships;
+    }
+  }
+);
+  return result;
+}
