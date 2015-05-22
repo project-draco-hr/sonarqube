@@ -1,0 +1,19 @@
+{
+  return new MeasureRepository(){
+    @Override public Optional<MeasureDto> findPrevious(    Metric<?> metric){
+      DbClient dbClient=context.getDbClient();
+      try (DbSession dbSession=dbClient.openSession(false)){
+        return Optional.fromNullable(dbClient.measureDao().findByComponentKeyAndMetricKey(dbSession,component.getKey(),metric.getKey()));
+      }
+     }
+    @Override public Optional<BatchReport.Measure> findCurrent(    final Metric<?> metric){
+      return Optional.fromNullable(Iterables.find(context.getReportReader().readComponentMeasures(component.getRef()),new Predicate<BatchReport.Measure>(){
+        @Override public boolean apply(        @Nonnull BatchReport.Measure input){
+          return input.getMetricKey().equals(metric.getKey());
+        }
+      }
+));
+    }
+  }
+;
+}
