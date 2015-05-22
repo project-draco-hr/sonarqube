@@ -6,7 +6,7 @@
   writer.writeMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).setProjectKey(PROJECT_KEY).build());
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).addChildRef(FILE_REF).build());
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(FILE_REF).setType(Constants.ComponentType.FILE).setLines(3).build());
-  sut.execute(new ComputationContext(new BatchReportReader(reportDir),PROJECT_KEY,projectSettings));
+  sut.execute(new ComputationContext(new BatchReportReader(reportDir),PROJECT_KEY,projectSettings,dbClient,ComponentTreeBuilders.from(DumbComponent.DUMB_PROJECT),languageRepository));
   assertThat(dbTester.countRowsOfTable("file_sources")).isEqualTo(1);
   FileSourceDto fileSourceDto=dbClient.fileSourceDao().selectSource(FILE_UUID);
   FileSourceDb.Data data=FileSourceDto.decodeSourceData(fileSourceDto.getBinaryData());

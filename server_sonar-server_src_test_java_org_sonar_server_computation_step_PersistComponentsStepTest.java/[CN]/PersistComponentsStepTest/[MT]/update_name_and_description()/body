@@ -11,7 +11,7 @@
   writer.writeMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).build());
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).setName("New project name").setDescription("New project description").addChildRef(2).build());
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey("MODULE_KEY").setName("New module name").setDescription("New module description").build());
-  sut.execute(new ComputationContext(new BatchReportReader(reportDir),PROJECT_KEY,projectSettings));
+  sut.execute(new ComputationContext(new BatchReportReader(reportDir),PROJECT_KEY,projectSettings,dbClient,ComponentTreeBuilders.from(DumbComponent.DUMB_PROJECT),languageRepository));
   ComponentDto projectReloaded=dbClient.componentDao().selectNullableByKey(session,PROJECT_KEY);
   assertThat(projectReloaded.name()).isEqualTo("New project name");
   assertThat(projectReloaded.description()).isEqualTo("New project description");

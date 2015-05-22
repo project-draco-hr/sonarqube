@@ -1,7 +1,7 @@
 {
   BatchReportWriter writer=initBasicReport(3);
   writer.writeComponentSymbols(FILE_REF,newArrayList(BatchReport.Symbols.Symbol.newBuilder().setDeclaration(BatchReport.Range.newBuilder().setStartLine(1).setEndLine(1).setStartOffset(2).setEndOffset(4).build()).addReference(BatchReport.Range.newBuilder().setStartLine(3).setEndLine(3).setStartOffset(1).setEndOffset(3).build()).build()));
-  sut.execute(new ComputationContext(new BatchReportReader(reportDir),PROJECT_KEY,projectSettings));
+  sut.execute(new ComputationContext(new BatchReportReader(reportDir),PROJECT_KEY,projectSettings,dbClient,ComponentTreeBuilders.from(DumbComponent.DUMB_PROJECT),languageRepository));
   assertThat(dbTester.countRowsOfTable("file_sources")).isEqualTo(1);
   FileSourceDto fileSourceDto=dbClient.fileSourceDao().selectSource(FILE_UUID);
   FileSourceDb.Data data=FileSourceDto.decodeSourceData(fileSourceDto.getBinaryData());

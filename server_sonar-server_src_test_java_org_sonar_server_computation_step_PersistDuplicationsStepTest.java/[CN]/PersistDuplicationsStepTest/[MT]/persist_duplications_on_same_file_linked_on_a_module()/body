@@ -11,7 +11,7 @@
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(3).setType(Constants.ComponentType.FILE).setSnapshotId(12L).setPath("file").build());
   BatchReport.Duplication duplication=BatchReport.Duplication.newBuilder().setOriginPosition(Range.newBuilder().setStartLine(1).setEndLine(5).build()).addDuplicate(BatchReport.Duplicate.newBuilder().setOtherFileRef(3).setRange(Range.newBuilder().setStartLine(6).setEndLine(10).build()).build()).build();
   writer.writeComponentDuplications(3,newArrayList(duplication));
-  sut.execute(new ComputationContext(new BatchReportReader(reportDir),PROJECT_KEY,projectSettings));
+  sut.execute(new ComputationContext(new BatchReportReader(reportDir),PROJECT_KEY,projectSettings,dbClient,ComponentTreeBuilders.from(DumbComponent.DUMB_PROJECT),languageRepository));
   assertThat(dbTester.countRowsOfTable("project_measures")).isEqualTo(1);
   Map<String,Object> dto=dbTester.selectFirst("select snapshot_id as \"snapshotId\", text_value as \"textValue\" from project_measures");
   assertThat(dto.get("snapshotId")).isEqualTo(12L);
