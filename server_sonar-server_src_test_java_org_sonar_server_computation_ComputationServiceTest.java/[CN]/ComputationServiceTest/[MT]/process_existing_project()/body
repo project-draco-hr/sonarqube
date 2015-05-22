@@ -1,0 +1,20 @@
+{
+  dbTester.prepareDbUnit(getClass(),"shared.xml");
+  logTester.setLevel(LoggerLevel.INFO);
+  when(steps.orderedSteps()).thenReturn(Arrays.asList(projectStep1,projectStep2));
+  AnalysisReportDto dto=newDefaultReport();
+  File zip=generateZip();
+  sut.process(new ReportQueue.Item(dto,zip));
+  assertThat(dto.getStatus()).isEqualTo(Status.SUCCESS);
+  assertThat(dto.getFinishedAt()).isNotNull();
+  assertThat(logTester.logs(LoggerLevel.INFO)).hasSize(1);
+  assertThat(logTester.logs(LoggerLevel.INFO).get(0)).startsWith("Analysis of project P1 (report 1) (done) | time=");
+  verify(projectStep1).execute(any(ComputationContext.class));
+  verify(projectStep2).execute(any(ComputationContext.class));
+  verify(activityService).save(activityArgumentCaptor.capture());
+  assertThat(activityArgumentCaptor.getValue().getType()).isEqualTo(Activity.Type.ANALYSIS_REPORT);
+  assertThat(activityArgumentCaptor.getValue().getAction()).isEqualTo("LOG_ANALYSIS_REPORT");
+  assertThat(activityArgumentCaptor.getValue().getData()).containsEntry("projectKey","P1");
+  assertThat(activityArgumentCaptor.getValue().getData()).containsEntry("projectName","Project 1");
+  assertThat(activityArgumentCaptor.getValue().getData().get("projectUuid")).isEqualTo("ABCD");
+}

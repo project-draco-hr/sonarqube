@@ -1,9 +1,7 @@
 {
   issueCache.newAppender().append(new DefaultIssue().setSeverity(Severity.BLOCKER)).close();
-  when(context.getProject().uuid()).thenReturn("PROJECT_UUID");
-  when(context.getReportMetadata()).thenReturn(BatchReport.Metadata.newBuilder().build());
-  when(notifService.hasProjectSubscribersForTypes("PROJECT_UUID",SendIssueNotificationsStep.NOTIF_TYPES)).thenReturn(true);
-  sut.execute(context);
+  when(notifService.hasProjectSubscribersForTypes(PROJECT_UUID,SendIssueNotificationsStep.NOTIF_TYPES)).thenReturn(true);
+  sut.execute(new ComputationContext(new BatchReportReader(reportDir),PROJECT_KEY));
   verify(notifService).deliver(any(NewIssuesNotification.class));
   verify(notifService,atLeastOnce()).deliver(any(IssueChangeNotification.class));
 }

@@ -1,4 +1,10 @@
 {
   issueCache=new IssueCache(temp.newFile(),System2.INSTANCE);
-  sut=new SendIssueNotificationsStep(issueCache,ruleCache,notifService,newIssuesNotificationFactory);
+  dbComponentsRefCache=new DbComponentsRefCache();
+  sut=new SendIssueNotificationsStep(issueCache,ruleCache,dbComponentsRefCache,notifService,newIssuesNotificationFactory);
+  dbComponentsRefCache.addComponent(1,new DbComponentsRefCache.DbComponent(1L,PROJECT_KEY,PROJECT_UUID));
+  reportDir=temp.newFolder();
+  BatchReportWriter writer=new BatchReportWriter(reportDir);
+  writer.writeMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).build());
+  writer.writeComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).setName("Project name").build());
 }

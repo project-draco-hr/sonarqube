@@ -1,18 +1,18 @@
 {
-  computeComponentsRefCache.addComponent(1,new ComputeComponentsRefCache.ComputeComponent("PROJECT_KEY","ABCD"));
+  computeComponentsRefCache.addComponent(1,new ComputeComponentsRefCache.ComputeComponent(PROJECT_KEY,"ABCD"));
   computeComponentsRefCache.addComponent(2,new ComputeComponentsRefCache.ComputeComponent("MODULE_KEY","BCDE"));
   computeComponentsRefCache.addComponent(3,new ComputeComponentsRefCache.ComputeComponent("MODULE_KEY:src/main/java/dir","CDEF"));
   computeComponentsRefCache.addComponent(4,new ComputeComponentsRefCache.ComputeComponent("MODULE_KEY:src/main/java/dir/Foo.java","DEFG"));
   File reportDir=temp.newFolder();
   BatchReportWriter writer=new BatchReportWriter(reportDir);
   writer.writeMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).build());
-  writer.writeComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey("PROJECT_KEY").setName("Project").setDescription("Project description").addChildRef(2).build());
+  writer.writeComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).setName("Project").setDescription("Project description").addChildRef(2).build());
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey("MODULE_KEY").setName("Module").setDescription("Module description").addChildRef(3).build());
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(3).setType(Constants.ComponentType.DIRECTORY).setPath("src/main/java/dir").addChildRef(4).build());
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(4).setType(Constants.ComponentType.FILE).setPath("src/main/java/dir/Foo.java").setLanguage("java").build());
-  sut.execute(new ComputationContext(new BatchReportReader(reportDir),ComponentTesting.newProjectDto()));
+  sut.execute(new ComputationContext(new BatchReportReader(reportDir),PROJECT_KEY));
   assertThat(dbTester.countRowsOfTable("projects")).isEqualTo(4);
-  ComponentDto project=dbClient.componentDao().selectNullableByKey(session,"PROJECT_KEY");
+  ComponentDto project=dbClient.componentDao().selectNullableByKey(session,PROJECT_KEY);
   assertThat(project).isNotNull();
   assertThat(project.name()).isEqualTo("Project");
   assertThat(project.description()).isEqualTo("Project description");

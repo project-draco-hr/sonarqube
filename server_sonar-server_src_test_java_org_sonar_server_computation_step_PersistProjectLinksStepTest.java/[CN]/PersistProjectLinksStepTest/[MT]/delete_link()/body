@@ -1,10 +1,10 @@
 {
   dbTester.prepareDbUnit(getClass(),"delete_link.xml");
-  dbComponentsRefCache.addComponent(1,new DbComponentsRefCache.DbComponent(1L,"PROJECT_KEY","ABCD"));
+  dbComponentsRefCache.addComponent(1,new DbComponentsRefCache.DbComponent(1L,PROJECT_KEY,"ABCD"));
   File reportDir=temp.newFolder();
   BatchReportWriter writer=new BatchReportWriter(reportDir);
-  writer.writeMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).setProjectKey("PROJECT_KEY").build());
+  writer.writeMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).setProjectKey(PROJECT_KEY).build());
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).build());
-  step.execute(new ComputationContext(new BatchReportReader(reportDir),mock(ComponentDto.class)));
+  step.execute(new ComputationContext(new BatchReportReader(reportDir),PROJECT_KEY));
   assertThat(dbTester.countRowsOfTable("project_links")).isEqualTo(0);
 }

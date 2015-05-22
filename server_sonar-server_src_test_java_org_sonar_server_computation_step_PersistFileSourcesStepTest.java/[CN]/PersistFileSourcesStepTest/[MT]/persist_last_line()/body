@@ -1,12 +1,12 @@
 {
-  dbComponentsRefCache.addComponent(1,new DbComponentsRefCache.DbComponent(1L,"PROJECT_KEY",PROJECT_UUID));
+  dbComponentsRefCache.addComponent(1,new DbComponentsRefCache.DbComponent(1L,PROJECT_KEY,PROJECT_UUID));
   dbComponentsRefCache.addComponent(FILE_REF,new DbComponentsRefCache.DbComponent(2L,"PROJECT_KEY:file",FILE_UUID));
   BatchReportWriter writer=new BatchReportWriter(reportDir);
   FileUtils.writeLines(writer.getFileStructure().fileFor(FileStructure.Domain.SOURCE,FILE_REF),Lists.newArrayList("line1","line2"));
-  writer.writeMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).setProjectKey("PROJECT_KEY").build());
+  writer.writeMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).setProjectKey(PROJECT_KEY).build());
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).addChildRef(FILE_REF).build());
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(FILE_REF).setType(Constants.ComponentType.FILE).setLines(3).build());
-  sut.execute(new ComputationContext(new BatchReportReader(reportDir),ComponentTesting.newProjectDto(PROJECT_UUID)));
+  sut.execute(new ComputationContext(new BatchReportReader(reportDir),PROJECT_KEY));
   assertThat(dbTester.countRowsOfTable("file_sources")).isEqualTo(1);
   FileSourceDto fileSourceDto=dbClient.fileSourceDao().selectSource(FILE_UUID);
   FileSourceDb.Data data=FileSourceDto.decodeSourceData(fileSourceDto.getBinaryData());
