@@ -1,0 +1,8 @@
+{
+  GroupDto group=groupDao.insert(session,new GroupDto().setName("to-delete"));
+  userGroupDao.insert(session,new UserGroupDto().setGroupId(group.getId()).setUserId(42L));
+  session.commit();
+  loginAsAdmin();
+  tester.newPostRequest("api/usergroups","delete").setParam("id",group.getId().toString()).execute().assertNoContent();
+  assertThat(dbTester.select("SELECT group_id FROM groups_users")).isEmpty();
+}

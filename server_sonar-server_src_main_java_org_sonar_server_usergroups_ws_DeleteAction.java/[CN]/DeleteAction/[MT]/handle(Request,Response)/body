@@ -1,0 +1,20 @@
+{
+  userSession.checkLoggedIn().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+  long groupId=request.mandatoryParamAsLong(PARAM_ID);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    if (dbClient.groupDao().selectById(dbSession,groupId) == null) {
+      throw new NotFoundException(String.format("Could not find a group with id=%d",groupId));
+    }
+    checkNotTryingToDeleteDefaultGroup(dbSession,groupId);
+    removeGroupMembers(groupId,dbSession);
+    removeGroupPermissions(groupId,dbSession);
+    removeFromPermissionTemplates(groupId,dbSession);
+    dbClient.groupDao().deleteById(dbSession,groupId);
+    dbSession.commit();
+    response.noContent();
+  }
+  finally {
+    MyBatis.closeQuietly(dbSession);
+  }
+}
