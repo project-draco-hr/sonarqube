@@ -2,11 +2,9 @@
   dbTester.prepareDbUnit(getClass(),"empty.xml");
   dbComponentsRefCache.addComponent(1,new DbComponent(1L,PROJECT_KEY,"ABCD"));
   dbComponentsRefCache.addComponent(2,new DbComponent(2L,"MODULE_KEY","BCDE"));
-  File reportDir=temp.newFolder();
-  BatchReportWriter writer=new BatchReportWriter(reportDir);
-  writer.writeMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).setProjectKey(PROJECT_KEY).setAnalysisDate(150000000L).build());
-  writer.writeComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setSnapshotId(1000L).addEvent(BatchReport.Event.newBuilder().setName("Red (was Orange)").setCategory(Constants.EventCategory.ALERT).setDescription("Open issues > 0").build()).addChildRef(2).build());
-  writer.writeComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setSnapshotId(1001L).addEvent(BatchReport.Event.newBuilder().setName("Red (was Orange)").setCategory(Constants.EventCategory.ALERT).setDescription("Open issues > 0").build()).build());
-  step.execute(new ComputationContext(new BatchReportReader(reportDir),PROJECT_KEY,projectSettings,dbClient,ComponentTreeBuilders.from(DumbComponent.DUMB_PROJECT),languageRepository));
+  reportReader.setMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).setProjectKey(PROJECT_KEY).setAnalysisDate(150000000L).build());
+  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setSnapshotId(1000L).addEvent(BatchReport.Event.newBuilder().setName("Red (was Orange)").setCategory(Constants.EventCategory.ALERT).setDescription("Open issues > 0").build()).addChildRef(2).build());
+  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setSnapshotId(1001L).addEvent(BatchReport.Event.newBuilder().setName("Red (was Orange)").setCategory(Constants.EventCategory.ALERT).setDescription("Open issues > 0").build()).build());
+  step.execute(new ComputationContext(reportReader,PROJECT_KEY,projectSettings,dbClient,ComponentTreeBuilders.from(DumbComponent.DUMB_PROJECT),languageRepository));
   dbTester.assertDbUnit(getClass(),"persist_report_events_with_component_children-result.xml","events");
 }

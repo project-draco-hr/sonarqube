@@ -1,7 +1,8 @@
 {
   BatchReportWriter writer=initBasicReport(1);
-  writer.writeComponentCoverage(FILE_REF,newArrayList(BatchReport.Coverage.newBuilder().setLine(1).setConditions(10).setUtHits(true).setUtCoveredConditions(2).setItHits(true).setItCoveredConditions(3).setOverallCoveredConditions(4).build()));
-  sut.execute(new ComputationContext(new BatchReportReader(reportDir),PROJECT_KEY,projectSettings,dbClient,ComponentTreeBuilders.from(DumbComponent.DUMB_PROJECT),languageRepository));
+  File file=writer.writeComponentCoverage(FILE_REF,newArrayList(BatchReport.Coverage.newBuilder().setLine(1).setConditions(10).setUtHits(true).setUtCoveredConditions(2).setItHits(true).setItCoveredConditions(3).setOverallCoveredConditions(4).build()));
+  reportReader.putCoverage(FILE_REF,file);
+  sut.execute(new ComputationContext(reportReader,PROJECT_KEY,projectSettings,dbClient,ComponentTreeBuilders.from(DumbComponent.DUMB_PROJECT),languageRepository));
   assertThat(dbTester.countRowsOfTable("file_sources")).isEqualTo(1);
   FileSourceDto fileSourceDto=dbClient.fileSourceDao().selectSource(FILE_UUID);
   FileSourceDb.Data data=FileSourceDto.decodeSourceData(fileSourceDto.getBinaryData());

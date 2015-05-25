@@ -1,13 +1,10 @@
 {
-  File reportDir=temp.newFolder();
-  BatchReportWriter writer=new BatchReportWriter(reportDir);
-  writer.writeMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).build());
-  writer.writeComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).addChildRef(2).build());
-  writer.writeComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey("MODULE_KEY").addChildRef(3).build());
-  writer.writeComponent(BatchReport.Component.newBuilder().setRef(3).setType(Constants.ComponentType.DIRECTORY).setPath("src/main/java/dir").addChildRef(4).build());
-  writer.writeComponent(BatchReport.Component.newBuilder().setRef(4).setType(Constants.ComponentType.FILE).setPath("src/main/java/dir/Foo.java").build());
-  BatchReportReader batchReportReader=new BatchReportReader(reportDir);
-  ComputationContext context=new ComputationContext(batchReportReader,PROJECT_KEY,projectSettings,dbClient,ComponentTreeBuilders.from(batchReportReader),languageRepository);
+  reportReader.setMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).build());
+  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).addChildRef(2).build());
+  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey("MODULE_KEY").addChildRef(3).build());
+  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(3).setType(Constants.ComponentType.DIRECTORY).setPath("src/main/java/dir").addChildRef(4).build());
+  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(4).setType(Constants.ComponentType.FILE).setPath("src/main/java/dir/Foo.java").build());
+  ComputationContext context=new ComputationContext(reportReader,PROJECT_KEY,projectSettings,dbClient,ComponentTreeBuilders.from(reportReader),languageRepository);
   sut.execute(context);
   Map<Integer,Component> componentsByRef=getComponentsByRef(context.getRoot());
   assertThat(componentsByRef.get(1).getKey()).isEqualTo(PROJECT_KEY);

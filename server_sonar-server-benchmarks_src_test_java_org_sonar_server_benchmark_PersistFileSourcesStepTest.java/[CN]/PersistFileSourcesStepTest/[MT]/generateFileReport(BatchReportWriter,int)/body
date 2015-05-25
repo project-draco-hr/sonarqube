@@ -3,12 +3,12 @@
   for (int line=1; line <= NUMBER_OF_LINES; line++) {
     lineData.generateLineData(line);
   }
-  writer.writeComponent(BatchReport.Component.newBuilder().setRef(fileRef).setType(Constants.ComponentType.FILE).setLines(NUMBER_OF_LINES).build());
+  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(fileRef).setType(Constants.ComponentType.FILE).setLines(NUMBER_OF_LINES).build());
   dbComponentsRefCache.addComponent(fileRef,new DbComponent((long)fileRef,"PROJECT:" + fileRef,Uuids.create()));
   FileUtils.writeLines(writer.getSourceFile(fileRef),lineData.lines);
-  writer.writeComponentCoverage(fileRef,lineData.coverages);
-  writer.writeComponentChangesets(lineData.changesetsBuilder.setComponentRef(fileRef).build());
-  writer.writeComponentSyntaxHighlighting(fileRef,lineData.highlightings);
-  writer.writeComponentSymbols(fileRef,lineData.symbols);
-  writer.writeComponentDuplications(fileRef,lineData.duplications);
+  reportReader.putCoverage(fileRef,writer.writeComponentCoverage(fileRef,lineData.coverages));
+  reportReader.putChangesets(lineData.changesetsBuilder.setComponentRef(fileRef).build());
+  reportReader.putSyntaxHighlighting(fileRef,writer.writeComponentSyntaxHighlighting(fileRef,lineData.highlightings));
+  reportReader.putSymbols(fileRef,lineData.symbols);
+  reportReader.putDuplications(fileRef,lineData.duplications);
 }

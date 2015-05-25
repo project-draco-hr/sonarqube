@@ -7,7 +7,7 @@
   File reportDir=temp.newFolder();
   BatchReportWriter writer=new BatchReportWriter(reportDir);
   writer.writeMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).build());
-  step().execute(new ComputationContext(new BatchReportReader(reportDir),PROJECT_KEY,new Settings(),dbClient,ComponentTreeBuilders.from(DumbComponent.DUMB_PROJECT),mock(LanguageRepository.class)));
+  step().execute(new ComputationContext(new FileBatchReportReader(new BatchReportReader(reportDir)),PROJECT_KEY,new Settings(),dbClient,ComponentTreeBuilders.from(DumbComponent.DUMB_PROJECT),mock(LanguageRepository.class)));
   List<SearchHit> docs=esTester.getDocuments(SourceLineIndexDefinition.INDEX,SourceLineIndexDefinition.TYPE);
   assertThat(docs).hasSize(1);
   SourceLineDoc doc=new SourceLineDoc(docs.get(0).sourceAsMap());

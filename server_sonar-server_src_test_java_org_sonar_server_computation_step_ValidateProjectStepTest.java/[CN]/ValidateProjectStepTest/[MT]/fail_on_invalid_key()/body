@@ -2,9 +2,9 @@
   String invalidProjectKey="Project\\Key";
   thrown.expect(IllegalArgumentException.class);
   thrown.expectMessage("Validation of project failed:\n" + "  o \"Project\\Key\" is not a valid project or module key. Allowed characters are alphanumeric, '-', '_', '.' and ':', with at least one non-digit.\n" + "  o \"Module$Key\" is not a valid project or module key. Allowed characters are alphanumeric, '-', '_', '.' and ':', with at least one non-digit");
-  writer.writeMetadata(BatchReport.Metadata.newBuilder().build());
-  writer.writeComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(invalidProjectKey).addChildRef(2).build());
-  writer.writeComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey("Module$Key").build());
+  reportReader.setMetadata(BatchReport.Metadata.newBuilder().build());
+  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(invalidProjectKey).addChildRef(2).build());
+  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey("Module$Key").build());
   DumbComponent root=new DumbComponent(Component.Type.PROJECT,1,"ABCD",invalidProjectKey,new DumbComponent(Component.Type.MODULE,2,"BCDE","Module$Key"));
-  sut.execute(new ComputationContext(new BatchReportReader(reportDir),null,null,null,ComponentTreeBuilders.from(root),null));
+  sut.execute(new ComputationContext(reportReader,null,null,null,ComponentTreeBuilders.from(root),null));
 }
