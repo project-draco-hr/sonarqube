@@ -6,15 +6,18 @@
  catch (  Exception e) {
     LOG.error("Failed to pop the queue of analysis reports",e);
   }
-  if (item != null) {
-    try {
-      container.execute(item);
-    }
- catch (    Throwable e) {
-      LOG.error(String.format("Failed to process analysis report %d of project %s",item.dto.getId(),item.dto.getProjectKey()),e);
-    }
+  if (item == null) {
+    return;
+  }
+  ComputeEngineContainer computeEngineContainer=containerFactory.create(sqContainer,item);
+  try {
+    computeEngineContainer.process();
+  }
+ catch (  Throwable e) {
+    LOG.error(String.format("Failed to process analysis report %d of project %s",item.dto.getId(),item.dto.getProjectKey()),e);
+  }
  finally {
-      removeSilentlyFromQueue(item);
-    }
+    computeEngineContainer.cleanup();
+    removeSilentlyFromQueue(item);
   }
 }
