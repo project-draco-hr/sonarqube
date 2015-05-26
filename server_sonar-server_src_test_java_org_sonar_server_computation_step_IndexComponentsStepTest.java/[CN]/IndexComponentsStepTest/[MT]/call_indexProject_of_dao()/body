@@ -1,11 +1,9 @@
 {
   dbComponentsRefCache.addComponent(1,new DbComponent(123L,PROJECT_KEY,"PROJECT_UUID"));
-  File reportDir=temp.newFolder();
-  BatchReportWriter writer=new BatchReportWriter(reportDir);
-  writer.writeMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).build());
+  reportReader.setMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).build());
   ComponentDto project=mock(ComponentDto.class);
   when(project.getId()).thenReturn(123L);
-  ComputationContext context=new ComputationContext(new FileBatchReportReader(new BatchReportReader(reportDir)),PROJECT_KEY,new Settings(),mock(DbClient.class),ComponentTreeBuilders.from(DumbComponent.DUMB_PROJECT),mock(LanguageRepository.class));
+  ComputationContext context=new ComputationContext(reportReader,PROJECT_KEY,new Settings(),mock(DbClient.class),ComponentTreeBuilders.from(DumbComponent.DUMB_PROJECT),mock(LanguageRepository.class));
   sut.execute(context);
   verify(resourceIndexerDao).indexProject(123L);
 }

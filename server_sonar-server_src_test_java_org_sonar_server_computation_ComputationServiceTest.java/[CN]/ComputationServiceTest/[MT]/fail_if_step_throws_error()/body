@@ -1,0 +1,14 @@
+{
+  String errorMessage="Failed to unzip";
+  when(steps.instances()).thenReturn(ImmutableList.of(projectStep1));
+  doThrow(new IllegalStateException(errorMessage)).when(projectStep1).execute(any(ComputationContext.class));
+  try {
+    sut.process();
+    fail();
+  }
+ catch (  IllegalStateException e) {
+    assertThat(e.getMessage()).isEqualTo(errorMessage);
+    assertThat(dto.getStatus()).isEqualTo(Status.FAILED);
+    assertThat(dto.getFinishedAt()).isNotNull();
+  }
+}

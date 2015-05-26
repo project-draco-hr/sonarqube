@@ -1,14 +1,15 @@
 {
   ComponentContainer container=Platform.getInstance().getContainer();
-  ComponentContainer child=container.createChild();
-  child.addSingletons(componentClasses());
-  child.addSingletons(ComputationSteps.orderedStepClasses());
-  child.startComponents();
+  ComponentContainer ceContainer=new CEContainer(container);
+  ceContainer.add(ceContainer);
+  ceContainer.add(item);
+  ceContainer.addSingletons(componentClasses());
+  ceContainer.addSingletons(ComputationSteps.orderedStepClasses());
   try {
-    child.getComponentByType(ComputationService.class).process(item);
+    ceContainer.getComponentByType(ComputationService.class).process();
   }
   finally {
-    child.stopComponents();
+    ceContainer.stopComponents();
     container.removeChild();
   }
 }

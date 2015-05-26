@@ -1,0 +1,15 @@
+{
+  ReflectionLifecycleStrategy lifecycleStrategy=new ReflectionLifecycleStrategy(new NullComponentMonitor(),"start","stop","close"){
+    @Override public boolean isLazy(    ComponentAdapter<?> adapter){
+      return true;
+    }
+    @Override public void start(    Object component){
+      Profiler profiler=Profiler.createIfTrace(Loggers.get(ComponentContainer.class));
+      profiler.start();
+      super.start(component);
+      profiler.stopTrace(component.getClass().getCanonicalName() + " started");
+    }
+  }
+;
+  return new DefaultPicoContainer(new OptInCaching(),lifecycleStrategy,parent.getPicoContainer());
+}
