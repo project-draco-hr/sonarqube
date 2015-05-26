@@ -1,3 +1,24 @@
 {
-  return delegate.readFileSource(fileRef);
+  File file=delegate.readFileSource(fileRef);
+  if (file == null) {
+    throw new IllegalStateException("Unable to find source for file #" + fileRef + ". File does not exist: "+ file);
+  }
+  try {
+    final LineIterator lineIterator=IOUtils.lineIterator(FileUtils.openInputStream(file),StandardCharsets.UTF_8);
+    return new CloseableIterator<String>(){
+      @Override public boolean hasNext(){
+        return lineIterator.hasNext();
+      }
+      @Override protected String doNext(){
+        return lineIterator.next();
+      }
+      @Override protected void doClose() throws Exception {
+        lineIterator.close();
+      }
+    }
+;
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Fail to traverse file: " + file,e);
+  }
 }

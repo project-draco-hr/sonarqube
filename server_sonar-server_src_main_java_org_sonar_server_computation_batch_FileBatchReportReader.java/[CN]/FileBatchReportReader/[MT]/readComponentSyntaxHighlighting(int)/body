@@ -1,3 +1,13 @@
 {
-  return delegate.readComponentSyntaxHighlighting(fileRef);
+  File file=delegate.readComponentSyntaxHighlighting(fileRef);
+  if (file == null) {
+    return CloseableIterator.emptyCloseableIterator();
+  }
+  try {
+    return new ParserCloseableIterator<>(BatchReport.SyntaxHighlighting.PARSER,FileUtils.openInputStream(file));
+  }
+ catch (  IOException e) {
+    Throwables.propagate(e);
+    return CloseableIterator.emptyCloseableIterator();
+  }
 }

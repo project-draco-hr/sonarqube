@@ -1,3 +1,13 @@
 {
-  return delegate.readTests(testFileRef);
+  File file=delegate.readTests(testFileRef);
+  if (file == null) {
+    return CloseableIterator.emptyCloseableIterator();
+  }
+  try {
+    return new ParserCloseableIterator<>(BatchReport.Test.PARSER,FileUtils.openInputStream(file));
+  }
+ catch (  IOException e) {
+    Throwables.propagate(e);
+    return CloseableIterator.emptyCloseableIterator();
+  }
 }

@@ -1,3 +1,13 @@
 {
-  return delegate.readCoverageDetails(testFileRef);
+  File file=delegate.readCoverageDetails(testFileRef);
+  if (file == null) {
+    return CloseableIterator.emptyCloseableIterator();
+  }
+  try {
+    return new ParserCloseableIterator<>(BatchReport.CoverageDetail.PARSER,FileUtils.openInputStream(file));
+  }
+ catch (  IOException e) {
+    Throwables.propagate(e);
+    return CloseableIterator.emptyCloseableIterator();
+  }
 }

@@ -1,10 +1,9 @@
 {
-  BatchReportWriter writer=new BatchReportWriter(reportDir);
   List<BatchReport.Test> batchTests=Arrays.asList(newTest(1));
-  reportReader.putTests(TEST_FILE_REF_1,writer.writeTests(TEST_FILE_REF_1,batchTests));
+  reportReader.putTests(TEST_FILE_REF_1,batchTests);
   List<CoverageDetail> coverageDetails=Arrays.asList(newCoverageDetail(1,MAIN_FILE_REF_1),newCoverageDetail(2,MAIN_FILE_REF_2));
-  reportReader.putCoverageDetails(TEST_FILE_REF_1,writer.writeCoverageDetails(TEST_FILE_REF_1,coverageDetails));
-  reportReader.putCoverageDetails(TEST_FILE_REF_2,writer.writeCoverageDetails(TEST_FILE_REF_2,coverageDetails));
+  reportReader.putCoverageDetails(TEST_FILE_REF_1,coverageDetails);
+  reportReader.putCoverageDetails(TEST_FILE_REF_2,coverageDetails);
   sut.execute(new ComputationContext(reportReader,PROJECT_KEY,projectSettings,dbClient,ComponentTreeBuilders.from(root),languageRepository));
   assertThat(log.logs(LoggerLevel.WARN)).hasSize(1);
   assertThat(log.logs(LoggerLevel.WARN).get(0)).isEqualTo("Some coverage tests are not taken into account during analysis of project 'PROJECT_KEY'");

@@ -1,21 +1,19 @@
 {
-  File coverageFile=reportReader.readComponentCoverage(componentRef);
+  CloseableIterator<BatchReport.Coverage> coverageReportIterator=reportReader.readComponentCoverage(componentRef);
   BatchReport.Changesets scmReport=reportReader.readChangesets(componentRef);
-  File highlightingFile=reportReader.readComponentSyntaxHighlighting(componentRef);
+  CloseableIterator<BatchReport.SyntaxHighlighting> highlightingIterator=reportReader.readComponentSyntaxHighlighting(componentRef);
   List<BatchReport.Symbols.Symbol> symbols=reportReader.readComponentSymbols(componentRef);
   List<BatchReport.Duplication> duplications=reportReader.readComponentDuplications(componentRef);
-  if (coverageFile != null) {
-    ReportIterator<BatchReport.Coverage> coverageReportIterator=new ReportIterator<>(coverageFile,BatchReport.Coverage.PARSER);
+  if (coverageReportIterator != null) {
     iterators.add(coverageReportIterator);
     readers.add(new CoverageLineReader(coverageReportIterator));
   }
   if (scmReport != null) {
     readers.add(new ScmLineReader(scmReport));
   }
-  if (highlightingFile != null) {
-    ReportIterator<BatchReport.SyntaxHighlighting> syntaxHighlightingReportIterator=new ReportIterator<>(highlightingFile,BatchReport.SyntaxHighlighting.PARSER);
-    iterators.add(syntaxHighlightingReportIterator);
-    readers.add(new HighlightingLineReader(syntaxHighlightingReportIterator));
+  if (highlightingIterator != null) {
+    iterators.add(highlightingIterator);
+    readers.add(new HighlightingLineReader(highlightingIterator));
   }
   if (!duplications.isEmpty()) {
     readers.add(new DuplicationLineReader(duplications));

@@ -1,11 +1,6 @@
 {
   Multimap<String,FileSourceDb.Test.Builder> tests=ArrayListMultimap.create();
-  File testsFile=reader.readTests(component.getRef());
-  if (testsFile == null) {
-    return tests;
-  }
-  ReportIterator<BatchReport.Test> testIterator=new ReportIterator<>(testsFile,BatchReport.Test.PARSER);
-  try {
+  try (CloseableIterator<BatchReport.Test> testIterator=reader.readTests(component.getRef())){
     while (testIterator.hasNext()) {
       BatchReport.Test batchTest=testIterator.next();
       FileSourceDb.Test.Builder dbTest=FileSourceDb.Test.newBuilder();
@@ -26,8 +21,5 @@
       tests.put(dbTest.getName(),dbTest);
     }
   }
-  finally {
-    testIterator.close();
-  }
-  return tests;
+   return tests;
 }

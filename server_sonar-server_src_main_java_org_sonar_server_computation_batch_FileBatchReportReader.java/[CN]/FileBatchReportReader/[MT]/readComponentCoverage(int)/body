@@ -1,3 +1,13 @@
 {
-  return delegate.readComponentCoverage(fileRef);
+  File file=delegate.readComponentCoverage(fileRef);
+  if (file == null) {
+    return CloseableIterator.emptyCloseableIterator();
+  }
+  try {
+    return new ParserCloseableIterator<>(BatchReport.Coverage.PARSER,FileUtils.openInputStream(file));
+  }
+ catch (  IOException e) {
+    Throwables.propagate(e);
+    return CloseableIterator.emptyCloseableIterator();
+  }
 }
