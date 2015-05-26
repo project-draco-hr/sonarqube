@@ -1,0 +1,7 @@
+{
+  GroupDto existingGroup=groupDao.insert(session,new GroupDto().setName("old-name").setDescription("Old Description"));
+  userGroupDao.insert(session,new UserGroupDto().setGroupId(existingGroup.getId()).setUserId(42L));
+  session.commit();
+  loginAsAdmin();
+  tester.newPostRequest("api/usergroups","update").setParam("id",existingGroup.getId().toString()).setParam("name","new-name").setParam("description","New Description").execute().assertJson("{" + "  \"group\": {" + "    \"name\": \"new-name\","+ "    \"description\": \"New Description\","+ "    \"membersCount\": 1"+ "  }"+ "}");
+}

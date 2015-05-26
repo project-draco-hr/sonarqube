@@ -2,17 +2,20 @@
   userSession.checkLoggedIn().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
   String name=request.mandatoryParam(PARAM_NAME);
   String description=request.param(PARAM_DESCRIPTION);
-  validateName(name);
-  validateDescription(description);
-  GroupDto newGroup=new GroupDto().setName(name).setDescription(description);
+  groupUpdater.validateName(name);
+  if (description != null) {
+    groupUpdater.validateDescription(description);
+  }
   DbSession session=dbClient.openSession(false);
   try {
-    checkNameIsUnique(name,session);
-    newGroup=dbClient.groupDao().insert(session,new GroupDto().setName(name).setDescription(description));
+    groupUpdater.checkNameIsUnique(name,session);
+    GroupDto newGroup=dbClient.groupDao().insert(session,new GroupDto().setName(name).setDescription(description));
     session.commit();
+    JsonWriter json=response.newJsonWriter().beginObject();
+    groupUpdater.writeGroup(json,newGroup,0);
+    json.endObject().close();
   }
   finally {
     closeQuietly(session);
   }
-  response.newJsonWriter().beginObject().name("group").beginObject().prop("id",newGroup.getId().toString()).prop(PARAM_NAME,newGroup.getName()).prop(PARAM_DESCRIPTION,newGroup.getDescription()).prop("membersCount",0).endObject().endObject().close();
 }

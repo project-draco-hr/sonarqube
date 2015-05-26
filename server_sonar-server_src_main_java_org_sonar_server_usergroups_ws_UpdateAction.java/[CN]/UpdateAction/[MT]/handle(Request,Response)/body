@@ -1,0 +1,27 @@
+{
+  userSession.checkLoggedIn().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+  Long groupId=request.mandatoryParamAsLong(PARAM_ID);
+  String name=request.param(PARAM_NAME);
+  String description=request.param(PARAM_DESCRIPTION);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    groupUpdater.checkNameIsUnique(name,dbSession);
+    GroupDto group=dbClient.groupDao().selectById(dbSession,groupId);
+    if (name != null) {
+      groupUpdater.validateName(name);
+      group.setName(name);
+    }
+    if (description != null) {
+      groupUpdater.validateDescription(description);
+      group.setDescription(description);
+    }
+    dbClient.groupDao().update(dbSession,group);
+    dbSession.commit();
+    JsonWriter json=response.newJsonWriter().beginObject();
+    groupUpdater.writeGroup(json,group,dbClient.groupMembershipDao().countUsersByGroups(dbSession,Arrays.asList(groupId)).get(group.getName()));
+    json.endObject().close();
+  }
+  finally {
+    closeQuietly(dbSession);
+  }
+}
