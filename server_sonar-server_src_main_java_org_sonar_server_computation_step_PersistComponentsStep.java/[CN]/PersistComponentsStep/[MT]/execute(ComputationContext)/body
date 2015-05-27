@@ -1,7 +1,12 @@
 {
   DbSession session=dbClient.openSession(false);
   try {
-    new ComponentDepthTraversalTypeAwareVisitor(session,context).visit(context.getRoot());
+    Component root=context.getRoot();
+    List<ComponentDto> components=dbClient.componentDao().selectComponentsFromProjectKey(session,root.getKey());
+    Map<String,ComponentDto> componentDtosByKey=componentDtosByKey(components);
+    ComponentContext componentContext=new ComponentContext(context.getReportReader(),session,componentDtosByKey);
+    ComponentDto projectDto=processProject(root,componentContext.reportReader.readComponent(root.getRef()),componentContext);
+    processChildren(componentContext,root,projectDto,projectDto);
     session.commit();
   }
   finally {

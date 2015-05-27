@@ -3,7 +3,7 @@
   BatchReportWriter writer=new BatchReportWriter(reportDir);
   writer.writeMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).build());
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).setName("Project").setDescription("Project description").addChildRef(2).build());
-  writer.writeComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey("MODULE_KEY").setName("Module").setDescription("Module description").addChildRef(3).build());
+  writer.writeComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey("MODULE_KEY").setPath("module").setName("Module").setDescription("Module description").addChildRef(3).build());
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(3).setType(Constants.ComponentType.DIRECTORY).setPath("src/main/java/dir").addChildRef(4).build());
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(4).setType(Constants.ComponentType.FILE).setPath("src/main/java/dir/Foo.java").setLanguage("java").build());
   DumbComponent root=new DumbComponent(Component.Type.PROJECT,1,"ABCD",PROJECT_KEY,new DumbComponent(Component.Type.MODULE,2,"BCDE","MODULE_KEY",new DumbComponent(Component.Type.DIRECTORY,3,"CDEF","MODULE_KEY:src/main/java/dir",new DumbComponent(Component.Type.FILE,4,"DEFG","MODULE_KEY:src/main/java/dir/Foo.java"))));
@@ -13,6 +13,7 @@
   assertThat(project).isNotNull();
   assertThat(project.name()).isEqualTo("Project");
   assertThat(project.description()).isEqualTo("Project description");
+  assertThat(project.path()).isNull();
   assertThat(project.uuid()).isEqualTo("ABCD");
   assertThat(project.moduleUuid()).isNull();
   assertThat(project.moduleUuidPath()).isEqualTo("." + project.uuid() + ".");
@@ -24,6 +25,7 @@
   assertThat(module).isNotNull();
   assertThat(module.name()).isEqualTo("Module");
   assertThat(module.description()).isEqualTo("Module description");
+  assertThat(module.path()).isEqualTo("module");
   assertThat(module.uuid()).isEqualTo("BCDE");
   assertThat(module.moduleUuid()).isEqualTo(project.uuid());
   assertThat(module.moduleUuidPath()).isEqualTo(project.moduleUuidPath() + module.uuid() + ".");
@@ -34,6 +36,7 @@
   ComponentDto directory=dbClient.componentDao().selectNullableByKey(session,"MODULE_KEY:src/main/java/dir");
   assertThat(directory).isNotNull();
   assertThat(directory.name()).isEqualTo("src/main/java/dir");
+  assertThat(directory.description()).isNull();
   assertThat(directory.path()).isEqualTo("src/main/java/dir");
   assertThat(directory.uuid()).isEqualTo("CDEF");
   assertThat(directory.moduleUuid()).isEqualTo(module.uuid());
@@ -45,6 +48,7 @@
   ComponentDto file=dbClient.componentDao().selectNullableByKey(session,"MODULE_KEY:src/main/java/dir/Foo.java");
   assertThat(file).isNotNull();
   assertThat(file.name()).isEqualTo("Foo.java");
+  assertThat(file.description()).isNull();
   assertThat(file.path()).isEqualTo("src/main/java/dir/Foo.java");
   assertThat(file.language()).isEqualTo("java");
   assertThat(file.uuid()).isEqualTo("DEFG");

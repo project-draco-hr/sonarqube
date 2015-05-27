@@ -1,0 +1,15 @@
+{
+  ComponentDto existingComponent=componentContext.componentDtosByKey.get(componentDto.getKey());
+  if (existingComponent == null) {
+    dbClient.componentDao().insert(componentContext.dbSession,componentDto);
+    dbComponentsRefCache.addComponent(componentRef,new DbComponentsRefCache.DbComponent(componentDto.getId(),componentDto.getKey(),componentDto.uuid()));
+    return componentDto;
+  }
+ else {
+    if (updateComponent(existingComponent,componentDto)) {
+      dbClient.componentDao().update(componentContext.dbSession,existingComponent);
+    }
+    dbComponentsRefCache.addComponent(componentRef,new DbComponentsRefCache.DbComponent(existingComponent.getId(),existingComponent.getKey(),existingComponent.uuid()));
+    return existingComponent;
+  }
+}
