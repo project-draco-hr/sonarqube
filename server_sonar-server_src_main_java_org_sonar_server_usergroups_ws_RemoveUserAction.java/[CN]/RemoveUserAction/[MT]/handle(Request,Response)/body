@@ -1,0 +1,20 @@
+{
+  userSession.checkLoggedIn().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+  Long groupId=request.mandatoryParamAsLong(PARAM_ID);
+  String login=request.param(PARAM_LOGIN);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    GroupDto group=dbClient.groupDao().selectById(dbSession,groupId);
+    UserDto user=dbClient.userDao().selectActiveUserByLogin(dbSession,login);
+    if (user == null) {
+      throw new NotFoundException(String.format("Could not find a user with login '%s'",login));
+    }
+    UserGroupDto userGroup=new UserGroupDto().setGroupId(group.getId()).setUserId(user.getId());
+    dbClient.userGroupDao().delete(dbSession,userGroup);
+    dbSession.commit();
+    response.noContent();
+  }
+  finally {
+    closeQuietly(dbSession);
+  }
+}
