@@ -1,0 +1,25 @@
+{
+  Long groupId=request.mandatoryParamAsLong(PARAM_ID);
+  int pageSize=request.mandatoryParamAsInt(Param.PAGE_SIZE);
+  int page=request.mandatoryParamAsInt(Param.PAGE);
+  String queryString=request.param(Param.TEXT_QUERY);
+  String selected=request.param(PARAM_SELECTED);
+  UserMembershipQuery query=UserMembershipQuery.builder().groupId(groupId).memberSearch(queryString).membership(getMembership(selected)).pageIndex(page).pageSize(pageSize).build();
+  DbSession session=dbClient.openSession(false);
+  try {
+    GroupDto group=dbClient.groupDao().selectById(session,groupId);
+    if (group == null) {
+      throw new NotFoundException(String.format("Unable to find a group with ID '%d'",groupId));
+    }
+    int total=dbClient.groupMembershipDao().countMembers(session,query);
+    Paging paging=Paging.create(pageSize,page,total);
+    List<UserMembershipDto> users=dbClient.groupMembershipDao().selectMembers(session,query,paging.offset(),pageSize);
+    JsonWriter json=response.newJsonWriter().beginObject();
+    writeMembers(json,users);
+    writePaging(json,paging);
+    json.endObject().close();
+  }
+  finally {
+    session.close();
+  }
+}

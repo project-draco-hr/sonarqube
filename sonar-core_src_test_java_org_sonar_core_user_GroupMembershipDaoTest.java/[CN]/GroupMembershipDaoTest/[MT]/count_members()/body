@@ -1,0 +1,17 @@
+{
+  dbTester.prepareDbUnit(getClass(),"shared_plus_empty_group.xml");
+  DbSession session=dbTester.myBatis().openSession(false);
+  try {
+    assertThat(dao.countMembers(session,UserMembershipQuery.builder().groupId(100L).membership(UserMembershipQuery.IN).build())).isEqualTo(1);
+    assertThat(dao.countMembers(session,UserMembershipQuery.builder().groupId(100L).membership(UserMembershipQuery.OUT).build())).isEqualTo(1);
+    assertThat(dao.countMembers(session,UserMembershipQuery.builder().groupId(101L).membership(UserMembershipQuery.IN).build())).isEqualTo(2);
+    assertThat(dao.countMembers(session,UserMembershipQuery.builder().groupId(101L).membership(UserMembershipQuery.OUT).build())).isZero();
+    assertThat(dao.countMembers(session,UserMembershipQuery.builder().groupId(102L).membership(UserMembershipQuery.IN).build())).isEqualTo(1);
+    assertThat(dao.countMembers(session,UserMembershipQuery.builder().groupId(102L).membership(UserMembershipQuery.OUT).build())).isEqualTo(1);
+    assertThat(dao.countMembers(session,UserMembershipQuery.builder().groupId(103L).membership(UserMembershipQuery.IN).build())).isZero();
+    assertThat(dao.countMembers(session,UserMembershipQuery.builder().groupId(103L).membership(UserMembershipQuery.OUT).build())).isEqualTo(2);
+  }
+  finally {
+    session.close();
+  }
+}
