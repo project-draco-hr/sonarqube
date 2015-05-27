@@ -1,0 +1,15 @@
+{
+  int pageSize=request.mandatoryParamAsInt(SearchAction.PARAM_PAGE_SIZE);
+  QueryContext context=new QueryContext(userSession).addFieldsToReturn(request.paramAsStrings(SearchAction.PARAM_FIELDS));
+  List<String> facets=request.paramAsStrings(SearchAction.PARAM_FACETS);
+  if (facets != null) {
+    context.addFacets(facets);
+  }
+  if (pageSize < 1) {
+    context.setPage(request.mandatoryParamAsInt(SearchAction.PARAM_PAGE),0).setMaxLimit();
+  }
+ else {
+    context.setPage(request.mandatoryParamAsInt(SearchAction.PARAM_PAGE),pageSize);
+  }
+  return context;
+}

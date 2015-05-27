@@ -7,5 +7,23 @@
   addMandatoryFacetValues(results,RuleIndex.FACET_ACTIVE_SEVERITIES,Severity.ALL);
   addMandatoryFacetValues(results,RuleIndex.FACET_TAGS,request.paramAsStrings(PARAM_TAGS));
   mergeNoneAndEmptyBucketOnCharacteristics(results);
-  super.writeFacets(request,context,results,json);
+  json.name("facets").beginArray();
+  for (  String facetName : context.facets()) {
+    json.beginObject();
+    json.prop("property",facetName);
+    json.name("values").beginArray();
+    if (results.getFacets().containsKey(facetName)) {
+      Set<String> itemsFromFacets=Sets.newHashSet();
+      for (      FacetValue facetValue : results.getFacets().get(facetName)) {
+        itemsFromFacets.add(facetValue.getKey());
+        json.beginObject();
+        json.prop("val",facetValue.getKey());
+        json.prop("count",facetValue.getValue());
+        json.endObject();
+      }
+      addZeroFacetsForSelectedItems(request,facetName,itemsFromFacets,json);
+    }
+    json.endArray().endObject();
+  }
+  json.endArray();
 }
