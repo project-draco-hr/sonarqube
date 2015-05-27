@@ -1,0 +1,15 @@
+{
+  super(Component.Type.FILE,Order.PRE_ORDER);
+  this.session=session;
+  this.dbComponentsRefCache=dbComponentsRefCache;
+  this.reader=context.getReportReader();
+  this.existingFileSourcesByUuid=new HashMap<>();
+  this.projectUuid=context.getRoot().getUuid();
+  session.select("org.sonar.core.source.db.FileSourceMapper.selectHashesForProject",ImmutableMap.of("projectUuid",context.getRoot().getUuid(),"dataType",Type.TEST),new ResultHandler(){
+    @Override public void handleResult(    ResultContext context){
+      FileSourceDto dto=(FileSourceDto)context.getResultObject();
+      existingFileSourcesByUuid.put(dto.getFileUuid(),dto);
+    }
+  }
+);
+}

@@ -1,0 +1,20 @@
+{
+  List<ComponentDto> components=dbClient.componentDao().selectComponentsFromProjectKey(session,project.getKey());
+  for (  ComponentDto componentDto : components) {
+    componentDtosByKey.put(componentDto.getKey(),componentDto);
+  }
+  BatchReport.Component reportComponent=reportReader.readComponent(project.getRef());
+  ComponentDto componentDto=createComponentDto(reportComponent,project);
+  componentDto.setScope(Scopes.PROJECT);
+  componentDto.setQualifier(Qualifiers.PROJECT);
+  componentDto.setName(reportComponent.getName());
+  componentDto.setLongName(componentDto.name());
+  if (reportComponent.hasDescription()) {
+    componentDto.setDescription(reportComponent.getDescription());
+  }
+  componentDto.setProjectUuid(componentDto.uuid());
+  componentDto.setModuleUuidPath(ComponentDto.MODULE_UUID_PATH_SEP + componentDto.uuid() + ComponentDto.MODULE_UUID_PATH_SEP);
+  persistComponent(project.getRef(),componentDto);
+  lastModule=componentDto;
+  projectId=componentDto.getId();
+}

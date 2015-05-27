@@ -1,6 +1,4 @@
 {
-  computeComponentsRefCache.addComponent(1,new ComputeComponentsRefCache.ComputeComponent(PROJECT_KEY,"ABCD"));
-  computeComponentsRefCache.addComponent(2,new ComputeComponentsRefCache.ComputeComponent("MODULE_KEY","BCDE"));
   ComponentDto project=ComponentTesting.newProjectDto("ABCD").setKey(PROJECT_KEY).setName("Project");
   dbClient.componentDao().insert(session,project);
   ComponentDto module=ComponentTesting.newModuleDto("BCDE",project).setKey("MODULE_KEY").setName("Module");
@@ -11,7 +9,8 @@
   writer.writeMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).build());
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).setName("New project name").setDescription("New project description").addChildRef(2).build());
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey("MODULE_KEY").setName("New module name").setDescription("New module description").build());
-  sut.execute(new ComputationContext(new BatchReportReader(reportDir),PROJECT_KEY,projectSettings,dbClient,ComponentTreeBuilders.from(DumbComponent.DUMB_PROJECT),languageRepository));
+  DumbComponent root=new DumbComponent(Component.Type.PROJECT,1,"ABCD",PROJECT_KEY,new DumbComponent(Component.Type.MODULE,2,"BCDE","MODULE_KEY"));
+  sut.execute(new ComputationContext(new BatchReportReader(reportDir),PROJECT_KEY,projectSettings,dbClient,ComponentTreeBuilders.from(root),languageRepository));
   ComponentDto projectReloaded=dbClient.componentDao().selectNullableByKey(session,PROJECT_KEY);
   assertThat(projectReloaded.name()).isEqualTo("New project name");
   assertThat(projectReloaded.description()).isEqualTo("New project description");

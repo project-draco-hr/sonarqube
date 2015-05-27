@@ -1,0 +1,22 @@
+{
+  Multimap<String,FileSourceDb.Test.Builder> testsByName=buildDbTests(component);
+  Table<String,String,FileSourceDb.Test.CoveredFile.Builder> coveredFilesByName=loadCoverageDetails(component.getRef());
+  List<FileSourceDb.Test> tests=addCoveredFilesToTests(testsByName,coveredFilesByName);
+  if (checkIfThereAreUnprocessedCoverageDetails(testsByName,coveredFilesByName,component)) {
+    hasUnprocessedCoverageDetails=true;
+  }
+  if (tests.isEmpty()) {
+    return;
+  }
+  String componentUuid=getUuid(component.getRef());
+  FileSourceDto existingDto=existingFileSourcesByUuid.get(componentUuid);
+  long now=system.now();
+  if (existingDto != null) {
+    existingDto.setTestData(tests).setUpdatedAt(now);
+    dbClient.fileSourceDao().update(session,existingDto);
+  }
+ else {
+    FileSourceDto newDto=new FileSourceDto().setTestData(tests).setFileUuid(componentUuid).setProjectUuid(projectUuid).setDataType(Type.TEST).setCreatedAt(now).setUpdatedAt(now);
+    dbClient.fileSourceDao().insert(session,newDto);
+  }
+}

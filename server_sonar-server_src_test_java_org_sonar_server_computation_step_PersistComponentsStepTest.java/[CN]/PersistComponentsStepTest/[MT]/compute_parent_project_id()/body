@@ -1,9 +1,4 @@
 {
-  computeComponentsRefCache.addComponent(1,new ComputeComponentsRefCache.ComputeComponent("PROJECT_KEY","ABCD"));
-  computeComponentsRefCache.addComponent(2,new ComputeComponentsRefCache.ComputeComponent("MODULE_KEY","BCDE"));
-  computeComponentsRefCache.addComponent(3,new ComputeComponentsRefCache.ComputeComponent("SUB_MODULE_1_KEY","CDEF"));
-  computeComponentsRefCache.addComponent(4,new ComputeComponentsRefCache.ComputeComponent("SUB_MODULE_2_KEY","DEFG"));
-  computeComponentsRefCache.addComponent(5,new ComputeComponentsRefCache.ComputeComponent("SUB_MODULE_2_KEY:src/main/java/dir","EFGH"));
   File reportDir=temp.newFolder();
   BatchReportWriter writer=new BatchReportWriter(reportDir);
   writer.writeMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).build());
@@ -12,7 +7,8 @@
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(3).setType(Constants.ComponentType.MODULE).setKey("SUB_MODULE_1_KEY").setName("Sub Module 1").addChildRef(4).build());
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(4).setType(Constants.ComponentType.MODULE).setKey("SUB_MODULE_2_KEY").setName("Sub Module 2").addChildRef(5).build());
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(5).setType(Constants.ComponentType.DIRECTORY).setPath("src/main/java/dir").build());
-  sut.execute(new ComputationContext(new BatchReportReader(reportDir),PROJECT_KEY,projectSettings,dbClient,ComponentTreeBuilders.from(DumbComponent.DUMB_PROJECT),languageRepository));
+  DumbComponent root=new DumbComponent(Component.Type.PROJECT,1,"ABCD",PROJECT_KEY,new DumbComponent(Component.Type.MODULE,2,"BCDE","MODULE_KEY",new DumbComponent(Component.Type.MODULE,3,"CDEF","SUB_MODULE_1_KEY",new DumbComponent(Component.Type.MODULE,4,"DEFG","SUB_MODULE_2_KEY",new DumbComponent(Component.Type.DIRECTORY,5,"EFGH","SUB_MODULE_2_KEY:src/main/java/dir")))));
+  sut.execute(new ComputationContext(new BatchReportReader(reportDir),PROJECT_KEY,projectSettings,dbClient,ComponentTreeBuilders.from(root),languageRepository));
   assertThat(dbTester.countRowsOfTable("projects")).isEqualTo(5);
   ComponentDto project=dbClient.componentDao().selectNullableByKey(session,PROJECT_KEY);
   assertThat(project).isNotNull();

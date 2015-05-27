@@ -1,12 +1,12 @@
 {
   DbSession session=dbClient.openSession(true);
   try {
-    int rootComponentRef=computationContext.getReportMetadata().getRootComponentRef();
-    TestContext context=new TestContext(computationContext,session,dbComponentsRefCache);
-    recursivelyProcessComponent(context,rootComponentRef);
+    TestDepthTraversalTypeAwareVisitor visitor=new TestDepthTraversalTypeAwareVisitor(context,session,dbComponentsRefCache);
+    visitor.visit(context.getRoot());
     session.commit();
-    if (context.hasUnprocessedCoverageDetails) {
-      LOG.warn("Some coverage tests are not taken into account during analysis of project '{}'",computationContext.getProjectKey());
+    if (visitor.hasUnprocessedCoverageDetails) {
+      String projectKey=dbComponentsRefCache.getByRef(context.getReportMetadata().getRootComponentRef()).getKey();
+      LOG.warn("Some coverage tests are not taken into account during analysis of project '{}'",projectKey);
     }
   }
   finally {
