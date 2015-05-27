@@ -1,0 +1,14 @@
+{
+  userSession.checkLoggedIn().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    List<Integer> ids=loadIds(dbSession,request);
+    dbClient.metricDao().disable(dbSession,ids);
+    dbClient.customMeasureDao().deleteByMetricIds(dbSession,ids);
+    dbSession.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(dbSession);
+  }
+  response.noContent();
+}

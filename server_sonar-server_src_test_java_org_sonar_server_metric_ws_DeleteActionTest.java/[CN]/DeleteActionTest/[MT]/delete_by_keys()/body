@@ -1,0 +1,9 @@
+{
+  insertCustomEnabledMetrics(1,2,3);
+  dbSession.commit();
+  newRequest().setParam("keys","key-1, key-3").execute();
+  dbSession.commit();
+  List<MetricDto> disabledMetrics=metricDao.selectByKeys(dbSession,Arrays.asList("key-1","key-3"));
+  assertThat(disabledMetrics).extracting("enabled").containsOnly(false);
+  assertThat(metricDao.selectByKey(dbSession,"key-2").isEnabled()).isTrue();
+}
