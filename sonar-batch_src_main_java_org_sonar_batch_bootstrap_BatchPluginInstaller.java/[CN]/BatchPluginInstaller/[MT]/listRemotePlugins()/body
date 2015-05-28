@@ -1,7 +1,8 @@
 {
   try {
-    LOG.debug("Download index of plugins");
+    Profiler profiler=Profiler.create(LOG).startInfo("Load plugins index");
     String indexContent=server.request(PLUGINS_INDEX_URL);
+    profiler.stopInfo();
     String[] rows=StringUtils.split(indexContent,CharUtils.LF);
     List<RemotePlugin> result=Lists.newArrayList();
     for (    String row : rows) {
@@ -10,6 +11,6 @@
     return result;
   }
  catch (  Exception e) {
-    throw new IllegalStateException("Fail to download list of plugins: " + PLUGINS_INDEX_URL,e);
+    throw new IllegalStateException("Fail to load plugin index: " + PLUGINS_INDEX_URL,e);
   }
 }
