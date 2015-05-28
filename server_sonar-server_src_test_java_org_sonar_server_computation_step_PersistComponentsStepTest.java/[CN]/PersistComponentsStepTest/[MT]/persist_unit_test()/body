@@ -3,8 +3,8 @@
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).setName("Project").addChildRef(2).build());
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.DIRECTORY).setPath("src/test/java/dir").addChildRef(3).build());
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(3).setType(Constants.ComponentType.FILE).setPath("src/test/java/dir/FooTest.java").setIsTest(true).build());
-  DumbComponent root=new DumbComponent(Component.Type.PROJECT,1,"ABCD",PROJECT_KEY,new DumbComponent(Component.Type.DIRECTORY,2,"CDEF",PROJECT_KEY + ":src/test/java/dir",new DumbComponent(Component.Type.FILE,3,"DEFG",PROJECT_KEY + ":src/test/java/dir/FooTest.java")));
-  sut.execute(new ComputationContext(ComponentTreeBuilders.from(root)));
+  treeRootHolder.setRoot(new DumbComponent(Component.Type.PROJECT,1,"ABCD",PROJECT_KEY,new DumbComponent(Component.Type.DIRECTORY,2,"CDEF",PROJECT_KEY + ":src/test/java/dir",new DumbComponent(Component.Type.FILE,3,"DEFG",PROJECT_KEY + ":src/test/java/dir/FooTest.java"))));
+  sut.execute(mock(ComputationContext.class));
   ComponentDto file=dbClient.componentDao().selectNullableByKey(session,PROJECT_KEY + ":src/test/java/dir/FooTest.java");
   assertThat(file).isNotNull();
   assertThat(file.name()).isEqualTo("FooTest.java");

@@ -7,8 +7,8 @@
   reportReader.setMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).build());
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).setName("Project").setDescription("New project description").addChildRef(2).build());
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey("MODULE_KEY").setName("Module").setDescription("New module description").build());
-  DumbComponent root=new DumbComponent(Component.Type.PROJECT,1,"ABCD",PROJECT_KEY,new DumbComponent(Component.Type.MODULE,2,"BCDE","MODULE_KEY"));
-  sut.execute(new ComputationContext(ComponentTreeBuilders.from(root)));
+  treeRootHolder.setRoot(new DumbComponent(Component.Type.PROJECT,1,"ABCD",PROJECT_KEY,new DumbComponent(Component.Type.MODULE,2,"BCDE","MODULE_KEY")));
+  sut.execute(mock(ComputationContext.class));
   ComponentDto projectReloaded=dbClient.componentDao().selectNullableByKey(session,PROJECT_KEY);
   assertThat(projectReloaded.description()).isEqualTo("New project description");
   ComponentDto moduleReloaded=dbClient.componentDao().selectNullableByKey(session,"MODULE_KEY");

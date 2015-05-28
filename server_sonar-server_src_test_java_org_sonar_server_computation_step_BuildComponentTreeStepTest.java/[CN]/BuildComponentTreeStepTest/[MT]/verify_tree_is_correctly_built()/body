@@ -1,0 +1,22 @@
+{
+  reportReader.putComponent(component(ROOT_REF,PROJECT,MODULE_REF));
+  reportReader.putComponent(component(MODULE_REF,MODULE,DIR_REF_1,DIR_REF_2));
+  reportReader.putComponent(component(DIR_REF_1,DIRECTORY,FILE_1_REF,FILE_2_REF));
+  reportReader.putComponent(component(FILE_1_REF,FILE));
+  reportReader.putComponent(component(FILE_2_REF,FILE));
+  reportReader.putComponent(component(DIR_REF_2,DIRECTORY,FILE_3_REF));
+  reportReader.putComponent(component(FILE_3_REF,FILE));
+  underTest.execute(mock(ComputationContext.class));
+  Component root=treeRootHolder.getRoot();
+  assertThat(root).isNotNull();
+  verifyComponent(root,Component.Type.PROJECT,ROOT_REF,1);
+  Component module=root.getChildren().iterator().next();
+  verifyComponent(module,Component.Type.MODULE,MODULE_REF,2);
+  Component dir1=module.getChildren().get(0);
+  verifyComponent(dir1,Component.Type.DIRECTORY,DIR_REF_1,2);
+  verifyComponent(dir1.getChildren().get(0),Component.Type.FILE,FILE_1_REF,0);
+  verifyComponent(dir1.getChildren().get(1),Component.Type.FILE,FILE_2_REF,0);
+  Component dir2=module.getChildren().get(1);
+  verifyComponent(dir2,Component.Type.DIRECTORY,DIR_REF_2,1);
+  verifyComponent(dir2.getChildren().iterator().next(),Component.Type.FILE,FILE_3_REF,0);
+}

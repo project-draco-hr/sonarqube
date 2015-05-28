@@ -1,10 +1,9 @@
 {
   QualityProfile qp=qp(QP_NAME_1,LANGUAGE_KEY_1);
-  ComputationContext context=newNoChildRootContext();
   mockLanguageNotInRepository(LANGUAGE_KEY_1);
-  mockMeasures(context.getRoot(),null,arrayOf(qp));
-  underTest.execute(context);
-  verify(eventRepository).add(eq(context.getRoot()),eventArgumentCaptor.capture());
+  mockMeasures(treeRootHolder.getRoot(),null,arrayOf(qp));
+  underTest.execute(mock(ComputationContext.class));
+  verify(eventRepository).add(eq(treeRootHolder.getRoot()),eventArgumentCaptor.capture());
   verifyNoMoreInteractions(eventRepository);
   verifyEvent(eventArgumentCaptor.getValue(),"Use '" + qp.getQpName() + "' ("+ qp.getLanguageKey()+ ")",null);
 }

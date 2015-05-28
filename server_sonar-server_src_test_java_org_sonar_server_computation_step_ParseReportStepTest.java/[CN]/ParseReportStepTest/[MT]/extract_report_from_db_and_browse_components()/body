@@ -1,8 +1,8 @@
 {
   DumbComponent root=new DumbComponent(Component.Type.PROJECT,1,"PROJECT_UUID",PROJECT_KEY,new DumbComponent(Component.Type.FILE,2,"FILE1_UUID","PROJECT_KEY:file1"),new DumbComponent(Component.Type.FILE,3,"FILE2_UUID","PROJECT_KEY:file2"));
   generateReport();
-  ComputationContext context=new ComputationContext(ComponentTreeBuilders.from(root));
-  sut.execute(context);
+  treeRootHolder.setRoot(root);
+  sut.execute(mock(ComputationContext.class));
   assertThat(reportReader.readMetadata().getRootComponentRef()).isEqualTo(1);
   assertThat(reportReader.readMetadata().getDeletedComponentsCount()).isEqualTo(1);
   verify(issueComputation).processComponentIssues(Collections.<BatchReport.Issue>emptyList(),"PROJECT_UUID",1,PROJECT_KEY,"PROJECT_UUID");

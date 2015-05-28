@@ -12,9 +12,9 @@
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey("MODULE_KEY").addChildRef(3).build());
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(3).setType(Constants.ComponentType.DIRECTORY).setPath("src/main/java/dir").addChildRef(4).build());
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(4).setType(Constants.ComponentType.FILE).setPath("src/main/java/dir/Foo.java").build());
-  ComputationContext context=new ComputationContext(ComponentTreeBuilders.from(reportReader));
-  sut.execute(context);
-  Map<Integer,Component> componentsByRef=getComponentsByRef(context.getRoot());
+  treeRootHolder.setRoot(ComponentTreeBuilders.from(reportReader).build());
+  sut.execute(mock(ComputationContext.class));
+  Map<Integer,Component> componentsByRef=getComponentsByRef(treeRootHolder.getRoot());
   assertThat(componentsByRef.get(1).getKey()).isEqualTo(PROJECT_KEY);
   assertThat(componentsByRef.get(1).getUuid()).isEqualTo("ABCD");
   assertThat(componentsByRef.get(2).getKey()).isEqualTo("MODULE_KEY");

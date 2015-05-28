@@ -1,11 +1,10 @@
 {
   QualityProfile qp1=qp(QP_NAME_1,LANGUAGE_KEY_1,parseDateTime("2011-04-25T01:05:13+0100"));
   QualityProfile qp2=qp(QP_NAME_1,LANGUAGE_KEY_1,parseDateTime("2011-04-25T01:05:17+0100"));
-  ComputationContext context=newNoChildRootContext();
-  mockMeasures(context.getRoot(),arrayOf(qp1),arrayOf(qp2));
+  mockMeasures(treeRootHolder.getRoot(),arrayOf(qp1),arrayOf(qp2));
   Language language=mockLanguageInRepository(LANGUAGE_KEY_1);
-  underTest.execute(context);
-  verify(eventRepository).add(eq(context.getRoot()),eventArgumentCaptor.capture());
+  underTest.execute(mock(ComputationContext.class));
+  verify(eventRepository).add(eq(treeRootHolder.getRoot()),eventArgumentCaptor.capture());
   verifyNoMoreInteractions(eventRepository);
   verifyEvent(eventArgumentCaptor.getValue(),"Changes in '" + qp2.getQpName() + "' ("+ language.getName()+ ")","from=" + UtcDateUtils.formatDateTime(parseDateTime("2011-04-25T01:05:14+0100")) + ";key="+ qp1.getQpKey()+ ";to="+ UtcDateUtils.formatDateTime(parseDateTime("2011-04-25T01:05:18+0100")));
 }

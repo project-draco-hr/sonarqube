@@ -1,5 +1,4 @@
 {
-  ComputationContext context=newNoChildRootContext();
   final Set<Event> events=new HashSet<>();
   doAnswer(new Answer(){
     @Override public Object answer(    InvocationOnMock invocationOnMock) throws Throwable {
@@ -7,9 +6,9 @@
       return null;
     }
   }
-).when(eventRepository).add(eq(context.getRoot()),any(Event.class));
-  mockMeasures(context.getRoot(),arrayOf(qp(QP_NAME_2,LANGUAGE_KEY_1),qp(QP_NAME_2,LANGUAGE_KEY_2),qp(QP_NAME_1,LANGUAGE_KEY_1,parseDateTime("2011-04-25T01:05:13+0100"))),arrayOf(qp(QP_NAME_1,LANGUAGE_KEY_1,parseDateTime("2011-04-25T01:05:17+0100")),qp(QP_NAME_2,LANGUAGE_KEY_2),qp(QP_NAME_2,LANGUAGE_KEY_3)));
+).when(eventRepository).add(eq(treeRootHolder.getRoot()),any(Event.class));
+  mockMeasures(treeRootHolder.getRoot(),arrayOf(qp(QP_NAME_2,LANGUAGE_KEY_1),qp(QP_NAME_2,LANGUAGE_KEY_2),qp(QP_NAME_1,LANGUAGE_KEY_1,parseDateTime("2011-04-25T01:05:13+0100"))),arrayOf(qp(QP_NAME_1,LANGUAGE_KEY_1,parseDateTime("2011-04-25T01:05:17+0100")),qp(QP_NAME_2,LANGUAGE_KEY_2),qp(QP_NAME_2,LANGUAGE_KEY_3)));
   mockNoLanguageInRepository();
-  underTest.execute(context);
+  underTest.execute(mock(ComputationContext.class));
   assertThat(events).extracting("name").containsOnly("Stop using '" + QP_NAME_2 + "' ("+ LANGUAGE_KEY_1+ ")","Use '" + QP_NAME_2 + "' ("+ LANGUAGE_KEY_3+ ")","Changes in '" + QP_NAME_1 + "' ("+ LANGUAGE_KEY_1+ ")");
 }

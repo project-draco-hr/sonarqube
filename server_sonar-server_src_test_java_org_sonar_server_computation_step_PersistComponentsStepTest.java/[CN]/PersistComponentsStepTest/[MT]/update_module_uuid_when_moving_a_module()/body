@@ -14,8 +14,8 @@
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(3).setType(Constants.ComponentType.MODULE).setKey("MODULE_B").setName("Module B").addChildRef(4).build());
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(4).setType(Constants.ComponentType.DIRECTORY).setPath("src/main/java/dir").addChildRef(5).build());
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(5).setType(Constants.ComponentType.FILE).setPath("src/main/java/dir/Foo.java").build());
-  DumbComponent root=new DumbComponent(Component.Type.PROJECT,1,"ABCD",PROJECT_KEY,new DumbComponent(Component.Type.MODULE,2,"EDCB","MODULE_A",new DumbComponent(Component.Type.MODULE,3,"BCDE","MODULE_B",new DumbComponent(Component.Type.DIRECTORY,4,"CDEF","MODULE_B:src/main/java/dir",new DumbComponent(Component.Type.FILE,5,"DEFG","MODULE_B:src/main/java/dir/Foo.java")))));
-  sut.execute(new ComputationContext(ComponentTreeBuilders.from(root)));
+  treeRootHolder.setRoot(new DumbComponent(Component.Type.PROJECT,1,"ABCD",PROJECT_KEY,new DumbComponent(Component.Type.MODULE,2,"EDCB","MODULE_A",new DumbComponent(Component.Type.MODULE,3,"BCDE","MODULE_B",new DumbComponent(Component.Type.DIRECTORY,4,"CDEF","MODULE_B:src/main/java/dir",new DumbComponent(Component.Type.FILE,5,"DEFG","MODULE_B:src/main/java/dir/Foo.java"))))));
+  sut.execute(mock(ComputationContext.class));
   assertThat(dbTester.countRowsOfTable("projects")).isEqualTo(5);
   ComponentDto moduleAreloaded=dbClient.componentDao().selectNullableByKey(session,"MODULE_A");
   assertThat(moduleAreloaded).isNotNull();
