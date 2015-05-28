@@ -6,8 +6,8 @@
   dbClient.permissionTemplateDao().addGroupPermission(permissionTemplateDto.getId(),null,UserRole.USER);
   dbSession.commit();
   dbComponentsRefCache.addComponent(1,new DbComponentsRefCache.DbComponent(projectDto.getId(),PROJECT_KEY,PROJECT_UUID));
-  Component project=new DumbComponent(Component.Type.PROJECT,1,PROJECT_KEY,PROJECT_UUID);
-  step.execute(new ComputationContext(ComponentTreeBuilders.from(project)));
+  treeRootHolder.setRoot(new DumbComponent(Component.Type.PROJECT,1,PROJECT_KEY,PROJECT_UUID));
+  step.execute();
   dbSession.commit();
   assertThat(dbClient.componentDao().selectByKey(dbSession,PROJECT_KEY).getAuthorizationUpdatedAt()).isNotNull();
   assertThat(dbClient.roleDao().selectGroupPermissions(dbSession,DefaultGroups.ANYONE,projectDto.getId())).containsOnly(UserRole.USER);
