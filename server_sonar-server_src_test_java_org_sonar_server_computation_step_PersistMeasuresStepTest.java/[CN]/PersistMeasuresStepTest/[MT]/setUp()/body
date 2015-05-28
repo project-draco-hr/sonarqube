@@ -1,16 +1,15 @@
 {
   dbTester.truncateTables();
   dbComponentsRefCache=new DbComponentsRefCache();
-  measureDao=new MeasureDao();
-  dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),measureDao,new ComponentDao(),new MetricDao(),new RuleDao(System2.INSTANCE));
+  dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),new MeasureDao(),new ComponentDao(),new MetricDao(),new RuleDao(System2.INSTANCE));
   session=dbClient.openSession(false);
   metric=new MetricDto().setKey(METRIC_KEY).setEnabled(true).setOptimizedBestValue(false).setHidden(false).setDeleteHistoricalData(false);
   dbClient.metricDao().insert(session,metric);
   rule=RuleTesting.newDto(RULE_KEY);
   dbClient.ruleDao().insert(session,rule);
   session.commit();
-  ruleCache=new RuleCache(new RuleCacheLoader(dbClient));
-  metricCache=new MetricCache(dbClient);
+  RuleCache ruleCache=new RuleCache(new RuleCacheLoader(dbClient));
+  MetricCache metricCache=new MetricCache(dbClient);
   session.commit();
   sut=new PersistMeasuresStep(dbClient,ruleCache,metricCache,dbComponentsRefCache,reportReader);
 }
