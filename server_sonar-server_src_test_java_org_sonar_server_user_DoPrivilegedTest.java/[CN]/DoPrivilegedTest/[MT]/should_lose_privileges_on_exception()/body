@@ -1,17 +1,19 @@
 {
-  try {
-    DoPrivileged.execute(new DoPrivileged.Task(threadLocalUserSession){
-      @Override protected void doPrivileged(){
-        UserSession userSession=threadLocalUserSession.get();
-        assertThat(userSession.isLoggedIn()).isTrue();
-        assertThat(userSession.hasGlobalPermission("any permission")).isTrue();
-        assertThat(userSession.hasProjectPermission("any permission","any project")).isTrue();
-        throw new RuntimeException("Test to lose privileges");
-      }
+  UserSessionCatcherTask catcher=new UserSessionCatcherTask(){
+    @Override protected void doPrivileged(){
+      super.doPrivileged();
+      throw new RuntimeException("Test to lose privileges");
     }
-);
+  }
+;
+  try {
+    DoPrivileged.execute(catcher);
+    fail("An exception should have been raised!");
   }
  catch (  Throwable ignored) {
-    assertThat(threadLocalUserSession.isLoggedIn()).isFalse();
+    assertThat(threadLocalUserSession.get()).isSameAs(session);
+    assertThat(catcher.userSession.isLoggedIn()).isFalse();
+    assertThat(catcher.userSession.hasGlobalPermission("any permission")).isTrue();
+    assertThat(catcher.userSession.hasProjectPermission("any permission","any project")).isTrue();
   }
 }

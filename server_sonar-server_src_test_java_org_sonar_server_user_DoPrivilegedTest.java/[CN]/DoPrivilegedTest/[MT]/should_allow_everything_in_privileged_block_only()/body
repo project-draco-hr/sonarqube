@@ -1,12 +1,8 @@
 {
-  DoPrivileged.execute(new DoPrivileged.Task(threadLocalUserSession){
-    @Override protected void doPrivileged(){
-      UserSession userSession=threadLocalUserSession.get();
-      assertThat(userSession.isLoggedIn()).isFalse();
-      assertThat(userSession.hasGlobalPermission("any permission")).isTrue();
-      assertThat(userSession.hasProjectPermission("any permission","any project")).isTrue();
-    }
-  }
-);
-  assertThat(threadLocalUserSession.isLoggedIn()).isFalse();
+  UserSessionCatcherTask catcher=new UserSessionCatcherTask();
+  DoPrivileged.execute(catcher);
+  assertThat(catcher.userSession.isLoggedIn()).isFalse();
+  assertThat(catcher.userSession.hasGlobalPermission("any permission")).isTrue();
+  assertThat(catcher.userSession.hasProjectPermission("any permission","any project")).isTrue();
+  assertThat(threadLocalUserSession.get()).isSameAs(session);
 }
