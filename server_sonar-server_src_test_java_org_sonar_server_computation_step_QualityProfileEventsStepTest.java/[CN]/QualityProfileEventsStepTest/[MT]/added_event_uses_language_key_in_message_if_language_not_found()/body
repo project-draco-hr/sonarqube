@@ -4,7 +4,7 @@
   mockLanguageNotInRepository(LANGUAGE_KEY_1);
   mockMeasures(context.getRoot(),null,arrayOf(qp));
   underTest.execute(context);
-  List<Event> events=Lists.newArrayList(context.getRoot().getEventRepository().getEvents());
-  assertThat(events).hasSize(1);
-  verifyEvent(events.get(0),"Use '" + qp.getQpName() + "' ("+ qp.getLanguageKey()+ ")",null);
+  verify(eventRepository).add(eq(context.getRoot()),eventArgumentCaptor.capture());
+  verifyNoMoreInteractions(eventRepository);
+  verifyEvent(eventArgumentCaptor.getValue(),"Use '" + qp.getQpName() + "' ("+ qp.getLanguageKey()+ ")",null);
 }

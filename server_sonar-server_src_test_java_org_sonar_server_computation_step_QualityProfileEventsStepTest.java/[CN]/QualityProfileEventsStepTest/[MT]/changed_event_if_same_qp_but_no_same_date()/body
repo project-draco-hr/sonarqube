@@ -5,7 +5,7 @@
   mockMeasures(context.getRoot(),arrayOf(qp1),arrayOf(qp2));
   Language language=mockLanguageInRepository(LANGUAGE_KEY_1);
   underTest.execute(context);
-  List<Event> events=Lists.newArrayList(context.getRoot().getEventRepository().getEvents());
-  assertThat(events).hasSize(1);
-  verifyEvent(events.get(0),"Changes in '" + qp2.getQpName() + "' ("+ language.getName()+ ")","from=" + UtcDateUtils.formatDateTime(parseDateTime("2011-04-25T01:05:14+0100")) + ";key="+ qp1.getQpKey()+ ";to="+ UtcDateUtils.formatDateTime(parseDateTime("2011-04-25T01:05:18+0100")));
+  verify(eventRepository).add(eq(context.getRoot()),eventArgumentCaptor.capture());
+  verifyNoMoreInteractions(eventRepository);
+  verifyEvent(eventArgumentCaptor.getValue(),"Changes in '" + qp2.getQpName() + "' ("+ language.getName()+ ")","from=" + UtcDateUtils.formatDateTime(parseDateTime("2011-04-25T01:05:14+0100")) + ";key="+ qp1.getQpKey()+ ";to="+ UtcDateUtils.formatDateTime(parseDateTime("2011-04-25T01:05:18+0100")));
 }
