@@ -1,12 +1,9 @@
 {
-  InputSupplier<InputStream> inputSupplier=doRequest(pathStartingWithSlash,requestMethod,timeoutMillis);
+  final byte[] buf=load(pathStartingWithSlash,requestMethod,wrapHttpException,timeoutMillis);
   try {
-    return IOUtils.toString(inputSupplier.getInput(),"UTF-8");
+    return new String(buf,"UTF-8");
   }
- catch (  HttpDownloader.HttpException e) {
-    throw wrapHttpException ? handleHttpException(e) : e;
-  }
-catch (  IOException e) {
+ catch (  UnsupportedEncodingException e) {
     throw new IllegalStateException(String.format("Unable to request: %s",pathStartingWithSlash),e);
   }
 }

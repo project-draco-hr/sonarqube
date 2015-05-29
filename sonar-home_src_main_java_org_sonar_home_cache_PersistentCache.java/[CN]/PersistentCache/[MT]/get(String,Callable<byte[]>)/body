@@ -1,0 +1,25 @@
+{
+  String key=getKey(obj);
+  log.debug("cache: " + obj + " -> "+ key);
+  try (FileLock l=lock()){
+    if (!forceUpdate) {
+      byte[] cached=getCache(key);
+      if (cached != null) {
+        log.debug("cache hit for " + obj);
+        return cached;
+      }
+      log.debug("cache miss for " + obj);
+    }
+ else {
+      log.debug("cache force update for " + obj);
+    }
+    if (valueLoader != null) {
+      byte[] value=valueLoader.call();
+      if (value != null) {
+        putCache(key,value);
+      }
+      return value;
+    }
+  }
+   return null;
+}
