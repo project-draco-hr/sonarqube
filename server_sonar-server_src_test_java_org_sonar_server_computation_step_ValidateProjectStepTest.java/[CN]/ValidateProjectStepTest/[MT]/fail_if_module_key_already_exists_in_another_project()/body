@@ -1,0 +1,13 @@
+{
+  String anotherProjectKey="ANOTHER_PROJECT_KEY";
+  thrown.expect(IllegalArgumentException.class);
+  thrown.expectMessage("Validation of project failed:\n" + "  o Module \"" + MODULE_KEY + "\" is already part of project \""+ anotherProjectKey+ "\"");
+  ComponentDto project=ComponentTesting.newProjectDto("ABCD").setKey(PROJECT_KEY);
+  ComponentDto anotherProject=ComponentTesting.newProjectDto().setKey(anotherProjectKey);
+  dbClient.componentDao().insert(dbSession,project,anotherProject);
+  ComponentDto module=ComponentTesting.newModuleDto("BCDE",anotherProject).setKey(MODULE_KEY);
+  dbClient.componentDao().insert(dbSession,module);
+  dbSession.commit();
+  DumbComponent root=new DumbComponent(Component.Type.PROJECT,1,"ABCD",PROJECT_KEY,new DumbComponent(Component.Type.MODULE,2,"BCDE",MODULE_KEY));
+  sut.execute(new ComputationContext(createBasicBatchReportReader(),null,null,null,ComponentTreeBuilders.from(root),null));
+}
