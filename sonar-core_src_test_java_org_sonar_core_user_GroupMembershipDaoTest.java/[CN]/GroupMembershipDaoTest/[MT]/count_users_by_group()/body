@@ -1,11 +1,5 @@
 {
   dbTester.prepareDbUnit(getClass(),"shared_plus_empty_group.xml");
-  DbSession session=dbTester.myBatis().openSession(false);
-  try {
-    assertThat(dao.countUsersByGroups(session,Arrays.asList(100L,101L,102L,103L))).containsOnly(entry("sonar-users",2),entry("sonar-reviewers",1),entry("sonar-administrators",1),entry("sonar-nobody",0));
-    assertThat(dao.countUsersByGroups(session,Arrays.asList(100L,103L))).containsOnly(entry("sonar-administrators",1),entry("sonar-nobody",0));
-  }
-  finally {
-    session.close();
-  }
+  assertThat(dao.countUsersByGroups(dbSession,Arrays.asList(100L,101L,102L,103L))).containsOnly(entry("sonar-users",2),entry("sonar-reviewers",1),entry("sonar-administrators",1),entry("sonar-nobody",0));
+  assertThat(dao.countUsersByGroups(dbSession,Arrays.asList(100L,103L))).containsOnly(entry("sonar-administrators",1),entry("sonar-nobody",0));
 }
