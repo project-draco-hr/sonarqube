@@ -1,0 +1,20 @@
+{
+  DbSession session=dbClient.openSession(false);
+  try {
+    List<ComponentDto> modules=dbClient.componentDao().selectModulesFromProjectKey(session,treeRootHolder.getRoot().getKey());
+    Map<String,ComponentDto> modulesByKey=Maps.uniqueIndex(modules,new Function<ComponentDto,String>(){
+      @Override public String apply(      @Nonnull ComponentDto input){
+        return input.key();
+      }
+    }
+);
+    ValidateProjectsVisitor visitor=new ValidateProjectsVisitor(session,dbClient.componentDao(),settings.getBoolean(CoreProperties.CORE_PREVENT_AUTOMATIC_PROJECT_CREATION),modulesByKey);
+    visitor.visit(treeRootHolder.getRoot());
+    if (!visitor.validationMessages.isEmpty()) {
+      throw new IllegalArgumentException("Validation of project failed:\n  o " + MESSAGES_JOINER.join(visitor.validationMessages));
+    }
+  }
+  finally {
+    session.close();
+  }
+}

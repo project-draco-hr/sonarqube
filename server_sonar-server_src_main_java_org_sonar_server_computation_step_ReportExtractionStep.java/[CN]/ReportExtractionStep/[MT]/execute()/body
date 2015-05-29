@@ -1,0 +1,15 @@
+{
+  File dir=tempFolder.newDir();
+  try {
+    Profiler profiler=Profiler.createIfDebug(LOG).start();
+    ZipUtils.unzip(item.zipFile,dir);
+    if (profiler.isDebugEnabled()) {
+      String message=String.format("Report extracted | size=%s | project=%s",FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(dir)),item.dto.getProjectKey());
+      profiler.stopDebug(message);
+    }
+    reportDirectoryHolder.setDirectory(dir);
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException(String.format("Fail to unzip %s into %s",item.zipFile,dir),e);
+  }
+}

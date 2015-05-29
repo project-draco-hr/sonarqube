@@ -1,0 +1,13 @@
+{
+  File zip=tempFolder.newFile();
+  FileUtils.write(zip,"not a file");
+  ReportExtractionStep underTest=new ReportExtractionStep(new ReportQueue.Item(dto,zip),tempFolder,reportDirectoryHolder);
+  try {
+    underTest.execute();
+    fail();
+  }
+ catch (  IllegalStateException e) {
+    assertThat(e.getMessage()).startsWith("Fail to unzip " + zip.getAbsolutePath() + " into ");
+  }
+  verifyNoMoreInteractions(reportDirectoryHolder);
+}

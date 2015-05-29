@@ -1,0 +1,17 @@
+{
+  new ReportExtractionStep(new ReportQueue.Item(dto,demoZipFile()),tempFolder,reportDirectoryHolder).execute();
+  verify(reportDirectoryHolder).setDirectory(fileCaptor.capture());
+  verifyNoMoreInteractions(reportDirectoryHolder);
+  File createDir=fileCaptor.getValue();
+  assertThat(createDir.exists()).isTrue();
+  assertThat(createDir.isDirectory()).isTrue();
+  verifyFile(createDir,"1.txt","1\n");
+  verifyFile(createDir,"2.txt","2\n");
+  File subDir1=verifyDir(createDir,"subdir1");
+  verifyFile(subDir1,"3.txt","3\n");
+  verifyFile(subDir1,"4.txt","4\n");
+  File subDir2=verifyDir(createDir,"subdir2");
+  verifyFile(subDir2,"5.txt","5\n");
+  File subdir3=verifyDir(subDir2,"subdir3");
+  verifyFile(subdir3,"6.txt","6\n");
+}
