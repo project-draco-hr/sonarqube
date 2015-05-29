@@ -1,21 +1,27 @@
 {
-  Map<String,ClassloaderDef> classloadersByBasePlugin=new HashMap<>();
+  Map<String,PluginClassloaderDef> classloadersByBasePlugin=new HashMap<>();
   for (  PluginInfo info : infoByKeys.values()) {
     String baseKey=basePluginKey(info,infoByKeys);
-    ClassloaderDef def=classloadersByBasePlugin.get(baseKey);
+    PluginClassloaderDef def=classloadersByBasePlugin.get(baseKey);
     if (def == null) {
-      def=new ClassloaderDef(baseKey);
+      def=new PluginClassloaderDef(baseKey);
       classloadersByBasePlugin.put(baseKey,def);
     }
-    ExplodedPlugin explodedPlugin=exploder.explode(info);
+    ExplodedPlugin explodedPlugin=jarExploder.explode(info);
     def.addFiles(asList(explodedPlugin.getMain()));
     def.addFiles(explodedPlugin.getLibs());
     def.addMainClass(info.getKey(),info.getMainClass());
     for (    String defaultSharedResource : DEFAULT_SHARED_RESOURCES) {
-      def.getMask().addInclusion(String.format("%s/%s/api/",defaultSharedResource,info.getKey()));
+      def.getExportMask().addInclusion(String.format("%s/%s/api/",defaultSharedResource,info.getKey()));
     }
     if (Strings.isNullOrEmpty(info.getBasePlugin())) {
       def.setSelfFirstStrategy(info.isUseChildFirstClassLoader());
+      Version minSqVersion=info.getMinimalSqVersion();
+      boolean compatibilityMode=(minSqVersion != null && minSqVersion.compareToIgnoreQualifier(COMPATIBILITY_MODE_MAX_VERSION) < 0);
+      def.setCompatibilityMode(compatibilityMode);
+      if (compatibilityMode) {
+        Loggers.get(getClass()).info("API compatibility mode is enabled on plugin {} [{}] " + "(built with API lower than {})",info.getName(),info.getKey(),COMPATIBILITY_MODE_MAX_VERSION);
+      }
     }
   }
   return classloadersByBasePlugin.values();

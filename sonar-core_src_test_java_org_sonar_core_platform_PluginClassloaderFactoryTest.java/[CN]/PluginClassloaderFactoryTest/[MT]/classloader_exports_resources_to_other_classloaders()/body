@@ -1,0 +1,12 @@
+{
+  PluginClassloaderDef baseDef=basePluginDef();
+  PluginClassloaderDef dependentDef=dependentPluginDef();
+  Map<PluginClassloaderDef,ClassLoader> map=factory.create(asList(baseDef,dependentDef));
+  ClassLoader baseClassloader=map.get(baseDef);
+  ClassLoader dependentClassloader=map.get(dependentDef);
+  assertThat(canLoadClass(dependentClassloader,"org.sonar.plugins.base.api.BaseApi")).isTrue();
+  assertThat(canLoadClass(dependentClassloader,BASE_PLUGIN_CLASSNAME)).isFalse();
+  assertThat(canLoadClass(dependentClassloader,DEPENDENT_PLUGIN_CLASSNAME)).isTrue();
+  assertThat(canLoadClass(baseClassloader,DEPENDENT_PLUGIN_CLASSNAME)).isFalse();
+  assertThat(canLoadClass(baseClassloader,BASE_PLUGIN_CLASSNAME)).isTrue();
+}

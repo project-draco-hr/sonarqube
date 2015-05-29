@@ -1,0 +1,21 @@
+{
+  final File jarFile=getFile("sonar-checkstyle-plugin-2.8.jar");
+  final File toDir=temp.newFolder();
+  PluginInfo pluginInfo=new PluginInfo("checkstyle").setJarFile(jarFile);
+  PluginJarExploder exploder=new PluginJarExploder(){
+    @Override public ExplodedPlugin explode(    PluginInfo info){
+      try {
+        ZipUtils.unzip(jarFile,toDir,newLibFilter());
+        return explodeFromUnzippedDir(info.getKey(),info.getNonNullJarFile(),toDir);
+      }
+ catch (      Exception e) {
+        throw new IllegalStateException(e);
+      }
+    }
+  }
+;
+  ExplodedPlugin exploded=exploder.explode(pluginInfo);
+  assertThat(exploded.getKey()).isEqualTo("checkstyle");
+  assertThat(exploded.getLibs()).extracting("name").containsOnly("antlr-2.7.6.jar","checkstyle-5.1.jar","commons-cli-1.0.jar");
+  assertThat(exploded.getMain()).isSameAs(jarFile);
+}

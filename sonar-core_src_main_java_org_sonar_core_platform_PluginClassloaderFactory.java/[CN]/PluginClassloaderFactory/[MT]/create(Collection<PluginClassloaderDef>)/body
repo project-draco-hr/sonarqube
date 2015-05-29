@@ -1,0 +1,18 @@
+{
+  ClassloaderBuilder builder=new ClassloaderBuilder();
+  builder.newClassloader(API_CLASSLOADER_KEY,baseClassloader());
+  builder.setMask(API_CLASSLOADER_KEY,apiMask());
+  for (  PluginClassloaderDef def : defs) {
+    builder.newClassloader(def.getBasePluginKey());
+    builder.setParent(def.getBasePluginKey(),API_CLASSLOADER_KEY,new Mask());
+    builder.setLoadingOrder(def.getBasePluginKey(),def.isSelfFirstStrategy() ? SELF_FIRST : PARENT_FIRST);
+    for (    File jar : def.getFiles()) {
+      builder.addURL(def.getBasePluginKey(),fileToUrl(jar));
+    }
+    if (def.isCompatibilityMode()) {
+      builder.addURL(def.getBasePluginKey(),extractCompatibilityModeJar());
+    }
+    exportResources(def,builder,defs);
+  }
+  return build(defs,builder);
+}

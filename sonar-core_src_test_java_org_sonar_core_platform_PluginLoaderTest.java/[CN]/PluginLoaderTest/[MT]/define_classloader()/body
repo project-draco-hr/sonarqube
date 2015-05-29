@@ -1,12 +1,12 @@
 {
   File jarFile=temp.newFile();
-  PluginInfo info=new PluginInfo("foo").setJarFile(jarFile).setMainClass("org.foo.FooPlugin");
-  PluginLoader loader=new PluginLoader(new FakePluginExploder());
-  Collection<ClassloaderDef> defs=loader.defineClassloaders(ImmutableMap.of("foo",info));
+  PluginInfo info=new PluginInfo("foo").setJarFile(jarFile).setMainClass("org.foo.FooPlugin").setMinimalSqVersion(Version.create("5.2"));
+  Collection<PluginClassloaderDef> defs=loader.defineClassloaders(ImmutableMap.of("foo",info));
   assertThat(defs).hasSize(1);
-  ClassloaderDef def=defs.iterator().next();
+  PluginClassloaderDef def=defs.iterator().next();
   assertThat(def.getBasePluginKey()).isEqualTo("foo");
   assertThat(def.isSelfFirstStrategy()).isFalse();
   assertThat(def.getFiles()).containsOnly(jarFile);
   assertThat(def.getMainClassesByPluginKey()).containsOnly(MapEntry.entry("foo","org.foo.FooPlugin"));
+  assertThat(def.isCompatibilityMode()).isFalse();
 }
