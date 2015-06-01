@@ -1,0 +1,22 @@
+{
+  userSession.checkLoggedIn().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+  String key=request.mandatoryParam(PARAM_KEY);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    MetricDto metricTemplate=newMetricTemplate(request);
+    MetricDto metricInDb=dbClient.metricDao().selectNullableByKey(dbSession,key);
+    checkMetricInDbAndTemplate(metricInDb,metricTemplate);
+    if (metricInDb == null) {
+      metricInDb=insertNewMetric(dbSession,metricTemplate);
+    }
+ else {
+      updateMetric(dbSession,metricInDb,metricTemplate);
+    }
+    JsonWriter json=response.newJsonWriter();
+    writeMetric(json,metricInDb);
+    json.close();
+  }
+  finally {
+    MyBatis.closeQuietly(dbSession);
+  }
+}

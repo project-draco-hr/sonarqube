@@ -1,0 +1,14 @@
+{
+  MetricDto metricInDb=MetricTesting.newMetricDto().setKey(DEFAULT_KEY).setValueType(DEFAULT_TYPE).setUserManaged(true).setEnabled(false);
+  dbClient.metricDao().insert(dbSession,metricInDb);
+  dbSession.commit();
+  WsTester.Result result=newRequest().setParam(PARAM_KEY,DEFAULT_KEY).setParam(PARAM_NAME,DEFAULT_NAME).setParam(PARAM_TYPE,DEFAULT_TYPE).setParam(PARAM_DESCRIPTION,DEFAULT_DESCRIPTION).setParam(PARAM_DOMAIN,DEFAULT_DOMAIN).execute();
+  result.assertJson(getClass(),"metric.json");
+  result.outputAsString().matches("\"id\"\\s*:\\s*\"" + metricInDb.getId() + "\"");
+  MetricDto metricAfterWs=dbClient.metricDao().selectNullableByKey(dbSession,DEFAULT_KEY);
+  assertThat(metricAfterWs.getId()).isEqualTo(metricInDb.getId());
+  assertThat(metricAfterWs.getDomain()).isEqualTo(DEFAULT_DOMAIN);
+  assertThat(metricAfterWs.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
+  assertThat(metricAfterWs.getValueType()).isEqualTo(DEFAULT_TYPE);
+  assertThat(metricAfterWs.getShortName()).isEqualTo(DEFAULT_NAME);
+}
