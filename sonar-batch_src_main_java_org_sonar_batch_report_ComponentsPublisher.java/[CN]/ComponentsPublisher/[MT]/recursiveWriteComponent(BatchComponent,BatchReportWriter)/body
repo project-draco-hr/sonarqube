@@ -1,18 +1,19 @@
 {
-  Resource r=batchResource.resource();
+  Resource r=batchComponent.resource();
   BatchReport.Component.Builder builder=BatchReport.Component.newBuilder();
-  builder.setRef(batchResource.batchId());
+  builder.setRef(batchComponent.batchId());
   builder.setType(getType(r));
-  if (ResourceUtils.isProject(r)) {
-    builder.setKey(r.getKey());
+  if (batchComponent.isProjectOrModule()) {
+    ProjectDefinition def=reactor.getProjectDefinition(batchComponent.key());
+    builder.setKey(def.getKey());
   }
-  Integer sid=batchResource.snapshotId();
+  Integer sid=batchComponent.snapshotId();
   if (sid != null) {
     builder.setSnapshotId(sid);
   }
-  if (batchResource.isFile()) {
+  if (batchComponent.isFile()) {
     builder.setIsTest(ResourceUtils.isUnitTestFile(r));
-    builder.setLines(((InputFile)batchResource.inputPath()).lines());
+    builder.setLines(((InputFile)batchComponent.inputPath()).lines());
   }
   String name=getName(r);
   if (name != null) {
@@ -30,14 +31,14 @@
   if (lang != null) {
     builder.setLanguage(lang);
   }
-  for (  BatchComponent child : batchResource.children()) {
+  for (  BatchComponent child : batchComponent.children()) {
     builder.addChildRef(child.batchId());
   }
-  writeLinks(r,builder);
-  writeVersion(r,builder);
-  writeEvents(batchResource,builder);
+  writeLinks(batchComponent,builder);
+  writeVersion(batchComponent,builder);
+  writeEvents(batchComponent,builder);
   writer.writeComponent(builder.build());
-  for (  BatchComponent child : batchResource.children()) {
+  for (  BatchComponent child : batchComponent.children()) {
     recursiveWriteComponent(child,writer);
   }
 }

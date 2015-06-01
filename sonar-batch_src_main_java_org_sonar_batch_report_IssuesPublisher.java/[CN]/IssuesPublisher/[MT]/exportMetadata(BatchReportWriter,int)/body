@@ -1,6 +1,11 @@
 {
-  BatchComponent rootProject=resourceCache.get(reactor.getRoot().getKeyWithBranch());
-  BatchReport.Metadata.Builder builder=BatchReport.Metadata.newBuilder().setAnalysisDate(((Project)rootProject.resource()).getAnalysisDate().getTime()).setProjectKey(((Project)rootProject.resource()).key()).setRootComponentRef(rootProject.batchId()).setDeletedComponentsCount(count);
+  ProjectDefinition root=reactor.getRoot();
+  BatchComponent rootProject=componentCache.getRoot();
+  BatchReport.Metadata.Builder builder=BatchReport.Metadata.newBuilder().setAnalysisDate(((Project)rootProject.resource()).getAnalysisDate().getTime()).setProjectKey(root.getKey()).setRootComponentRef(rootProject.batchId()).setDeletedComponentsCount(count);
+  String branch=root.properties().get(CoreProperties.PROJECT_BRANCH_PROPERTY);
+  if (branch != null) {
+    builder.setBranch(branch);
+  }
   Integer sid=rootProject.snapshotId();
   if (sid != null) {
     builder.setSnapshotId(sid);

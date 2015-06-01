@@ -1,4 +1,6 @@
 {
+  ProjectDefinition rootDef=ProjectDefinition.create().setKey("foo");
+  rootDef.properties().put(CoreProperties.PROJECT_VERSION_PROPERTY,"1.0");
   Project root=new Project("foo").setName("Root project").setDescription("Root description").setAnalysisDate(DateUtils.parseDate(("2012-12-12")));
   root.setId(1).setUuid("PROJECT_UUID");
   resourceCache.add(root,null).setSnapshot(new Snapshot().setId(11));
@@ -6,7 +8,7 @@
   module1.setParent(root);
   module1.setId(2).setUuid("MODULE_UUID");
   resourceCache.add(module1,root).setSnapshot(new Snapshot().setId(12));
-  reactor.getRoot().addSubProject(ProjectDefinition.create().setKey("module1"));
+  rootDef.addSubProject(ProjectDefinition.create().setKey("module1"));
   Directory dir=Directory.create("src");
   dir.setEffectiveKey("module1:src");
   dir.setId(3).setUuid("DIR_UUID");
@@ -23,6 +25,8 @@
   testFile.setEffectiveKey("module1:test/FooTest.java");
   testFile.setId(6).setUuid("TEST_FILE_UUID");
   resourceCache.add(testFile,dir).setSnapshot(new Snapshot().setId(16)).setInputPath(new DefaultInputFile("module1","test/FooTest.java").setLines(4));
+  ImmutableProjectReactor reactor=new ImmutableProjectReactor(rootDef);
+  ComponentsPublisher publisher=new ComponentsPublisher(reactor,resourceCache,eventCache);
   File outputDir=temp.newFolder();
   BatchReportWriter writer=new BatchReportWriter(outputDir);
   publisher.publish(writer);
