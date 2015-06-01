@@ -1,0 +1,12 @@
+{
+  thrown.expect(IllegalArgumentException.class);
+  thrown.expectMessage("Validation of project failed:\n" + "  o The project \"" + MODULE_KEY + "\" is already defined in SonarQube but not as a module of project \""+ PROJECT_KEY+ "\". "+ "If you really want to stop directly analysing project \""+ MODULE_KEY+ "\", please first delete it from SonarQube and then relaunch the analysis of project \""+ PROJECT_KEY+ "\".");
+  writer.writeMetadata(BatchReport.Metadata.newBuilder().build());
+  writer.writeComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).addChildRef(2).build());
+  writer.writeComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey(MODULE_KEY).build());
+  ComponentDto project=ComponentTesting.newProjectDto("ABCD").setKey(MODULE_KEY);
+  dbClient.componentDao().insert(dbSession,project);
+  dbSession.commit();
+  DumbComponent root=new DumbComponent(Component.Type.PROJECT,1,"ABCD",PROJECT_KEY,new DumbComponent(Component.Type.MODULE,2,"BCDE",MODULE_KEY));
+  sut.execute(new ComputationContext(new BatchReportReader(reportDir),null,null,null,ComponentTreeBuilders.from(root),null));
+}

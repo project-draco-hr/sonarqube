@@ -1,0 +1,8 @@
+{
+  writer.writeMetadata(BatchReport.Metadata.newBuilder().build());
+  writer.writeComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).build());
+  settings.appendProperty(CoreProperties.CORE_PREVENT_AUTOMATIC_PROJECT_CREATION,"true");
+  dbClient.componentDao().insert(dbSession,ComponentTesting.newProjectDto("ABCD").setKey(PROJECT_KEY));
+  dbSession.commit();
+  sut.execute(new ComputationContext(new BatchReportReader(reportDir),null,null,null,ComponentTreeBuilders.from(new DumbComponent(Component.Type.PROJECT,1,"ABCD",PROJECT_KEY)),null));
+}
