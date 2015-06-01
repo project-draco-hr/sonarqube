@@ -1,0 +1,12 @@
+{
+  configure();
+  channel.sendTestEmail("user@nowhere","Test Message from SonarQube","This is a test message from SonarQube.");
+  List<WiserMessage> messages=server.getMessages();
+  assertThat(messages).hasSize(1);
+  MimeMessage email=messages.get(0).getMimeMessage();
+  Assertions.assertThat(email.getHeader("Content-Type",null)).isEqualTo("text/plain; charset=UTF-8");
+  Assertions.assertThat(email.getHeader("From",",")).isEqualTo("SonarQube <server@nowhere>");
+  Assertions.assertThat(email.getHeader("To",null)).isEqualTo("<user@nowhere>");
+  Assertions.assertThat(email.getHeader("Subject",null)).isEqualTo("[SONARQUBE] Test Message from SonarQube");
+  assertThat((String)email.getContent()).startsWith("This is a test message from SonarQube.");
+}

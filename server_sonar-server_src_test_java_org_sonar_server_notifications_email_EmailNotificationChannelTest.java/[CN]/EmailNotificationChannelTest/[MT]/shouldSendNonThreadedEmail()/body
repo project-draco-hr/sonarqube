@@ -1,0 +1,17 @@
+{
+  configure();
+  EmailMessage emailMessage=new EmailMessage().setTo("user@nowhere").setSubject("Foo").setMessage("Bar");
+  channel.deliver(emailMessage);
+  List<WiserMessage> messages=server.getMessages();
+  assertThat(messages).hasSize(1);
+  MimeMessage email=messages.get(0).getMimeMessage();
+  Assertions.assertThat(email.getHeader("Content-Type",null)).isEqualTo("text/plain; charset=UTF-8");
+  Assertions.assertThat(email.getHeader("In-Reply-To",null)).isNull();
+  Assertions.assertThat(email.getHeader("References",null)).isNull();
+  Assertions.assertThat(email.getHeader("List-ID",null)).isEqualTo("SonarQube <sonar.nemo.sonarsource.org>");
+  Assertions.assertThat(email.getHeader("List-Archive",null)).isEqualTo("http://nemo.sonarsource.org");
+  Assertions.assertThat(email.getHeader("From",null)).isEqualTo("SonarQube <server@nowhere>");
+  Assertions.assertThat(email.getHeader("To",null)).isEqualTo("<user@nowhere>");
+  Assertions.assertThat(email.getHeader("Subject",null)).isEqualTo("[SONARQUBE] Foo");
+  assertThat((String)email.getContent()).startsWith("Bar");
+}
