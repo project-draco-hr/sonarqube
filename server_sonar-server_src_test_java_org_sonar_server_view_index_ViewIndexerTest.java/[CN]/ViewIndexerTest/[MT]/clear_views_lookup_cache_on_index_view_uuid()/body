@@ -1,0 +1,26 @@
+{
+  IssueIndex issueIndex=new IssueIndex(esTester.client(),System2.INSTANCE,userSessionRule);
+  IssueIndexer issueIndexer=(IssueIndexer)new IssueIndexer(dbClient,esTester.client()).setEnabled(true);
+  IssueAuthorizationIndexer issueAuthorizationIndexer=(IssueAuthorizationIndexer)new IssueAuthorizationIndexer(dbClient,esTester.client()).setEnabled(true);
+  String viewUuid="ABCD";
+  RuleDto rule=RuleTesting.newXooX1();
+  dbClient.ruleDao().insert(dbSession,rule);
+  ComponentDto project1=addProjectWithIssue(rule);
+  issueIndexer.indexAll();
+  issueAuthorizationIndexer.index();
+  ComponentDto view=ComponentTesting.newView("ABCD");
+  ComponentDto techProject1=ComponentTesting.newProjectCopy("CDEF",project1,view);
+  dbClient.componentDao().insert(dbSession,view,techProject1);
+  dbSession.commit();
+  indexer.index(viewUuid);
+  SearchResult<IssueDoc> docs=issueIndex.search(IssueQuery.builder(userSessionRule).viewUuids(newArrayList(viewUuid)).build(),new SearchOptions());
+  assertThat(docs.getDocs()).hasSize(1);
+  ComponentDto project2=addProjectWithIssue(rule);
+  issueIndexer.indexAll();
+  issueAuthorizationIndexer.index();
+  ComponentDto techProject2=ComponentTesting.newProjectCopy("EFGH",project2,view);
+  dbClient.componentDao().insert(dbSession,techProject2);
+  dbSession.commit();
+  indexer.index(viewUuid);
+  assertThat(issueIndex.search(IssueQuery.builder(userSessionRule).viewUuids(newArrayList(viewUuid)).build(),new SearchOptions()).getDocs()).hasSize(2);
+}
