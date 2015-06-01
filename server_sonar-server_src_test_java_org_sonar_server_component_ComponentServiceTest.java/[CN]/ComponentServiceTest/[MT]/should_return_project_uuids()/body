@@ -1,0 +1,13 @@
+{
+  ComponentDto project=createProject("sample:root");
+  String moduleKey="sample:root:module";
+  ComponentDto module=ComponentTesting.newModuleDto(project).setKey(moduleKey);
+  dbClient.componentDao().insert(session,module);
+  String fileKey="sample:root:module:Foo.xoo";
+  ComponentDto file=ComponentTesting.newFileDto(module).setKey(fileKey);
+  dbClient.componentDao().insert(session,file);
+  session.commit();
+  assertThat(service.componentUuids(Arrays.asList(moduleKey,fileKey))).hasSize(2);
+  assertThat(service.componentUuids(null)).isEmpty();
+  assertThat(service.componentUuids(Arrays.<String>asList())).isEmpty();
+}
