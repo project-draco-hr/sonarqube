@@ -1,0 +1,17 @@
+{
+  Optional<MeasureDto> previousMeasure=measureRepository.findPrevious(project,CoreMetrics.ALERT_STATUS);
+  if (!previousMeasure.isPresent()) {
+    checkNewQualityGate(project,currentStatus,alertText);
+    return;
+  }
+  Optional<AlertStatus> previousQGStatus=parse(previousMeasure.get().getAlertStatus());
+  if (!previousQGStatus.isPresent()) {
+    LOGGER.warn("Previous alterStatus for project %s is not a supported value. Can not compute Quality Gate event");
+    checkNewQualityGate(project,currentStatus,alertText);
+    return;
+  }
+  if (previousQGStatus.get() != currentStatus) {
+    String alertName=String.format("%s (was %s)",currentStatus.getColorName(),previousQGStatus.get().getColorName());
+    createEvent(project,alertName,alertText);
+  }
+}

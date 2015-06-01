@@ -1,0 +1,14 @@
+{
+  when(measureRepository.findCurrent(PROJECT_COMPONENT,ALERT_STATUS)).thenReturn(createBatchReportMeasure(currentAlterStatus,ALERT_TEXT));
+  when(measureRepository.findPrevious(PROJECT_COMPONENT,ALERT_STATUS)).thenReturn(Optional.fromNullable(measureDto));
+  underTest.execute();
+  verify(measureRepository).findCurrent(PROJECT_COMPONENT,ALERT_STATUS);
+  verify(measureRepository).findPrevious(PROJECT_COMPONENT,ALERT_STATUS);
+  verify(eventRepository).add(eq(PROJECT_COMPONENT),eventArgumentCaptor.capture());
+  verifyNoMoreInteractions(measureRepository,eventRepository);
+  Event event=eventArgumentCaptor.getValue();
+  assertThat(event.getCategory()).isEqualTo(Event.Category.ALERT);
+  assertThat(event.getName()).isEqualTo(expectedEventName);
+  assertThat(event.getDescription()).isEqualTo(ALERT_TEXT);
+  assertThat(event.getData()).isNull();
+}
