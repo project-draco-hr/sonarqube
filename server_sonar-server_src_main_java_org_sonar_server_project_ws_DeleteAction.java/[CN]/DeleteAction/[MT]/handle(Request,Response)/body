@@ -1,0 +1,14 @@
+{
+  String uuid=request.param(PARAM_UUID);
+  String key=request.param(PARAM_KEY);
+  checkPermissions(uuid,key);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    ComponentDto project=searchProject(dbSession,uuid,key);
+    componentCleanerService.delete(dbSession,Arrays.asList(project));
+  }
+  finally {
+    MyBatis.closeQuietly(dbSession);
+  }
+  response.noContent();
+}

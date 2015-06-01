@@ -1,0 +1,12 @@
+{
+  long snapshotId1=insertNewProjectInDbAndReturnSnapshotId(1);
+  long snapshotId2=insertNewProjectInDbAndReturnSnapshotId(2);
+  newRequest().setParam(PARAM_UUID,"project-uuid-1").execute();
+  dbSession.commit();
+  assertThat(dbClient.componentDao().selectNullableByUuid(dbSession,"project-uuid-1")).isNull();
+  assertThat(dbClient.componentDao().selectByUuid(dbSession,"project-uuid-2")).isNotNull();
+  assertThat(dbClient.snapshotDao().getNullableByKey(dbSession,snapshotId1)).isNull();
+  assertThat(dbClient.snapshotDao().getNullableByKey(dbSession,snapshotId2)).isNotNull();
+  assertThat(dbClient.issueDao().selectNullableByKey(dbSession,"issue-key-1")).isNull();
+  assertThat(dbClient.issueDao().selectByKey(dbSession,"issue-key-2")).isNotNull();
+}
