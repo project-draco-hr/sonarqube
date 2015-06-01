@@ -1,0 +1,13 @@
+{
+  dbTester.truncateTables();
+  esTester.truncateIndices();
+  RoleDao roleDao=new RoleDao();
+  PermissionTemplateDao permissionTemplateDao=new PermissionTemplateDao(dbTester.myBatis(),System2.INSTANCE);
+  dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),new ComponentDao(),roleDao,permissionTemplateDao);
+  dbSession=dbClient.openSession(false);
+  settings=new Settings();
+  issueAuthorizationIndexer=new IssueAuthorizationIndexer(dbClient,esTester.client());
+  issueAuthorizationIndexer.setEnabled(true);
+  dbComponentsRefCache=new DbComponentsRefCache();
+  step=new ApplyPermissionsStep(dbClient,dbComponentsRefCache,issueAuthorizationIndexer,new PermissionFacade(roleDao,null,new ResourceDao(dbTester.myBatis(),System2.INSTANCE),permissionTemplateDao,settings));
+}

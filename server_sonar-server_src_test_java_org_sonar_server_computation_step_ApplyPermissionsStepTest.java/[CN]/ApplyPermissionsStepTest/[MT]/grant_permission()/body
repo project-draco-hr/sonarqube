@@ -1,0 +1,20 @@
+{
+  ComponentDto projectDto=ComponentTesting.newProjectDto(PROJECT_UUID).setKey(PROJECT_KEY);
+  dbClient.componentDao().insert(dbSession,projectDto);
+  PermissionTemplateDto permissionTemplateDto=dbClient.permissionTemplateDao().createPermissionTemplate("Default",null,null);
+  settings.setProperty("sonar.permission.template.default",permissionTemplateDto.getKee());
+  dbClient.permissionTemplateDao().addGroupPermission(permissionTemplateDto.getId(),null,UserRole.USER);
+  dbSession.commit();
+  dbComponentsRefCache.addComponent(1,new DbComponentsRefCache.DbComponent(projectDto.getId(),PROJECT_KEY,PROJECT_UUID));
+  Component project=new DumbComponent(Component.Type.PROJECT,1,PROJECT_KEY,PROJECT_UUID);
+  step.execute(new ComputationContext(createDumbBatchReportReader(),null,null,null,ComponentTreeBuilders.from(project),null));
+  dbSession.commit();
+  assertThat(dbClient.componentDao().selectByKey(dbSession,PROJECT_KEY).getAuthorizationUpdatedAt()).isNotNull();
+  assertThat(dbClient.roleDao().selectGroupPermissions(dbSession,DefaultGroups.ANYONE,projectDto.getId())).containsOnly(UserRole.USER);
+  List<SearchHit> issueAuthorizationHits=esTester.getDocuments(IssueIndexDefinition.INDEX,IssueIndexDefinition.TYPE_AUTHORIZATION);
+  assertThat(issueAuthorizationHits).hasSize(1);
+  Map<String,Object> issueAhutorization=issueAuthorizationHits.get(0).sourceAsMap();
+  assertThat(issueAhutorization.get("project")).isEqualTo(PROJECT_UUID);
+  assertThat((List<String>)issueAhutorization.get("groups")).containsOnly(DefaultGroups.ANYONE);
+  assertThat((List<String>)issueAhutorization.get("users")).isEmpty();
+}
