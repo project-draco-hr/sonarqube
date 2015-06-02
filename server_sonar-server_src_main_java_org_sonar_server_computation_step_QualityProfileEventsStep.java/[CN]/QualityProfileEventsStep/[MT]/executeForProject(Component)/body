@@ -3,12 +3,12 @@
   if (!previousMeasure.isPresent()) {
     return;
   }
-  Map<String,QualityProfile> previousProfiles=QPMeasureData.fromJson(previousMeasure.get().getData()).getProfilesByKey();
   Optional<BatchReport.Measure> currentMeasure=measureRepository.findCurrent(projectComponent,CoreMetrics.QUALITY_PROFILES);
   if (!currentMeasure.isPresent()) {
     throw new IllegalStateException("Missing measure " + CoreMetrics.QUALITY_PROFILES + " for component "+ projectComponent.getRef());
   }
   Map<String,QualityProfile> currentProfiles=QPMeasureData.fromJson(currentMeasure.get().getStringValue()).getProfilesByKey();
+  Map<String,QualityProfile> previousProfiles=parseJsonData(previousMeasure);
   detectNewOrUpdatedProfiles(projectComponent,previousProfiles,currentProfiles);
   detectNoMoreUsedProfiles(projectComponent,previousProfiles,currentProfiles);
 }
