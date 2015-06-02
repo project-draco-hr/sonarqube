@@ -1,18 +1,5 @@
 {
   requireNonNull(iterator);
-  checkArgument(!(iterator instanceof CloseableIterator),"This method does not support creating a CloseableIterator from a CloseableIterator");
-  return new CloseableIterator<T>(){
-    @Override public boolean hasNext(){
-      return iterator.hasNext();
-    }
-    @Override public T next(){
-      return iterator.next();
-    }
-    @Override protected T doNext(){
-      throw new UnsupportedOperationException("hasNext has been override, doNext is never called");
-    }
-    @Override protected void doClose() throws Exception {
-    }
-  }
-;
+  checkArgument(!(iterator instanceof AutoCloseable),"This method does not support creating a CloseableIterator from an Iterator which is Closeable");
+  return new RegularIteratorWrapper<>(iterator);
 }
