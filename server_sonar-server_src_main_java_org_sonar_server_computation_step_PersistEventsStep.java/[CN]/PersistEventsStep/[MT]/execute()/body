@@ -1,7 +1,22 @@
 {
-  DbSession session=dbClient.openSession(false);
+  final DbSession session=dbClient.openSession(false);
   try {
-    new EventVisitor(session,reportReader.readMetadata().getAnalysisDate()).visit(treeRootHolder.getRoot());
+    final long analysisDate=reportReader.readMetadata().getAnalysisDate();
+    new DepthTraversalTypeAwareVisitor(Component.Type.FILE,DepthTraversalTypeAwareVisitor.Order.PRE_ORDER){
+      @Override public void visitProject(      Component project){
+        processComponent(project,session,analysisDate);
+      }
+      @Override public void visitModule(      Component module){
+        processComponent(module,session,analysisDate);
+      }
+      @Override public void visitDirectory(      Component directory){
+        processComponent(directory,session,analysisDate);
+      }
+      @Override public void visitFile(      Component file){
+        processComponent(file,session,analysisDate);
+      }
+    }
+.visit(treeRootHolder.getRoot());
     session.commit();
   }
   finally {
