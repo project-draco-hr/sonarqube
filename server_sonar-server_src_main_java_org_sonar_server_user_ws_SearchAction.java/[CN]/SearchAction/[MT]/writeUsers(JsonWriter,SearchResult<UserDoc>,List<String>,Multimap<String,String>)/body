@@ -1,13 +1,8 @@
 {
   json.name("users").beginArray();
   for (  UserDoc user : result.getDocs()) {
-    json.beginObject();
-    writeIfNeeded(json,user.login(),FIELD_LOGIN,fields);
-    writeIfNeeded(json,user.name(),FIELD_NAME,fields);
-    writeIfNeeded(json,user.email(),FIELD_EMAIL,fields);
-    writeGroupsIfNeeded(json,groupsByLogin.get(user.login()),fields);
-    writeScmAccountsIfNeeded(json,fields,user);
-    json.endObject();
+    Collection<String> groups=groupsByLogin.get(user.login());
+    userWriter.write(json,user,groups,fields);
   }
   json.endArray();
 }

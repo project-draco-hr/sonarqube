@@ -1,3 +1,12 @@
 {
-  json.name("user").beginObject().prop("login",user.login()).prop("name",user.name()).prop("email",user.email()).prop("active",user.active()).name("scmAccounts").beginArray().values(user.scmAccounts()).endArray().endObject();
+  json.name("user");
+  Set<String> groups=Sets.newHashSet();
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    groups.addAll(dbClient.groupMembershipDao().selectGroupsByLogins(dbSession,Arrays.asList(user.login())).get(user.login()));
+  }
+  finally {
+    MyBatis.closeQuietly(dbSession);
+  }
+  userWriter.write(json,user,groups,UserJsonWriter.FIELDS);
 }
