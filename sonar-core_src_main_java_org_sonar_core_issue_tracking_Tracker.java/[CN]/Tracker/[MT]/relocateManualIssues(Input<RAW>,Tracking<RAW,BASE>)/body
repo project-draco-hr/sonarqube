@@ -1,0 +1,20 @@
+{
+  Iterable<BASE> manualIssues=from(tracking.getUnmatchedBases()).filter(IsManual.INSTANCE);
+  for (  BASE base : manualIssues) {
+    if (base.getLine() == null) {
+      tracking.associateManualIssueToLine(base,0);
+    }
+ else {
+      String lineHash=base.getLineHash();
+      if (!Strings.isNullOrEmpty(lineHash)) {
+        int[] rawLines=rawInput.getLineHashSequence().getLinesForHash(lineHash);
+        if (rawLines.length == 1) {
+          tracking.associateManualIssueToLine(base,rawLines[0]);
+        }
+ else         if (rawLines.length == 0 && base.getLine() <= rawInput.getLineHashSequence().length()) {
+          tracking.associateManualIssueToLine(base,base.getLine());
+        }
+      }
+    }
+  }
+}

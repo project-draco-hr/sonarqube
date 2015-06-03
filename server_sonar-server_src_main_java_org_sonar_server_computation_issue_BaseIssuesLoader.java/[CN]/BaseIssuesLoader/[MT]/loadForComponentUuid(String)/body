@@ -1,0 +1,19 @@
+{
+  DbSession session=dbClient.openSession(false);
+  final List<DefaultIssue> result=new ArrayList<>();
+  try {
+    Map<String,String> params=ImmutableMap.of("componentUuid",componentUuid);
+    session.select(IssueMapper.class.getName() + ".selectOpenByComponentUuid",params,new ResultHandler(){
+      @Override public void handleResult(      ResultContext resultContext){
+        DefaultIssue issue=((IssueDto)resultContext.getResultObject()).toDefaultIssue();
+        issue.setOnDisabledRule(ruleCache.getNullable(issue.ruleKey()) == null);
+        result.add(issue);
+      }
+    }
+);
+    return result;
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

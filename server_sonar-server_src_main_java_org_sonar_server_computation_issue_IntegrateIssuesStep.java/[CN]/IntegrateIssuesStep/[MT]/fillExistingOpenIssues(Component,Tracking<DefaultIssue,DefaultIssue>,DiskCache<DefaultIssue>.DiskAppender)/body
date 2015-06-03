@@ -1,0 +1,16 @@
+{
+  for (  Map.Entry<DefaultIssue,DefaultIssue> entry : tracking.getMatchedRaws().entrySet()) {
+    DefaultIssue raw=entry.getKey();
+    DefaultIssue base=entry.getValue();
+    issueListeners.beforeIssue(component,raw);
+    issueLifecycle.mergeExistingOpenIssue(raw,base);
+    process(component,raw,cacheAppender);
+  }
+  for (  Map.Entry<Integer,DefaultIssue> entry : tracking.getOpenManualIssuesByLine().entries()) {
+    int line=entry.getKey();
+    DefaultIssue manualIssue=entry.getValue();
+    manualIssue.setLine(line == 0 ? null : line);
+    issueListeners.beforeIssue(component,manualIssue);
+    process(component,manualIssue,cacheAppender);
+  }
+}

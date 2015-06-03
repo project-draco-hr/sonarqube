@@ -1,0 +1,16 @@
+{
+  FakeInput baseInput=FakeInput.createForSourceLines("package example1;","","public class Toto {","","    public void doSomething() {","        // doSomething","        }","","    public void doSomethingElse() {","        // doSomethingElse","        }","}");
+  Issue base1=baseInput.createIssueOnLine(7,RULE_SYSTEM_PRINT,"Indentation");
+  Issue base2=baseInput.createIssueOnLine(11,RULE_SYSTEM_PRINT,"Indentation");
+  FakeInput rawInput=FakeInput.createForSourceLines("package example1;","","public class Toto {","","    public Toto(){}","","    public void doSomethingNew() {","        // doSomethingNew","        }","","    public void doSomethingElseNew() {","        // doSomethingElseNew","        }","","    public void doSomething() {","        // doSomething","        }","","    public void doSomethingElse() {","        // doSomethingElse","        }","}");
+  Issue raw1=rawInput.createIssueOnLine(9,RULE_SYSTEM_PRINT,"Indentation");
+  Issue raw2=rawInput.createIssueOnLine(13,RULE_SYSTEM_PRINT,"Indentation");
+  Issue raw3=rawInput.createIssueOnLine(17,RULE_SYSTEM_PRINT,"Indentation");
+  Issue raw4=rawInput.createIssueOnLine(21,RULE_SYSTEM_PRINT,"Indentation");
+  Tracking<Issue,Issue> tracking=tracker.track(rawInput,baseInput);
+  assertThat(tracking.baseFor(raw1)).isNull();
+  assertThat(tracking.baseFor(raw2)).isNull();
+  assertThat(tracking.baseFor(raw3)).isSameAs(base1);
+  assertThat(tracking.baseFor(raw4)).isSameAs(base2);
+  assertThat(tracking.getUnmatchedBases()).isEmpty();
+}

@@ -1,0 +1,12 @@
+{
+  Issue issue=new DefaultIssue().setBeingClosed(false);
+  when(context.issue()).thenReturn(issue);
+  try {
+    INSTANCE.execute(context);
+    fail();
+  }
+ catch (  IllegalStateException e) {
+    assertThat(e.getMessage()).contains("Issue is still alive");
+    verify(context,never()).setResolution(anyString());
+  }
+}

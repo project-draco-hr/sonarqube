@@ -1,0 +1,14 @@
+{
+  Tracking<DefaultIssue,DefaultIssue> tracking=tracker.track(component);
+  DiskCache<DefaultIssue>.DiskAppender cacheAppender=issueCache.newAppender();
+  try {
+    issueListeners.beforeComponent(component,tracking);
+    fillNewOpenIssues(component,tracking,cacheAppender);
+    fillExistingOpenIssues(component,tracking,cacheAppender);
+    closeUnmatchedBaseIssues(component,tracking,cacheAppender);
+    issueListeners.afterComponent(component);
+  }
+  finally {
+    cacheAppender.close();
+  }
+}

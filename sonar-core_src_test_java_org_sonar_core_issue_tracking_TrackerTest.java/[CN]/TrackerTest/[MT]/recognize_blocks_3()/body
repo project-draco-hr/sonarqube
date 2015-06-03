@@ -1,0 +1,15 @@
+{
+  FakeInput baseInput=FakeInput.createForSourceLines("package sample;","","public class Sample {","\t","\tpublic Sample(int i) {","\t\tint j = i+1;","\t}","","\tpublic boolean avoidUtilityClass() {","\t\treturn true;","\t}","","\tprivate String myMethod() {","\t\treturn \"hello\";","\t}","}");
+  Issue base1=baseInput.createIssueOnLine(6,RULE_UNUSED_LOCAL_VARIABLE,"Avoid unused local variables such as 'j'.");
+  Issue base2=baseInput.createIssueOnLine(13,RULE_UNUSED_PRIVATE_METHOD,"Avoid unused private methods such as 'myMethod()'.");
+  Issue base3=baseInput.createIssueOnLine(9,RULE_NOT_DESIGNED_FOR_EXTENSION,"Method 'avoidUtilityClass' is not designed for extension - needs to be abstract, final or empty.");
+  FakeInput rawInput=FakeInput.createForSourceLines("package sample;","","public class Sample {","","\tpublic Sample(int i) {","\t\tint j = i+1;","\t}","\t","\tpublic boolean avoidUtilityClass() {","\t\treturn true;","\t}","\t","\tprivate String myMethod() {","\t\treturn \"hello\";","\t}","","  public void newIssue() {","    String msg = myMethod();","  }","}");
+  Issue newRaw=rawInput.createIssueOnLine(18,RULE_UNUSED_LOCAL_VARIABLE,"Avoid unused local variables such as 'msg'.");
+  Issue rawSameAsBase1=rawInput.createIssueOnLine(6,RULE_UNUSED_LOCAL_VARIABLE,"Avoid unused local variables such as 'j'.");
+  Issue rawSameAsBase3=rawInput.createIssueOnLine(9,RULE_NOT_DESIGNED_FOR_EXTENSION,"Method 'avoidUtilityClass' is not designed for extension - needs to be abstract, final or empty.");
+  Tracking<Issue,Issue> tracking=tracker.track(rawInput,baseInput);
+  assertThat(tracking.baseFor(newRaw)).isNull();
+  assertThat(tracking.baseFor(rawSameAsBase1)).isSameAs(base1);
+  assertThat(tracking.baseFor(rawSameAsBase3)).isSameAs(base3);
+  assertThat(tracking.getUnmatchedBases()).containsOnly(base2);
+}

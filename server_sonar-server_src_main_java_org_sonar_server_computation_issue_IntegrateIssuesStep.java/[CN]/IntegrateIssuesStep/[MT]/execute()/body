@@ -1,0 +1,11 @@
+{
+  final Set<String> unprocessedComponentUuids=Sets.newHashSet(baseIssuesLoader.loadComponentUuids());
+  new DepthTraversalTypeAwareVisitor(Component.Type.FILE,POST_ORDER){
+    @Override public void visitAny(    Component component){
+      processIssues(component);
+      unprocessedComponentUuids.remove(component.getUuid());
+    }
+  }
+.visit(treeRootHolder.getRoot());
+  closeIssuesForDeletedComponentUuids(unprocessedComponentUuids);
+}
