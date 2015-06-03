@@ -1,0 +1,13 @@
+{
+  ComponentDto project=ComponentTesting.newProjectDto("ABCD").setKey(PROJECT_KEY).setName("Project");
+  dbClient.componentDao().insert(session,project);
+  ComponentDto module=ComponentTesting.newModuleDto("BCDE",project).setKey("MODULE_KEY").setName("Module").setPath("path");
+  dbClient.componentDao().insert(session,module);
+  session.commit();
+  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).setName("Project").addChildRef(2).build());
+  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey("MODULE_KEY").setName("Module").setPath("New path").build());
+  treeRootHolder.setRoot(new DumbComponent(Component.Type.PROJECT,1,"ABCD",PROJECT_KEY,new DumbComponent(Component.Type.MODULE,2,"BCDE","MODULE_KEY")));
+  sut.execute();
+  ComponentDto moduleReloaded=dbClient.componentDao().selectNullableByKey(session,"MODULE_KEY");
+  assertThat(moduleReloaded.path()).isEqualTo("New path");
+}

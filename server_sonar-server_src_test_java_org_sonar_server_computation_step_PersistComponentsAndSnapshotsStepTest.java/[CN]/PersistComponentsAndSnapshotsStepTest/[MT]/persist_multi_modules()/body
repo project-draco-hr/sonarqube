@@ -1,0 +1,29 @@
+{
+  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).setName("Project").addChildRef(2).addChildRef(4).build());
+  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey("MODULE_A").setName("Module A").addChildRef(3).build());
+  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(3).setType(Constants.ComponentType.MODULE).setKey("SUB_MODULE_A").setName("Sub Module A").build());
+  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(4).setType(Constants.ComponentType.MODULE).setKey("MODULE_B").setName("Module B").build());
+  treeRootHolder.setRoot(new DumbComponent(Component.Type.PROJECT,1,"ABCD",PROJECT_KEY,new DumbComponent(Component.Type.MODULE,2,"BCDE","MODULE_A",new DumbComponent(Component.Type.MODULE,3,"DEFG","SUB_MODULE_A")),new DumbComponent(Component.Type.MODULE,4,"CDEF","MODULE_B")));
+  sut.execute();
+  assertThat(dbTester.countRowsOfTable("projects")).isEqualTo(4);
+  ComponentDto project=dbClient.componentDao().selectNullableByKey(session,PROJECT_KEY);
+  assertThat(project).isNotNull();
+  assertThat(project.moduleUuid()).isNull();
+  assertThat(project.moduleUuidPath()).isEqualTo("." + project.uuid() + ".");
+  assertThat(project.parentProjectId()).isNull();
+  ComponentDto moduleA=dbClient.componentDao().selectNullableByKey(session,"MODULE_A");
+  assertThat(moduleA).isNotNull();
+  assertThat(moduleA.moduleUuid()).isEqualTo(project.uuid());
+  assertThat(moduleA.moduleUuidPath()).isEqualTo(project.moduleUuidPath() + moduleA.uuid() + ".");
+  assertThat(moduleA.parentProjectId()).isEqualTo(project.getId());
+  ComponentDto subModuleA=dbClient.componentDao().selectNullableByKey(session,"SUB_MODULE_A");
+  assertThat(subModuleA).isNotNull();
+  assertThat(subModuleA.moduleUuid()).isEqualTo(moduleA.uuid());
+  assertThat(subModuleA.moduleUuidPath()).isEqualTo(moduleA.moduleUuidPath() + subModuleA.uuid() + ".");
+  assertThat(subModuleA.parentProjectId()).isEqualTo(project.getId());
+  ComponentDto moduleB=dbClient.componentDao().selectNullableByKey(session,"MODULE_B");
+  assertThat(moduleB).isNotNull();
+  assertThat(moduleB.moduleUuid()).isEqualTo(project.uuid());
+  assertThat(moduleB.moduleUuidPath()).isEqualTo(project.moduleUuidPath() + moduleB.uuid() + ".");
+  assertThat(moduleB.parentProjectId()).isEqualTo(project.getId());
+}
