@@ -1,6 +1,5 @@
 {
   dbTester.truncateTables();
-  dbComponentsRefCache=new DbComponentsRefCache();
   dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),new MeasureDao(),new ComponentDao(),new MetricDao(),new RuleDao(System2.INSTANCE));
   session=dbClient.openSession(false);
   metric=new MetricDto().setKey(METRIC_KEY).setEnabled(true).setOptimizedBestValue(false).setHidden(false).setDeleteHistoricalData(false);
@@ -11,5 +10,5 @@
   RuleCache ruleCache=new RuleCache(new RuleCacheLoader(dbClient));
   MetricCache metricCache=new MetricCache(dbClient);
   session.commit();
-  sut=new PersistMeasuresStep(dbClient,ruleCache,metricCache,dbComponentsRefCache,reportReader);
+  sut=new PersistMeasuresStep(dbClient,ruleCache,metricCache,dbIdsRepository,treeRootHolder,reportReader);
 }

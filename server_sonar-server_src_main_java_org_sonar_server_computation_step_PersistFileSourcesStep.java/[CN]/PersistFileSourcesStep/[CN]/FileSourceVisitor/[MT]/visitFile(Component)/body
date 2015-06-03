@@ -1,0 +1,18 @@
+{
+  int fileRef=file.getRef();
+  BatchReport.Component component=reportReader.readComponent(fileRef);
+  CloseableIterator<String> linesIterator=reportReader.readFileSource(fileRef);
+  LineReaders lineReaders=new LineReaders(reportReader,fileRef);
+  try {
+    ComputeFileSourceData computeFileSourceData=new ComputeFileSourceData(linesIterator,lineReaders.readers(),component.getLines());
+    ComputeFileSourceData.Data fileSourceData=computeFileSourceData.compute();
+    persistSource(fileSourceData,file.getUuid());
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException(String.format("Cannot persist sources of %s",file.getKey()),e);
+  }
+ finally {
+    linesIterator.close();
+    lineReaders.close();
+  }
+}

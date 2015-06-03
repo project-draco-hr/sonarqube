@@ -5,8 +5,9 @@
   settings.setProperty("sonar.permission.template.default",permissionTemplateDto.getKee());
   dbClient.permissionTemplateDao().addGroupPermission(permissionTemplateDto.getId(),null,UserRole.USER);
   dbSession.commit();
-  dbComponentsRefCache.addComponent(1,new DbComponentsRefCache.DbComponent(projectDto.getId(),PROJECT_KEY,PROJECT_UUID));
-  treeRootHolder.setRoot(new DumbComponent(Component.Type.PROJECT,1,PROJECT_KEY,PROJECT_UUID));
+  Component project=new DumbComponent(Component.Type.PROJECT,1,PROJECT_UUID,PROJECT_KEY);
+  dbIdsRepository.setComponentId(project,projectDto.getId());
+  treeRootHolder.setRoot(project);
   step.execute();
   dbSession.commit();
   assertThat(dbClient.componentDao().selectByKey(dbSession,PROJECT_KEY).getAuthorizationUpdatedAt()).isNotNull();

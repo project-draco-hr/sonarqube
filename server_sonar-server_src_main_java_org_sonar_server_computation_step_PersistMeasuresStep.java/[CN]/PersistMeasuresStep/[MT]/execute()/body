@@ -1,7 +1,10 @@
 {
-  int rootComponentRef=reportReader.readMetadata().getRootComponentRef();
-  try (DbSession dbSession=dbClient.openSession(true)){
-    recursivelyProcessComponent(dbSession,rootComponentRef);
+  DbSession dbSession=dbClient.openSession(true);
+  try {
+    new MeasureVisitor(dbSession).visit(treeRootHolder.getRoot());
     dbSession.commit();
   }
- }
+  finally {
+    dbSession.close();
+  }
+}

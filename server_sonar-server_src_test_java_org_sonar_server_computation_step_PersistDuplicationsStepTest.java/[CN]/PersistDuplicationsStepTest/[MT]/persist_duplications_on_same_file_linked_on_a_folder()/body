@@ -1,9 +1,12 @@
 {
-  dbComponentsRefCache.addComponent(1,new DbComponent(1L,PROJECT_KEY,"ABCD"));
-  dbComponentsRefCache.addComponent(2,new DbComponent(2L,"PROJECT_KEY:dir","BCDE"));
-  dbComponentsRefCache.addComponent(3,new DbComponent(3L,"PROJECT_KEY:file","CDEF"));
+  Component file=new DumbComponent(Component.Type.FILE,3,"CDEF","PROJECT_KEY:file");
+  Component directory=new DumbComponent(Component.Type.DIRECTORY,2,"BCDE","PROJECT_KEY:dir",file);
+  Component project=new DumbComponent(Component.Type.PROJECT,1,"ABCD",PROJECT_KEY,directory);
+  treeRootHolder.setRoot(project);
+  dbIdsRepository.setComponentId(project,1);
+  dbIdsRepository.setComponentId(directory,3);
+  dbIdsRepository.setComponentId(file,2);
   saveDuplicationMetric();
-  reportReader.setMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).build());
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).setSnapshotId(10L).addChildRef(2).build());
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.DIRECTORY).setSnapshotId(11L).addChildRef(3).setPath("dir").build());
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(3).setType(Constants.ComponentType.FILE).setSnapshotId(12L).setPath("file").build());

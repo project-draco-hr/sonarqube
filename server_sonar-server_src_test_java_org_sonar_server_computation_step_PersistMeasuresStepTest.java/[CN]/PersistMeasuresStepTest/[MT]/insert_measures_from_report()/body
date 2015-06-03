@@ -1,6 +1,11 @@
 {
-  ComponentDto project=addComponent(1,"project-key");
-  ComponentDto file=addComponent(2,"file-key");
+  ComponentDto projectDto=addComponent(1,"project-key");
+  ComponentDto fileDto=addComponent(2,"file-key");
+  Component file=new DumbComponent(Component.Type.FILE,2,"CDEF","MODULE_KEY:file");
+  Component project=new DumbComponent(Component.Type.PROJECT,1,"ABCD",PROJECT_KEY,file);
+  treeRootHolder.setRoot(project);
+  dbIdsRepository.setComponentId(project,projectDto.getId());
+  dbIdsRepository.setComponentId(file,fileDto.getId());
   reportReader.setMetadata(BatchReport.Metadata.newBuilder().setAnalysisDate(new Date().getTime()).setRootComponentRef(1).setProjectKey("project-key").setSnapshotId(3).build());
   reportReader.putComponent(defaultComponent().addChildRef(2).build());
   reportReader.putComponent(defaultComponent().setRef(2).build());
@@ -12,14 +17,14 @@
   List<Map<String,Object>> dtos=dbTester.select("select snapshot_id as \"snapshotId\", project_id as \"componentId\", metric_id as \"metricId\", rule_id as \"ruleId\", value as \"value\", text_value as \"textValue\", " + "rule_priority as \"severity\" from project_measures");
   Map<String,Object> dto=dtos.get(0);
   assertThat(dto.get("snapshotId")).isNotNull();
-  assertThat(dto.get("componentId")).isEqualTo(project.getId());
+  assertThat(dto.get("componentId")).isEqualTo(projectDto.getId());
   assertThat(dto.get("metricId")).isEqualTo(metric.getId().longValue());
   assertThat(dto.get("ruleId")).isEqualTo(rule.getId().longValue());
   assertThat(dto.get("textValue")).isEqualTo("measure-data");
   assertThat(dto.get("severity")).isEqualTo(0L);
   dto=dtos.get(1);
   assertThat(dto.get("snapshotId")).isNotNull();
-  assertThat(dto.get("componentId")).isEqualTo(file.getId());
+  assertThat(dto.get("componentId")).isEqualTo(fileDto.getId());
   assertThat(dto.get("metricId")).isEqualTo(metric.getId().longValue());
   assertThat(dto.get("ruleId")).isEqualTo(rule.getId().longValue());
   assertThat(dto.get("value")).isEqualTo(123.123d);

@@ -1,8 +1,8 @@
 {
   dbTester.prepareDbUnit(getClass(),"empty.xml");
-  dbComponentsRefCache.addComponent(1,new DbComponentsRefCache.DbComponent(1L,PROJECT_KEY,"ABCD"));
-  reportReader.setMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).setProjectKey(PROJECT_KEY).build());
-  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.FILE).addLink(BatchReport.ComponentLink.newBuilder().setType(Constants.ComponentLinkType.HOME).setHref("http://www.sonarqube.org").build()).build());
+  treeRootHolder.setRoot(new DumbComponent(Component.Type.PROJECT,1,"ABCD",null,new DumbComponent(Component.Type.FILE,2,"BCDE",null)));
+  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).addChildRef(2).build());
+  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.FILE).addLink(BatchReport.ComponentLink.newBuilder().setType(Constants.ComponentLinkType.HOME).setHref("http://www.sonarqube.org").build()).build());
   step.execute();
   assertThat(dbTester.countRowsOfTable("project_links")).isEqualTo(0);
 }

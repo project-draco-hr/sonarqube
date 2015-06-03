@@ -1,10 +1,8 @@
 {
   DbSession session=dbClient.openSession(true);
   try {
-    MetricDto duplicationMetric=dbClient.metricDao().selectNullableByKey(session,CoreMetrics.DUPLICATIONS_DATA_KEY);
-    DuplicationContext duplicationContext=new DuplicationContext(duplicationMetric,session);
-    int rootComponentRef=reportReader.readMetadata().getRootComponentRef();
-    recursivelyProcessComponent(duplicationContext,rootComponentRef);
+    MetricDto duplicationMetric=dbClient.metricDao().selectByKey(session,CoreMetrics.DUPLICATIONS_DATA_KEY);
+    new DuplicationVisitor(session,duplicationMetric).visit(treeRootHolder.getRoot());
     session.commit();
   }
   finally {
