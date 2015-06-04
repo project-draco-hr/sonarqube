@@ -1,18 +1,9 @@
 {
-  Preconditions.checkArgument(pathStartingWithSlash.startsWith("/"),"Path must start with slash /");
-  String path=StringEscapeUtils.escapeHtml(pathStartingWithSlash);
-  URI uri=URI.create(getURL() + path);
-  try {
-    InputSupplier<InputStream> inputSupplier;
-    if (Strings.isNullOrEmpty(getLogin())) {
-      inputSupplier=downloader.newInputSupplier(uri,requestMethod,timeoutMillis);
+  final byte[] buf=load(pathStartingWithSlash,requestMethod,false,timeoutMillis);
+  return new InputSupplier<InputStream>(){
+    @Override public InputStream getInput() throws IOException {
+      return new ByteArrayInputStream(buf);
     }
- else {
-      inputSupplier=downloader.newInputSupplier(uri,requestMethod,getLogin(),getPassword(),timeoutMillis);
-    }
-    return inputSupplier;
   }
- catch (  Exception e) {
-    throw new IllegalStateException(String.format("Unable to request: %s",uri),e);
-  }
+;
 }

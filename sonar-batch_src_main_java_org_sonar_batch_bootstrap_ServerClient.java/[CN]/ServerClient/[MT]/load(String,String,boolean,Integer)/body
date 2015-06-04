@@ -1,0 +1,19 @@
+{
+  Preconditions.checkArgument(pathStartingWithSlash.startsWith("/"),"Path must start with slash /");
+  String path=StringEscapeUtils.escapeHtml(pathStartingWithSlash);
+  URI uri=URI.create(getURL() + path);
+  try {
+    if (GET.equals(requestMethod) && mode.isPreview()) {
+      return cache.get(uri.toString(),new HttpValueLoader(uri,requestMethod,timeoutMillis));
+    }
+ else {
+      return new HttpValueLoader(uri,requestMethod,timeoutMillis).call();
+    }
+  }
+ catch (  HttpDownloader.HttpException e) {
+    throw wrapHttpException ? handleHttpException(e) : e;
+  }
+catch (  Exception e) {
+    throw new IllegalStateException(String.format("Unable to request: %s",uri),e);
+  }
+}
