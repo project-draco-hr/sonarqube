@@ -1,0 +1,19 @@
+{
+  Optional<Measure> baseMeasure=measureRepository.getBaseMeasure(project,metric);
+  if (!baseMeasure.isPresent()) {
+    checkNewQualityGate(project,rawStatus);
+    return;
+  }
+  if (!baseMeasure.get().hasQualityGateStatus()) {
+    LOGGER.warn(String.format("Previous alterStatus for project %s is not a supported value. Can not compute Quality Gate event",project.getKey()));
+    checkNewQualityGate(project,rawStatus);
+    return;
+  }
+  Measure.QualityGateStatus baseStatus=baseMeasure.get().getQualityGateStatus();
+  if (baseStatus.getStatus() != rawStatus.getStatus()) {
+    String label=String.format("%s (was %s)",rawStatus.getStatus().getColorName(),baseStatus.getStatus().getColorName());
+    createEvent(project,label,rawStatus.getText());
+    boolean isNewKo=(rawStatus.getStatus() == Measure.Level.OK);
+    notifyUsers(project,label,rawStatus,isNewKo);
+  }
+}

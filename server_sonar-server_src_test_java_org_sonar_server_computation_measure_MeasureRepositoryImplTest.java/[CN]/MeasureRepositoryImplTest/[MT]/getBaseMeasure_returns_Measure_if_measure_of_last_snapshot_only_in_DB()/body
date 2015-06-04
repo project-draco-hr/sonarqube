@@ -1,0 +1,12 @@
+{
+  dbTester.prepareDbUnit(getClass(),"shared.xml");
+  dbSession=dbClient.openSession(false);
+  dbClient.measureDao().insert(dbSession,createMeasureDto(METRIC_ID_1,LAST_SNAPSHOT_ID));
+  dbClient.measureDao().insert(dbSession,createMeasureDto(METRIC_ID_2,OTHER_SNAPSHOT_ID));
+  dbSession.commit();
+  Optional<Measure> res=underTest.getBaseMeasure(FILE_COMPONENT,metric1);
+  assertThat(res).isPresent();
+  assertThat(res.get().getStringValue()).isEqualTo(SOME_DATA);
+  res=underTest.getBaseMeasure(FILE_COMPONENT,metric2);
+  assertThat(res).isAbsent();
+}

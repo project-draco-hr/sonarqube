@@ -1,0 +1,10 @@
+{
+  requireNonNull(key);
+  try (DbSession dbSession=dbClient.openSession(false)){
+    MetricDto metricDto=dbClient.metricDao().selectNullableByKey(dbSession,key);
+    if (metricDto == null) {
+      throw new IllegalStateException(String.format("Metric with key '%s' does not exist",key));
+    }
+    return toMetric(metricDto);
+  }
+ }

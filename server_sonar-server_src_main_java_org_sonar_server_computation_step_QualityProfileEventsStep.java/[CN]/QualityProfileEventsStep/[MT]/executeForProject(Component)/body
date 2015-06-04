@@ -1,14 +1,14 @@
 {
-  Optional<MeasureDto> previousMeasure=measureRepository.findPrevious(projectComponent,CoreMetrics.QUALITY_PROFILES);
-  if (!previousMeasure.isPresent()) {
+  Optional<Measure> baseMeasure=measureRepository.getBaseMeasure(projectComponent,metricRepository.getByKey(CoreMetrics.QUALITY_PROFILES_KEY));
+  if (!baseMeasure.isPresent()) {
     return;
   }
-  Optional<BatchReport.Measure> currentMeasure=measureRepository.findCurrent(projectComponent,CoreMetrics.QUALITY_PROFILES);
-  if (!currentMeasure.isPresent()) {
+  Optional<Measure> rawMeasure=measureRepository.getRawMeasure(projectComponent,metricRepository.getByKey(CoreMetrics.QUALITY_PROFILES_KEY));
+  if (!rawMeasure.isPresent()) {
     throw new IllegalStateException("Missing measure " + CoreMetrics.QUALITY_PROFILES + " for component "+ projectComponent.getRef());
   }
-  Map<String,QualityProfile> currentProfiles=QPMeasureData.fromJson(currentMeasure.get().getStringValue()).getProfilesByKey();
-  Map<String,QualityProfile> previousProfiles=parseJsonData(previousMeasure);
-  detectNewOrUpdatedProfiles(projectComponent,previousProfiles,currentProfiles);
-  detectNoMoreUsedProfiles(projectComponent,previousProfiles,currentProfiles);
+  Map<String,QualityProfile> rawProfiles=QPMeasureData.fromJson(rawMeasure.get().getStringValue()).getProfilesByKey();
+  Map<String,QualityProfile> baseProfiles=parseJsonData(baseMeasure);
+  detectNewOrUpdatedProfiles(projectComponent,baseProfiles,rawProfiles);
+  detectNoMoreUsedProfiles(projectComponent,baseProfiles,rawProfiles);
 }
