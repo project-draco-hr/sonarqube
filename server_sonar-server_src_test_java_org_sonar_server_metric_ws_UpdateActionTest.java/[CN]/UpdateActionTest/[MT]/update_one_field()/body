@@ -1,0 +1,13 @@
+{
+  int id=insertMetric(newDefaultMetric());
+  dbClient.customMeasureDao().insert(dbSession,newCustomMeasureDto().setMetricId(id));
+  dbSession.commit();
+  newRequest().setParam(PARAM_ID,String.valueOf(id)).setParam(PARAM_DESCRIPTION,"another-description").execute();
+  dbSession.commit();
+  MetricDto result=dbClient.metricDao().selectNullableById(dbSession,id);
+  assertThat(result.getKey()).isEqualTo(DEFAULT_KEY);
+  assertThat(result.getShortName()).isEqualTo(DEFAULT_NAME);
+  assertThat(result.getValueType()).isEqualTo(DEFAULT_TYPE);
+  assertThat(result.getDomain()).isEqualTo(DEFAULT_DOMAIN);
+  assertThat(result.getDescription()).isEqualTo("another-description");
+}
