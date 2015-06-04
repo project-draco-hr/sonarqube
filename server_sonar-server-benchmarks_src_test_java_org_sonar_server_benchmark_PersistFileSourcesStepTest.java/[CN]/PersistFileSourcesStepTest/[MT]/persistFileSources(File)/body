@@ -2,7 +2,9 @@
   LOGGER.info("Persist file sources");
   DbClient dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),new FileSourceDao(dbTester.myBatis()));
   long start=System.currentTimeMillis();
-  PersistFileSourcesStep step=new PersistFileSourcesStep(dbClient,System2.INSTANCE,treeRootHolder,reportReader);
+  BatchReportDirectoryHolderImpl batchReportDirectoryHolder=new BatchReportDirectoryHolderImpl();
+  batchReportDirectoryHolder.setDirectory(reportDir);
+  PersistFileSourcesStep step=new PersistFileSourcesStep(dbClient,System2.INSTANCE,treeRootHolder,new BatchReportReaderImpl(batchReportDirectoryHolder));
   step.execute();
   long end=System.currentTimeMillis();
   long duration=end - start;

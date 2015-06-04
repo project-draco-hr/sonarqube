@@ -1,12 +1,15 @@
 {
   LOGGER.info("Create report");
-  reportReader.setMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).build());
+  File reportDir=temp.newFolder();
+  BatchReportWriter writer=new BatchReportWriter(reportDir);
+  writer.writeMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).build());
   BatchReport.Component.Builder project=BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT);
   List<Component> components=new ArrayList<>();
   for (int fileRef=2; fileRef <= NUMBER_OF_FILES + 1; fileRef++) {
-    components.add(generateFileReport(fileRef));
+    components.add(generateFileReport(writer,fileRef));
     project.addChildRef(fileRef);
   }
   treeRootHolder.setRoot(new DumbComponent(Component.Type.PROJECT,1,PROJECT_UUID,"PROJECT",components.toArray(new Component[components.size()])));
-  reportReader.putComponent(project.build());
+  writer.writeComponent(project.build());
+  return reportDir;
 }
