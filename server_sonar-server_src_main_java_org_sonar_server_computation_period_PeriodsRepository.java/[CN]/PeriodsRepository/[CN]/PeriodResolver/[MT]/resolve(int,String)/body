@@ -1,0 +1,20 @@
+{
+  if (StringUtils.isBlank(property)) {
+    return null;
+  }
+  Integer days=tryToResolveByDays(property);
+  if (days != null) {
+    return periodFinder.findByDays(session,projectId,analysisDate,days);
+  }
+  Date date=tryToResolveByDate(property);
+  if (date != null) {
+    return periodFinder.findByDate(session,projectId,date);
+  }
+  if (StringUtils.equals(CoreProperties.TIMEMACHINE_MODE_PREVIOUS_ANALYSIS,property)) {
+    return periodFinder.findByPreviousAnalysis(session,projectId,analysisDate);
+  }
+  if (StringUtils.equals(CoreProperties.TIMEMACHINE_MODE_PREVIOUS_VERSION,property)) {
+    return periodFinder.findByPreviousVersion(session,projectId,currentVersion);
+  }
+  return periodFinder.findByVersion(session,projectId,property);
+}

@@ -1,0 +1,21 @@
+{
+  DbSession session=dbClient.openSession(false);
+  try {
+    Component project=treeRootHolder.getRoot();
+    ComponentDto projectDto=dbClient.componentDao().selectNullableByKey(session,project.getKey());
+    if (projectDto != null) {
+      BatchReport.Component batchProject=batchReportReader.readComponent(project.getRef());
+      PeriodResolver periodResolver=new PeriodResolver(session,projectDto.getId(),batchReportReader.readMetadata().getAnalysisDate(),batchProject.getVersion(),Qualifiers.PROJECT);
+      for (int index=1; index <= NUMBER_OF_PERIODS; index++) {
+        Period period=periodResolver.resolve(index);
+        if (period != null) {
+          periods.add(period.setIndex(index));
+          LOG.debug(period.toString());
+        }
+      }
+    }
+  }
+  finally {
+    session.close();
+  }
+}
