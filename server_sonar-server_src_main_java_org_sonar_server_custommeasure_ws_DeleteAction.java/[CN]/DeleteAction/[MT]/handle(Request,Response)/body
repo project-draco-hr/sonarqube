@@ -1,0 +1,14 @@
+{
+  long id=request.mandatoryParamAsLong(PARAM_ID);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    CustomMeasureDto customMeasure=dbClient.customMeasureDao().selectById(dbSession,id);
+    checkPermissions(dbSession,customMeasure);
+    dbClient.customMeasureDao().delete(dbSession,id);
+    dbSession.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(dbSession);
+  }
+  response.noContent();
+}

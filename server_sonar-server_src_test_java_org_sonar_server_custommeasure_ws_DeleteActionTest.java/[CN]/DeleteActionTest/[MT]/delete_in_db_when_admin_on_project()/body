@@ -1,0 +1,8 @@
+{
+  ComponentDto project=ComponentTesting.newProjectDto("project-uuid");
+  dbClient.componentDao().insert(dbSession,project);
+  userSessionRule.login("login").addProjectUuidPermissions(UserRole.ADMIN,"project-uuid");
+  long id=insertCustomMeasure(newCustomMeasureDto().setComponentId(project.getId()));
+  newRequest().setParam(PARAM_ID,String.valueOf(id)).execute();
+  assertThat(dbClient.customMeasureDao().selectNullableById(dbSession,id)).isNull();
+}
