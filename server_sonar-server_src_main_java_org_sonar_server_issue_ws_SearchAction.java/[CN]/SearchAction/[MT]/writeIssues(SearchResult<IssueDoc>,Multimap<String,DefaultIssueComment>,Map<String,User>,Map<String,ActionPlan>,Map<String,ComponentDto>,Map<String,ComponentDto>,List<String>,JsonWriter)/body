@@ -1,26 +1,7 @@
 {
   json.name("issues").beginArray();
   for (  IssueDoc issue : result.getDocs()) {
-    json.beginObject();
-    String actionPlanKey=issue.actionPlanKey();
-    ComponentDto file=componentsByUuid.get(issue.componentUuid());
-    ComponentDto project=null, subProject=null;
-    if (file != null) {
-      project=projectsByComponentUuid.get(file.uuid());
-      if (!file.projectUuid().equals(file.moduleUuid())) {
-        subProject=componentsByUuid.get(file.moduleUuid());
-      }
-    }
-    Duration debt=issue.debt();
-    Date updateDate=issue.updateDate();
-    json.prop("key",issue.key()).prop("component",file != null ? file.getKey() : null).prop("componentId",file != null ? file.getId() : null).prop("project",project != null ? project.getKey() : null).prop("subProject",subProject != null ? subProject.getKey() : null).prop("rule",issue.ruleKey().toString()).prop("status",issue.status()).prop("resolution",issue.resolution()).prop("severity",issue.severity()).prop("message",issue.message()).prop("line",issue.line()).prop("debt",debt != null ? durations.encode(debt) : null).prop("reporter",issue.reporter()).prop("author",issue.authorLogin()).prop("actionPlan",actionPlanKey).prop("creationDate",isoDate(issue.creationDate())).prop("updateDate",isoDate(updateDate)).prop("fUpdateAge",formatAgeDate(updateDate)).prop("closeDate",isoDate(issue.closeDate()));
-    json.name("assignee");
-    userWriter.write(json,usersByLogin.get(issue.assignee()));
-    writeTags(issue,json);
-    writeIssueComments(commentsByIssues.get(issue.key()),usersByLogin,json);
-    writeIssueAttributes(issue,json);
-    writeIssueExtraFields(issue,usersByLogin,actionPlanByKeys,extraFields,json);
-    json.endObject();
+    issueWriter.write(json,issue,usersByLogin,componentsByUuid,projectsByComponentUuid,commentsByIssues,actionPlanByKeys,extraFields);
   }
   json.endArray();
 }

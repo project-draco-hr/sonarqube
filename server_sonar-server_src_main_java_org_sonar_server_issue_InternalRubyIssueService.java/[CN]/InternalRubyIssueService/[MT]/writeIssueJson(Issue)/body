@@ -1,0 +1,35 @@
+{
+  StringWriter writer=new StringWriter();
+  JsonWriter json=JsonWriter.of(writer);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    Map<String,User> usersByLogin=getIssueUsersByLogin(issue);
+    Set<String> componentUuids=ImmutableSet.of(issue.componentUuid());
+    Set<String> projectUuids=Sets.newHashSet();
+    Set<ComponentDto> componentDtos=Sets.newHashSet();
+    List<ComponentDto> projectDtos=Lists.newArrayList();
+    Map<String,ComponentDto> componentsByUuid=Maps.newHashMap();
+    Map<String,ComponentDto> projectsByComponentUuid=Maps.newHashMap();
+    List<ComponentDto> fileDtos=dbClient.componentDao().selectByUuids(dbSession,componentUuids);
+    List<ComponentDto> subProjectDtos=dbClient.componentDao().selectSubProjectsByComponentUuids(dbSession,componentUuids);
+    componentDtos.addAll(fileDtos);
+    componentDtos.addAll(subProjectDtos);
+    for (    ComponentDto component : componentDtos) {
+      projectUuids.add(component.projectUuid());
+    }
+    projectDtos.addAll(dbClient.componentDao().selectByUuids(dbSession,projectUuids));
+    componentDtos.addAll(projectDtos);
+    for (    ComponentDto componentDto : componentDtos) {
+      componentsByUuid.put(componentDto.uuid(),componentDto);
+    }
+    projectsByComponentUuid=issueComponentHelper.prepareComponentsAndProjects(projectUuids,componentUuids,componentsByUuid,componentDtos,subProjectDtos,dbSession);
+    json.beginObject().name("issue");
+    issueWriter.write(json,issue,usersByLogin,componentsByUuid,projectsByComponentUuid,ImmutableMultimap.<String,DefaultIssueComment>of(),ImmutableMap.<String,ActionPlan>of(),ImmutableList.of(IssueJsonWriter.ACTIONS_EXTRA_FIELD,IssueJsonWriter.TRANSITIONS_EXTRA_FIELD));
+    json.endObject().close();
+  }
+  finally {
+    MyBatis.closeQuietly(dbSession);
+    IOUtils.closeQuietly(writer);
+  }
+  return writer.toString();
+}

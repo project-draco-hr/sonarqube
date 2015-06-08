@@ -9,6 +9,7 @@
   Map<String,ComponentDto> componentsByUuid=newHashMap();
   Multimap<String,DefaultIssueComment> commentsByIssues=ArrayListMultimap.create();
   Collection<ComponentDto> componentDtos=newHashSet();
+  List<ComponentDto> projectDtos=Lists.newArrayList();
   Map<String,ComponentDto> projectsByComponentUuid=newHashMap();
   for (  IssueDoc issueDoc : result.getDocs()) {
     issueKeys.add(issueDoc.key());
@@ -38,19 +39,7 @@
       }
     }
     usersByLogin=getUsersByLogin(userLogins);
-    List<ComponentDto> fileDtos=dbClient.componentDao().selectByUuids(session,componentUuids);
-    List<ComponentDto> subProjectDtos=dbClient.componentDao().selectSubProjectsByComponentUuids(session,componentUuids);
-    componentDtos.addAll(fileDtos);
-    componentDtos.addAll(subProjectDtos);
-    for (    ComponentDto component : componentDtos) {
-      projectUuids.add(component.projectUuid());
-    }
-    List<ComponentDto> projectDtos=dbClient.componentDao().selectByUuids(session,projectUuids);
-    componentDtos.addAll(projectDtos);
-    for (    ComponentDto componentDto : componentDtos) {
-      componentsByUuid.put(componentDto.uuid(),componentDto);
-    }
-    projectsByComponentUuid=getProjectsByComponentUuid(componentDtos,projectDtos);
+    projectsByComponentUuid=issueComponentHelper.prepareComponentsAndProjects(projectUuids,componentUuids,componentsByUuid,componentDtos,projectDtos,session);
     writeProjects(json,projectDtos);
     writeComponents(json,componentDtos,projectsByComponentUuid);
   }

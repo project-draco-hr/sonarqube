@@ -1,0 +1,17 @@
+{
+  Map<String,ComponentDto> projectsByComponentUuid;
+  List<ComponentDto> fileDtos=dbClient.componentDao().selectByUuids(session,componentUuids);
+  List<ComponentDto> subProjectDtos=dbClient.componentDao().selectSubProjectsByComponentUuids(session,componentUuids);
+  componentDtos.addAll(fileDtos);
+  componentDtos.addAll(subProjectDtos);
+  for (  ComponentDto component : componentDtos) {
+    projectUuids.add(component.projectUuid());
+  }
+  projectDtos.addAll(dbClient.componentDao().selectByUuids(session,projectUuids));
+  componentDtos.addAll(projectDtos);
+  for (  ComponentDto componentDto : componentDtos) {
+    componentsByUuid.put(componentDto.uuid(),componentDto);
+  }
+  projectsByComponentUuid=getProjectsByComponentUuid(componentDtos,projectDtos);
+  return projectsByComponentUuid;
+}
