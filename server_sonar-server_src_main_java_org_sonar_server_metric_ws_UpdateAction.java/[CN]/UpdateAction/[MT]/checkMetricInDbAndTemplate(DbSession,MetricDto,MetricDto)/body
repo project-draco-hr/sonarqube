@@ -1,7 +1,8 @@
 {
-  if (isMetricFoundInDb(metricInDb) || isMetricDisabled(metricInDb) || isMetricNonCustom(metricInDb)) {
-    throw new ServerException(HttpURLConnection.HTTP_CONFLICT,String.format("No active custom metric has been found for id '%d'. Maybe you want to create a metric ?",template.getId()));
+  if (!isMetricFoundInDb(metricInDb) || isMetricDisabled(metricInDb) || !isMetricCustom(metricInDb)) {
+    throw new ServerException(HttpURLConnection.HTTP_CONFLICT,String.format("No active custom metric has been found for id '%d'.",template.getId()));
   }
+  checkNoOtherMetricWithTargetKey(dbSession,metricInDb,template);
   if (haveMetricTypeChanged(metricInDb,template)) {
     List<CustomMeasureDto> customMeasures=dbClient.customMeasureDao().selectByMetricId(dbSession,metricInDb.getId());
     if (haveAssociatedCustomMeasures(customMeasures)) {
