@@ -1,0 +1,12 @@
+{
+  String metricMsg="trololo_metric_msg";
+  int periodIndex=1;
+  String periodLabel="periodLabel";
+  when(i18n.message(Locale.ENGLISH,"metric." + SOME_VARIATION_METRIC.getKey() + ".name",SOME_VARIATION_METRIC.getName())).thenReturn(metricMsg);
+  Date date=new Date();
+  Period period=new Period(periodIndex,SOME_MODE,null,date.getTime(),SOME_SNAPSHOT_ID);
+  periodsHolder.setPeriods(period);
+  when(periods.label(period.getMode(),period.getModeParameter(),date)).thenReturn(periodLabel);
+  Condition condition=new Condition(SOME_VARIATION_METRIC,operator.getDbValue(),ERROR_THRESHOLD,WARNING_THRESHOLD,periodIndex);
+  assertThat(underTest.asText(condition,new EvaluationResult(level,null))).isEqualTo(metricMsg + " " + toSign(operator)+ " "+ (getThreshold(level))+ " "+ periodLabel);
+}

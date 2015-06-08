@@ -1,0 +1,16 @@
+{
+  String conditionValue=getValueToEval(condition,alertLevel);
+  if (StringUtils.isEmpty(conditionValue)) {
+    return Optional.absent();
+  }
+  try {
+    Comparable conditionComparable=parseConditionValue(condition.getMetric(),conditionValue);
+    if (doesReachThresholds(measureComparable,conditionComparable,condition)) {
+      return of(new EvaluationResult(alertLevel,measureComparable));
+    }
+    return Optional.absent();
+  }
+ catch (  NumberFormatException badValueFormat) {
+    throw new IllegalArgumentException(String.format("Quality Gate: Unable to parse value '%s' to compare against %s",conditionValue,condition.getMetric().getName()));
+  }
+}

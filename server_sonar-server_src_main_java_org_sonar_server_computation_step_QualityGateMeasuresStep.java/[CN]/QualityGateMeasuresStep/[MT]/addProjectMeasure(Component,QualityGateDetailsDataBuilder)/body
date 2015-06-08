@@ -1,0 +1,9 @@
+{
+  Measure globalMeasure=Measure.newMeasureBuilder().setQualityGateStatus(new QualityGateStatus(builder.getGlobalLevel(),StringUtils.join(builder.getLabels(),", "))).create(builder.getGlobalLevel());
+  Metric metric=metricRepository.getByKey(CoreMetrics.ALERT_STATUS_KEY);
+  measureRepository.add(project,metric,globalMeasure);
+  String detailMeasureValue=new QualityGateDetailsData(builder.getGlobalLevel(),builder.getEvaluatedConditions()).toJson();
+  Measure detailsMeasure=Measure.newMeasureBuilder().create(detailMeasureValue);
+  Metric qgDetailsMetric=metricRepository.getByKey(CoreMetrics.QUALITY_GATE_DETAILS_KEY);
+  measureRepository.add(project,qgDetailsMetric,detailsMeasure);
+}

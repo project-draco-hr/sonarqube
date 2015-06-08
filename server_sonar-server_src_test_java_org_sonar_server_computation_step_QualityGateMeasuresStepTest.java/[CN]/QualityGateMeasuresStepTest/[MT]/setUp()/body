@@ -1,0 +1,13 @@
+{
+  treeRootHolder.setRoot(PROJECT_COMPONENT);
+  when(metricRepository.getByKey(CoreMetrics.ALERT_STATUS_KEY)).thenReturn(ALERT_STATUS_METRIC);
+  when(metricRepository.getByKey(CoreMetrics.QUALITY_GATE_DETAILS_KEY)).thenReturn(QUALITY_GATE_DETAILS_METRIC);
+  when(resultTextConverter.asText(any(Condition.class),any(EvaluationResult.class))).thenAnswer(new Answer<String>(){
+    @Override public String answer(    InvocationOnMock invocation) throws Throwable {
+      Condition condition=(Condition)invocation.getArguments()[0];
+      EvaluationResult evaluationResult=(EvaluationResult)invocation.getArguments()[1];
+      return dumbResultTextAnswer(condition,evaluationResult.getLevel(),evaluationResult.getValue());
+    }
+  }
+);
+}

@@ -1,0 +1,21 @@
+{
+  Optional<Double> periodValue=getPeriodValue(measure,condition.getPeriod());
+  if (periodValue.isPresent()) {
+switch (condition.getMetric().getType().getValueType()) {
+case BOOLEAN:
+      return periodValue.get().intValue() == 1;
+case INT:
+    return periodValue.get().intValue();
+case LONG:
+  return periodValue.get().longValue();
+case DOUBLE:
+return periodValue.get();
+case NO_VALUE:
+case STRING:
+case LEVEL:
+default :
+throw new IllegalArgumentException("Period conditions are not supported for metric type " + condition.getMetric().getType());
+}
+}
+return null;
+}

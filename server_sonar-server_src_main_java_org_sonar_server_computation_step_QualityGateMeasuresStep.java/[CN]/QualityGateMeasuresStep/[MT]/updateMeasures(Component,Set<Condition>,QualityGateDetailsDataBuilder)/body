@@ -1,0 +1,14 @@
+{
+  for (  Condition condition : conditions) {
+    Optional<Measure> measure=measureRepository.getRawMeasure(project,condition.getMetric());
+    if (!measure.isPresent()) {
+      continue;
+    }
+    EvaluationResult evaluationResult=new ConditionEvaluator().evaluate(condition,measure.get());
+    String text=evaluationResultTextConverter.asText(condition,evaluationResult);
+    builder.addLabel(text);
+    Measure updatedMeasure=Measure.updatedMeasureBuilder(measure.get()).setQualityGateStatus(new QualityGateStatus(evaluationResult.getLevel(),text)).create();
+    measureRepository.update(project,condition.getMetric(),updatedMeasure);
+    builder.addEvaluatedCondition(condition,evaluationResult);
+  }
+}

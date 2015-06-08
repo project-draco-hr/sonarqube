@@ -1,0 +1,16 @@
+{
+  Integer alertPeriod=condition.getPeriod();
+  String metric=i18n.message(Locale.ENGLISH,"metric." + condition.getMetric().getKey() + ".name",condition.getMetric().getName());
+  StringBuilder stringBuilder=new StringBuilder();
+  stringBuilder.append(metric);
+  if (alertPeriod != null && !condition.getMetric().getKey().startsWith(VARIATION_METRIC_PREFIX)) {
+    String variation=i18n.message(Locale.ENGLISH,VARIATION,VARIATION).toLowerCase();
+    stringBuilder.append(" ").append(variation);
+  }
+  stringBuilder.append(" ").append(OPERATOR_LABELS.get(condition.getOperator())).append(" ").append(alertValue(condition,level));
+  if (alertPeriod != null) {
+    Period period=periodsHolder.getPeriod(alertPeriod);
+    stringBuilder.append(" ").append(periods.label(period.getMode(),period.getModeParameter(),DateUtils.longToDate(period.getSnapshotDate())));
+  }
+  return stringBuilder.toString();
+}

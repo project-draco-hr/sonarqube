@@ -1,0 +1,23 @@
+{
+  int rawValue=1;
+  Condition equals1ErrorCondition=createEqualsCondition(INT_METRIC_1,"1",null);
+  Condition equals1WarningCondition=createEqualsCondition(INT_METRIC_2,null,"1");
+  Measure rawMeasure=Measure.newMeasureBuilder().create(rawValue,null);
+  qualityGateHolder.setQualityGate(new QualityGate("name",of(equals1ErrorCondition,equals1WarningCondition)));
+  when(measureRepository.getRawMeasure(PROJECT_COMPONENT,INT_METRIC_1)).thenReturn(Optional.of(rawMeasure));
+  when(measureRepository.getRawMeasure(PROJECT_COMPONENT,INT_METRIC_2)).thenReturn(Optional.of(rawMeasure));
+  underTest.execute();
+  ArgumentCaptor<Measure> equals1ErrorConditionMeasureCaptor=ArgumentCaptor.forClass(Measure.class);
+  ArgumentCaptor<Measure> equals1WarningConditionMeasureCaptor=ArgumentCaptor.forClass(Measure.class);
+  verify(measureRepository).getRawMeasure(PROJECT_COMPONENT,INT_METRIC_1);
+  verify(measureRepository).getRawMeasure(PROJECT_COMPONENT,INT_METRIC_2);
+  verify(measureRepository).update(same(PROJECT_COMPONENT),same(INT_METRIC_1),equals1ErrorConditionMeasureCaptor.capture());
+  verify(measureRepository).update(same(PROJECT_COMPONENT),same(INT_METRIC_2),equals1WarningConditionMeasureCaptor.capture());
+  verify(measureRepository).add(same(PROJECT_COMPONENT),same(ALERT_STATUS_METRIC),alertStatusMeasureCaptor.capture());
+  verify(measureRepository).add(same(PROJECT_COMPONENT),same(QUALITY_GATE_DETAILS_METRIC),qgDetailsMeasureCaptor.capture());
+  verifyNoMoreInteractions(measureRepository);
+  assertThat(equals1ErrorConditionMeasureCaptor.getValue()).hasQualityGateLevel(ERROR).hasQualityGateText(dumbResultTextAnswer(equals1ErrorCondition,ERROR,rawValue));
+  assertThat(equals1WarningConditionMeasureCaptor.getValue()).hasQualityGateLevel(WARN).hasQualityGateText(dumbResultTextAnswer(equals1WarningCondition,WARN,rawValue));
+  assertThat(alertStatusMeasureCaptor.getValue()).hasQualityGateLevel(ERROR).hasQualityGateText(dumbResultTextAnswer(equals1ErrorCondition,ERROR,rawValue) + ", " + dumbResultTextAnswer(equals1WarningCondition,WARN,rawValue));
+  assertThat(qgDetailsMeasureCaptor.getValue()).hasValue(new QualityGateDetailsData(ERROR,of(new EvaluatedCondition(equals1ErrorCondition,ERROR,rawValue),new EvaluatedCondition(equals1WarningCondition,WARN,rawValue))).toJson());
+}
