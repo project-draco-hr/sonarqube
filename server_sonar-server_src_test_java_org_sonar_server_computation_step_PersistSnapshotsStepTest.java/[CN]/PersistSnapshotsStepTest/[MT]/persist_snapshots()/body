@@ -12,10 +12,10 @@
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setVersion("1.1").addChildRef(3).build());
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(3).setType(Constants.ComponentType.DIRECTORY).addChildRef(4).build());
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(4).setType(Constants.ComponentType.FILE).build());
-  Component file=new DumbComponent(Component.Type.FILE,4,"DEFG","MODULE_KEY:src/main/java/dir/Foo.java");
-  Component directory=new DumbComponent(Component.Type.DIRECTORY,3,"CDEF","MODULE_KEY:src/main/java/dir",file);
-  Component module=new DumbComponent(Component.Type.MODULE,2,"BCDE","MODULE_KEY",directory);
-  Component project=new DumbComponent(Component.Type.PROJECT,1,"ABCD",PROJECT_KEY,module);
+  Component file=DumbComponent.builder(Component.Type.FILE,4).setUuid("DEFG").setKey("MODULE_KEY:src/main/java/dir/Foo.java").build();
+  Component directory=DumbComponent.builder(Component.Type.DIRECTORY,3).setUuid("CDEF").setKey("MODULE_KEY:src/main/java/dir").addChildren(file).build();
+  Component module=DumbComponent.builder(Component.Type.MODULE,2).setUuid("BCDE").setKey("MODULE_KEY").addChildren(directory).build();
+  Component project=DumbComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).addChildren(module).build();
   treeRootHolder.setRoot(project);
   dbIdsRepository.setComponentId(project,projectDto.getId());
   dbIdsRepository.setComponentId(module,moduleDto.getId());

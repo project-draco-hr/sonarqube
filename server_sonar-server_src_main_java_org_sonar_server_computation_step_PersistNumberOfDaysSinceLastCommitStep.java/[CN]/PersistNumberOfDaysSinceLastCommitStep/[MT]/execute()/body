@@ -1,12 +1,13 @@
 {
   NumberOfDaysSinceLastCommitVisitor visitor=new NumberOfDaysSinceLastCommitVisitor();
-  visitor.visit(treeRootHolder.getRoot());
+  Component project=treeRootHolder.getRoot();
+  visitor.visit(project);
   long lastCommitTimestamp=visitor.lastCommitTimestampFromReport;
   if (lastCommitTimestamp == 0L) {
     Long lastCommitFromIndex=lastCommitFromIndex(treeRootHolder.getRoot().getUuid());
     lastCommitTimestamp=firstNonNull(lastCommitFromIndex,lastCommitTimestamp);
   }
   if (lastCommitTimestamp != 0L) {
-    persistNumberOfDaysSinceLastCommit(lastCommitTimestamp);
+    persistNumberOfDaysSinceLastCommit(lastCommitTimestamp,dbIdsRepository.getSnapshotId(project));
   }
 }

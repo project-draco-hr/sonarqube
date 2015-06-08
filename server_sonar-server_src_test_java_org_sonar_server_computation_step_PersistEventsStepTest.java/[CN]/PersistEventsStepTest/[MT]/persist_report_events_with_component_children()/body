@@ -1,10 +1,13 @@
 {
   dbTester.prepareDbUnit(getClass(),"empty.xml");
-  DumbComponent root=DumbComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").addChildren(DumbComponent.builder(Component.Type.MODULE,2).setUuid("BCDE").build()).build();
+  DumbComponent module=DumbComponent.builder(Component.Type.MODULE,2).setUuid("BCDE").build();
+  DumbComponent root=DumbComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").addChildren(module).build();
   treeRootHolder.setRoot(root);
+  dbIdsRepository.setSnapshotId(root,1000L);
+  dbIdsRepository.setSnapshotId(module,1001L);
   reportReader.setMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).setAnalysisDate(150000000L).build());
-  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setSnapshotId(1000L).addChildRef(2).build());
-  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setSnapshotId(1001L).build());
+  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).addChildRef(2).build());
+  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).build());
   Component child=root.getChildren().get(0);
   when(eventRepository.getEvents(root)).thenReturn(ImmutableList.of(Event.createAlert("Red (was Orange)",null,"Open issues > 0")));
   when(eventRepository.getEvents(child)).thenReturn(ImmutableList.of(Event.createAlert("Red (was Orange)",null,"Open issues > 0")));

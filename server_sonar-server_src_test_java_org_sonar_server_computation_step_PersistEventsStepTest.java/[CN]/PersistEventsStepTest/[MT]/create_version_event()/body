@@ -1,8 +1,10 @@
 {
   dbTester.prepareDbUnit(getClass(),"empty.xml");
-  treeRootHolder.setRoot(DumbComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").build());
+  Component project=DumbComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").build();
+  treeRootHolder.setRoot(project);
+  dbIdsRepository.setSnapshotId(project,1000L);
   reportReader.setMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).setAnalysisDate(150000000L).build());
-  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setSnapshotId(1000L).setVersion("1.0").build());
+  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setVersion("1.0").build());
   step.execute();
   dbTester.assertDbUnit(getClass(),"add_version_event-result.xml","events");
 }
