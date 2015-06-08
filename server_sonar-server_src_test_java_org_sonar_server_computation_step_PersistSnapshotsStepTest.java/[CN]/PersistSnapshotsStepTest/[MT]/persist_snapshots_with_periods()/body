@@ -1,0 +1,17 @@
+{
+  ComponentDto projectDto=ComponentTesting.newProjectDto("ABCD").setKey(PROJECT_KEY).setName("Project");
+  dbClient.componentDao().insert(session,projectDto);
+  SnapshotDto snapshotDto=SnapshotTesting.createForProject(projectDto).setCreatedAt(DateUtils.parseDateQuietly("2015-01-01").getTime());
+  dbClient.snapshotDao().insert(session,snapshotDto);
+  session.commit();
+  periodsHolderRule.addPeriod(new Period(1,CoreProperties.TIMEMACHINE_MODE_DATE,"2015-01-01",analysisDate));
+  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).setName("Project").setVersion("1.0").addChildRef(2).build());
+  Component project=new DumbComponent(Component.Type.PROJECT,1,"ABCD",PROJECT_KEY);
+  treeRootHolder.setRoot(project);
+  dbIdsRepository.setComponentId(project,projectDto.getId());
+  sut.execute();
+  SnapshotDto projectSnapshot=getUnprocessedSnapshot(projectDto.getId());
+  assertThat(projectSnapshot.getPeriodMode(1)).isEqualTo(CoreProperties.TIMEMACHINE_MODE_DATE);
+  assertThat(projectSnapshot.getPeriodDate(1)).isEqualTo(analysisDate);
+  assertThat(projectSnapshot.getPeriodModeParameter(1)).isNotNull();
+}
