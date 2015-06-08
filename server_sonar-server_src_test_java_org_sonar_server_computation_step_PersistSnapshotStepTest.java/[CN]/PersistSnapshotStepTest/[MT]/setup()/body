@@ -1,0 +1,11 @@
+{
+  dbTester.truncateTables();
+  session=dbTester.myBatis().openSession(false);
+  dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),new ComponentDao(),new SnapshotDao());
+  analysisDate=DATE_FORMAT.parse("2015-06-01").getTime();
+  reportReader.setMetadata(BatchReport.Metadata.newBuilder().setAnalysisDate(analysisDate).build());
+  dbIdsRepository=new DbIdsRepository();
+  now=DATE_FORMAT.parse("2015-06-02").getTime();
+  when(system2.now()).thenReturn(now);
+  sut=new PersistSnapshotsStep(system2,dbClient,treeRootHolder,reportReader,dbIdsRepository);
+}

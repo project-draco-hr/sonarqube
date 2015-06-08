@@ -1,0 +1,22 @@
+{
+  BatchReport.Component reportComponent=reportReader.readComponent(component.getRef());
+switch (component.getType()) {
+case PROJECT:
+    this.project=processProject(component,reportComponent);
+  processChildren(component,project);
+break;
+case MODULE:
+ComponentDto persistedModule=processModule(component,reportComponent,nonNullLastModule(lastModule));
+processChildren(component,persistedModule);
+break;
+case DIRECTORY:
+processDirectory(component,reportComponent,nonNullLastModule(lastModule));
+processChildren(component,nonNullLastModule(lastModule));
+break;
+case FILE:
+processFile(component,reportComponent,nonNullLastModule(lastModule));
+break;
+default :
+throw new IllegalStateException(String.format("Unsupported component type '%s'",component.getType()));
+}
+}
