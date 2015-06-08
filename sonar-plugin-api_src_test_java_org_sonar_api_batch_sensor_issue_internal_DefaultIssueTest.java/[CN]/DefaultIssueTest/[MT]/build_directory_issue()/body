@@ -1,10 +1,11 @@
 {
   SensorStorage storage=mock(SensorStorage.class);
-  DefaultIssue issue=new DefaultIssue(storage).onDir(new DefaultInputDir("foo","src")).forRule(RuleKey.of("repo","rule")).overrideSeverity(Severity.BLOCKER).message("Wrong way!");
-  assertThat(issue.inputPath()).isEqualTo(new DefaultInputDir("foo","src"));
+  DefaultIssue issue=new DefaultIssue(storage).addLocation(new DefaultIssueLocation().onDir(new DefaultInputDir("foo","src")).message("Wrong way!")).forRule(RuleKey.of("repo","rule")).overrideSeverity(Severity.BLOCKER);
+  assertThat(issue.locations().get(0).inputPath()).isEqualTo(new DefaultInputDir("foo","src"));
   assertThat(issue.ruleKey()).isEqualTo(RuleKey.of("repo","rule"));
-  assertThat(issue.message()).isEqualTo("Wrong way!");
-  assertThat(issue.overridenSeverity()).isEqualTo(Severity.BLOCKER);
+  assertThat(issue.locations().get(0).textRange()).isNull();
+  assertThat(issue.locations().get(0).message()).isEqualTo("Wrong way!");
+  assertThat(issue.overriddenSeverity()).isEqualTo(Severity.BLOCKER);
   issue.save();
   verify(storage).store(issue);
 }

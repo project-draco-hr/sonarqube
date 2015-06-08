@@ -1,6 +1,6 @@
 {
   DefaultFileSystem fs=new DefaultFileSystem(temp.newFolder().toPath());
-  DefaultInputFile inputFile=new DefaultInputFile("foo","src/Foo.xoo").setLanguage(Xoo.KEY).setLines(10);
+  DefaultInputFile inputFile=new DefaultInputFile("foo","src/Foo.xoo").setLanguage(Xoo.KEY).initMetadata(new FileMetadata().readMetadata(new StringReader("a\nb\nc\nd\ne\nf\ng\nh\ni\n")));
   fs.add(inputFile);
   SensorContext context=mock(SensorContext.class);
   final SensorStorage sensorStorage=mock(SensorStorage.class);
@@ -18,5 +18,5 @@
   ArgumentCaptor<DefaultIssue> argCaptor=ArgumentCaptor.forClass(DefaultIssue.class);
   verify(sensorStorage,times(10)).store(argCaptor.capture());
   assertThat(argCaptor.getAllValues()).hasSize(10);
-  assertThat(argCaptor.getValue().overridenSeverity()).isEqualTo(Severity.MINOR);
+  assertThat(argCaptor.getValue().overriddenSeverity()).isEqualTo(Severity.MINOR);
 }

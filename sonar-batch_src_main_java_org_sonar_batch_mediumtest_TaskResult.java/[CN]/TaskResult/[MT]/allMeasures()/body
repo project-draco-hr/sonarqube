@@ -1,3 +1,11 @@
 {
-  return measures.values();
+  Map<String,List<BatchReport.Measure>> result=new HashMap<>();
+  for (  Map.Entry<String,Component> component : reportComponents.entrySet()) {
+    List<BatchReport.Measure> measures=new ArrayList<>();
+    try (CloseableIterator<BatchReport.Measure> it=reader.readComponentMeasures(component.getValue().getRef())){
+      Iterators.addAll(measures,it);
+    }
+     result.put(component.getKey(),measures);
+  }
+  return result;
 }

@@ -5,6 +5,10 @@
     boolean unitTest=InputFile.Type.TEST == inputFile.type();
     Resource sonarFile=File.create(inputFile.relativePath(),languages.get(languageKey),unitTest);
     sonarIndex.index(sonarFile);
-    resourceCache.get(sonarFile).setInputPath(inputFile);
+    BatchComponent file=componentCache.get(sonarFile);
+    file.setInputPath(inputFile);
+    Resource sonarDir=file.parent().resource();
+    InputDir inputDir=fs.inputDir(inputFile.file().getParentFile());
+    componentCache.get(sonarDir).setInputPath(inputDir);
   }
 }

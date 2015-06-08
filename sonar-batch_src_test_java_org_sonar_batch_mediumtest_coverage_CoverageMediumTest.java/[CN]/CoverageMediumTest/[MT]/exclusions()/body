@@ -9,5 +9,6 @@
   TaskResult result=tester.newTask().properties(ImmutableMap.<String,String>builder().put("sonar.task","scan").put("sonar.projectBaseDir",baseDir.getAbsolutePath()).put("sonar.projectKey","com.foo.project").put("sonar.projectName","Foo Project").put("sonar.projectVersion","1.0-SNAPSHOT").put("sonar.projectDescription","Description of Foo Project").put("sonar.sources","src").put("sonar.coverage.exclusions","**/sample.xoo").build()).start();
   InputFile file=result.inputFile("src/sample.xoo");
   assertThat(result.coverageFor(file,2)).isNull();
-  assertThat(result.allMeasures()).extracting("metric.key").doesNotContain(CoreMetrics.LINES_TO_COVER,CoreMetrics.UNCOVERED_LINES,CoreMetrics.CONDITIONS_TO_COVER,CoreMetrics.COVERED_CONDITIONS_BY_LINE);
+  Map<String,List<org.sonar.batch.protocol.output.BatchReport.Measure>> allMeasures=result.allMeasures();
+  assertThat(allMeasures.get("com.foo.project:src/sample.xoo")).extracting("metricKey").doesNotContain(CoreMetrics.LINES_TO_COVER_KEY,CoreMetrics.UNCOVERED_LINES_KEY,CoreMetrics.CONDITIONS_TO_COVER_KEY,CoreMetrics.COVERED_CONDITIONS_BY_LINE_KEY);
 }

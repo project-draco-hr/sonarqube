@@ -7,6 +7,7 @@
   File otherFile=new File(srcDir,"sample.other");
   FileUtils.write(otherFile,"Sample other\ncontent\n");
   TaskResult result=tester.newTask().properties(ImmutableMap.<String,String>builder().put("sonar.task","scan").put("sonar.projectBaseDir",baseDir.getAbsolutePath()).put("sonar.projectKey","com.foo.project").put("sonar.projectName","Foo Project").put("sonar.projectVersion","1.0-SNAPSHOT").put("sonar.projectDescription","Description of Foo Project").put("sonar.sources","src").put("sonar.import_unknown_files","true").build()).start();
-  assertThat(result.measures("com.foo.project:src/sample.xoo")).extracting("metric.key","value").contains(tuple("lines",3));
-  assertThat(result.measures("com.foo.project:src/sample.other")).extracting("metric.key","value").contains(tuple("lines",3),tuple("ncloc",2));
+  Map<String,List<Measure>> allMeasures=result.allMeasures();
+  assertThat(allMeasures.get("com.foo.project:src/sample.xoo")).extracting("metricKey","intValue").contains(tuple("lines",3));
+  assertThat(allMeasures.get("com.foo.project:src/sample.other")).extracting("metricKey","intValue").contains(tuple("lines",3),tuple("ncloc",2));
 }

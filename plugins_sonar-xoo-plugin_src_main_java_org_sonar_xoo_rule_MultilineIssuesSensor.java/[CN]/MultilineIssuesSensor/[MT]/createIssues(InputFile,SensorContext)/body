@@ -1,0 +1,43 @@
+{
+  Pattern startPattern=Pattern.compile(START_ISSUE_PATTERN);
+  Pattern endPattern=Pattern.compile(END_ISSUE_PATTERN);
+  Map<Integer,Map<Integer,TextPointer>> startPositions=new HashMap<>();
+  Map<Integer,Map<Integer,TextPointer>> endPositions=new HashMap<>();
+  RuleKey ruleKey=RuleKey.of(XooRulesDefinition.XOO_REPOSITORY,RULE_KEY);
+  int currentLine=0;
+  try {
+    for (    String lineStr : Files.readAllLines(file.path(),context.fileSystem().encoding())) {
+      currentLine++;
+      Matcher m=startPattern.matcher(lineStr);
+      while (m.find()) {
+        Integer issueId=Integer.parseInt(m.group(1));
+        Integer issueLocationId=Integer.parseInt(m.group(2));
+        TextPointer newPointer=file.newPointer(currentLine,m.start());
+        if (!startPositions.containsKey(issueId)) {
+          startPositions.put(issueId,new HashMap<Integer,TextPointer>());
+        }
+        startPositions.get(issueId).put(issueLocationId,newPointer);
+      }
+      m=endPattern.matcher(lineStr);
+      while (m.find()) {
+        Integer issueId=Integer.parseInt(m.group(1));
+        Integer issueLocationId=Integer.parseInt(m.group(2));
+        TextPointer newPointer=file.newPointer(currentLine,m.start());
+        if (!endPositions.containsKey(issueId)) {
+          endPositions.put(issueId,new HashMap<Integer,TextPointer>());
+        }
+        endPositions.get(issueId).put(issueLocationId,newPointer);
+      }
+    }
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Unable to read file",e);
+  }
+  for (  Map.Entry<Integer,Map<Integer,TextPointer>> entry : startPositions.entrySet()) {
+    NewIssue newIssue=context.newIssue().forRule(ruleKey);
+    for (    Map.Entry<Integer,TextPointer> location : entry.getValue().entrySet()) {
+      newIssue.addLocation(newIssue.newLocation().onFile(file).at(file.newRange(location.getValue(),endPositions.get(entry.getKey()).get(location.getKey()))).message("Multiline issue"));
+    }
+    newIssue.save();
+  }
+}

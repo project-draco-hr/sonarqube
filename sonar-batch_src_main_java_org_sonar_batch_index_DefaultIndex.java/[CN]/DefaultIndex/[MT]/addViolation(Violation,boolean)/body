@@ -1,22 +1,29 @@
 {
-  Resource resource=violation.getResource();
-  if (resource == null) {
-    violation.setResource(currentProject);
-  }
- else   if (!Scopes.isHigherThanOrEquals(resource,Scopes.FILE)) {
-    throw new IllegalArgumentException("Violations are only supported on files, directories and project");
+  BatchComponent component=componentCache.get(violation.getResource());
+  if (component == null) {
+    LOG.warn("Resource is not indexed. Ignoring violation {}",violation);
+    return;
   }
   Rule rule=violation.getRule();
   if (rule == null) {
     LOG.warn("Rule is null. Ignoring violation {}",violation);
     return;
   }
-  Bucket bucket=getBucket(resource);
-  if (bucket == null) {
-    LOG.warn("Resource is not indexed. Ignoring violation {}",violation);
-    return;
+  DefaultIssue newIssue=new DefaultIssue(sensorStorage);
+  NewIssueLocation newLocation=newIssue.newLocation();
+  if (component.isProjectOrModule()) {
+    newLocation.onProject();
   }
-  violation.setSeverity(null);
-  violation.setResource(bucket.getResource());
-  moduleIssues.initAndAddViolation(violation);
+ else   if (component.isDir()) {
+    newLocation.onDir((InputDir)component.inputPath());
+  }
+ else   if (component.isFile()) {
+    InputFile inputFile=(InputFile)component.inputPath();
+    newLocation.onFile(inputFile);
+    if (violation.hasLineId()) {
+      newLocation.at(inputFile.selectLine(violation.getLineId()));
+    }
+  }
+  newLocation.message(violation.getMessage());
+  newIssue.addLocation(newLocation).forRule(RuleKey.of(violation.getRule().getRepositoryKey(),violation.getRule().getKey())).effortToFix(violation.getCost()).save();
 }

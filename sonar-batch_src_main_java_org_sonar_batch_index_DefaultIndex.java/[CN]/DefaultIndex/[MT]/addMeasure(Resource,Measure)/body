@@ -1,21 +1,7 @@
 {
   Bucket bucket=getBucket(resource);
   if (bucket != null) {
-    if (DEPRECATED_METRICS_KEYS.contains(measure.getMetricKey())) {
-      return null;
-    }
-    org.sonar.api.batch.measure.Metric metric=metricFinder.findByKey(measure.getMetricKey());
-    if (metric == null) {
-      throw new SonarException("Unknown metric: " + measure.getMetricKey());
-    }
-    if (!measure.isFromCore() && INTERNAL_METRICS.contains(metric)) {
-      LOG.debug("Metric " + metric.key() + " is an internal metric computed by SonarQube. Provided value is ignored.");
-      return measure;
-    }
-    if (measureCache.contains(resource,measure)) {
-      throw new SonarException("Can not add the same measure twice on " + resource + ": "+ measure);
-    }
-    measureCache.put(resource,measure);
+    return sensorStorage.saveMeasure(resource,measure);
   }
   return measure;
 }

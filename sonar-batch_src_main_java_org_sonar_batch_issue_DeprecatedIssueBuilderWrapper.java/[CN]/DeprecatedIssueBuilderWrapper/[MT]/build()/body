@@ -1,0 +1,22 @@
+{
+  if (primaryMessage != null || primaryRange != null || locations.isEmpty()) {
+    NewIssueLocation newLocation=newIssue.newLocation().message(primaryMessage);
+    if (primaryComponent.isProjectOrModule()) {
+      newLocation.onProject();
+    }
+ else     if (primaryComponent.isFile()) {
+      newLocation.onFile((InputFile)primaryComponent.inputPath());
+      if (primaryRange != null) {
+        newLocation.at(primaryRange);
+      }
+    }
+ else     if (primaryComponent.isDir()) {
+      newLocation.onDir((InputDir)primaryComponent.inputPath());
+    }
+    newIssue.addLocation(newLocation);
+  }
+  for (  NewIssueLocation issueLocation : locations) {
+    newIssue.addLocation(issueLocation);
+  }
+  return new DeprecatedIssueWrapper(newIssue);
+}
