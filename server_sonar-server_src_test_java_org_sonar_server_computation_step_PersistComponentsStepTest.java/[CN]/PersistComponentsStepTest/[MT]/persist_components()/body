@@ -9,6 +9,7 @@
   Component project=DumbComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).addChildren(module).build();
   treeRootHolder.setRoot(project);
   sut.execute();
+  session.commit();
   assertThat(dbTester.countRowsOfTable("projects")).isEqualTo(4);
   ComponentDto projectDto=dbClient.componentDao().selectNullableByKey(session,PROJECT_KEY);
   assertThat(projectDto).isNotNull();
@@ -22,6 +23,7 @@
   assertThat(projectDto.qualifier()).isEqualTo("TRK");
   assertThat(projectDto.scope()).isEqualTo("PRJ");
   assertThat(projectDto.parentProjectId()).isNull();
+  assertThat(projectDto.getCreatedAt()).isEqualTo(now);
   ComponentDto moduleDto=dbClient.componentDao().selectNullableByKey(session,"MODULE_KEY");
   assertThat(moduleDto).isNotNull();
   assertThat(moduleDto.name()).isEqualTo("Module");
@@ -34,6 +36,7 @@
   assertThat(moduleDto.qualifier()).isEqualTo("BRC");
   assertThat(moduleDto.scope()).isEqualTo("PRJ");
   assertThat(moduleDto.parentProjectId()).isEqualTo(projectDto.getId());
+  assertThat(moduleDto.getCreatedAt()).isEqualTo(now);
   ComponentDto directoryDto=dbClient.componentDao().selectNullableByKey(session,"MODULE_KEY:src/main/java/dir");
   assertThat(directoryDto).isNotNull();
   assertThat(directoryDto.name()).isEqualTo("src/main/java/dir");
@@ -46,6 +49,7 @@
   assertThat(directoryDto.qualifier()).isEqualTo("DIR");
   assertThat(directoryDto.scope()).isEqualTo("DIR");
   assertThat(directoryDto.parentProjectId()).isEqualTo(moduleDto.getId());
+  assertThat(directoryDto.getCreatedAt()).isEqualTo(now);
   ComponentDto fileDto=dbClient.componentDao().selectNullableByKey(session,"MODULE_KEY:src/main/java/dir/Foo.java");
   assertThat(fileDto).isNotNull();
   assertThat(fileDto.name()).isEqualTo("Foo.java");
@@ -59,6 +63,7 @@
   assertThat(fileDto.qualifier()).isEqualTo("FIL");
   assertThat(fileDto.scope()).isEqualTo("FIL");
   assertThat(fileDto.parentProjectId()).isEqualTo(moduleDto.getId());
+  assertThat(fileDto.getCreatedAt()).isEqualTo(now);
   assertThat(dbIdsRepository.getComponentId(project)).isEqualTo(projectDto.getId());
   assertThat(dbIdsRepository.getComponentId(module)).isEqualTo(moduleDto.getId());
   assertThat(dbIdsRepository.getComponentId(directory)).isEqualTo(directoryDto.getId());
