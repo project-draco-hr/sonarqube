@@ -1,0 +1,11 @@
+{
+  dbTester.prepareDbUnit(getClass(),"previous_version_deleted.xml");
+  settings.setProperty("sonar.timemachine.period1","previous_version");
+  sut.execute();
+  List<Period> periods=periodsHolder.getPeriods();
+  assertThat(periods).hasSize(1);
+  Period period=periods.get(0);
+  assertThat(period.getMode()).isEqualTo(CoreProperties.TIMEMACHINE_MODE_PREVIOUS_VERSION);
+  assertThat(period.getModeParameter()).isEqualTo("0.9");
+  assertThat(period.getSnapshotDate()).isEqualTo(1226379600000L);
+}
