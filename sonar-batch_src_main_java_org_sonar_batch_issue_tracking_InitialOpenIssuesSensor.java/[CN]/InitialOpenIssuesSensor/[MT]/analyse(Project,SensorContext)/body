@@ -1,18 +1,22 @@
 {
-  final Date now=DateUtils.addSeconds(DateUtils.truncate(new Date(),Calendar.MILLISECOND),1);
-  issueDao.selectNonClosedIssuesByModule(project.getId(),new ResultHandler(){
-    @Override public void handleResult(    ResultContext rc){
-      IssueDto dto=(IssueDto)rc.getResultObject();
-      dto.setSelectedAt(now.getTime());
-      initialOpenIssuesStack.addIssue(dto);
+  ResourceDto module=resourceDao.getResource(ResourceQuery.create().setKey(project.getEffectiveKey()));
+  if (module != null) {
+    long moduleId=module.getId();
+    final Date now=DateUtils.addSeconds(DateUtils.truncate(new Date(),Calendar.MILLISECOND),1);
+    issueDao.selectNonClosedIssuesByModule(moduleId,new ResultHandler(){
+      @Override public void handleResult(      ResultContext rc){
+        IssueDto dto=(IssueDto)rc.getResultObject();
+        dto.setSelectedAt(now.getTime());
+        initialOpenIssuesStack.addIssue(dto);
+      }
     }
-  }
 );
-  issueChangeDao.selectChangelogOnNonClosedIssuesByModuleAndType(project.getId(),new ResultHandler(){
-    @Override public void handleResult(    ResultContext rc){
-      IssueChangeDto dto=(IssueChangeDto)rc.getResultObject();
-      initialOpenIssuesStack.addChangelog(dto);
+    issueChangeDao.selectChangelogOnNonClosedIssuesByModuleAndType(moduleId,new ResultHandler(){
+      @Override public void handleResult(      ResultContext rc){
+        IssueChangeDto dto=(IssueChangeDto)rc.getResultObject();
+        initialOpenIssuesStack.addChangelog(dto);
+      }
     }
-  }
 );
+  }
 }
