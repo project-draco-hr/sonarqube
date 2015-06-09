@@ -1,11 +1,11 @@
 {
-  Optional<BatchReport.Measure> currentStatus=measureRepository.findCurrent(project,CoreMetrics.ALERT_STATUS);
-  if (!currentStatus.isPresent()) {
+  Optional<BatchReport.Measure> statusMeasure=measureRepository.findCurrent(project,CoreMetrics.ALERT_STATUS);
+  if (!statusMeasure.isPresent()) {
     return;
   }
-  Optional<AlertStatus> alertLevel=parse(currentStatus.get().getAlertStatus());
-  if (!alertLevel.isPresent()) {
+  Optional<GateStatus> status=parse(statusMeasure.get().getAlertStatus());
+  if (!status.isPresent()) {
     return;
   }
-  checkQualityGateStatusChange(project,alertLevel.get(),currentStatus.get().getAlertText());
+  checkStatusChange(project,status.get(),statusMeasure.get().getAlertText());
 }

@@ -1,0 +1,22 @@
+{
+  when(measureRepository.findCurrent(DUMB_PROJECT,ALERT_STATUS)).thenReturn(createBatchReportMeasure(status,DESCRIPTION));
+  when(measureRepository.findPrevious(DUMB_PROJECT,ALERT_STATUS)).thenReturn(Optional.fromNullable(measureDto));
+  underTest.execute();
+  verify(measureRepository).findCurrent(DUMB_PROJECT,ALERT_STATUS);
+  verify(measureRepository).findPrevious(DUMB_PROJECT,ALERT_STATUS);
+  verify(eventRepository).add(eq(DUMB_PROJECT),eventArgumentCaptor.capture());
+  verifyNoMoreInteractions(measureRepository,eventRepository);
+  Event event=eventArgumentCaptor.getValue();
+  assertThat(event.getCategory()).isEqualTo(Event.Category.ALERT);
+  assertThat(event.getName()).isEqualTo(expectedLabel);
+  assertThat(event.getDescription()).isEqualTo(DESCRIPTION);
+  assertThat(event.getData()).isNull();
+  verify(notificationManager).scheduleForSending(notificationArgumentCaptor.capture());
+  Notification notification=notificationArgumentCaptor.getValue();
+  assertThat(notification.getType()).isEqualTo("alerts");
+  assertThat(notification.getFieldValue("projectKey")).isEqualTo(DUMB_PROJECT.getKey());
+  assertThat(notification.getFieldValue("projectUuid")).isEqualTo(DUMB_PROJECT.getUuid());
+  assertThat(notification.getFieldValue("projectName")).isEqualTo(DUMB_PROJECT.getName());
+  assertThat(notification.getFieldValue("alertLevel")).isEqualTo(status);
+  assertThat(notification.getFieldValue("alertName")).isEqualTo(expectedLabel);
+}
