@@ -3,7 +3,7 @@
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey("MODULE_A").setName("Module A").addChildRef(3).build());
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(3).setType(Constants.ComponentType.MODULE).setKey("SUB_MODULE_A").setName("Sub Module A").build());
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(4).setType(Constants.ComponentType.MODULE).setKey("MODULE_B").setName("Module B").build());
-  treeRootHolder.setRoot(new DumbComponent(Component.Type.PROJECT,1,"ABCD",PROJECT_KEY,new DumbComponent(Component.Type.MODULE,2,"BCDE","MODULE_A",new DumbComponent(Component.Type.MODULE,3,"DEFG","SUB_MODULE_A")),new DumbComponent(Component.Type.MODULE,4,"CDEF","MODULE_B")));
+  treeRootHolder.setRoot(DumbComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).addChildren(DumbComponent.builder(Component.Type.MODULE,2).setUuid("BCDE").setKey("MODULE_A").addChildren(DumbComponent.builder(Component.Type.MODULE,3).setUuid("DEFG").setKey("SUB_MODULE_A").build()).build(),DumbComponent.builder(Component.Type.MODULE,4).setUuid("CDEF").setKey("MODULE_B").build()).build());
   sut.execute();
   assertThat(dbTester.countRowsOfTable("projects")).isEqualTo(4);
   ComponentDto project=dbClient.componentDao().selectNullableByKey(session,PROJECT_KEY);

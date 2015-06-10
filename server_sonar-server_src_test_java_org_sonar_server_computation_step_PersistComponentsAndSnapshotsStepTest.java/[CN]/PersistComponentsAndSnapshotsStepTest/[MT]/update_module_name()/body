@@ -6,7 +6,7 @@
   session.commit();
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).setName("New project name").addChildRef(2).build());
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey("MODULE_KEY").setName("New module name").setPath("New path").build());
-  treeRootHolder.setRoot(new DumbComponent(Component.Type.PROJECT,1,"ABCD",PROJECT_KEY,new DumbComponent(Component.Type.MODULE,2,"BCDE","MODULE_KEY")));
+  treeRootHolder.setRoot(DumbComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).addChildren(DumbComponent.builder(Component.Type.MODULE,2).setUuid("BCDE").setKey("MODULE_KEY").build()).build());
   sut.execute();
   ComponentDto projectReloaded=dbClient.componentDao().selectNullableByKey(session,PROJECT_KEY);
   assertThat(projectReloaded.name()).isEqualTo("New project name");
