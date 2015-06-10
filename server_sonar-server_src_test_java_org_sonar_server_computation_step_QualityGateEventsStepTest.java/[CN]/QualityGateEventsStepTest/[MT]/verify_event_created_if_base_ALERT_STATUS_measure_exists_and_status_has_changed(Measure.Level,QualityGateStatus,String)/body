@@ -1,7 +1,6 @@
 {
-  QualityGateStatus someQGStatus=new QualityGateStatus(rawAlterStatus,ALERT_TEXT);
-  when(measureRepository.getRawMeasure(PROJECT_COMPONENT,alertStatusMetric)).thenReturn(of(MeasureImpl.createNoValue().setQualityGateStatus(someQGStatus)));
-  when(measureRepository.getBaseMeasure(PROJECT_COMPONENT,alertStatusMetric)).thenReturn(of(MeasureImpl.createNoValue()));
+  when(measureRepository.getRawMeasure(PROJECT_COMPONENT,alertStatusMetric)).thenReturn(of(MeasureImpl.createNoValue().setQualityGateStatus(newQualityGateStatus)));
+  when(measureRepository.getBaseMeasure(PROJECT_COMPONENT,alertStatusMetric)).thenReturn(of(MeasureImpl.createNoValue().setQualityGateStatus(new QualityGateStatus(previousAlertStatus))));
   underTest.execute();
   verify(measureRepository).getRawMeasure(PROJECT_COMPONENT,alertStatusMetric);
   verify(measureRepository).getBaseMeasure(PROJECT_COMPONENT,alertStatusMetric);
@@ -18,6 +17,7 @@
   assertThat(notification.getFieldValue("projectKey")).isEqualTo(PROJECT_COMPONENT.getKey());
   assertThat(notification.getFieldValue("projectUuid")).isEqualTo(PROJECT_COMPONENT.getUuid());
   assertThat(notification.getFieldValue("projectName")).isEqualTo(PROJECT_COMPONENT.getName());
-  assertThat(notification.getFieldValue("alertLevel")).isEqualTo(rawAlterStatus.name());
+  assertThat(notification.getFieldValue("alertLevel")).isEqualTo(newQualityGateStatus.getStatus().name());
   assertThat(notification.getFieldValue("alertName")).isEqualTo(expectedLabel);
+  reset(measureRepository,eventRepository,notificationManager);
 }
