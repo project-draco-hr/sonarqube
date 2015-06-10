@@ -1,0 +1,22 @@
+{
+switch (metric.getType()) {
+case INT:
+case RATING:
+case MILLISEC:
+    return Measure.newMeasureBuilder().create((int)dto.getValue());
+case WORK_DUR:
+  return Measure.newMeasureBuilder().create((long)dto.getValue());
+case FLOAT:
+case PERCENT:
+return Measure.newMeasureBuilder().create(dto.getValue());
+case BOOL:
+return Measure.newMeasureBuilder().create(NumberUtils.compare(dto.getValue(),1.0) == 0);
+case STRING:
+case DISTRIB:
+case DATA:
+case LEVEL:
+return Measure.newMeasureBuilder().create(dto.getTextValue());
+default :
+throw new IllegalArgumentException(String.format("Custom measures do not support the metric type [%s]",metric.getType()));
+}
+}
