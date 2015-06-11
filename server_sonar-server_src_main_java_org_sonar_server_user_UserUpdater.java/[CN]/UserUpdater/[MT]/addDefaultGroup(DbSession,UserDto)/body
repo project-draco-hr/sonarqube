@@ -1,7 +1,7 @@
 {
   final String defaultGroup=settings.getString(CoreProperties.CORE_DEFAULT_GROUP);
   if (defaultGroup == null) {
-    throw new IllegalStateException(String.format("The default group property '%s' is null",CoreProperties.CORE_DEFAULT_GROUP));
+    throw new ServerException(HttpURLConnection.HTTP_INTERNAL_ERROR,String.format("The default group property '%s' is null",CoreProperties.CORE_DEFAULT_GROUP));
   }
   List<GroupDto> userGroups=dbClient.groupDao().findByUserLogin(dbSession,userDto.getLogin());
   if (!Iterables.any(userGroups,new Predicate<GroupDto>(){
@@ -12,7 +12,7 @@
 )) {
     GroupDto groupDto=dbClient.groupDao().selectNullableByKey(dbSession,defaultGroup);
     if (groupDto == null) {
-      throw new IllegalStateException(String.format("The default group '%s' for new users does not exist. Please update the general security settings to fix this issue.",defaultGroup));
+      throw new ServerException(HttpURLConnection.HTTP_INTERNAL_ERROR,String.format("The default group '%s' for new users does not exist. Please update the general security settings to fix this issue.",defaultGroup));
     }
     dbClient.userGroupDao().insert(dbSession,new UserGroupDto().setUserId(userDto.getId()).setGroupId(groupDto.getId()));
   }
