@@ -2,17 +2,4 @@
   if (!ComponentKeys.isValidModuleKey(moduleDef.getKey())) {
     validationMessages.add(String.format("\"%s\" is not a valid project or module key. " + "Allowed characters are alphanumeric, '-', '_', '.' and ':', with at least one non-digit.",moduleDef.getKey()));
   }
- else   if (resourceDao != null && isSubProject(moduleDef)) {
-    String moduleKey=ComponentKeys.createKey(moduleDef.getKey(),branch);
-    ResourceDto rootInDB=resourceDao.getRootProjectByComponentKey(moduleKey);
-    if (rootInDB == null || Qualifiers.LIBRARY.equals(rootInDB.getQualifier())) {
-      return;
-    }
-    if (rootInDB.getKey().equals(moduleKey)) {
-      throw new SonarException(String.format("The project '%s' is already defined in SonarQube but not as a module of project '%s'. " + "If you really want to stop directly analysing project '%s', please first delete it from SonarQube and then relaunch the analysis of project '%s'.",moduleKey,rootProjectKey,moduleKey,rootProjectKey));
-    }
-    if (!rootProjectKey.equals(rootInDB.getKey())) {
-      throw new SonarException(String.format("Module \"%s\" is already part of project \"%s\"",moduleDef.getKey(),rootInDB.getKey()));
-    }
-  }
 }
