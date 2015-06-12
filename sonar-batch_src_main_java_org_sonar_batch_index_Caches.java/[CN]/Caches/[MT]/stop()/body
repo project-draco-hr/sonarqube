@@ -1,15 +1,16 @@
 {
-  if (persistit != null) {
+  for (  Entry<String,Exchange> e : caches.entrySet()) {
+    persistit.releaseExchange(e.getValue());
+  }
+  caches.clear();
+  if (volume != null) {
     try {
-      persistit.close(false);
-      persistit=null;
-      volume=null;
+      volume.close();
+      volume.delete();
     }
  catch (    PersistitException e) {
       throw new IllegalStateException("Fail to close caches",e);
     }
+    volume=null;
   }
-  FileUtils.deleteQuietly(tempDir);
-  tempDir=null;
-  cacheNames.clear();
 }
