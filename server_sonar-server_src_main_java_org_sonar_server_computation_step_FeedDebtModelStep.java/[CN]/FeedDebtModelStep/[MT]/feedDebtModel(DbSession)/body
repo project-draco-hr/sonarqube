@@ -1,11 +1,7 @@
 {
   List<CharacteristicDto> characteristicDtos=dbClient.debtCharacteristicDao().selectEnabledCharacteristics(session);
-  List<CharacteristicDto> rootCharacteristicDtos=FluentIterable.from(characteristicDtos).filter(isRootPredicate).toList();
-  Multimap<Integer,CharacteristicDto> subCharacteristicDtosByParentId=FluentIterable.from(characteristicDtos).filter(Predicates.not(isRootPredicate)).index(dtoToParentIdFunction);
-  for (  CharacteristicDto rootCharacteristicDto : rootCharacteristicDtos) {
-    Collection<CharacteristicDto> subCharacteristicDtos=subCharacteristicDtosByParentId.get(rootCharacteristicDto.getId());
-    Characteristic rootCharacteristic=toCharacteristic(rootCharacteristicDto);
-    List<Characteristic> subCharacteristic=FluentIterable.from(subCharacteristicDtos).transform(dtoToCharFunction).toList();
-    mutableDebtModelHolder.addCharacteristics(rootCharacteristic,subCharacteristic);
+  Map<Integer,CharacteristicDto> rootCharacteristicsById=FluentIterable.from(characteristicDtos).filter(IsRootPredicate.INSTANCE).uniqueIndex(CharacteristicDtoToId.INSTANCE);
+  for (  Map.Entry<Integer,Collection<CharacteristicDto>> entry : FluentIterable.from(characteristicDtos).filter(Predicates.not(IsRootPredicate.INSTANCE)).index(DtoToParentIdFunction.INSTANCE).asMap().entrySet()) {
+    mutableDebtModelHolder.addCharacteristics(toCharacteristic(rootCharacteristicsById.get(entry.getKey())),FluentIterable.from(entry.getValue()).transform(DtoToCharFunction.INSTANCE));
   }
 }
