@@ -1,0 +1,14 @@
+{
+  File defaultSonarHome=new File(System.getProperty("user.home"),".sonar");
+  File tmpDir=new File(new File(defaultSonarHome,CoreProperties.GLOBAL_WORKING_DIRECTORY_DEFAULT_VALUE),TempFolderProvider.TMP_NAME);
+  try {
+    TempFolder tempFolder=tempFolderProvider.provide(new BootstrapProperties(Collections.<String,String>emptyMap()));
+    tempFolder.newDir();
+    tempFolder.newFile();
+    assertThat(tmpDir).exists();
+    assertThat(tmpDir.list()).hasSize(2);
+  }
+  finally {
+    FileUtils.deleteDirectory(tmpDir);
+  }
+}

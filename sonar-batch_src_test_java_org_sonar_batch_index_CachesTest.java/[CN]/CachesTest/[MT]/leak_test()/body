@@ -1,0 +1,17 @@
+{
+  caches.stop();
+  System.out.println(cachesManager.tempDir());
+  int len=1 * 1024 * 1024;
+  StringBuilder sb=new StringBuilder(len);
+  for (int i=0; i < len; i++) {
+    sb.append("a");
+  }
+  for (int i=0; i < 3; i++) {
+    caches=new Caches(cachesManager);
+    caches.start();
+    Cache<String> c=caches.<String>createCache("test" + i);
+    c.put("key" + i,sb.toString());
+    cachesManager.persistit().flush();
+    caches.stop();
+  }
+}
