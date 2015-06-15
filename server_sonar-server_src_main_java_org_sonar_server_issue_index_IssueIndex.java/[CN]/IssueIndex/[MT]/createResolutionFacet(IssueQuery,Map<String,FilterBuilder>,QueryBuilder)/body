@@ -4,10 +4,10 @@
   Map<String,FilterBuilder> resolutionFilters=Maps.newHashMap(filters);
   resolutionFilters.remove("__isResolved");
   resolutionFilters.remove(fieldName);
-  StickyFacetBuilder assigneeFacetBuilder=new StickyFacetBuilder(esQuery,resolutionFilters);
+  StickyFacetBuilder assigneeFacetBuilder=newStickyFacetBuilder(query,resolutionFilters,esQuery);
   BoolFilterBuilder facetFilter=assigneeFacetBuilder.getStickyFacetFilter(fieldName);
   FilterAggregationBuilder facetTopAggregation=assigneeFacetBuilder.buildTopFacetAggregation(fieldName,facetName,facetFilter,DEFAULT_FACET_SIZE);
   facetTopAggregation=assigneeFacetBuilder.addSelectedItemsToFacet(fieldName,facetName,facetTopAggregation,Issue.RESOLUTIONS.toArray());
-  facetTopAggregation.subAggregation(AggregationBuilders.missing(facetName + FACET_SUFFIX_MISSING).field(fieldName));
+  facetTopAggregation.subAggregation(addDebtAggregationIfNeeded(query,AggregationBuilders.missing(facetName + FACET_SUFFIX_MISSING).field(fieldName)));
   return AggregationBuilders.global(facetName).subAggregation(facetTopAggregation);
 }

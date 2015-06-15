@@ -4,13 +4,13 @@
   Map<String,FilterBuilder> assigneeFilters=Maps.newHashMap(filters);
   assigneeFilters.remove(IS_ASSIGNED_FILTER);
   assigneeFilters.remove(fieldName);
-  StickyFacetBuilder assigneeFacetBuilder=new StickyFacetBuilder(queryBuilder,assigneeFilters);
+  StickyFacetBuilder assigneeFacetBuilder=newStickyFacetBuilder(query,assigneeFilters,queryBuilder);
   BoolFilterBuilder facetFilter=assigneeFacetBuilder.getStickyFacetFilter(fieldName);
   FilterAggregationBuilder facetTopAggregation=assigneeFacetBuilder.buildTopFacetAggregation(fieldName,facetName,facetFilter,DEFAULT_FACET_SIZE);
   Collection<String> assigneesEscaped=escapeValuesForFacetInclusion(query.assignees());
   if (!assigneesEscaped.isEmpty()) {
     facetTopAggregation=assigneeFacetBuilder.addSelectedItemsToFacet(fieldName,facetName,facetTopAggregation,assigneesEscaped.toArray());
   }
-  facetTopAggregation.subAggregation(AggregationBuilders.missing(facetName + FACET_SUFFIX_MISSING).field(fieldName));
+  facetTopAggregation.subAggregation(addDebtAggregationIfNeeded(query,AggregationBuilders.missing(facetName + FACET_SUFFIX_MISSING).field(fieldName)));
   return AggregationBuilders.global(facetName).subAggregation(facetTopAggregation);
 }

@@ -5,8 +5,8 @@
   }
   String fieldName=IssueIndexDefinition.FIELD_ISSUE_ASSIGNEE;
   String facetName=IssueFilterParameters.FACET_ASSIGNED_TO_ME;
-  StickyFacetBuilder assignedToMeFacetBuilder=new StickyFacetBuilder(queryBuilder,filters);
+  StickyFacetBuilder assignedToMeFacetBuilder=newStickyFacetBuilder(query,filters,queryBuilder);
   BoolFilterBuilder facetFilter=assignedToMeFacetBuilder.getStickyFacetFilter(IS_ASSIGNED_FILTER,fieldName);
-  FilterAggregationBuilder facetTopAggregation=AggregationBuilders.filter(facetName + "__filter").filter(facetFilter).subAggregation(AggregationBuilders.terms(facetName + "__terms").field(fieldName).include(login));
+  FilterAggregationBuilder facetTopAggregation=AggregationBuilders.filter(facetName + "__filter").filter(facetFilter).subAggregation(addDebtAggregationIfNeeded(query,AggregationBuilders.terms(facetName + "__terms").field(fieldName).include(login)));
   builder.addAggregation(AggregationBuilders.global(facetName).subAggregation(facetTopAggregation));
 }

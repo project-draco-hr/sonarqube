@@ -1,6 +1,10 @@
 {
   if (selected.length > 0) {
-    facetTopAggregation.subAggregation(AggregationBuilders.terms(facetName + "_selected").field(fieldName).include(Joiner.on('|').join(selected)));
+    TermsBuilder selectedTerms=AggregationBuilders.terms(facetName + "_selected").field(fieldName).include(Joiner.on('|').join(selected));
+    if (subAggregation != null) {
+      selectedTerms=selectedTerms.subAggregation(subAggregation);
+    }
+    facetTopAggregation.subAggregation(selectedTerms);
   }
   return facetTopAggregation;
 }

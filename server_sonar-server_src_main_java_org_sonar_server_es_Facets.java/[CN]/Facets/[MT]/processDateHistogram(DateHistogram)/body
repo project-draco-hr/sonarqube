@@ -1,6 +1,11 @@
 {
   LinkedHashMap<String,Long> facet=getOrCreateFacet(aggregation.getName());
   for (  DateHistogram.Bucket value : aggregation.getBuckets()) {
-    facet.put(value.getKeyAsText().toString(),value.getDocCount());
+    if (value.getAggregations().getAsMap().containsKey("debt")) {
+      facet.put(value.getKey(),Math.round(((Sum)value.getAggregations().get("debt")).getValue()));
+    }
+ else {
+      facet.put(value.getKey(),value.getDocCount());
+    }
   }
 }

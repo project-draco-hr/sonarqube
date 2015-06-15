@@ -4,10 +4,10 @@
   Map<String,FilterBuilder> actionPlanFilters=Maps.newHashMap(filters);
   actionPlanFilters.remove("__isPlanned");
   actionPlanFilters.remove(fieldName);
-  StickyFacetBuilder actionPlanFacetBuilder=new StickyFacetBuilder(esQuery,actionPlanFilters);
+  StickyFacetBuilder actionPlanFacetBuilder=newStickyFacetBuilder(query,actionPlanFilters,esQuery);
   BoolFilterBuilder facetFilter=actionPlanFacetBuilder.getStickyFacetFilter(fieldName);
   FilterAggregationBuilder facetTopAggregation=actionPlanFacetBuilder.buildTopFacetAggregation(fieldName,facetName,facetFilter,DEFAULT_FACET_SIZE);
   facetTopAggregation=actionPlanFacetBuilder.addSelectedItemsToFacet(fieldName,facetName,facetTopAggregation,query.actionPlans().toArray());
-  facetTopAggregation.subAggregation(AggregationBuilders.missing(facetName + FACET_SUFFIX_MISSING).field(fieldName));
+  facetTopAggregation.subAggregation(addDebtAggregationIfNeeded(query,AggregationBuilders.missing(facetName + FACET_SUFFIX_MISSING).field(fieldName)));
   return AggregationBuilders.global(facetName).subAggregation(facetTopAggregation);
 }

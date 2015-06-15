@@ -1,6 +1,12 @@
 {
   long docCount=aggregation.getDocCount();
   if (docCount > 0L) {
-    getOrCreateFacet(aggregation.getName().replace("_missing","")).put("",docCount);
+    LinkedHashMap<String,Long> facet=getOrCreateFacet(aggregation.getName().replace("_missing",""));
+    if (aggregation.getAggregations().getAsMap().containsKey("debt")) {
+      facet.put("",Math.round(((Sum)aggregation.getAggregations().get("debt")).getValue()));
+    }
+ else {
+      facet.put("",docCount);
+    }
   }
 }

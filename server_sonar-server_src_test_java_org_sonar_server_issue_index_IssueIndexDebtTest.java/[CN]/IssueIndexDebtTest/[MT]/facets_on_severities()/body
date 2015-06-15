@@ -1,0 +1,9 @@
+{
+  ComponentDto project=ComponentTesting.newProjectDto();
+  ComponentDto file=ComponentTesting.newFileDto(project);
+  indexIssues(IssueTesting.newDoc("ISSUE1",file).setSeverity(Severity.INFO),IssueTesting.newDoc("ISSUE2",file).setSeverity(Severity.INFO),IssueTesting.newDoc("ISSUE3",file).setSeverity(Severity.MAJOR));
+  SearchResult<IssueDoc> result=index.search(newQueryBuilder().build(),new SearchOptions().addFacets(newArrayList("severities")));
+  assertThat(result.getFacets().getNames()).containsOnly("severities","debt");
+  assertThat(result.getFacets().get("severities")).containsOnly(entry("INFO",20L),entry("MAJOR",10L));
+  assertThat(result.getFacets().get("debt")).containsOnly(entry("total",30L));
+}

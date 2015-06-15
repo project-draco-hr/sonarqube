@@ -1,3 +1,7 @@
 {
-  return AggregationBuilders.filter(facetName + "_filter").filter(facetFilter).subAggregation(AggregationBuilders.terms(facetName).field(fieldName).order(Terms.Order.count(false)).size(size).minDocCount(FACET_DEFAULT_MIN_DOC_COUNT));
+  TermsBuilder termsAggregation=AggregationBuilders.terms(facetName).field(fieldName).order(order).size(size).minDocCount(FACET_DEFAULT_MIN_DOC_COUNT);
+  if (subAggregation != null) {
+    termsAggregation=termsAggregation.subAggregation(subAggregation);
+  }
+  return AggregationBuilders.filter(facetName + "_filter").filter(facetFilter).subAggregation(termsAggregation);
 }

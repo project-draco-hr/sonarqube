@@ -1,6 +1,6 @@
 {
   if (!options.getFacets().isEmpty()) {
-    StickyFacetBuilder stickyFacetBuilder=new StickyFacetBuilder(esQuery,filters);
+    StickyFacetBuilder stickyFacetBuilder=newStickyFacetBuilder(query,filters,esQuery);
     addSimpleStickyFacetIfNeeded(options,stickyFacetBuilder,esSearch,IssueFilterParameters.SEVERITIES,IssueIndexDefinition.FIELD_ISSUE_SEVERITY,Severity.ALL.toArray());
     addSimpleStickyFacetIfNeeded(options,stickyFacetBuilder,esSearch,IssueFilterParameters.STATUSES,IssueIndexDefinition.FIELD_ISSUE_STATUS,Issue.STATUSES.toArray());
     addSimpleStickyFacetIfNeeded(options,stickyFacetBuilder,esSearch,IssueFilterParameters.PROJECT_UUIDS,IssueIndexDefinition.FIELD_ISSUE_PROJECT_UUID,query.projectUuids().toArray());
@@ -15,7 +15,7 @@
       esSearch.addAggregation(stickyFacetBuilder.buildStickyFacet(IssueIndexDefinition.FIELD_ISSUE_TAGS,IssueFilterParameters.TAGS,query.tags().toArray()));
     }
     if (options.getFacets().contains(IssueFilterParameters.RESOLUTIONS)) {
-      esSearch.addAggregation(createResolutionFacet(filters,esQuery));
+      esSearch.addAggregation(createResolutionFacet(query,filters,esQuery));
     }
     if (options.getFacets().contains(IssueFilterParameters.ASSIGNEES)) {
       esSearch.addAggregation(createAssigneesFacet(query,filters,esQuery));
@@ -27,5 +27,8 @@
     if (options.getFacets().contains(IssueFilterParameters.CREATED_AT)) {
       esSearch.addAggregation(getCreatedAtFacet(query,filters,esQuery));
     }
+  }
+  if (IssueFilterParameters.FACET_MODE_DEBT.equals(query.facetMode())) {
+    esSearch.addAggregation(DEBT_AGGREGATION);
   }
 }
