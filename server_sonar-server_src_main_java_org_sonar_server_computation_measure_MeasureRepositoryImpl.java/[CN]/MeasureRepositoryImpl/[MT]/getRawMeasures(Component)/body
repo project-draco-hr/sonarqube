@@ -1,5 +1,5 @@
 {
-  Map<String,Measure> rawMeasures=measures.get(component.getRef());
+  Map<MeasureKey,Measure> rawMeasures=measures.get(component.getRef());
   ListMultimap<String,BatchReport.Measure> batchMeasures=from(reportReader.readComponentMeasures(component.getRef())).index(BatchMeasureToMetricKey.INSTANCE);
   if (rawMeasures == null && batchMeasures.isEmpty()) {
     return ImmutableSetMultimap.of();
@@ -10,8 +10,8 @@
   }
   ImmutableSetMultimap.Builder<String,Measure> builder=ImmutableSetMultimap.builder();
   builder.putAll(rawMeasuresFromBatch);
-  for (  Map.Entry<String,Measure> entry : rawMeasures.entrySet()) {
-    builder.put(entry.getKey(),entry.getValue());
+  for (  Map.Entry<MeasureKey,Measure> entry : rawMeasures.entrySet()) {
+    builder.put(entry.getKey().metricKey,entry.getValue());
   }
   return builder.build();
 }
