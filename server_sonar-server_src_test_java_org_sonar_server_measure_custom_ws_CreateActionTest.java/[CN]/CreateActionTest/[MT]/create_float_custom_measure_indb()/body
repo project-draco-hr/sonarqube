@@ -1,0 +1,7 @@
+{
+  MetricDto metric=insertMetricAndProject(ValueType.FLOAT,DEFAULT_PROJECT_UUID);
+  newRequest().setParam(CreateAction.PARAM_PROJECT_ID,DEFAULT_PROJECT_UUID).setParam(CreateAction.PARAM_METRIC_ID,metric.getId().toString()).setParam(CreateAction.PARAM_VALUE,"4.2").execute();
+  CustomMeasureDto customMeasure=dbClient.customMeasureDao().selectByMetricId(dbSession,metric.getId()).get(0);
+  assertThat(customMeasure.getValue()).isCloseTo(4.2d,Offset.offset(0.01d));
+  assertThat(customMeasure.getTextValue()).isNullOrEmpty();
+}

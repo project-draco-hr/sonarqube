@@ -1,0 +1,21 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  String description=request.param(PARAM_DESCRIPTION);
+  long now=system.now();
+  try {
+    ComponentDto component=searchProject(dbSession,request);
+    MetricDto metric=searchMetric(dbSession,request);
+    checkPermissions(component);
+    checkMeasureDoesNotExistAlready(dbSession,component,metric);
+    CustomMeasureDto measure=new CustomMeasureDto().setComponentUuid(component.uuid()).setComponentId(component.getId()).setMetricId(metric.getId()).setDescription(description).setCreatedAt(now);
+    setMeasureValue(measure,request,metric);
+    dbClient.customMeasureDao().insert(dbSession,measure);
+    dbSession.commit();
+    JsonWriter json=response.newJsonWriter();
+    writeMeasure(json,measure,component,metric,request.mandatoryParam(PARAM_VALUE));
+    json.close();
+  }
+  finally {
+    MyBatis.closeQuietly(dbSession);
+  }
+}

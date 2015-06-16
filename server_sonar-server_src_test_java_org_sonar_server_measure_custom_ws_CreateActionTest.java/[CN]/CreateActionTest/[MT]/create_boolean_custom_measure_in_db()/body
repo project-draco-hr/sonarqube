@@ -1,0 +1,11 @@
+{
+  MetricDto metric=insertMetricAndProject(ValueType.BOOL,DEFAULT_PROJECT_UUID);
+  newRequest().setParam(CreateAction.PARAM_PROJECT_ID,DEFAULT_PROJECT_UUID).setParam(CreateAction.PARAM_METRIC_ID,metric.getId().toString()).setParam(CreateAction.PARAM_DESCRIPTION,"custom-measure-description").setParam(CreateAction.PARAM_VALUE,"true").execute();
+  List<CustomMeasureDto> customMeasures=dbClient.customMeasureDao().selectByMetricId(dbSession,metric.getId());
+  CustomMeasureDto customMeasure=customMeasures.get(0);
+  assertThat(customMeasures).hasSize(1);
+  assertThat(customMeasure.getDescription()).isEqualTo("custom-measure-description");
+  assertThat(customMeasure.getTextValue()).isNullOrEmpty();
+  assertThat(customMeasure.getValue()).isCloseTo(1.0d,offset(0.01d));
+  assertThat(customMeasure.getComponentUuid()).isEqualTo(DEFAULT_PROJECT_UUID);
+}
