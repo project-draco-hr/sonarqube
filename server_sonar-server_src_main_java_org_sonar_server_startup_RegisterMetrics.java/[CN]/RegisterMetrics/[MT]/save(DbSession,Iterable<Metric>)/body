@@ -1,0 +1,24 @@
+{
+  Map<String,MetricDto> basesByKey=new HashMap<>();
+  for (  MetricDto base : from(dbClient.metricDao().selectEnabled(session)).toList()) {
+    basesByKey.put(base.getKey(),base);
+  }
+  for (  Metric metric : metrics) {
+    MetricDto dto=MetricToDto.INSTANCE.apply(metric);
+    MetricDto base=basesByKey.get(metric.getKey());
+    if (base == null) {
+      dbClient.metricDao().insert(session,dto);
+    }
+ else     if (!base.isUserManaged()) {
+      dto.setId(base.getId());
+      dbClient.metricDao().update(session,dto);
+    }
+    basesByKey.remove(metric.getKey());
+  }
+  for (  MetricDto nonUpdatedBase : basesByKey.values()) {
+    if (!nonUpdatedBase.isUserManaged()) {
+      LOG.info("Disable metric {} [{}]",nonUpdatedBase.getShortName(),nonUpdatedBase.getKey());
+      dbClient.metricDao().disableByKey(session,nonUpdatedBase.getKey());
+    }
+  }
+}
