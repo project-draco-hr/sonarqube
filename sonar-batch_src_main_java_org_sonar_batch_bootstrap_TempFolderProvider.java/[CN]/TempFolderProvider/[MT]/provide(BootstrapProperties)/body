@@ -6,7 +6,13 @@
       Path home=findHome(bootstrapProps);
       workingPath=home.resolve(workingPath).normalize();
     }
-    Path tempDir=workingPath.resolve(TMP_NAME);
+    try {
+      cleanTempFolders(workingPath);
+    }
+ catch (    IOException e) {
+      LOG.warn("failed to clean global working directory: " + e.getMessage());
+    }
+    Path tempDir=workingPath.resolve(TMP_NAME_PREFIX + System.currentTimeMillis());
     try {
       Files.createDirectories(tempDir);
     }
@@ -14,6 +20,7 @@
       throw new IllegalStateException("Unable to create root temp directory " + tempDir,e);
     }
     tempFolder=new DefaultTempFolder(tempDir.toFile(),true);
+    this.instance=tempFolder;
   }
   return tempFolder;
 }

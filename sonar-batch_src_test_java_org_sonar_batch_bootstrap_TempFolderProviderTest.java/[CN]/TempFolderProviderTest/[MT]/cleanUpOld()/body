@@ -1,0 +1,11 @@
+{
+  long creationTime=System.currentTimeMillis() - TimeUnit.DAYS.toMillis(100);
+  File workingDir=temp.getRoot();
+  for (int i=0; i < 3; i++) {
+    File tmp=new File(workingDir,".sonartmp_" + i);
+    tmp.mkdirs();
+    setFileCreationDate(tmp,creationTime);
+  }
+  tempFolderProvider.provide(new BootstrapProperties(ImmutableMap.of(CoreProperties.GLOBAL_WORKING_DIRECTORY,workingDir.getAbsolutePath())));
+  assertThat(getCreatedTempDir(workingDir)).exists();
+}
