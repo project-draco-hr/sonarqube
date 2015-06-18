@@ -4,15 +4,20 @@
   String qualityGateSetting=settings.getString(PROPERTY_QUALITY_GATE);
   if (qualityGateSetting == null || StringUtils.isBlank(qualityGateSetting)) {
     LOGGER.debug("No quality gate is configured for project " + projectKey);
-    qualityGateHolder.setQualityGate(DEFAULT_QUALITY_GATE);
+    qualityGateHolder.setNoQualityGate();
     return;
   }
   try {
-    long qualityGateId=Long.parseLong(qualityGateSetting.trim());
-    qualityGateHolder.setQualityGate(qualityGateService.findById(qualityGateId).or(DEFAULT_QUALITY_GATE));
+    long qualityGateId=Long.parseLong(qualityGateSetting);
+    Optional<QualityGate> qualityGate=qualityGateService.findById(qualityGateId);
+    if (qualityGate.isPresent()) {
+      qualityGateHolder.setQualityGate(qualityGate.get());
+    }
+ else {
+      qualityGateHolder.setNoQualityGate();
+    }
   }
  catch (  NumberFormatException e) {
-    LOGGER.error(String.format("Unsupported value in property %s, using empty Quality Gate",PROPERTY_QUALITY_GATE));
-    qualityGateHolder.setQualityGate(DEFAULT_QUALITY_GATE);
+    throw new IllegalStateException(String.format("Unsupported value (%s) in property %s",qualityGateSetting,PROPERTY_QUALITY_GATE),e);
   }
 }
