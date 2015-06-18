@@ -1,4 +1,7 @@
 {
+  if (issue == null) {
+    return "{}";
+  }
   StringWriter writer=new StringWriter();
   JsonWriter json=JsonWriter.of(writer);
   DbSession dbSession=dbClient.openSession(false);
@@ -25,6 +28,12 @@
     projectsByComponentUuid=issueComponentHelper.prepareComponentsAndProjects(projectUuids,componentUuids,componentsByUuid,componentDtos,subProjectDtos,dbSession);
     json.beginObject().name("issue");
     issueWriter.write(json,issue,usersByLogin,componentsByUuid,projectsByComponentUuid,ImmutableMultimap.<String,DefaultIssueComment>of(),ImmutableMap.<String,ActionPlan>of(),ImmutableList.of(IssueJsonWriter.ACTIONS_EXTRA_FIELD,IssueJsonWriter.TRANSITIONS_EXTRA_FIELD));
+    json.name("users").beginArray();
+    String assignee=issue.assignee();
+    if (assignee != null && usersByLogin.containsKey(assignee)) {
+      userWriter.write(json,usersByLogin.get(assignee));
+    }
+    json.endArray();
     json.endObject().close();
   }
   finally {
