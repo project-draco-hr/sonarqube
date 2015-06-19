@@ -1,15 +1,5 @@
 {
-  List<String> fileUuids=Lists.transform(tests,new NonNullInputFunction<TestDoc,String>(){
-    @Override protected String doApply(    TestDoc testDoc){
-      return testDoc.fileUuid();
-    }
-  }
-);
+  List<String> fileUuids=Lists.transform(tests,new TestToFileUuidFunction());
   List<ComponentDto> components=dbClient.componentDao().selectByUuids(dbSession,fileUuids);
-  return Maps.uniqueIndex(components,new NonNullInputFunction<ComponentDto,String>(){
-    @Override public String doApply(    ComponentDto componentDto){
-      return componentDto.uuid();
-    }
-  }
-);
+  return Maps.uniqueIndex(components,new ComponentToUuidFunction());
 }
