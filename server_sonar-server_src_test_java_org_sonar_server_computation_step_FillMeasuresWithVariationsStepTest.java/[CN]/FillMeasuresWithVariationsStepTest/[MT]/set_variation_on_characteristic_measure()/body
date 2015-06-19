@@ -1,0 +1,20 @@
+{
+  SnapshotDto period1ProjectSnapshot=createForProject(PROJECT_DTO);
+  dbClient.snapshotDao().insert(session,period1ProjectSnapshot);
+  CharacteristicDto char1=new CharacteristicDto().setKey("PORTABILITY");
+  CharacteristicDto char2=new CharacteristicDto().setKey("MAINTAINABILITY");
+  dbClient.debtCharacteristicDao().insert(session,char1,char2);
+  dbClient.measureDao().insert(session,newMeasureDto(ISSUES_METRIC.getId(),PROJECT_DTO.getId(),period1ProjectSnapshot.getId(),60d));
+  dbClient.measureDao().insert(session,newMeasureDto(ISSUES_METRIC.getId(),PROJECT_DTO.getId(),period1ProjectSnapshot.getId(),40d).setCharacteristicId(char1.getId()));
+  dbClient.measureDao().insert(session,newMeasureDto(ISSUES_METRIC.getId(),PROJECT_DTO.getId(),period1ProjectSnapshot.getId(),20d).setCharacteristicId(char2.getId()));
+  session.commit();
+  periodsHolder.addPeriod(newPeriod(1,period1ProjectSnapshot));
+  treeRootHolder.setRoot(PROJECT);
+  measureRepository.add(PROJECT,toMetric(ISSUES_METRIC),Measure.newMeasureBuilder().create(80,null));
+  measureRepository.add(PROJECT,toMetric(ISSUES_METRIC),Measure.newMeasureBuilder().forCharacteristic(char1.getId()).create(45,null));
+  measureRepository.add(PROJECT,toMetric(ISSUES_METRIC),Measure.newMeasureBuilder().forCharacteristic(char2.getId()).create(35,null));
+  sut.execute();
+  assertThat(measureRepository.getRawMeasure(PROJECT,toMetric(ISSUES_METRIC)).get().getVariations().getVariation1()).isEqualTo(20d);
+  assertThat(measureRepository.getRawMeasure(PROJECT,toMetric(ISSUES_METRIC),new Characteristic(char1.getId(),char1.getKey())).get().getVariations().getVariation1()).isEqualTo(5d);
+  assertThat(measureRepository.getRawMeasure(PROJECT,toMetric(ISSUES_METRIC),new Characteristic(char2.getId(),char2.getKey())).get().getVariations().getVariation1()).isEqualTo(15d);
+}

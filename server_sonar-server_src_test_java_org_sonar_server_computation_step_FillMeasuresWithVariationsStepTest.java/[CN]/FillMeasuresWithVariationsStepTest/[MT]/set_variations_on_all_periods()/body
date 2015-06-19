@@ -1,0 +1,26 @@
+{
+  SnapshotDto period1ProjectSnapshot=createForProject(PROJECT_DTO).setLast(false);
+  SnapshotDto period2ProjectSnapshot=createForProject(PROJECT_DTO).setLast(false);
+  SnapshotDto period3ProjectSnapshot=createForProject(PROJECT_DTO).setLast(false);
+  SnapshotDto period4ProjectSnapshot=createForProject(PROJECT_DTO).setLast(false);
+  SnapshotDto period5ProjectSnapshot=createForProject(PROJECT_DTO).setLast(false);
+  dbClient.snapshotDao().insert(session,period1ProjectSnapshot,period2ProjectSnapshot,period3ProjectSnapshot,period4ProjectSnapshot,period5ProjectSnapshot);
+  dbClient.measureDao().insert(session,newMeasureDto(ISSUES_METRIC.getId(),PROJECT_DTO.getId(),period1ProjectSnapshot.getId(),0d),newMeasureDto(ISSUES_METRIC.getId(),PROJECT_DTO.getId(),period2ProjectSnapshot.getId(),20d),newMeasureDto(ISSUES_METRIC.getId(),PROJECT_DTO.getId(),period3ProjectSnapshot.getId(),40d),newMeasureDto(ISSUES_METRIC.getId(),PROJECT_DTO.getId(),period4ProjectSnapshot.getId(),80d),newMeasureDto(ISSUES_METRIC.getId(),PROJECT_DTO.getId(),period5ProjectSnapshot.getId(),100d));
+  session.commit();
+  periodsHolder.addPeriod(newPeriod(1,period1ProjectSnapshot));
+  periodsHolder.addPeriod(newPeriod(2,period2ProjectSnapshot));
+  periodsHolder.addPeriod(newPeriod(3,period3ProjectSnapshot));
+  periodsHolder.addPeriod(newPeriod(4,period4ProjectSnapshot));
+  periodsHolder.addPeriod(newPeriod(5,period5ProjectSnapshot));
+  treeRootHolder.setRoot(PROJECT);
+  addRawMeasure(PROJECT,ISSUES_METRIC,Measure.newMeasureBuilder().create(80,null));
+  sut.execute();
+  assertThat(measureRepository.getRawMeasures(PROJECT).keys()).hasSize(1);
+  Measure measure=measureRepository.getRawMeasure(PROJECT,toMetric(ISSUES_METRIC)).get();
+  assertThat(measure.hasVariations()).isTrue();
+  assertThat(measure.getVariations().getVariation1()).isEqualTo(80d);
+  assertThat(measure.getVariations().getVariation2()).isEqualTo(60d);
+  assertThat(measure.getVariations().getVariation3()).isEqualTo(40d);
+  assertThat(measure.getVariations().getVariation4()).isEqualTo(0d);
+  assertThat(measure.getVariations().getVariation5()).isEqualTo(-20d);
+}

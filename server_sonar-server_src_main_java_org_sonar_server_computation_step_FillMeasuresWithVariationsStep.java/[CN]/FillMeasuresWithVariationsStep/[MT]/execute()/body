@@ -1,0 +1,10 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    Iterable<Metric> metrics=FluentIterable.from(metricRepository.getAll()).filter(NumericMetric.INSTANCE);
+    new VariationMeasuresVisitor(dbSession,metrics).visit(treeRootHolder.getRoot());
+  }
+  finally {
+    dbSession.close();
+  }
+}
