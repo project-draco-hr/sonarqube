@@ -1,0 +1,13 @@
+{
+  if (periodsHolder.getPeriods().isEmpty()) {
+    return;
+  }
+  Metric metric=metricRepository.getByKey(metricKey);
+  Double[] periodValues=new Double[]{null,null,null,null,null};
+  for (  Period period : periodsHolder.getPeriods()) {
+    Collection<Measure> childrenMeasures=getChildrenMeasures(component,metric);
+    double periodValue=sumIssuesOnPeriod(issues,period.getSnapshotDate()) + sumChildrenMeasuresOnPeriod(childrenMeasures,period.getIndex());
+    periodValues[period.getIndex() - 1]=periodValue;
+  }
+  measureRepository.add(component,metric,Measure.newMeasureBuilder().setVariations(new MeasureVariations(periodValues)).createNoValue());
+}
