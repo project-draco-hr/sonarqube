@@ -1,16 +1,11 @@
 {
-  String projectKey=root.getKey();
-  String moduleKey=module.getKey();
-  validateBatchKey(module);
-  ComponentDto moduleDto=loadComponent(moduleKey);
-  if (moduleDto == null) {
+  String rawProjectKey=rawProject.getKey();
+  String rawModuleKey=rawModule.getKey();
+  validateBatchKey(rawModule);
+  ComponentDto baseModule=loadBaseComponent(rawModuleKey);
+  if (baseModule == null) {
     return;
   }
-  if (moduleDto.projectUuid().equals(moduleDto.uuid())) {
-    validationMessages.add(String.format("The project \"%s\" is already defined in SonarQube but not as a module of project \"%s\". " + "If you really want to stop directly analysing project \"%s\", please first delete it from SonarQube and then relaunch the analysis of project \"%s\".",moduleKey,projectKey,moduleKey,projectKey));
-  }
- else   if (!moduleDto.projectUuid().equals(root.getUuid())) {
-    ComponentDto projectModule=componentDao.selectByUuid(session,moduleDto.projectUuid());
-    validationMessages.add(String.format("Module \"%s\" is already part of project \"%s\"",moduleKey,projectModule.key()));
-  }
+  validateModuleIsNotAlreadyUsedAsProject(baseModule,rawProjectKey,rawModuleKey);
+  validateModuleKeyIsNotAlreadyUsedInAnotherProject(baseModule,rawModuleKey);
 }

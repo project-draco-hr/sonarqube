@@ -1,16 +1,9 @@
 {
-  this.root=project;
+  this.rawProject=rawProject;
   validateBranch();
-  validateBatchKey(project);
-  String projectKey=project.getKey();
-  ComponentDto projectDto=loadComponent(projectKey);
-  if (projectDto == null) {
-    if (preventAutomaticProjectCreation) {
-      validationMessages.add(String.format("Unable to scan non-existing project '%s'",projectKey));
-    }
-  }
- else   if (!projectDto.projectUuid().equals(projectDto.uuid())) {
-    ComponentDto anotherProject=componentDao.selectByUuid(session,projectDto.projectUuid());
-    validationMessages.add(String.format("The project \"%s\" is already defined in SonarQube but as a module of project \"%s\". " + "If you really want to stop directly analysing project \"%s\", please first delete it from SonarQube and then relaunch the analysis of project \"%s\".",projectKey,anotherProject.key(),anotherProject.key(),projectKey));
-  }
+  validateBatchKey(rawProject);
+  String rawProjectKey=rawProject.getKey();
+  ComponentDto baseProject=loadBaseComponent(rawProjectKey);
+  validateWhenProvisioningEnforced(baseProject,rawProjectKey);
+  validateProjectKey(baseProject,rawProjectKey);
 }
