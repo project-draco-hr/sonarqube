@@ -1,0 +1,26 @@
+{
+  int id=request.mandatoryParamAsInt(PARAM_ID);
+  String value=request.param(PARAM_VALUE);
+  String description=request.param(PARAM_DESCRIPTION);
+  checkParameters(value,description);
+  DbSession dbSession=dbClient.openSession(true);
+  try {
+    CustomMeasureDto customMeasure=dbClient.customMeasureDao().selectById(dbSession,id);
+    MetricDto metric=dbClient.metricDao().selectById(dbSession,customMeasure.getMetricId());
+    ComponentDto component=dbClient.componentDao().selectByUuid(dbSession,customMeasure.getComponentUuid());
+    User user=userIndex.getByLogin(userSession.getLogin());
+    checkPermissions(component);
+    setValue(customMeasure,value,metric);
+    setDescription(customMeasure,description);
+    customMeasure.setUserLogin(user.login());
+    customMeasure.setUpdatedAt(system.now());
+    dbClient.customMeasureDao().update(dbSession,customMeasure);
+    dbSession.commit();
+    JsonWriter json=response.newJsonWriter();
+    customMeasureJsonWriter.write(json,customMeasure,metric,component,user);
+    json.close();
+  }
+  finally {
+    MyBatis.closeQuietly(dbSession);
+  }
+}
