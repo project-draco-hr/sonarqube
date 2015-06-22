@@ -1,19 +1,10 @@
 {
-  ComponentDto projectDto=addComponent("project-key");
-  ComponentDto fileDto=addComponent("file-key");
-  Component file=DumbComponent.builder(Component.Type.FILE,2).setUuid("CDEF").setKey("MODULE_KEY:file").build();
-  Component project=DumbComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).addChildren(file).build();
-  treeRootHolder.setRoot(project);
-  dbIdsRepository.setComponentId(project,projectDto.getId());
-  dbIdsRepository.setSnapshotId(project,3L);
-  dbIdsRepository.setComponentId(file,fileDto.getId());
-  dbIdsRepository.setSnapshotId(file,4L);
-  reportReader.putMeasures(1,Arrays.asList(BatchReport.Measure.newBuilder().setValueType(MeasureValueType.STRING).setStringValue("measure-data").setVariationValue1(1.1d).setVariationValue2(2.2d).setVariationValue3(3.3d).setVariationValue4(4.4d).setVariationValue5(5.5d).setAlertStatus("WARN").setAlertText("Open issues > 0").setDescription("measure-description").setMetricKey(STRING_METRIC_KEY).setCharactericId(123456).build()));
-  reportReader.putMeasures(2,Arrays.asList(BatchReport.Measure.newBuilder().setValueType(MeasureValueType.DOUBLE).setDoubleValue(123.123d).setVariationValue1(1.1d).setVariationValue2(2.2d).setVariationValue3(3.3d).setVariationValue4(4.4d).setVariationValue5(5.5d).setAlertStatus("ERROR").setAlertText("Blocker issues variation > 0").setDescription("measure-description").setMetricKey(DOUBLE_METRIC_KEY).setRuleKey(RULE_KEY.toString()).build()));
+  reportReader.putMeasures(PROJECT_REF,Arrays.asList(BatchReport.Measure.newBuilder().setValueType(MeasureValueType.STRING).setStringValue("measure-data").setVariationValue1(1.1d).setVariationValue2(2.2d).setVariationValue3(3.3d).setVariationValue4(4.4d).setVariationValue5(5.5d).setAlertStatus("WARN").setAlertText("Open issues > 0").setDescription("measure-description").setMetricKey(STRING_METRIC_KEY).setCharactericId(123456).build()));
+  reportReader.putMeasures(FILE_REF,Arrays.asList(BatchReport.Measure.newBuilder().setValueType(MeasureValueType.DOUBLE).setDoubleValue(123.123d).setVariationValue1(1.1d).setVariationValue2(2.2d).setVariationValue3(3.3d).setVariationValue4(4.4d).setVariationValue5(5.5d).setAlertStatus("ERROR").setAlertText("Blocker issues variation > 0").setDescription("measure-description").setMetricKey(DOUBLE_METRIC_KEY).setRuleKey(RULE_KEY.toString()).build()));
   sut.execute();
   session.commit();
-  assertThat(dbTester.countRowsOfTable("project_measures")).isEqualTo(2);
-  List<Map<String,Object>> dtos=dbTester.select("select snapshot_id as \"snapshotId\", project_id as \"componentId\", metric_id as \"metricId\", rule_id as \"ruleId\", value as \"value\", text_value as \"textValue\", " + "rule_priority as \"severity\" from project_measures");
+  assertThat(dbTester.countRowsOfTable("project_measures")).isEqualTo(FILE_REF);
+  List<Map<String,Object>> dtos=retrieveDtos();
   Map<String,Object> dto=dtos.get(0);
   assertThat(dto.get("snapshotId")).isEqualTo(3L);
   assertThat(dto.get("componentId")).isEqualTo(projectDto.getId());
@@ -21,7 +12,7 @@
   assertThat(dto.get("ruleId")).isNull();
   assertThat(dto.get("textValue")).isEqualTo("measure-data");
   assertThat(dto.get("severity")).isNull();
-  dto=dtos.get(1);
+  dto=dtos.get(PROJECT_REF);
   assertThat(dto.get("snapshotId")).isEqualTo(4L);
   assertThat(dto.get("componentId")).isEqualTo(fileDto.getId());
   assertThat(dto.get("metricId")).isEqualTo(doubleMetric.getId().longValue());

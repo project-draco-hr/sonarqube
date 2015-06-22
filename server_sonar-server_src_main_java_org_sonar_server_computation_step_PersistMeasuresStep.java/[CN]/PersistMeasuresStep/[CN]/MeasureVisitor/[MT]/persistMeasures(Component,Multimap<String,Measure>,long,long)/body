@@ -5,7 +5,8 @@
       throw new IllegalStateException(String.format("Measures on metric '%s' cannot be send in the report",metricKey));
     }
     Metric metric=metricRepository.getByKey(metricKey);
-    for (    Measure measure : measures.getValue()) {
+    Predicate<Measure> notBestValueOptimization=Predicates.not(BestValueOptimization.from(metric,component));
+    for (    Measure measure : from(measures.getValue()).filter(notBestValueOptimization)) {
       MeasureDto measureDto=MeasureToMeasureDto.INSTANCE.toMeasureDto(measure,metric,componentId,snapshotId);
       dbClient.measureDao().insert(session,measureDto);
     }

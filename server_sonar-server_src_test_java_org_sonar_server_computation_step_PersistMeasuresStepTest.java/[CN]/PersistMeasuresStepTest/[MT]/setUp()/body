@@ -6,6 +6,8 @@
   dbClient.metricDao().insert(session,stringMetric);
   doubleMetric=new MetricDto().setValueType("FLOAT").setShortName("Double metric").setKey(DOUBLE_METRIC_KEY).setEnabled(true);
   dbClient.metricDao().insert(session,doubleMetric);
+  optimizedMetric=new MetricDto().setValueType("BOOL").setShortName("Optimized metric").setKey(OPTIMIZED_METRIC_KEY).setEnabled(true).setOptimizedBestValue(true).setBestValue(1d);
+  dbClient.metricDao().insert(session,optimizedMetric);
   rule=RuleTesting.newDto(RULE_KEY);
   dbClient.ruleDao().insert(session,rule);
   session.commit();
@@ -15,4 +17,13 @@
   MeasureRepository measureRepository=new MeasureRepositoryImpl(dbClient,reportReader,metricRepository,ruleCache);
   session.commit();
   sut=new PersistMeasuresStep(dbClient,metricRepository,dbIdsRepository,treeRootHolder,measureRepository);
+  projectDto=addComponent("project-key");
+  fileDto=addComponent("file-key");
+  Component file=DumbComponent.builder(Component.Type.FILE,FILE_REF).setUuid("CDEF").setKey("MODULE_KEY:file").build();
+  Component project=DumbComponent.builder(Component.Type.PROJECT,PROJECT_REF).setUuid("ABCD").setKey(PROJECT_KEY).addChildren(file).build();
+  treeRootHolder.setRoot(project);
+  dbIdsRepository.setComponentId(project,projectDto.getId());
+  dbIdsRepository.setSnapshotId(project,3L);
+  dbIdsRepository.setComponentId(file,fileDto.getId());
+  dbIdsRepository.setSnapshotId(file,4L);
 }
