@@ -1,8 +1,16 @@
 {
+  List<String> fields=Lists.newArrayList();
+  if (selectedFields == null || selectedFields.isEmpty()) {
+    fields.addAll(SELECTABLE_MINUS_EXTRAS);
+  }
+ else {
+    fields.addAll(selectedFields);
+  }
   json.beginObject();
   String actionPlanKey=issue.actionPlanKey();
   ComponentDto file=componentsByUuid.get(issue.componentUuid());
-  ComponentDto project=null, subProject=null;
+  ComponentDto project=null;
+  ComponentDto subProject=null;
   if (file != null) {
     project=projectsByComponentUuid.get(file.uuid());
     if (!file.projectUuid().equals(file.moduleUuid())) {
@@ -11,10 +19,34 @@
   }
   Duration debt=issue.debt();
   Date updateDate=issue.updateDate();
-  json.prop("key",issue.key()).prop("component",file != null ? file.getKey() : null).prop("componentId",file != null ? file.getId() : null).prop("project",project != null ? project.getKey() : null).prop("subProject",subProject != null ? subProject.getKey() : null).prop("rule",issue.ruleKey().toString()).prop("status",issue.status()).prop("resolution",issue.resolution()).prop("severity",issue.severity()).prop("message",issue.message()).prop("line",issue.line()).prop("debt",debt != null ? durations.encode(debt) : null).prop("assignee",issue.assignee()).prop("reporter",issue.reporter()).prop("author",issue.authorLogin()).prop("actionPlan",actionPlanKey).prop("creationDate",isoDate(issue.creationDate())).prop("updateDate",isoDate(updateDate)).prop("closeDate",isoDate(issue.closeDate()));
-  writeTags(issue,json);
-  writeIssueComments(commentsByIssues.get(issue.key()),usersByLogin,json);
-  writeIssueAttributes(issue,json);
-  writeIssueExtraFields(issue,usersByLogin,actionPlanByKeys,extraFields,json);
+  json.prop(FIELD_KEY,issue.key());
+  JsonWriterUtils.writeIfNeeded(json,file != null ? file.getKey() : null,FIELD_COMPONENT,fields);
+  writeIfNeeded(json,file != null ? file.getId() : null,FIELD_COMPONENT_ID,fields);
+  writeIfNeeded(json,project != null ? project.getKey() : null,FIELD_PROJECT,fields);
+  writeIfNeeded(json,subProject != null ? subProject.getKey() : null,FIELD_SUB_PROJECT,fields);
+  writeIfNeeded(json,issue.ruleKey().toString(),FIELD_RULE,fields);
+  writeIfNeeded(json,issue.status(),FIELD_STATUS,fields);
+  writeIfNeeded(json,issue.resolution(),FIELD_RESOLUTION,fields);
+  writeIfNeeded(json,issue.severity(),FIELD_SEVERITY,fields);
+  writeIfNeeded(json,issue.message(),FIELD_MESSAGE,fields);
+  writeIfNeeded(json,issue.line(),FIELD_LINE,fields);
+  writeIfNeeded(json,debt != null ? durations.encode(debt) : null,FIELD_DEBT,fields);
+  writeIfNeeded(json,issue.assignee(),FIELD_ASSIGNEE,fields);
+  writeIfNeeded(json,issue.reporter(),FIELD_REPORTER,fields);
+  writeIfNeeded(json,issue.authorLogin(),FIELD_AUTHOR,fields);
+  writeIfNeeded(json,actionPlanKey,FIELD_ACTION_PLAN,fields);
+  writeIfNeeded(json,isoDate(issue.creationDate()),FIELD_CREATION_DATE,fields);
+  writeIfNeeded(json,isoDate(updateDate),FIELD_UPDATE_DATE,fields);
+  writeIfNeeded(json,isoDate(issue.closeDate()),FIELD_CLOSE_DATE,fields);
+  if (JsonWriterUtils.isFieldWanted(FIELD_TAGS,fields)) {
+    writeTags(issue,json);
+  }
+  if (JsonWriterUtils.isFieldWanted(FIELD_COMMENTS,fields)) {
+    writeIssueComments(commentsByIssues.get(issue.key()),usersByLogin,json);
+  }
+  if (JsonWriterUtils.isFieldWanted(FIELD_ATTRIBUTES,fields)) {
+    writeIssueAttributes(issue,json);
+  }
+  writeIssueExtraFields(issue,actionPlanByKeys,fields,json);
   json.endObject();
 }
