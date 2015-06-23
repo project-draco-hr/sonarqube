@@ -1,0 +1,20 @@
+{
+  if (projectTempFolder == null) {
+    String workingDirPath=StringUtils.defaultIfBlank(props.property(CoreProperties.WORKING_DIRECTORY),CoreProperties.WORKING_DIRECTORY_DEFAULT_VALUE);
+    Path workingDir=Paths.get(workingDirPath).normalize();
+    if (!workingDir.isAbsolute()) {
+      Path base=getBasePath(props);
+      workingDir=base.resolve(workingDir);
+    }
+    Path tempDir=workingDir.resolve(TMP_NAME);
+    try {
+      Files.createDirectories(tempDir);
+    }
+ catch (    IOException e) {
+      throw new IllegalStateException("Unable to create root temp directory " + tempDir,e);
+    }
+    projectTempFolder=new DefaultTempFolder(tempDir.toFile(),true);
+    this.instance=projectTempFolder;
+  }
+  return projectTempFolder;
+}
