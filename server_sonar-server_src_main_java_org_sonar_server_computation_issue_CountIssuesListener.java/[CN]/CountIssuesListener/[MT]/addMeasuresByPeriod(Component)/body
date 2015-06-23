@@ -1,0 +1,26 @@
+{
+  if (!periodsHolder.getPeriods().isEmpty()) {
+    Double[] unresolvedVariations=new Double[PeriodsHolder.MAX_NUMBER_OF_PERIODS];
+    for (    Period period : periodsHolder.getPeriods()) {
+      unresolvedVariations[period.getIndex() - 1]=new Double(currentCounters.counterForPeriod(period.getIndex()).unresolved);
+    }
+    measureRepository.add(component,metricRepository.getByKey(NEW_VIOLATIONS_KEY),Measure.newMeasureBuilder().setVariations(new MeasureVariations(unresolvedVariations)).createNoValue());
+    for (    Map.Entry<String,String> entry : SEVERITY_TO_NEW_METRIC_KEY.entrySet()) {
+      String severity=entry.getKey();
+      String metricKey=entry.getValue();
+      Double[] variations=new Double[PeriodsHolder.MAX_NUMBER_OF_PERIODS];
+      boolean set=false;
+      for (      Period period : periodsHolder.getPeriods()) {
+        Multiset<String> bag=currentCounters.counterForPeriod(period.getIndex()).severityBag;
+        if (bag.contains(severity)) {
+          variations[period.getIndex() - 1]=new Double(bag.count(severity));
+          set=true;
+        }
+      }
+      if (set) {
+        Metric metric=metricRepository.getByKey(metricKey);
+        measureRepository.add(component,metric,Measure.newMeasureBuilder().setVariations(new MeasureVariations(variations)).createNoValue());
+      }
+    }
+  }
+}
