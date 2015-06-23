@@ -1,0 +1,13 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    UserDto user=dbClient.userDao().selectByLogin(dbSession,login);
+    String cryptedPassword=encryptPassword(password,user.getSalt());
+    if (!cryptedPassword.equals(user.getCryptedPassword())) {
+      throw new IllegalArgumentException("Incorrect password");
+    }
+  }
+  finally {
+    dbSession.close();
+  }
+}
