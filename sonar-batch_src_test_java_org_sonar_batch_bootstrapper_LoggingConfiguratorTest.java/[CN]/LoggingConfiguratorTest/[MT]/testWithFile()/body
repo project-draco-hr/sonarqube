@@ -1,0 +1,14 @@
+{
+  InputStream is=this.getClass().getResourceAsStream(DEFAULT_CLASSPATH_CONF);
+  File tmpFolder=folder.getRoot();
+  File testFile=new File(tmpFolder,"test");
+  OutputStream os=new FileOutputStream(testFile);
+  IOUtils.copy(is,os);
+  os.close();
+  conf.setListener(listener);
+  LoggingConfigurator.apply(conf,testFile);
+  Logger logger=LoggerFactory.getLogger(this.getClass());
+  logger.info(TEST_STR);
+  assertThat(listener.msg).endsWith(TEST_STR);
+  assertThat(listener.level).isEqualTo(LogListener.Level.INFO);
+}
