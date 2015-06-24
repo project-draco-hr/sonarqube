@@ -1,6 +1,7 @@
 {
   String key=getKey(obj);
-  try (FileLock l=lock()){
+  try {
+    lock();
     if (!forceUpdate) {
       byte[] cached=getCache(key);
       if (cached != null) {
@@ -20,5 +21,8 @@
       return value;
     }
   }
-   return null;
+  finally {
+    unlock();
+  }
+  return null;
 }

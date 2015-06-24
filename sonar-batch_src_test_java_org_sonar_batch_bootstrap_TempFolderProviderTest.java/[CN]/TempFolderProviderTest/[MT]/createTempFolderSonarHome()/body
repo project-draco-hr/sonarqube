@@ -1,9 +1,10 @@
 {
-  File sonarHome=temp.getRoot();
-  File workingDir=new File(sonarHome,CoreProperties.GLOBAL_WORKING_DIRECTORY_DEFAULT_VALUE);
+  File sonarHome=temp.newFolder();
+  File workingDir=new File(sonarHome,CoreProperties.GLOBAL_WORKING_DIRECTORY_DEFAULT_VALUE).getAbsoluteFile();
   TempFolder tempFolder=tempFolderProvider.provide(new BootstrapProperties(ImmutableMap.of("sonar.userHome",sonarHome.getAbsolutePath())));
   tempFolder.newDir();
   tempFolder.newFile();
   assertThat(getCreatedTempDir(workingDir)).exists();
   assertThat(getCreatedTempDir(workingDir).list()).hasSize(2);
+  FileUtils.deleteQuietly(sonarHome);
 }

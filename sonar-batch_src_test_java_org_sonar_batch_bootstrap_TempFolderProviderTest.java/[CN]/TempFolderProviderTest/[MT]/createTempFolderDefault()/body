@@ -1,7 +1,10 @@
 {
-  File userHome=temp.getRoot();
-  System.setProperty("user.home",userHome.getAbsolutePath());
-  File defaultSonarHome=new File(System.getProperty("user.home"),".sonar");
+  System2 system=mock(System2.class);
+  tempFolderProvider=new TempFolderProvider(system);
+  File userHome=temp.newFolder();
+  when(system.envVariable("SONAR_USER_HOME")).thenReturn(null);
+  when(system.property("user.home")).thenReturn(userHome.getAbsolutePath().toString());
+  File defaultSonarHome=new File(userHome.getAbsolutePath(),".sonar");
   File workingDir=new File(defaultSonarHome,CoreProperties.GLOBAL_WORKING_DIRECTORY_DEFAULT_VALUE).getAbsoluteFile();
   try {
     TempFolder tempFolder=tempFolderProvider.provide(new BootstrapProperties(Collections.<String,String>emptyMap()));
@@ -11,6 +14,6 @@
     assertThat(getCreatedTempDir(workingDir).list()).hasSize(2);
   }
   finally {
-    FileUtils.deleteDirectory(getCreatedTempDir(workingDir));
+    FileUtils.deleteQuietly(workingDir);
   }
 }
