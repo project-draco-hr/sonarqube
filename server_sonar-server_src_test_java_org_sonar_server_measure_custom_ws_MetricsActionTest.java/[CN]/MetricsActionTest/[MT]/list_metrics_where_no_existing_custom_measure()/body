@@ -1,0 +1,11 @@
+{
+  MetricDto metric=insertCustomMetric("metric-key-1");
+  insertCustomMetric("metric-key-2");
+  ComponentDto project=insertDefaultProject();
+  insertProject("project-uuid-2","project-key-2");
+  CustomMeasureDto customMeasure=newCustomMeasureDto().setComponentUuid(project.uuid()).setComponentId(project.getId()).setMetricId(metric.getId());
+  dbClient.customMeasureDao().insert(dbSession,customMeasure);
+  dbSession.commit();
+  String response=newRequest().outputAsString();
+  assertThat(response).contains("metric-key-2").doesNotContain("metric-key-1");
+}

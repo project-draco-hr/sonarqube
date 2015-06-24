@@ -1,0 +1,14 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    List<MetricDto> metrics=searchMetrics(dbSession,request);
+    JsonWriter json=response.newJsonWriter();
+    json.beginObject();
+    MetricJsonWriter.write(json,metrics,MetricJsonWriter.ALL_FIELDS);
+    json.endObject();
+    json.close();
+  }
+  finally {
+    MyBatis.closeQuietly(dbSession);
+  }
+}
