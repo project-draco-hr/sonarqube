@@ -3,10 +3,16 @@
   final List<DefaultIssue> result=new ArrayList<>();
   try {
     Map<String,String> params=ImmutableMap.of("componentUuid",componentUuid);
-    session.select(IssueMapper.class.getName() + ".selectOpenByComponentUuid",params,new ResultHandler(){
+    session.select(IssueMapper.class.getName() + ".selectNonClosedByComponentUuid",params,new ResultHandler(){
       @Override public void handleResult(      ResultContext resultContext){
         DefaultIssue issue=((IssueDto)resultContext.getResultObject()).toDefaultIssue();
-        issue.setOnDisabledRule(ruleCache.getNullable(issue.ruleKey()) == null);
+        RuleDto rule=ruleCache.getNullable(issue.ruleKey());
+        if (rule == null || rule.getStatus() == RuleStatus.REMOVED || !isActive(issue.ruleKey())) {
+          issue.setOnDisabledRule(true);
+          issue.setBeingClosed(true);
+        }
+        issue.setSelectedAt(System.currentTimeMillis());
+        Loggers.get(getClass()).info("Loaded from db: " + issue);
         result.add(issue);
       }
     }

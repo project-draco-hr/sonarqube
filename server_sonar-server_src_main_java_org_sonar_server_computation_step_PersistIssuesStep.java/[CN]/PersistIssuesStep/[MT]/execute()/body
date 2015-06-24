@@ -9,21 +9,23 @@
       boolean saved=false;
       if (issue.isNew()) {
         Integer ruleId=ruleCache.get(issue.ruleKey()).getId();
-        mapper.insert(IssueDto.toDtoForComputationInsert(issue,ruleId,system2.now()));
+        IssueDto dto=IssueDto.toDtoForComputationInsert(issue,ruleId,system2.now());
+        Loggers.get(getClass()).info("---- INSERT " + dto);
+        mapper.insert(dto);
         saved=true;
       }
  else       if (issue.isChanged()) {
         IssueDto dto=IssueDto.toDtoForUpdate(issue,system2.now());
-        if (Issue.STATUS_CLOSED.equals(issue.status()) || issue.selectedAt() == null) {
-          mapper.update(dto);
-        }
- else {
-          int updateCount=mapper.updateIfBeforeSelectedDate(dto);
-          if (updateCount == 0) {
-            conflictResolver.resolve(issue,mapper);
-          }
+        Loggers.get(getClass()).info("---- UPDATE " + dto);
+        int updateCount=mapper.updateIfBeforeSelectedDate(dto);
+        if (updateCount == 0) {
+          Loggers.get(getClass()).info("---- CONFLICT: " + updateCount);
+          conflictResolver.resolve(issue,mapper);
         }
         saved=true;
+      }
+ else {
+        Loggers.get(getClass()).info("---- UNCHANGED " + issue);
       }
       if (saved) {
         insertChanges(changeMapper,issue);

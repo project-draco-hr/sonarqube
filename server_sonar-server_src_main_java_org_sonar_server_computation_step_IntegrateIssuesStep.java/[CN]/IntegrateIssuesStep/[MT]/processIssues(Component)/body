@@ -1,12 +1,14 @@
 {
   Tracking<DefaultIssue,DefaultIssue> tracking=tracker.track(component);
+  Loggers.get(getClass()).info("----- tracking ------");
+  Loggers.get(getClass()).info("" + tracking);
   DiskCache<DefaultIssue>.DiskAppender cacheAppender=issueCache.newAppender();
   try {
-    issueListeners.beforeComponent(component,tracking);
+    issueVisitors.beforeComponent(component,tracking);
     fillNewOpenIssues(component,tracking,cacheAppender);
     fillExistingOpenIssues(component,tracking,cacheAppender);
     closeUnmatchedBaseIssues(component,tracking,cacheAppender);
-    issueListeners.afterComponent(component);
+    issueVisitors.afterComponent(component);
   }
   finally {
     cacheAppender.close();

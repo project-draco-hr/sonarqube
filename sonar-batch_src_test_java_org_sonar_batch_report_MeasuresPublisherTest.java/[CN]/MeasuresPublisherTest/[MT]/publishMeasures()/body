@@ -1,20 +1,18 @@
 {
-  Measure measure1=new Measure<>(CoreMetrics.COVERAGE).setValue(2.0).setAlertStatus(Level.ERROR).setAlertText("Foo").setCharacteristic(mock(Characteristic.class)).setPersonId(2);
+  Measure measure1=new Measure<>(CoreMetrics.COVERAGE).setValue(2.0).setPersonId(2);
   Measure measure2=new Measure<>(CoreMetrics.NEW_BLOCKER_VIOLATIONS).setVariation1(1.0).setVariation2(2.0).setVariation3(3.0).setVariation4(4.0).setVariation5(5.0);
   Measure manual=new Measure<>(new Metric<>("manual_metric",ValueType.BOOL)).setValue(1.0).setDescription("Manual");
   Measure rating=new Measure<>(CoreMetrics.SQALE_RATING).setValue(2.0).setData("A");
   Measure longMeasure=new Measure<>(CoreMetrics.TECHNICAL_DEBT).setValue(1.0);
   Measure stringMeasure=new Measure<>(CoreMetrics.NCLOC_LANGUAGE_DISTRIBUTION).setData("foo bar");
-  when(measureCache.byResource(sampleFile)).thenReturn(Arrays.asList(measure1,measure2,manual,rating,longMeasure,stringMeasure));
+  when(measureCache.byResource(sampleFile)).thenReturn(asList(measure1,measure2,manual,rating,longMeasure,stringMeasure));
   File outputDir=temp.newFolder();
   BatchReportWriter writer=new BatchReportWriter(outputDir);
   publisher.publish(writer);
   BatchReportReader reader=new BatchReportReader(outputDir);
   assertThat(reader.readComponentMeasures(1)).hasSize(0);
   List<org.sonar.batch.protocol.output.BatchReport.Measure> componentMeasures=reader.readComponentMeasures(2);
-  assertThat(componentMeasures).hasSize(8);
+  assertThat(componentMeasures).hasSize(6);
   assertThat(componentMeasures.get(0).getDoubleValue()).isEqualTo(2.0);
-  assertThat(componentMeasures.get(0).getAlertStatus()).isEqualTo("ERROR");
-  assertThat(componentMeasures.get(0).getAlertText()).isEqualTo("Foo");
   assertThat(componentMeasures.get(0).getPersonId()).isEqualTo(2);
 }
