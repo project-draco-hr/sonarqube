@@ -1,0 +1,11 @@
+{
+  MetricDto metric=MetricTesting.newMetricDto().setEnabled(true).setValueType(ValueType.STRING.name()).setKey("metric-key");
+  dbClient.metricDao().insert(dbSession,metric);
+  ComponentDto project=ComponentTesting.newProjectDto(DEFAULT_PROJECT_UUID).setKey(DEFAULT_PROJECT_KEY);
+  dbClient.componentDao().insert(dbSession,project);
+  dbClient.componentDao().insert(dbSession,ComponentTesting.newDirectory(project,"directory-uuid","path/to/directory").setKey("directory-key"));
+  dbSession.commit();
+  expectedException.expect(ServerException.class);
+  expectedException.expectMessage("Component 'directory-key' (id: directory-uuid) must be a project or a module.");
+  newRequest().setParam(CreateAction.PARAM_PROJECT_ID,"directory-uuid").setParam(CreateAction.PARAM_METRIC_ID,metric.getId().toString()).setParam(CreateAction.PARAM_VALUE,"whatever-value").execute();
+}
