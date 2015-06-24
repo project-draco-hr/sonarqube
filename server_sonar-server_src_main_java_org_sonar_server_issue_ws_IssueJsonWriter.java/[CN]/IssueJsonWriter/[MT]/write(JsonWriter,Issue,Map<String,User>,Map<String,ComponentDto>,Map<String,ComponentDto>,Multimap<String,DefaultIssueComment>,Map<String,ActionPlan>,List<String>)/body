@@ -1,11 +1,5 @@
 {
-  List<String> fields=Lists.newArrayList();
-  if (selectedFields == null || selectedFields.isEmpty()) {
-    fields.addAll(SELECTABLE_MINUS_EXTRAS);
-  }
- else {
-    fields.addAll(selectedFields);
-  }
+  List<String> fields=useDefaultFieldsIfNotSpecified(selectedFields);
   json.beginObject();
   String actionPlanKey=issue.actionPlanKey();
   ComponentDto file=componentsByUuid.get(issue.componentUuid());
@@ -38,13 +32,13 @@
   writeIfNeeded(json,isoDate(issue.creationDate()),FIELD_CREATION_DATE,fields);
   writeIfNeeded(json,isoDate(updateDate),FIELD_UPDATE_DATE,fields);
   writeIfNeeded(json,isoDate(issue.closeDate()),FIELD_CLOSE_DATE,fields);
-  if (JsonWriterUtils.isFieldWanted(FIELD_TAGS,fields)) {
+  if (JsonWriterUtils.isFieldNeeded(FIELD_TAGS,fields)) {
     writeTags(issue,json);
   }
-  if (JsonWriterUtils.isFieldWanted(FIELD_COMMENTS,fields)) {
+  if (JsonWriterUtils.isFieldNeeded(FIELD_COMMENTS,fields)) {
     writeIssueComments(commentsByIssues.get(issue.key()),usersByLogin,json);
   }
-  if (JsonWriterUtils.isFieldWanted(FIELD_ATTRIBUTES,fields)) {
+  if (JsonWriterUtils.isFieldNeeded(FIELD_ATTRIBUTES,fields)) {
     writeIssueAttributes(issue,json);
   }
   writeIssueExtraFields(issue,actionPlanByKeys,fields,json);
