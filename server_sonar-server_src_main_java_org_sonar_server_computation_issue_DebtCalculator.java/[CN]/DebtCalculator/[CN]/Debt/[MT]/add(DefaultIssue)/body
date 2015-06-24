@@ -1,0 +1,14 @@
+{
+  Long issueMinutes=issue.debtInMinutes();
+  if (issueMinutes != null && issueMinutes != 0L) {
+    this.minutes+=issueMinutes;
+    RuleDto rule=ruleCache.get(issue.ruleKey());
+    this.minutesByRuleId.add(rule.getId(),issueMinutes);
+    Characteristic characteristic=debtModelHolder.getCharacteristicById(rule.getSubCharacteristicId());
+    this.minutesByCharacteristicId.add(characteristic.getId(),issueMinutes);
+    Integer characteristicParentId=characteristic.getParentId();
+    if (characteristicParentId != null) {
+      this.minutesByCharacteristicId.add(characteristicParentId,issueMinutes);
+    }
+  }
+}
