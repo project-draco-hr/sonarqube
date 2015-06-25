@@ -1,0 +1,18 @@
+{
+  String projectUuid=request.param(PARAM_PROJECT_ID);
+  String projectKey=request.param(PARAM_PROJECT_KEY);
+  List<String> fieldsToReturn=request.paramAsStrings(WebService.Param.FIELDS);
+  SearchOptions searchOptions=new SearchOptions().setPage(request.mandatoryParamAsInt(WebService.Param.PAGE),request.mandatoryParamAsInt(WebService.Param.PAGE_SIZE));
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    ComponentDto project=searchProject(dbSession,projectUuid,projectKey);
+    List<CustomMeasureDto> customMeasures=searchCustomMeasures(dbSession,project,searchOptions);
+    int nbCustomMeasures=countTotalOfCustomMeasures(dbSession,project);
+    Map<String,User> usersByLogin=usersByLogin(customMeasures);
+    Map<Integer,MetricDto> metricsById=metricsById(dbSession,customMeasures);
+    writeResponse(response,customMeasures,nbCustomMeasures,project,metricsById,usersByLogin,searchOptions,fieldsToReturn);
+  }
+  finally {
+    MyBatis.closeQuietly(dbSession);
+  }
+}

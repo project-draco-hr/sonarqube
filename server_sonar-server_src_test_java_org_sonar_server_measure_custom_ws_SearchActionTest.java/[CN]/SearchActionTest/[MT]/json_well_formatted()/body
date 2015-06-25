@@ -1,0 +1,18 @@
+{
+  MetricDto metric1=insertCustomMetric(1);
+  MetricDto metric2=insertCustomMetric(2);
+  MetricDto metric3=insertCustomMetric(3);
+  CustomMeasureDto customMeasure1=insertCustomMeasure(1,metric1);
+  CustomMeasureDto customMeasure2=insertCustomMeasure(2,metric2);
+  CustomMeasureDto customMeasure3=insertCustomMeasure(3,metric3);
+  WsTester.Result response=newRequest().setParam(SearchAction.PARAM_PROJECT_ID,DEFAULT_PROJECT_UUID).execute();
+  response.assertJson(getClass(),"metrics.json");
+  String responseAsString=response.outputAsString();
+  assertThat(responseAsString).matches(nameValuePattern("id",metric1.getId().toString()));
+  assertThat(responseAsString).matches(nameValuePattern("id",metric2.getId().toString()));
+  assertThat(responseAsString).matches(nameValuePattern("id",metric3.getId().toString()));
+  assertThat(responseAsString).matches(nameValuePattern("id",String.valueOf(customMeasure1.getId())));
+  assertThat(responseAsString).matches(nameValuePattern("id",String.valueOf(customMeasure2.getId())));
+  assertThat(responseAsString).matches(nameValuePattern("id",String.valueOf(customMeasure3.getId())));
+  assertThat(responseAsString).contains("createdAt","updatedAt");
+}
