@@ -1,0 +1,13 @@
+{
+  for (  Metric metric : metrics) {
+    Optional<Measure> measureOptional=measureRepository.getRawMeasure(file,metric);
+    if (!measureOptional.isPresent()) {
+      continue;
+    }
+    Measure measure=measureOptional.get();
+    if (!measure.hasVariations() || measure.getValueType() != Measure.ValueType.NO_VALUE) {
+      continue;
+    }
+    builders.getOrCreateBuilder(metric.getKey()).incrementVariationsBy(measure.getVariations(),periodsHolder);
+  }
+}

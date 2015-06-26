@@ -1,0 +1,24 @@
+{
+  Component fileComponent=counters.getComponent();
+  BatchReport.Changesets componentScm=batchReportReader.readChangesets(fileComponent.getRef());
+  if (componentScm == null) {
+    return false;
+  }
+  Optional<Measure> hitsByLineMeasure=measureRepository.getRawMeasure(fileComponent,newCoverageMetrics.coverageLineHitsData);
+  if (!hitsByLineMeasure.isPresent() || hitsByLineMeasure.get().getValueType() == Measure.ValueType.NO_VALUE) {
+    return false;
+  }
+  Map<Integer,Integer> hitsByLine=parseCountByLine(hitsByLineMeasure);
+  Map<Integer,Integer> conditionsByLine=parseCountByLine(measureRepository.getRawMeasure(fileComponent,newCoverageMetrics.conditionsByLine));
+  Map<Integer,Integer> coveredConditionsByLine=parseCountByLine(measureRepository.getRawMeasure(fileComponent,newCoverageMetrics.coveredConditionsByLine));
+  for (  Map.Entry<Integer,Integer> entry : hitsByLine.entrySet()) {
+    int lineId=entry.getKey();
+    int hits=entry.getValue();
+    int conditions=(Integer)ObjectUtils.defaultIfNull(conditionsByLine.get(lineId),0);
+    int coveredConditions=(Integer)ObjectUtils.defaultIfNull(coveredConditionsByLine.get(lineId),0);
+    BatchReport.Changesets.Changeset changeset=componentScm.getChangeset(componentScm.getChangesetIndexByLine(lineId - 1));
+    Date date=changeset.hasDate() ? new Date(changeset.getDate()) : null;
+    counters.analyze(date,hits,conditions,coveredConditions);
+  }
+  return true;
+}

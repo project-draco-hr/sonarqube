@@ -1,0 +1,12 @@
+{
+  List<Counter> nonEmptyCounters=from(counters.getCounters()).filter(CounterHasNewCode.INSTANCE).toList();
+  if (nonEmptyCounters.isEmpty()) {
+    measureRepository.add(counters.getComponent(),metric,newMeasureBuilder().createNoValue());
+    return;
+  }
+  MeasureVariations.Builder variationsBuilder=MeasureVariations.newMeasureVarationsBuilder();
+  for (  Counter counter : nonEmptyCounters) {
+    variationsBuilder.setVariation(counter.getPeriodIndex(),measureComputer.compute(counter));
+  }
+  measureRepository.add(counters.getComponent(),metric,newMeasureBuilder().setVariations(variationsBuilder.build()).createNoValue());
+}

@@ -1,0 +1,16 @@
+{
+  treeRootHolder.setRoot(MANY_FILES_TREE);
+  periodHolder.setPeriods(createPeriod(2));
+  for (  Integer fileComponentRef : of(1111,1112,1121,1122,1123,1211,1212)) {
+    measureRepository.addRawMeasure(fileComponentRef,NEW_LINES_TO_COVER_KEY,createMeasure((double)fileComponentRef));
+  }
+  underTest.execute();
+  assertThat(toEntries(measureRepository.getNewRawMeasures(111))).containsOnly(entryOf(NEW_LINES_TO_COVER_KEY,createMeasure(1111 + 1112)));
+  assertThat(toEntries(measureRepository.getNewRawMeasures(112))).containsOnly(entryOf(NEW_LINES_TO_COVER_KEY,createMeasure(1121 + 1122 + 1123)));
+  assertThat(toEntries(measureRepository.getNewRawMeasures(121))).containsOnly(entryOf(NEW_LINES_TO_COVER_KEY,createMeasure(1211 + 1212)));
+  assertThat(measureRepository.getNewRawMeasures(122).isEmpty()).isTrue();
+  assertThat(toEntries(measureRepository.getNewRawMeasures(11))).containsOnly(entryOf(NEW_LINES_TO_COVER_KEY,createMeasure(1111 + 1112 + 1121+ 1122+ 1123)));
+  assertThat(toEntries(measureRepository.getNewRawMeasures(12))).containsOnly(entryOf(NEW_LINES_TO_COVER_KEY,createMeasure(1211 + 1212)));
+  assertThat(measureRepository.getNewRawMeasures(13).isEmpty()).isTrue();
+  assertThat(toEntries(measureRepository.getNewRawMeasures(1))).containsOnly(entryOf(NEW_LINES_TO_COVER_KEY,createMeasure(1111 + 1112 + 1121+ 1122+ 1123+ 1211+ 1212)));
+}
