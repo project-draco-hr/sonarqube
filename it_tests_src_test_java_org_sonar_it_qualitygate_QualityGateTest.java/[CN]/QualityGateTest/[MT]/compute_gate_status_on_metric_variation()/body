@@ -1,0 +1,16 @@
+{
+  QualityGate simple=qgClient().create("SimpleWithDifferential");
+  qgClient().setDefault(simple.id());
+  qgClient().createCondition(NewCondition.create(simple.id()).metricKey("ncloc").period(1).operator("EQ").warningThreshold("0"));
+  try {
+    SonarRunner build=SonarRunner.create(projectDir("qualitygate/xoo-sample"));
+    orchestrator.executeBuild(build);
+    assertThat(fetchGateStatus().getData()).isEqualTo("OK");
+    orchestrator.executeBuild(build);
+    assertThat(fetchGateStatus().getData()).isEqualTo("WARN");
+  }
+  finally {
+    qgClient().unsetDefault();
+    qgClient().destroy(simple.id());
+  }
+}
