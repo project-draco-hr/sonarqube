@@ -1,0 +1,7 @@
+{
+  orchestrator.executeBuilds(SonarRunner.create(projectDir("testing/xoo-sample-with-coverage-per-test")));
+  String tests=orchestrator.getServer().adminWsClient().get("api/tests/list","testFileKey","sample-with-tests:src/test/xoo/sample/SampleTest.xoo");
+  JSONAssert.assertEquals(IOUtils.toString(this.getClass().getResourceAsStream("CoverageTrackingTest/tests-expected.json"),"UTF-8"),tests,false);
+  String covered_files=orchestrator.getServer().adminWsClient().get("api/tests/covered_files","testUuid",extractSuccessfulTestUuid(tests));
+  JSONAssert.assertEquals(IOUtils.toString(this.getClass().getResourceAsStream("CoverageTrackingTest/covered_files-expected.json"),"UTF-8"),covered_files,false);
+}
