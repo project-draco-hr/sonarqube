@@ -6,11 +6,12 @@
   DbSession dbSession=dbClient.openSession(false);
   try {
     ComponentDto project=searchProject(dbSession,projectUuid,projectKey);
+    Long lastAnalysisDateMs=searchLastSnapshot(dbSession,project);
     List<CustomMeasureDto> customMeasures=searchCustomMeasures(dbSession,project,searchOptions);
     int nbCustomMeasures=countTotalOfCustomMeasures(dbSession,project);
     Map<String,User> usersByLogin=usersByLogin(customMeasures);
     Map<Integer,MetricDto> metricsById=metricsById(dbSession,customMeasures);
-    writeResponse(response,customMeasures,nbCustomMeasures,project,metricsById,usersByLogin,searchOptions,fieldsToReturn);
+    writeResponse(response,customMeasures,nbCustomMeasures,project,metricsById,usersByLogin,lastAnalysisDateMs,searchOptions,fieldsToReturn);
   }
   finally {
     MyBatis.closeQuietly(dbSession);
