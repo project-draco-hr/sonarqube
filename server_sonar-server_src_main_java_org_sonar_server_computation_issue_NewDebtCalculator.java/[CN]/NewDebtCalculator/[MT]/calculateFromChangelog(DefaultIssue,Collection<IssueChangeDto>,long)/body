@@ -1,0 +1,20 @@
+{
+  List<FieldDiffs> debtDiffs=from(debtChangelog).transform(ToFieldDiffs.INSTANCE).filter(HasDebtChange.INSTANCE).toSortedList(CHANGE_ORDERING);
+  FieldDiffs currentChange=issue.currentChange();
+  if (currentChange != null && HasDebtChange.INSTANCE.apply(currentChange)) {
+    debtDiffs=Lists.newArrayList(debtDiffs);
+    debtDiffs.add(currentChange);
+  }
+  long newDebt=issue.debtInMinutes();
+  for (Iterator<FieldDiffs> it=debtDiffs.iterator(); it.hasNext(); ) {
+    FieldDiffs diffs=it.next();
+    Date date=diffs.creationDate();
+    if (isBeforeOrEqual(date,new Date(periodDate))) {
+      return subtract(newDebt,debtDiff(diffs).newValueLong());
+    }
+    if (!it.hasNext()) {
+      return subtract(newDebt,debtDiff(diffs).oldValueLong());
+    }
+  }
+  return 0L;
+}

@@ -1,0 +1,18 @@
+{
+  DefaultIssue unresolved1=new DefaultIssue().setDebt(Duration.create(10)).setRuleKey(rule.getKey());
+  DefaultIssue unresolved2=new DefaultIssue().setDebt(Duration.create(30)).setRuleKey(rule.getKey());
+  DefaultIssue unresolvedWithoutDebt=new DefaultIssue().setRuleKey(rule.getKey());
+  DefaultIssue resolved=new DefaultIssue().setDebt(Duration.create(50)).setResolution(RESOLUTION_FIXED).setRuleKey(rule.getKey());
+  underTest.beforeComponent(file,mock(Tracking.class));
+  underTest.onIssue(file,unresolved1);
+  underTest.onIssue(file,unresolved2);
+  underTest.onIssue(file,unresolvedWithoutDebt);
+  underTest.onIssue(file,resolved);
+  underTest.afterComponent(file);
+  assertThat(debtMeasure(file).get().getLongValue()).isEqualTo(10 + 30);
+  assertThat(debtRuleMeasure(file,rule.getId()).get().getLongValue()).isEqualTo(10 + 30);
+  assertThat(debtCharacteristicMeasure(file,PORTABILITY_ID).get().getLongValue()).isEqualTo(10 + 30);
+  assertThat(debtCharacteristicMeasure(file,PORTABILITY_SOFT_ID).get().getLongValue()).isEqualTo(10 + 30);
+  assertThat(debtCharacteristicMeasure(file,PORTABILITY_HARD_ID).isPresent()).isFalse();
+  assertThat(debtCharacteristicMeasure(file,RELIABILITY_ID).isPresent()).isFalse();
+}

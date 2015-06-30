@@ -1,18 +1,14 @@
 {
-  Loggers.get(getClass()).info("----- fillExistingOpenIssues on " + component.getKey());
   for (  Map.Entry<DefaultIssue,DefaultIssue> entry : tracking.getMatchedRaws().entrySet()) {
     DefaultIssue raw=entry.getKey();
     DefaultIssue base=entry.getValue();
     issueLifecycle.mergeExistingOpenIssue(raw,base);
-    Loggers.get(getClass()).info("merged " + raw);
     process(component,raw,cacheAppender);
   }
   for (  Map.Entry<Integer,DefaultIssue> entry : tracking.getOpenManualIssuesByLine().entries()) {
-    int line=entry.getKey();
+    Integer line=entry.getKey();
     DefaultIssue manualIssue=entry.getValue();
-    manualIssue.setLine(line == 0 ? null : line);
-    Loggers.get(getClass()).info("kept manual " + manualIssue);
+    issueLifecycle.moveOpenManualIssue(manualIssue,line);
     process(component,manualIssue,cacheAppender);
   }
-  Loggers.get(getClass()).info("----- /fillExistingOpenIssues on " + component.getKey());
 }

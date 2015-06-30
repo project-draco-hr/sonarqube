@@ -1,7 +1,11 @@
 {
   DbSession session=dbClient.openSession(false);
   try {
-    return dbClient.ruleDao().getNullableByKey(session,key);
+    RuleDto dto=dbClient.ruleDao().getNullableByKey(session,key);
+    if (dto != null) {
+      return new RuleImpl(dto,activatedKeys.contains(key));
+    }
+    return null;
   }
   finally {
     MyBatis.closeQuietly(session);

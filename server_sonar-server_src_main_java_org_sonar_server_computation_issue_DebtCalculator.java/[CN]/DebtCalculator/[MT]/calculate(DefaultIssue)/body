@@ -1,0 +1,17 @@
+{
+  Rule rule=ruleRepository.getByKey(issue.ruleKey());
+  DebtRemediationFunction fn=rule.getRemediationFunction();
+  if (fn != null) {
+    verifyEffortToFix(issue,fn);
+    Duration debt=Duration.create(0);
+    if (fn.type().usesCoefficient() && !Strings.isNullOrEmpty(fn.coefficient())) {
+      int effortToFixValue=Objects.firstNonNull(issue.effortToFix(),1).intValue();
+      debt=durations.decode(fn.coefficient()).multiply(effortToFixValue);
+    }
+    if (fn.type().usesOffset() && !Strings.isNullOrEmpty(fn.offset())) {
+      debt=debt.add(durations.decode(fn.offset()));
+    }
+    return debt;
+  }
+  return null;
+}

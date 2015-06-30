@@ -6,13 +6,11 @@
     session.select(IssueMapper.class.getName() + ".selectNonClosedByComponentUuid",params,new ResultHandler(){
       @Override public void handleResult(      ResultContext resultContext){
         DefaultIssue issue=((IssueDto)resultContext.getResultObject()).toDefaultIssue();
-        RuleDto rule=ruleCache.getNullable(issue.ruleKey());
-        if (rule == null || rule.getStatus() == RuleStatus.REMOVED || !isActive(issue.ruleKey())) {
+        if (!isActive(issue.ruleKey()) || ruleRepository.getByKey(issue.ruleKey()).getStatus() == RuleStatus.REMOVED) {
           issue.setOnDisabledRule(true);
           issue.setBeingClosed(true);
         }
         issue.setSelectedAt(System.currentTimeMillis());
-        Loggers.get(getClass()).info("Loaded from db: " + issue);
         result.add(issue);
       }
     }

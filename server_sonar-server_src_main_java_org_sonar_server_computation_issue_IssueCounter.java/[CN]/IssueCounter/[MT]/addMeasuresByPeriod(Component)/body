@@ -9,18 +9,12 @@
       String severity=entry.getKey();
       String metricKey=entry.getValue();
       Double[] variations=new Double[PeriodsHolder.MAX_NUMBER_OF_PERIODS];
-      boolean set=false;
       for (      Period period : periodsHolder.getPeriods()) {
         Multiset<String> bag=currentCounters.counterForPeriod(period.getIndex()).severityBag;
-        if (bag.contains(severity)) {
-          variations[period.getIndex() - 1]=new Double(bag.count(severity));
-          set=true;
-        }
+        variations[period.getIndex() - 1]=new Double(bag.count(severity));
       }
-      if (set) {
-        Metric metric=metricRepository.getByKey(metricKey);
-        measureRepository.add(component,metric,Measure.newMeasureBuilder().setVariations(new MeasureVariations(variations)).createNoValue());
-      }
+      Metric metric=metricRepository.getByKey(metricKey);
+      measureRepository.add(component,metric,Measure.newMeasureBuilder().setVariations(new MeasureVariations(variations)).createNoValue());
     }
   }
 }
