@@ -1,17 +1,17 @@
 {
-  if (!Files.isDirectory(e)) {
+  if (!Files.isDirectory(path)) {
     return false;
   }
-  if (!e.getFileName().toString().startsWith(TMP_NAME_PREFIX)) {
+  if (!path.getFileName().toString().startsWith(TMP_NAME_PREFIX)) {
     return false;
   }
   long threshold=System.currentTimeMillis() - CLEAN_MAX_AGE;
   BasicFileAttributes attrs;
   try {
-    attrs=Files.readAttributes(e,BasicFileAttributes.class);
+    attrs=Files.readAttributes(path,BasicFileAttributes.class);
   }
  catch (  IOException ioe) {
-    LOG.warn("couldn't read file attributes for " + e + " : "+ ioe.getMessage());
+    LOG.error(String.format("Couldn't read file attributes for %s : ",path),ioe);
     return false;
   }
   long creationTime=attrs.creationTime().toMillis();
