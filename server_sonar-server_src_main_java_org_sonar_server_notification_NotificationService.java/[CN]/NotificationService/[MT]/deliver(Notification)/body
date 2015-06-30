@@ -1,21 +1,12 @@
 {
   final SetMultimap<String,NotificationChannel> recipients=HashMultimap.create();
   for (  NotificationDispatcher dispatcher : dispatchers) {
-    NotificationDispatcher.Context context=new NotificationDispatcher.Context(){
-      @Override public void addUser(      String username){
-      }
-      @Override public void addUser(      String userLogin,      NotificationChannel notificationChannel){
-        if (userLogin != null) {
-          recipients.put(userLogin,notificationChannel);
-        }
-      }
-    }
-;
+    NotificationDispatcher.Context context=new ContextImpl(recipients);
     try {
       dispatcher.performDispatch(notification,context);
     }
  catch (    Exception e) {
-      LOG.warn("Unable to dispatch notification " + notification + " using "+ dispatcher,e);
+      LOG.warn(String.format("Unable to dispatch notification %s using %s",notification,dispatcher),e);
     }
   }
   dispatch(notification,recipients);
