@@ -1,21 +1,23 @@
 {
+  metricRepository.add(1,STRING_METRIC);
+  metricRepository.add(2,DOUBLE_METRIC);
   reportReader.putMeasures(PROJECT_REF,Arrays.asList(BatchReport.Measure.newBuilder().setValueType(MeasureValueType.STRING).setStringValue("measure-data").setVariationValue1(1.1d).setVariationValue2(2.2d).setVariationValue3(3.3d).setVariationValue4(4.4d).setVariationValue5(5.5d).setAlertStatus("WARN").setAlertText("Open issues > 0").setDescription("measure-description").setMetricKey(STRING_METRIC_KEY).setCharactericId(123456).build()));
   reportReader.putMeasures(FILE_REF,Arrays.asList(BatchReport.Measure.newBuilder().setValueType(MeasureValueType.DOUBLE).setDoubleValue(123.123d).setVariationValue1(1.1d).setVariationValue2(2.2d).setVariationValue3(3.3d).setVariationValue4(4.4d).setVariationValue5(5.5d).setAlertStatus("ERROR").setAlertText("Blocker issues variation > 0").setDescription("measure-description").setMetricKey(DOUBLE_METRIC_KEY).setRuleKey(RULE_KEY.toString()).build()));
   sut.execute();
   session.commit();
-  assertThat(dbTester.countRowsOfTable("project_measures")).isEqualTo(FILE_REF);
+  assertThat(dbTester.countRowsOfTable("project_measures")).isEqualTo(2);
   List<Map<String,Object>> dtos=retrieveDtos();
   Map<String,Object> dto=dtos.get(0);
   assertThat(dto.get("snapshotId")).isEqualTo(3L);
   assertThat(dto.get("componentId")).isEqualTo(projectDto.getId());
-  assertThat(dto.get("metricId")).isEqualTo(stringMetric.getId().longValue());
+  assertThat(dto.get("metricId")).isEqualTo(1L);
   assertThat(dto.get("ruleId")).isNull();
   assertThat(dto.get("textValue")).isEqualTo("measure-data");
   assertThat(dto.get("severity")).isNull();
   dto=dtos.get(PROJECT_REF);
   assertThat(dto.get("snapshotId")).isEqualTo(4L);
   assertThat(dto.get("componentId")).isEqualTo(fileDto.getId());
-  assertThat(dto.get("metricId")).isEqualTo(doubleMetric.getId().longValue());
+  assertThat(dto.get("metricId")).isEqualTo(2L);
   assertThat(dto.get("ruleId")).isEqualTo(rule.getId().longValue());
   assertThat(dto.get("characteristicId")).isNull();
   assertThat(dto.get("value")).isEqualTo(123.1d);

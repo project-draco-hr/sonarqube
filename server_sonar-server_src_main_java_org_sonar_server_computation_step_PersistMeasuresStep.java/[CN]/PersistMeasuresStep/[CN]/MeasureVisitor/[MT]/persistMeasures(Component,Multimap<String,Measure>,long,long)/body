@@ -4,6 +4,9 @@
     if (FORBIDDEN_METRIC_KEYS.contains(metricKey)) {
       throw new IllegalStateException(String.format("Measures on metric '%s' cannot be send in the report",metricKey));
     }
+    if (NOT_TO_PERSIST_ON_FILE_METRIC_KEYS.contains(metricKey) && component.getType() == Component.Type.FILE) {
+      continue;
+    }
     Metric metric=metricRepository.getByKey(metricKey);
     Predicate<Measure> notBestValueOptimized=Predicates.not(BestValueOptimization.from(metric,component));
     for (    Measure measure : from(measures.getValue()).filter(NonEmptyMeasure.INSTANCE).filter(notBestValueOptimized)) {

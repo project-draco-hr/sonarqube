@@ -2,18 +2,10 @@
   dbTester.truncateTables();
   dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),new MeasureDao(),new ComponentDao(),new MetricDao(),new RuleDao(System2.INSTANCE));
   session=dbClient.openSession(false);
-  stringMetric=new MetricDto().setValueType("STRING").setShortName("String metric").setKey(STRING_METRIC_KEY).setEnabled(true);
-  dbClient.metricDao().insert(session,stringMetric);
-  doubleMetric=new MetricDto().setValueType("FLOAT").setShortName("Double metric").setKey(DOUBLE_METRIC_KEY).setEnabled(true);
-  dbClient.metricDao().insert(session,doubleMetric);
-  optimizedMetric=new MetricDto().setValueType("BOOL").setShortName("Optimized metric").setKey(OPTIMIZED_METRIC_KEY).setEnabled(true).setOptimizedBestValue(true).setBestValue(1d);
-  dbClient.metricDao().insert(session,optimizedMetric);
   rule=RuleTesting.newDto(RULE_KEY);
   dbClient.ruleDao().insert(session,rule);
   session.commit();
   RuleCache ruleCache=new RuleCache(new RuleCacheLoader(dbClient));
-  MetricRepositoryImpl metricRepository=new MetricRepositoryImpl(dbClient);
-  metricRepository.start();
   MeasureRepository measureRepository=new MeasureRepositoryImpl(dbClient,reportReader,metricRepository,ruleCache);
   session.commit();
   sut=new PersistMeasuresStep(dbClient,metricRepository,dbIdsRepository,treeRootHolder,measureRepository);
