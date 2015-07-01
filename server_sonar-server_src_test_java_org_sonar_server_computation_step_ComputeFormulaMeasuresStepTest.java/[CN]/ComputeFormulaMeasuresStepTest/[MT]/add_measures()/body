@@ -1,0 +1,16 @@
+{
+  DumbComponent project=DumbComponent.builder(PROJECT,1).addChildren(DumbComponent.builder(MODULE,11).addChildren(DumbComponent.builder(DIRECTORY,111).addChildren(builder(Component.Type.FILE,1111).build(),builder(Component.Type.FILE,1112).build()).build()).build(),DumbComponent.builder(MODULE,12).addChildren(DumbComponent.builder(DIRECTORY,121).addChildren(builder(Component.Type.FILE,1211).build()).build()).build()).build();
+  treeRootHolder.setRoot(project);
+  measureRepository.addRawMeasure(1111,CoreMetrics.LINES_KEY,newMeasureBuilder().create(10));
+  measureRepository.addRawMeasure(1112,CoreMetrics.LINES_KEY,newMeasureBuilder().create(8));
+  measureRepository.addRawMeasure(1211,CoreMetrics.LINES_KEY,newMeasureBuilder().create(2));
+  sut.execute();
+  assertThat(toEntries(measureRepository.getNewRawMeasures(1))).containsOnly(entryOf(CoreMetrics.NCLOC_KEY,newMeasureBuilder().create(20)));
+  assertThat(toEntries(measureRepository.getNewRawMeasures(11))).containsOnly(entryOf(CoreMetrics.NCLOC_KEY,newMeasureBuilder().create(18)));
+  assertThat(toEntries(measureRepository.getNewRawMeasures(111))).containsOnly(entryOf(CoreMetrics.NCLOC_KEY,newMeasureBuilder().create(18)));
+  assertThat(toEntries(measureRepository.getNewRawMeasures(1111))).containsOnly(entryOf(CoreMetrics.NCLOC_KEY,newMeasureBuilder().create(10)));
+  assertThat(toEntries(measureRepository.getNewRawMeasures(1112))).containsOnly(entryOf(CoreMetrics.NCLOC_KEY,newMeasureBuilder().create(8)));
+  assertThat(toEntries(measureRepository.getNewRawMeasures(12))).containsOnly(entryOf(CoreMetrics.NCLOC_KEY,newMeasureBuilder().create(2)));
+  assertThat(toEntries(measureRepository.getNewRawMeasures(121))).containsOnly(entryOf(CoreMetrics.NCLOC_KEY,newMeasureBuilder().create(2)));
+  assertThat(toEntries(measureRepository.getNewRawMeasures(1211))).containsOnly(entryOf(CoreMetrics.NCLOC_KEY,newMeasureBuilder().create(2)));
+}
