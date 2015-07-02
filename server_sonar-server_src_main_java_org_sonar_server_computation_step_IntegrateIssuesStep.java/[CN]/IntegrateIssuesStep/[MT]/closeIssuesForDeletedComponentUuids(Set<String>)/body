@@ -1,0 +1,17 @@
+{
+  DiskCache<DefaultIssue>.DiskAppender cacheAppender=issueCache.newAppender();
+  try {
+    for (    String deletedComponentUuid : deletedComponentUuids) {
+      List<DefaultIssue> issues=baseIssuesLoader.loadForComponentUuid(deletedComponentUuid);
+      for (      DefaultIssue issue : issues) {
+        issue.setBeingClosed(true);
+        issue.setOnDisabledRule(false);
+        issueLifecycle.doAutomaticTransition(issue);
+        cacheAppender.append(issue);
+      }
+    }
+  }
+  finally {
+    cacheAppender.close();
+  }
+}

@@ -1,0 +1,11 @@
+{
+  List<UserDoc> users=index.getAtMostThreeActiveUsersForScmAccount(scmAccount);
+  if (users.size() == 1) {
+    return users.get(0).login();
+  }
+  if (!users.isEmpty()) {
+    Collection<String> logins=Collections2.transform(users,UserDocToLogin.INSTANCE);
+    log.warn(String.format("Multiple users share the SCM account '%s': %s",scmAccount,Joiner.on(", ").join(logins)));
+  }
+  return null;
+}

@@ -1,0 +1,48 @@
+{
+  BlockHashSequence rawHashSequence=rawInput.getBlockHashSequence();
+  BlockHashSequence baseHashSequence=baseInput.getBlockHashSequence();
+  Multimap<Integer,RAW> rawsByLine=groupByLine(tracking.getUnmatchedRaws(),rawHashSequence);
+  Multimap<Integer,BASE> basesByLine=groupByLine(tracking.getUnmatchedBases(),baseHashSequence);
+  Map<Integer,HashOccurrence> occurrencesByHash=new HashMap<>();
+  for (  Integer line : basesByLine.keySet()) {
+    int hash=baseHashSequence.getBlockHashForLine(line);
+    HashOccurrence hashOccurrence=occurrencesByHash.get(hash);
+    if (hashOccurrence == null) {
+      hashOccurrence=new HashOccurrence();
+      hashOccurrence.baseLine=line;
+      hashOccurrence.baseCount=1;
+      occurrencesByHash.put(hash,hashOccurrence);
+    }
+ else {
+      hashOccurrence.baseCount++;
+    }
+  }
+  for (  Integer line : rawsByLine.keySet()) {
+    int hash=rawHashSequence.getBlockHashForLine(line);
+    HashOccurrence hashOccurrence=occurrencesByHash.get(hash);
+    if (hashOccurrence != null) {
+      hashOccurrence.rawLine=line;
+      hashOccurrence.rawCount++;
+    }
+  }
+  for (  HashOccurrence hashOccurrence : occurrencesByHash.values()) {
+    if (hashOccurrence.baseCount == 1 && hashOccurrence.rawCount == 1) {
+      map(rawsByLine.get(hashOccurrence.rawLine),basesByLine.get(hashOccurrence.baseLine),tracking);
+      basesByLine.removeAll(hashOccurrence.baseLine);
+      rawsByLine.removeAll(hashOccurrence.rawLine);
+    }
+  }
+  if (basesByLine.keySet().size() * rawsByLine.keySet().size() < 250000) {
+    List<LinePair> possibleLinePairs=Lists.newArrayList();
+    for (    Integer baseLine : basesByLine.keySet()) {
+      for (      Integer rawLine : rawsByLine.keySet()) {
+        int weight=lengthOfMaximalBlock(baseInput.getLineHashSequence(),baseLine,rawInput.getLineHashSequence(),rawLine);
+        possibleLinePairs.add(new LinePair(baseLine,rawLine,weight));
+      }
+    }
+    Collections.sort(possibleLinePairs,LinePairComparator.INSTANCE);
+    for (    LinePair linePair : possibleLinePairs) {
+      map(rawsByLine.get(linePair.rawLine),basesByLine.get(linePair.baseLine),tracking);
+    }
+  }
+}

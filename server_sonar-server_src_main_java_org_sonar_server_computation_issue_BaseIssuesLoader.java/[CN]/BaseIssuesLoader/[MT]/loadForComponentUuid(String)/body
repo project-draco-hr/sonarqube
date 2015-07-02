@@ -1,0 +1,23 @@
+{
+  DbSession session=dbClient.openSession(false);
+  final List<DefaultIssue> result=new ArrayList<>();
+  try {
+    Map<String,String> params=ImmutableMap.of("componentUuid",componentUuid);
+    session.select(IssueMapper.class.getName() + ".selectNonClosedByComponentUuid",params,new ResultHandler(){
+      @Override public void handleResult(      ResultContext resultContext){
+        DefaultIssue issue=((IssueDto)resultContext.getResultObject()).toDefaultIssue();
+        if (!isActive(issue.ruleKey()) || ruleRepository.getByKey(issue.ruleKey()).getStatus() == RuleStatus.REMOVED) {
+          issue.setOnDisabledRule(true);
+          issue.setBeingClosed(true);
+        }
+        issue.setSelectedAt(System.currentTimeMillis());
+        result.add(issue);
+      }
+    }
+);
+    return result;
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

@@ -1,0 +1,22 @@
+{
+  periodsHolder.setPeriods();
+  sut.beforeComponent(FILE1,tracking);
+  sut.onIssue(FILE1,createIssue(null,STATUS_OPEN,BLOCKER));
+  sut.onIssue(FILE1,createIssue(RESOLUTION_FIXED,STATUS_CLOSED,MAJOR));
+  sut.afterComponent(FILE1);
+  sut.beforeComponent(FILE2,tracking);
+  sut.onIssue(FILE2,createIssue(null,STATUS_CONFIRMED,BLOCKER));
+  sut.onIssue(FILE2,createIssue(null,STATUS_CONFIRMED,MAJOR));
+  sut.afterComponent(FILE2);
+  sut.beforeComponent(PROJECT,tracking);
+  sut.afterComponent(PROJECT);
+  assertThat(measureRepository.getRawMeasure(FILE1,BLOCKER_ISSUES_METRIC).get().getIntValue()).isEqualTo(1);
+  assertThat(measureRepository.getRawMeasure(FILE1,CRITICAL_ISSUES_METRIC).get().getIntValue()).isEqualTo(0);
+  assertThat(measureRepository.getRawMeasure(FILE1,MAJOR_ISSUES_METRIC).get().getIntValue()).isEqualTo(0);
+  assertThat(measureRepository.getRawMeasure(FILE2,BLOCKER_ISSUES_METRIC).get().getIntValue()).isEqualTo(1);
+  assertThat(measureRepository.getRawMeasure(FILE2,CRITICAL_ISSUES_METRIC).get().getIntValue()).isEqualTo(0);
+  assertThat(measureRepository.getRawMeasure(FILE2,MAJOR_ISSUES_METRIC).get().getIntValue()).isEqualTo(1);
+  assertThat(measureRepository.getRawMeasure(PROJECT,BLOCKER_ISSUES_METRIC).get().getIntValue()).isEqualTo(2);
+  assertThat(measureRepository.getRawMeasure(PROJECT,CRITICAL_ISSUES_METRIC).get().getIntValue()).isEqualTo(0);
+  assertThat(measureRepository.getRawMeasure(PROJECT,MAJOR_ISSUES_METRIC).get().getIntValue()).isEqualTo(1);
+}

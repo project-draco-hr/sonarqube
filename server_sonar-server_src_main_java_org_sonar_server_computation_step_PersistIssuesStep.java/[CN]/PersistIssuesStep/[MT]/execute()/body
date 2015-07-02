@@ -8,20 +8,16 @@
       DefaultIssue issue=issues.next();
       boolean saved=false;
       if (issue.isNew()) {
-        Integer ruleId=ruleCache.get(issue.ruleKey()).getId();
-        mapper.insert(IssueDto.toDtoForComputationInsert(issue,ruleId,system2.now()));
+        Integer ruleId=ruleRepository.getByKey(issue.ruleKey()).getId();
+        IssueDto dto=IssueDto.toDtoForComputationInsert(issue,ruleId,system2.now());
+        mapper.insert(dto);
         saved=true;
       }
  else       if (issue.isChanged()) {
         IssueDto dto=IssueDto.toDtoForUpdate(issue,system2.now());
-        if (Issue.STATUS_CLOSED.equals(issue.status()) || issue.selectedAt() == null) {
-          mapper.update(dto);
-        }
- else {
-          int updateCount=mapper.updateIfBeforeSelectedDate(dto);
-          if (updateCount == 0) {
-            conflictResolver.resolve(issue,mapper);
-          }
+        int updateCount=mapper.updateIfBeforeSelectedDate(dto);
+        if (updateCount == 0) {
+          conflictResolver.resolve(issue,mapper);
         }
         saved=true;
       }

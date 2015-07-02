@@ -1,0 +1,14 @@
+{
+  currentSum=new DebtSum();
+  sumsByComponentRef.put(component.getRef(),currentSum);
+  List<IssueChangeDto> changes=dbClient.issueChangeDao().selectChangelogOfNonClosedIssuesByComponent(component.getUuid());
+  for (  IssueChangeDto change : changes) {
+    changesByIssueUuid.put(change.getIssueKey(),change);
+  }
+  for (  Component child : component.getChildren()) {
+    DebtSum childSum=sumsByComponentRef.remove(child.getRef());
+    if (childSum != null) {
+      currentSum.add(childSum);
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  periodsHolder.setPeriods();
+  sut.beforeComponent(FILE1,tracking);
+  sut.onIssue(FILE1,createIssue(null,STATUS_OPEN,BLOCKER));
+  sut.onIssue(FILE1,createIssue(RESOLUTION_FIXED,STATUS_CLOSED,MAJOR));
+  sut.onIssue(FILE1,createIssue(RESOLUTION_FALSE_POSITIVE,STATUS_RESOLVED,MAJOR));
+  sut.afterComponent(FILE1);
+  sut.beforeComponent(FILE2,tracking);
+  sut.onIssue(FILE2,createIssue(null,STATUS_CONFIRMED,BLOCKER));
+  sut.onIssue(FILE2,createIssue(null,STATUS_CONFIRMED,MAJOR));
+  sut.afterComponent(FILE2);
+  sut.beforeComponent(FILE3,tracking);
+  sut.afterComponent(FILE3);
+  sut.beforeComponent(PROJECT,tracking);
+  sut.afterComponent(PROJECT);
+  assertThat(measureRepository.getRawMeasure(FILE1,ISSUES_METRIC).get().getIntValue()).isEqualTo(1);
+  assertThat(measureRepository.getRawMeasure(FILE1,OPEN_ISSUES_METRIC).get().getIntValue()).isEqualTo(1);
+  assertThat(measureRepository.getRawMeasure(FILE1,FALSE_POSITIVE_ISSUES_METRIC).get().getIntValue()).isEqualTo(1);
+  assertThat(measureRepository.getRawMeasure(FILE1,CONFIRMED_ISSUES_METRIC).get().getIntValue()).isEqualTo(0);
+  assertThat(measureRepository.getRawMeasure(FILE2,ISSUES_METRIC).get().getIntValue()).isEqualTo(2);
+  assertThat(measureRepository.getRawMeasure(FILE2,OPEN_ISSUES_METRIC).get().getIntValue()).isEqualTo(0);
+  assertThat(measureRepository.getRawMeasure(FILE2,FALSE_POSITIVE_ISSUES_METRIC).get().getIntValue()).isEqualTo(0);
+  assertThat(measureRepository.getRawMeasure(FILE2,CONFIRMED_ISSUES_METRIC).get().getIntValue()).isEqualTo(2);
+  assertThat(measureRepository.getRawMeasure(FILE3,ISSUES_METRIC).get().getIntValue()).isEqualTo(0);
+  assertThat(measureRepository.getRawMeasure(PROJECT,ISSUES_METRIC).get().getIntValue()).isEqualTo(3);
+  assertThat(measureRepository.getRawMeasure(PROJECT,OPEN_ISSUES_METRIC).get().getIntValue()).isEqualTo(1);
+  assertThat(measureRepository.getRawMeasure(PROJECT,FALSE_POSITIVE_ISSUES_METRIC).get().getIntValue()).isEqualTo(1);
+  assertThat(measureRepository.getRawMeasure(PROJECT,CONFIRMED_ISSUES_METRIC).get().getIntValue()).isEqualTo(2);
+}

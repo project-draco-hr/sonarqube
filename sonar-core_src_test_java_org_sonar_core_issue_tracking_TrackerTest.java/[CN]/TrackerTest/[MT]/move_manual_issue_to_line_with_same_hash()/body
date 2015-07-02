@@ -1,0 +1,10 @@
+{
+  FakeInput baseInput=new FakeInput("H1","H2");
+  Issue issue=baseInput.createIssueOnLine(1,RULE_MANUAL,"message");
+  FakeInput rawInput=new FakeInput("H3","H4","H1");
+  Tracking<Issue,Issue> tracking=tracker.track(rawInput,baseInput);
+  assertThat(tracking.getUnmatchedBases()).isEmpty();
+  Multimap<Integer,Issue> openManualIssues=tracking.getOpenManualIssuesByLine();
+  assertThat(openManualIssues.keySet()).containsOnly(3);
+  assertThat(Iterables.getOnlyElement(openManualIssues.get(3))).isSameAs(issue);
+}

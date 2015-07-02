@@ -1,0 +1,13 @@
+{
+  projectDef.properties().put(CoreProperties.PROJECT_BRANCH_PROPERTY,"myBranch");
+  project.setKey("foo:myBranch");
+  project.setEffectiveKey("foo:myBranch");
+  File outputDir=temp.newFolder();
+  BatchReportWriter writer=new BatchReportWriter(outputDir);
+  underTest.publish(writer);
+  BatchReportReader reader=new BatchReportReader(outputDir);
+  BatchReport.Metadata metadata=reader.readMetadata();
+  assertThat(metadata.getAnalysisDate()).isEqualTo(1234567L);
+  assertThat(metadata.getProjectKey()).isEqualTo("foo");
+  assertThat(metadata.getBranch()).isEqualTo("myBranch");
+}

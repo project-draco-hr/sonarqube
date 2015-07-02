@@ -1,11 +1,11 @@
 {
-  root=ProjectDefinition.create().setKey("foo");
-  p=new Project("foo").setAnalysisDate(new Date(1234567L));
+  projectDef=ProjectDefinition.create().setKey("foo");
+  project=new Project("foo").setAnalysisDate(new Date(1234567L));
   BatchComponentCache componentCache=new BatchComponentCache();
   org.sonar.api.resources.Resource sampleFile=org.sonar.api.resources.File.create("src/Foo.php").setEffectiveKey("foo:src/Foo.php");
-  componentCache.add(p,null).setSnapshot(new Snapshot().setId(2));
-  componentCache.add(sampleFile,p);
+  componentCache.add(project,null).setSnapshot(new Snapshot().setId(2));
+  componentCache.add(sampleFile,project);
   issueCache=mock(IssueCache.class);
   when(issueCache.byComponent(anyString())).thenReturn(Collections.<DefaultIssue>emptyList());
-  publisher=new IssuesPublisher(new ImmutableProjectReactor(root),componentCache,issueCache);
+  underTest=new IssuesPublisher(componentCache,issueCache);
 }
