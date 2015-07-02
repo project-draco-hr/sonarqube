@@ -1,0 +1,8 @@
+{
+  orchestrator=Orchestrator.builderEnv().setServerProperty("sonar.updatecenter.url",UpdateCenterSystemUpdateTest.class.getResource("UpdateCenterTest/update-center-with-missing-plugin-version.properties").toString()).addPlugin(pluginArtifact("sonar-fake-plugin")).build();
+  orchestrator.start();
+  Selenese selenese=Selenese.builder().setHtmlTestsInClasspath("system-updates-with-missing-installed-plugin-version","/updatecenter/system-updates-with-missing-installed-plugin-version.html").build();
+  orchestrator.executeSelenese(selenese);
+  File logs=orchestrator.getServer().getLogs();
+  assertThat(FileUtils.readFileToString(logs)).doesNotContain("NoSuchElementException");
+}

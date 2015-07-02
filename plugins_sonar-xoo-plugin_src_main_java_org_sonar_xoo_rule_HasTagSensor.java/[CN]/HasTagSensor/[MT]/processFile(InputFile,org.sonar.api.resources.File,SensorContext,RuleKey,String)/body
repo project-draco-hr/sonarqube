@@ -1,0 +1,19 @@
+{
+  org.sonar.api.batch.rule.ActiveRule activeRule=activeRules.find(ruleKey);
+  String tag=activeRule.param("tag");
+  if (tag == null) {
+    throw new IllegalStateException("Rule is badly configured. The parameter 'tag' is missing.");
+  }
+  try {
+    Issuable issuable=perspectives.as(Issuable.class,sonarFile);
+    List<String> lines=FileUtils.readLines(inputFile.file(),fs.encoding().name());
+    for (int index=0; index < lines.size(); index++) {
+      if (lines.get(index).contains(tag)) {
+        issuable.addIssue(issuable.newIssueBuilder().effortToFix(settings.getDouble(EFFORT_TO_FIX_PROPERTY)).line(index + 1).ruleKey(ruleKey).build());
+      }
+    }
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Fail to process " + inputFile,e);
+  }
+}

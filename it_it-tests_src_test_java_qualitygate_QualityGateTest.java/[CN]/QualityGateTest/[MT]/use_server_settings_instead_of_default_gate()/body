@@ -1,0 +1,18 @@
+{
+  QualityGate alert=qgClient().create("AlertWithLowThreshold");
+  qgClient().createCondition(NewCondition.create(alert.id()).metricKey("ncloc").operator("GT").warningThreshold("10"));
+  QualityGate error=qgClient().create("ErrorWithLowThreshold");
+  qgClient().createCondition(NewCondition.create(error.id()).metricKey("ncloc").operator("GT").errorThreshold("10"));
+  qgClient().setDefault(alert.id());
+  qgClient().selectProject(error.id(),provisionnedProjectId);
+  try {
+    SonarRunner build=SonarRunner.create(projectDir("qualitygate/xoo-sample"));
+    orchestrator.executeBuild(build);
+    assertThat(fetchGateStatus().getData()).isEqualTo("ERROR");
+  }
+  finally {
+    qgClient().unsetDefault();
+    qgClient().destroy(alert.id());
+    qgClient().destroy(error.id());
+  }
+}

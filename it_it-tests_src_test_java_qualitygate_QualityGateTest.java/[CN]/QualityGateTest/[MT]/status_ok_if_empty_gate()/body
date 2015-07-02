@@ -1,0 +1,13 @@
+{
+  QualityGate empty=qgClient().create("Empty");
+  qgClient().setDefault(empty.id());
+  try {
+    SonarRunner build=SonarRunner.create(projectDir("qualitygate/xoo-sample"));
+    orchestrator.executeBuild(build);
+    assertThat(fetchGateStatus().getData()).isEqualTo("OK");
+  }
+  finally {
+    qgClient().unsetDefault();
+    qgClient().destroy(empty.id());
+  }
+}

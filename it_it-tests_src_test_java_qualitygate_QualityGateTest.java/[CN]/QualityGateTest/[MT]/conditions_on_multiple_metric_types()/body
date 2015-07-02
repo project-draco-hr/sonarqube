@@ -1,0 +1,17 @@
+{
+  QualityGate allTypes=qgClient().create("AllMetricTypes");
+  qgClient().createCondition(NewCondition.create(allTypes.id()).metricKey("ncloc").operator("GT").warningThreshold("10"));
+  qgClient().createCondition(NewCondition.create(allTypes.id()).metricKey("duplicated_lines_density").operator("GT").warningThreshold("20"));
+  qgClient().setDefault(allTypes.id());
+  try {
+    SonarRunner build=SonarRunner.create(projectDir("qualitygate/xoo-sample")).setProperty("sonar.cpd.xoo.minimumLines","2").setProperty("sonar.cpd.xoo.minimumTokens","5");
+    orchestrator.executeBuild(build);
+    Measure alertStatus=fetchGateStatus();
+    assertThat(alertStatus.getData()).isEqualTo("WARN");
+    assertThat(alertStatus.getAlertText()).contains("Lines of code > 10").contains("Duplicated lines (%) > 20");
+  }
+  finally {
+    qgClient().unsetDefault();
+    qgClient().destroy(allTypes.id());
+  }
+}
