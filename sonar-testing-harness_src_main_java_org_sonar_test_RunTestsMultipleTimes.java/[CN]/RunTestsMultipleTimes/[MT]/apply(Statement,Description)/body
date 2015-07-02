@@ -1,0 +1,36 @@
+{
+  return new Statement(){
+    @Override public void evaluate() throws Throwable {
+      ExecutorService executor=Executors.newFixedThreadPool(threads);
+      List<Future<?>> results=new ArrayList<>();
+      for (int i=0; i < times; i++) {
+        final int index=i;
+        results.add(executor.submit(new Runnable(){
+          @Override public void run(){
+            try {
+              System.out.println(index);
+              base.evaluate();
+            }
+ catch (            RuntimeException e) {
+              throw e;
+            }
+catch (            Throwable e) {
+              throw new RuntimeException(e);
+            }
+          }
+        }
+));
+      }
+      for (      Future<?> result : results) {
+        try {
+          result.get();
+        }
+ catch (        ExecutionException e) {
+          throw e.getCause();
+        }
+      }
+      executor.shutdown();
+    }
+  }
+;
+}
