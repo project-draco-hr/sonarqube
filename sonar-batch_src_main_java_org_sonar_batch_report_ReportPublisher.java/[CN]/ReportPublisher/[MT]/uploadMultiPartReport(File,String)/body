@@ -3,9 +3,7 @@
   long startTime=System.currentTimeMillis();
   URL url;
   try {
-    ProjectDefinition projectDefinition=projectReactor.getRoot();
-    String effectiveKey=projectDefinition.getKeyWithBranch();
-    url=new URL(serverClient.getURL() + "/api/computation/submit_report?projectKey=" + effectiveKey+ "&projectName="+ ServerClient.encodeForUrl(projectDefinition.getName()));
+    url=new URL(serverClient.getURL() + relativeUrl);
   }
  catch (  MalformedURLException e) {
     throw new IllegalArgumentException("Invalid URL",e);
@@ -13,18 +11,18 @@
   HttpRequest request=HttpRequest.post(url);
   request.trustAllCerts();
   request.trustAllHosts();
-  request.header("User-Agent",String.format("SonarQube %s",server.getVersion()));
+  request.header("User-Agent",format("SonarQube %s",server.getVersion()));
   request.basic(serverClient.getLogin(),serverClient.getPassword());
   request.part("report",null,"application/octet-stream",report);
   if (!request.ok()) {
     int responseCode=request.code();
     if (responseCode == 401) {
-      throw new IllegalStateException(String.format(serverClient.getMessageWhenNotAuthorized(),CoreProperties.LOGIN,CoreProperties.PASSWORD));
+      throw new IllegalStateException(format(serverClient.getMessageWhenNotAuthorized(),CoreProperties.LOGIN,CoreProperties.PASSWORD));
     }
     if (responseCode == 403) {
       throw new IllegalStateException(request.body());
     }
-    throw new IllegalStateException(String.format("Fail to execute request [code=%s, url=%s]: %s",responseCode,url,request.body()));
+    throw new IllegalStateException(format("Fail to execute request [code=%s, url=%s]: %s",responseCode,url,request.body()));
   }
   long stopTime=System.currentTimeMillis();
   LOG.info("Analysis reports sent to server in " + (stopTime - startTime) + "ms");

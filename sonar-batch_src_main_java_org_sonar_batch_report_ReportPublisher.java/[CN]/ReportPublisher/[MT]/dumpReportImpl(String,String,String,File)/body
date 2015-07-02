@@ -1,0 +1,13 @@
+{
+  File dumpDir=new File(dumpDirLocation);
+  if (!dumpDir.exists() || !dumpDir.isDirectory()) {
+    LOG.warn("Report dump directory '{}' does not exist or is not a directory",dumpDirLocation);
+    return;
+  }
+  long dateTime=new Date().getTime();
+  File dumpedZip=new File(dumpDir,format("batch-report_%s_%s.zip",projectKey,dateTime));
+  FileUtils.copyFile(report,new FileOutputStream(dumpedZip));
+  File dumpedMetadata=new File(dumpDir,format("batch-report_%s_%s.txt",projectKey,dateTime));
+  FileUtils.write(dumpedMetadata,relativeUrl);
+  LOG.info("Batch report dumped to {}",dumpedZip.getAbsolutePath());
+}
