@@ -1,8 +1,8 @@
 {
-  Iterable<BASE> manualIssues=from(new HashSet<>(tracking.getUnmatchedBases())).filter(IsManual.INSTANCE);
+  Iterable<BASE> manualIssues=from(tracking.getUnmatchedBases()).filter(IsManual.INSTANCE);
   for (  BASE base : manualIssues) {
     if (base.getLine() == null) {
-      tracking.associateManualIssueToLine(base,null);
+      tracking.keepManualIssueOpen(base,null);
     }
  else {
       String baseHash=base.getLineHash();
@@ -12,10 +12,10 @@
       if (!Strings.isNullOrEmpty(baseHash)) {
         int[] rawLines=rawInput.getLineHashSequence().getLinesForHash(baseHash);
         if (rawLines.length == 1) {
-          tracking.associateManualIssueToLine(base,rawLines[0]);
+          tracking.keepManualIssueOpen(base,rawLines[0]);
         }
  else         if (rawLines.length == 0 && rawInput.getLineHashSequence().hasLine(base.getLine())) {
-          tracking.associateManualIssueToLine(base,base.getLine());
+          tracking.keepManualIssueOpen(base,base.getLine());
         }
       }
     }

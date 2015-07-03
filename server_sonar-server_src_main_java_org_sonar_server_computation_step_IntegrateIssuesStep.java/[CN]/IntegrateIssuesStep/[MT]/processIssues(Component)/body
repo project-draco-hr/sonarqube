@@ -1,14 +1,17 @@
 {
-  Tracking<DefaultIssue,DefaultIssue> tracking=tracker.track(component);
   DiskCache<DefaultIssue>.DiskAppender cacheAppender=issueCache.newAppender();
   try {
-    issueVisitors.beforeComponent(component,tracking);
+    Tracking<DefaultIssue,DefaultIssue> tracking=tracker.track(component);
+    issueVisitors.beforeComponent(component);
     fillNewOpenIssues(component,tracking,cacheAppender);
     fillExistingOpenIssues(component,tracking,cacheAppender);
     closeUnmatchedBaseIssues(component,tracking,cacheAppender);
     issueVisitors.afterComponent(component);
   }
-  finally {
+ catch (  Exception e) {
+    Loggers.get(getClass()).error(String.format("Fail to process issues of %s",component.getKey()),e);
+  }
+ finally {
     cacheAppender.close();
   }
 }
