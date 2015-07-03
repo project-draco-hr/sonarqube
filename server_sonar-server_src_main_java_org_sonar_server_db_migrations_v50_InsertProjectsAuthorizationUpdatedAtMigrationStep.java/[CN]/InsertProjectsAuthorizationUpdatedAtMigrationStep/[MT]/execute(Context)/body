@@ -1,16 +1,7 @@
 {
-  final long now=system.now();
   MassUpdate massUpdate=context.prepareMassUpdate();
   massUpdate.select("SELECT p.id FROM projects p WHERE p.scope=? AND p.enabled=? and p.authorization_updated_at IS NULL").setString(1,"PRJ").setBoolean(2,true);
   massUpdate.update("UPDATE projects SET authorization_updated_at=? WHERE id=?");
   massUpdate.rowPluralName("projects");
-  massUpdate.execute(new MassUpdate.Handler(){
-    @Override public boolean handle(    Select.Row row,    SqlStatement update) throws SQLException {
-      Long id=row.getNullableLong(1);
-      update.setLong(1,now);
-      update.setLong(2,id);
-      return true;
-    }
-  }
-);
+  massUpdate.execute(new MigrationHandler());
 }

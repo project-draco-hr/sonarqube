@@ -1,14 +1,5 @@
 {
   BatchReportWriter writer=reportPublisher.getWriter();
   DefaultInputFile inputFile=(DefaultInputFile)highlighting.inputFile();
-  writer.writeComponentSyntaxHighlighting(resourceCache.get(inputFile).batchId(),Iterables.transform(highlighting.getSyntaxHighlightingRuleSet(),new Function<SyntaxHighlightingRule,BatchReport.SyntaxHighlighting>(){
-    private BatchReport.SyntaxHighlighting.Builder builder=BatchReport.SyntaxHighlighting.newBuilder();
-    private Range.Builder rangeBuilder=Range.newBuilder();
-    @Override public BatchReport.SyntaxHighlighting apply(    SyntaxHighlightingRule input){
-      builder.setRange(rangeBuilder.setStartLine(input.range().start().line()).setStartOffset(input.range().start().lineOffset()).setEndLine(input.range().end().line()).setEndOffset(input.range().end().lineOffset()).build());
-      builder.setType(BatchReportUtils.toProtocolType(input.getTextType()));
-      return builder.build();
-    }
-  }
-));
+  writer.writeComponentSyntaxHighlighting(resourceCache.get(inputFile).batchId(),Iterables.transform(highlighting.getSyntaxHighlightingRuleSet(),new BuildSyntaxHighlighting()));
 }

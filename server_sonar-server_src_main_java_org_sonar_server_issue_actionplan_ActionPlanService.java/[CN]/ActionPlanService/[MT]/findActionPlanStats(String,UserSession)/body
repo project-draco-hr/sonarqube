@@ -2,12 +2,7 @@
   ResourceDto project=findProject(projectKey);
   checkUserCanAccessProject(project.getKey(),userSession);
   List<ActionPlanStatsDto> actionPlanStatsDtos=actionPlanStatsDao.findByProjectId(project.getId());
-  List<ActionPlanStats> actionPlanStats=newArrayList(Iterables.transform(actionPlanStatsDtos,new Function<ActionPlanStatsDto,ActionPlanStats>(){
-    @Override public ActionPlanStats apply(    ActionPlanStatsDto actionPlanStatsDto){
-      return actionPlanStatsDto.toActionPlanStat();
-    }
-  }
-));
+  List<ActionPlanStats> actionPlanStats=newArrayList(Iterables.transform(actionPlanStatsDtos,ToActionPlanStats.INSTANCE));
   Collections.sort(actionPlanStats,new ActionPlanDeadlineComparator());
   return actionPlanStats;
 }

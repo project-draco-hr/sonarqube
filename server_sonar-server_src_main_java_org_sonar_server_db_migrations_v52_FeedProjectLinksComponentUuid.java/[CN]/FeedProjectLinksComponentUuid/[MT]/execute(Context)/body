@@ -2,12 +2,5 @@
   MassUpdate update=context.prepareMassUpdate().rowPluralName("project links");
   update.select("SELECT p.uuid, link.id " + "FROM project_links link " + "INNER JOIN projects p ON p.id=link.project_id "+ "WHERE link.component_uuid is null");
   update.update("UPDATE project_links SET component_uuid=? WHERE id=?");
-  update.execute(new Handler(){
-    @Override public boolean handle(    Row row,    SqlStatement update) throws SQLException {
-      update.setString(1,row.getString(1));
-      update.setLong(2,row.getLong(2));
-      return true;
-    }
-  }
-);
+  update.execute(MigrationHandler.INSTANCE);
 }
