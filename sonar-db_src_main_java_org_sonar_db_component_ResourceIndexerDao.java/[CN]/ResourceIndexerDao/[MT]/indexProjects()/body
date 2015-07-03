@@ -1,0 +1,18 @@
+{
+  final DbSession session=mybatis.openSession(true);
+  try {
+    final ResourceIndexerMapper mapper=session.getMapper(ResourceIndexerMapper.class);
+    session.select("org.sonar.db.component.ResourceIndexerMapper.selectRootProjectIds",ResourceIndexerQuery.create(),new ResultHandler(){
+      @Override public void handleResult(      ResultContext context){
+        Integer rootProjectId=(Integer)context.getResultObject();
+        doIndexProject(rootProjectId,session,mapper);
+        session.commit();
+      }
+    }
+);
+    return this;
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

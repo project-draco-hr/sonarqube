@@ -1,0 +1,13 @@
+{
+  if (database == null) {
+    database=new H2Database("sonarHibernate",true);
+    database.start();
+    databaseCommands=DatabaseCommands.forDialect(database.getDialect());
+    myBatis=new MyBatis(database,new NullQueue());
+    myBatis.start();
+    try (SqlSession session=myBatis.openSession(false)){
+      session.getMapper(SchemaMigrationMapper.class).insert(String.valueOf(DatabaseVersion.LAST_VERSION));
+      session.commit();
+    }
+   }
+}
