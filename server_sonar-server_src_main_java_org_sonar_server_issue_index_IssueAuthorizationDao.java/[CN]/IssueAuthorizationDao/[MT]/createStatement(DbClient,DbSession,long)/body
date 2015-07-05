@@ -1,0 +1,16 @@
+{
+  String sql;
+  if (afterDate > 0L) {
+    sql=StringUtils.replace(SQL_TEMPLATE,"{dateCondition}"," AND projects.authorization_updated_at>? ");
+  }
+ else {
+    sql=StringUtils.replace(SQL_TEMPLATE,"{dateCondition}","");
+  }
+  PreparedStatement stmt=dbClient.getMyBatis().newScrollingSelectStatement(session,sql);
+  if (afterDate > 0L) {
+    for (int i=1; i <= 4; i++) {
+      stmt.setLong(i,afterDate);
+    }
+  }
+  return stmt;
+}

@@ -1,14 +1,16 @@
 {
   dbTester.prepareDbUnit(getClass(),"feed.xml");
-  PreparedStatement stmt=connection.prepareStatement("select * from issues order by id");
-  FailIterator iterator=new FailIterator(stmt);
-  assertThat(iterator.hasNext()).isTrue();
-  try {
-    iterator.next();
-    fail();
+  try (Connection connection=dbTester.openConnection()){
+    PreparedStatement stmt=connection.prepareStatement("select * from issues order by id");
+    FailIterator iterator=new FailIterator(stmt);
+    assertThat(iterator.hasNext()).isTrue();
+    try {
+      iterator.next();
+      fail();
+    }
+ catch (    IllegalStateException e) {
+      assertThat(e.getCause()).isInstanceOf(SQLException.class);
+    }
+    iterator.close();
   }
- catch (  IllegalStateException e) {
-    assertThat(e.getCause()).isInstanceOf(SQLException.class);
-  }
-  iterator.close();
-}
+ }

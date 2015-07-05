@@ -1,14 +1,12 @@
 {
   LOGGER.info("Scroll table FILE_SOURCES");
-  DbClient dbClient=new DbClient(dbTester.database(),dbTester.myBatis());
-  Connection connection=dbTester.openConnection();
   AtomicLong counter=new AtomicLong();
   ProgressTask progress=new ProgressTask(LOGGER,"source file",counter);
   Timer timer=new Timer("SourceDbScroll");
   timer.schedule(progress,ProgressTask.PERIOD_MS,ProgressTask.PERIOD_MS);
   try {
     long start=System.currentTimeMillis();
-    SourceLineResultSetIterator it=SourceLineResultSetIterator.create(dbClient,connection,0L,null);
+    SourceLineResultSetIterator it=SourceLineResultSetIterator.create(dbTester.getDbClient(),dbTester.getSession(),0L,null);
     while (it.hasNext()) {
       FileSourcesUpdaterHelper.Row row=it.next();
       assertThat(row.getUpdateRequests().size()).isEqualTo(NUMBER_OF_LINES);
@@ -22,7 +20,6 @@
     benchmark.expectBetween("Throughput to scroll FILE_SOURCES",throughputPerSecond,9,13);
   }
   finally {
-    DbUtils.closeQuietly(connection);
     timer.cancel();
   }
 }

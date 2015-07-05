@@ -1,21 +1,3 @@
 {
-  IDatabaseConnection connection=openDbUnitConnection();
-  try {
-    IDataSet dataSet=connection.createDataSet();
-    IDataSet expectedDataSet=getExpectedData(testName);
-    for (    String table : tables) {
-      ITable filteredTable=DefaultColumnFilter.excludedColumnsTable(dataSet.getTable(table),excludedColumnNames);
-      ITable filteredExpectedTable=DefaultColumnFilter.excludedColumnsTable(expectedDataSet.getTable(table),excludedColumnNames);
-      Assertion.assertEquals(filteredExpectedTable,filteredTable);
-    }
-  }
- catch (  DatabaseUnitException e) {
-    fail(e.getMessage());
-  }
-catch (  SQLException e) {
-    throw translateException("Error while checking results",e);
-  }
- finally {
-    closeDbUnitConnection(connection);
-  }
+  dbTester.assertDbUnit(getClass(),testName + (testName.endsWith("-result.xml") ? "" : "-result.xml"),excludedColumnNames,tables);
 }

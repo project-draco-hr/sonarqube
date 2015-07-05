@@ -1,0 +1,20 @@
+{
+  IDatabaseConnection connection=dbUnitConnection();
+  try {
+    IDataSet dataSet=connection.createDataSet();
+    String path="/" + testClass.getName().replace('.','/') + "/"+ filename;
+    IDataSet expectedDataSet=dbUnitDataSet(testClass.getResourceAsStream(path));
+    ITable filteredTable=DefaultColumnFilter.includedColumnsTable(dataSet.getTable(table),columns);
+    ITable filteredExpectedTable=DefaultColumnFilter.includedColumnsTable(expectedDataSet.getTable(table),columns);
+    Assertion.assertEquals(filteredExpectedTable,filteredTable);
+  }
+ catch (  DatabaseUnitException e) {
+    fail(e.getMessage());
+  }
+catch (  SQLException e) {
+    throw translateException("Error while checking results",e);
+  }
+ finally {
+    closeQuietly(connection);
+  }
+}

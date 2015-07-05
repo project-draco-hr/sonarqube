@@ -2,9 +2,8 @@
   final BulkIndexer bulk=new BulkIndexer(esClient,INDEX);
   bulk.setLarge(lastUpdatedAt == 0L);
   DbSession dbSession=dbClient.openSession(false);
-  Connection dbConnection=dbSession.getConnection();
   try {
-    TestResultSetIterator rowIt=TestResultSetIterator.create(dbClient,dbConnection,lastUpdatedAt,projectUuid);
+    TestResultSetIterator rowIt=TestResultSetIterator.create(dbClient,dbSession,lastUpdatedAt,projectUuid);
     long maxUpdatedAt=doIndex(bulk,rowIt);
     rowIt.close();
     return maxUpdatedAt;

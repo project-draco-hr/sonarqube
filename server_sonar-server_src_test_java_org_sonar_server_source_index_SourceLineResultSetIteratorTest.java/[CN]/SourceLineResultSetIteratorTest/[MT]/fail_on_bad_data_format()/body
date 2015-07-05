@@ -1,7 +1,9 @@
 {
   db.prepareDbUnit(getClass(),"shared.xml");
-  FileSourceTesting.updateDataColumn(connection,"F1","THIS_IS_NOT_PROTOBUF".getBytes());
-  iterator=SourceLineResultSetIterator.create(dbClient,connection,0L,null);
+  try (Connection connection=db.openConnection()){
+    FileSourceTesting.updateDataColumn(connection,"F1","THIS_IS_NOT_PROTOBUF".getBytes());
+  }
+   iterator=SourceLineResultSetIterator.create(db.getDbClient(),db.getSession(),0L,null);
   try {
     assertThat(iterator.hasNext()).isTrue();
     iterator.next();

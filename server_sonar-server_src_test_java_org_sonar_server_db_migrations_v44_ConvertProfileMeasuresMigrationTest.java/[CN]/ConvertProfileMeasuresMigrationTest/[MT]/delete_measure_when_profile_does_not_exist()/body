@@ -1,15 +1,15 @@
 {
   db.prepareDbUnit(getClass(),"measure_on_deleted_profile.xml");
   migration.execute();
-  Connection connection=db.openConnection();
-  Statement stmt=connection.createStatement();
-  ResultSet rs=stmt.executeQuery("select * from project_measures where id=2");
-  try {
-    assertThat(rs.next()).isFalse();
-  }
+  try (Connection connection=db.openConnection()){
+    Statement stmt=connection.createStatement();
+    ResultSet rs=stmt.executeQuery("select * from project_measures where id=2");
+    try {
+      assertThat(rs.next()).isFalse();
+    }
   finally {
-    rs.close();
-    stmt.close();
-    connection.close();
+      rs.close();
+      stmt.close();
+    }
   }
-}
+ }

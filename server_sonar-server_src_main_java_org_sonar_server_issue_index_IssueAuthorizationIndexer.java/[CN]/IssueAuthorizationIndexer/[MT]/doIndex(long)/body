@@ -1,14 +1,12 @@
 {
   final BulkIndexer bulk=new BulkIndexer(esClient,IssueIndexDefinition.INDEX);
   DbSession dbSession=dbClient.openSession(false);
-  Connection dbConnection=dbSession.getConnection();
   try {
     IssueAuthorizationDao dao=new IssueAuthorizationDao();
-    Collection<IssueAuthorizationDao.Dto> authorizations=dao.selectAfterDate(dbClient,dbConnection,lastUpdatedAt);
+    Collection<IssueAuthorizationDao.Dto> authorizations=dao.selectAfterDate(dbClient,dbSession,lastUpdatedAt);
     return doIndex(bulk,authorizations);
   }
   finally {
-    DbUtils.closeQuietly(dbConnection);
     dbSession.close();
   }
 }

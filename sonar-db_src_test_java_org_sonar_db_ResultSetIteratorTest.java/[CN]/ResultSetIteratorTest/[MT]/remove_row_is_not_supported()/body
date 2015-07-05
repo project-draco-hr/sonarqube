@@ -1,11 +1,13 @@
 {
-  PreparedStatement stmt=connection.prepareStatement("select * from issues order by id");
-  FirstIntColumnIterator iterator=new FirstIntColumnIterator(stmt);
-  try {
-    iterator.remove();
-    fail();
+  try (Connection connection=dbTester.openConnection()){
+    PreparedStatement stmt=connection.prepareStatement("select * from issues order by id");
+    FirstIntColumnIterator iterator=new FirstIntColumnIterator(stmt);
+    try {
+      iterator.remove();
+      fail();
+    }
+ catch (    UnsupportedOperationException ok) {
+    }
+    iterator.close();
   }
- catch (  UnsupportedOperationException ok) {
-  }
-  iterator.close();
-}
+ }

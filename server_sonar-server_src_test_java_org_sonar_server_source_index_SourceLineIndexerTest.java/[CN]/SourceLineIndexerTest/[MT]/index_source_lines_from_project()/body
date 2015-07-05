@@ -1,8 +1,8 @@
 {
   db.prepareDbUnit(getClass(),"db.xml");
-  Connection connection=db.openConnection();
-  FileSourceTesting.updateDataColumn(connection,"FILE_UUID",FileSourceTesting.newRandomData(3).build());
-  connection.close();
-  indexer.index("PROJECT_UUID");
+  try (Connection connection=db.openConnection()){
+    FileSourceTesting.updateDataColumn(connection,"FILE_UUID",FileSourceTesting.newRandomData(3).build());
+  }
+   indexer.index("PROJECT_UUID");
   assertThat(countDocuments()).isEqualTo(3);
 }

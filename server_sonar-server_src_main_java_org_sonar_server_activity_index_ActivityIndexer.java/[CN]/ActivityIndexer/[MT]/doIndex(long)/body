@@ -2,9 +2,8 @@
   BulkIndexer bulk=new BulkIndexer(esClient,ActivityIndexDefinition.INDEX);
   bulk.setLarge(lastUpdatedAt == 0L);
   DbSession dbSession=dbClient.openSession(false);
-  Connection dbConnection=dbSession.getConnection();
   try {
-    ActivityResultSetIterator it=ActivityResultSetIterator.create(dbClient,dbConnection,lastUpdatedAt);
+    ActivityResultSetIterator it=ActivityResultSetIterator.create(dbClient,dbSession,lastUpdatedAt);
     bulk.start();
     while (it.hasNext()) {
       bulk.add(it.next());

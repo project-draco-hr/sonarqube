@@ -2,15 +2,13 @@
   final BulkIndexer bulk=new BulkIndexer(esClient,UserIndexDefinition.INDEX);
   bulk.setLarge(lastUpdatedAt == 0L);
   DbSession dbSession=dbClient.openSession(false);
-  Connection dbConnection=dbSession.getConnection();
   try {
-    UserResultSetIterator rowIt=UserResultSetIterator.create(dbClient,dbConnection,lastUpdatedAt);
+    UserResultSetIterator rowIt=UserResultSetIterator.create(dbClient,dbSession,lastUpdatedAt);
     long maxUpdatedAt=doIndex(bulk,rowIt);
     rowIt.close();
     return maxUpdatedAt;
   }
   finally {
-    DbUtils.closeQuietly(dbConnection);
     dbSession.close();
   }
 }

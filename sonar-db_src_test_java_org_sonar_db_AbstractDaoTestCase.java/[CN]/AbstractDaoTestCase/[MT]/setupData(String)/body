@@ -1,23 +1,7 @@
 {
-  InputStream[] streams=new InputStream[testNames.length];
-  try {
-    for (int i=0; i < testNames.length; i++) {
-      String className=getClass().getName();
-      className=String.format("/%s/%s.xml",className.replace(".","/"),testNames[i]);
-      streams[i]=getClass().getResourceAsStream(className);
-      if (streams[i] == null) {
-        throw new RuntimeException("Test not found :" + className);
-      }
-    }
-    setupData(streams);
-    databaseCommands.resetPrimaryKeys(database.getDataSource());
+  List<String> filenames=new ArrayList<>();
+  for (  String testName : testNames) {
+    filenames.add(testName + (testName.endsWith(".xml") ? "" : ".xml"));
   }
- catch (  SQLException e) {
-    throw translateException("Could not setup DBUnit data",e);
-  }
- finally {
-    for (    InputStream stream : streams) {
-      IOUtils.closeQuietly(stream);
-    }
-  }
+  dbTester.prepareDbUnit(getClass(),filenames.toArray(new String[filenames.size()]));
 }

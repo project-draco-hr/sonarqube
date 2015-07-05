@@ -1,7 +1,9 @@
 {
   db.prepareDbUnit(getClass(),"shared.xml");
-  FileSourceTesting.updateDataColumn(connection,"F1",FileSourceTesting.newFakeData(3).build());
-  iterator=SourceLineResultSetIterator.create(dbClient,connection,0L,null);
+  try (Connection connection=db.openConnection()){
+    FileSourceTesting.updateDataColumn(connection,"F1",FileSourceTesting.newFakeData(3).build());
+  }
+   iterator=SourceLineResultSetIterator.create(db.getDbClient(),db.getSession(),0L,null);
   assertThat(iterator.hasNext()).isTrue();
   FileSourcesUpdaterHelper.Row row=iterator.next();
   assertThat(row.getProjectUuid()).isEqualTo("P1");
