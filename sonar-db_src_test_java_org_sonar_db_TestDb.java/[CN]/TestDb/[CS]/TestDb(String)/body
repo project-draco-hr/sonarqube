@@ -1,0 +1,34 @@
+{
+  if (db == null) {
+    Settings settings=new Settings().setProperties(Maps.fromProperties(System.getProperties()));
+    if (settings.hasKey("orchestrator.configUrl")) {
+      loadOrchestratorSettings(settings);
+    }
+    String login=settings.getString("sonar.jdbc.username");
+    for (    String key : settings.getKeysStartingWith("sonar.jdbc")) {
+      LOG.info(key + ": " + settings.getString(key));
+    }
+    String dialect=settings.getString("sonar.jdbc.dialect");
+    if (dialect != null && !"h2".equals(dialect)) {
+      db=new DefaultDatabase(settings);
+    }
+ else {
+      db=new H2Database("h2Tests" + DigestUtils.md5Hex(StringUtils.defaultString(schemaPath)),schemaPath == null);
+    }
+    db.start();
+    if (schemaPath != null) {
+      if (db.getDialect().getId().equals("h2")) {
+        ((H2Database)db).executeScript(schemaPath);
+      }
+ else {
+        db.stop();
+        throw new AssumptionViolatedException("Test disabled because it supports only H2");
+      }
+    }
+    LOG.info("Test Database: " + db);
+    commands=DatabaseCommands.forDialect(db.getDialect());
+    tester=new DataSourceDatabaseTester(db.getDataSource(),commands.useLoginAsSchema() ? login : null);
+    myBatis=new MyBatis(db,new NullQueue());
+    myBatis.start();
+  }
+}

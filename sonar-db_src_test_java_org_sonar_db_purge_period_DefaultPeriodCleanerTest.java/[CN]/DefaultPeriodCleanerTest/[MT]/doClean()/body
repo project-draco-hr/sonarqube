@@ -4,10 +4,10 @@
   when(dao.selectPurgeableSnapshots(123L,session)).thenReturn(Arrays.asList(new PurgeableSnapshotDto().setSnapshotId(999L).setDate(System2.INSTANCE.now())));
   Filter filter1=newLazyFilter();
   Filter filter2=newLazyFilter();
-  DefaultPeriodCleaner cleaner=new DefaultPeriodCleaner(dao);
+  DefaultPeriodCleaner cleaner=new DefaultPeriodCleaner(dao,new PurgeProfiler());
   cleaner.doClean(123L,Arrays.asList(filter1,filter2),session);
   verify(filter1).log();
   verify(filter2).log();
-  verify(dao,times(2)).deleteSnapshots(argThat(newRootSnapshotQuery()),eq(session));
-  verify(dao,times(2)).deleteSnapshots(argThat(newSnapshotIdQuery()),eq(session));
+  verify(dao,times(2)).deleteSnapshots(argThat(newRootSnapshotQuery()),eq(session),any(PurgeProfiler.class));
+  verify(dao,times(2)).deleteSnapshots(argThat(newSnapshotIdQuery()),eq(session),any(PurgeProfiler.class));
 }
