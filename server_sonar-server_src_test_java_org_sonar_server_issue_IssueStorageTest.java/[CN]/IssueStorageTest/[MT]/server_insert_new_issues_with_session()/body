@@ -1,13 +1,12 @@
 {
   ComponentDto project=new ComponentDto().setId(10L).setUuid("uuid-10");
   ComponentDto component=new ComponentDto().setId(100L).setUuid("uuid-100");
-  DbClient dbClient=new DbClient(dbTester.database(),dbTester.myBatis());
   FakeServerSaver saver=new FakeServerSaver(dbClient,new FakeRuleFinder(),component,project);
   DefaultIssueComment comment=DefaultIssueComment.create("ABCDE","emmerik","the comment");
   comment.setKey("FGHIJ");
   Date date=DateUtils.parseDateTime("2013-05-18T12:00:00+0000");
   DefaultIssue issue=new DefaultIssue().setKey("ABCDE").setNew(true).setRuleKey(RuleKey.of("squid","AvoidCycle")).setLine(5000).setDebt(Duration.create(10L)).setReporter("emmerik").setResolution("OPEN").setStatus("OPEN").setSeverity("BLOCKER").setAttribute("foo","bar").addComment(comment).setCreationDate(date).setUpdateDate(date).setCloseDate(date).setComponentKey("struts:Action").setComponentUuid("component-uuid").setProjectUuid("project-uuid");
-  saver.save(session,issue);
-  session.commit();
-  checkTables("should_insert_new_issues",new String[]{"id","created_at","updated_at","issue_change_creation_date"},"issues","issue_changes");
+  saver.save(dbTester.getSession(),issue);
+  dbTester.getSession().commit();
+  dbTester.assertDbUnit(getClass(),"should_insert_new_issues-result.xml",new String[]{"id","created_at","updated_at","issue_change_creation_date"},"issues","issue_changes");
 }

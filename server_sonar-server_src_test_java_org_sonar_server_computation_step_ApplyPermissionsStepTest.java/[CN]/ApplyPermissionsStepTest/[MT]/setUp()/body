@@ -3,11 +3,11 @@
   esTester.truncateIndices();
   RoleDao roleDao=new RoleDao();
   PermissionTemplateDao permissionTemplateDao=new PermissionTemplateDao(dbTester.myBatis(),System2.INSTANCE);
-  dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),new ComponentDao(),roleDao,permissionTemplateDao);
+  dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),new ComponentDao(),roleDao,permissionTemplateDao,new ResourceDao(dbTester.myBatis(),System2.INSTANCE));
   dbSession=dbClient.openSession(false);
   settings=new Settings();
   issueAuthorizationIndexer=new IssueAuthorizationIndexer(dbClient,esTester.client());
   issueAuthorizationIndexer.setEnabled(true);
   dbIdsRepository=new DbIdsRepository();
-  step=new ApplyPermissionsStep(dbClient,dbIdsRepository,issueAuthorizationIndexer,new PermissionFacade(roleDao,null,new ResourceDao(dbTester.myBatis(),System2.INSTANCE),permissionTemplateDao,settings),treeRootHolder);
+  step=new ApplyPermissionsStep(dbClient,dbIdsRepository,issueAuthorizationIndexer,new PermissionFacade(dbClient,settings),treeRootHolder);
 }
