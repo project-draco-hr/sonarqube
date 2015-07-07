@@ -1,0 +1,18 @@
+{
+  Optional<Measure> newLinesMeasure=counterContext.getMeasure(metricKeys.getLines());
+  if (!newLinesMeasure.isPresent() || !newLinesMeasure.get().hasVariations()) {
+    return;
+  }
+  MeasureVariations newLines=newLinesMeasure.get().getVariations();
+  MeasureVariations newConditions=CoverageUtils.getMeasureVariations(counterContext,metricKeys.getConditions());
+  MeasureVariations uncoveredLines=CoverageUtils.getMeasureVariations(counterContext,metricKeys.getUncoveredLines());
+  MeasureVariations uncoveredConditions=CoverageUtils.getMeasureVariations(counterContext,metricKeys.getUncoveredConditions());
+  for (  Period period : counterContext.getPeriods()) {
+    if (!newLines.hasVariation(period.getIndex())) {
+      continue;
+    }
+    long elements=(long)newLines.getVariation(period.getIndex()) + CoverageUtils.getLongVariation(newConditions,period);
+    this.elements.increment(period,elements);
+    coveredElements.increment(period,elements - CoverageUtils.getLongVariation(uncoveredConditions,period) - CoverageUtils.getLongVariation(uncoveredLines,period));
+  }
+}
