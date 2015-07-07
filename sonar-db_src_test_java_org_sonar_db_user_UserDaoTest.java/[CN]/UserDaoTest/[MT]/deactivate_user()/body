@@ -1,5 +1,5 @@
 {
-  setupData("deactivate_user");
+  dbTester.prepareDbUnit(getClass(),"deactivate_user.xml");
   when(system2.now()).thenReturn(1500000000000L);
   String login="marius";
   boolean deactivated=dao.deactivateUserByLogin(login);
@@ -8,5 +8,5 @@
   UserDto userDto=dao.getUser(100);
   assertThat(userDto.isActive()).isFalse();
   assertThat(userDto.getUpdatedAt()).isEqualTo(1500000000000L);
-  checkTables("deactivate_user","dashboards","active_dashboards","groups_users","issue_filters","issue_filter_favourites","measure_filters","measure_filter_favourites","properties","user_roles");
+  dbTester.assertDbUnit(getClass(),"deactivate_user-result.xml","dashboards","active_dashboards","groups_users","issue_filters","issue_filter_favourites","measure_filters","measure_filter_favourites","properties","user_roles");
 }

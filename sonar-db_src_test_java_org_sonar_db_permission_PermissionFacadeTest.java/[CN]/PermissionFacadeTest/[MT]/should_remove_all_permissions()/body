@@ -1,13 +1,13 @@
 {
-  setupData("should_remove_all_permissions");
-  assertThat(permissionFacade.selectGroupPermissions(session,"devs",123L)).hasSize(1);
-  assertThat(permissionFacade.selectGroupPermissions(session,"other",123L)).isEmpty();
-  assertThat(permissionFacade.selectUserPermissions(session,"dave.loper",123L)).hasSize(1);
-  assertThat(permissionFacade.selectUserPermissions(session,"other.user",123L)).isEmpty();
-  permissionFacade.removeAllPermissions(123L,session);
-  session.commit();
-  checkTable("should_remove_all_permissions","group_roles","group_id","resource_id","role");
-  checkTable("should_remove_all_permissions","user_roles","user_id","resource_id","role");
-  assertThat(permissionFacade.selectGroupPermissions(session,"devs",123L)).isEmpty();
-  assertThat(permissionFacade.selectUserPermissions(session,"dave.loper",123L)).isEmpty();
+  dbTester.prepareDbUnit(getClass(),"should_remove_all_permissions.xml");
+  assertThat(permissionFacade.selectGroupPermissions(dbTester.getSession(),"devs",123L)).hasSize(1);
+  assertThat(permissionFacade.selectGroupPermissions(dbTester.getSession(),"other",123L)).isEmpty();
+  assertThat(permissionFacade.selectUserPermissions(dbTester.getSession(),"dave.loper",123L)).hasSize(1);
+  assertThat(permissionFacade.selectUserPermissions(dbTester.getSession(),"other.user",123L)).isEmpty();
+  permissionFacade.removeAllPermissions(123L,dbTester.getSession());
+  dbTester.getSession().commit();
+  dbTester.assertDbUnitTable(getClass(),"should_remove_all_permissions-result.xml","group_roles","group_id","resource_id","role");
+  dbTester.assertDbUnitTable(getClass(),"should_remove_all_permissions-result.xml","user_roles","user_id","resource_id","role");
+  assertThat(permissionFacade.selectGroupPermissions(dbTester.getSession(),"devs",123L)).isEmpty();
+  assertThat(permissionFacade.selectUserPermissions(dbTester.getSession(),"dave.loper",123L)).isEmpty();
 }

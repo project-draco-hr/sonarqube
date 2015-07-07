@@ -1,7 +1,7 @@
 {
-  setupData("should_insert_group_permission");
-  permissionFacade.insertGroupPermission(123L,"devs",UserRole.USER,session);
-  session.commit();
-  checkTable("should_insert_group_permission","group_roles","group_id","resource_id","role");
-  checkTable("should_insert_group_permission","projects","authorization_updated_at");
+  dbTester.prepareDbUnit(getClass(),"should_insert_group_permission.xml");
+  permissionFacade.insertGroupPermission(123L,"devs",UserRole.USER,dbTester.getSession());
+  dbTester.getSession().commit();
+  dbTester.assertDbUnitTable(getClass(),"should_insert_group_permission-result.xml","group_roles","group_id","resource_id","role");
+  dbTester.assertDbUnitTable(getClass(),"should_insert_group_permission-result.xml","projects","authorization_updated_at");
 }

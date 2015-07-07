@@ -1,21 +1,15 @@
 {
-  setupData("inheritance");
-  DbSession session=getMyBatis().openSession(false);
-  try {
-    List<QualityProfileDto> dtos=dao.findChildren(session,"java_parent");
-    assertThat(dtos).hasSize(2);
-    QualityProfileDto dto1=dtos.get(0);
-    assertThat(dto1.getId()).isEqualTo(1);
-    assertThat(dto1.getName()).isEqualTo("Child1");
-    assertThat(dto1.getLanguage()).isEqualTo("java");
-    assertThat(dto1.getParentKee()).isEqualTo("java_parent");
-    QualityProfileDto dto2=dtos.get(1);
-    assertThat(dto2.getId()).isEqualTo(2);
-    assertThat(dto2.getName()).isEqualTo("Child2");
-    assertThat(dto2.getLanguage()).isEqualTo("java");
-    assertThat(dto2.getParentKee()).isEqualTo("java_parent");
-  }
-  finally {
-    session.close();
-  }
+  dbTester.prepareDbUnit(getClass(),"inheritance.xml");
+  List<QualityProfileDto> dtos=dao.findChildren(dbTester.getSession(),"java_parent");
+  assertThat(dtos).hasSize(2);
+  QualityProfileDto dto1=dtos.get(0);
+  assertThat(dto1.getId()).isEqualTo(1);
+  assertThat(dto1.getName()).isEqualTo("Child1");
+  assertThat(dto1.getLanguage()).isEqualTo("java");
+  assertThat(dto1.getParentKee()).isEqualTo("java_parent");
+  QualityProfileDto dto2=dtos.get(1);
+  assertThat(dto2.getId()).isEqualTo(2);
+  assertThat(dto2.getName()).isEqualTo("Child2");
+  assertThat(dto2.getLanguage()).isEqualTo("java");
+  assertThat(dto2.getParentKee()).isEqualTo("java_parent");
 }

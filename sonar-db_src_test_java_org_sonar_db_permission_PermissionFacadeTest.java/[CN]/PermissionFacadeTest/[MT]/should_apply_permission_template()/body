@@ -1,13 +1,13 @@
 {
-  setupData("should_apply_permission_template");
-  assertThat(permissionFacade.selectGroupPermissions(session,"sonar-administrators",123L)).isEmpty();
-  assertThat(permissionFacade.selectGroupPermissions(session,"sonar-users",123L)).isEmpty();
-  assertThat(permissionFacade.selectGroupPermissions(session,"Anyone",123L)).isEmpty();
-  assertThat(permissionFacade.selectUserPermissions(session,"marius",123L)).isEmpty();
-  permissionFacade.applyPermissionTemplate(session,"default_20130101_010203",123L);
-  assertThat(permissionFacade.selectGroupPermissions(session,"sonar-administrators",123L)).containsOnly("admin","issueadmin");
-  assertThat(permissionFacade.selectGroupPermissions(session,"sonar-users",123L)).containsOnly("user","codeviewer");
-  assertThat(permissionFacade.selectGroupPermissions(session,"Anyone",123L)).containsOnly("user","codeviewer");
-  assertThat(permissionFacade.selectUserPermissions(session,"marius",123L)).containsOnly("admin");
-  assertThat(resourceDao.getResource(123L,session).getAuthorizationUpdatedAt()).isEqualTo(123456789L);
+  dbTester.prepareDbUnit(getClass(),"should_apply_permission_template.xml");
+  assertThat(permissionFacade.selectGroupPermissions(dbTester.getSession(),"sonar-administrators",123L)).isEmpty();
+  assertThat(permissionFacade.selectGroupPermissions(dbTester.getSession(),"sonar-users",123L)).isEmpty();
+  assertThat(permissionFacade.selectGroupPermissions(dbTester.getSession(),"Anyone",123L)).isEmpty();
+  assertThat(permissionFacade.selectUserPermissions(dbTester.getSession(),"marius",123L)).isEmpty();
+  permissionFacade.applyPermissionTemplate(dbTester.getSession(),"default_20130101_010203",123L);
+  assertThat(permissionFacade.selectGroupPermissions(dbTester.getSession(),"sonar-administrators",123L)).containsOnly("admin","issueadmin");
+  assertThat(permissionFacade.selectGroupPermissions(dbTester.getSession(),"sonar-users",123L)).containsOnly("user","codeviewer");
+  assertThat(permissionFacade.selectGroupPermissions(dbTester.getSession(),"Anyone",123L)).containsOnly("user","codeviewer");
+  assertThat(permissionFacade.selectUserPermissions(dbTester.getSession(),"marius",123L)).containsOnly("admin");
+  assertThat(dbTester.getDbClient().resourceDao().getResource(123L,dbTester.getSession()).getAuthorizationUpdatedAt()).isEqualTo(123456789L);
 }

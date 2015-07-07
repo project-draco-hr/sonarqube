@@ -1,8 +1,6 @@
 {
-  setupData("shared");
-  DbSession session=getMyBatis().openSession(false);
-  List<DefaultIssueComment> comments=dao.selectCommentsByIssues(session,Arrays.asList("1000"));
-  MyBatis.closeQuietly(session);
+  dbTester.prepareDbUnit(getClass(),"shared.xml");
+  List<DefaultIssueComment> comments=dao.selectCommentsByIssues(dbTester.getSession(),Arrays.asList("1000"));
   assertThat(comments).hasSize(2);
   DefaultIssueComment first=comments.get(0);
   assertThat(first.markdownText()).isEqualTo("old comment");

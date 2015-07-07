@@ -1,11 +1,5 @@
 {
-  setupData("shouldDeleteSnapshot");
-  SqlSession session=getMyBatis().openSession();
-  try {
-    new PurgeCommands(session,profiler).deleteSnapshots(PurgeSnapshotQuery.create().setId(5L));
-  }
-  finally {
-    MyBatis.closeQuietly(session);
-  }
-  checkTables("shouldDeleteSnapshot","snapshots","project_measures","duplications_index","events");
+  dbTester.prepareDbUnit(getClass(),"shouldDeleteSnapshot.xml");
+  new PurgeCommands(dbTester.getSession(),profiler).deleteSnapshots(PurgeSnapshotQuery.create().setId(5L));
+  dbTester.assertDbUnit(getClass(),"shouldDeleteSnapshot-result.xml","snapshots","project_measures","duplications_index","events");
 }

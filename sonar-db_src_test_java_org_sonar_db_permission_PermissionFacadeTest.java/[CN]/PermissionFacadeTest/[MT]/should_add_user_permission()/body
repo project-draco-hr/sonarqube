@@ -1,7 +1,7 @@
 {
-  setupData("should_add_user_permission");
-  permissionFacade.insertUserPermission(123L,200L,UserRole.ADMIN,session);
-  session.commit();
-  checkTable("should_add_user_permission","user_roles","user_id","resource_id","role");
-  checkTable("should_add_user_permission","projects","authorization_updated_at");
+  dbTester.prepareDbUnit(getClass(),"should_add_user_permission.xml");
+  permissionFacade.insertUserPermission(123L,200L,UserRole.ADMIN,dbTester.getSession());
+  dbTester.getSession().commit();
+  dbTester.assertDbUnitTable(getClass(),"should_add_user_permission-result.xml","user_roles","user_id","resource_id","role");
+  dbTester.assertDbUnitTable(getClass(),"should_add_user_permission-result.xml","projects","authorization_updated_at");
 }

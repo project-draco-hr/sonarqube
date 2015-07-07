@@ -1,7 +1,9 @@
 {
-  setupData("createNonAsciiPermissionTemplate");
+  db.prepareDbUnit(getClass(),"createNonAsciiPermissionTemplate.xml");
+  Date now=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2013-01-02 01:04:05");
+  when(system.now()).thenReturn(now.getTime());
   PermissionTemplateDto permissionTemplate=permissionTemplateDao.createPermissionTemplate("M???? Gn?? Gn????????","my description",null);
   assertThat(permissionTemplate).isNotNull();
   assertThat(permissionTemplate.getId()).isEqualTo(1L);
-  checkTable("createNonAsciiPermissionTemplate","permission_templates","id","name","kee","description");
+  db.assertDbUnitTable(getClass(),"createNonAsciiPermissionTemplate-result.xml","permission_templates","id","name","kee","description");
 }

@@ -1,5 +1,5 @@
 {
-  setupData("updateBeforeSelectedDate_with_conflict");
+  dbTester.prepareDbUnit(getClass(),"updateBeforeSelectedDate_with_conflict.xml");
   IssueDto dto=new IssueDto();
   dto.setComponentUuid("uuid-123");
   dto.setProjectUuid("uuid-101");
@@ -26,6 +26,6 @@
   dto.setSelectedAt(1400000000000L);
   int count=mapper.updateIfBeforeSelectedDate(dto);
   assertThat(count).isEqualTo(0);
-  session.commit();
-  checkTables("updateBeforeSelectedDate_with_conflict",new String[]{"id"},"issues");
+  dbTester.getSession().commit();
+  dbTester.assertDbUnit(getClass(),"updateBeforeSelectedDate_with_conflict-result.xml",new String[]{"id"},"issues");
 }

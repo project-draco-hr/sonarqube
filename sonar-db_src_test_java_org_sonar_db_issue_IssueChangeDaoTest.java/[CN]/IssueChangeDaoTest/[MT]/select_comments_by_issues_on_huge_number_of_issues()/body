@@ -1,11 +1,9 @@
 {
-  setupData("shared");
-  DbSession session=getMyBatis().openSession(false);
+  dbTester.prepareDbUnit(getClass(),"shared.xml");
   List<String> hugeNbOfIssues=newArrayList();
   for (int i=0; i < 4500; i++) {
     hugeNbOfIssues.add("ABCD" + i);
   }
-  List<DefaultIssueComment> comments=dao.selectCommentsByIssues(session,hugeNbOfIssues);
-  MyBatis.closeQuietly(session);
+  List<DefaultIssueComment> comments=dao.selectCommentsByIssues(dbTester.getSession(),hugeNbOfIssues);
   assertThat(comments).isEmpty();
 }

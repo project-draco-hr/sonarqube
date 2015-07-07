@@ -1,10 +1,13 @@
 {
+  dbTester.truncateTables();
   PermissionTemplateDto permissionTemplateDto=new PermissionTemplateDto().setName("Test template").setKee("test_template");
   PermissionTemplateDto templateWithPermissions=new PermissionTemplateDto().setKee("test_template");
-  permissionTemplateDao=mock(PermissionTemplateDao.class);
-  when(permissionTemplateDao.selectTemplateByKey(session,"test_template")).thenReturn(permissionTemplateDto);
-  when(permissionTemplateDao.selectPermissionTemplate(session,"test_template")).thenReturn(templateWithPermissions);
-  permissionFacade=new PermissionFacade(null,null,null,permissionTemplateDao,null);
-  PermissionTemplateDto permissionTemplate=permissionFacade.getPermissionTemplateWithPermissions(session,"test_template");
+  PermissionTemplateDao permissionTemplateDao=mock(PermissionTemplateDao.class);
+  when(permissionTemplateDao.selectTemplateByKey(dbTester.getSession(),"test_template")).thenReturn(permissionTemplateDto);
+  when(permissionTemplateDao.selectPermissionTemplate(dbTester.getSession(),"test_template")).thenReturn(templateWithPermissions);
+  DbClient dbClient=mock(DbClient.class);
+  when(dbClient.permissionTemplateDao()).thenReturn(permissionTemplateDao);
+  permissionFacade=new PermissionFacade(dbClient,null);
+  PermissionTemplateDto permissionTemplate=permissionFacade.getPermissionTemplateWithPermissions(dbTester.getSession(),"test_template");
   assertThat(permissionTemplate).isSameAs(templateWithPermissions);
 }

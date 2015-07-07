@@ -1,11 +1,5 @@
 {
-  setupData("shouldDeleteWastedMeasuresWhenPurgingSnapshot");
-  SqlSession session=getMyBatis().openSession();
-  try {
-    new PurgeCommands(session,profiler).purgeSnapshots(PurgeSnapshotQuery.create().setId(1L));
-  }
-  finally {
-    MyBatis.closeQuietly(session);
-  }
-  checkTables("shouldDeleteWastedMeasuresWhenPurgingSnapshot","project_measures");
+  dbTester.prepareDbUnit(getClass(),"shouldDeleteWastedMeasuresWhenPurgingSnapshot.xml");
+  new PurgeCommands(dbTester.getSession(),profiler).purgeSnapshots(PurgeSnapshotQuery.create().setId(1L));
+  dbTester.assertDbUnit(getClass(),"shouldDeleteWastedMeasuresWhenPurgingSnapshot-result.xml","project_measures");
 }
