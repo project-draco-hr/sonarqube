@@ -1,0 +1,24 @@
+{
+  String coverageLineHitsData=CoreMetrics.IT_COVERAGE_LINE_HITS_DATA_KEY;
+  String conditionsByLine=CoreMetrics.IT_CONDITIONS_BY_LINE_KEY;
+  String coveredConditionsByLine=CoreMetrics.IT_COVERED_CONDITIONS_BY_LINE_KEY;
+  String newLinesToCover=CoreMetrics.NEW_IT_LINES_TO_COVER_KEY;
+  String newUncoveredLines=CoreMetrics.NEW_IT_UNCOVERED_LINES_KEY;
+  String newConditionsToCover=CoreMetrics.NEW_IT_CONDITIONS_TO_COVER_KEY;
+  String newUncoveredConditions=CoreMetrics.NEW_IT_UNCOVERED_CONDITIONS_KEY;
+  MetricKeys metricKeys=new MetricKeys(coverageLineHitsData,conditionsByLine,coveredConditionsByLine,newLinesToCover,newUncoveredLines,newConditionsToCover,newUncoveredConditions);
+  treeRootHolder.setRoot(MULTIPLE_FILES_TREE);
+  defineChangeSetsAndMeasures(11111,metricKeys,new MeasureValues(3,4,1),new MeasureValues(0,3,2));
+  defineChangeSetsAndMeasures(11121,metricKeys,new MeasureValues(0,14,6),new MeasureValues(0,13,7));
+  defineChangeSetsAndMeasures(11122,metricKeys,new MeasureValues(3,4,1),new MeasureValues(1,13,7));
+  underTest.execute();
+  assertThat(toEntries(measureRepository.getNewRawMeasures(11111))).containsOnly(entryOf(metricKeys.newLinesToCover,createMeasure(5d,3d)),entryOf(metricKeys.newUncoveredLines,createMeasure(3d,2d)),entryOf(metricKeys.newConditionsToCover,createMeasure(7d,3d)),entryOf(metricKeys.newUncoveredConditions,createMeasure(4d,1d)));
+  assertThat(toEntries(measureRepository.getNewRawMeasures(11121))).containsOnly(entryOf(metricKeys.newLinesToCover,createMeasure(5d,3d)),entryOf(metricKeys.newUncoveredLines,createMeasure(4d,2d)),entryOf(metricKeys.newConditionsToCover,createMeasure(27d,13d)),entryOf(metricKeys.newUncoveredConditions,createMeasure(14d,6d)));
+  assertThat(toEntries(measureRepository.getNewRawMeasures(11122))).containsOnly(entryOf(metricKeys.newLinesToCover,createMeasure(5d,3d)),entryOf(metricKeys.newUncoveredLines,createMeasure(2d,1d)),entryOf(metricKeys.newConditionsToCover,createMeasure(17d,13d)),entryOf(metricKeys.newUncoveredConditions,createMeasure(9d,6d)));
+  assertThat(toEntries(measureRepository.getNewRawMeasures(1111))).containsOnly(entryOf(metricKeys.newLinesToCover,createMeasure(5d,3d)),entryOf(metricKeys.newUncoveredLines,createMeasure(3d,2d)),entryOf(metricKeys.newConditionsToCover,createMeasure(7d,3d)),entryOf(metricKeys.newUncoveredConditions,createMeasure(4d,1d)));
+  assertThat(toEntries(measureRepository.getNewRawMeasures(1112))).containsOnly(entryOf(metricKeys.newLinesToCover,createMeasure(10d,6d)),entryOf(metricKeys.newUncoveredLines,createMeasure(6d,3d)),entryOf(metricKeys.newConditionsToCover,createMeasure(44d,26d)),entryOf(metricKeys.newUncoveredConditions,createMeasure(23d,12d)));
+  MeasureRepoEntry[] repoEntriesFromSubModuleUp={entryOf(metricKeys.newLinesToCover,createMeasure(15d,9d)),entryOf(metricKeys.newUncoveredLines,createMeasure(9d,5d)),entryOf(metricKeys.newConditionsToCover,createMeasure(51d,29d)),entryOf(metricKeys.newUncoveredConditions,createMeasure(27d,13d))};
+  assertThat(toEntries(measureRepository.getNewRawMeasures(111))).containsOnly(repoEntriesFromSubModuleUp);
+  assertThat(toEntries(measureRepository.getNewRawMeasures(11))).containsOnly(repoEntriesFromSubModuleUp);
+  assertThat(toEntries(measureRepository.getNewRawMeasures(11))).containsOnly(repoEntriesFromSubModuleUp);
+}
