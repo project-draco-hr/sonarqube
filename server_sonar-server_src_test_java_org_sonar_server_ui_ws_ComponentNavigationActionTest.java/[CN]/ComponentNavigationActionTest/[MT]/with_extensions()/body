@@ -1,8 +1,8 @@
 {
   ComponentDto project=ComponentTesting.newProjectDto("abcd").setKey("polop").setName("Polop").setLanguage("xoo");
-  dbClient.componentDao().insert(session,project);
-  dbClient.snapshotDao().insert(session,SnapshotTesting.createForProject(project));
-  session.commit();
+  dbClient.componentDao().insert(dbTester.getSession(),project);
+  dbClient.snapshotDao().insert(dbTester.getSession(),SnapshotTesting.createForProject(project));
+  dbTester.getSession().commit();
   userSessionRule.addProjectUuidPermissions(UserRole.USER,"abcd");
   WsTester wsTester=newdWsTester(createViews());
   wsTester.newGetRequest("api/navigation","component").setParam("componentKey","polop").execute().assertJson(getClass(),"with_extensions.json");

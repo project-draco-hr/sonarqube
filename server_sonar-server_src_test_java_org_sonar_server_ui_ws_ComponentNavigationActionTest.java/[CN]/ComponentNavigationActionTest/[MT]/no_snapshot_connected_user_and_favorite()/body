@@ -1,9 +1,9 @@
 {
   int userId=42;
   ComponentDto project=ComponentTesting.newProjectDto("abcd").setKey("polop").setName("Polop");
-  dbClient.componentDao().insert(session,project);
-  dbClient.propertiesDao().setProperty(new PropertyDto().setKey("favourite").setResourceId(project.getId()).setUserId((long)userId),session);
-  session.commit();
+  dbClient.componentDao().insert(dbTester.getSession(),project);
+  dbClient.propertiesDao().setProperty(new PropertyDto().setKey("favourite").setResourceId(project.getId()).setUserId((long)userId),dbTester.getSession());
+  dbTester.getSession().commit();
   userSessionRule.login("obiwan").setUserId(userId).addProjectUuidPermissions(UserRole.USER,"abcd");
   WsTester wsTester=newdWsTester();
   wsTester.newGetRequest("api/navigation","component").setParam("componentKey","polop").execute().assertJson(getClass(),"no_snapshot_user_favourite.json");

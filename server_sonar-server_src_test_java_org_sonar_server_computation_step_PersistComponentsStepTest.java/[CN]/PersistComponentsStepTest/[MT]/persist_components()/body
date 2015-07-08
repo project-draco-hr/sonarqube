@@ -9,9 +9,9 @@
   Component project=DumbComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).addChildren(module).build();
   treeRootHolder.setRoot(project);
   sut.execute();
-  session.commit();
+  dbTester.getSession().commit();
   assertThat(dbTester.countRowsOfTable("projects")).isEqualTo(4);
-  ComponentDto projectDto=dbClient.componentDao().selectByKey(session,PROJECT_KEY).get();
+  ComponentDto projectDto=dbClient.componentDao().selectByKey(dbTester.getSession(),PROJECT_KEY).get();
   assertThat(projectDto.name()).isEqualTo("Project");
   assertThat(projectDto.description()).isEqualTo("Project description");
   assertThat(projectDto.path()).isNull();
@@ -23,7 +23,7 @@
   assertThat(projectDto.scope()).isEqualTo("PRJ");
   assertThat(projectDto.parentProjectId()).isNull();
   assertThat(projectDto.getCreatedAt()).isEqualTo(now);
-  ComponentDto moduleDto=dbClient.componentDao().selectByKey(session,"MODULE_KEY").get();
+  ComponentDto moduleDto=dbClient.componentDao().selectByKey(dbTester.getSession(),"MODULE_KEY").get();
   assertThat(moduleDto.name()).isEqualTo("Module");
   assertThat(moduleDto.description()).isEqualTo("Module description");
   assertThat(moduleDto.path()).isEqualTo("module");
@@ -35,7 +35,7 @@
   assertThat(moduleDto.scope()).isEqualTo("PRJ");
   assertThat(moduleDto.parentProjectId()).isEqualTo(projectDto.getId());
   assertThat(moduleDto.getCreatedAt()).isEqualTo(now);
-  ComponentDto directoryDto=dbClient.componentDao().selectByKey(session,"MODULE_KEY:src/main/java/dir").get();
+  ComponentDto directoryDto=dbClient.componentDao().selectByKey(dbTester.getSession(),"MODULE_KEY:src/main/java/dir").get();
   assertThat(directoryDto.name()).isEqualTo("src/main/java/dir");
   assertThat(directoryDto.description()).isNull();
   assertThat(directoryDto.path()).isEqualTo("src/main/java/dir");
@@ -47,7 +47,7 @@
   assertThat(directoryDto.scope()).isEqualTo("DIR");
   assertThat(directoryDto.parentProjectId()).isEqualTo(moduleDto.getId());
   assertThat(directoryDto.getCreatedAt()).isEqualTo(now);
-  ComponentDto fileDto=dbClient.componentDao().selectByKey(session,"MODULE_KEY:src/main/java/dir/Foo.java").get();
+  ComponentDto fileDto=dbClient.componentDao().selectByKey(dbTester.getSession(),"MODULE_KEY:src/main/java/dir/Foo.java").get();
   assertThat(fileDto.name()).isEqualTo("Foo.java");
   assertThat(fileDto.description()).isNull();
   assertThat(fileDto.path()).isEqualTo("src/main/java/dir/Foo.java");

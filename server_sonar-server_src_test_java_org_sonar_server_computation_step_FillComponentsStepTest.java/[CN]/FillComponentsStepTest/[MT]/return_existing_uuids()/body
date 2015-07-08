@@ -1,12 +1,12 @@
 {
   ComponentDto project=ComponentTesting.newProjectDto("ABCD").setKey(PROJECT_KEY);
-  dbClient.componentDao().insert(session,project);
+  dbClient.componentDao().insert(dbTester.getSession(),project);
   ComponentDto module=ComponentTesting.newModuleDto("BCDE",project).setKey("MODULE_KEY");
-  dbClient.componentDao().insert(session,module);
+  dbClient.componentDao().insert(dbTester.getSession(),module);
   ComponentDto directory=ComponentTesting.newDirectory(module,"CDEF","src/main/java/dir").setKey("MODULE_KEY:src/main/java/dir");
   ComponentDto file=ComponentTesting.newFileDto(module,"DEFG").setKey("MODULE_KEY:src/main/java/dir/Foo.java");
-  dbClient.componentDao().insert(session,directory,file);
-  session.commit();
+  dbClient.componentDao().insert(dbTester.getSession(),directory,file);
+  dbTester.getSession().commit();
   reportReader.setMetadata(BatchReport.Metadata.newBuilder().setRootComponentRef(1).build());
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).addChildRef(2).build());
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey("MODULE_KEY").addChildRef(3).build());

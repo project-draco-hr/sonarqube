@@ -1,10 +1,10 @@
 {
   userSessionRule.setGlobalPermissions(GlobalPermissions.PROVISIONING);
   ComponentDto analyzedProject=ComponentTesting.newProjectDto("analyzed-uuid-1");
-  componentDao.insert(dbSession,newProvisionedProject("1"),newProvisionedProject("2"),analyzedProject);
+  componentDao.insert(db.getSession(),newProvisionedProject("1"),newProvisionedProject("2"),analyzedProject);
   SnapshotDto snapshot=SnapshotTesting.createForProject(analyzedProject);
-  dbClient.snapshotDao().insert(dbSession,snapshot);
-  dbSession.commit();
+  dbClient.snapshotDao().insert(db.getSession(),snapshot);
+  db.getSession().commit();
   WsTester.Result result=ws.newGetRequest("api/projects","provisioned").execute();
   result.assertJson(getClass(),"all-projects.json");
   assertThat(result.outputAsString()).doesNotContain("analyzed-uuid-1");

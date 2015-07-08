@@ -1,14 +1,14 @@
 {
   Date oldDate=DateUtils.parseDate("2015-01-01");
   ComponentDto project=ComponentTesting.newProjectDto("ABCD").setKey(PROJECT_KEY).setName("Project").setCreatedAt(oldDate);
-  dbClient.componentDao().insert(session,project);
+  dbClient.componentDao().insert(dbTester.getSession(),project);
   ComponentDto module=ComponentTesting.newModuleDto("BCDE",project).setKey("MODULE_KEY").setName("Module").setPath("path").setCreatedAt(oldDate);
-  dbClient.componentDao().insert(session,module);
-  session.commit();
+  dbClient.componentDao().insert(dbTester.getSession(),module);
+  dbTester.getSession().commit();
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).setName("New project name").addChildRef(2).build());
   treeRootHolder.setRoot(DumbComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).build());
   sut.execute();
-  Optional<ComponentDto> projectReloaded=dbClient.componentDao().selectByKey(session,PROJECT_KEY);
+  Optional<ComponentDto> projectReloaded=dbClient.componentDao().selectByKey(dbTester.getSession(),PROJECT_KEY);
   assertThat(projectReloaded.get().name()).isEqualTo("New project name");
   assertThat(projectReloaded.get().getCreatedAt()).isNotEqualTo(now);
 }

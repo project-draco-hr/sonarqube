@@ -1,8 +1,8 @@
 {
   ComponentDto project=ComponentTesting.newProjectDto("ABCD").setKey(PROJECT_KEY);
   ComponentDto module=ComponentTesting.newModuleDto("BCDE",project).setKey(MODULE_KEY);
-  componentDao.insert(session,project,module);
-  session.commit();
+  db.getDbClient().componentDao().insert(db.getSession(),project,module);
+  db.getSession().commit();
   indexIssues(IssueTesting.newDoc("EFGH",module).setRuleKey("squid:AvoidCycle").setSeverity("BLOCKER").setStatus("RESOLVED").setResolution("FALSE-POSITIVE").setManualSeverity(false).setMessage("Do not use this method").setLine(200).setChecksum("123456").setAssignee("john"));
   userSessionRule.login("henry").setGlobalPermissions(GlobalPermissions.PREVIEW_EXECUTION);
   WsTester.TestRequest request=tester.newGetRequest("batch","issues").setParam("key",MODULE_KEY);

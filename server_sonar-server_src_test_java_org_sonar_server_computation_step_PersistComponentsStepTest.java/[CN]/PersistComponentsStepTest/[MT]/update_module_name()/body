@@ -1,15 +1,15 @@
 {
   ComponentDto project=ComponentTesting.newProjectDto("ABCD").setKey(PROJECT_KEY).setName("Project");
-  dbClient.componentDao().insert(session,project);
+  dbClient.componentDao().insert(dbTester.getSession(),project);
   ComponentDto module=ComponentTesting.newModuleDto("BCDE",project).setKey("MODULE_KEY").setName("Module").setPath("path");
-  dbClient.componentDao().insert(session,module);
-  session.commit();
+  dbClient.componentDao().insert(dbTester.getSession(),module);
+  dbTester.getSession().commit();
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).setName("New project name").addChildRef(2).build());
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey("MODULE_KEY").setName("New module name").setPath("New path").build());
   treeRootHolder.setRoot(DumbComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).addChildren(DumbComponent.builder(Component.Type.MODULE,2).setUuid("BCDE").setKey("MODULE_KEY").build()).build());
   sut.execute();
-  ComponentDto projectReloaded=dbClient.componentDao().selectByKey(session,PROJECT_KEY).get();
+  ComponentDto projectReloaded=dbClient.componentDao().selectByKey(dbTester.getSession(),PROJECT_KEY).get();
   assertThat(projectReloaded.name()).isEqualTo("New project name");
-  ComponentDto moduleReloaded=dbClient.componentDao().selectByKey(session,"MODULE_KEY").get();
+  ComponentDto moduleReloaded=dbClient.componentDao().selectByKey(dbTester.getSession(),"MODULE_KEY").get();
   assertThat(moduleReloaded.name()).isEqualTo("New module name");
 }

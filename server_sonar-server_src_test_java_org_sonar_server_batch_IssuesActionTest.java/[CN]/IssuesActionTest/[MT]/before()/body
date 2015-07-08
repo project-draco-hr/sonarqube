@@ -1,12 +1,9 @@
 {
   db.truncateTables();
   es.truncateIndices();
-  this.session=db.myBatis().openSession(false);
-  componentDao=new ComponentDao();
-  DbClient dbClient=new DbClient(db.database(),db.myBatis(),new IssueDao(db.myBatis()),componentDao);
   issueIndex=new IssueIndex(es.client(),System2.INSTANCE,userSessionRule);
   issueIndexer=new IssueIndexer(null,es.client());
   issueAuthorizationIndexer=new IssueAuthorizationIndexer(null,es.client());
-  issuesAction=new IssuesAction(dbClient,issueIndex,userSessionRule,new ComponentFinder(dbClient));
+  issuesAction=new IssuesAction(db.getDbClient(),issueIndex,userSessionRule,new ComponentFinder(db.getDbClient()));
   tester=new WsTester(new BatchWs(new BatchIndex(mock(Server.class)),issuesAction));
 }
