@@ -8,8 +8,8 @@
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey("MODULE_KEY").setName("Module").setDescription("New module description").build());
   treeRootHolder.setRoot(DumbComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).addChildren(DumbComponent.builder(Component.Type.MODULE,2).setUuid("BCDE").setKey("MODULE_KEY").build()).build());
   sut.execute();
-  ComponentDto projectReloaded=dbClient.componentDao().selectNullableByKey(session,PROJECT_KEY);
+  ComponentDto projectReloaded=dbClient.componentDao().selectByKey(session,PROJECT_KEY).get();
   assertThat(projectReloaded.description()).isEqualTo("New project description");
-  ComponentDto moduleReloaded=dbClient.componentDao().selectNullableByKey(session,"MODULE_KEY");
+  ComponentDto moduleReloaded=dbClient.componentDao().selectByKey(session,"MODULE_KEY").get();
   assertThat(moduleReloaded.description()).isEqualTo("New module description");
 }

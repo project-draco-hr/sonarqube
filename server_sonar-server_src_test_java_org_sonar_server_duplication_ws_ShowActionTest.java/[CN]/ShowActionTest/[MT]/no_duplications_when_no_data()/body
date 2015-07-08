@@ -1,8 +1,8 @@
 {
   String componentKey="src/Foo.java";
   userSessionRule.addComponentPermission(UserRole.CODEVIEWER,"org.codehaus.sonar:sonar",componentKey);
-  ComponentDto componentDto=new ComponentDto().setId(10L);
-  when(componentDao.selectNullableByKey(session,componentKey)).thenReturn(componentDto);
+  ComponentDto componentDto=new ComponentDto().setId(10L).setKey(componentKey);
+  when(componentDao.selectByKey(session,componentKey)).thenReturn(Optional.of(componentDto));
   when(measureDao.findByComponentKeyAndMetricKey(session,componentKey,CoreMetrics.DUPLICATIONS_DATA_KEY)).thenReturn(null);
   WsTester.TestRequest request=tester.newGetRequest("api/duplications","show").setParam("key",componentKey);
   request.execute();

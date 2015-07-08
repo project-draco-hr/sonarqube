@@ -1,9 +1,9 @@
 {
   String issueKey="ABCD";
   ComponentDto project=ComponentTesting.newProjectDto().setId(1L).setKey("org.sonar.Sonar").setLongName("SonarQube").setName("SonarQube");
-  when(componentDao.selectByUuid(session,project.uuid())).thenReturn(project);
+  when(componentDao.selectNonNullByUuid(session,project.uuid())).thenReturn(project);
   ComponentDto file=ComponentTesting.newFileDto(project).setId(10L).setKey("org.sonar.server.issue.IssueClient").setLongName("SonarQube :: Issue Client").setName("SonarQube :: Issue Client").setQualifier("FIL").setParentProjectId(1L);
-  when(componentDao.selectByUuid(session,file.uuid())).thenReturn(file);
+  when(componentDao.selectNonNullByUuid(session,file.uuid())).thenReturn(file);
   DefaultIssue issue=new DefaultIssue().setKey(issueKey).setComponentKey("org.sonar.server.issue.IssueClient").setComponentUuid(file.uuid()).setProjectKey("org.sonar.Sonar").setProjectUuid(project.uuid()).setRuleKey(RuleKey.of("squid","AvoidCycle")).setLine(12).setMessage("Fix it").setResolution("FIXED").setStatus("CLOSED").setSeverity("MAJOR").setCreationDate(issueCreationDate);
   when(issueService.getByKey(issueKey)).thenReturn(issue);
   WsTester.TestRequest request=tester.newGetRequest("api/issues","show").setParam("key",issueKey);

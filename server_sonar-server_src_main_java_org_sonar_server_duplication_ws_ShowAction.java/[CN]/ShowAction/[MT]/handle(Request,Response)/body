@@ -3,14 +3,12 @@
   String fileUuid=request.param("uuid");
   Preconditions.checkArgument(fileKey != null || fileUuid != null,"At least one of 'key' or 'uuid' must be provided");
   DbSession session=dbClient.openSession(false);
-  if (fileKey == null) {
-    fileKey=componentDao.selectByUuid(session,fileUuid).key();
-  }
-  userSession.checkComponentPermission(UserRole.CODEVIEWER,fileKey);
   try {
-    ComponentDto component=findComponent(fileKey,session);
+    ComponentDto component=componentFinder.getByKeyOrUuid(session,fileUuid,fileKey);
+    String componentKey=component.key();
+    userSession.checkComponentPermission(UserRole.CODEVIEWER,componentKey);
     JsonWriter json=response.newJsonWriter().beginObject();
-    String duplications=findDataFromComponent(fileKey,CoreMetrics.DUPLICATIONS_DATA_KEY,session);
+    String duplications=findDataFromComponent(componentKey,CoreMetrics.DUPLICATIONS_DATA_KEY,session);
     List<DuplicationsParser.Block> blocks=parser.parse(component,duplications,session);
     duplicationsJsonWriter.write(blocks,json,session);
     json.endObject().close();

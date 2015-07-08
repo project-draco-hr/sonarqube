@@ -2,9 +2,8 @@
   String uuid="ABCD";
   String componentKey="src/Foo.java";
   userSessionRule.addComponentPermission(UserRole.CODEVIEWER,"org.codehaus.sonar:sonar",componentKey);
-  when(componentDao.selectByUuid(session,uuid)).thenReturn(new ComponentDto().setKey(componentKey));
-  ComponentDto componentDto=new ComponentDto().setId(10L);
-  when(componentDao.selectNullableByKey(session,componentKey)).thenReturn(componentDto);
+  ComponentDto componentDto=new ComponentDto().setId(10L).setKey(componentKey);
+  when(componentDao.selectByUuid(session,uuid)).thenReturn(Optional.of(componentDto));
   String data="{duplications}";
   when(measureDao.findByComponentKeyAndMetricKey(session,componentKey,CoreMetrics.DUPLICATIONS_DATA_KEY)).thenReturn(new MeasureDto().setComponentKey(componentKey).setMetricKey(CoreMetrics.DUPLICATIONS_DATA_KEY).setData("{duplications}"));
   List<DuplicationsParser.Block> blocks=newArrayList(new DuplicationsParser.Block(newArrayList(new DuplicationsParser.Duplication(componentDto,1,2))));

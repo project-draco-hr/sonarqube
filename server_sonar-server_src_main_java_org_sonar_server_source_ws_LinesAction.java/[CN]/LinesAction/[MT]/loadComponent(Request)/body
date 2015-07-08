@@ -3,11 +3,19 @@
   try {
     String fileUuid=request.param(PARAM_UUID);
     if (fileUuid != null) {
-      return dbClient.componentDao().selectByUuid(session,fileUuid);
+      Optional<ComponentDto> componentDto=dbClient.componentDao().selectByUuid(session,fileUuid);
+      if (!componentDto.isPresent()) {
+        throw new NotFoundException(String.format("Component with uuid '%s' not found",fileUuid));
+      }
+      return componentDto.get();
     }
     String fileKey=request.param(PARAM_KEY);
     if (fileKey != null) {
-      return dbClient.componentDao().selectByKey(session,fileKey);
+      Optional<ComponentDto> componentDto=dbClient.componentDao().selectByKey(session,fileKey);
+      if (!componentDto.isPresent()) {
+        throw new NotFoundException(String.format("Component with key '%s' not found",fileKey));
+      }
+      return componentDto.get();
     }
     throw new IllegalArgumentException(String.format("Param %s or param %s is missing",PARAM_UUID,PARAM_KEY));
   }

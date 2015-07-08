@@ -2,8 +2,12 @@
   verifyLoggedIn();
   DbSession session=dbClient.openSession(false);
   try {
-    ComponentDto component=dbClient.componentDao().selectByKey(session,componentKey);
-    ComponentDto project=dbClient.componentDao().selectByUuid(session,component.projectUuid());
+    Optional<ComponentDto> componentOptional=dbClient.componentDao().selectByKey(session,componentKey);
+    if (!componentOptional.isPresent()) {
+      throw new NotFoundException(String.format("Component with key '%s' not found",componentKey));
+    }
+    ComponentDto component=componentOptional.get();
+    ComponentDto project=dbClient.componentDao().selectNonNullByUuid(session,component.projectUuid());
     userSession.checkProjectPermission(UserRole.USER,project.getKey());
     if (!ruleKey.isManual()) {
       throw new IllegalArgumentException("Issues can be created only on rules marked as 'manual': " + ruleKey);

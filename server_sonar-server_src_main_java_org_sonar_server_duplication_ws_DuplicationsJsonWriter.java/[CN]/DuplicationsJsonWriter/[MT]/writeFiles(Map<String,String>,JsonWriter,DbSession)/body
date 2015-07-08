@@ -4,8 +4,9 @@
   for (  Map.Entry<String,String> entry : refByComponentKey.entrySet()) {
     String componentKey=entry.getKey();
     String ref=entry.getValue();
-    ComponentDto file=componentDao.selectNullableByKey(session,componentKey);
-    if (file != null) {
+    Optional<ComponentDto> fileOptional=componentDao.selectByKey(session,componentKey);
+    if (fileOptional.isPresent()) {
+      ComponentDto file=fileOptional.get();
       json.name(ref).beginObject();
       addFile(json,file);
       ComponentDto project=getProject(file.projectUuid(),projectsByUuid,session);

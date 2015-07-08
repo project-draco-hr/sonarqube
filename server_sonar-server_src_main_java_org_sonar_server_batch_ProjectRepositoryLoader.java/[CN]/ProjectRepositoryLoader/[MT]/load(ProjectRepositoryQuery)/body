@@ -5,8 +5,9 @@
   try {
     ProjectRepositories ref=new ProjectRepositories();
     String projectKey=query.getModuleKey();
-    ComponentDto module=dbClient.componentDao().selectNullableByKey(session,query.getModuleKey());
-    if (module != null) {
+    Optional<ComponentDto> moduleOptional=dbClient.componentDao().selectByKey(session,query.getModuleKey());
+    if (moduleOptional.isPresent()) {
+      ComponentDto module=moduleOptional.get();
       if (query.isPreview() && !userSession.hasProjectPermissionByUuid(UserRole.USER,module.projectUuid())) {
         throw new ForbiddenException("You're not authorized to access to project '" + module.name() + "', please contact your SonarQube administrator.");
       }

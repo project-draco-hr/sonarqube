@@ -1,12 +1,8 @@
 {
+  thrown.expect(IllegalArgumentException.class);
+  thrown.expectMessage("Minimum search is 2 characters");
   dbTester.prepareDbUnit(getClass(),"shared.xml");
   userSessionRule.login("john").addProjectUuidPermissions(UserRole.USER,"EFGH");
   WsTester.TestRequest request=tester.newGetRequest("api/components","search").setParam("componentUuid","EFGH").setParam("q","s");
-  try {
-    request.execute();
-    failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
-  }
- catch (  IllegalArgumentException e) {
-    assertThat(e).hasMessage("Minimum search is 2 characters");
-  }
+  request.execute();
 }

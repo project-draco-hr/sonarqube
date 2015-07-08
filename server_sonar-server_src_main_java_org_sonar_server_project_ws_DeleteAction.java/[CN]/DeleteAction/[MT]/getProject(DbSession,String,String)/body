@@ -1,0 +1,17 @@
+{
+  if (key == null && uuid != null) {
+    Optional<ComponentDto> componentDto=dbClient.componentDao().selectByUuid(session,uuid);
+    if (!componentDto.isPresent()) {
+      throw new NotFoundException(String.format("Component with uuid '%s' not found",uuid));
+    }
+    return componentDto.get();
+  }
+ else   if (uuid == null && key != null) {
+    Optional<ComponentDto> componentDto=dbClient.componentDao().selectByKey(session,key);
+    if (!componentDto.isPresent()) {
+      throw new NotFoundException(String.format("Component with key '%s' not found",key));
+    }
+    return componentDto.get();
+  }
+  throw new IllegalArgumentException("Id or key must be provided");
+}

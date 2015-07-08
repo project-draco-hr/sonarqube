@@ -8,7 +8,7 @@
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).setName("New project name").addChildRef(2).build());
   treeRootHolder.setRoot(DumbComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).build());
   sut.execute();
-  ComponentDto projectReloaded=dbClient.componentDao().selectNullableByKey(session,PROJECT_KEY);
-  assertThat(projectReloaded.name()).isEqualTo("New project name");
-  assertThat(projectReloaded.getCreatedAt()).isNotEqualTo(now);
+  Optional<ComponentDto> projectReloaded=dbClient.componentDao().selectByKey(session,PROJECT_KEY);
+  assertThat(projectReloaded.get().name()).isEqualTo("New project name");
+  assertThat(projectReloaded.get().getCreatedAt()).isNotEqualTo(now);
 }
