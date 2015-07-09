@@ -1,0 +1,10 @@
+{
+  List<Component> components=context.prepareSelect("SELECT p.id, p.uuid, p.project_uuid, p.enabled FROM projects p WHERE p.kee=? ORDER BY id").setString(1,row.getString(1)).list(ComponentRowReader.INSTANCE);
+  Component refComponent=FluentIterable.from(components).firstMatch(EnabledComponent.INSTANCE).or(components.get(components.size() - 1));
+  for (  Component componentToRemove : FluentIterable.from(components).filter(Predicates.not(new MatchComponentId(refComponent.id)))) {
+    componentUpdate.setLong(1,componentToRemove.id).addBatch();
+    issuesUpdate.setString(1,refComponent.uuid).setString(2,refComponent.projectUuid).setString(3,componentToRemove.uuid).addBatch();
+    counter.getAndIncrement();
+    isEmpty=false;
+  }
+}

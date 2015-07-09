@@ -1,0 +1,20 @@
+{
+  Upsert componentUpdate=context.prepareUpsert("DELETE FROM projects WHERE id=?");
+  Upsert issuesUpdate=context.prepareUpsert("UPDATE issues SET component_uuid=?, project_uuid=? WHERE component_uuid=?");
+  ProgressLogger progress=ProgressLogger.create(getClass(),counter);
+  progress.start();
+  try {
+    RemoveDuplicatedComponentHandler handler=new RemoveDuplicatedComponentHandler(context,componentUpdate,issuesUpdate);
+    context.prepareSelect("SELECT p.kee, COUNT(p.kee) FROM projects p " + "GROUP BY p.kee " + "HAVING COUNT(p.kee) > 1").scroll(handler);
+    if (!handler.isEmpty) {
+      componentUpdate.execute().commit();
+      issuesUpdate.execute().commit();
+    }
+    progress.log();
+  }
+  finally {
+    progress.stop();
+    componentUpdate.close();
+    issuesUpdate.close();
+  }
+}
