@@ -1,0 +1,14 @@
+{
+  RulesDefinition.NewRepository newFindbugs=context.createRepository("findbugs","java").setName("Findbugs");
+  newFindbugs.createRule("NPE").setName("NPE").setHtmlDescription("NPE");
+  newFindbugs.done();
+  RulesDefinition.NewRepository newFbContrib=context.createRepository("findbugs","java");
+  newFbContrib.createRule("VULNERABILITY").setName("Vulnerability").setMarkdownDescription("Detect vulnerability");
+  newFbContrib.done();
+  assertThat(context.repositories()).hasSize(1);
+  RulesDefinition.Repository findbugs=context.repository("findbugs");
+  assertThat(findbugs.key()).isEqualTo("findbugs");
+  assertThat(findbugs.language()).isEqualTo("java");
+  assertThat(findbugs.name()).isEqualTo("Findbugs");
+  assertThat(findbugs.rules()).extracting("key").containsOnly("NPE","VULNERABILITY");
+}
