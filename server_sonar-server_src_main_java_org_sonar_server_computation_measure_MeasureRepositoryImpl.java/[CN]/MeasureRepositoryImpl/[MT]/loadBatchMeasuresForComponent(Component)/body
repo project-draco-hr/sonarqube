@@ -3,8 +3,11 @@
     return;
   }
   for (  BatchReport.Measure batchMeasure : reportReader.readComponentMeasures(component.getRef())) {
-    Metric metric=metricRepository.getByKey(batchMeasure.getMetricKey());
-    addLocal(component,metric,batchMeasureToMeasure.toMeasure(batchMeasure,metric).get(),OverridePolicy.DO_NOT_OVERRIDE);
+    String metricKey=batchMeasure.getMetricKey();
+    if (reportMetricValidator.validate(metricKey)) {
+      Metric metric=metricRepository.getByKey(metricKey);
+      addLocal(component,metric,batchMeasureToMeasure.toMeasure(batchMeasure,metric).get(),OverridePolicy.DO_NOT_OVERRIDE);
+    }
   }
   loadedComponents.add(component.getRef());
 }
