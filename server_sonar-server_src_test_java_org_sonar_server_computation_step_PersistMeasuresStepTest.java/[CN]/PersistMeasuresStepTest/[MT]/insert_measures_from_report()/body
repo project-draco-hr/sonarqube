@@ -1,8 +1,8 @@
 {
   metricRepository.add(1,STRING_METRIC);
   metricRepository.add(2,DOUBLE_METRIC);
-  reportReader.putMeasures(PROJECT_REF,Arrays.asList(BatchReport.Measure.newBuilder().setValueType(MeasureValueType.STRING).setStringValue("measure-data").setVariationValue1(1.1d).setVariationValue2(2.2d).setVariationValue3(3.3d).setVariationValue4(4.4d).setVariationValue5(5.5d).setDescription("measure-description").setMetricKey(STRING_METRIC_KEY).build()));
-  reportReader.putMeasures(FILE_REF,Arrays.asList(BatchReport.Measure.newBuilder().setValueType(MeasureValueType.DOUBLE).setDoubleValue(123.123d).setVariationValue1(1.1d).setVariationValue2(2.2d).setVariationValue3(3.3d).setVariationValue4(4.4d).setVariationValue5(5.5d).setDescription("measure-description").setMetricKey(DOUBLE_METRIC_KEY).build()));
+  measureRepository.addRawMeasure(PROJECT_REF,STRING_METRIC_KEY,Measure.newMeasureBuilder().setVariations(MeasureVariations.newMeasureVariationsBuilder().setVariation(1,1.1d).setVariation(2,2.2d).setVariation(3,3.3d).setVariation(4,4.4d).setVariation(5,5.5d).build()).create("measure-data"));
+  measureRepository.addRawMeasure(FILE_REF,DOUBLE_METRIC_KEY,Measure.newMeasureBuilder().setVariations(MeasureVariations.newMeasureVariationsBuilder().setVariation(1,1.1d).setVariation(2,2.2d).setVariation(3,3.3d).setVariation(4,4.4d).setVariation(5,5.5d).build()).create(123.123d));
   sut.execute();
   session.commit();
   assertThat(dbTester.countRowsOfTable("project_measures")).isEqualTo(2);

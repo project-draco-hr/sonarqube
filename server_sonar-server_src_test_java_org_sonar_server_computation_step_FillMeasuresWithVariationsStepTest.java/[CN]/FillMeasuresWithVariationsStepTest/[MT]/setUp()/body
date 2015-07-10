@@ -1,12 +1,6 @@
 {
   dbTester.truncateTables();
-  session=dbTester.myBatis().openSession(false);
-  dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),new ComponentDao(),new SnapshotDao(),new MetricDao(),new MeasureDao(),new RuleDao(System2.INSTANCE),new CharacteristicDao(dbTester.myBatis()));
-  dbClient.metricDao().insert(session,ISSUES_METRIC,DEBT_METRIC,FILE_COMPLEXITY_METRIC,BUILD_BREAKER_METRIC);
   dbClient.componentDao().insert(session,PROJECT_DTO);
   session.commit();
-  metricRepository=new MetricRepositoryImpl(dbClient);
-  metricRepository.start();
-  measureRepository=new MeasureRepositoryImpl(dbClient,reportReader,metricRepository);
   sut=new FillMeasuresWithVariationsStep(dbClient,treeRootHolder,periodsHolder,metricRepository,measureRepository);
 }
