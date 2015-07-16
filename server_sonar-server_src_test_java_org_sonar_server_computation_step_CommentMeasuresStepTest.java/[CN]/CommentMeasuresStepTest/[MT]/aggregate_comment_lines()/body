@@ -2,10 +2,11 @@
   measureRepository.addRawMeasure(FILE_1_REF,COMMENT_LINES_KEY,newMeasureBuilder().create(100));
   measureRepository.addRawMeasure(FILE_2_REF,COMMENT_LINES_KEY,newMeasureBuilder().create(400));
   underTest.execute();
-  assertThat(measureRepository.getNewRawMeasures(FILE_1_REF).get(COMMENT_LINES_KEY)).isEmpty();
-  assertThat(measureRepository.getNewRawMeasures(FILE_2_REF).get(COMMENT_LINES_KEY)).isEmpty();
-  assertThat(measureRepository.getNewRawMeasures(DIRECTORY_REF).get(COMMENT_LINES_KEY)).containsOnly(newMeasureBuilder().create(500));
-  assertThat(measureRepository.getNewRawMeasures(SUB_MODULE_REF).get(COMMENT_LINES_KEY)).containsOnly(newMeasureBuilder().create(500));
-  assertThat(measureRepository.getNewRawMeasures(MODULE_REF).get(COMMENT_LINES_KEY)).containsOnly(newMeasureBuilder().create(500));
+  assertThat(measureRepository.getNewRawMeasure(FILE_1_REF,COMMENT_LINES_KEY)).isAbsent();
+  assertThat(measureRepository.getNewRawMeasure(FILE_2_REF,COMMENT_LINES_KEY)).isAbsent();
+  assertThat(measureRepository.getNewRawMeasure(DIRECTORY_REF,COMMENT_LINES_KEY).get().getIntValue()).isEqualTo(500);
+  assertThat(measureRepository.getNewRawMeasure(SUB_MODULE_REF,COMMENT_LINES_KEY).get().getIntValue()).isEqualTo(500);
+  assertThat(measureRepository.getNewRawMeasure(MODULE_REF,COMMENT_LINES_KEY).get().getIntValue()).isEqualTo(500);
+  assertThat(measureRepository.getNewRawMeasure(ROOT_REF,COMMENT_LINES_KEY).get().getIntValue()).isEqualTo(500);
   assertThat(measureRepository.getNewRawMeasures(ROOT_REF).get(COMMENT_LINES_KEY)).containsOnly(newMeasureBuilder().create(500));
 }
