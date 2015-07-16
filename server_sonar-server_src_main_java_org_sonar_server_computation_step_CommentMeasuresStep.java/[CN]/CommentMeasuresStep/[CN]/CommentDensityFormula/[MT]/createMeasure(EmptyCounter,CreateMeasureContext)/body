@@ -1,0 +1,14 @@
+{
+  Optional<Measure> nclocsOpt=measureRepository.getRawMeasure(context.getComponent(),nclocMetric);
+  Optional<Measure> commentsOpt=measureRepository.getRawMeasure(context.getComponent(),commentMetric);
+  if (nclocsOpt.isPresent() && commentsOpt.isPresent()) {
+    double nclocs=nclocsOpt.get().getIntValue();
+    double comments=commentsOpt.get().getIntValue();
+    double divisor=nclocs + comments;
+    if (divisor > 0d) {
+      double value=100d * (comments / divisor);
+      return Optional.of(Measure.newMeasureBuilder().create(value));
+    }
+  }
+  return Optional.absent();
+}
