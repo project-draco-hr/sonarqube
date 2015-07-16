@@ -1,9 +1,9 @@
 {
   db.prepareDbUnit(getClass(),"snapshots.xml");
   SnapshotDto snapshot=defaultSnapshot().setId(1L);
-  sut.updateSnapshotAndChildrenLastFlagAndStatus(db.getSession(),snapshot,false,SnapshotDto.STATUS_PROCESSED);
+  underTest.updateSnapshotAndChildrenLastFlagAndStatus(db.getSession(),snapshot,false,SnapshotDto.STATUS_PROCESSED);
   db.getSession().commit();
-  List<SnapshotDto> snapshots=sut.selectSnapshotAndChildrenOfProjectScope(db.getSession(),1L);
+  List<SnapshotDto> snapshots=underTest.selectSnapshotAndChildrenOfProjectScope(db.getSession(),1L);
   assertThat(snapshots).hasSize(2);
   assertThat(snapshots).extracting("id").containsOnly(1L,6L);
   assertThat(snapshots).extracting("last").containsOnly(false);
