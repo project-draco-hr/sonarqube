@@ -1,0 +1,8 @@
+{
+  reportReader.putFileSourceLines(FILE.getRef(),"line 1;","line 2;");
+  DefaultIssue ceIssue=new DefaultIssue().setRuleKey(RuleKey.of(CommonRuleKeys.commonRepositoryForLang("java"),"InsufficientCoverage")).setMessage("not enough coverage").setEffortToFix(10.0);
+  when(commonRuleEngine.process(FILE)).thenReturn(asList(ceIssue));
+  Input<DefaultIssue> input=underTest.create(FILE);
+  assertThat(input.getIssues()).containsOnly(ceIssue);
+  assertInitializedIssue(input.getIssues().iterator().next());
+}

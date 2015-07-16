@@ -1,0 +1,12 @@
+{
+  requireNonNull(activeRules,"Active rules cannot be null");
+  checkState(activeRulesByKey == null,"Active rules have already been initialized");
+  Map<RuleKey,ActiveRule> temp=new HashMap<>();
+  for (  ActiveRule activeRule : activeRules) {
+    ActiveRule previousValue=temp.put(activeRule.getRuleKey(),activeRule);
+    if (previousValue != null) {
+      throw new IllegalArgumentException("Active rule must not be declared multiple times: " + activeRule.getRuleKey());
+    }
+  }
+  activeRulesByKey=ImmutableMap.copyOf(temp);
+}

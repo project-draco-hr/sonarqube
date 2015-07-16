@@ -1,0 +1,11 @@
+{
+  activeRuleHolder.put(new ActiveRule(RULE_KEY,Severity.CRITICAL));
+  measureRepository.addRawMeasure(FILE.getRef(),CoreMetrics.COMMENT_LINES_DENSITY_KEY,Measure.newMeasureBuilder().create(10.0));
+  measureRepository.addRawMeasure(FILE.getRef(),CoreMetrics.COMMENT_LINES_KEY,Measure.newMeasureBuilder().create(40));
+  measureRepository.addRawMeasure(FILE.getRef(),CoreMetrics.NCLOC_KEY,Measure.newMeasureBuilder().create(360));
+  DefaultIssue issue=underTest.processFile(FILE,"java");
+  assertThat(issue.ruleKey()).isEqualTo(RULE_KEY);
+  assertThat(issue.severity()).isEqualTo(Severity.CRITICAL);
+  assertThat(issue.effortToFix()).isEqualTo(120.0 - 40.0);
+  assertThat(issue.message()).isEqualTo("80 more comment lines need to be written to reach the minimum threshold of 25.0% comment density.");
+}

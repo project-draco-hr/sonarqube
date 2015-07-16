@@ -1,0 +1,18 @@
+{
+  DefaultIssue issue=null;
+  RuleKey ruleKey=RuleKey.of(commonRepositoryForLang(fileLanguage),key);
+  Optional<ActiveRule> activeRule=activeRulesHolder.get(ruleKey);
+  if (activeRule.isPresent()) {
+    CommonRuleIssue cri=doProcessFile(file,activeRule.get());
+    if (cri != null) {
+      issue=new DefaultIssue();
+      issue.setEffortToFix(cri.effortToFix);
+      issue.setMessage(cri.message);
+      issue.setRuleKey(ruleKey);
+      issue.setSeverity(activeRule.get().getSeverity());
+      issue.setLine(null);
+      issue.setChecksum("");
+    }
+  }
+  return issue;
+}

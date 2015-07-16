@@ -1,0 +1,18 @@
+{
+  Optional<Measure> commentDensityMeasure=measureRepository.getRawMeasure(file,commentDensityMetric);
+  Optional<Measure> commentLinesMeasure=measureRepository.getRawMeasure(file,commentLinesMetric);
+  Optional<Measure> nclocMeasure=measureRepository.getRawMeasure(file,nclocMetric);
+  double minCommentDensity=25.0;
+  if (commentDensityMeasure.isPresent() && nclocMeasure.isPresent() && nclocMeasure.get().getIntValue() > 0 && commentDensityMeasure.get().getDoubleValue() < minCommentDensity) {
+    int commentLines=commentLinesMeasure.isPresent() ? commentLinesMeasure.get().getIntValue() : 0;
+    int ncloc=nclocMeasure.get().getIntValue();
+    int minExpectedCommentLines=(int)Math.ceil(minCommentDensity * ncloc / (100 - minCommentDensity));
+    int missingCommentLines=minExpectedCommentLines - commentLines;
+    if (missingCommentLines <= 0) {
+      throw new IllegalStateException(format("Bug in measures of comment lines - density=%s, comment_lines= %d, ncloc=%d, threshold=%s%%",commentDensityMeasure.get().getDoubleValue(),commentLines,nclocMeasure.get().getIntValue(),minCommentDensity));
+    }
+    String message=format("%d more comment lines need to be written to reach the minimum threshold of %s%% comment density.",missingCommentLines,minCommentDensity);
+    return new CommonRuleIssue(missingCommentLines,message);
+  }
+  return null;
+}

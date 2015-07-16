@@ -1,0 +1,17 @@
+{
+  reportReader.putFileSourceLines(FILE.getRef(),"line 1;","line 2;");
+  BatchReport.Issue reportIssue=BatchReport.Issue.newBuilder().setLine(2).setMsg("the message").setRuleRepository("java").setRuleKey("S001").setSeverity(Constants.Severity.BLOCKER).setEffortToFix(3.14).addTag("bug").addTag("performance").build();
+  reportReader.putIssues(FILE.getRef(),asList(reportIssue));
+  Input<DefaultIssue> input=underTest.create(FILE);
+  Collection<DefaultIssue> issues=input.getIssues();
+  assertThat(issues).hasSize(1);
+  DefaultIssue issue=Iterators.getOnlyElement(issues.iterator());
+  assertThat(issue.ruleKey()).isEqualTo(RuleKey.of("java","S001"));
+  assertThat(issue.severity()).isEqualTo(Severity.BLOCKER);
+  assertThat(issue.line()).isEqualTo(2);
+  assertThat(issue.effortToFix()).isEqualTo(3.14);
+  assertThat(issue.message()).isEqualTo("the message");
+  assertThat(issue.tags()).containsOnly("bug","performance");
+  assertThat(issue.checksum()).isEqualTo(input.getLineHashSequence().getHashForLine(2));
+  assertInitializedIssue(issue);
+}

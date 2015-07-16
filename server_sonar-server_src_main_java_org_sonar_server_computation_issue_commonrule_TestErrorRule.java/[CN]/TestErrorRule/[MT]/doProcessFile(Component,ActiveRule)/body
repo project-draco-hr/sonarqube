@@ -1,0 +1,12 @@
+{
+  Optional<Measure> errorsMeasure=measureRepository.getRawMeasure(file,testErrorMetric);
+  Optional<Measure> failuresMeasure=measureRepository.getRawMeasure(file,testFailureMetric);
+  int errors=errorsMeasure.isPresent() ? errorsMeasure.get().getIntValue() : 0;
+  int failures=failuresMeasure.isPresent() ? failuresMeasure.get().getIntValue() : 0;
+  int total=errors + failures;
+  if (total > 0) {
+    String message=format("Fix failing unit tests on file \"%s\".",file.getName());
+    return new CommonRuleIssue(total,message);
+  }
+  return null;
+}

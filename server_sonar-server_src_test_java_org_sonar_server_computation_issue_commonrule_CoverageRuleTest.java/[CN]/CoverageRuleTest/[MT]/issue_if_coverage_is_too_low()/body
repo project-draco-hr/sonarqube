@@ -1,0 +1,11 @@
+{
+  activeRuleHolder.put(new ActiveRule(getRuleKey(),Severity.CRITICAL));
+  measureRepository.addRawMeasure(FILE.getRef(),getCoverageMetricKey(),Measure.newMeasureBuilder().create(20.0));
+  measureRepository.addRawMeasure(FILE.getRef(),getUncoveredMetricKey(),Measure.newMeasureBuilder().create(40.0));
+  measureRepository.addRawMeasure(FILE.getRef(),getToCoverMetricKey(),Measure.newMeasureBuilder().create(50.0));
+  DefaultIssue issue=underTest.processFile(FILE,"java");
+  assertThat(issue.ruleKey()).isEqualTo(getRuleKey());
+  assertThat(issue.severity()).isEqualTo(Severity.CRITICAL);
+  assertThat(issue.effortToFix()).isEqualTo(23.0);
+  assertThat(issue.message()).isEqualTo(getExpectedIssueMessage());
+}

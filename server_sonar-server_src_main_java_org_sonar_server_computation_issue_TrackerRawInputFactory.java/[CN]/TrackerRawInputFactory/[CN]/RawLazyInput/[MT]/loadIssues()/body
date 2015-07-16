@@ -1,12 +1,20 @@
 {
   List<BatchReport.Issue> reportIssues=reportReader.readComponentIssues(component.getRef());
-  List<DefaultIssue> issues=new ArrayList<>();
+  List<DefaultIssue> result=new ArrayList<>();
+  for (  DefaultIssue commonRuleIssue : commonRuleEngine.process(component)) {
+    result.add(init(commonRuleIssue));
+  }
   if (!reportIssues.isEmpty()) {
     LineHashSequence lineHashSeq=getLineHashSequence();
     for (    BatchReport.Issue reportIssue : reportIssues) {
-      DefaultIssue issue=toIssue(lineHashSeq,reportIssue);
-      issues.add(issue);
+      if (isIssueOnUnsupportedCommonRule(reportIssue)) {
+        DefaultIssue issue=toIssue(lineHashSeq,reportIssue);
+        result.add(issue);
+      }
+ else {
+        Loggers.get(getClass()).debug("Ignored issue from analysis report on rule {}:{}",reportIssue.getRuleRepository(),reportIssue.getRuleKey());
+      }
     }
   }
-  return issues;
+  return result;
 }
