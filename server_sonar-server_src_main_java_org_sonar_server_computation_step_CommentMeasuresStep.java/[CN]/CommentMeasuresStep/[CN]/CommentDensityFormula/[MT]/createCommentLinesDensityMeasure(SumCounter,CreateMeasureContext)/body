@@ -1,0 +1,16 @@
+{
+  if (context.getMetric().getKey().equals(COMMENT_LINES_DENSITY_KEY)) {
+    Optional<Measure> nclocsOpt=measureRepository.getRawMeasure(context.getComponent(),nclocMetric);
+    Optional<Integer> commentsOpt=counter.getValue();
+    if (nclocsOpt.isPresent() && commentsOpt.isPresent()) {
+      double nclocs=nclocsOpt.get().getIntValue();
+      double comments=commentsOpt.get();
+      double divisor=nclocs + comments;
+      if (divisor > 0d) {
+        double value=100d * (comments / divisor);
+        return Optional.of(Measure.newMeasureBuilder().create(value));
+      }
+    }
+  }
+  return Optional.absent();
+}
