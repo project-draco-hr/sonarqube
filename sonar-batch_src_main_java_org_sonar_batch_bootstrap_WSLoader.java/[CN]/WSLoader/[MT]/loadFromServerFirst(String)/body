@@ -1,0 +1,15 @@
+{
+  try {
+    return loadFromServer(id);
+  }
+ catch (  Exception serverException) {
+    if (serverException.getCause() instanceof HttpDownloader.HttpException) {
+      throw serverException;
+    }
+    byte[] cached=loadFromCache(id);
+    if (cached != null) {
+      return cached;
+    }
+  }
+  throw new IllegalStateException(FAIL_MSG);
+}

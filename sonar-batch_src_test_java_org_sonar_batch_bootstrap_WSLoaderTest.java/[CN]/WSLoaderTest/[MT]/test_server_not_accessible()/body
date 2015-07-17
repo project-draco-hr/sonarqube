@@ -1,0 +1,9 @@
+{
+  when(client.load(anyString(),anyString(),anyBoolean(),anyInt(),anyInt())).thenThrow(new IllegalStateException());
+  WSLoader loader=new WSLoader(true,cache,client);
+  loader.setStrategy(LoadStrategy.SERVER_FIRST);
+  loader.load(ID);
+  loader.load(ID);
+  verify(client,times(1)).load(eq(ID),anyString(),anyBoolean(),anyInt(),anyInt());
+  verify(cache,times(2)).get(ID,null);
+}

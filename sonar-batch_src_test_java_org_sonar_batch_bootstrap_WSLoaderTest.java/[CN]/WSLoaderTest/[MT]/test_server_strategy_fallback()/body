@@ -1,0 +1,10 @@
+{
+  when(client.load(anyString(),anyString(),anyBoolean(),anyInt(),anyInt())).thenThrow(new IllegalStateException());
+  WSLoader loader=new WSLoader(true,cache,client);
+  loader.setStrategy(LoadStrategy.SERVER_FIRST);
+  loader.setCacheEnabled(true);
+  assertThat(loader.loadString(ID)).isEqualTo(cacheValue);
+  InOrder inOrder=Mockito.inOrder(client,cache);
+  inOrder.verify(client).load(eq(ID),anyString(),anyBoolean(),anyInt(),anyInt());
+  inOrder.verify(cache).get(ID,null);
+}

@@ -2,16 +2,11 @@
   if (userLogins.isEmpty()) {
     return Collections.emptyList();
   }
-  try {
-    InputSupplier<InputStream> request=serverClient.doRequest("/batch/users?logins=" + Joiner.on(',').join(Lists.transform(userLogins,new Function<String,String>(){
-      @Override public String apply(      String input){
-        return ServerClient.encodeForUrl(input);
-      }
+  ByteSource source=wsLoader.loadSource("/batch/users?logins=" + Joiner.on(',').join(Lists.transform(userLogins,new Function<String,String>(){
+    @Override public String apply(    String input){
+      return BatchUtils.encodeForUrl(input);
     }
-)),"GET",null);
-    return parseUsers(request);
   }
- catch (  HttpDownloader.HttpException e) {
-    throw serverClient.handleHttpException(e);
-  }
+)));
+  return parseUsers(source);
 }

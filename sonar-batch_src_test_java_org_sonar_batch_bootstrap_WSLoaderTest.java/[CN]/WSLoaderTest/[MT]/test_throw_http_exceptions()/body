@@ -1,0 +1,14 @@
+{
+  HttpDownloader.HttpException httpException=mock(HttpDownloader.HttpException.class);
+  IllegalStateException wrapperException=new IllegalStateException(httpException);
+  when(client.load(anyString(),anyString(),anyBoolean(),anyInt(),anyInt())).thenThrow(wrapperException);
+  WSLoader loader=new WSLoader(true,cache,client);
+  loader.setStrategy(LoadStrategy.SERVER_FIRST);
+  try {
+    loader.load(ID);
+  }
+ catch (  IllegalStateException e) {
+    verifyNoMoreInteractions(cache);
+    throw e;
+  }
+}

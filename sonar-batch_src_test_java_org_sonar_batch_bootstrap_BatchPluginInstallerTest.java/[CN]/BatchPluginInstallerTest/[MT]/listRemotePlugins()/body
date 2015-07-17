@@ -1,7 +1,8 @@
 {
-  ServerClient server=mock(ServerClient.class);
-  when(server.request("/deploy/plugins/index.txt")).thenReturn("checkstyle\nsqale");
-  BatchPluginInstaller installer=new BatchPluginInstaller(server,fileCache,pluginPredicate);
+  WSLoader wsLoader=mock(WSLoader.class);
+  when(wsLoader.load("/deploy/plugins/index.txt")).thenReturn("checkstyle\nsqale".getBytes());
+  when(wsLoader.loadString("/deploy/plugins/index.txt")).thenReturn("checkstyle\nsqale");
+  BatchPluginInstaller installer=new BatchPluginInstaller(wsLoader,fileCache,pluginPredicate);
   List<RemotePlugin> remotePlugins=installer.listRemotePlugins();
   assertThat(remotePlugins).extracting("key").containsOnly("checkstyle","sqale");
 }

@@ -1,0 +1,22 @@
+{
+  URI uri=getURI(pathStartingWithSlash);
+  try {
+    if (Strings.isNullOrEmpty(getLogin())) {
+      return downloader.newInputSupplier(uri,requestMethod,connectTimeoutMs,readTimeoutMs).getInput();
+    }
+ else {
+      return downloader.newInputSupplier(uri,requestMethod,getLogin(),getPassword(),connectTimeoutMs,readTimeoutMs).getInput();
+    }
+  }
+ catch (  HttpDownloader.HttpException e) {
+    if (wrapHttpException) {
+      throw handleHttpException(e);
+    }
+ else {
+      throw e;
+    }
+  }
+catch (  IOException e) {
+    throw new IllegalStateException(String.format("Unable to request: %s",uri),e);
+  }
+}

@@ -1,0 +1,23 @@
+{
+  String key=getKey(obj);
+  try {
+    lock();
+    byte[] cached=getCache(key);
+    if (cached != null) {
+      logger.debug("cache hit for " + obj + " -> "+ key);
+      return cached;
+    }
+    logger.debug("cache miss for " + obj + " -> "+ key);
+    if (valueLoader != null) {
+      byte[] value=valueLoader.get();
+      if (value != null) {
+        putCache(key,value);
+      }
+      return value;
+    }
+  }
+  finally {
+    unlock();
+  }
+  return null;
+}
