@@ -1,6 +1,9 @@
 {
   String jarFilename=getClass().getSimpleName() + "/" + "some.jar";
   when(pluginRepository.getPluginInfos()).thenReturn(of(new PluginInfo("plugKey").setName("plugName").setDescription("desc_it").setVersion(Version.create("1.0")).setLicense("license_hey").setOrganizationName("org_name").setOrganizationUrl("org_url").setHomepageUrl("homepage_url").setIssueTrackerUrl("issueTracker_url").setImplementationBuild("sou_rev_sha1").setJarFile(new File(getClass().getResource(jarFilename).toURI()))));
+  UpdateCenter updateCenter=mock(UpdateCenter.class);
+  when(updateCenterMatrixFactory.getUpdateCenter(false)).thenReturn(Optional.of(updateCenter));
+  when(updateCenter.findAllCompatiblePlugins()).thenReturn(Arrays.asList(new Plugin("plugKey").setCategory("cat_1")));
   underTest.handle(request,response);
-  assertJson(response.outputAsString()).isSimilarTo("{" + "  \"plugins\":" + "  ["+ "    {"+ "      \"key\": \"plugKey\","+ "      \"name\": \"plugName\","+ "      \"description\": \"desc_it\","+ "      \"version\": \"1.0\","+ "      \"license\": \"license_hey\","+ "      \"organizationName\": \"org_name\","+ "      \"organizationUrl\": \"org_url\","+ "      \"homepageUrl\": \"homepage_url\","+ "      \"issueTrackerUrl\": \"issueTracker_url\","+ "      \"implementationBuild\": \"sou_rev_sha1\""+ "    }"+ "  ]"+ "}");
+  assertJson(response.outputAsString()).isSimilarTo("{" + "  \"plugins\":" + "  ["+ "    {"+ "      \"key\": \"plugKey\","+ "      \"name\": \"plugName\","+ "      \"description\": \"desc_it\","+ "      \"version\": \"1.0\","+ "      \"category\":\"cat_1\","+ "      \"license\": \"license_hey\","+ "      \"organizationName\": \"org_name\","+ "      \"organizationUrl\": \"org_url\","+ "      \"homepageUrl\": \"homepage_url\","+ "      \"issueTrackerUrl\": \"issueTracker_url\","+ "      \"implementationBuild\": \"sou_rev_sha1\""+ "    }"+ "  ]"+ "}");
 }

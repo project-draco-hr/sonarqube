@@ -1,7 +1,9 @@
 {
   jsonWriter.beginObject();
-  UpdateCenter updateCenter=updateCenterFactory.getUpdateCenter(DO_NOT_FORCE_REFRESH);
+  Optional<UpdateCenter> updateCenter=updateCenterFactory.getUpdateCenter(DO_NOT_FORCE_REFRESH);
   writeUpgrades(jsonWriter,updateCenter);
-  jsonWriter.propDateTime(PROPERTY_UPDATE_CENTER_REFRESH,updateCenter.getDate());
+  if (updateCenter.isPresent()) {
+    jsonWriter.propDateTime(PROPERTY_UPDATE_CENTER_REFRESH,updateCenter.get().getDate());
+  }
   jsonWriter.endObject();
 }

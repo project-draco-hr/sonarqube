@@ -1,12 +1,15 @@
 {
-  for (  Release release : updateCenterMatrixFactory.getUpdateCenter(true).findInstallablePlugins(pluginKey,version)) {
-    try {
-      downloadRelease(release);
-    }
- catch (    Exception e) {
-      String message=String.format("Fail to download the plugin (%s, version %s) from %s (error is : %s)",release.getArtifact().getKey(),release.getVersion().getName(),release.getDownloadUrl(),e.getMessage());
-      LOG.debug(message,e);
-      throw new SonarException(message,e);
+  Optional<UpdateCenter> updateCenter=updateCenterMatrixFactory.getUpdateCenter(true);
+  if (updateCenter.isPresent()) {
+    for (    Release release : updateCenter.get().findInstallablePlugins(pluginKey,version)) {
+      try {
+        downloadRelease(release);
+      }
+ catch (      Exception e) {
+        String message=String.format("Fail to download the plugin (%s, version %s) from %s (error is : %s)",release.getArtifact().getKey(),release.getVersion().getName(),release.getDownloadUrl(),e.getMessage());
+        LOG.debug(message,e);
+        throw new SonarException(message,e);
+      }
     }
   }
 }
