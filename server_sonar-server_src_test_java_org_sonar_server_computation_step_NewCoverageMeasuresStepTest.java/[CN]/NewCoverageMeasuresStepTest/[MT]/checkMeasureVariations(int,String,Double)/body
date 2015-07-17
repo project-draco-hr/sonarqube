@@ -1,0 +1,20 @@
+{
+  Optional<Measure> measure=measureRepository.getNewRawMeasure(fileRef,metricKey);
+  if (measure.isPresent()) {
+    MeasureVariations measureVariations=measure.get().getVariations();
+    for (int i=0; i < expectedVariations.length - 1; i++) {
+      Double expectedVariation=expectedVariations[i];
+      int period=i + 1;
+      if (expectedVariation != null) {
+        assertThat(measureVariations.hasVariation(period)).isTrue();
+        assertThat(measureVariations.getVariation(period)).isEqualTo(expectedVariation,DEFAULT_OFFSET);
+      }
+ else {
+        assertThat(measureVariations.hasVariation(period)).isFalse();
+      }
+    }
+  }
+ else {
+    fail(String.format("No measure on metric '%s' for component '%s'",metricKey,fileRef));
+  }
+}

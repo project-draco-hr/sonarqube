@@ -1,3 +1,6 @@
 {
-  assertThat(toEntries(measureRepository.getNewRawMeasures(componentRef))).containsOnly(MeasureRepoEntry.entryOf(DEVELOPMENT_COST_KEY,newMeasureBuilder().create(Long.toString(expectedDevCost))),MeasureRepoEntry.entryOf(SQALE_DEBT_RATIO_KEY,newMeasureBuilder().create(expectedDebtRatio * 100.0)),MeasureRepoEntry.entryOf(SQALE_RATING_KEY,createSqaleRatingMeasure(expectedRating)));
+  assertThat(measureRepository.getNewRawMeasure(componentRef,DEVELOPMENT_COST_KEY).get().getStringValue()).isEqualTo(Long.toString(expectedDevCost));
+  assertThat(measureRepository.getNewRawMeasure(componentRef,SQALE_DEBT_RATIO_KEY).get().getDoubleValue()).isEqualTo(expectedDebtRatio * 100d,Offset.offset(0.1d));
+  assertThat(measureRepository.getNewRawMeasure(componentRef,SQALE_RATING_KEY).get().getIntValue()).isEqualTo(expectedRating.getIndex());
+  assertThat(measureRepository.getNewRawMeasure(componentRef,SQALE_RATING_KEY).get().getData()).isEqualTo(expectedRating.name());
 }
