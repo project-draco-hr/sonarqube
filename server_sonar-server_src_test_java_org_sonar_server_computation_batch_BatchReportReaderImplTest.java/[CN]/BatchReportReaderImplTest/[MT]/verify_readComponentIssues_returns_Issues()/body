@@ -1,6 +1,7 @@
 {
   writer.writeComponentIssues(COMPONENT_REF,of(ISSUE));
-  List<BatchReport.Issue> res=underTest.readComponentIssues(COMPONENT_REF);
-  assertThat(res).hasSize(1);
-  assertThat(res.get(0)).isEqualTo(ISSUE);
-}
+  try (CloseableIterator<BatchReport.Issue> res=underTest.readComponentIssues(COMPONENT_REF)){
+    assertThat(res.next()).isEqualTo(ISSUE);
+    assertThat(res.hasNext()).isFalse();
+  }
+ }

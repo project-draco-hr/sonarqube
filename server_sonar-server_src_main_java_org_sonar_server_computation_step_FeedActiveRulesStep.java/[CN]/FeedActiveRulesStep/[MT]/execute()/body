@@ -1,4 +1,10 @@
 {
-  Collection<String> keys=batchReportReader.readMetadata().getActiveRuleKeyList();
-  activeRulesHolder.set(from(keys).transform(stringToRuleKey()).transform(ToActiveRule.INSTANCE).toList());
+  List<ActiveRule> activeRules=new ArrayList<>();
+  try (CloseableIterator<BatchReport.ActiveRule> batchActiveRules=batchReportReader.readActiveRules()){
+    while (batchActiveRules.hasNext()) {
+      BatchReport.ActiveRule batchActiveRule=batchActiveRules.next();
+      activeRules.add(convert(batchActiveRule));
+    }
+  }
+   activeRulesHolder.set(activeRules);
 }

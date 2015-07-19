@@ -2,14 +2,9 @@
   Optional<Measure> coverageMeasure=measureRepository.getRawMeasure(file,coverageMetric);
   if (!file.getFileAttributes().isUnitTest() && coverageMeasure.isPresent()) {
     double coverage=coverageMeasure.get().getDoubleValue();
-    double minimumCoverage=65.0;
+    double minimumCoverage=getMinDensityParam(activeRule,minPropertyKey);
     if (coverage < minimumCoverage) {
-      Optional<Measure> uncoveredMeasure=measureRepository.getRawMeasure(file,uncoveredMetric);
-      Optional<Measure> toCoverMeasure=measureRepository.getRawMeasure(file,toCoverMetric);
-      double uncovered=uncoveredMeasure.isPresent() ? uncoveredMeasure.get().getDoubleValue() : 0.0;
-      double toCover=toCoverMeasure.isPresent() ? toCoverMeasure.get().getDoubleValue() : 0.0;
-      int effortToFix=(int)Math.ceil((toCover * minimumCoverage / 100) - (toCover - uncovered));
-      return new CommonRuleIssue(effortToFix,formatMessage(effortToFix,minimumCoverage));
+      return generateIssue(file,minimumCoverage);
     }
   }
   return null;

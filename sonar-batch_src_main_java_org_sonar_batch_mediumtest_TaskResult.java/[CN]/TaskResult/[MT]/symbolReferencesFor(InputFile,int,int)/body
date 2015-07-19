@@ -1,13 +1,12 @@
 {
   int ref=reportComponents.get(((DefaultInputFile)file).key()).getRef();
-  List<Symbol> symbols=getReportReader().readComponentSymbols(ref);
-  if (symbols.isEmpty()) {
-    return Collections.emptyList();
-  }
-  for (  Symbol symbol : symbols) {
-    if (symbol.getDeclaration().getStartLine() == symbolStartLine && symbol.getDeclaration().getStartOffset() == symbolStartLineOffset) {
-      return symbol.getReferenceList();
+  try (CloseableIterator<Symbol> symbols=getReportReader().readComponentSymbols(ref)){
+    while (symbols.hasNext()) {
+      Symbol symbol=symbols.next();
+      if (symbol.getDeclaration().getStartLine() == symbolStartLine && symbol.getDeclaration().getStartOffset() == symbolStartLineOffset) {
+        return symbol.getReferenceList();
+      }
     }
   }
-  return Collections.emptyList();
+   return Collections.emptyList();
 }

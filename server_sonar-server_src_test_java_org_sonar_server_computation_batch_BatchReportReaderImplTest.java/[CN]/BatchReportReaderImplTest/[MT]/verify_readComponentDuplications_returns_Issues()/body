@@ -1,6 +1,7 @@
 {
   writer.writeComponentDuplications(COMPONENT_REF,of(DUPLICATION));
-  List<BatchReport.Duplication> res=underTest.readComponentDuplications(COMPONENT_REF);
-  assertThat(res).hasSize(1);
-  assertThat(res.get(0)).isEqualTo(DUPLICATION);
-}
+  try (CloseableIterator<BatchReport.Duplication> res=underTest.readComponentDuplications(COMPONENT_REF)){
+    assertThat(res.next()).isEqualTo(DUPLICATION);
+    assertThat(res.hasNext()).isFalse();
+  }
+ }

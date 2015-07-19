@@ -1,0 +1,19 @@
+{
+  File outputDir=temp.newFolder();
+  BatchReportWriter writer=new BatchReportWriter(outputDir);
+  NewActiveRule ar=new ActiveRulesBuilder().create(RuleKey.of("java","S001")).setSeverity("BLOCKER").setParam("p1","v1");
+  ActiveRules activeRules=new DefaultActiveRules(Arrays.asList(ar));
+  ActiveRulesPublisher underTest=new ActiveRulesPublisher(activeRules);
+  underTest.publish(writer);
+  BatchReportReader reader=new BatchReportReader(outputDir);
+  try (CloseableIterator<BatchReport.ActiveRule> readIt=reader.readActiveRules()){
+    BatchReport.ActiveRule reportAr=readIt.next();
+    assertThat(reportAr.getRuleRepository()).isEqualTo("java");
+    assertThat(reportAr.getRuleKey()).isEqualTo("S001");
+    assertThat(reportAr.getSeverity()).isEqualTo(Constants.Severity.BLOCKER);
+    assertThat(reportAr.getParamCount()).isEqualTo(1);
+    assertThat(reportAr.getParam(0).getKey()).isEqualTo("p1");
+    assertThat(reportAr.getParam(0).getValue()).isEqualTo("v1");
+    assertThat(readIt.hasNext()).isFalse();
+  }
+ }

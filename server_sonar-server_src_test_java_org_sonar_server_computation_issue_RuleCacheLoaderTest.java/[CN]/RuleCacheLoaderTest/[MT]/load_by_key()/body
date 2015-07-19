@@ -1,14 +1,10 @@
 {
-  BatchReport.Metadata metadata=BatchReport.Metadata.newBuilder().addAllActiveRuleKey(asList("java:JAV01")).build();
-  reportReader.setMetadata(metadata);
   dbTester.prepareDbUnit(getClass(),"shared.xml");
   DbClient dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),new RuleDao(mock(System2.class)));
-  RuleCacheLoader loader=new RuleCacheLoader(dbClient,reportReader);
+  RuleCacheLoader loader=new RuleCacheLoader(dbClient);
   Rule javaRule=loader.load(RuleKey.of("java","JAV01"));
   assertThat(javaRule.getName()).isEqualTo("Java One");
-  assertThat(javaRule.isActivated()).isTrue();
   Rule jsRule=loader.load(RuleKey.of("js","JS01"));
   assertThat(jsRule.getName()).isEqualTo("JS One");
-  assertThat(jsRule.isActivated()).isFalse();
   assertThat(loader.load(RuleKey.of("java","MISSING"))).isNull();
 }

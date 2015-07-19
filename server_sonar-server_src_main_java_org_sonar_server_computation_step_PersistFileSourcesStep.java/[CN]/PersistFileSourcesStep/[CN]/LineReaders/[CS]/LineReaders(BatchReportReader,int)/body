@@ -1,24 +1,18 @@
 {
-  CloseableIterator<BatchReport.Coverage> coverageReportIterator=reportReader.readComponentCoverage(componentRef);
+  CloseableIterator<BatchReport.Coverage> coverageIt=reportReader.readComponentCoverage(componentRef);
+  closeables.add(coverageIt);
+  readers.add(new CoverageLineReader(coverageIt));
   BatchReport.Changesets scmReport=reportReader.readChangesets(componentRef);
-  CloseableIterator<BatchReport.SyntaxHighlighting> highlightingIterator=reportReader.readComponentSyntaxHighlighting(componentRef);
-  List<BatchReport.Symbols.Symbol> symbols=reportReader.readComponentSymbols(componentRef);
-  List<BatchReport.Duplication> duplications=reportReader.readComponentDuplications(componentRef);
-  if (coverageReportIterator != null) {
-    iterators.add(coverageReportIterator);
-    readers.add(new CoverageLineReader(coverageReportIterator));
-  }
   if (scmReport != null) {
     readers.add(new ScmLineReader(scmReport));
   }
-  if (highlightingIterator != null) {
-    iterators.add(highlightingIterator);
-    readers.add(new HighlightingLineReader(highlightingIterator));
-  }
-  if (!duplications.isEmpty()) {
-    readers.add(new DuplicationLineReader(duplications));
-  }
-  if (!symbols.isEmpty()) {
-    readers.add(new SymbolsLineReader(symbols));
-  }
+  CloseableIterator<BatchReport.SyntaxHighlighting> highlightingIt=reportReader.readComponentSyntaxHighlighting(componentRef);
+  closeables.add(highlightingIt);
+  readers.add(new HighlightingLineReader(highlightingIt));
+  CloseableIterator<BatchReport.Symbol> symbolsIt=reportReader.readComponentSymbols(componentRef);
+  closeables.add(symbolsIt);
+  readers.add(new SymbolsLineReader(symbolsIt));
+  CloseableIterator<BatchReport.Duplication> duplicationsIt=reportReader.readComponentDuplications(componentRef);
+  closeables.add(duplicationsIt);
+  readers.add(new DuplicationLineReader(duplicationsIt));
 }

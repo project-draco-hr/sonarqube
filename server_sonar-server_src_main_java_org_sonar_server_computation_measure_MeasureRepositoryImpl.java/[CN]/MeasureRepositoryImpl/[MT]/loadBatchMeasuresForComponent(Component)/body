@@ -2,12 +2,15 @@
   if (loadedComponents.contains(component.getRef())) {
     return;
   }
-  for (  BatchReport.Measure batchMeasure : reportReader.readComponentMeasures(component.getRef())) {
-    String metricKey=batchMeasure.getMetricKey();
-    if (reportMetricValidator.validate(metricKey)) {
-      Metric metric=metricRepository.getByKey(metricKey);
-      addLocal(component,metric,batchMeasureToMeasure.toMeasure(batchMeasure,metric).get(),OverridePolicy.DO_NOT_OVERRIDE);
+  try (CloseableIterator<BatchReport.Measure> readIt=reportReader.readComponentMeasures(component.getRef())){
+    while (readIt.hasNext()) {
+      BatchReport.Measure batchMeasure=readIt.next();
+      String metricKey=batchMeasure.getMetricKey();
+      if (reportMetricValidator.validate(metricKey)) {
+        Metric metric=metricRepository.getByKey(metricKey);
+        addLocal(component,metric,batchMeasureToMeasure.toMeasure(batchMeasure,metric).get(),OverridePolicy.DO_NOT_OVERRIDE);
+      }
     }
   }
-  loadedComponents.add(component.getRef());
+   loadedComponents.add(component.getRef());
 }

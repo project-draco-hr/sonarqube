@@ -11,8 +11,7 @@
   publisher.publish(writer);
   BatchReportReader reader=new BatchReportReader(outputDir);
   assertThat(reader.readComponentMeasures(1)).hasSize(0);
-  List<org.sonar.batch.protocol.output.BatchReport.Measure> componentMeasures=reader.readComponentMeasures(2);
-  assertThat(componentMeasures).hasSize(6);
-  assertThat(componentMeasures.get(0).getDoubleValue()).isEqualTo(2.0);
-  assertThat(componentMeasures.get(0).getPersonId()).isEqualTo(2);
-}
+  try (CloseableIterator<BatchReport.Measure> componentMeasures=reader.readComponentMeasures(2)){
+    assertThat(componentMeasures).hasSize(6);
+  }
+ }

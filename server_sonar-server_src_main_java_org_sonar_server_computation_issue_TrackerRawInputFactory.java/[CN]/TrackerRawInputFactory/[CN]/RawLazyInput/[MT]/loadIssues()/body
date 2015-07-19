@@ -1,14 +1,13 @@
 {
-  List<BatchReport.Issue> reportIssues=reportReader.readComponentIssues(component.getRef());
   List<DefaultIssue> result=new ArrayList<>();
   for (  DefaultIssue commonRuleIssue : commonRuleEngine.process(component)) {
     result.add(init(commonRuleIssue));
   }
-  if (!reportIssues.isEmpty()) {
-    LineHashSequence lineHashSeq=getLineHashSequence();
-    for (    BatchReport.Issue reportIssue : reportIssues) {
+  try (CloseableIterator<BatchReport.Issue> reportIssues=reportReader.readComponentIssues(component.getRef())){
+    while (reportIssues.hasNext()) {
+      BatchReport.Issue reportIssue=reportIssues.next();
       if (isIssueOnUnsupportedCommonRule(reportIssue)) {
-        DefaultIssue issue=toIssue(lineHashSeq,reportIssue);
+        DefaultIssue issue=toIssue(getLineHashSequence(),reportIssue);
         result.add(issue);
       }
  else {
@@ -16,5 +15,5 @@
       }
     }
   }
-  return result;
+   return result;
 }
