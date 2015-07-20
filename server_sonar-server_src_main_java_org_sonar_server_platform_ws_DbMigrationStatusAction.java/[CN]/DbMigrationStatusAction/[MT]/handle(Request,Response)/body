@@ -1,8 +1,5 @@
 {
   Integer currentVersion=databaseVersion.getVersion();
-  if (currentVersion == null) {
-    throw new IllegalStateException("Version can not be retrieved from Database. Database is either blank or corrupted");
-  }
   JsonWriter json=response.newJsonWriter();
   try {
     if (currentVersion >= DatabaseVersion.LAST_VERSION) {
@@ -19,9 +16,8 @@ case SUCCEEDED:
         write(json,databaseMigration);
       break;
 case NONE:
-    databaseMigration.startIt();
-  writeJustStartedResponse(json,databaseMigration);
-break;
+    writeMigrationNeededResponse(json);
+  break;
 default :
 throw new IllegalArgumentException(UNSUPPORTED_DATABASE_MIGRATION_STATUS);
 }
