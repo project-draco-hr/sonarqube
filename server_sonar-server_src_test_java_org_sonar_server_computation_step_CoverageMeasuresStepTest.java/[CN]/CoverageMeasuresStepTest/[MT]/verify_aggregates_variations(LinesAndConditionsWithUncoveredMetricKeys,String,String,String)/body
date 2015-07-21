@@ -1,23 +1,12 @@
 {
   measureRepository.addRawMeasure(FILE_1_REF,metricKeys.getLines(),measureWithVariation(3000L,2000L)).addRawMeasure(FILE_1_REF,metricKeys.getConditions(),measureWithVariation(300L,400L)).addRawMeasure(FILE_1_REF,metricKeys.getUncoveredLines(),measureWithVariation(30L,200L)).addRawMeasure(FILE_1_REF,metricKeys.getUncoveredConditions(),measureWithVariation(9L,16L)).addRawMeasure(FILE_2_REF,metricKeys.getLines(),measureWithVariation(2000L,3000L)).addRawMeasure(FILE_2_REF,metricKeys.getConditions(),measureWithVariation(400L,300L)).addRawMeasure(FILE_2_REF,metricKeys.getUncoveredLines(),measureWithVariation(200L,30L)).addRawMeasure(FILE_2_REF,metricKeys.getUncoveredConditions(),measureWithVariation(16L,9L)).addRawMeasure(UNIT_TEST_FILE_REF,metricKeys.getLines(),measureWithVariation(1000L,2000L)).addRawMeasure(UNIT_TEST_FILE_REF,metricKeys.getConditions(),measureWithVariation(100L,400L)).addRawMeasure(UNIT_TEST_FILE_REF,metricKeys.getUncoveredLines(),measureWithVariation(10L,200L)).addRawMeasure(UNIT_TEST_FILE_REF,metricKeys.getUncoveredConditions(),measureWithVariation(3L,16L));
   underTest.execute();
-  checkMeasureVariations(FILE_1_REF,codeCoverageKey,null,98.8,null,null,91d);
-  checkMeasureVariations(FILE_1_REF,lineCoverageKey,null,99d,null,null,90d);
-  checkMeasureVariations(FILE_1_REF,branchCoverageKey,null,97d,null,null,96d);
-  checkMeasureVariations(FILE_2_REF,codeCoverageKey,null,91d,null,null,98.8d);
-  checkMeasureVariations(FILE_2_REF,lineCoverageKey,null,90d,null,null,99d);
-  checkMeasureVariations(FILE_2_REF,branchCoverageKey,null,96d,null,null,97d);
-  assertThat(measureRepository.getAddedRawMeasures(UNIT_TEST_FILE_REF)).isEmpty();
-  checkMeasureVariations(DIRECTORY_REF,codeCoverageKey,null,95.5d,null,null,95.5d);
-  checkMeasureVariations(DIRECTORY_REF,lineCoverageKey,null,95.4d,null,null,95.4d);
-  checkMeasureVariations(DIRECTORY_REF,branchCoverageKey,null,96.4d,null,null,96.4d);
-  checkMeasureVariations(SUB_MODULE_REF,codeCoverageKey,null,95.5d,null,null,95.5d);
-  checkMeasureVariations(SUB_MODULE_REF,lineCoverageKey,null,95.4d,null,null,95.4d);
-  checkMeasureVariations(SUB_MODULE_REF,branchCoverageKey,null,96.4d,null,null,96.4d);
-  checkMeasureVariations(MODULE_REF,codeCoverageKey,null,95.5d,null,null,95.5d);
-  checkMeasureVariations(MODULE_REF,lineCoverageKey,null,95.4d,null,null,95.4d);
-  checkMeasureVariations(MODULE_REF,branchCoverageKey,null,96.4d,null,null,96.4d);
-  checkMeasureVariations(ROOT_REF,codeCoverageKey,null,95.5d,null,null,95.5d);
-  checkMeasureVariations(ROOT_REF,lineCoverageKey,null,95.4d,null,null,95.4d);
-  checkMeasureVariations(ROOT_REF,branchCoverageKey,null,96.4d,null,null,96.4d);
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(FILE_1_REF))).containsOnly(entryOf(codeCoverageKey,measureWithVariation(98.8d,91d)),entryOf(lineCoverageKey,measureWithVariation(99d,90d)),entryOf(branchCoverageKey,measureWithVariation(97d,96d)));
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(FILE_2_REF))).containsOnly(entryOf(codeCoverageKey,measureWithVariation(91d,98.8d)),entryOf(lineCoverageKey,measureWithVariation(90d,99d)),entryOf(branchCoverageKey,measureWithVariation(96d,97d)));
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(UNIT_TEST_FILE_REF))).isEmpty();
+  MeasureRepoEntry[] nonFileRepoEntries={entryOf(codeCoverageKey,measureWithVariation(95.5d,95.5d)),entryOf(lineCoverageKey,measureWithVariation(95.4d,95.4d)),entryOf(branchCoverageKey,measureWithVariation(96.4d,96.4d))};
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(DIRECTORY_REF))).containsOnly(nonFileRepoEntries);
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(SUB_MODULE_REF))).containsOnly(nonFileRepoEntries);
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(MODULE_REF))).containsOnly(nonFileRepoEntries);
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(ROOT_REF))).containsOnly(nonFileRepoEntries);
 }
