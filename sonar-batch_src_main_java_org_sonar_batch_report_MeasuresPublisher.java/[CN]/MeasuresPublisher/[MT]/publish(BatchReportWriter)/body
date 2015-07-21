@@ -1,13 +1,6 @@
 {
   for (  final BatchComponent resource : resourceCache.all()) {
     Iterable<Measure> batchMeasures=measureCache.byResource(resource.resource());
-    batchMeasures=Iterables.filter(batchMeasures,new Predicate<Measure>(){
-      @Override public boolean apply(      Measure input){
-        input.setMetric(metricFinder.findByKey(input.getMetricKey()));
-        return shouldPersistMeasure(resource.resource(),input);
-      }
-    }
-);
     Iterable<org.sonar.batch.protocol.output.BatchReport.Measure> reportMeasures=Iterables.transform(batchMeasures,new Function<Measure,BatchReport.Measure>(){
       private final BatchReport.Measure.Builder builder=BatchReport.Measure.newBuilder();
       @Override public BatchReport.Measure apply(      Measure input){
