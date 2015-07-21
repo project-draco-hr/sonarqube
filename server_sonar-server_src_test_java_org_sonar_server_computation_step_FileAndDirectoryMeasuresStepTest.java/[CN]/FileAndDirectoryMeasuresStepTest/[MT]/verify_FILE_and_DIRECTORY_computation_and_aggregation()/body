@@ -1,0 +1,13 @@
+{
+  treeRootHolder.setRoot(builder(PROJECT,ROOT_REF).addChildren(builder(MODULE,MODULE_REF).addChildren(builder(MODULE,SUB_MODULE_REF).addChildren(builder(DIRECTORY,DIRECTORY_1_REF).addChildren(builder(FILE,FILE_1_REF).build(),builder(FILE,FILE_2_REF).build()).build(),builder(DIRECTORY,DIRECTORY_2_REF).addChildren(builder(FILE,FILE_3_REF).build(),builder(FILE,UNIT_TEST_REF).setFileAttributes(new FileAttributes(true,LANGUAGE_KEY_DOES_NOT_MATTER_HERE)).build()).build()).build()).build()).build());
+  underTest.execute();
+  verifyMeasuresOnFile(FILE_1_REF,1);
+  verifyMeasuresOnFile(FILE_2_REF,1);
+  verifyMeasuresOnFile(FILE_3_REF,1);
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(UNIT_TEST_REF))).isEmpty();
+  verifyMeasuresOnOtherComponent(DIRECTORY_1_REF,2,1);
+  verifyMeasuresOnOtherComponent(DIRECTORY_2_REF,1,1);
+  verifyMeasuresOnOtherComponent(SUB_MODULE_REF,3,2);
+  verifyMeasuresOnOtherComponent(MODULE_REF,3,2);
+  verifyMeasuresOnOtherComponent(ROOT_REF,3,2);
+}
