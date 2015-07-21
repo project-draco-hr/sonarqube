@@ -1,0 +1,14 @@
+{
+  treeRootHolder.setRoot(MULTIPLE_FILES_TREE);
+  measureRepository.addRawMeasure(FILE_1_REF,metricKeys.getLines(),createMeasure(3000d,2000d)).addRawMeasure(FILE_1_REF,metricKeys.getConditions(),createMeasure(300d,400d)).addRawMeasure(FILE_1_REF,metricKeys.getUncoveredLines(),createMeasure(30d,200d)).addRawMeasure(FILE_1_REF,metricKeys.getUncoveredConditions(),createMeasure(9d,16d)).addRawMeasure(FILE_2_REF,metricKeys.getLines(),createMeasure(2000d,3000d)).addRawMeasure(FILE_2_REF,metricKeys.getConditions(),createMeasure(400d,300d)).addRawMeasure(FILE_2_REF,metricKeys.getUncoveredLines(),createMeasure(200d,30d)).addRawMeasure(FILE_2_REF,metricKeys.getUncoveredConditions(),createMeasure(16d,9d));
+  underTest.execute();
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(FILE_1_REF))).containsOnly(entryOf(codeCoverageKey,createMeasure(98.8d,91d)),entryOf(lineCoverageKey,createMeasure(99d,90d)),entryOf(branchCoverageKey,createMeasure(97d,96d)));
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(FILE_2_REF))).containsOnly(entryOf(codeCoverageKey,createMeasure(91d,98.8d)),entryOf(lineCoverageKey,createMeasure(90d,99d)),entryOf(branchCoverageKey,createMeasure(96d,97d)));
+  assertThat(measureRepository.getAddedRawMeasures(FILE_3_REF)).isEmpty();
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(DIRECTORY_1_REF))).containsOnly(entryOf(codeCoverageKey,createMeasure(98.8d,91d)),entryOf(lineCoverageKey,createMeasure(99d,90d)),entryOf(branchCoverageKey,createMeasure(97d,96d)));
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(DIRECTORY_2_REF))).containsOnly(entryOf(codeCoverageKey,createMeasure(91d,98.8d)),entryOf(lineCoverageKey,createMeasure(90d,99d)),entryOf(branchCoverageKey,createMeasure(96d,97d)));
+  MeasureRepoEntry[] modulesAndProjectEntries={entryOf(codeCoverageKey,createMeasure(95.5d,95.5d)),entryOf(lineCoverageKey,createMeasure(95.4d,95.4d)),entryOf(branchCoverageKey,createMeasure(96.4d,96.4d))};
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(SUB_MODULE_REF))).containsOnly(modulesAndProjectEntries);
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(MODULE_REF))).containsOnly(modulesAndProjectEntries);
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(ROOT_REF))).containsOnly(modulesAndProjectEntries);
+}
