@@ -1,12 +1,12 @@
 {
-  DefaultIssue issue=new DefaultIssue().setKey("ABCDE").setStatus(Issue.STATUS_OPEN).setRuleKey(RuleKey.of(RuleKey.MANUAL_REPOSITORY_KEY,"Performance"));
+  DefaultIssue issue=new DefaultIssue().setKey("ABCDE").setStatus(Issue.STATUS_OPEN).setRuleKey(RuleKey.of(MANUAL_REPOSITORY_KEY,"Performance"));
   workflow.start();
   assertThat(workflow.outTransitions(issue)).containsOnly(Transition.create("confirm","OPEN","CONFIRMED"),Transition.create("resolve","OPEN","RESOLVED"),Transition.create("falsepositive","OPEN","RESOLVED"),Transition.create("wontfix","OPEN","RESOLVED"));
   workflow.doTransition(issue,"resolve",mock(IssueChangeContext.class));
-  Assertions.assertThat(issue.resolution()).isEqualTo("FIXED");
-  Assertions.assertThat(issue.status()).isEqualTo("RESOLVED");
+  assertThat(issue.resolution()).isEqualTo(RESOLUTION_FIXED);
+  assertThat(issue.status()).isEqualTo("RESOLVED");
   assertThat(workflow.outTransitions(issue)).containsOnly(Transition.create("reopen","RESOLVED","REOPENED"));
   workflow.doAutomaticTransition(issue,mock(IssueChangeContext.class));
-  Assertions.assertThat(issue.resolution()).isEqualTo("FIXED");
-  Assertions.assertThat(issue.status()).isEqualTo("CLOSED");
+  assertThat(issue.resolution()).isEqualTo(RESOLUTION_FIXED);
+  assertThat(issue.status()).isEqualTo(STATUS_CLOSED);
 }
