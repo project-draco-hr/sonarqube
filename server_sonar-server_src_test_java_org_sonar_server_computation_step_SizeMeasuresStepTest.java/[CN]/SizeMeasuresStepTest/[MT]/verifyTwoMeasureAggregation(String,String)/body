@@ -1,0 +1,17 @@
+{
+  measureRepository.addRawMeasure(FILE_1_REF,metric1Key,newMeasureBuilder().create(1));
+  measureRepository.addRawMeasure(FILE_1_REF,metric2Key,newMeasureBuilder().create(10));
+  measureRepository.addRawMeasure(FILE_2_REF,metric1Key,newMeasureBuilder().create(6));
+  measureRepository.addRawMeasure(UNIT_TEST_REF,metric2Key,newMeasureBuilder().create(90));
+  underTest.execute();
+  verifyMeasuresOnFile(FILE_1_REF,1);
+  verifyMeasuresOnFile(FILE_2_REF,1);
+  verifyMeasuresOnFile(FILE_3_REF,1);
+  verifyNoMeasure(UNIT_TEST_REF);
+  verifyMeasuresOnOtherComponent(DIRECTORY_1_REF,2,1,entryOf(metric1Key,newMeasureBuilder().create(7)),entryOf(metric2Key,newMeasureBuilder().create(10)));
+  verifyMeasuresOnOtherComponent(DIRECTORY_2_REF,1,1,entryOf(metric2Key,newMeasureBuilder().create(90)));
+  MeasureRepoEntry[] subModuleAndAboveEntries={entryOf(metric1Key,newMeasureBuilder().create(7)),entryOf(metric2Key,newMeasureBuilder().create(100))};
+  verifyMeasuresOnOtherComponent(SUB_MODULE_REF,3,2,subModuleAndAboveEntries);
+  verifyMeasuresOnOtherComponent(MODULE_REF,3,2,subModuleAndAboveEntries);
+  verifyMeasuresOnOtherComponent(ROOT_REF,3,2,subModuleAndAboveEntries);
+}
