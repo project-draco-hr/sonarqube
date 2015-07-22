@@ -1,15 +1,15 @@
 {
-  Table<String,String,FileSourceDb.Test.CoveredFile.Builder> nameToCoveredFiles=HashBasedTable.create();
+  Table<String,String,FileSources.Test.CoveredFile.Builder> nameToCoveredFiles=HashBasedTable.create();
   try (CloseableIterator<BatchReport.CoverageDetail> coverageIterator=reportReader.readCoverageDetails(testFileRef)){
     while (coverageIterator.hasNext()) {
       BatchReport.CoverageDetail batchCoverageDetail=coverageIterator.next();
       for (      BatchReport.CoverageDetail.CoveredFile batchCoveredFile : batchCoverageDetail.getCoveredFileList()) {
         String testName=batchCoverageDetail.getTestName();
         String mainFileUuid=getUuid(batchCoveredFile.getFileRef());
-        FileSourceDb.Test.CoveredFile.Builder existingDbCoveredFile=nameToCoveredFiles.get(testName,mainFileUuid);
+        FileSources.Test.CoveredFile.Builder existingDbCoveredFile=nameToCoveredFiles.get(testName,mainFileUuid);
         List<Integer> batchCoveredLines=batchCoveredFile.getCoveredLineList();
         if (existingDbCoveredFile == null) {
-          FileSourceDb.Test.CoveredFile.Builder dbCoveredFile=FileSourceDb.Test.CoveredFile.newBuilder().setFileUuid(getUuid(batchCoveredFile.getFileRef())).addAllCoveredLine(batchCoveredLines);
+          FileSources.Test.CoveredFile.Builder dbCoveredFile=FileSources.Test.CoveredFile.newBuilder().setFileUuid(getUuid(batchCoveredFile.getFileRef())).addAllCoveredLine(batchCoveredLines);
           nameToCoveredFiles.put(testName,mainFileUuid,dbCoveredFile);
         }
  else {

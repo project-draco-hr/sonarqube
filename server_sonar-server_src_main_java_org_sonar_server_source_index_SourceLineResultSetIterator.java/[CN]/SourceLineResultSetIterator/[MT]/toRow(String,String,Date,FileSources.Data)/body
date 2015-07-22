@@ -1,0 +1,88 @@
+{
+  Row result=new Row(projectUuid,fileUuid,updatedAt.getTime());
+  for (  FileSources.Line line : data.getLinesList()) {
+    ByteArrayOutputStream bytes=new ByteArrayOutputStream();
+    JsonWriter writer=JsonWriter.of(new OutputStreamWriter(bytes,StandardCharsets.UTF_8)).setSerializeNulls(true);
+    writer.beginObject();
+    writer.prop(SourceLineIndexDefinition.FIELD_PROJECT_UUID,projectUuid);
+    writer.prop(SourceLineIndexDefinition.FIELD_FILE_UUID,fileUuid);
+    writer.prop(SourceLineIndexDefinition.FIELD_LINE,line.getLine());
+    writer.prop(SourceLineIndexDefinition.FIELD_UPDATED_AT,EsUtils.formatDateTime(updatedAt));
+    writer.prop(SourceLineIndexDefinition.FIELD_SCM_REVISION,line.getScmRevision());
+    writer.prop(SourceLineIndexDefinition.FIELD_SCM_AUTHOR,line.getScmAuthor());
+    writer.prop(SourceLineIndexDefinition.FIELD_SCM_DATE,EsUtils.formatDateTime(line.hasScmDate() ? new Date(line.getScmDate()) : null));
+    if (line.hasUtLineHits()) {
+      writer.prop(SourceLineIndexDefinition.FIELD_UT_LINE_HITS,line.getUtLineHits());
+    }
+ else {
+      writer.name(SourceLineIndexDefinition.FIELD_UT_LINE_HITS).valueObject(null);
+    }
+    if (line.hasUtConditions()) {
+      writer.prop(SourceLineIndexDefinition.FIELD_UT_CONDITIONS,line.getUtConditions());
+    }
+ else {
+      writer.name(SourceLineIndexDefinition.FIELD_UT_CONDITIONS).valueObject(null);
+    }
+    if (line.hasUtCoveredConditions()) {
+      writer.prop(SourceLineIndexDefinition.FIELD_UT_COVERED_CONDITIONS,line.getUtCoveredConditions());
+    }
+ else {
+      writer.name(SourceLineIndexDefinition.FIELD_UT_COVERED_CONDITIONS).valueObject(null);
+    }
+    if (line.hasItLineHits()) {
+      writer.prop(SourceLineIndexDefinition.FIELD_IT_LINE_HITS,line.getItLineHits());
+    }
+ else {
+      writer.name(SourceLineIndexDefinition.FIELD_IT_LINE_HITS).valueObject(null);
+    }
+    if (line.hasItConditions()) {
+      writer.prop(SourceLineIndexDefinition.FIELD_IT_CONDITIONS,line.getItConditions());
+    }
+ else {
+      writer.name(SourceLineIndexDefinition.FIELD_IT_CONDITIONS).valueObject(null);
+    }
+    if (line.hasItCoveredConditions()) {
+      writer.prop(SourceLineIndexDefinition.FIELD_IT_COVERED_CONDITIONS,line.getItCoveredConditions());
+    }
+ else {
+      writer.name(SourceLineIndexDefinition.FIELD_IT_COVERED_CONDITIONS).valueObject(null);
+    }
+    if (line.hasOverallLineHits()) {
+      writer.prop(SourceLineIndexDefinition.FIELD_OVERALL_LINE_HITS,line.getOverallLineHits());
+    }
+ else {
+      writer.name(SourceLineIndexDefinition.FIELD_OVERALL_LINE_HITS).valueObject(null);
+    }
+    if (line.hasOverallConditions()) {
+      writer.prop(SourceLineIndexDefinition.FIELD_OVERALL_CONDITIONS,line.getOverallConditions());
+    }
+ else {
+      writer.name(SourceLineIndexDefinition.FIELD_OVERALL_CONDITIONS).valueObject(null);
+    }
+    if (line.hasOverallCoveredConditions()) {
+      writer.prop(SourceLineIndexDefinition.FIELD_OVERALL_COVERED_CONDITIONS,line.getOverallCoveredConditions());
+    }
+ else {
+      writer.name(SourceLineIndexDefinition.FIELD_OVERALL_COVERED_CONDITIONS).valueObject(null);
+    }
+    if (line.hasHighlighting()) {
+      writer.prop(SourceLineIndexDefinition.FIELD_HIGHLIGHTING,line.getHighlighting());
+    }
+ else {
+      writer.name(SourceLineIndexDefinition.FIELD_HIGHLIGHTING).valueObject(null);
+    }
+    if (line.hasSymbols()) {
+      writer.prop(SourceLineIndexDefinition.FIELD_SYMBOLS,line.getSymbols());
+    }
+ else {
+      writer.name(SourceLineIndexDefinition.FIELD_SYMBOLS).valueObject(null);
+    }
+    writer.name(SourceLineIndexDefinition.FIELD_DUPLICATIONS).valueObject(line.getDuplicationList());
+    writer.prop(SourceLineIndexDefinition.FIELD_SOURCE,line.hasSource() ? line.getSource() : null);
+    writer.endObject().close();
+    byte[] jsonDoc=bytes.toByteArray();
+    UpdateRequest updateRequest=new UpdateRequest(SourceLineIndexDefinition.INDEX,SourceLineIndexDefinition.TYPE,SourceLineIndexDefinition.docKey(fileUuid,line.getLine())).routing(projectUuid).doc(jsonDoc).upsert(jsonDoc);
+    result.getUpdateRequests().add(updateRequest);
+  }
+  return result;
+}
