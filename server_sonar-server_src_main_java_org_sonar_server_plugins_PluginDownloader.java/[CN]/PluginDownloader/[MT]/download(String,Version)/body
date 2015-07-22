@@ -1,7 +1,11 @@
 {
   Optional<UpdateCenter> updateCenter=updateCenterMatrixFactory.getUpdateCenter(true);
   if (updateCenter.isPresent()) {
-    for (    Release release : updateCenter.get().findInstallablePlugins(pluginKey,version)) {
+    List<Release> installablePlugins=updateCenter.get().findInstallablePlugins(pluginKey,version);
+    if (installablePlugins.isEmpty()) {
+      throw new BadRequestException(String.format("Error while downloading plugin '%s' with version '%s'. No compatible plugin found.",pluginKey,version.getName()));
+    }
+    for (    Release release : installablePlugins) {
       try {
         downloadRelease(release);
       }
