@@ -1,0 +1,11 @@
+{
+  SonarRunner analysis=newAnalysis();
+  analysis.setProperty("sonar.analysis.mode","preview");
+  String excludedPlugins=Joiner.on(",").join(DISABLED_PLUGINS_FOR_PREVIEW_MODE);
+  if (orchestrator.getServer().version().toString().startsWith("5.1.1")) {
+    excludedPlugins+=",groovy";
+    excludedPlugins+=",issueassign";
+  }
+  analysis.setProperty("sonar.preview.excludePlugins",excludedPlugins);
+  orchestrator.executeBuild(analysis);
+}

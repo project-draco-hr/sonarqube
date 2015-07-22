@@ -1,0 +1,13 @@
+{
+  Resource resource=getMeasureForComponentKey(filePathToKey(filePath),metricKeys);
+  errorCollector.checkThat("Measures " + Joiner.on(",").join(metricKeys) + " are set on file "+ filePath,resource,notNullValue());
+  if (resource != null) {
+    for (    String metricKey : metricKeys) {
+      Measure measure=resource.getMeasure(metricKey);
+      errorCollector.checkThat("Measure " + metricKey + " is set on file "+ filePath,measure,notNullValue());
+      if (measure != null && measure.getIntValue() != null) {
+        errorCollector.checkThat("Measure " + metricKey + " is positive on file "+ filePath,measure.getIntValue(),Matchers.greaterThanOrEqualTo(min));
+      }
+    }
+  }
+}

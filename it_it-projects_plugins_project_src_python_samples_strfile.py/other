@@ -1,0 +1,41 @@
+import struct, string, sys
+if (len(sys.argv) == 1):
+    print 'Usage: strfile.py <filename>'
+    sys.exit()
+LONG_SIZE = struct.calcsize('L')
+is_64_bit = (LONG_SIZE == 8)
+delimiter = '%'
+filename = sys.argv[1]
+input = open(filename, 'r')
+output = open((filename + '.dat'), 'w')
+output.seek((LONG_SIZE * 6))
+write_long(0)
+shortest = sys.maxint
+longest = 0
+numstr = 0
+quotation = ''
+while 1:
+    L = input.readline()
+    if (L == ''):
+        break
+    if (string.strip(L) != delimiter):
+        quotation = (quotation + L)
+        continue
+    if (quotation == ''):
+        continue
+    shortest = min(shortest, len(quotation))
+    longest = max(longest, len(quotation))
+    write_long(input.tell())
+    numstr = (numstr + 1)
+    quotation = ''
+assert (quotation == '')
+input.close()
+output.seek(0)
+write_long(1)
+write_long(numstr)
+write_long(longest)
+write_long(shortest)
+write_long(0)
+output.write((delimiter + ('\x00' * (LONG_SIZE - 1))))
+output.close()
+print ('"%s.dat" created\nThere were %i strings\nLongest string: %i bytes\nShortest string: %i bytes' % (filename, numstr, longest, shortest))
