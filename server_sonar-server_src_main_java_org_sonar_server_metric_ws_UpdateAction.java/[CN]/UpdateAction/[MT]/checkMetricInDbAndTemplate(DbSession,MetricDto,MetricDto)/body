@@ -1,12 +1,12 @@
 {
   if (!isMetricFoundInDb(metricInDb) || isMetricDisabled(metricInDb) || !isMetricCustom(metricInDb)) {
-    throw new ServerException(HttpURLConnection.HTTP_CONFLICT,String.format("No active custom metric has been found for id '%d'.",template.getId()));
+    throw new BadRequestException(String.format("No active custom metric has been found for id '%d'.",template.getId()));
   }
   checkNoOtherMetricWithTargetKey(dbSession,metricInDb,template);
   if (haveMetricTypeChanged(metricInDb,template)) {
     List<CustomMeasureDto> customMeasures=dbClient.customMeasureDao().selectByMetricId(dbSession,metricInDb.getId());
     if (haveAssociatedCustomMeasures(customMeasures)) {
-      throw new ServerException(HttpURLConnection.HTTP_CONFLICT,String.format("You're trying to change the type '%s' while there are associated custom measures.",metricInDb.getValueType()));
+      throw new BadRequestException(String.format("You're trying to change the type '%s' while there are associated custom measures.",metricInDb.getValueType()));
     }
   }
 }

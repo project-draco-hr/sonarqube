@@ -6,15 +6,15 @@
     return;
   }
   if (isMetricEnabled(metricInDb)) {
-    throw new ServerException(HttpURLConnection.HTTP_CONFLICT,"An active metric already exist with key: " + metricInDb.getKey());
+    throw new BadRequestException("An active metric already exist with key: " + metricInDb.getKey());
   }
   if (isMetricNonCustom(metricInDb)) {
-    throw new ServerException(HttpURLConnection.HTTP_CONFLICT,"An non custom metric already exist with key: " + metricInDb.getKey());
+    throw new BadRequestException("An non custom metric already exist with key: " + metricInDb.getKey());
   }
   if (hasMetricTypeChanged(metricInDb,template)) {
     List<CustomMeasureDto> customMeasures=dbClient.customMeasureDao().selectByMetricId(dbSession,metricInDb.getId());
     if (hasAssociatedCustomMeasures(customMeasures)) {
-      throw new ServerException(HttpURLConnection.HTTP_CONFLICT,String.format("You're trying to change the type '%s' while there are associated measures.",metricInDb.getValueType()));
+      throw new BadRequestException(String.format("You're trying to change the type '%s' while there are associated measures.",metricInDb.getValueType()));
     }
   }
 }
