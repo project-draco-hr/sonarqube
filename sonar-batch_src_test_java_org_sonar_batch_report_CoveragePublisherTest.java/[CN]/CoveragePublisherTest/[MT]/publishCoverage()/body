@@ -14,9 +14,9 @@
   File outputDir=temp.newFolder();
   BatchReportWriter writer=new BatchReportWriter(outputDir);
   publisher.publish(writer);
-  try (InputStream inputStream=FileUtils.openInputStream(new BatchReportReader(outputDir).readComponentCoverage(2))){
-    assertThat(BatchReport.Coverage.PARSER.parseDelimitedFrom(inputStream)).isEqualTo(Coverage.newBuilder().setLine(2).setUtHits(true).setItHits(false).build());
-    assertThat(BatchReport.Coverage.PARSER.parseDelimitedFrom(inputStream)).isEqualTo(Coverage.newBuilder().setLine(3).setUtHits(true).setItHits(false).setConditions(4).setUtCoveredConditions(2).setItCoveredConditions(1).setOverallCoveredConditions(2).build());
-    assertThat(BatchReport.Coverage.PARSER.parseDelimitedFrom(inputStream)).isEqualTo(Coverage.newBuilder().setLine(5).setUtHits(false).setItHits(true).build());
+  try (CloseableIterator<Coverage> it=new BatchReportReader(outputDir).readComponentCoverage(2)){
+    assertThat(it.next()).isEqualTo(Coverage.newBuilder().setLine(2).setUtHits(true).setItHits(false).build());
+    assertThat(it.next()).isEqualTo(Coverage.newBuilder().setLine(3).setUtHits(true).setItHits(false).setConditions(4).setUtCoveredConditions(2).setItCoveredConditions(1).setOverallCoveredConditions(2).build());
+    assertThat(it.next()).isEqualTo(Coverage.newBuilder().setLine(5).setUtHits(false).setItHits(true).build());
   }
  }
