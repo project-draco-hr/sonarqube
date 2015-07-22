@@ -1,9 +1,13 @@
 {
-  thrown.expect(IllegalArgumentException.class);
-  thrown.expectMessage("Measure on metric 'coverage' and component 'foo:src/Foo.php' has no value, but it's not allowed");
   Measure measure=new Measure<>(CoreMetrics.COVERAGE);
   when(measureCache.byResource(sampleFile)).thenReturn(Collections.singletonList(measure));
   File outputDir=temp.newFolder();
   BatchReportWriter writer=new BatchReportWriter(outputDir);
-  publisher.publish(writer);
+  try {
+    publisher.publish(writer);
+    fail();
+  }
+ catch (  RuntimeException e) {
+    assertThat(ExceptionUtils.getFullStackTrace(e)).contains("Measure on metric 'coverage' and component 'foo:src/Foo.php' has no value, but it's not allowed");
+  }
 }
