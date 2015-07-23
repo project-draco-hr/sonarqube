@@ -1,3 +1,7 @@
 {
   addMeasure(project,path.current());
+  Optional<Measure> qProfileMeasure=measureRepository.getRawMeasure(project,qProfilesMetric);
+  if (!qProfileMeasure.isPresent() || QPMeasureData.fromJson(qProfileMeasure.get().getData()).getProfiles().isEmpty()) {
+    throw MessageException.of(String.format("No quality profiles has been found on project '%s', you probably don't have any language plugin suitable for this analysis.",project.getKey()));
+  }
 }
