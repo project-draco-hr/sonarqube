@@ -8,7 +8,10 @@
   UserMembershipQuery query=UserMembershipQuery.builder().groupId(groupId).memberSearch(queryString).membership(getMembership(selected)).pageIndex(page).pageSize(pageSize).build();
   DbSession dbSession=dbClient.openSession(false);
   try {
-    dbClient.groupDao().selectById(dbSession,groupId);
+    GroupDto group=dbClient.groupDao().selectNullableById(dbSession,groupId);
+    if (group == null) {
+      throw new NotFoundException(String.format("Could not find user group with id '%s'",groupId));
+    }
     int total=dbClient.groupMembershipDao().countMembers(dbSession,query);
     Paging paging=Paging.create(pageSize,page,total);
     List<UserMembershipDto> users=dbClient.groupMembershipDao().selectMembers(dbSession,query,paging.offset(),paging.pageSize());
