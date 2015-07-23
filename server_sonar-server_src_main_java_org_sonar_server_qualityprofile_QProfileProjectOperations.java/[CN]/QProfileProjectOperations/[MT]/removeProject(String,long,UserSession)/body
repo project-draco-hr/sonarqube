@@ -1,9 +1,9 @@
 {
   DbSession session=db.openSession(false);
   try {
-    ComponentDto project=db.componentDao().selectNonNullById(session,projectId);
+    ComponentDto project=db.componentDao().selectOrFailById(session,projectId);
     checkPermission(userSession,project.key());
-    QualityProfileDto associatedProfile=db.qualityProfileDao().getByProjectAndLanguage(project.getKey(),language,session);
+    QualityProfileDto associatedProfile=db.qualityProfileDao().selectByProjectAndLanguage(session,project.getKey(),language);
     if (associatedProfile != null) {
       db.qualityProfileDao().deleteProjectProfileAssociation(project.uuid(),associatedProfile.getKey(),session);
       session.commit();

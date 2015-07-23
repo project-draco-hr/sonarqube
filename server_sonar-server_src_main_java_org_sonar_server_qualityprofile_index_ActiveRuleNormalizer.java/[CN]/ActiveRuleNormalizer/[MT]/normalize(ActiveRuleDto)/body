@@ -13,7 +13,7 @@
   newRule.put(ActiveRuleField.UPDATED_AT.field(),activeRuleDto.getUpdatedAt());
   DbSession session=db.openSession(false);
   try {
-    QualityProfileDto profile=db.qualityProfileDao().getById(activeRuleDto.getProfileId(),session);
+    QualityProfileDto profile=db.qualityProfileDao().selectById(session,activeRuleDto.getProfileId());
     if (profile == null) {
       throw new IllegalStateException("Profile is null : " + activeRuleDto.getProfileId());
     }
@@ -21,13 +21,13 @@
     String parentKey=null;
     Integer parentId=activeRuleDto.getParentId();
     if (parentId != null) {
-      ActiveRuleDto parentDto=db.activeRuleDao().getById(session,parentId);
+      ActiveRuleDto parentDto=db.activeRuleDao().selectById(session,parentId);
       if (parentDto != null) {
         parentKey=parentDto.getKey().toString();
       }
     }
     requests.add(new UpdateRequest().replicationType(ReplicationType.ASYNC).routing(key.ruleKey().toString()).id(activeRuleDto.getKey().toString()).parent(activeRuleDto.getKey().ruleKey().toString()).doc(newRule).upsert(getUpsertFor(ActiveRuleField.ALL_FIELDS,newRule)));
-    for (    ActiveRuleParamDto param : db.activeRuleDao().findParamsByActiveRuleKey(session,key)) {
+    for (    ActiveRuleParamDto param : db.activeRuleDao().selectParamsByActiveRuleKey(session,key)) {
       requests.addAll(normalizeNested(param,key));
     }
     newRule.put(ActiveRuleField.PARENT_KEY.field(),parentKey);

@@ -11,6 +11,6 @@
   when(durations.format(any(Locale.class),any(Duration.class),eq(Durations.DurationFormat.SHORT))).thenReturn("3h 2min");
   WsTester.TestRequest request=tester.newGetRequest("api/components","app").setParam("uuid",COMPONENT_UUID);
   request.execute().assertJson(getClass(),"app_with_measures.json");
-  verify(measureDao).findByComponentKeyAndMetricKeys(eq(session),eq(COMPONENT_KEY),measureKeysCaptor.capture());
+  verify(measureDao).selectByComponentKeyAndMetricKeys(eq(session),eq(COMPONENT_KEY),measureKeysCaptor.capture());
   assertThat(measureKeysCaptor.getValue()).contains(CoreMetrics.LINES_KEY,CoreMetrics.COVERAGE_KEY,CoreMetrics.DUPLICATED_LINES_DENSITY_KEY,CoreMetrics.TECHNICAL_DEBT_KEY);
 }

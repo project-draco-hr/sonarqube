@@ -1,10 +1,10 @@
 {
   DbSession dbSession=db.openSession(false);
   try {
-    QualityProfileDto fromProfile=db.qualityProfileDao().getNonNullByKey(dbSession,fromProfileKey);
+    QualityProfileDto fromProfile=db.qualityProfileDao().selectOrFailByKey(dbSession,fromProfileKey);
     QProfileName toProfileName=new QProfileName(fromProfile.getLanguage(),toName);
     verify(fromProfile,toProfileName);
-    QualityProfileDto toProfile=db.qualityProfileDao().getByNameAndLanguage(toProfileName.getName(),toProfileName.getLanguage(),dbSession);
+    QualityProfileDto toProfile=db.qualityProfileDao().selectByNameAndLanguage(toProfileName.getName(),toProfileName.getLanguage(),dbSession);
     if (toProfile == null) {
       toProfile=factory.create(dbSession,toProfileName);
       toProfile.setParentKee(fromProfile.getParentKee());

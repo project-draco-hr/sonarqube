@@ -9,12 +9,12 @@
   activate(activation,XOO_P2_KEY);
   ruleActivator.setParent(XOO_P2_KEY,XOO_P1_KEY);
   dbSession.clearCache();
-  assertThat(db.qualityProfileDao().getByKey(dbSession,XOO_P2_KEY).getParentKee()).isEqualTo(XOO_P1_KEY);
+  assertThat(db.qualityProfileDao().selectByKey(dbSession,XOO_P2_KEY).getParentKee()).isEqualTo(XOO_P1_KEY);
   verifyHasActiveRule(ActiveRuleKey.of(XOO_P2_KEY,RuleTesting.XOO_X1),Severity.MAJOR,ActiveRuleDto.INHERITED,ImmutableMap.of("max","10"));
   verifyHasActiveRule(ActiveRuleKey.of(XOO_P2_KEY,RuleTesting.XOO_X2),Severity.MAJOR,null,Collections.<String,String>emptyMap());
   dbSession.clearCache();
   ruleActivator.setParent(XOO_P2_KEY,null);
   assertThat(countActiveRules(XOO_P2_KEY)).isEqualTo(1);
-  assertThat(db.qualityProfileDao().getByKey(dbSession,XOO_P2_KEY).getParentKee()).isNull();
+  assertThat(db.qualityProfileDao().selectByKey(dbSession,XOO_P2_KEY).getParentKee()).isNull();
   verifyHasActiveRule(ActiveRuleKey.of(XOO_P2_KEY,RuleTesting.XOO_X2),Severity.MAJOR,null,Collections.<String,String>emptyMap());
 }

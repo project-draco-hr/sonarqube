@@ -9,10 +9,10 @@
   createActiveRule(rule3,profile);
   createActiveRule(rule1,profile);
   session.commit();
-  assertThat(db.activeRuleDao().findByProfileKey(session,profile.getKey())).hasSize(4);
+  assertThat(db.activeRuleDao().selectByProfileKey(session,profile.getKey())).hasSize(4);
   WsTester.TestRequest request=wsTester.newPostRequest(QProfilesWs.API_ENDPOINT,BulkRuleActivationActions.BULK_DEACTIVATE_ACTION);
   request.setParam(RuleActivationActions.PROFILE_KEY,profile.getKey().toString());
   WsTester.Result result=request.execute();
   session.clearCache();
-  assertThat(db.activeRuleDao().findByProfileKey(session,profile.getKey())).isEmpty();
+  assertThat(db.activeRuleDao().selectByProfileKey(session,profile.getKey())).isEmpty();
 }

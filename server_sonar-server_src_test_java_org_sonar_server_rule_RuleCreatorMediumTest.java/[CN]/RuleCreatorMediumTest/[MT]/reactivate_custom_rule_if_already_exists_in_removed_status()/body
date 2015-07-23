@@ -2,7 +2,7 @@
   String key="CUSTOM_RULE";
   RuleDto templateRule=createTemplateRule();
   RuleDto rule=dao.insert(dbSession,RuleTesting.newCustomRule(templateRule).setRuleKey(key).setStatus(RuleStatus.REMOVED).setName("Old name").setDescription("Old description").setDescriptionFormat(Format.MARKDOWN).setSeverity(Severity.INFO));
-  dao.addRuleParam(dbSession,rule,dao.findRuleParamsByRuleKey(dbSession,templateRule.getKey()).get(0).setDefaultValue("a.*"));
+  dao.insertRuleParam(dbSession,rule,dao.selectRuleParamsByRuleKey(dbSession,templateRule.getKey()).get(0).setDefaultValue("a.*"));
   dbSession.commit();
   dbSession.clearCache();
   NewRule newRule=NewRule.createForCustomRule(key,templateRule.getKey()).setName("New name").setMarkdownDescription("New description").setSeverity(Severity.MAJOR).setStatus(RuleStatus.READY).setParameters(ImmutableMap.of("regex","c.*"));

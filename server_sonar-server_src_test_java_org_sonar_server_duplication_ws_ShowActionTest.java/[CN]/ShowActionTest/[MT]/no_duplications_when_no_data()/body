@@ -3,7 +3,7 @@
   userSessionRule.addComponentPermission(UserRole.CODEVIEWER,"org.codehaus.sonar:sonar",componentKey);
   ComponentDto componentDto=new ComponentDto().setId(10L).setKey(componentKey);
   when(componentDao.selectByKey(session,componentKey)).thenReturn(Optional.of(componentDto));
-  when(measureDao.findByComponentKeyAndMetricKey(session,componentKey,CoreMetrics.DUPLICATIONS_DATA_KEY)).thenReturn(null);
+  when(measureDao.selectByComponentKeyAndMetricKey(session,componentKey,CoreMetrics.DUPLICATIONS_DATA_KEY)).thenReturn(null);
   WsTester.TestRequest request=tester.newGetRequest("api/duplications","show").setParam("key",componentKey);
   request.execute();
   verify(duplicationsJsonWriter).write(eq(Lists.<DuplicationsParser.Block>newArrayList()),any(JsonWriter.class),eq(session));

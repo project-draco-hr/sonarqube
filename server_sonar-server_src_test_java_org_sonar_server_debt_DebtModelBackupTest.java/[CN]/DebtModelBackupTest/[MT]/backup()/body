@@ -1,7 +1,7 @@
 {
   when(dao.selectEnabledCharacteristics(session)).thenReturn(newArrayList(new CharacteristicDto().setId(1).setKey("PORTABILITY").setName("Portability updated").setOrder(2),new CharacteristicDto().setId(2).setKey("COMPILER").setName("Compiler updated").setParentId(1)));
   when(ruleDao.selectEnabledAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setRepositoryKey("squid").setRuleKey("UselessImportCheck").setSubCharacteristicId(2).setRemediationFunction(DebtRemediationFunction.Type.LINEAR_OFFSET.toString()).setRemediationCoefficient("2h").setRemediationOffset("15min"),new RuleDto().setRepositoryKey("squid").setRuleKey("AvoidNPE").setDefaultSubCharacteristicId(2).setDefaultRemediationFunction("LINEAR").setDefaultRemediationCoefficient("2h")));
-  debtModelBackup.backup();
+  underTest.backup();
   ArgumentCaptor<DebtModel> debtModelArgument=ArgumentCaptor.forClass(DebtModel.class);
   verify(debtModelXMLExporter).export(debtModelArgument.capture(),ruleDebtListCaptor.capture());
   assertThat(debtModelArgument.getValue().rootCharacteristics()).hasSize(1);

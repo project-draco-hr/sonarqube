@@ -3,12 +3,12 @@
   ruleDao.insert(dbSession,templateRule);
   RuleParamDto templateRuleParam1=RuleParamDto.createFor(templateRule).setName("regex").setType("STRING").setDescription("Reg ex").setDefaultValue(".*");
   RuleParamDto templateRuleParam2=RuleParamDto.createFor(templateRule).setName("format").setType("STRING").setDescription("Format");
-  ruleDao.addRuleParam(dbSession,templateRule,templateRuleParam1);
-  ruleDao.addRuleParam(dbSession,templateRule,templateRuleParam2);
+  ruleDao.insertRuleParam(dbSession,templateRule,templateRuleParam1);
+  ruleDao.insertRuleParam(dbSession,templateRule,templateRuleParam2);
   RuleDto customRule=RuleTesting.newCustomRule(templateRule).setName("Old name").setDescription("Old description").setSeverity(Severity.MINOR).setStatus(RuleStatus.BETA);
   ruleDao.insert(dbSession,customRule);
-  ruleDao.addRuleParam(dbSession,customRule,templateRuleParam1.setDefaultValue("a.*"));
-  ruleDao.addRuleParam(dbSession,customRule,templateRuleParam2.setDefaultValue(null));
+  ruleDao.insertRuleParam(dbSession,customRule,templateRuleParam1.setDefaultValue("a.*"));
+  ruleDao.insertRuleParam(dbSession,customRule,templateRuleParam2.setDefaultValue(null));
   dbSession.commit();
   RuleUpdate update=RuleUpdate.createForCustomRule(customRule.getKey()).setName("New name").setMarkdownDescription("New description").setSeverity("MAJOR").setStatus(RuleStatus.READY).setParameters(ImmutableMap.of("regex","b.*"));
   updater.update(update,userSessionRule);

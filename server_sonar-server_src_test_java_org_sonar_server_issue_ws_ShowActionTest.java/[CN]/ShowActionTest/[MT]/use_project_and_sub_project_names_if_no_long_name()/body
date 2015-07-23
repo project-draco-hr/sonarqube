@@ -1,11 +1,11 @@
 {
   String issueKey="ABCD";
   ComponentDto project=ComponentTesting.newProjectDto().setId(1L).setKey("org.sonar.Sonar").setName("SonarQube").setLongName(null);
-  when(componentDao.selectNonNullByUuid(session,project.uuid())).thenReturn(project);
+  when(componentDao.selectOrFailByUuid(session,project.uuid())).thenReturn(project);
   ComponentDto module=ComponentTesting.newModuleDto(project).setId(2L).setKey("org.sonar.server.Server").setName("SonarQube :: Server").setLongName(null).setQualifier("BRC").setParentProjectId(1L);
   when(componentDao.selectById(session,module.getId())).thenReturn(Optional.of(module));
   ComponentDto file=ComponentTesting.newFileDto(module).setId(10L).setKey("org.sonar.server.issue.IssueClient").setLongName("SonarQube :: Issue Client").setQualifier("FIL").setParentProjectId(2L);
-  when(componentDao.selectNonNullByUuid(session,file.uuid())).thenReturn(file);
+  when(componentDao.selectOrFailByUuid(session,file.uuid())).thenReturn(file);
   DefaultIssue issue=new DefaultIssue().setKey(issueKey).setComponentKey("org.sonar.server.issue.IssueClient").setComponentUuid(file.uuid()).setProjectKey("org.sonar.Sonar").setProjectUuid(project.uuid()).setModuleUuid(module.uuid()).setRuleKey(RuleKey.of("squid","AvoidCycle")).setLine(12).setEffortToFix(2.0).setMessage("Fix it").setResolution("FIXED").setStatus("CLOSED").setSeverity("MAJOR").setCreationDate(issueCreationDate);
   when(issueService.getByKey(issueKey)).thenReturn(issue);
   WsTester.TestRequest request=tester.newGetRequest("api/issues","show").setParam("key",issueKey);

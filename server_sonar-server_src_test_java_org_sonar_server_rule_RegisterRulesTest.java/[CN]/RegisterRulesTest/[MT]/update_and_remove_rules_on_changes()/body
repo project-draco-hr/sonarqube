@@ -1,6 +1,6 @@
 {
   execute(new FakeRepositoryV1());
-  assertThat(dbClient.ruleDao().findAll(dbTester.getSession())).hasSize(2);
+  assertThat(dbClient.ruleDao().selectAll(dbTester.getSession())).hasSize(2);
   RuleKey ruleKey1=RuleKey.of("fake","rule1");
   RuleDto rule1=dbClient.ruleDao().getNullableByKey(dbTester.getSession(),ruleKey1);
   rule1.setTags(Sets.newHashSet("usertag1","usertag2"));
@@ -22,7 +22,7 @@
   assertThat(rule1.getStatus()).isEqualTo(RuleStatus.READY);
   assertThat(rule1.getCreatedAt()).isEqualTo(DATE1);
   assertThat(rule1.getUpdatedAt()).isEqualTo(DATE2);
-  List<RuleParamDto> params=dbClient.ruleDao().findRuleParamsByRuleKey(dbTester.getSession(),ruleKey1);
+  List<RuleParamDto> params=dbClient.ruleDao().selectRuleParamsByRuleKey(dbTester.getSession(),ruleKey1);
   assertThat(params).hasSize(2);
   RuleParamDto param=getParam(params,"param1");
   assertThat(param.getDescription()).isEqualTo("parameter one v2");

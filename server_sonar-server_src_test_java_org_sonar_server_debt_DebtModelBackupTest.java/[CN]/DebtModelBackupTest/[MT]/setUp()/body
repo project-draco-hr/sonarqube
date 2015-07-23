@@ -5,16 +5,16 @@
   doAnswer(new Answer(){
     public Object answer(    InvocationOnMock invocation){
       Object[] args=invocation.getArguments();
-      CharacteristicDto dto=(CharacteristicDto)args[0];
+      CharacteristicDto dto=(CharacteristicDto)args[1];
       dto.setId(currentId++);
       return null;
     }
   }
-).when(dao).insert(any(CharacteristicDto.class),any(DbSession.class));
+).when(dao).insert(any(DbSession.class),any(CharacteristicDto.class));
   when(dbClient.openSession(false)).thenReturn(session);
   when(dbClient.ruleDao()).thenReturn(ruleDao);
   when(dbClient.debtCharacteristicDao()).thenReturn(dao);
   Reader defaultModelReader=mock(Reader.class);
   when(debtModelPluginRepository.createReaderForXMLFile("technical-debt")).thenReturn(defaultModelReader);
-  debtModelBackup=new DebtModelBackup(dbClient,debtModelOperations,ruleOperations,debtModelPluginRepository,characteristicsXMLImporter,rulesXMLImporter,debtModelXMLExporter,defLoader,system2,userSessionRule);
+  underTest=new DebtModelBackup(dbClient,debtModelOperations,ruleOperations,debtModelPluginRepository,characteristicsXMLImporter,rulesXMLImporter,debtModelXMLExporter,defLoader,system2,userSessionRule);
 }

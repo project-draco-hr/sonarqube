@@ -3,8 +3,8 @@
   RuleDto rule0=createRule(profile.getLanguage(),"toto");
   RuleDto rule1=createRule(profile.getLanguage(),"tata");
   session.commit();
-  assertThat(db.activeRuleDao().findByProfileKey(session,profile.getKey())).isEmpty();
-  assertThat(db.activeRuleDao().findByProfileKey(session,profile.getKey())).hasSize(0);
+  assertThat(db.activeRuleDao().selectByProfileKey(session,profile.getKey())).isEmpty();
+  assertThat(db.activeRuleDao().selectByProfileKey(session,profile.getKey())).hasSize(0);
   assertThat(tester.get(RuleIndex.class).search(new RuleQuery().setSeverities(ImmutableSet.of("BLOCKER")),new QueryContext(userSessionRule)).getHits()).hasSize(2);
   WsTester.TestRequest request=wsTester.newPostRequest(QProfilesWs.API_ENDPOINT,BulkRuleActivationActions.BULK_ACTIVATE_ACTION);
   request.setParam(BulkRuleActivationActions.PROFILE_KEY,profile.getKey().toString());

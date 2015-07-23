@@ -1,17 +1,17 @@
 {
-  QualityProfileDto profile=db.qualityProfileDao().getNonNullByKey(dbSession,profileKey);
+  QualityProfileDto profile=db.qualityProfileDao().selectOrFailByKey(dbSession,profileKey);
   if (parentKey == null) {
     removeParent(dbSession,profile);
   }
  else   if (profile.getParentKee() == null || !parentKey.equals(profile.getParentKee())) {
-    QualityProfileDto parentProfile=db.qualityProfileDao().getNonNullByKey(dbSession,parentKey);
+    QualityProfileDto parentProfile=db.qualityProfileDao().selectOrFailByKey(dbSession,parentKey);
     if (isDescendant(dbSession,profile,parentProfile)) {
       throw new BadRequestException(String.format("Descendant profile '%s' can not be selected as parent of '%s'",parentKey,profileKey));
     }
     removeParent(dbSession,profile);
     profile.setParentKee(parentKey);
     db.qualityProfileDao().update(dbSession,profile);
-    for (    ActiveRuleDto parentActiveRule : db.activeRuleDao().findByProfileKey(dbSession,parentKey)) {
+    for (    ActiveRuleDto parentActiveRule : db.activeRuleDao().selectByProfileKey(dbSession,parentKey)) {
       try {
         RuleActivation activation=new RuleActivation(parentActiveRule.getKey().ruleKey());
         activate(dbSession,activation,profileKey);

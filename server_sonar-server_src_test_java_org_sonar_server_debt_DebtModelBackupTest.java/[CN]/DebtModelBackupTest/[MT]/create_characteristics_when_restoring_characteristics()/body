@@ -1,7 +1,7 @@
 {
   when(dao.selectEnabledCharacteristics(session)).thenReturn(Collections.<CharacteristicDto>emptyList());
-  debtModelBackup.restoreCharacteristics(new DebtModel().addRootCharacteristic(new DefaultDebtCharacteristic().setKey("PORTABILITY").setName("Portability").setOrder(1)).addSubCharacteristic(new DefaultDebtCharacteristic().setKey("COMPILER").setName("Compiler"),"PORTABILITY"),now,session);
-  verify(dao,times(2)).insert(characteristicCaptor.capture(),eq(session));
+  underTest.restoreCharacteristics(session,new DebtModel().addRootCharacteristic(new DefaultDebtCharacteristic().setKey("PORTABILITY").setName("Portability").setOrder(1)).addSubCharacteristic(new DefaultDebtCharacteristic().setKey("COMPILER").setName("Compiler"),"PORTABILITY"),now);
+  verify(dao,times(2)).insert(eq(session),characteristicCaptor.capture());
   CharacteristicDto dto1=characteristicCaptor.getAllValues().get(0);
   assertThat(dto1.getId()).isEqualTo(10);
   assertThat(dto1.getKey()).isEqualTo("PORTABILITY");

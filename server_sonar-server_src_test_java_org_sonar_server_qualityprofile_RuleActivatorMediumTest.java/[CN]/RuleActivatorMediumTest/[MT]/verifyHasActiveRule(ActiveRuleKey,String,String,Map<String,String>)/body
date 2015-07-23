@@ -1,6 +1,6 @@
 {
   boolean found=false;
-  List<ActiveRuleDto> activeRuleDtos=db.activeRuleDao().findByProfileKey(dbSession,activeRuleKey.qProfile());
+  List<ActiveRuleDto> activeRuleDtos=db.activeRuleDao().selectByProfileKey(dbSession,activeRuleKey.qProfile());
   for (  ActiveRuleDto activeRuleDto : activeRuleDtos) {
     if (activeRuleDto.getKey().equals(activeRuleKey)) {
       found=true;
@@ -8,10 +8,10 @@
       assertThat(activeRuleDto.getInheritance()).isEqualTo(expectedInheritance);
       assertThat(activeRuleDto.getCreatedAt()).isNotNull();
       assertThat(activeRuleDto.getUpdatedAt()).isNotNull();
-      List<ActiveRuleParamDto> paramDtos=db.activeRuleDao().findParamsByActiveRuleKey(dbSession,activeRuleDto.getKey());
+      List<ActiveRuleParamDto> paramDtos=db.activeRuleDao().selectParamsByActiveRuleKey(dbSession,activeRuleDto.getKey());
       assertThat(paramDtos).hasSize(expectedParams.size());
       for (      Map.Entry<String,String> entry : expectedParams.entrySet()) {
-        ActiveRuleParamDto paramDto=db.activeRuleDao().getParamByKeyAndName(activeRuleDto.getKey(),entry.getKey(),dbSession);
+        ActiveRuleParamDto paramDto=db.activeRuleDao().selectParamByKeyAndName(activeRuleDto.getKey(),entry.getKey(),dbSession);
         assertThat(paramDto).isNotNull();
         assertThat(paramDto.getValue()).isEqualTo(entry.getValue());
       }

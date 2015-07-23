@@ -3,11 +3,11 @@
   tester.start();
   dbSession=dbClient().openSession(false);
   QualityProfileDao qualityProfileDao=dbClient().qualityProfileDao();
-  assertThat(qualityProfileDao.findAll(dbSession)).hasSize(1);
-  QualityProfileDto profile=qualityProfileDao.getByNameAndLanguage("Basic","xoo",dbSession);
+  assertThat(qualityProfileDao.selectAll(dbSession)).hasSize(1);
+  QualityProfileDto profile=qualityProfileDao.selectByNameAndLanguage("Basic","xoo",dbSession);
   assertThat(profile).isNotNull();
   ActiveRuleDao activeRuleDao=dbClient().activeRuleDao();
-  assertThat(activeRuleDao.findByProfileKey(dbSession,profile.getKey())).hasSize(2);
+  assertThat(activeRuleDao.selectByProfileKey(dbSession,profile.getKey())).hasSize(2);
   RuleKey ruleKey=RuleKey.of("xoo","x1");
   ActiveRuleKey activeRuleKey=ActiveRuleKey.of(profile.getKey(),ruleKey);
   assertThat(tester.get(ActiveRuleIndex.class).getNullableByKey(activeRuleKey)).isNotNull();
@@ -19,7 +19,7 @@
   assertThat(activeRule.key().qProfile()).isEqualTo(profile.getKee());
   assertThat(activeRule.key().ruleKey()).isEqualTo(ruleKey);
   assertThat(activeRule.severity()).isEqualTo(Severity.CRITICAL);
-  Map<String,ActiveRuleParamDto> params=ActiveRuleParamDto.groupByKey(activeRuleDao.findParamsByActiveRuleKey(dbSession,activeRule.key()));
+  Map<String,ActiveRuleParamDto> params=ActiveRuleParamDto.groupByKey(activeRuleDao.selectParamsByActiveRuleKey(dbSession,activeRule.key()));
   assertThat(params).hasSize(2);
   assertThat(params.get("acceptWhitespace").getValue()).isEqualTo("true");
   assertThat(params.get("max").getValue()).isEqualTo("10");

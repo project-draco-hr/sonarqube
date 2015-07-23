@@ -4,7 +4,7 @@
   when(rulesXMLImporter.importXML(anyString(),any(ValidationMessages.class))).thenReturn(newArrayList(new RuleDebt().setRuleKey(RuleKey.of("squid","UselessImportCheck")).setSubCharacteristicKey("COMPILER").setFunction(DebtRemediationFunction.Type.LINEAR.name()).setCoefficient("2h")));
   when(ruleDao.selectEnabledAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setId(1).setRepositoryKey("squid").setRuleKey("UselessImportCheck").setDefaultSubCharacteristicId(3).setDefaultRemediationFunction("LINEAR").setDefaultRemediationCoefficient("2h")));
   when(ruleOperations.updateRule(any(RuleDto.class),any(CharacteristicDto.class),anyString(),anyString(),anyString(),eq(session))).thenThrow(IllegalArgumentException.class);
-  assertThat(debtModelBackup.restoreFromXml("<xml/>").getErrors()).hasSize(1);
+  assertThat(underTest.restoreFromXml("<xml/>").getErrors()).hasSize(1);
   verify(ruleDao).selectEnabledAndNonManual(session);
   verify(session,never()).commit();
 }
