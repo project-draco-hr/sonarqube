@@ -1,0 +1,8 @@
+{
+  MetricDto metric1=underTest.insert(session,newMetricDto().setEnabled(true).setUserManaged(true));
+  MetricDto metric2=underTest.insert(session,newMetricDto().setEnabled(true).setUserManaged(true));
+  underTest.disableCustomByIds(session,Arrays.asList(metric1.getId(),metric2.getId()));
+  List<MetricDto> result=underTest.selectByIds(session,newHashSet(metric1.getId(),metric2.getId()));
+  assertThat(result).hasSize(2);
+  assertThat(result).extracting("enabled").containsOnly(false);
+}
