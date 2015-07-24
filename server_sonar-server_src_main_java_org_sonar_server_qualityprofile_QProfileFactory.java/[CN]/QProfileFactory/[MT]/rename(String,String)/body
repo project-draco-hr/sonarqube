@@ -3,7 +3,10 @@
   Verifications.check(newName.length() < 100,String.format("Name is too long (>%d characters)",100));
   DbSession dbSession=db.openSession(false);
   try {
-    QualityProfileDto profile=db.qualityProfileDao().selectOrFailByKey(dbSession,key);
+    QualityProfileDto profile=db.qualityProfileDao().selectByKey(dbSession,key);
+    if (profile == null) {
+      throw new NotFoundException("Quality profile not found: " + key);
+    }
     if (!StringUtils.equals(newName,profile.getName())) {
       if (db.qualityProfileDao().selectByNameAndLanguage(newName,profile.getLanguage(),dbSession) != null) {
         throw new BadRequestException("Quality profile already exists: " + newName);
