@@ -1,0 +1,13 @@
+{
+  QualityGateClient qgClient=orchestrator.getServer().adminWsClient().qualityGateClient();
+  QualityGate qGate=qgClient.create("AlertsForHistory");
+  qgClient.setDefault(qGate.id());
+  QualityGateCondition lowThresholds=qgClient.createCondition(NewCondition.create(qGate.id()).metricKey("lines").operator("GT").warningThreshold("5").errorThreshold("50"));
+  scanSampleWithDate("2012-01-01");
+  qgClient.updateCondition(UpdateCondition.create(lowThresholds.id()).metricKey("lines").operator("GT").warningThreshold("5000").errorThreshold("5000"));
+  scanSampleWithDate("2012-01-02");
+  Selenese selenese=Selenese.builder().setHtmlTestsInClasspath("display-alerts-history-page","/administration/display-alerts-history-page/should-display-alerts-correctly-history-page.html").build();
+  orchestrator.executeSelenese(selenese);
+  qgClient.unsetDefault();
+  qgClient.destroy(qGate.id());
+}

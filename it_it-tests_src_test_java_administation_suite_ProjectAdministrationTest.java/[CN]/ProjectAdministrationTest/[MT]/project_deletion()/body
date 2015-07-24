@@ -1,0 +1,14 @@
+{
+  String projectAdminUser="project-deletion-with-admin-permission-on-project";
+  SonarClient adminClient=orchestrator.getServer().adminWsClient();
+  try {
+    SonarRunner scan=SonarRunner.create(projectDir("shared/xoo-sample"));
+    orchestrator.executeBuild(scan);
+    adminClient.userClient().create(UserParameters.create().login(projectAdminUser).name(projectAdminUser).password("password").passwordConfirmation("password"));
+    adminClient.permissionClient().addPermission(PermissionParameters.create().user(projectAdminUser).component("sample").permission("admin"));
+    orchestrator.executeSelenese(Selenese.builder().setHtmlTestsInClasspath("project-deletion","/administration/project-deletion/project-deletion.html").build());
+  }
+  finally {
+    adminClient.userClient().deactivate(projectAdminUser);
+  }
+}
