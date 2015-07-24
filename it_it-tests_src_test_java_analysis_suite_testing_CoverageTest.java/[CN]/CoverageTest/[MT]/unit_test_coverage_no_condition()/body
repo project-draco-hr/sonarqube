@@ -1,0 +1,16 @@
+{
+  orchestrator.executeBuilds(SonarRunner.create(projectDir("testing/xoo-sample-ut-coverage-no-condition")));
+  Resource project=orchestrator.getServer().getWsClient().find(ResourceQuery.createForMetrics("sample-ut-coverage",ALL_COVERAGE_METRICS));
+  assertThat(project.getMeasureValue("line_coverage")).isEqualTo(50.0);
+  assertThat(project.getMeasureValue("lines_to_cover")).isEqualTo(4);
+  assertThat(project.getMeasureValue("uncovered_lines")).isEqualTo(2);
+  assertThat(project.getMeasureValue("branch_coverage")).isNull();
+  assertThat(project.getMeasureValue("conditions_to_cover")).isNull();
+  assertThat(project.getMeasureValue("uncovered_conditions")).isNull();
+  assertThat(project.getMeasureValue("coverage")).isEqualTo(50.0);
+  assertThat(project.getMeasureValue("it_coverage")).isNull();
+  assertThat(project.getMeasureValue("overall_coverage")).isNull();
+  String coverage=orchestrator.getServer().adminWsClient().get("api/sources/lines","key","sample-ut-coverage:src/main/xoo/sample/Sample.xoo");
+  JSONAssert.assertEquals(IOUtils.toString(this.getClass().getResourceAsStream("/testing/suite/CoverageTest/unit_test_coverage_no_condition-expected.json"),"UTF-8"),coverage,false);
+  verifyComputeEngineTempDirIsEmpty();
+}
