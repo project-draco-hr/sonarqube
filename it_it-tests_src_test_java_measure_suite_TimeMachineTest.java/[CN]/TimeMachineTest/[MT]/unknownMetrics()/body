@@ -1,0 +1,12 @@
+{
+  TimeMachine timemachine=orchestrator.getServer().getWsClient().find(TimeMachineQuery.createForMetrics(PROJECT,"notfound"));
+  assertThat(timemachine.getCells().length).isEqualTo(0);
+  timemachine=orchestrator.getServer().getWsClient().find(TimeMachineQuery.createForMetrics(PROJECT,"lines","notfound"));
+  assertThat(timemachine.getCells().length).isEqualTo(2);
+  for (  TimeMachineCell cell : timemachine.getCells()) {
+    assertThat(cell.getValues().length).isEqualTo(1);
+    assertThat(cell.getValues()[0]).isInstanceOf(Long.class);
+  }
+  timemachine=orchestrator.getServer().getWsClient().find(TimeMachineQuery.createForMetrics(PROJECT));
+  assertThat(timemachine.getCells().length).isEqualTo(0);
+}
