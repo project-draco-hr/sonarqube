@@ -1,16 +1,7 @@
 {
-  if (keys.isEmpty()) {
-    return Collections.emptyList();
-  }
-  SqlSession session=mybatis.openSession(false);
+  DbSession session=mybatis.openSession(false);
   try {
-    List<ActionPlanDto> dtosList=newArrayList();
-    List<List<String>> keysPartition=Lists.partition(newArrayList(keys),1000);
-    for (    List<String> partition : keysPartition) {
-      List<ActionPlanDto> dtos=session.getMapper(ActionPlanMapper.class).findByKeys(partition);
-      dtosList.addAll(dtos);
-    }
-    return dtosList;
+    return selectByKeys(session,keys);
   }
   finally {
     MyBatis.closeQuietly(session);
