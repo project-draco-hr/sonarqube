@@ -1,5 +1,5 @@
 {
-  Map<String,Plugin> instancesByPluginKey=new HashMap<>();
+  Map<String,SonarPlugin> instancesByPluginKey=new HashMap<>();
   for (  Map.Entry<PluginClassloaderDef,ClassLoader> entry : classloaders.entrySet()) {
     PluginClassloaderDef def=entry.getKey();
     ClassLoader classLoader=entry.getValue();
@@ -7,7 +7,7 @@
       String pluginKey=mainClassEntry.getKey();
       String mainClass=mainClassEntry.getValue();
       try {
-        instancesByPluginKey.put(pluginKey,(Plugin)classLoader.loadClass(mainClass).newInstance());
+        instancesByPluginKey.put(pluginKey,(SonarPlugin)classLoader.loadClass(mainClass).newInstance());
       }
  catch (      UnsupportedClassVersionError e) {
         throw new IllegalStateException(String.format("The plugin [%s] does not support Java %s",pluginKey,SystemUtils.JAVA_VERSION_TRIMMED),e);
