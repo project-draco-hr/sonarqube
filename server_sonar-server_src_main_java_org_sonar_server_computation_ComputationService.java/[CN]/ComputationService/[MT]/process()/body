@@ -1,11 +1,14 @@
 {
   String projectKey=item.dto.getProjectKey();
-  Profiler profiler=Profiler.create(LOG).startDebug(String.format("Analysis of project %s (report %d)",projectKey,item.dto.getId()));
+  String message=format("Analysis of project %s (report %d)",projectKey,item.dto.getId());
+  Profiler profiler=Profiler.create(LOG).startDebug(message);
+  long timingSum=0L;
+  Profiler stepProfiler=Profiler.create(LOG);
   try {
     for (    ComputationStep step : steps.instances()) {
-      Profiler stepProfiler=Profiler.createIfDebug(LOG).startDebug(step.getDescription());
+      stepProfiler.start();
       step.execute();
-      stepProfiler.stopDebug();
+      timingSum+=stepProfiler.stopInfo(step.getDescription());
     }
     item.dto.setStatus(SUCCESS);
   }
@@ -16,6 +19,6 @@
  finally {
     item.dto.setFinishedAt(system.now());
     activityManager.saveActivity(item.dto);
-    profiler.stopInfo();
+    profiler.stopInfo(format("%s total time spent in steps=%sms",message,timingSum));
   }
 }
