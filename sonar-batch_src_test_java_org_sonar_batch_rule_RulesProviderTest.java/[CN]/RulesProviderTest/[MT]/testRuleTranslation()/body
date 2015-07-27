@@ -1,0 +1,16 @@
+{
+  final Rule testRule=new Rule("repo1:key1","repo1","key1","name","severity","language");
+  RulesSearchResult loadResult=new RulesSearchResult();
+  loadResult.setRules(Arrays.asList(testRule));
+  RulesLoader loader=mock(RulesLoader.class);
+  when(loader.load()).thenReturn(loadResult);
+  RulesProvider provider=new RulesProvider();
+  Rules rules=provider.provide(loader);
+  assertThat(rules.findAll()).hasSize(1);
+  assertThat(rules.findAll()).are(new Condition<org.sonar.api.batch.rule.Rule>(){
+    @Override public boolean matches(    org.sonar.api.batch.rule.Rule value){
+      return value.key().rule().equals(testRule.internalKey()) && value.internalKey().equals(testRule.internalKey()) && value.name().equals(testRule.name())&& value.severity().equals(testRule.severity())&& value.key().repository().equals(testRule.repositoryKey());
+    }
+  }
+);
+}
