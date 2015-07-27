@@ -1,0 +1,16 @@
+{
+  HttpClient httpclient=new DefaultHttpClient();
+  try {
+    HttpGet get=new HttpGet(orchestrator.getServer().getUrl() + "/api/widgets");
+    HttpResponse response=httpclient.execute(get);
+    assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
+    String json=IOUtils.toString(response.getEntity().getContent());
+    List widgets=(List)JSONValue.parse(json);
+    assertThat(widgets.size()).isGreaterThan(10);
+    assertThat(((Map)widgets.get(0)).get("title")).isNotNull();
+    EntityUtils.consume(response.getEntity());
+  }
+  finally {
+    httpclient.getConnectionManager().shutdown();
+  }
+}

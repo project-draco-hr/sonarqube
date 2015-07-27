@@ -1,0 +1,13 @@
+{
+  List<String> cookies=connection.getHeaderFields().get("Set-Cookie");
+  boolean foundSessionCookie=false;
+  for (  String cookie : cookies) {
+    if (StringUtils.containsIgnoreCase(cookie,"JSESSIONID")) {
+      foundSessionCookie=true;
+      assertThat(cookie).containsIgnoringCase("Secure").containsIgnoringCase("HttpOnly");
+    }
+  }
+  if (!foundSessionCookie) {
+    fail("Session cookie not found");
+  }
+}

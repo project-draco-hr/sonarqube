@@ -1,0 +1,15 @@
+{
+  HttpClient httpclient=new DefaultHttpClient();
+  try {
+    HttpGet get=new HttpGet(orchestrator.getServer().getUrl() + "/api");
+    HttpResponse response=httpclient.execute(get);
+    assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
+    String json=IOUtils.toString(response.getEntity().getContent());
+    Map jsonAsMap=(Map)JSONValue.parse(json);
+    assertThat(jsonAsMap.get("webServices")).isNotNull();
+    EntityUtils.consume(response.getEntity());
+  }
+  finally {
+    httpclient.getConnectionManager().shutdown();
+  }
+}

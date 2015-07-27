@@ -1,0 +1,18 @@
+{
+  SonarRunner build=SonarRunner.create(projectDir("shared/xoo-sample"));
+  orchestrator.executeBuild(build);
+  String url=orchestrator.getServer().getUrl() + "/api/projects?key=sample&versions=true";
+  HttpClient httpclient=new DefaultHttpClient();
+  try {
+    HttpGet get=new HttpGet(url);
+    HttpResponse response=httpclient.execute(get);
+    assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
+    String content=IOUtils.toString(response.getEntity().getContent());
+    assertThat(content).doesNotContain("error");
+    assertThat(content).contains("sample");
+    EntityUtils.consume(response.getEntity());
+  }
+  finally {
+    httpclient.getConnectionManager().shutdown();
+  }
+}

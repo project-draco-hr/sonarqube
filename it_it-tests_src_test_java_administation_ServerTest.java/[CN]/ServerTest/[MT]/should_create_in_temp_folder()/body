@@ -1,0 +1,11 @@
+{
+  orchestrator=Orchestrator.builderEnv().addPlugin(ItUtils.pluginArtifact("server-plugin")).setServerProperty("sonar.createTempFiles","true").build();
+  orchestrator.start();
+  File tempDir=new File(orchestrator.getServer().getHome(),"temp/tmp");
+  String logs=FileUtils.readFileToString(orchestrator.getServer().getLogs());
+  assertThat(logs).contains("Creating temp directory: " + tempDir.getAbsolutePath() + File.separator+ "sonar-it");
+  assertThat(logs).contains("Creating temp file: " + tempDir.getAbsolutePath() + File.separator+ "sonar-it");
+  assertThat(new File(tempDir,"sonar-it")).isDirectory().exists();
+  orchestrator.stop();
+  assertThat(new File(tempDir,"sonar-it")).doesNotExist();
+}
