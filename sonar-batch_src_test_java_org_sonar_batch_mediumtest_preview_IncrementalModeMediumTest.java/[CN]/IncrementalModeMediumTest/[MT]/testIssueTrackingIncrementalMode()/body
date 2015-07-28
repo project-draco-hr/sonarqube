@@ -5,21 +5,5 @@
   File xooFile=new File(srcDir,"sample.xoo");
   FileUtils.write(xooFile,SAMPLE_CONTENT + "\nmodification");
   TaskResult result=tester.newTask().properties(ImmutableMap.<String,String>builder().put("sonar.task","scan").put("sonar.projectBaseDir",baseDir.getAbsolutePath()).put("sonar.projectKey","sample").put("sonar.projectName","Foo Project").put("sonar.projectVersion","1.0-SNAPSHOT").put("sonar.projectDescription","Description of Foo Project").put("sonar.sources","src").build()).start();
-  int newIssues=0;
-  int openIssues=0;
-  int resolvedIssue=0;
-  for (  Issue issue : result.issues()) {
-    if (issue.isNew()) {
-      newIssues++;
-    }
- else     if (issue.resolution() != null) {
-      resolvedIssue++;
-    }
- else {
-      openIssues++;
-    }
-  }
-  assertThat(newIssues).isEqualTo(4);
-  assertThat(openIssues).isEqualTo(2);
-  assertThat(resolvedIssue).isEqualTo(1);
+  assertThat(result.trackedIssues()).extracting("ruleKey","line","message","status","resolution","new").containsOnly(tuple(RuleKey.of("xoo","OneIssuePerLine"),1,"This issue is generated on each line","OPEN",null,false),tuple(RuleKey.of("xoo","OneIssuePerLine"),2,"This issue is generated on each line","OPEN",null,true),tuple(RuleKey.of("xoo","OneIssuePerLine"),3,"This issue is generated on each line","OPEN",null,true),tuple(RuleKey.of("xoo","OneIssuePerLine"),4,"This issue is generated on each line","OPEN",null,true),tuple(RuleKey.of("xoo","OneIssuePerLine"),5,"This issue is generated on each line","OPEN",null,true),tuple(RuleKey.of("manual","MyManualIssue"),4,null,"OPEN",null,false),tuple(RuleKey.of("xoo","OneIssuePerFile"),null,"An issue that is no more detected","CLOSED","REMOVED",false));
 }

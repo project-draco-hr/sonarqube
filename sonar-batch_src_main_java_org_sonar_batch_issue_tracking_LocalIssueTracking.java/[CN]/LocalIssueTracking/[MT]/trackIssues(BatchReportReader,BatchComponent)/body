@@ -1,0 +1,28 @@
+{
+  if (analysisMode.isIncremental() && !component.isFile()) {
+    return;
+  }
+  Set<BatchReport.Issue> rawIssues=Sets.newIdentityHashSet();
+  try (CloseableIterator<BatchReport.Issue> it=reader.readComponentIssues(component.batchId())){
+    while (it.hasNext()) {
+      rawIssues.add(it.next());
+    }
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Can't read issues for " + component.key(),e);
+  }
+  Collection<ServerIssue> serverIssues=loadServerIssues(component);
+  SourceHashHolder sourceHashHolder=loadSourceHashes(component);
+  IssueTrackingResult trackingResult=tracking.track(sourceHashHolder,serverIssues,rawIssues);
+  List<DefaultIssue> trackedIssues=Lists.newArrayList();
+  addUnmatchedFromServer(trackingResult.unmatched(),sourceHashHolder,trackedIssues);
+  mergeMatched(component,trackingResult,trackedIssues,rawIssues);
+  addUnmatchedRawIssues(component,rawIssues,trackedIssues);
+  if (ResourceUtils.isRootProject(component.resource())) {
+    addIssuesOnDeletedComponents(trackedIssues);
+  }
+  for (  DefaultIssue issue : trackedIssues) {
+    workflow.doAutomaticTransition(issue,changeContext);
+    issueCache.put(issue);
+  }
+}

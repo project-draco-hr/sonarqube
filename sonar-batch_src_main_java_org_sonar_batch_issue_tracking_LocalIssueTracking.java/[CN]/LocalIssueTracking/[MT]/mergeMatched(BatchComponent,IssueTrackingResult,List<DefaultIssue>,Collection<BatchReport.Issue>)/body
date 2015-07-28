@@ -1,0 +1,19 @@
+{
+  for (  BatchReport.Issue rawIssue : result.matched()) {
+    rawIssues.remove(rawIssue);
+    org.sonar.batch.protocol.input.BatchInput.ServerIssue ref=((ServerIssueFromWs)result.matching(rawIssue)).getDto();
+    DefaultIssue tracked=toTracked(component,rawIssue);
+    tracked.setKey(ref.getKey());
+    tracked.setNew(false);
+    tracked.setBeingClosed(false);
+    tracked.setOnDisabledRule(false);
+    tracked.setResolution(ref.hasResolution() ? ref.getResolution() : null);
+    tracked.setStatus(ref.getStatus());
+    tracked.setAssignee(ref.hasAssigneeLogin() ? ref.getAssigneeLogin() : null);
+    tracked.setCreationDate(new Date(ref.getCreationDate()));
+    if (ref.getManualSeverity()) {
+      tracked.setSeverity(ref.getSeverity().name());
+    }
+    trackedIssues.add(tracked);
+  }
+}

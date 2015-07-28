@@ -1,0 +1,24 @@
+{
+  BatchComponent component;
+  InputPath inputPath=issue.locations().get(0).inputPath();
+  if (inputPath != null) {
+    component=componentCache.get(inputPath);
+  }
+ else {
+    component=componentCache.get(project);
+  }
+  DefaultIssue defaultIssue=toDefaultIssue(project.getKey(),component.key(),issue);
+  RuleKey ruleKey=defaultIssue.ruleKey();
+  Rule rule=rules.find(ruleKey);
+  validateRule(defaultIssue,rule);
+  ActiveRule activeRule=activeRules.find(ruleKey);
+  if (activeRule == null) {
+    return false;
+  }
+  updateIssue(defaultIssue,rule,activeRule);
+  if (filters.accept(defaultIssue)) {
+    write(component,defaultIssue);
+    return true;
+  }
+  return false;
+}

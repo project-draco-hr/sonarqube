@@ -2,14 +2,11 @@
   ruleBuilder.add(SQUID_RULE_KEY).setName(SQUID_RULE_NAME);
   activeRulesBuilder.create(SQUID_RULE_KEY).setSeverity(Severity.INFO).activate();
   initModuleIssues();
-  Date analysisDate=new Date();
-  when(project.getAnalysisDate()).thenReturn(analysisDate);
-  DefaultIssue issue=new DefaultIssue().setKey("ABCDE").setRuleKey(SQUID_RULE_KEY).setSeverity(Severity.CRITICAL);
-  when(filters.accept(issue)).thenReturn(true);
+  DefaultIssue issue=new DefaultIssue().addLocation(new DefaultIssueLocation().onFile(file).at(file.selectLine(3)).message("Foo")).forRule(SQUID_RULE_KEY).overrideSeverity(org.sonar.api.batch.rule.Severity.CRITICAL);
+  when(filters.accept(any(org.sonar.core.issue.DefaultIssue.class))).thenReturn(true);
   boolean added=moduleIssues.initAndAddIssue(issue);
   assertThat(added).isTrue();
-  ArgumentCaptor<DefaultIssue> argument=ArgumentCaptor.forClass(DefaultIssue.class);
-  verify(cache).put(argument.capture());
-  assertThat(argument.getValue().severity()).isEqualTo(Severity.CRITICAL);
-  assertThat(argument.getValue().creationDate()).isEqualTo(DateUtils.truncate(analysisDate,Calendar.SECOND));
+  ArgumentCaptor<BatchReport.Issue> argument=ArgumentCaptor.forClass(BatchReport.Issue.class);
+  verify(reportPublisher.getWriter()).appendComponentIssue(eq(1),argument.capture());
+  assertThat(argument.getValue().getSeverity()).isEqualTo(org.sonar.batch.protocol.Constants.Severity.CRITICAL);
 }

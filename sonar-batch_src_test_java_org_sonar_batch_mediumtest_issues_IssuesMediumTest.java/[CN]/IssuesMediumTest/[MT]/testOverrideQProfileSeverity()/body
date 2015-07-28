@@ -3,5 +3,6 @@
   File tmpDir=temp.newFolder();
   FileUtils.copyDirectory(projectDir,tmpDir);
   TaskResult result=tester.newScanTask(new File(tmpDir,"sonar-project.properties")).property("sonar.oneIssuePerLine.forceSeverity","CRITICAL").start();
-  assertThat(result.issues().iterator().next().severity()).isEqualTo(Severity.CRITICAL.name());
+  List<Issue> issues=result.issuesFor(result.inputFile("xources/hello/HelloJava.xoo"));
+  assertThat(issues.get(0).getSeverity()).isEqualTo(org.sonar.batch.protocol.Constants.Severity.CRITICAL);
 }
