@@ -1,0 +1,8 @@
+{
+  ws.newPostRequest(PermissionsWs.ENDPOINT,ACTION).setParam(RemoveGroupAction.PARAM_GROUP_NAME,"sonar-administrators").setParam(RemoveGroupAction.PARAM_PERMISSION,SYSTEM_ADMIN).execute();
+  ArgumentCaptor<PermissionChange> permissionChangeCaptor=ArgumentCaptor.forClass(PermissionChange.class);
+  verify(permissionService).removePermission(permissionChangeCaptor.capture());
+  PermissionChange permissionChange=permissionChangeCaptor.getValue();
+  assertThat(permissionChange.group()).isEqualTo("sonar-administrators");
+  assertThat(permissionChange.permission()).isEqualTo(SYSTEM_ADMIN);
+}
