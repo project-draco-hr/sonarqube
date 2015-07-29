@@ -1,25 +1,13 @@
 {
-  if (primaryMessage != null || primaryRange != null || locations.isEmpty()) {
-    NewIssueLocation newLocation=newIssue.newLocation();
+  if (newIssue.primaryLocation() == null) {
+    NewIssueLocation newLocation=newIssue.newLocation().on(primaryComponent);
     if (primaryMessage != null) {
       newLocation.message(primaryMessage);
     }
-    if (primaryComponent.isProjectOrModule()) {
-      newLocation.onProject();
+    if (primaryComponent.isFile() && primaryRange != null) {
+      newLocation.at(primaryRange);
     }
- else     if (primaryComponent.isFile()) {
-      newLocation.onFile((InputFile)primaryComponent.inputPath());
-      if (primaryRange != null) {
-        newLocation.at(primaryRange);
-      }
-    }
- else     if (primaryComponent.isDir()) {
-      newLocation.onDir((InputDir)primaryComponent.inputPath());
-    }
-    newIssue.addLocation(newLocation);
-  }
-  for (  NewIssueLocation issueLocation : locations) {
-    newIssue.addLocation(issueLocation);
+    newIssue.at(newLocation);
   }
   return new DeprecatedIssueWrapper(newIssue);
 }

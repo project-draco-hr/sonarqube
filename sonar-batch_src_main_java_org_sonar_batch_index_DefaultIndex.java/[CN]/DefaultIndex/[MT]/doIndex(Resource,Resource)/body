@@ -7,10 +7,7 @@
     LOG.warn("Unable to index a resource without key " + resource);
     return null;
   }
-  Resource parent=null;
-  if (!ResourceUtils.isLibrary(resource)) {
-    parent=(Resource)ObjectUtils.defaultIfNull(parentReference,currentProject);
-  }
+  Resource parent=(Resource)ObjectUtils.defaultIfNull(parentReference,currentProject);
   Bucket parentBucket=getBucket(parent);
   if (parentBucket == null && parent != null) {
     LOG.warn("Resource ignored, parent is not indexed: " + resource);
@@ -25,6 +22,9 @@
   bucket=new Bucket(resource).setParent(parentBucket);
   addBucket(resource,bucket);
   Resource parentResource=parentBucket != null ? parentBucket.getResource() : null;
-  componentCache.add(resource,parentResource);
+  BatchComponent component=componentCache.add(resource,parentResource);
+  if (ResourceUtils.isProject(resource)) {
+    component.setInputComponent(new DefaultInputModule(resource.getEffectiveKey()));
+  }
   return bucket;
 }

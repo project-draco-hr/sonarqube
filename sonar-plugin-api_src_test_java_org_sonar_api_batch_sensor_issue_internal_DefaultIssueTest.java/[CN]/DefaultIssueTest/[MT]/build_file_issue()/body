@@ -1,11 +1,11 @@
 {
   SensorStorage storage=mock(SensorStorage.class);
-  DefaultIssue issue=new DefaultIssue(storage).addLocation(new DefaultIssueLocation().onFile(inputFile).at(inputFile.selectLine(1)).message("Wrong way!")).forRule(RuleKey.of("repo","rule")).effortToFix(10.0);
-  assertThat(issue.locations().get(0).inputPath()).isEqualTo(inputFile);
+  DefaultIssue issue=new DefaultIssue(storage).at(new DefaultIssueLocation().on(inputFile).at(inputFile.selectLine(1)).message("Wrong way!")).forRule(RuleKey.of("repo","rule")).effortToFix(10.0);
+  assertThat(issue.primaryLocation().inputComponent()).isEqualTo(inputFile);
   assertThat(issue.ruleKey()).isEqualTo(RuleKey.of("repo","rule"));
-  assertThat(issue.locations().get(0).textRange().start().line()).isEqualTo(1);
+  assertThat(issue.primaryLocation().textRange().start().line()).isEqualTo(1);
   assertThat(issue.effortToFix()).isEqualTo(10.0);
-  assertThat(issue.locations().get(0).message()).isEqualTo("Wrong way!");
+  assertThat(issue.primaryLocation().message()).isEqualTo("Wrong way!");
   issue.save();
   verify(storage).store(issue);
 }

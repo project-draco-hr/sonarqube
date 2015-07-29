@@ -1,7 +1,13 @@
 {
-  File projectDir=new File(MultilineIssuesMediumTest.class.getResource("/mediumtest/xoo/sample-multiline").toURI());
-  File tmpDir=temp.newFolder();
-  FileUtils.copyDirectory(projectDir,tmpDir);
-  TaskResult result=tester.newScanTask(new File(tmpDir,"sonar-project.properties")).start();
-  assertThat(result.issuesFor(result.inputFile("xources/hello/HelloJava.xoo"))).hasSize(1);
+  List<Issue> issues=result.issuesFor(result.inputFile("xources/hello/Single.xoo"));
+  assertThat(issues).hasSize(1);
+  Issue issue=issues.get(0);
+  assertThat(issue.getLine()).isEqualTo(6);
+  assertThat(issue.getMsg()).isEqualTo("Primary location");
+  IssueLocation primaryLocation=issue.getPrimaryLocation();
+  assertThat(primaryLocation.getMsg()).isEqualTo("Primary location");
+  assertThat(primaryLocation.getTextRange().getStartLine()).isEqualTo(6);
+  assertThat(primaryLocation.getTextRange().getStartOffset()).isEqualTo(25);
+  assertThat(primaryLocation.getTextRange().getEndLine()).isEqualTo(6);
+  assertThat(primaryLocation.getTextRange().getEndOffset()).isEqualTo(52);
 }

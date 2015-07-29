@@ -1,23 +1,38 @@
 {
-  BatchComponent component;
-  InputPath inputPath=issue.locations().get(0).inputPath();
-  if (inputPath != null) {
-    component=componentCache.get(inputPath);
-  }
- else {
-    component=componentCache.get(project);
-  }
-  DefaultIssue defaultIssue=toDefaultIssue(project.getKey(),component.key(),issue);
-  RuleKey ruleKey=defaultIssue.ruleKey();
-  Rule rule=rules.find(ruleKey);
-  validateRule(defaultIssue,rule);
-  ActiveRule activeRule=activeRules.find(ruleKey);
+  String key=((DefaultInputComponent)issue.primaryLocation().inputComponent()).key();
+  BatchComponent component=componentCache.get(key);
+  Rule rule=validateRule(issue);
+  ActiveRule activeRule=activeRules.find(issue.ruleKey());
   if (activeRule == null) {
     return false;
   }
-  updateIssue(defaultIssue,rule,activeRule);
-  if (filters.accept(defaultIssue)) {
-    write(component,defaultIssue);
+  String primaryMessage=Strings.isNullOrEmpty(issue.primaryLocation().message()) ? rule.name() : issue.primaryLocation().message();
+  org.sonar.api.batch.rule.Severity overriddenSeverity=issue.overriddenSeverity();
+  Severity severity=overriddenSeverity != null ? Severity.valueOf(overriddenSeverity.name()) : Severity.valueOf(activeRule.severity());
+  builder.clear();
+  locationBuilder.clear();
+  builder.setSeverity(severity);
+  builder.setRuleRepository(issue.ruleKey().repository());
+  builder.setRuleKey(issue.ruleKey().rule());
+  builder.setAttributes(KeyValueFormat.format(issue.attributes()));
+  builder.setMsg(primaryMessage);
+  locationBuilder.setMsg(primaryMessage);
+  locationBuilder.setComponentRef(component.batchId());
+  TextRange primaryTextRange=issue.primaryLocation().textRange();
+  applyTextRange(primaryTextRange);
+  if (primaryTextRange != null) {
+    builder.setLine(primaryTextRange.start().line());
+  }
+  builder.setPrimaryLocation(locationBuilder.build());
+  Double effortToFix=issue.effortToFix();
+  if (effortToFix != null) {
+    builder.setEffortToFix(effortToFix);
+  }
+  applyAdditionalLocations(issue);
+  applyExecutionFlows(issue);
+  BatchReport.Issue rawIssue=builder.build();
+  if (filters.accept(key,rawIssue)) {
+    write(component,rawIssue);
     return true;
   }
   return false;
