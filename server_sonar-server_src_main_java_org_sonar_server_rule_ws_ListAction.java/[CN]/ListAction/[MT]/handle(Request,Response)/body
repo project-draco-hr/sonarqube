@@ -1,0 +1,24 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  final ListResponse.Builder listResponseBuilder=ListResponse.newBuilder();
+  final ListResponse.Rule.Builder ruleBuilder=ListResponse.Rule.newBuilder();
+  try {
+    dbClient.ruleDao().selectEnabledAndNonManual(dbSession,new ResultHandler(){
+      @Override public void handleResult(      ResultContext resultContext){
+        RuleDto dto=(RuleDto)resultContext.getResultObject();
+        ruleBuilder.clear().setRepository(dto.getRepositoryKey()).setKey(dto.getRuleKey());
+        String internalKey=dto.getConfigKey();
+        if (!Strings.isNullOrEmpty(internalKey)) {
+          ruleBuilder.setInternalKey(internalKey);
+        }
+        listResponseBuilder.addRules(ruleBuilder.build());
+      }
+    }
+);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+  wsResponse.stream().setMediaType(MimeTypes.PROTOBUF);
+  listResponseBuilder.build().writeTo(wsResponse.stream().output());
+}

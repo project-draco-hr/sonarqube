@@ -1,0 +1,14 @@
+{
+  dbTester.prepareDbUnit(getClass(),"selectEnabledAndNonManual.xml");
+  final List<RuleDto> rules=new ArrayList<>();
+  ResultHandler resultHandler=new ResultHandler(){
+    @Override public void handleResult(    ResultContext resultContext){
+      rules.add((RuleDto)resultContext.getResultObject());
+    }
+  }
+;
+  underTest.selectEnabledAndNonManual(dbTester.getSession(),resultHandler);
+  assertThat(rules.size()).isEqualTo(1);
+  RuleDto ruleDto=rules.get(0);
+  assertThat(ruleDto.getId()).isEqualTo(1);
+}

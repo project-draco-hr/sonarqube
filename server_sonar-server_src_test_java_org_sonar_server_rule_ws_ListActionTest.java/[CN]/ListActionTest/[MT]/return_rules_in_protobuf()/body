@@ -1,0 +1,13 @@
+{
+  dbTester.getDbClient().ruleDao().insert(dbTester.getSession(),RuleTesting.newDto(RuleKey.of("java","S001")).setConfigKey(null));
+  dbTester.getDbClient().ruleDao().insert(dbTester.getSession(),RuleTesting.newDto(RuleKey.of("java","S002")).setConfigKey("I002"));
+  dbTester.getSession().commit();
+  TestResponse response=tester.newRequest().setMimeType(MimeTypes.PROTOBUF).execute();
+  assertThat(response.getMediaType()).isEqualTo(MimeTypes.PROTOBUF);
+  Rules.ListResponse listResponse=Rules.ListResponse.parseFrom(response.getInputStream());
+  assertThat(listResponse.getRulesCount()).isEqualTo(2);
+  assertThat(listResponse.getRules(0).getKey()).isEqualTo("S001");
+  assertThat(listResponse.getRules(0).hasInternalKey()).isFalse();
+  assertThat(listResponse.getRules(1).getKey()).isEqualTo("S002");
+  assertThat(listResponse.getRules(1).getInternalKey()).isEqualTo("I002");
+}
