@@ -1,13 +1,11 @@
 {
   ImmutableListMultimap.Builder<String,Rule> builder=ImmutableListMultimap.builder();
-  ImmutableTable.Builder<String,String,Rule> tableBuilder=ImmutableTable.builder();
+  Table<String,String,List<Rule>> tableBuilder=HashBasedTable.create();
   for (  NewRule newRule : newRules) {
     DefaultRule r=new DefaultRule(newRule);
     builder.put(r.key().repository(),r);
-    if (r.internalKey() != null) {
-      tableBuilder.put(r.key().repository(),r.internalKey(),r);
-    }
+    addToTable(tableBuilder,r);
   }
   rulesByRepository=builder.build();
-  rulesByRepositoryAndInternalKey=tableBuilder.build();
+  rulesByRepositoryAndInternalKey=ImmutableTable.copyOf(tableBuilder);
 }
