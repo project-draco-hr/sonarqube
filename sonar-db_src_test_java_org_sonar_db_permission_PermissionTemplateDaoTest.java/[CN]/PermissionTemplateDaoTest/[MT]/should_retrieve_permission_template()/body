@@ -1,0 +1,11 @@
+{
+  dbTester.truncateTables();
+  PermissionTemplateDto permissionTemplateDto=new PermissionTemplateDto().setName("Test template").setKee("test_template");
+  PermissionTemplateDto templateWithPermissions=new PermissionTemplateDto().setKee("test_template");
+  underTest=mock(PermissionTemplateDao.class);
+  when(underTest.selectTemplateByKey(dbTester.getSession(),"test_template")).thenReturn(permissionTemplateDto);
+  when(underTest.selectPermissionTemplate(dbTester.getSession(),"test_template")).thenReturn(templateWithPermissions);
+  when(underTest.selectPermissionTemplateWithPermissions(dbTester.getSession(),"test_template")).thenCallRealMethod();
+  PermissionTemplateDto permissionTemplate=underTest.selectPermissionTemplateWithPermissions(dbTester.getSession(),"test_template");
+  assertThat(permissionTemplate).isSameAs(templateWithPermissions);
+}

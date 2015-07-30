@@ -1,0 +1,23 @@
+{
+  List<PermissionTemplateDto> allPermissionTemplates=dbClient.permissionTemplateDao().selectAllPermissionTemplates(session);
+  List<PermissionTemplateDto> matchingTemplates=new ArrayList<>();
+  for (  PermissionTemplateDto permissionTemplateDto : allPermissionTemplates) {
+    String keyPattern=permissionTemplateDto.getKeyPattern();
+    if (StringUtils.isNotBlank(keyPattern) && componentKey.matches(keyPattern)) {
+      matchingTemplates.add(permissionTemplateDto);
+    }
+  }
+  checkAtMostOneMatchForComponentKey(componentKey,matchingTemplates);
+  if (matchingTemplates.size() == 1) {
+    return matchingTemplates.get(0).getKee();
+  }
+  String qualifierTemplateKey=settings.getString("sonar.permission.template." + qualifier + ".default");
+  if (!StringUtils.isBlank(qualifierTemplateKey)) {
+    return qualifierTemplateKey;
+  }
+  String defaultTemplateKey=settings.getString("sonar.permission.template.default");
+  if (StringUtils.isBlank(defaultTemplateKey)) {
+    throw new IllegalStateException("At least one default permission template should be defined");
+  }
+  return defaultTemplateKey;
+}

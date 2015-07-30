@@ -1,0 +1,14 @@
+{
+  dbTester.prepareDbUnit(getClass(),"should_apply_permission_template.xml");
+  RoleDao roleDao=dbTester.getDbClient().roleDao();
+  assertThat(roleDao.selectGroupPermissions(dbTester.getSession(),"sonar-administrators",123L)).isEmpty();
+  assertThat(roleDao.selectGroupPermissions(dbTester.getSession(),"sonar-users",123L)).isEmpty();
+  assertThat(roleDao.selectGroupPermissions(dbTester.getSession(),"Anyone",123L)).isEmpty();
+  assertThat(roleDao.selectUserPermissions(dbTester.getSession(),"marius",123L)).isEmpty();
+  underTest.applyPermissionTemplate(dbTester.getSession(),"default_20130101_010203",123L);
+  assertThat(roleDao.selectGroupPermissions(dbTester.getSession(),"sonar-administrators",123L)).containsOnly("admin","issueadmin");
+  assertThat(roleDao.selectGroupPermissions(dbTester.getSession(),"sonar-users",123L)).containsOnly("user","codeviewer");
+  assertThat(roleDao.selectGroupPermissions(dbTester.getSession(),"Anyone",123L)).containsOnly("user","codeviewer");
+  assertThat(roleDao.selectUserPermissions(dbTester.getSession(),"marius",123L)).containsOnly("admin");
+  assertThat(dbTester.getDbClient().resourceDao().selectResource(123L,dbTester.getSession()).getAuthorizationUpdatedAt()).isEqualTo(123456789L);
+}

@@ -1,12 +1,12 @@
 {
-  db.truncateTables();
+  dbTester.truncateTables();
   PermissionTemplateMapper mapper=mock(PermissionTemplateMapper.class);
   DbSession session=mock(DbSession.class);
   when(session.getMapper(PermissionTemplateMapper.class)).thenReturn(mapper);
   MyBatis myBatis=mock(MyBatis.class);
   when(myBatis.openSession(false)).thenReturn(session);
-  permissionTemplateDao=new PermissionTemplateDao(myBatis,system);
-  PermissionTemplateDto permissionTemplate=permissionTemplateDao.insertPermissionTemplate(PermissionTemplateDto.DEFAULT.getName(),null,null);
+  underTest=new PermissionTemplateDao(myBatis,system);
+  PermissionTemplateDto permissionTemplate=underTest.insertPermissionTemplate(PermissionTemplateDto.DEFAULT.getName(),null,null);
   verify(mapper).insert(permissionTemplate);
   verify(session).commit();
   assertThat(permissionTemplate.getKee()).isEqualTo(PermissionTemplateDto.DEFAULT.getKee());

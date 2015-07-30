@@ -1,0 +1,13 @@
+{
+  dbTester.prepareDbUnit(getClass(),"should_remove_all_permissions.xml");
+  assertThat(underTest.selectGroupPermissions(dbTester.getSession(),"devs",123L)).hasSize(1);
+  assertThat(underTest.selectGroupPermissions(dbTester.getSession(),"other",123L)).isEmpty();
+  assertThat(underTest.selectUserPermissions(dbTester.getSession(),"dave.loper",123L)).hasSize(1);
+  assertThat(underTest.selectUserPermissions(dbTester.getSession(),"other.user",123L)).isEmpty();
+  underTest.removeAllPermissions(dbTester.getSession(),123L);
+  dbTester.getSession().commit();
+  dbTester.assertDbUnitTable(getClass(),"should_remove_all_permissions-result.xml","group_roles","group_id","resource_id","role");
+  dbTester.assertDbUnitTable(getClass(),"should_remove_all_permissions-result.xml","user_roles","user_id","resource_id","role");
+  assertThat(underTest.selectGroupPermissions(dbTester.getSession(),"devs",123L)).isEmpty();
+  assertThat(underTest.selectUserPermissions(dbTester.getSession(),"dave.loper",123L)).isEmpty();
+}

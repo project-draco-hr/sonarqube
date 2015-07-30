@@ -1,0 +1,16 @@
+{
+  Long componentId=getComponentId(session,permissionChange.component());
+  checkProjectAdminPermission(permissionChange.component());
+  List<String> existingPermissions=dbClient.roleDao().selectGroupPermissions(session,permissionChange.group(),componentId);
+  if (shouldSkipPermissionChange(operation,existingPermissions,permissionChange)) {
+    return false;
+  }
+  Long targetedGroup=getTargetedGroup(session,permissionChange.group());
+  if (Operation.ADD == operation) {
+    permissionRepository.insertGroupPermission(componentId,targetedGroup,permissionChange.permission(),session);
+  }
+ else {
+    permissionRepository.deleteGroupPermission(componentId,targetedGroup,permissionChange.permission(),session);
+  }
+  return true;
+}
