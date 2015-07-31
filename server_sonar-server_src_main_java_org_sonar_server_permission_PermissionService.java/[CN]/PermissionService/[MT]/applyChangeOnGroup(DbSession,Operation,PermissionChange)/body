@@ -6,12 +6,14 @@
     return false;
   }
   Long targetedGroup=getTargetedGroup(session,permissionChange.group());
+  String permission=permissionChange.permission();
   if (Operation.ADD == operation) {
-    permissionRepository.insertGroupPermission(componentId,targetedGroup,permissionChange.permission(),session);
+    checkNotAnyoneAndAdmin(permission,permissionChange.group());
+    permissionRepository.insertGroupPermission(componentId,targetedGroup,permission,session);
   }
  else {
     checkAdminUsersExistOutsideTheRemovedGroup(session,permissionChange,targetedGroup);
-    permissionRepository.deleteGroupPermission(componentId,targetedGroup,permissionChange.permission(),session);
+    permissionRepository.deleteGroupPermission(componentId,targetedGroup,permission,session);
   }
   return true;
 }
