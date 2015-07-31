@@ -5,8 +5,9 @@
     List<IssueFilterDto> filters=service.findFavoriteFilters(userSession);
     List<IssueFilterDto> sharedFiltersWithoutUserFilters=service.findSharedFiltersWithoutUserFilters(userSession);
     filters.addAll(sharedFiltersWithoutUserFilters);
+    ImmutableSortedSet<IssueFilterDto> allUniqueIssueFilters=FluentIterable.from(filters).toSortedSet(IssueFilterDtoIdComparator.INSTANCE);
     json.name("issueFilters").beginArray();
-    for (    IssueFilterDto favorite : filters) {
+    for (    IssueFilterDto favorite : allUniqueIssueFilters) {
       issueFilterJsonWriter.write(json,favorite,userSession);
     }
     json.endArray();
