@@ -1,9 +1,15 @@
 {
   Profiler profiler=Profiler.createIfDebug(Loggers.get(getClass())).addContext("file",fileKey).startDebug("Load line hashes");
+  WSLoaderResult<String> result=wsLoader.loadString("/api/sources/hash?key=" + BatchUtils.encodeForUrl(fileKey));
   try {
-    return wsLoader.loadString("/api/sources/hash?key=" + BatchUtils.encodeForUrl(fileKey));
+    return result.get();
   }
   finally {
-    profiler.stopDebug();
+    if (result.isFromCache()) {
+      profiler.stopDebug();
+    }
+ else {
+      profiler.stopDebug("Load line hashes (done from cache)");
+    }
   }
 }

@@ -8,19 +8,10 @@
       return Collections.emptyList();
     }
     Profiler profiler=Profiler.create(LOG).startInfo("Load server issues for " + component.resource().getPath());
-    final List<ServerIssue> result=new ArrayList<>();
-    previousIssuesLoader.load(component.key(),new Function<ServerIssue,Void>(){
-      @Override public Void apply(      @Nullable ServerIssue issue){
-        if (issue == null) {
-          return null;
-        }
-        result.add(issue);
-        return null;
-      }
-    }
-,true);
-    profiler.stopDebug();
-    return result;
+    ServerIssueConsumer consumer=new ServerIssueConsumer();
+    boolean fromCache=previousIssuesLoader.load(component.key(),consumer,true);
+    stopDebug(profiler,"Load server issues for " + component.resource().getPath(),fromCache);
+    return consumer.issueList;
   }
  else {
     return issuesCache.values(component.batchId());

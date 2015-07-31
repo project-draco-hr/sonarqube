@@ -1,9 +1,13 @@
 {
   if (!cacheEnabled) {
-    return null;
+    throw new NotAvailableException("cache disabled");
   }
   try {
-    return cache.get(client.getURI(id).toString(),null);
+    byte[] result=cache.get(client.getURI(id).toString(),null);
+    if (result == null) {
+      throw new NotAvailableException("resource not cached");
+    }
+    return new WSLoaderResult<byte[]>(result,true);
   }
  catch (  IOException e) {
     throw new IllegalStateException(e);

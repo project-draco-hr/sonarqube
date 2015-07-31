@@ -5,22 +5,6 @@
   Profiler profiler=Profiler.create(LOG).startInfo("Load server issues");
   this.issuesCache=caches.createCache("previousIssues");
   caches.registerValueCoder(ServerIssue.class,new ServerIssueValueCoder());
-  previousIssuesLoader.load(reactor.getRoot().getKeyWithBranch(),new Function<ServerIssue,Void>(){
-    @Override public Void apply(    @Nullable ServerIssue issue){
-      if (issue == null) {
-        return null;
-      }
-      String componentKey=ComponentKeys.createEffectiveKey(issue.getModuleKey(),issue.hasPath() ? issue.getPath() : null);
-      BatchComponent r=resourceCache.get(componentKey);
-      if (r == null) {
-        issuesCache.put(0,issue.getKey(),issue);
-      }
- else {
-        issuesCache.put(r.batchId(),issue.getKey(),issue);
-      }
-      return null;
-    }
-  }
-,false);
-  profiler.stopDebug();
+  boolean fromCache=previousIssuesLoader.load(reactor.getRoot().getKeyWithBranch(),new SaveIssueConsumer(),false);
+  stopDebug(profiler,"Load server issues",fromCache);
 }

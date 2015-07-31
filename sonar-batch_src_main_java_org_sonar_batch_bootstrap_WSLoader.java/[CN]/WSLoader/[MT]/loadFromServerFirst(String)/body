@@ -2,14 +2,12 @@
   try {
     return loadFromServer(id);
   }
- catch (  Exception serverException) {
-    if (serverException.getCause() instanceof HttpDownloader.HttpException) {
-      throw serverException;
+ catch (  NotAvailableException serverNotAvailable) {
+    try {
+      return loadFromCache(id);
     }
-    byte[] cached=loadFromCache(id);
-    if (cached != null) {
-      return cached;
+ catch (    NotAvailableException cacheNotAvailable) {
+      throw new IllegalStateException(FAIL_MSG,serverNotAvailable.getCause());
     }
-    throw new IllegalStateException(FAIL_MSG,serverException);
   }
 }

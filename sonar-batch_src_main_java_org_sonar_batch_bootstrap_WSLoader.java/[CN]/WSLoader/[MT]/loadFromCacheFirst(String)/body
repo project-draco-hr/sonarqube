@@ -1,15 +1,13 @@
 {
-  byte[] cached=loadFromCache(id);
-  if (cached != null) {
-    return cached;
-  }
   try {
-    return loadFromServer(id);
+    return loadFromCache(id);
   }
- catch (  Exception e) {
-    if (e.getCause() instanceof HttpDownloader.HttpException) {
-      throw e;
+ catch (  NotAvailableException cacheNotAvailable) {
+    try {
+      return loadFromServer(id);
     }
-    throw new IllegalStateException(FAIL_MSG,e);
+ catch (    NotAvailableException serverNotAvailable) {
+      throw new IllegalStateException(FAIL_MSG,serverNotAvailable.getCause());
+    }
   }
 }

@@ -1,10 +1,17 @@
 {
+  Profiler profiler=Profiler.create(LOG).startInfo(LOG_MSG);
   List<Rule> loadedRules=ref.load();
   RulesBuilder builder=new RulesBuilder();
   for (  Rule r : loadedRules) {
     NewRule newRule=builder.add(RuleKey.of(r.getRepository(),r.getKey()));
     newRule.setName(r.getName());
     newRule.setInternalKey(r.getInternalKey());
+  }
+  if (ref.loadedFromCache()) {
+    profiler.stopInfo(LOG_MSG + " (done from cache)");
+  }
+ else {
+    profiler.stopInfo();
   }
   return builder.build();
 }
