@@ -1,0 +1,9 @@
+{
+  DbClient dbClient=db.getDbClient();
+  UserDto user=dbClient.userDao().insert(db.getSession(),new UserDto().setActive(true));
+  dbClient.roleDao().insertUserRole(db.getSession(),new UserRoleDto().setUserId(user.getId()).setResourceId(123L).setRole(GlobalPermissions.SYSTEM_ADMIN));
+  dbClient.roleDao().insertUserRole(db.getSession(),new UserRoleDto().setUserId(user.getId()).setRole(GlobalPermissions.SYSTEM_ADMIN));
+  dbClient.roleDao().insertUserRole(db.getSession(),new UserRoleDto().setUserId(user.getId()).setRole(GlobalPermissions.SCAN_EXECUTION));
+  int result=underTest.countUserPermissions(db.getSession(),GlobalPermissions.SYSTEM_ADMIN,null);
+  assertThat(result).isEqualTo(1);
+}
