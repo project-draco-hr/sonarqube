@@ -1,8 +1,8 @@
 {
   ClassloaderBuilder builder=new ClassloaderBuilder();
   builder.newClassloader(API_CLASSLOADER_KEY,baseClassloader());
-  builder.setMask(API_CLASSLOADER_KEY,apiMask());
   for (  PluginClassloaderDef def : defs) {
+    builder.setMask(API_CLASSLOADER_KEY,def.isServerExtension() ? new Mask() : apiMask());
     builder.newClassloader(def.getBasePluginKey());
     builder.setParent(def.getBasePluginKey(),API_CLASSLOADER_KEY,new Mask());
     builder.setLoadingOrder(def.getBasePluginKey(),def.isSelfFirstStrategy() ? SELF_FIRST : PARENT_FIRST);
