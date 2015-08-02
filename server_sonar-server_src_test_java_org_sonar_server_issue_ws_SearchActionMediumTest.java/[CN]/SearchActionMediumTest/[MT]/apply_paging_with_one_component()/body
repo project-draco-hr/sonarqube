@@ -1,14 +1,14 @@
 {
   RuleDto rule=newRule();
-  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("ABCD").setKey("MyProject"));
+  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("PROJECT_ID").setKey("MyProject"));
   setDefaultProjectPermission(project);
-  ComponentDto file=insertComponent(ComponentTesting.newFileDto(project,"BCDE").setKey("MyComponent"));
+  ComponentDto file=insertComponent(ComponentTesting.newFileDto(project,"FILE_ID").setKey("MyComponent"));
   for (int i=0; i < QueryContext.MAX_LIMIT + 1; i++) {
     IssueDto issue=IssueTesting.newDto(rule,file,project);
     tester.get(IssueDao.class).insert(session,issue);
   }
   session.commit();
   tester.get(IssueIndexer.class).indexAll();
-  WsTester.Result result=wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).setParam(IssueFilterParameters.COMPONENTS,file.getKey()).execute();
+  WsTester.Result result=wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION).setParam(IssueFilterParameters.COMPONENTS,file.getKey()).execute();
   result.assertJson(this.getClass(),"apply_paging_with_one_component.json");
 }

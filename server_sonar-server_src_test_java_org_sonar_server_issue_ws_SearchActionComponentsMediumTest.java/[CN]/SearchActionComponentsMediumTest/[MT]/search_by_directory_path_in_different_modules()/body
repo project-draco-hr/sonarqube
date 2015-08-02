@@ -1,21 +1,21 @@
 {
-  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("ABCD").setKey("MyProject"));
+  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("P1").setKey("MyProject"));
   setDefaultProjectPermission(project);
-  ComponentDto module1=insertComponent(ComponentTesting.newModuleDto(project).setKey("module1"));
-  ComponentDto module2=insertComponent(ComponentTesting.newModuleDto(project).setKey("module2"));
-  ComponentDto directory1=insertComponent(ComponentTesting.newDirectory(module1,"src/main/java/dir"));
-  ComponentDto directory2=insertComponent(ComponentTesting.newDirectory(module2,"src/main/java/dir"));
-  ComponentDto file1=insertComponent(ComponentTesting.newFileDto(module1,"BCDE").setKey("module1:MyComponent").setPath(directory1.path() + "/MyComponent.java"));
-  insertComponent(ComponentTesting.newFileDto(module2,"CDEF").setKey("module2:MyComponent").setPath(directory2.path() + "/MyComponent.java"));
+  ComponentDto module1=insertComponent(ComponentTesting.newModuleDto("M1",project).setKey("module1"));
+  ComponentDto module2=insertComponent(ComponentTesting.newModuleDto("M2",project).setKey("module2"));
+  ComponentDto directory1=insertComponent(ComponentTesting.newDirectory(module1,"D1","src/main/java/dir"));
+  ComponentDto directory2=insertComponent(ComponentTesting.newDirectory(module2,"D2","src/main/java/dir"));
+  ComponentDto file1=insertComponent(ComponentTesting.newFileDto(module1,"F1").setKey("module1:MyComponent").setPath(directory1.path() + "/MyComponent.java"));
+  insertComponent(ComponentTesting.newFileDto(module2,"F2").setKey("module2:MyComponent").setPath(directory2.path() + "/MyComponent.java"));
   RuleDto rule=newRule();
   IssueDto issue1=IssueTesting.newDto(rule,file1,project).setKee("82fd47d4-b650-4037-80bc-7b112bd4eac2");
   db.issueDao().insert(session,issue1);
   session.commit();
   tester.get(IssueIndexer.class).indexAll();
-  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).setParam(IssueFilterParameters.COMPONENT_UUIDS,directory1.uuid()).execute().assertJson(this.getClass(),"search_by_directory_uuid.json");
-  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).setParam(IssueFilterParameters.COMPONENT_UUIDS,directory2.uuid()).execute().assertJson(this.getClass(),"no_issue.json");
-  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).setParam(IssueFilterParameters.MODULE_UUIDS,module1.uuid()).setParam(IssueFilterParameters.DIRECTORIES,"src/main/java/dir").execute().assertJson(this.getClass(),"search_by_directory_uuid.json");
-  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).setParam(IssueFilterParameters.MODULE_UUIDS,module2.uuid()).setParam(IssueFilterParameters.DIRECTORIES,"src/main/java/dir").execute().assertJson(this.getClass(),"no_issue.json");
-  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).setParam(IssueFilterParameters.DIRECTORIES,"src/main/java/dir").execute().assertJson(this.getClass(),"search_by_directory_uuid.json");
-  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).setParam(IssueFilterParameters.DIRECTORIES,"src/main/java").execute().assertJson(this.getClass(),"no_issue.json");
+  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION).setParam(IssueFilterParameters.COMPONENT_UUIDS,directory1.uuid()).execute().assertJson(this.getClass(),"search_by_directory_uuid.json");
+  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION).setParam(IssueFilterParameters.COMPONENT_UUIDS,directory2.uuid()).execute().assertJson(this.getClass(),"no_issue.json");
+  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION).setParam(IssueFilterParameters.MODULE_UUIDS,module1.uuid()).setParam(IssueFilterParameters.DIRECTORIES,"src/main/java/dir").execute().assertJson(this.getClass(),"search_by_directory_uuid.json");
+  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION).setParam(IssueFilterParameters.MODULE_UUIDS,module2.uuid()).setParam(IssueFilterParameters.DIRECTORIES,"src/main/java/dir").execute().assertJson(this.getClass(),"no_issue.json");
+  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION).setParam(IssueFilterParameters.DIRECTORIES,"src/main/java/dir").execute().assertJson(this.getClass(),"search_by_directory_uuid.json");
+  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION).setParam(IssueFilterParameters.DIRECTORIES,"src/main/java").execute().assertJson(this.getClass(),"no_issue.json");
 }

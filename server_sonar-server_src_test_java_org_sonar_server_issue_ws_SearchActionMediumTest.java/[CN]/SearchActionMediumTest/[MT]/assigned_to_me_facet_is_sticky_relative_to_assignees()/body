@@ -1,8 +1,8 @@
 {
   db.userDao().insert(session,new UserDto().setLogin("alice").setName("Alice").setEmail("alice@email.com"));
-  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("ABCD").setKey("MyProject"));
+  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("PROJECT_ID").setKey("MyProject"));
   setDefaultProjectPermission(project);
-  ComponentDto file=insertComponent(ComponentTesting.newFileDto(project,"BCDE").setKey("MyComponent"));
+  ComponentDto file=insertComponent(ComponentTesting.newFileDto(project,"FILE_ID").setKey("MyFile"));
   RuleDto rule=newRule();
   IssueDto issue1=IssueTesting.newDto(rule,file,project).setIssueCreationDate(DateUtils.parseDate("2014-09-04")).setIssueUpdateDate(DateUtils.parseDate("2017-12-04")).setDebt(10L).setStatus("OPEN").setKee("82fd47d4-b650-4037-80bc-7b112bd4eac2").setSeverity("MAJOR").setAssignee("john-bob.polop");
   IssueDto issue2=IssueTesting.newDto(rule,file,project).setIssueCreationDate(DateUtils.parseDate("2014-09-04")).setIssueUpdateDate(DateUtils.parseDate("2017-12-04")).setDebt(10L).setStatus("OPEN").setKee("7b112bd4-b650-4037-80bc-82fd47d4eac2").setSeverity("MAJOR").setAssignee("alice");
@@ -11,5 +11,5 @@
   session.commit();
   tester.get(IssueIndexer.class).indexAll();
   userSessionRule.login("john-bob.polop");
-  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).setParam("resolved","false").setParam("assignees","alice").setParam(WebService.Param.FACETS,"assignees,assigned_to_me").execute().assertJson(this.getClass(),"assigned_to_me_facet_sticky.json");
+  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION).setParam("resolved","false").setParam("assignees","alice").setParam(WebService.Param.FACETS,"assignees,assigned_to_me").execute().assertJson(this.getClass(),"assigned_to_me_facet_sticky.json");
 }

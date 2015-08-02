@@ -1,11 +1,11 @@
 {
-  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("ABCD").setKey("MyProject"));
+  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("PROJECT_ID").setKey("MyProject"));
   setDefaultProjectPermission(project);
-  ComponentDto file=insertComponent(ComponentTesting.newFileDto(project,"BCDE").setKey("MyComponent"));
+  ComponentDto file=insertComponent(ComponentTesting.newFileDto(project,"FILE_ID").setKey("MyComponent"));
   IssueDto issue=IssueTesting.newDto(newRule(),file,project);
   db.issueDao().insert(session,issue);
   session.commit();
   tester.get(IssueIndexer.class).indexAll();
-  WsTester.Result result=wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).execute();
+  WsTester.Result result=wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION).execute();
   assertThat(result.outputAsString()).contains("\"componentId\":" + file.getId() + ",");
 }

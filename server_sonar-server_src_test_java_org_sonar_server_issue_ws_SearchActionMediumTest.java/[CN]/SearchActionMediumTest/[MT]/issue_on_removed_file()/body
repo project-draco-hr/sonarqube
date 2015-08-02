@@ -1,0 +1,12 @@
+{
+  RuleDto rule=newRule();
+  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("PROJECT_ID").setKey("MyProject"));
+  setDefaultProjectPermission(project);
+  ComponentDto removedFile=insertComponent(ComponentTesting.newFileDto(project).setUuid("REMOVED_FILE_ID").setEnabled(false).setKey("RemovedComponent"));
+  IssueDto issue=IssueTesting.newDto(rule,removedFile,project).setKee("82fd47d4-b650-4037-80bc-7b112bd4eac2").setComponent(removedFile).setStatus("OPEN").setResolution("OPEN").setSeverity("MAJOR").setIssueCreationDate(DateUtils.parseDateTime("2014-09-04T00:00:00+0100")).setIssueUpdateDate(DateUtils.parseDateTime("2017-12-04T00:00:00+0100"));
+  db.issueDao().insert(session,issue);
+  session.commit();
+  tester.get(IssueIndexer.class).indexAll();
+  WsTester.Result result=wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION).execute();
+  result.assertJson(this.getClass(),"issue_on_removed_file.json");
+}

@@ -1,0 +1,12 @@
+{
+  if (collector.contains(COMMENTS)) {
+    List<IssueChangeDto> comments=dbClient.issueChangeDao().selectByTypeAndIssueKeys(dbSession,collector.getIssueKeys(),IssueChangeDto.TYPE_COMMENT);
+    result.setComments(comments);
+    for (    IssueChangeDto comment : comments) {
+      collector.add(USERS,comment.getUserLogin());
+      if (commentService.canEditOrDelete(comment)) {
+        result.addUpdatableComment(comment.getKey());
+      }
+    }
+  }
+}

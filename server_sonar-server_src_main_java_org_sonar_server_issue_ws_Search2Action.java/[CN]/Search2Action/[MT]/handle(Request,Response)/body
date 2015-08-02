@@ -1,0 +1,23 @@
+{
+  SearchOptions options=new SearchOptions();
+  options.setPage(request.mandatoryParamAsInt(Param.PAGE),request.mandatoryParamAsInt(Param.PAGE_SIZE));
+  options.addFacets(request.paramAsStrings(Param.FACETS));
+  EnumSet<SearchAdditionalField> additionalFields=SearchAdditionalField.getFromRequest(request);
+  IssueQuery query=issueQueryService.createFromRequest(request);
+  SearchResult<IssueDoc> result=service.search(query,options);
+  List<String> issueKeys=from(result.getDocs()).transform(IssueDocToKey.INSTANCE).toList();
+  SearchResponseLoader.Collector collector=new SearchResponseLoader.Collector(additionalFields,issueKeys);
+  collectLoggedInUser(collector);
+  collectRequestParams(collector,request);
+  Facets facets=null;
+  if (!options.getFacets().isEmpty()) {
+    facets=result.getFacets();
+    completeFacets(facets,options,request);
+    collectFacets(collector,facets);
+  }
+  SearchResponseData data=searchResponseLoader.load(collector,facets);
+  facets=reorderFacets(facets,options.getFacets());
+  Paging paging=Paging.create(options.getLimit(),options.getPage(),(int)result.getTotal());
+  Issues.Search responseBody=searchResponseFormat.format(additionalFields,data,paging,facets);
+  WsUtils.writeProtobuf(responseBody,request,response);
+}

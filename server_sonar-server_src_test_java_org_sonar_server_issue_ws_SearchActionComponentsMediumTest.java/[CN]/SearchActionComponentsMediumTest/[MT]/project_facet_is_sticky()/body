@@ -1,13 +1,13 @@
 {
-  ComponentDto project1=insertComponent(ComponentTesting.newProjectDto("ABCD").setKey("MyProject1"));
-  ComponentDto project2=insertComponent(ComponentTesting.newProjectDto("BCDE").setKey("MyProject2"));
-  ComponentDto project3=insertComponent(ComponentTesting.newProjectDto("CDEF").setKey("MyProject3"));
+  ComponentDto project1=insertComponent(ComponentTesting.newProjectDto("P1").setKey("MyProject1"));
+  ComponentDto project2=insertComponent(ComponentTesting.newProjectDto("P2").setKey("MyProject2"));
+  ComponentDto project3=insertComponent(ComponentTesting.newProjectDto("P3").setKey("MyProject3"));
   setDefaultProjectPermission(project1);
   setDefaultProjectPermission(project2);
   setDefaultProjectPermission(project3);
-  ComponentDto file1=insertComponent(ComponentTesting.newFileDto(project1,"FEDC").setKey("MyComponent1"));
-  ComponentDto file2=insertComponent(ComponentTesting.newFileDto(project2,"EDCB").setKey("MyComponent2"));
-  ComponentDto file3=insertComponent(ComponentTesting.newFileDto(project3,"DCBA").setKey("MyComponent3"));
+  ComponentDto file1=insertComponent(ComponentTesting.newFileDto(project1,"F1").setKey("MyComponent1"));
+  ComponentDto file2=insertComponent(ComponentTesting.newFileDto(project2,"F2").setKey("MyComponent2"));
+  ComponentDto file3=insertComponent(ComponentTesting.newFileDto(project3,"F3").setKey("MyComponent3"));
   RuleDto rule=newRule();
   IssueDto issue1=IssueTesting.newDto(rule,file1,project1).setKee("82fd47d4-b650-4037-80bc-7b112bd4eac2");
   IssueDto issue2=IssueTesting.newDto(rule,file2,project2).setKee("2bd4eac2-b650-4037-80bc-7b1182fd47d4");
@@ -15,5 +15,5 @@
   db.issueDao().insert(session,issue1,issue2,issue3);
   session.commit();
   tester.get(IssueIndexer.class).indexAll();
-  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).setParam(IssueFilterParameters.PROJECT_UUIDS,project1.uuid()).setParam(WebService.Param.FACETS,"projectUuids").execute().assertJson(this.getClass(),"display_sticky_project_facet.json");
+  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION).setParam(IssueFilterParameters.PROJECT_UUIDS,project1.uuid()).setParam(WebService.Param.FACETS,"projectUuids").execute().assertJson(this.getClass(),"display_sticky_project_facet.json");
 }

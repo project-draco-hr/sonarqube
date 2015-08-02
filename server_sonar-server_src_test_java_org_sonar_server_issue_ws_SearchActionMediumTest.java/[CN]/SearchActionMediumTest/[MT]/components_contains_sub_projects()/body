@@ -1,5 +1,5 @@
 {
-  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("ABCD").setKey("ProjectHavingModule"));
+  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("PROJECT_ID").setKey("ProjectHavingModule"));
   setDefaultProjectPermission(project);
   ComponentDto module=insertComponent(ComponentTesting.newModuleDto(project).setKey("ModuleHavingFile"));
   ComponentDto file=insertComponent(ComponentTesting.newFileDto(module,"BCDE").setKey("FileLinkedToModule"));
@@ -7,6 +7,6 @@
   db.issueDao().insert(session,issue);
   session.commit();
   tester.get(IssueIndexer.class).indexAll();
-  WsTester.Result result=wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).execute();
+  WsTester.Result result=wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION).setParam(Search2Action.ADDITIONAL_FIELDS,"_all").execute();
   result.assertJson(this.getClass(),"components_contains_sub_projects.json");
 }

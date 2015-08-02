@@ -1,0 +1,40 @@
+{
+  issueBuilder.setKey(dto.getKey());
+  ComponentDto component=data.getComponentByUuid(dto.getComponentUuid());
+  issueBuilder.setComponent(dto.getComponentUuid());
+  issueBuilder.setComponentId(component.getId());
+  ComponentDto project=data.getComponentByUuid(dto.getProjectUuid());
+  if (project != null) {
+    issueBuilder.setProject(project.uuid());
+  }
+  issueBuilder.setRule(dto.getRuleKey().toString());
+  issueBuilder.setSeverity(Common.Severity.valueOf(dto.getSeverity()));
+  issueBuilder.setAssignee(nullToEmpty(dto.getAssignee()));
+  issueBuilder.setReporter(nullToEmpty(dto.getReporter()));
+  issueBuilder.setResolution(nullToEmpty(dto.getResolution()));
+  issueBuilder.setStatus(nullToEmpty(dto.getStatus()));
+  issueBuilder.setActionPlan(nullToEmpty(dto.getActionPlanKey()));
+  issueBuilder.setMessage(nullToEmpty(dto.getMessage()));
+  issueBuilder.addAllTags(dto.getTags());
+  Long debt=dto.getDebt();
+  if (debt != null) {
+    issueBuilder.setDebt(durations.encode(Duration.create(debt)));
+  }
+  Integer line=dto.getLine();
+  if (line != null) {
+    issueBuilder.setLine(line);
+  }
+  issueBuilder.setAuthor(nullToEmpty(dto.getAuthorLogin()));
+  Date date=dto.getIssueCreationDate();
+  if (date != null) {
+    issueBuilder.setCreationDate(DateUtils.formatDateTime(date));
+  }
+  date=dto.getIssueUpdateDate();
+  if (date != null) {
+    issueBuilder.setUpdateDate(DateUtils.formatDateTime(date));
+  }
+  date=dto.getIssueCloseDate();
+  if (date != null) {
+    issueBuilder.setCloseDate(DateUtils.formatDateTime(date));
+  }
+}

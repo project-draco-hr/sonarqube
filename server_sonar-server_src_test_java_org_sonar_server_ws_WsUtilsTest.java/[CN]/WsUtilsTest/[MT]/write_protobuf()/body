@@ -1,0 +1,9 @@
+{
+  TestRequest request=new TestRequest();
+  request.setMediaType(MimeTypes.PROTOBUF);
+  DumbResponse response=new DumbResponse();
+  Issues.Issue msg=Issues.Issue.newBuilder().setKey("I1").build();
+  WsUtils.writeProtobuf(msg,request,response);
+  assertThat(response.stream().mediaType()).isEqualTo(MimeTypes.PROTOBUF);
+  assertThat(Issues.Issue.parseFrom(response.getFlushedOutput()).getKey()).isEqualTo("I1");
+}

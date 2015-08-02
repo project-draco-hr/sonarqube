@@ -1,13 +1,13 @@
 {
-  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("ABCD").setKey("MyProject"));
+  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("P1").setKey("MyProject"));
   setDefaultProjectPermission(project);
-  ComponentDto file=insertComponent(ComponentTesting.newFileDto(project,"BCDE").setKey("MyComponent"));
+  ComponentDto file=insertComponent(ComponentTesting.newFileDto(project,"F1").setKey("MyComponent"));
   IssueDto issue=IssueTesting.newDto(newRule(),file,project).setKee("82fd47d4-b650-4037-80bc-7b112bd4eac2");
   db.issueDao().insert(session,issue);
   session.commit();
   tester.get(IssueIndexer.class).indexAll();
-  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).setParam(IssueFilterParameters.PROJECT_UUIDS,project.uuid()).execute().assertJson(this.getClass(),"search_by_project_uuid.json");
-  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).setParam(IssueFilterParameters.PROJECT_UUIDS,"unknown").execute().assertJson(this.getClass(),"no_issue.json");
-  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).setParam(IssueFilterParameters.COMPONENT_UUIDS,project.uuid()).execute().assertJson(this.getClass(),"search_by_project_uuid.json");
-  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).setParam(IssueFilterParameters.COMPONENT_UUIDS,"unknown").execute().assertJson(this.getClass(),"no_issue.json");
+  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION).setParam(IssueFilterParameters.PROJECT_UUIDS,project.uuid()).execute().assertJson(this.getClass(),"search_by_project_uuid.json");
+  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION).setParam(IssueFilterParameters.PROJECT_UUIDS,"unknown").execute().assertJson(this.getClass(),"no_issue.json");
+  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION).setParam(IssueFilterParameters.COMPONENT_UUIDS,project.uuid()).execute().assertJson(this.getClass(),"search_by_project_uuid.json");
+  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION).setParam(IssueFilterParameters.COMPONENT_UUIDS,"unknown").execute().assertJson(this.getClass(),"no_issue.json");
 }

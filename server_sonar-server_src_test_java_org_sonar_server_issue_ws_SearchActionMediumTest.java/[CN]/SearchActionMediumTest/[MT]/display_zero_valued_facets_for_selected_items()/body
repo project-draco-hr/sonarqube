@@ -1,12 +1,12 @@
 {
-  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("ABCD").setKey("MyProject"));
+  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("PROJECT_ID").setKey("MyProject"));
   setDefaultProjectPermission(project);
-  ComponentDto file=insertComponent(ComponentTesting.newFileDto(project,"BCDE").setKey("MyComponent"));
+  ComponentDto file=insertComponent(ComponentTesting.newFileDto(project,"FILE_ID").setKey("MyComponent"));
   IssueDto issue=IssueTesting.newDto(newRule(),file,project).setIssueCreationDate(DateUtils.parseDate("2014-09-04")).setIssueUpdateDate(DateUtils.parseDate("2017-12-04")).setDebt(10L).setStatus("OPEN").setKee("82fd47d4-b650-4037-80bc-7b112bd4eac2").setSeverity("MAJOR");
   db.issueDao().insert(session,issue);
   session.commit();
   tester.get(IssueIndexer.class).indexAll();
   userSessionRule.login("john");
-  WsTester.Result result=wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).setParam("resolved","false").setParam("severities","MAJOR,MINOR").setParam("languages","xoo,polop,palap").setParam(WebService.Param.FACETS,"statuses,severities,resolutions,projectUuids,rules,fileUuids,assignees,assigned_to_me,languages,actionPlans").execute();
+  WsTester.Result result=wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION).setParam("resolved","false").setParam("severities","MAJOR,MINOR").setParam("languages","xoo,polop,palap").setParam(WebService.Param.FACETS,"statuses,severities,resolutions,projectUuids,rules,fileUuids,assignees,assigned_to_me,languages,actionPlans").execute();
   result.assertJson(this.getClass(),"display_zero_facets.json");
 }

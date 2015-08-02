@@ -1,0 +1,15 @@
+{
+  db.userDao().insert(session,new UserDto().setLogin("simon").setName("Simon").setEmail("simon@email.com"));
+  db.userDao().insert(session,new UserDto().setLogin("fabrice").setName("Fabrice").setEmail("fabrice@email.com"));
+  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("PROJECT_ID").setKey("MyProject"));
+  setDefaultProjectPermission(project);
+  ComponentDto file=insertComponent(ComponentTesting.newFileDto(project,"FILE_ID").setKey("MyComponent"));
+  tester.get(ActionPlanDao.class).save(new ActionPlanDto().setKey("AP-ABCD").setName("1.0").setStatus("OPEN").setProjectId(project.getId()).setUserLogin("simon"));
+  IssueDto issue=IssueTesting.newDto(newRule(),file,project).setKee("82fd47d4-b650-4037-80bc-7b112bd4eac2").setAuthorLogin("John").setAssignee("simon").setReporter("fabrice").setActionPlanKey("AP-ABCD");
+  db.issueDao().insert(session,issue);
+  session.commit();
+  tester.get(IssueIndexer.class).indexAll();
+  userSessionRule.login("john");
+  WsTester.Result result=wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION).setParam("additionalFields","_all").execute();
+  result.assertJson(this.getClass(),"load_additional_fields.json");
+}

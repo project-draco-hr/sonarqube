@@ -1,0 +1,15 @@
+{
+  response.setActionPlansPresentIfEmpty(true);
+  List<ActionPlanDto> actionPlans=data.getActionPlans();
+  if (actionPlans != null) {
+    Issues.ActionPlan.Builder planBuilder=Issues.ActionPlan.newBuilder();
+    for (    ActionPlanDto actionPlan : actionPlans) {
+      planBuilder.clear().setKey(actionPlan.getKey()).setName(nullToEmpty(actionPlan.getName())).setStatus(nullToEmpty(actionPlan.getStatus())).setProject(nullToEmpty(actionPlan.getProjectUuid()));
+      Date deadLine=actionPlan.getDeadLine();
+      if (deadLine != null) {
+        planBuilder.setDeadLine(DateUtils.formatDateTime(deadLine));
+      }
+      response.addActionPlans(planBuilder.build());
+    }
+  }
+}

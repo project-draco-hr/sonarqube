@@ -1,15 +1,15 @@
 {
   RuleDto rule=newRule();
-  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("ABCD").setKey("MyProject"));
+  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("PROJECT_ID").setKey("MyProject"));
   setDefaultProjectPermission(project);
-  ComponentDto file=insertComponent(ComponentTesting.newFileDto(project,"BCDE").setKey("MyComponent"));
+  ComponentDto file=insertComponent(ComponentTesting.newFileDto(project,"FILE_ID").setKey("MyComponent"));
   for (int i=0; i < 12; i++) {
     IssueDto issue=IssueTesting.newDto(rule,file,project);
     tester.get(IssueDao.class).insert(session,issue);
   }
   session.commit();
   tester.get(IssueIndexer.class).indexAll();
-  WsTester.TestRequest request=wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION);
+  WsTester.TestRequest request=wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION);
   request.setParam(IssueFilterParameters.PAGE_INDEX,"2");
   request.setParam(IssueFilterParameters.PAGE_SIZE,"9");
   WsTester.Result result=request.execute();

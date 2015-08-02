@@ -1,0 +1,18 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    SearchResponseData result=new SearchResponseData(dbClient.issueDao().selectByOrderedKeys(dbSession,collector.getIssueKeys()));
+    collector.collect(result.getIssues());
+    loadRules(collector,dbSession,result);
+    loadComments(collector,dbSession,result);
+    loadUsers(collector,dbSession,result);
+    loadActionPlans(collector,dbSession,result);
+    loadComponents(collector,dbSession,result);
+    loadActionsAndTransitions(collector,result);
+    completeTotalDebtFromFacet(facets,result);
+    return result;
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

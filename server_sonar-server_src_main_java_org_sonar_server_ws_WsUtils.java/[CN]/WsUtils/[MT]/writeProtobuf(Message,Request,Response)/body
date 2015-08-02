@@ -1,0 +1,18 @@
+{
+  OutputStream output=response.stream().output();
+  try {
+    if (request.getMediaType().equals(MimeTypes.PROTOBUF)) {
+      response.stream().setMediaType(MimeTypes.PROTOBUF);
+      msg.writeTo(output);
+    }
+ else {
+      response.stream().setMediaType(MimeTypes.JSON);
+      try (OutputStreamWriter writer=new OutputStreamWriter(output)){
+        ProtobufJsonFormat.write(msg,JsonWriter.of(writer));
+      }
+     }
+  }
+  finally {
+    IOUtils.closeQuietly(output);
+  }
+}

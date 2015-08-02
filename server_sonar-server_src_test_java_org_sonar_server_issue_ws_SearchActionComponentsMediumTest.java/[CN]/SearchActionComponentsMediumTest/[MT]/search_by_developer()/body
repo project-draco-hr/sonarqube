@@ -1,7 +1,7 @@
 {
-  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("ABCD").setKey("MyProject"));
+  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("P1").setKey("MyProject"));
   setDefaultProjectPermission(project);
-  ComponentDto file=insertComponent(ComponentTesting.newFileDto(project,"BCDE").setKey("MyComponent"));
+  ComponentDto file=insertComponent(ComponentTesting.newFileDto(project,"F1").setKey("MyComponent"));
   ComponentDto developer=insertComponent(ComponentTesting.newDeveloper("Anakin Skywalker"));
   db.authorDao().insertAuthor("vader",developer.getId());
   db.authorDao().insertAuthor("anakin@skywalker.name",developer.getId());
@@ -11,5 +11,5 @@
   db.issueDao().insert(session,issue1,issue2);
   session.commit();
   tester.get(IssueIndexer.class).indexAll();
-  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).setParam(IssueFilterParameters.COMPONENT_UUIDS,developer.uuid()).execute().assertJson(this.getClass(),"search_by_developer.json");
+  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION).setParam(IssueFilterParameters.COMPONENT_UUIDS,developer.uuid()).execute().assertJson(this.getClass(),"search_by_developer.json");
 }

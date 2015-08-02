@@ -1,13 +1,13 @@
 {
-  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("ABCD").setKey("MyProject"));
+  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("P1").setKey("MyProject"));
   setDefaultProjectPermission(project);
-  ComponentDto file=insertComponent(ComponentTesting.newFileDto(project,"BCDE").setKey("MyComponent"));
-  ComponentDto otherProject=insertComponent(ComponentTesting.newProjectDto("XXXX").setKey("OtherProject"));
+  ComponentDto file=insertComponent(ComponentTesting.newFileDto(project,"F1").setKey("MyComponent"));
+  ComponentDto otherProject=insertComponent(ComponentTesting.newProjectDto("P2").setKey("OtherProject"));
   setDefaultProjectPermission(otherProject);
-  ComponentDto otherFile=insertComponent(ComponentTesting.newFileDto(otherProject,"YYYY").setKey("OtherComponent"));
+  ComponentDto otherFile=insertComponent(ComponentTesting.newFileDto(otherProject,"F2").setKey("OtherComponent"));
   ComponentDto developer=insertComponent(ComponentTesting.newDeveloper("Anakin Skywalker"));
-  ComponentDto technicalProject=insertComponent(ComponentTesting.newDevProjectCopy("CDEF",project,developer));
-  insertComponent(ComponentTesting.newDevProjectCopy("DEFG",otherProject,developer));
+  ComponentDto technicalProject=insertComponent(ComponentTesting.newDevProjectCopy("COPY_P1",project,developer));
+  insertComponent(ComponentTesting.newDevProjectCopy("COPY_P2",otherProject,developer));
   db.authorDao().insertAuthor("vader",developer.getId());
   db.authorDao().insertAuthor("anakin@skywalker.name",developer.getId());
   RuleDto newRule=newRule();
@@ -17,6 +17,6 @@
   db.issueDao().insert(session,issue1,issue2,issueX);
   session.commit();
   tester.get(IssueIndexer.class).indexAll();
-  Result result=wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).setParam(IssueFilterParameters.COMPONENT_UUIDS,technicalProject.uuid()).execute();
+  Result result=wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION).setParam(IssueFilterParameters.COMPONENT_UUIDS,technicalProject.uuid()).execute();
   result.assertJson(this.getClass(),"search_by_developer.json");
 }

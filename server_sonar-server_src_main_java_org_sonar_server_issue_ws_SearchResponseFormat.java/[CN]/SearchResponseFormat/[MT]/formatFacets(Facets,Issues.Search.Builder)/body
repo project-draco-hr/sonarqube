@@ -1,0 +1,21 @@
+{
+  response.setFacetsPresentIfEmpty(true);
+  Common.Facet.Builder facetBuilder=Common.Facet.newBuilder();
+  for (  Map.Entry<String,LinkedHashMap<String,Long>> facet : facets.getAll().entrySet()) {
+    facetBuilder.clear();
+    facetBuilder.setProperty(facet.getKey());
+    LinkedHashMap<String,Long> buckets=facet.getValue();
+    if (buckets != null) {
+      for (      Map.Entry<String,Long> bucket : buckets.entrySet()) {
+        Common.FacetValue.Builder valueBuilder=facetBuilder.addValuesBuilder();
+        valueBuilder.setVal(bucket.getKey());
+        valueBuilder.setCount(bucket.getValue());
+        valueBuilder.build();
+      }
+    }
+ else {
+      facetBuilder.addAllValues(Collections.<Common.FacetValue>emptyList());
+    }
+    response.addFacets(facetBuilder.build());
+  }
+}

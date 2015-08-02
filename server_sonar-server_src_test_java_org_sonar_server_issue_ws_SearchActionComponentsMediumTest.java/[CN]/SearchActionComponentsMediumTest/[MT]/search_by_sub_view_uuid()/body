@@ -1,13 +1,13 @@
 {
-  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("ABCD").setKey("MyProject"));
+  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("P1").setKey("MyProject"));
   setDefaultProjectPermission(project);
-  ComponentDto file=insertComponent(ComponentTesting.newFileDto(project,"BCDE").setKey("MyComponent"));
+  ComponentDto file=insertComponent(ComponentTesting.newFileDto(project,"F1").setKey("MyComponent"));
   insertIssue(IssueTesting.newDto(newRule(),file,project).setKee("82fd47d4-b650-4037-80bc-7b112bd4eac2"));
-  ComponentDto view=insertComponent(ComponentTesting.newProjectDto("CDEF").setQualifier(Qualifiers.VIEW).setKey("MyView"));
+  ComponentDto view=insertComponent(ComponentTesting.newProjectDto("V1").setQualifier(Qualifiers.VIEW).setKey("MyView"));
   indexView(view.uuid(),newArrayList(project.uuid()));
-  ComponentDto subView=insertComponent(ComponentTesting.newProjectDto("DEFG").setQualifier(Qualifiers.SUBVIEW).setKey("MySubView"));
+  ComponentDto subView=insertComponent(ComponentTesting.newProjectDto("SV1").setQualifier(Qualifiers.SUBVIEW).setKey("MySubView"));
   indexView(subView.uuid(),newArrayList(project.uuid()));
   setAnyoneProjectPermission(view,UserRole.USER);
   userSessionRule.login("john").addComponentUuidPermission(UserRole.USER,view.uuid(),subView.uuid());
-  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,SearchAction.SEARCH_ACTION).setParam(IssueFilterParameters.COMPONENT_UUIDS,subView.uuid()).execute().assertJson(this.getClass(),"search_by_view_uuid.json");
+  wsTester.newGetRequest(IssuesWs.API_ENDPOINT,Search2Action.SEARCH_ACTION).setParam(IssueFilterParameters.COMPONENT_UUIDS,subView.uuid()).execute().assertJson(this.getClass(),"search_by_view_uuid.json");
 }

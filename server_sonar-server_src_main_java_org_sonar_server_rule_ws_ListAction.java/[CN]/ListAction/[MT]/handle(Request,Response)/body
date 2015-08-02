@@ -6,11 +6,7 @@
     dbClient.ruleDao().selectEnabledAndNonManual(dbSession,new ResultHandler(){
       @Override public void handleResult(      ResultContext resultContext){
         RuleDto dto=(RuleDto)resultContext.getResultObject();
-        ruleBuilder.clear().setRepository(dto.getRepositoryKey()).setKey(dto.getRuleKey());
-        String internalKey=dto.getConfigKey();
-        if (!Strings.isNullOrEmpty(internalKey)) {
-          ruleBuilder.setInternalKey(internalKey);
-        }
+        ruleBuilder.clear().setRepository(dto.getRepositoryKey()).setKey(dto.getRuleKey()).setName(nullToEmpty(dto.getName())).setInternalKey(nullToEmpty(dto.getConfigKey()));
         listResponseBuilder.addRules(ruleBuilder.build());
       }
     }
