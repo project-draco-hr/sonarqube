@@ -1,0 +1,28 @@
+{
+  List<MessageField> fields=new ArrayList<>();
+  BiMap<Descriptors.FieldDescriptor,Descriptors.FieldDescriptor> repeatedToBoolean=HashBiMap.create();
+  for (  Descriptors.FieldDescriptor desc : message.getDescriptorForType().getFields()) {
+    if (desc.isRepeated()) {
+      String booleanName=desc.getName() + "PresentIfEmpty";
+      Descriptors.FieldDescriptor booleanDesc=message.getDescriptorForType().findFieldByName(booleanName);
+      if (booleanDesc != null && booleanDesc.getJavaType() == Descriptors.FieldDescriptor.JavaType.BOOLEAN) {
+        repeatedToBoolean.put(desc,booleanDesc);
+      }
+    }
+  }
+  for (  Descriptors.FieldDescriptor descriptor : message.getDescriptorForType().getFields()) {
+    if (descriptor.isRepeated()) {
+      Descriptors.FieldDescriptor booleanDesc=repeatedToBoolean.get(descriptor);
+      if (booleanDesc == null) {
+        fields.add(new MessageRepeatedField(descriptor));
+      }
+ else {
+        fields.add(new MessageNullableRepeatedField(booleanDesc,descriptor));
+      }
+    }
+ else     if (!repeatedToBoolean.containsValue(descriptor)) {
+      fields.add(new MessageNonRepeatedField(descriptor));
+    }
+  }
+  return new MessageJsonDescriptor(fields.toArray(new MessageField[fields.size()]));
+}

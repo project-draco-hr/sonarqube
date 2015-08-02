@@ -1,5 +1,18 @@
 {
-  for (  Map.Entry<Descriptors.FieldDescriptor,Object> entry : message.getAllFields().entrySet()) {
-    writeField(entry.getKey(),entry.getValue(),writer);
+  MessageJsonDescriptor fields=MessageJsonDescriptor.of(message);
+  for (  MessageField field : fields.getFields()) {
+    if (field.hasValue(message)) {
+      writer.name(field.getName());
+      if (field.isRepeated()) {
+        writer.beginArray();
+        for (        Object o : (Collection)field.getValue(message)) {
+          writeFieldValue(field,o,writer);
+        }
+        writer.endArray();
+      }
+ else {
+        writeFieldValue(field,field.getValue(message),writer);
+      }
+    }
   }
 }
