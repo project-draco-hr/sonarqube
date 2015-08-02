@@ -1,0 +1,17 @@
+{
+  ByteArrayOutputStream byteOutput=new ByteArrayOutputStream();
+  LZ4BlockOutputStream compressedOutput=new LZ4BlockOutputStream(byteOutput);
+  try {
+    for (    DbFileSources.Test test : tests) {
+      test.writeDelimitedTo(compressedOutput);
+    }
+    compressedOutput.close();
+    return byteOutput.toByteArray();
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Fail to serialize and compress source tests",e);
+  }
+ finally {
+    IOUtils.closeQuietly(compressedOutput);
+  }
+}
