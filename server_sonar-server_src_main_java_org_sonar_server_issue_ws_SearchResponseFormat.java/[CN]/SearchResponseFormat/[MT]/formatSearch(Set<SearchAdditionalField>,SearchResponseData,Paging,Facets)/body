@@ -1,0 +1,27 @@
+{
+  Issues.Search.Builder response=Issues.Search.newBuilder();
+  formatPaging(paging,response);
+  formatDebtTotal(data,response);
+  response.addAllIssues(formatIssues(fields,data));
+  response.addAllComponents(formatComponents(data));
+  if (facets != null) {
+    formatFacets(facets,response);
+  }
+  if (fields.contains(SearchAdditionalField.RULES)) {
+    response.setRulesPresentIfEmpty(true);
+    response.addAllRules(formatRules(data));
+  }
+  if (fields.contains(SearchAdditionalField.USERS)) {
+    response.setUsersPresentIfEmpty(true);
+    response.addAllUsers(formatUsers(data));
+  }
+  if (fields.contains(SearchAdditionalField.ACTION_PLANS)) {
+    response.setActionPlansPresentIfEmpty(true);
+    response.addAllActionPlans(formatActionPlans(data));
+  }
+  if (fields.contains(SearchAdditionalField.LANGUAGES)) {
+    response.setLanguagesPresentIfEmpty(true);
+    response.addAllLanguages(formatLanguages());
+  }
+  return response.build();
+}
