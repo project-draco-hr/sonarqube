@@ -1,6 +1,16 @@
 {
+  MockitoAnnotations.initMocks(this);
+  RuleKey ruleKey=RuleKey.of("repo","key");
   issue=new DefaultIssue();
   issue.setKey("key");
-  issueCache=mock(IssueCache.class);
+  issue.setAssignee("user");
+  issue.setRuleKey(ruleKey);
   when(issueCache.all()).thenReturn(ImmutableList.of(issue));
+  BatchInput.User.Builder userBuilder=BatchInput.User.newBuilder();
+  userBuilder.setLogin("user");
+  userBuilder.setName("name");
+  when(userRepository.loadFromWs(anyListOf(String.class))).thenReturn(ImmutableList.of(userBuilder.build()));
+  Rule r=mock(Rule.class);
+  when(r.name()).thenReturn("rule name");
+  when(rules.find(ruleKey)).thenReturn(r);
 }

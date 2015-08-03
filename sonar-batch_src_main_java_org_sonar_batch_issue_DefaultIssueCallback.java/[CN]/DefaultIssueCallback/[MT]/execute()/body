@@ -3,6 +3,23 @@
     return;
   }
   for (  DefaultIssue issue : issues.all()) {
-    listener.handle(issue);
+    collectInfo(issue);
+  }
+  getUsers();
+  for (  DefaultIssue issue : issues.all()) {
+    IssueListener.Issue newIssue=new IssueListener.Issue();
+    newIssue.setAssigneeLogin(issue.assignee());
+    newIssue.setAssigneeName(getAssigneeName(issue.assignee()));
+    newIssue.setComponentKey(issue.componentKey());
+    newIssue.setKey(issue.key());
+    newIssue.setLine(issue.getLine());
+    newIssue.setMessage(issue.getMessage());
+    newIssue.setNew(issue.isNew());
+    newIssue.setResolution(issue.resolution());
+    newIssue.setRuleKey(issue.getRuleKey().rule());
+    newIssue.setRuleName(getRuleName(issue.getRuleKey()));
+    newIssue.setSeverity(issue.severity());
+    newIssue.setStatus(issue.status());
+    listener.handle(newIssue);
   }
 }
