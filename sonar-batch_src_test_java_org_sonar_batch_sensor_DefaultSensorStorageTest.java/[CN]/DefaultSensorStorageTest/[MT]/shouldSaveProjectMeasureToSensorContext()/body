@@ -1,7 +1,9 @@
 {
+  DefaultInputModule module=new DefaultInputModule(project.getEffectiveKey());
+  resourceCache.add(project,null).setInputComponent(module);
   ArgumentCaptor<org.sonar.api.measures.Measure> argumentCaptor=ArgumentCaptor.forClass(org.sonar.api.measures.Measure.class);
   when(measureCache.put(eq(project),argumentCaptor.capture())).thenReturn(null);
-  sensorStorage.store(new DefaultMeasure().onProject().forMetric(CoreMetrics.NCLOC).withValue(10));
+  sensorStorage.store(new DefaultMeasure().on(module).forMetric(CoreMetrics.NCLOC).withValue(10));
   org.sonar.api.measures.Measure m=argumentCaptor.getValue();
   assertThat(m.getValue()).isEqualTo(10.0);
   assertThat(m.getMetric()).isEqualTo(CoreMetrics.NCLOC);

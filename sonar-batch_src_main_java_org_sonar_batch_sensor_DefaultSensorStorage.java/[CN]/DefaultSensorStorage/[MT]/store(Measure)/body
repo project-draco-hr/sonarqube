@@ -4,14 +4,9 @@
   org.sonar.api.measures.Measure measureToSave=new org.sonar.api.measures.Measure(m);
   setValueAccordingToMetricType(newMeasure,m,measureToSave);
   measureToSave.setFromCore(measure.isFromCore());
-  InputFile inputFile=newMeasure.inputFile();
-  if (inputFile != null) {
-    File sonarFile=getFile(inputFile);
-    if (coverageExclusions.accept(sonarFile,measureToSave)) {
-      saveMeasure(sonarFile,measureToSave);
-    }
-  }
- else {
-    saveMeasure(project,measureToSave);
+  InputComponent inputComponent=newMeasure.inputComponent();
+  Resource resource=resourceCache.get(inputComponent).resource();
+  if (coverageExclusions.accept(resource,measureToSave)) {
+    saveMeasure(resource,measureToSave);
   }
 }
