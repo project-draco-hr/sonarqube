@@ -1,7 +1,8 @@
 {
   when(permissionTemplateDao.selectTemplateByKey(anyString())).thenReturn(new PermissionTemplateDto().setId(1L).setKee("my_template"));
-  when(permissionTemplateDao.selectUsers(any(PermissionQuery.class),anyLong(),anyInt(),anyInt())).thenReturn(newArrayList(new UserWithPermissionDto().setName("user1").setPermission("user")));
-  UserWithPermissionQueryResult result=finder.findUsersWithPermissionTemplate(PermissionQuery.builder().permission("user").template("my_template").build());
+  when(permissionTemplateDao.selectUsers(any(DbSession.class),any(PermissionQuery.class),anyLong(),anyInt(),anyInt())).thenReturn(newArrayList(new UserWithPermissionDto().setName("user1").setPermission("user")));
+  when(permissionTemplateDao.countUsers(any(DbSession.class),any(PermissionQuery.class),anyLong())).thenReturn(1);
+  UserWithPermissionQueryResult result=underTest.findUsersWithPermissionTemplate(PermissionQuery.builder().permission("user").template("my_template").build());
   assertThat(result.users()).hasSize(1);
-  assertThat(result.hasMoreResults()).isFalse();
+  assertThat(result.total()).isEqualTo(1);
 }

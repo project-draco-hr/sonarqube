@@ -1,0 +1,28 @@
+{
+  String permission=request.mandatoryParam("permission");
+  String selected=request.param(Param.SELECTED);
+  int page=request.mandatoryParamAsInt(Param.PAGE);
+  int pageSize=request.mandatoryParamAsInt(Param.PAGE_SIZE);
+  String query=request.param(Param.TEXT_QUERY);
+  if (query != null) {
+    selected=SelectionMode.ALL.value();
+  }
+  userSession.checkLoggedIn().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+  PermissionQuery.Builder permissionQuery=PermissionQuery.builder().permission(permission).pageIndex(page).pageSize(pageSize).membership(toMembership(firstNonNull(selected,SelectionMode.SELECTED.value())));
+  if (query != null) {
+    permissionQuery.search(query);
+  }
+  UserWithPermissionQueryResult usersResult=permissionFinder.findUsersWithPermission(permissionQuery.build());
+  List<UserWithPermission> usersWithPermission=usersResult.users();
+  Permissions.UsersResponse.Builder userResponse=Permissions.UsersResponse.newBuilder();
+  Permissions.UsersResponse.User.Builder user=Permissions.UsersResponse.User.newBuilder();
+  Common.Paging.Builder paging=Common.Paging.newBuilder();
+  for (  UserWithPermission userWithPermission : usersWithPermission) {
+    userResponse.addUsers(user.clear().setLogin(userWithPermission.login()).setName(userWithPermission.name()).setSelected(userWithPermission.hasPermission()));
+    userResponse.setPaging(paging.clear().setPages(page).setPageSize(pageSize).setTotal(usersResult.total()));
+  }
+  response.stream().setMediaType(MimeTypes.JSON);
+  JsonWriter json=response.newJsonWriter();
+  ProtobufJsonFormat.write(userResponse.build(),json);
+  json.close();
+}

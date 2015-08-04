@@ -1,5 +1,12 @@
 {
   Long permissionTemplateId=templateId(query.template());
-  int limit=limit(query);
-  return toUserQueryResult(permissionTemplateDao.selectUsers(query,permissionTemplateId,offset(query),limit),limit);
+  int limit=query.pageSize();
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    int total=permissionTemplateDao.countUsers(dbSession,query,permissionTemplateId);
+    return toUserQueryResult(permissionTemplateDao.selectUsers(dbSession,query,permissionTemplateId,offset(query),limit),total);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
 }
