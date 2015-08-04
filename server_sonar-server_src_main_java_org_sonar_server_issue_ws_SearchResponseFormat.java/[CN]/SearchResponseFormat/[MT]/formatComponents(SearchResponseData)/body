@@ -1,9 +1,21 @@
 {
-  List<Common.Component> result=new ArrayList<>();
+  List<Issues.Component> result=new ArrayList<>();
   Collection<ComponentDto> components=data.getComponents();
   if (components != null) {
     for (    ComponentDto dto : components) {
-      result.add(commonFormat.formatComponent(dto).build());
+      Issues.Component.Builder builder=Issues.Component.newBuilder().setId(dto.getId()).setKey(dto.key()).setUuid(dto.uuid()).setQualifier(dto.qualifier()).setName(nullToEmpty(dto.name())).setLongName(nullToEmpty(dto.longName())).setEnabled(dto.isEnabled());
+      String path=dto.path();
+      if (!Strings.isNullOrEmpty(path)) {
+        builder.setPath(path);
+      }
+      if (dto.projectUuid() != null && dto.parentProjectId() != null) {
+        ComponentDto project=data.getComponentByUuid(dto.projectUuid());
+        builder.setProjectId(project.getId());
+      }
+      if (dto.parentProjectId() != null) {
+        builder.setSubProjectId(dto.parentProjectId());
+      }
+      result.add(builder.build());
     }
   }
   return result;
