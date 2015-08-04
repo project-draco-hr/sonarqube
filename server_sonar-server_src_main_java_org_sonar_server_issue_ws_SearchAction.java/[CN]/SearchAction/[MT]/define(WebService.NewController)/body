@@ -1,10 +1,10 @@
 {
-  WebService.NewAction action=controller.createAction(SEARCH_ACTION).setHandler(this).setDescription("Get a list of issues. Requires Browse permission on project(s)").setSince("3.6").setResponseExample(Resources.getResource(this.getClass(),"example-search.json"));
+  WebService.NewAction action=controller.createAction(SEARCH_ACTION).setHandler(this).setDescription("Search for issues. Requires Browse permission on project(s)").setSince("3.6").setResponseExample(Resources.getResource(this.getClass(),"example-search.json"));
   action.addPagingParams(100);
-  action.createParam(WebService.Param.FACETS).setDescription("Comma-separated list of the facets to be computed. No facet is computed by default.").setPossibleValues(IssueIndex.SUPPORTED_FACETS);
+  action.createParam(Param.FACETS).setDescription("Comma-separated list of the facets to be computed. No facet is computed by default.").setPossibleValues(IssueIndex.SUPPORTED_FACETS);
   action.createParam(IssueFilterParameters.FACET_MODE).setDefaultValue(IssueFilterParameters.FACET_MODE_COUNT).setDescription("Choose the returned value for facet items, either count of issues or sum of debt.").setPossibleValues(IssueFilterParameters.FACET_MODE_COUNT,IssueFilterParameters.FACET_MODE_DEBT);
   action.addSortParams(IssueQuery.SORTS,null,true);
-  action.addFieldsParam(IssueJsonWriter.SELECTABLE_FIELDS);
+  action.createParam(ADDITIONAL_FIELDS).setDescription("Comma-separated list of the optional fields to be returned in response.").setPossibleValues(SearchAdditionalField.possibleValues());
   addComponentRelatedParams(action);
   action.createParam(IssueFilterParameters.ISSUES).setDescription("Comma-separated list of issue keys").setExampleValue("5bccd6e8-f525-43a2-8d76-fcb13dde79ef");
   action.createParam(IssueFilterParameters.SEVERITIES).setDescription("Comma-separated list of severities").setExampleValue(Severity.BLOCKER + "," + Severity.CRITICAL).setPossibleValues(Severity.ALL);
@@ -13,8 +13,6 @@
   action.createParam(IssueFilterParameters.RESOLVED).setDescription("To match resolved or unresolved issues").setBooleanPossibleValues();
   action.createParam(IssueFilterParameters.RULES).setDescription("Comma-separated list of coding rule keys. Format is <repository>:<rule>").setExampleValue("squid:AvoidCycles");
   action.createParam(IssueFilterParameters.TAGS).setDescription("Comma-separated list of tags.").setExampleValue("security,convention");
-  action.createParam(IssueFilterParameters.HIDE_RULES).setDescription("To not return rules").setDefaultValue(false).setBooleanPossibleValues();
-  action.createParam(IssueFilterParameters.HIDE_COMMENTS).setDescription("To not return comments").setDefaultValue(false).setBooleanPossibleValues();
   action.createParam(IssueFilterParameters.ACTION_PLANS).setDescription("Comma-separated list of action plan keys (not names)").setExampleValue("3f19de90-1521-4482-a737-a311758ff513");
   action.createParam(IssueFilterParameters.PLANNED).setDescription("To retrieve issues associated to an action plan or not").setBooleanPossibleValues();
   action.createParam(IssueFilterParameters.REPORTERS).setDescription("Comma-separated list of reporter logins").setExampleValue("admin");
@@ -26,5 +24,4 @@
   action.createParam(IssueFilterParameters.CREATED_AFTER).setDescription("To retrieve issues created after the given date (exclusive). Format: date or datetime ISO formats. If this parameter is set, createdSince must not be set").setExampleValue("2013-05-01 (or 2013-05-01T13:00:00+0100)");
   action.createParam(IssueFilterParameters.CREATED_BEFORE).setDescription("To retrieve issues created before the given date (exclusive). Format: date or datetime ISO formats").setExampleValue("2013-05-01 (or 2013-05-01T13:00:00+0100)");
   action.createParam(IssueFilterParameters.CREATED_IN_LAST).setDescription("To retrieve issues created during a time span before the current time (exclusive). " + "Accepted units are 'y' for year, 'm' for month, 'w' for week and 'd' for day. " + "If this parameter is set, createdAfter must not be set").setExampleValue("1m2w (1 month 2 weeks)");
-  action.createParam("format").setDescription("Only json format is available. This parameter is kept only for backward compatibility and shouldn't be used anymore");
 }

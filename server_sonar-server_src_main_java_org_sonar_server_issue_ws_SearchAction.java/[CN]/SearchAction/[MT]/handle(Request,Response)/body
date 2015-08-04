@@ -1,15 +1,23 @@
 {
   SearchOptions options=new SearchOptions();
-  options.setPage(request.mandatoryParamAsInt(WebService.Param.PAGE),request.mandatoryParamAsInt(WebService.Param.PAGE_SIZE));
-  options.addFacets(request.paramAsStrings(WebService.Param.FACETS));
+  options.setPage(request.mandatoryParamAsInt(Param.PAGE),request.mandatoryParamAsInt(Param.PAGE_SIZE));
+  options.addFacets(request.paramAsStrings(Param.FACETS));
+  EnumSet<SearchAdditionalField> additionalFields=SearchAdditionalField.getFromRequest(request);
   IssueQuery query=issueQueryService.createFromRequest(request);
   SearchResult<IssueDoc> result=service.search(query,options);
-  JsonWriter json=response.newJsonWriter().beginObject();
-  options.writeJson(json,result.getTotal());
-  options.writeDeprecatedJson(json,result.getTotal());
-  writeResponse(request,result,json);
+  List<String> issueKeys=from(result.getDocs()).transform(IssueDocToKey.INSTANCE).toList();
+  SearchResponseLoader.Collector collector=new SearchResponseLoader.Collector(additionalFields,issueKeys);
+  collectLoggedInUser(collector);
+  collectRequestParams(collector,request);
+  Facets facets=null;
   if (!options.getFacets().isEmpty()) {
-    writeFacets(request,options,result,json);
+    facets=result.getFacets();
+    completeFacets(facets,options,request);
+    collectFacets(collector,facets);
   }
-  json.endObject().close();
+  SearchResponseData data=searchResponseLoader.load(collector,facets);
+  facets=reorderFacets(facets,options.getFacets());
+  Paging paging=Paging.create(options.getLimit(),options.getPage(),(int)result.getTotal());
+  Issues.Search responseBody=searchResponseFormat.formatSearch(additionalFields,data,paging,facets);
+  WsUtils.writeProtobuf(responseBody,request,response);
 }
