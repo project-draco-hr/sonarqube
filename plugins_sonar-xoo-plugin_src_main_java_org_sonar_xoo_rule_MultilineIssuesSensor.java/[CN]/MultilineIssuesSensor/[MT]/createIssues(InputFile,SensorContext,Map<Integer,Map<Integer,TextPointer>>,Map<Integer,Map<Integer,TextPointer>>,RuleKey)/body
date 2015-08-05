@@ -1,0 +1,15 @@
+{
+  for (  Map.Entry<Integer,Map<Integer,TextPointer>> entry : startPositions.entrySet()) {
+    NewIssue newIssue=context.newIssue().forRule(ruleKey);
+    for (    Map.Entry<Integer,TextPointer> location : entry.getValue().entrySet()) {
+      NewIssueLocation newLocation=newIssue.newLocation().on(file).at(file.newRange(location.getValue(),endPositions.get(entry.getKey()).get(location.getKey())));
+      if (location.getKey() == 1) {
+        newIssue.at(newLocation.message("Primary location"));
+      }
+ else {
+        newIssue.addLocation(newLocation.message("Location #" + location.getKey()));
+      }
+    }
+    newIssue.save();
+  }
+}
