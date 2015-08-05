@@ -21,5 +21,21 @@
   if (reportIssue.hasAttributes()) {
     issue.setAttributes(KeyValueFormat.parse(reportIssue.getAttributes()));
   }
+  DbIssues.Locations.Builder dbLocationsBuilder=DbIssues.Locations.newBuilder();
+  if (reportIssue.hasPrimaryLocation()) {
+    BatchReport.IssueLocation location=reportIssue.getPrimaryLocation();
+    dbLocationsBuilder.setPrimary(convertLocation(location));
+  }
+  for (  BatchReport.IssueLocation location : reportIssue.getAdditionalLocationList()) {
+    dbLocationsBuilder.addSecondary(convertLocation(location));
+  }
+  for (  BatchReport.ExecutionFlow flow : reportIssue.getExecutionFlowList()) {
+    DbIssues.ExecutionFlow.Builder dbFlowBuilder=DbIssues.ExecutionFlow.newBuilder();
+    for (    BatchReport.IssueLocation location : flow.getLocationList()) {
+      dbFlowBuilder.addLocations(convertLocation(location));
+    }
+    dbLocationsBuilder.addExecutionFlow(dbFlowBuilder);
+  }
+  issue.setLocations(dbLocationsBuilder.build());
   return issue;
 }

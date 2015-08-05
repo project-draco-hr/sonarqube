@@ -1,0 +1,19 @@
+{
+  DbIssues.Locations locations=dto.parseLocations();
+  if (locations != null) {
+    if (locations.hasPrimary()) {
+      DbIssues.Location primary=locations.getPrimary();
+      issueBuilder.setLocation(convertLocation(primary));
+    }
+    for (    DbIssues.Location secondary : locations.getSecondaryList()) {
+      issueBuilder.addSecondaryLocations(convertLocation(secondary));
+    }
+    for (    DbIssues.ExecutionFlow flow : locations.getExecutionFlowList()) {
+      Issues.ExecutionFlow.Builder targetFlow=Issues.ExecutionFlow.newBuilder();
+      for (      DbIssues.Location flowLocation : flow.getLocationsList()) {
+        targetFlow.addLocations(convertLocation(flowLocation));
+      }
+      issueBuilder.addExecutionFlows(targetFlow);
+    }
+  }
+}
