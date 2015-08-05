@@ -1,0 +1,33 @@
+{
+  RuleKey ruleKey=RuleKey.of(XooRulesDefinition.XOO_REPOSITORY,RULE_KEY);
+  for (  Map.Entry<Integer,Map<Integer,TextPointer>> entry : startPositions.rowMap().entrySet()) {
+    Integer issueId=entry.getKey();
+    NewIssue newIssue=context.newIssue().forRule(ruleKey);
+    for (    Map.Entry<Integer,TextPointer> location : entry.getValue().entrySet()) {
+      NewIssueLocation newLocation=newIssue.newLocation().on(file).at(file.newRange(location.getValue(),endPositions.row(entry.getKey()).get(location.getKey())));
+      if (location.getKey() == 1) {
+        newIssue.at(newLocation.message("Primary location"));
+      }
+ else {
+        newIssue.addLocation(newLocation.message("Location #" + location.getKey()));
+      }
+    }
+    if (startFlowsPositions.containsKey(issueId)) {
+      Table<Integer,Integer,TextPointer> flows=startFlowsPositions.get(issueId);
+      for (      Map.Entry<Integer,Map<Integer,TextPointer>> flowEntry : flows.rowMap().entrySet()) {
+        Integer flowId=flowEntry.getKey();
+        List<NewIssueLocation> flowLocations=Lists.newArrayList();
+        List<Integer> flowNums=Lists.newArrayList(flowEntry.getValue().keySet());
+        Collections.sort(flowNums);
+        for (        Integer flowNum : flowNums) {
+          TextPointer start=flowEntry.getValue().get(flowNum);
+          TextPointer end=endFlowsPositions.get(issueId).row(flowId).get(flowNum);
+          NewIssueLocation newLocation=newIssue.newLocation().on(file).at(file.newRange(start,end)).message("Flow step #" + flowNum);
+          flowLocations.add(newLocation);
+        }
+        newIssue.addExecutionFlow(flowLocations);
+      }
+    }
+    newIssue.save();
+  }
+}

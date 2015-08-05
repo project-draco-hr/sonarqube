@@ -3,25 +3,19 @@
   try {
     for (    String lineStr : Files.readAllLines(file.path(),context.fileSystem().encoding())) {
       currentLine++;
-      Matcher m=startPattern.matcher(lineStr);
+      Matcher m=START_ISSUE_PATTERN.matcher(lineStr);
       while (m.find()) {
         Integer issueId=Integer.parseInt(m.group(1));
         Integer issueLocationId=Integer.parseInt(m.group(2));
         TextPointer newPointer=file.newPointer(currentLine,m.end());
-        if (!startPositions.containsKey(issueId)) {
-          startPositions.put(issueId,new HashMap<Integer,TextPointer>());
-        }
-        startPositions.get(issueId).put(issueLocationId,newPointer);
+        startPositions.row(issueId).put(issueLocationId,newPointer);
       }
-      m=endPattern.matcher(lineStr);
+      m=END_ISSUE_PATTERN.matcher(lineStr);
       while (m.find()) {
         Integer issueId=Integer.parseInt(m.group(1));
         Integer issueLocationId=Integer.parseInt(m.group(2));
         TextPointer newPointer=file.newPointer(currentLine,m.start());
-        if (!endPositions.containsKey(issueId)) {
-          endPositions.put(issueId,new HashMap<Integer,TextPointer>());
-        }
-        endPositions.get(issueId).put(issueLocationId,newPointer);
+        endPositions.row(issueId).put(issueLocationId,newPointer);
       }
     }
   }
