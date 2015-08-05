@@ -24,7 +24,9 @@
   DbIssues.Locations.Builder dbLocationsBuilder=DbIssues.Locations.newBuilder();
   if (reportIssue.hasPrimaryLocation()) {
     BatchReport.IssueLocation location=reportIssue.getPrimaryLocation();
-    dbLocationsBuilder.setPrimary(convertLocation(location));
+    if (location.hasTextRange()) {
+      dbLocationsBuilder.setPrimary(convertTextRange(location.getTextRange()));
+    }
   }
   for (  BatchReport.IssueLocation location : reportIssue.getAdditionalLocationList()) {
     dbLocationsBuilder.addSecondary(convertLocation(location));
@@ -32,7 +34,7 @@
   for (  BatchReport.ExecutionFlow flow : reportIssue.getExecutionFlowList()) {
     DbIssues.ExecutionFlow.Builder dbFlowBuilder=DbIssues.ExecutionFlow.newBuilder();
     for (    BatchReport.IssueLocation location : flow.getLocationList()) {
-      dbFlowBuilder.addLocations(convertLocation(location));
+      dbFlowBuilder.addLocation(convertLocation(location));
     }
     dbLocationsBuilder.addExecutionFlow(dbFlowBuilder);
   }
