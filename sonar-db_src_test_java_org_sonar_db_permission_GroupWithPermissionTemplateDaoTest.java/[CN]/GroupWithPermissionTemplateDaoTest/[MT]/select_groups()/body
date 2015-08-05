@@ -1,8 +1,10 @@
 {
   dbTester.prepareDbUnit(getClass(),"groups_with_permissions.xml");
   PermissionQuery query=PermissionQuery.builder().permission("user").build();
-  List<GroupWithPermissionDto> result=dao.selectGroups(query,TEMPLATE_ID);
+  List<GroupWithPermissionDto> result=underTest.selectGroups(session,query,TEMPLATE_ID);
+  int count=underTest.countGroups(session,query,TEMPLATE_ID);
   assertThat(result).hasSize(4);
+  assertThat(count).isEqualTo(4);
   GroupWithPermissionDto anyone=result.get(0);
   assertThat(anyone.getName()).isEqualTo("Anyone");
   assertThat(anyone.getDescription()).isNull();

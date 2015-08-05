@@ -1,4 +1,10 @@
 {
   Long componentId=componentId(query.component());
-  return toGroupQueryResult(permissionDao.selectGroups(query,componentId),query);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    return toGroupQueryResult(permissionDao.selectGroups(dbSession,query,componentId),query);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
 }
