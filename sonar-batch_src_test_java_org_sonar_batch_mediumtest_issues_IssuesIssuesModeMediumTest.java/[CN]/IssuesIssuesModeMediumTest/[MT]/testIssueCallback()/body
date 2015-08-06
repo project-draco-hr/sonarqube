@@ -1,0 +1,13 @@
+{
+  File projectDir=new File(IssuesMediumTest.class.getResource("/mediumtest/xoo/sample").toURI());
+  File tmpDir=temp.newFolder();
+  FileUtils.copyDirectory(projectDir,tmpDir);
+  IssueRecorder issueListener=new IssueRecorder();
+  TaskResult result1=testerPreview.newScanTask(new File(tmpDir,"sonar-project.properties")).setIssueListener(issueListener).property(CoreProperties.ANALYSIS_MODE,CoreProperties.ANALYSIS_MODE_ISSUES).start();
+  assertThat(result1.trackedIssues()).hasSize(14);
+  assertThat(issueListener.issueList).hasSize(14);
+  issueListener=new IssueRecorder();
+  TaskResult result2=testerPreview.newScanTask(new File(tmpDir,"sonar-project.properties")).setIssueListener(issueListener).property(CoreProperties.ANALYSIS_MODE,CoreProperties.ANALYSIS_MODE_ISSUES).start();
+  assertThat(result2.trackedIssues()).hasSize(28);
+  assertThat(issueListener.issueList).hasSize(28);
+}
