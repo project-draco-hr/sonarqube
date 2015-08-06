@@ -5,11 +5,11 @@
   session.commit();
   assertThat(tester.get(RoleDao.class).selectGroupPermissions(session,group.getName(),project.getId())).isEmpty();
   PermissionChange change=new PermissionChange().setPermission(UserRole.USER).setGroup(group.getName()).setComponentKey(project.key());
-  service.addPermission(change);
+  underTest.addPermission(change);
   session.commit();
   assertThat(tester.get(RoleDao.class).selectGroupPermissions(session,group.getName(),project.getId())).hasSize(1);
   assertThat(countIssueAuthorizationDocs()).isEqualTo(1);
-  service.removePermission(change);
+  underTest.removePermission(change);
   session.commit();
   assertThat(tester.get(RoleDao.class).selectGroupPermissions(session,group.getName(),project.getId())).hasSize(0);
   SearchResponse docs=getAllIndexDocs();
