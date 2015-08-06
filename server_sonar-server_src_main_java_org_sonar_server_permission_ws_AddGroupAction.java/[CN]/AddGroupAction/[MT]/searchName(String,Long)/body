@@ -1,0 +1,17 @@
+{
+  checkParameters(groupNameParam,groupId);
+  if (groupNameParam != null) {
+    return groupNameParam;
+  }
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    GroupDto group=dbClient.groupDao().selectById(dbSession,groupId);
+    if (group == null) {
+      throw new NotFoundException(String.format("Group with id '%d' not found",groupId));
+    }
+    return group.getName();
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}
