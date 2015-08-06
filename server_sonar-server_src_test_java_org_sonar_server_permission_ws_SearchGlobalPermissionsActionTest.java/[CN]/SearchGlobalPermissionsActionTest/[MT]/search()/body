@@ -1,0 +1,18 @@
+{
+  RoleDao roleDao=db.getDbClient().roleDao();
+  GroupDao groupDao=db.getDbClient().groupDao();
+  GroupDto adminGroup=groupDao.insert(db.getSession(),new GroupDto().setName("sonar-admins").setDescription("Administrators"));
+  GroupDto userGroup=groupDao.insert(db.getSession(),new GroupDto().setName("sonar-users").setDescription("Users"));
+  roleDao.insertGroupRole(db.getSession(),newGroupRoleDto(SCAN_EXECUTION,userGroup.getId()));
+  roleDao.insertGroupRole(db.getSession(),newGroupRoleDto(SYSTEM_ADMIN,adminGroup.getId()));
+  roleDao.insertGroupRole(db.getSession(),newGroupRoleDto(SCAN_EXECUTION,null));
+  UserDto user=db.getDbClient().userDao().insert(db.getSession(),new UserDto().setLogin("user").setName("user-name").setActive(true));
+  UserDto adminUser=db.getDbClient().userDao().insert(db.getSession(),new UserDto().setLogin("admin").setName("admin-name").setActive(true));
+  roleDao.insertUserRole(db.getSession(),newUserRoleDto(PROVISIONING,user.getId()));
+  roleDao.insertUserRole(db.getSession(),newUserRoleDto(QUALITY_PROFILE_ADMIN,adminUser.getId()));
+  roleDao.insertUserRole(db.getSession(),newUserRoleDto(PREVIEW_EXECUTION,adminUser.getId()));
+  roleDao.insertUserRole(db.getSession(),newUserRoleDto(PREVIEW_EXECUTION,user.getId()));
+  db.getSession().commit();
+  String result=ws.newRequest().execute().getInput();
+  assertJson(result).isSimilarTo(Resources.getResource(getClass(),"SearchGlobalPermissionsActionTest/permissions.json"));
+}
