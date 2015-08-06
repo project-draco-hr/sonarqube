@@ -1,0 +1,16 @@
+{
+  try {
+    return loadFromServer(id);
+  }
+ catch (  NotAvailableException serverNotAvailable) {
+    if (fallback) {
+      try {
+        return loadFromCache(id);
+      }
+ catch (      NotAvailableException cacheNotAvailable) {
+        throw new IllegalStateException(FAIL_MSG,serverNotAvailable.getCause());
+      }
+    }
+    throw new IllegalStateException(FAIL_MSG,serverNotAvailable.getCause());
+  }
+}

@@ -1,0 +1,21 @@
+{
+  Date lastSync=cacheStatus.getSyncStatus(project.getKeyWithBranch());
+  if (lastSync != null) {
+    LOG.debug("Found project [" + project.getKeyWithBranch() + " ] cache ["+ lastSync+ "]");
+    if (!force) {
+      return;
+    }
+  }
+  cacheStatus.delete(project.getKeyWithBranch());
+  ProjectRepositories projectRepo=projectRepositoryLoader.load(project,properties);
+  if (projectRepo.lastAnalysisDate() == null) {
+    return;
+  }
+  IssueAccumulator consumer=new IssueAccumulator();
+  issuesLoader.load(project.getKeyWithBranch(),consumer,false);
+  for (  String login : consumer.loginSet) {
+    userRepository.load(login);
+  }
+  loadLineHashes(projectRepo.fileDataByModuleAndPath());
+  cacheStatus.save(project.getKeyWithBranch());
+}

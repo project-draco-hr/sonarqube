@@ -1,0 +1,9 @@
+{
+  String resourceName=this.getClass().getSimpleName() + "/sample_response.json";
+  String response=IOUtils.toString(this.getClass().getResourceAsStream(resourceName));
+  when(wsLoader.loadString(anyString())).thenReturn(new WSLoaderResult<>(response,false));
+  project=ProjectDefinition.create().setKey("foo");
+  ProjectRepositories projectRepo=loader.load(project,taskProperties);
+  assertThat(projectRepo.activeRules().size()).isEqualTo(221);
+  assertThat(projectRepo.fileDataByPath("my:project").size()).isEqualTo(11);
+}
