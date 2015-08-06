@@ -1,0 +1,15 @@
+{
+  when(visitors.instances()).thenReturn(Arrays.<Visitor>asList(new TestTypeAwareVisitor()));
+  ExecuteVisitorsStep underStep=new ExecuteVisitorsStep(treeRootHolder,visitors);
+  measureRepository.addRawMeasure(FILE_1_REF,NCLOC_KEY,newMeasureBuilder().create(1));
+  measureRepository.addRawMeasure(FILE_2_REF,NCLOC_KEY,newMeasureBuilder().create(2));
+  measureRepository.addRawMeasure(DIRECTORY_REF,NCLOC_KEY,newMeasureBuilder().create(3));
+  measureRepository.addRawMeasure(MODULE_REF,NCLOC_KEY,newMeasureBuilder().create(3));
+  measureRepository.addRawMeasure(ROOT_REF,NCLOC_KEY,newMeasureBuilder().create(3));
+  underStep.execute();
+  assertThat(measureRepository.getAddedRawMeasure(FILE_1_REF,TEST_METRIC_KEY).get().getIntValue()).isEqualTo(2);
+  assertThat(measureRepository.getAddedRawMeasure(FILE_2_REF,TEST_METRIC_KEY).get().getIntValue()).isEqualTo(3);
+  assertThat(measureRepository.getAddedRawMeasure(DIRECTORY_REF,TEST_METRIC_KEY).get().getIntValue()).isEqualTo(4);
+  assertThat(measureRepository.getAddedRawMeasure(MODULE_REF,TEST_METRIC_KEY).get().getIntValue()).isEqualTo(4);
+  assertThat(measureRepository.getAddedRawMeasure(ROOT_REF,TEST_METRIC_KEY).get().getIntValue()).isEqualTo(4);
+}
