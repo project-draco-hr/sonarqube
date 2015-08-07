@@ -1,18 +1,19 @@
 {
-  RoleDao roleDao=db.getDbClient().roleDao();
-  GroupDao groupDao=db.getDbClient().groupDao();
-  GroupDto adminGroup=groupDao.insert(db.getSession(),new GroupDto().setName("sonar-admins").setDescription("Administrators"));
-  GroupDto userGroup=groupDao.insert(db.getSession(),new GroupDto().setName("sonar-users").setDescription("Users"));
-  roleDao.insertGroupRole(db.getSession(),newGroupRoleDto(SCAN_EXECUTION,userGroup.getId()));
-  roleDao.insertGroupRole(db.getSession(),newGroupRoleDto(SYSTEM_ADMIN,adminGroup.getId()));
-  roleDao.insertGroupRole(db.getSession(),newGroupRoleDto(SCAN_EXECUTION,null));
-  UserDto user=db.getDbClient().userDao().insert(db.getSession(),new UserDto().setLogin("user").setName("user-name").setActive(true));
-  UserDto adminUser=db.getDbClient().userDao().insert(db.getSession(),new UserDto().setLogin("admin").setName("admin-name").setActive(true));
-  roleDao.insertUserRole(db.getSession(),newUserRoleDto(PROVISIONING,user.getId()));
-  roleDao.insertUserRole(db.getSession(),newUserRoleDto(QUALITY_PROFILE_ADMIN,adminUser.getId()));
-  roleDao.insertUserRole(db.getSession(),newUserRoleDto(PREVIEW_EXECUTION,adminUser.getId()));
-  roleDao.insertUserRole(db.getSession(),newUserRoleDto(PREVIEW_EXECUTION,user.getId()));
+  GroupDto adminGroup=insertGroup(newGroupDto("sonar-admins","Administrators"));
+  GroupDto userGroup=insertGroup(newGroupDto("sonar-users","Users"));
+  insertGroupRole(newGroupRole(SCAN_EXECUTION,null));
+  insertGroupRole(newGroupRole(SCAN_EXECUTION,userGroup.getId()));
+  insertGroupRole(newGroupRole(SYSTEM_ADMIN,adminGroup.getId()));
+  insertGroupRole(newGroupRole(PROVISIONING,userGroup.getId()));
+  insertGroupRole(newGroupRole(DASHBOARD_SHARING,null));
+  UserDto user=insertUser(newUserDto("user","user-name"));
+  UserDto adminUser=insertUser(newUserDto("admin","admin-name"));
+  insertUserRole(newUserRoleDto(PROVISIONING,user.getId()));
+  insertUserRole(newUserRoleDto(QUALITY_PROFILE_ADMIN,user.getId()));
+  insertUserRole(newUserRoleDto(QUALITY_PROFILE_ADMIN,adminUser.getId()));
+  insertUserRole(newUserRoleDto(PREVIEW_EXECUTION,adminUser.getId()));
+  insertUserRole(newUserRoleDto(PREVIEW_EXECUTION,user.getId()));
   db.getSession().commit();
   String result=ws.newRequest().execute().getInput();
-  assertJson(result).isSimilarTo(Resources.getResource(getClass(),"SearchGlobalPermissionsActionTest/permissions.json"));
+  assertJson(result).isSimilarTo(getClass().getResource("search_global_permissions-example.json"));
 }
