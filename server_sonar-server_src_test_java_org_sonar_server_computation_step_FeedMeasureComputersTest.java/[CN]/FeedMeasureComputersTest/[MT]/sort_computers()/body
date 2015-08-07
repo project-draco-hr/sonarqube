@@ -1,0 +1,13 @@
+{
+  MeasureComputer.Implementation implementation1=mock(MeasureComputer.Implementation.class);
+  MeasureComputer.Implementation implementation2=mock(MeasureComputer.Implementation.class);
+  MeasureComputer.Implementation implementation3=mock(MeasureComputer.Implementation.class);
+  MeasureComputerProvider[] providers=new MeasureComputerProvider[]{new NewMeasureComputerProvider(array(NEW_METRIC_3),array(NEW_METRIC_4),implementation3),new NewMeasureComputerProvider(array(NEW_METRIC_1),array(NEW_METRIC_2),implementation1),new NewMeasureComputerProvider(array(NEW_METRIC_2),array(NEW_METRIC_3),implementation2)};
+  ComputationStep underTest=new FeedMeasureComputers(holder,array(new TestMetrics()),providers);
+  underTest.execute();
+  List<MeasureComputer> computers=newArrayList(holder.getMeasureComputers());
+  assertThat(computers).hasSize(3);
+  assertThat(computers.get(0).getImplementation()).isEqualTo(implementation1);
+  assertThat(computers.get(1).getImplementation()).isEqualTo(implementation2);
+  assertThat(computers.get(2).getImplementation()).isEqualTo(implementation3);
+}

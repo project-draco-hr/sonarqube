@@ -1,0 +1,25 @@
+{
+  Map<String,MeasureComputer> computersByOutputMetric=new HashMap<>();
+  Map<String,MeasureComputer> computersByInputMetric=new HashMap<>();
+  for (  MeasureComputer computer : computers) {
+    for (    String outputMetric : computer.getOutputMetrics()) {
+      computersByOutputMetric.put(outputMetric,computer);
+    }
+    for (    String inputMetric : computer.getInputMetrics()) {
+      computersByInputMetric.put(inputMetric,computer);
+    }
+  }
+  ToComputerByKey toComputerByOutputMetricKey=new ToComputerByKey(computersByOutputMetric);
+  ToComputerByKey toComputerByInputMetricKey=new ToComputerByKey(computersByInputMetric);
+  DirectAcyclicGraph dag=new DirectAcyclicGraph();
+  for (  MeasureComputer computer : computers) {
+    dag.add(computer);
+    for (    MeasureComputer dependency : getDependencies(computer,toComputerByOutputMetricKey)) {
+      dag.add(computer,dependency);
+    }
+    for (    MeasureComputer generates : getDependents(computer,toComputerByInputMetricKey)) {
+      dag.add(generates,computer);
+    }
+  }
+  return FluentIterable.from(dag.sort());
+}
