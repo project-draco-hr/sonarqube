@@ -11,16 +11,16 @@
   measureRepository.addRawMeasure(ROOT_REF,COMMENT_LINES_KEY,newMeasureBuilder().create(7));
   measureComputersHolder.setMeasureComputers(newArrayList(new MeasureComputerImpl.MeasureComputerBuilderImpl().setInputMetrics(NCLOC_KEY,COMMENT_LINES_KEY).setOutputMetrics(NEW_METRIC_KEY).setImplementation(new MeasureComputer.Implementation(){
     @Override public void compute(    Context ctx){
-      Measure ncloc=ctx.getMeasure(NCLOC_KEY);
-      Measure comment=ctx.getMeasure(COMMENT_LINES_KEY);
+      org.sonar.api.ce.measure.Measure ncloc=ctx.getMeasure(NCLOC_KEY);
+      org.sonar.api.ce.measure.Measure comment=ctx.getMeasure(COMMENT_LINES_KEY);
       if (ncloc != null && comment != null) {
         ctx.addMeasure(NEW_METRIC_KEY,ncloc.getIntValue() + comment.getIntValue());
       }
     }
   }
 ).build()));
-  ComputationStep underTest=new ComputePluginMeasuresStep(treeRootHolder,metricRepository,measureRepository,null,measureComputersHolder);
-  underTest.execute();
+  VisitorsCrawler visitorsCrawler=new VisitorsCrawler(Arrays.<Visitor>asList(new MeasureComputersVisitor(metricRepository,measureRepository,null,measureComputersHolder)));
+  visitorsCrawler.visit(ROOT);
   assertThat(toEntries(measureRepository.getAddedRawMeasures(FILE_1_REF))).containsOnly(entryOf(NEW_METRIC_KEY,newMeasureBuilder().create(12)));
   assertThat(toEntries(measureRepository.getAddedRawMeasures(FILE_2_REF))).containsOnly(entryOf(NEW_METRIC_KEY,newMeasureBuilder().create(45)));
   assertThat(toEntries(measureRepository.getAddedRawMeasures(DIRECTORY_REF))).containsOnly(entryOf(NEW_METRIC_KEY,newMeasureBuilder().create(57)));

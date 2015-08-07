@@ -10,8 +10,8 @@
   measureRepository.addRawMeasure(ROOT_REF,NCLOC_KEY,newMeasureBuilder().create(50));
   measureRepository.addRawMeasure(ROOT_REF,COMMENT_LINES_KEY,newMeasureBuilder().create(7));
   measureComputersHolder.setMeasureComputers(Collections.<MeasureComputer>emptyList());
-  ComputationStep underTest=new ComputePluginMeasuresStep(treeRootHolder,metricRepository,measureRepository,null,measureComputersHolder);
-  underTest.execute();
+  VisitorsCrawler visitorsCrawler=new VisitorsCrawler(Arrays.<Visitor>asList(new MeasureComputersVisitor(metricRepository,measureRepository,null,measureComputersHolder)));
+  visitorsCrawler.visit(ROOT);
   assertThat(toEntries(measureRepository.getAddedRawMeasures(FILE_1_REF))).isEmpty();
   assertThat(toEntries(measureRepository.getAddedRawMeasures(FILE_2_REF))).isEmpty();
   assertThat(toEntries(measureRepository.getAddedRawMeasures(DIRECTORY_REF))).isEmpty();
