@@ -1,9 +1,0 @@
-{
-  GroupDto group=db.getDbClient().groupDao().insert(db.getSession(),new GroupDto().setName("sonar-administrators"));
-  db.getSession().commit();
-  ws.newPostRequest(PermissionsWs.ENDPOINT,ACTION).setParam(AddGroupAction.PARAM_GROUP_ID,group.getId().toString()).setParam(AddGroupAction.PARAM_PERMISSION,SYSTEM_ADMIN).execute();
-  ArgumentCaptor<PermissionChange> permissionChangeCaptor=ArgumentCaptor.forClass(PermissionChange.class);
-  verify(permissionUpdater).addPermission(permissionChangeCaptor.capture());
-  PermissionChange permissionChange=permissionChangeCaptor.getValue();
-  assertThat(permissionChange.group()).isEqualTo("sonar-administrators");
-}
