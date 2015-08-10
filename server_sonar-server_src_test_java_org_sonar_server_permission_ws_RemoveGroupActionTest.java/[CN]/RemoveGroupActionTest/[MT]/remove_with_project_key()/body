@@ -1,0 +1,8 @@
+{
+  insertComponent(newProjectDto("project-uuid").setKey("project-key"));
+  commit();
+  newRequest().setParam(PARAM_GROUP_NAME,"sonar-administrators").setParam(PARAM_PROJECT_KEY,"project-key").setParam(PARAM_PERMISSION,SYSTEM_ADMIN).execute();
+  verify(permissionUpdater).removePermission(permissionChangeCaptor.capture());
+  PermissionChange permissionChange=permissionChangeCaptor.getValue();
+  assertThat(permissionChange.component()).isEqualTo("project-key");
+}

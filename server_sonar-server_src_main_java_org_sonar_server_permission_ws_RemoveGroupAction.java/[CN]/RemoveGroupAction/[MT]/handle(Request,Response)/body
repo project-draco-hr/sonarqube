@@ -1,11 +1,8 @@
 {
-  String permission=request.mandatoryParam(PARAM_PERMISSION);
-  String groupNameParam=request.param(PARAM_GROUP_NAME);
-  Long groupId=request.paramAsLong(PARAM_GROUP_ID);
   DbSession dbSession=dbClient.openSession(false);
   try {
-    String groupName=permissionWsCommons.searchGroupName(dbSession,groupNameParam,groupId);
-    permissionUpdater.removePermission(new PermissionChange().setPermission(permission).setGroup(groupName));
+    PermissionChange permissionChange=permissionWsCommons.buildGroupPermissionChange(dbSession,request);
+    permissionUpdater.removePermission(permissionChange);
   }
   finally {
     dbClient.closeSession(dbSession);
