@@ -1,21 +1,37 @@
 {
+  Profiler profiler=Profiler.create(Loggers.get(ProjectCacheSynchronizer.class));
   Date lastSync=cacheStatus.getSyncStatus(project.getKeyWithBranch());
   if (lastSync != null) {
-    LOG.debug("Found project [" + project.getKeyWithBranch() + " ] cache ["+ lastSync+ "]");
     if (!force) {
+      LOG.info("Found project [{}] cache [{}]",project.getKeyWithBranch(),lastSync);
       return;
     }
+ else {
+      LOG.info("Found project [{}] cache [{}], refreshing data..",project.getKeyWithBranch(),lastSync);
+    }
+    cacheStatus.delete(project.getKeyWithBranch());
   }
-  cacheStatus.delete(project.getKeyWithBranch());
+ else {
+    LOG.info("Cache for project [{}] not found, fetching data..",project.getKeyWithBranch());
+  }
+  profiler.startInfo("Load project repository");
   ProjectRepositories projectRepo=projectRepositoryLoader.load(project,properties);
+  profiler.stopInfo(projectRepositoryLoader.loadedFromCache());
   if (projectRepo.lastAnalysisDate() == null) {
+    LOG.debug("No previous analysis found");
+    LOG.info("Succesfully synchronized project cache");
     return;
   }
-  IssueAccumulator consumer=new IssueAccumulator();
-  issuesLoader.load(project.getKeyWithBranch(),consumer,false);
+  profiler.startInfo("Load server issues");
+  UserLoginAccumulator consumer=new UserLoginAccumulator();
+  boolean fromCache=issuesLoader.load(project.getKeyWithBranch(),consumer);
+  profiler.stopInfo(fromCache);
+  profiler.startInfo("Load user information (" + consumer.loginSet.size() + " users)");
   for (  String login : consumer.loginSet) {
     userRepository.load(login);
   }
-  loadLineHashes(projectRepo.fileDataByModuleAndPath());
+  stopInfo(profiler,"Load user information",fromCache);
+  loadLineHashes(projectRepo.fileDataByModuleAndPath(),profiler);
   cacheStatus.save(project.getKeyWithBranch());
+  LOG.info("Succesfully synchronized project cache");
 }

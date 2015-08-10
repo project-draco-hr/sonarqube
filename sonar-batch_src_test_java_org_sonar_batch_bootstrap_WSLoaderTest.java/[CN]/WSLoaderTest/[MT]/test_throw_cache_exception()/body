@@ -1,5 +1,12 @@
 {
   when(cache.get(ID,null)).thenThrow(new IllegalStateException());
   WSLoader loader=new WSLoader(LoadStrategy.CACHE_FIRST,cache,client);
-  loader.load(ID);
+  try {
+    loader.load(ID);
+    fail("IllegalStateException expected");
+  }
+ catch (  IllegalStateException e) {
+    assertUsedServer(0);
+    assertUsedCache(1);
+  }
 }

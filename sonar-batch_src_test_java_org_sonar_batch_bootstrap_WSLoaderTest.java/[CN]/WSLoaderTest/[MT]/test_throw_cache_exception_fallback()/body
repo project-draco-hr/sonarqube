@@ -2,5 +2,12 @@
   turnServerOffline();
   when(cache.get(ID,null)).thenThrow(new NullPointerException());
   WSLoader loader=new WSLoader(LoadStrategy.SERVER_FIRST,cache,client);
-  loader.load(ID);
+  try {
+    loader.load(ID);
+    fail("NPE expected");
+  }
+ catch (  NullPointerException e) {
+    assertUsedServer(1);
+    assertUsedCache(1);
+  }
 }

@@ -2,11 +2,12 @@
   WSLoader wsLoader=mock(WSLoader.class);
   UserRepositoryLoader userRepo=new UserRepositoryLoader(wsLoader);
   ByteSource source=mock(ByteSource.class);
-  when(wsLoader.loadSource("/batch/users?logins=fmallet,sbrandhof")).thenReturn(new WSLoaderResult<>(source,true));
+  WSLoaderResult<ByteSource> res=new WSLoaderResult<>(source,true);
+  when(wsLoader.loadSource("/batch/users?logins=fmallet,sbrandhof")).thenReturn(res);
   InputStream errorInputStream=mock(InputStream.class);
   Mockito.doThrow(IOException.class).when(errorInputStream).read();
   when(source.openStream()).thenReturn(errorInputStream);
   exception.expect(IllegalStateException.class);
   exception.expectMessage("Unable to get user details from server");
-  assertThat(userRepo.load(Arrays.asList("fmallet","sbrandhof"))).extracting("login","name").containsOnly(tuple("fmallet","Freddy Mallet"),tuple("sbrandhof","Simon"));
+  userRepo.load(Arrays.asList("fmallet","sbrandhof"));
 }
