@@ -1,13 +1,14 @@
 {
-  permissionFinder=new PermissionFinder(dbClient);
-  userSession.login("login").setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
-  underTest=new UsersAction(userSession,permissionFinder);
+  PermissionFinder permissionFinder=new PermissionFinder(dbClient);
+  PermissionWsCommons permissionWsCommons=new PermissionWsCommons(dbClient,new ComponentFinder(dbClient),userSession);
+  underTest=new UsersAction(userSession,permissionFinder,permissionWsCommons);
   ws=new WsActionTester(underTest);
-  UserDto user1=dbClient.userDao().insert(dbSession,new UserDto().setActive(true).setLogin("login-1").setName("name-1"));
-  UserDto user2=dbClient.userDao().insert(dbSession,new UserDto().setActive(true).setLogin("login-2").setName("name-2"));
-  UserDto user3=dbClient.userDao().insert(dbSession,new UserDto().setActive(true).setLogin("login-3").setName("name-3"));
-  dbClient.roleDao().insertUserRole(dbSession,new UserRoleDto().setRole(GlobalPermissions.SCAN_EXECUTION).setUserId(user1.getId()));
-  dbClient.roleDao().insertUserRole(dbSession,new UserRoleDto().setRole(GlobalPermissions.SCAN_EXECUTION).setUserId(user2.getId()));
-  dbClient.roleDao().insertUserRole(dbSession,new UserRoleDto().setRole(GlobalPermissions.SYSTEM_ADMIN).setUserId(user3.getId()));
-  dbSession.commit();
+  userSession.login("login").setGlobalPermissions(SYSTEM_ADMIN);
+  UserDto user1=insertUser(new UserDto().setLogin("login-1").setName("name-1"));
+  UserDto user2=insertUser(new UserDto().setLogin("login-2").setName("name-2"));
+  UserDto user3=insertUser(new UserDto().setLogin("login-3").setName("name-3"));
+  insertUserRole(new UserRoleDto().setRole(SCAN_EXECUTION).setUserId(user1.getId()));
+  insertUserRole(new UserRoleDto().setRole(SCAN_EXECUTION).setUserId(user2.getId()));
+  insertUserRole(new UserRoleDto().setRole(SYSTEM_ADMIN).setUserId(user3.getId()));
+  commit();
 }

@@ -1,10 +1,10 @@
 {
   db.truncateTables();
-  UserDto user1=dbClient.userDao().insert(dbSession,new UserDto().setActive(true).setLogin("admin").setName("Administrator"));
-  UserDto user2=dbClient.userDao().insert(dbSession,new UserDto().setActive(true).setLogin("george.orwell").setName("George Orwell"));
-  dbClient.roleDao().insertUserRole(dbSession,new UserRoleDto().setRole(GlobalPermissions.SCAN_EXECUTION).setUserId(user1.getId()));
-  dbClient.roleDao().insertUserRole(dbSession,new UserRoleDto().setRole(GlobalPermissions.SCAN_EXECUTION).setUserId(user2.getId()));
-  dbSession.commit();
+  UserDto user1=insertUser(new UserDto().setLogin("admin").setName("Administrator"));
+  UserDto user2=insertUser(new UserDto().setLogin("george.orwell").setName("George Orwell"));
+  insertUserRole(new UserRoleDto().setRole(SCAN_EXECUTION).setUserId(user1.getId()));
+  insertUserRole(new UserRoleDto().setRole(SCAN_EXECUTION).setUserId(user2.getId()));
+  commit();
   String result=ws.newRequest().setParam("permission","scan").execute().getInput();
-  assertJson(result).isSimilarTo(Resources.getResource(getClass(),"users-example.json"));
+  assertJson(result).isSimilarTo(getClass().getResource("users-example.json"));
 }

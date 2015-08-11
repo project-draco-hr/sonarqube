@@ -1,35 +1,9 @@
 {
-  String permission=request.mandatoryParam("permission");
-  String selected=request.param(WebService.Param.SELECTED);
-  int page=request.mandatoryParamAsInt(WebService.Param.PAGE);
-  int pageSize=request.mandatoryParamAsInt(WebService.Param.PAGE_SIZE);
-  String query=request.param(WebService.Param.TEXT_QUERY);
-  if (query != null) {
-    selected=WebService.SelectionMode.ALL.value();
-  }
-  userSession.checkLoggedIn().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
-  PermissionQuery.Builder permissionQuery=PermissionQuery.builder().permission(permission).pageIndex(page).pageSize(pageSize).membership(toMembership(firstNonNull(selected,WebService.SelectionMode.SELECTED.value())));
-  if (query != null) {
-    permissionQuery.search(query);
-  }
-  GroupWithPermissionQueryResult groupsResult=permissionFinder.findGroupsWithPermission(permissionQuery.build());
-  List<GroupWithPermission> groupsWithPermission=groupsResult.groups();
-  Permissions.GroupsResponse.Builder groupsResponse=Permissions.GroupsResponse.newBuilder();
-  Permissions.GroupsResponse.Group.Builder group=Permissions.GroupsResponse.Group.newBuilder();
-  Common.Paging.Builder paging=Common.Paging.newBuilder();
-  for (  GroupWithPermission groupWithPermission : groupsWithPermission) {
-    group.clear().setName(groupWithPermission.name()).setSelected(groupWithPermission.hasPermission());
-    if (groupWithPermission.id() != 0) {
-      group.setId(String.valueOf(groupWithPermission.id()));
-    }
-    if (groupWithPermission.description() != null) {
-      group.setDescription(groupWithPermission.description());
-    }
-    groupsResponse.addGroups(group);
-  }
-  groupsResponse.setPaging(paging.setPageIndex(page).setPageSize(pageSize).setTotal(groupsResult.total()));
-  response.stream().setMediaType(MimeTypes.JSON);
-  JsonWriter json=response.newJsonWriter();
-  ProtobufJsonFormat.write(groupsResponse.build(),json);
-  json.close();
+  int page=wsRequest.mandatoryParamAsInt(Param.PAGE);
+  int pageSize=wsRequest.mandatoryParamAsInt(Param.PAGE_SIZE);
+  Optional<ComponentDto> project=permissionWsCommons.searchProject(wsRequest);
+  permissionWsCommons.checkPermissions(project);
+  PermissionQuery permissionQuery=buildPermissionQuery(wsRequest,project);
+  Permissions.GroupsResponse groupsResponse=groupsResponse(permissionQuery,page,pageSize);
+  writeProtobuf(groupsResponse,wsRequest,wsResponse);
 }

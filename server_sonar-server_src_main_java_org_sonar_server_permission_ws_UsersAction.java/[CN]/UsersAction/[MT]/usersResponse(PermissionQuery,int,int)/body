@@ -1,0 +1,12 @@
+{
+  UserWithPermissionQueryResult usersResult=permissionFinder.findUsersWithPermission(permissionQuery);
+  List<UserWithPermission> usersWithPermission=usersResult.users();
+  UsersResponse.Builder userResponse=UsersResponse.newBuilder();
+  UsersResponse.User.Builder user=UsersResponse.User.newBuilder();
+  Common.Paging.Builder paging=Common.Paging.newBuilder();
+  for (  UserWithPermission userWithPermission : usersWithPermission) {
+    userResponse.addUsers(user.clear().setLogin(userWithPermission.login()).setName(userWithPermission.name()).setSelected(userWithPermission.hasPermission()));
+    userResponse.setPaging(paging.clear().setPageIndex(page).setPageSize(pageSize).setTotal(usersResult.total()));
+  }
+  return userResponse.build();
+}

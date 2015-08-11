@@ -1,0 +1,10 @@
+{
+  dbClient.componentDao().insert(dbSession,newProjectDto("project-uuid").setKey("project-key"));
+  ComponentDto project=dbClient.componentDao().selectOrFailByUuid(dbSession,"project-uuid");
+  UserDto user=insertUser(new UserDto().setLogin("project-user-login").setName("project-user-name"));
+  insertUserRole(new UserRoleDto().setRole(SCAN_EXECUTION).setUserId(user.getId()).setResourceId(project.getId()));
+  commit();
+  userSession.login().addProjectUuidPermissions(SYSTEM_ADMIN,"project-uuid");
+  String result=ws.newRequest().setParam(PARAM_PERMISSION,SCAN_EXECUTION).setParam(PARAM_PROJECT_UUID,"project-uuid").execute().getInput();
+  assertThat(result).contains("project-user-login").doesNotContain("login-1");
+}
