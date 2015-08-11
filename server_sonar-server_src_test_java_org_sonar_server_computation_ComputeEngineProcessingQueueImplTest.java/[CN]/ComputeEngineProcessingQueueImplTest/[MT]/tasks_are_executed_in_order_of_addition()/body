@@ -1,0 +1,31 @@
+{
+  ComputeEngineProcessingExecutorServiceAdapter processingExecutorService=new SimulateFixedRateCallsProcessingExecutorService(10);
+  final List<Integer> nameList=new ArrayList<>();
+  ComputeEngineProcessingQueueImpl underTest=new ComputeEngineProcessingQueueImpl(processingExecutorService);
+  underTest.addTask(new ComputeEngineTask(){
+    @Override public void run(){
+      nameList.add(1);
+    }
+  }
+);
+  underTest.addTask(new ComputeEngineTask(){
+    @Override public void run(){
+      nameList.add(2);
+    }
+  }
+);
+  underTest.addTask(new ComputeEngineTask(){
+    @Override public void run(){
+      nameList.add(3);
+    }
+  }
+);
+  underTest.addTask(new ComputeEngineTask(){
+    @Override public void run(){
+      nameList.add(4);
+    }
+  }
+);
+  underTest.onServerStart(mock(Server.class));
+  assertThat(nameList).containsExactly(1,2,3,4);
+}
