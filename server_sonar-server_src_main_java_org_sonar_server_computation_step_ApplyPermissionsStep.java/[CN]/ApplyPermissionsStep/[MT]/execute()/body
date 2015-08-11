@@ -1,14 +1,8 @@
 {
-  DbSession session=dbClient.openSession(false);
-  try {
-    long projectId=dbIdsRepository.getComponentId(treeRootHolder.getRoot());
-    if (dbClient.roleDao().countComponentPermissions(session,projectId) == 0) {
-      permissionRepository.grantDefaultRoles(session,projectId,Qualifiers.PROJECT);
-      session.commit();
+  new DepthTraversalTypeAwareCrawler(PROJECT,PRE_ORDER){
+    @Override public void visitProject(    Component project){
+      execute(project);
     }
-    indexer.index();
   }
-  finally {
-    MyBatis.closeQuietly(session);
-  }
+.visit(treeRootHolder.getRoot());
 }
