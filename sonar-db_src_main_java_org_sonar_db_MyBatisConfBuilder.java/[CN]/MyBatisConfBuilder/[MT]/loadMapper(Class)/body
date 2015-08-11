@@ -1,0 +1,16 @@
+{
+  String configFile=configFilePath(mapperClass);
+  InputStream input=null;
+  try {
+    input=mapperClass.getResourceAsStream(configFile);
+    checkArgument(input != null,format("Can not find mapper XML file %s",configFile));
+    new SQXMLMapperBuilder(mapperClass,input,conf,conf.getSqlFragments()).parse();
+    loadAndConfigureLogger(mapperClass.getName());
+  }
+ catch (  Exception e) {
+    throw new IllegalArgumentException("Unable to load mapper " + mapperClass,e);
+  }
+ finally {
+    Closeables.closeQuietly(input);
+  }
+}
