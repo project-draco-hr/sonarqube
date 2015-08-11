@@ -1,5 +1,12 @@
 {
-  PermissionChange permissionChange=permissionWsCommons.buildUserPermissionChange(request);
-  permissionUpdater.removePermission(permissionChange);
-  response.noContent();
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    PermissionRequest permissionRequest=new Builder(request).withUser().build();
+    PermissionChange permissionChange=permissionWsCommons.buildUserPermissionChange(dbSession,permissionRequest);
+    permissionUpdater.removePermission(permissionChange);
+    response.noContent();
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
 }

@@ -1,9 +1,8 @@
 {
-  int page=wsRequest.mandatoryParamAsInt(Param.PAGE);
-  int pageSize=wsRequest.mandatoryParamAsInt(Param.PAGE_SIZE);
-  Optional<ComponentDto> project=permissionWsCommons.searchProject(wsRequest);
+  PermissionRequest request=new Builder(wsRequest).withPagination().build();
+  Optional<ComponentDto> project=permissionWsCommons.searchProject(request);
   permissionWsCommons.checkPermissions(project);
-  PermissionQuery permissionQuery=buildPermissionQuery(wsRequest,project);
-  UsersResponse usersResponse=usersResponse(permissionQuery,page,pageSize);
+  PermissionQuery permissionQuery=buildPermissionQuery(request,project);
+  UsersResponse usersResponse=usersResponse(permissionQuery,request.page(),request.pageSize());
   writeProtobuf(usersResponse,wsRequest,wsResponse);
 }
