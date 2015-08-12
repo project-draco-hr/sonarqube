@@ -1,4 +1,5 @@
 {
+  ExecutorService executor=Executors.newFixedThreadPool(NUM_THREAD);
   int numFiles=0;
   for (  Map<String,FileData> fileDataByPath : fileDataByModuleAndPath.values()) {
     numFiles+=fileDataByPath.size();
@@ -8,8 +9,20 @@
     String moduleKey=e1.getKey();
     for (    Entry<String,FileData> e2 : e1.getValue().entrySet()) {
       String filePath=e2.getKey();
-      lineHashesLoader.getLineHashes(getComponentKey(moduleKey,filePath),null);
+      executor.submit(new LineHashLoadWorker(getComponentKey(moduleKey,filePath)));
     }
+  }
+  executor.shutdown();
+  try {
+    boolean done=executor.awaitTermination(30,TimeUnit.MINUTES);
+    if (!done) {
+      executor.shutdownNow();
+      throw new IllegalStateException("Timeout while fetching line hashes");
+    }
+  }
+ catch (  InterruptedException e) {
+    executor.shutdownNow();
+    throw new IllegalStateException("Interrupted while fetching line hashes",e);
   }
   profiler.stopInfo("Load line file hashes (done)");
 }
