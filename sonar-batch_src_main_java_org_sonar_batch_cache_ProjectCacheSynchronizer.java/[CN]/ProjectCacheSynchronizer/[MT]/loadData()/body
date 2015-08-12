@@ -1,0 +1,21 @@
+{
+  Profiler profiler=Profiler.create(Loggers.get(ProjectCacheSynchronizer.class));
+  profiler.startInfo("Load project repository");
+  MutableBoolean fromCache=new MutableBoolean();
+  ProjectRepositories projectRepo=projectRepositoryLoader.load(project,properties,fromCache);
+  profiler.stopInfo(fromCache.booleanValue());
+  if (projectRepo.lastAnalysisDate() == null) {
+    LOG.debug("No previous analysis found");
+    return;
+  }
+  profiler.startInfo("Load server issues");
+  UserLoginAccumulator consumer=new UserLoginAccumulator();
+  boolean isFromCache=issuesLoader.load(project.getKeyWithBranch(),consumer);
+  profiler.stopInfo(isFromCache);
+  profiler.startInfo("Load user information (" + consumer.loginSet.size() + " users)");
+  for (  String login : consumer.loginSet) {
+    userRepository.load(login,null);
+  }
+  stopInfo(profiler,"Load user information",isFromCache);
+  loadLineHashes(projectRepo.fileDataByModuleAndPath(),profiler);
+}
