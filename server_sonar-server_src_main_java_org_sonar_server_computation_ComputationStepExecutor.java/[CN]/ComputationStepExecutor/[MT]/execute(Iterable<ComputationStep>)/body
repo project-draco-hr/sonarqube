@@ -1,0 +1,22 @@
+{
+  listener.onStart();
+  Profiler profiler=Profiler.create(logger).startDebug(description);
+  long timingSum=0L;
+  Profiler stepProfiler=Profiler.create(logger);
+  try {
+    for (    ComputationStep step : steps) {
+      stepProfiler.start();
+      step.execute();
+      timingSum+=stepProfiler.stopInfo(step.getDescription());
+    }
+    long timing=logProcessingEnd(description,profiler,timingSum);
+    listener.onSuccess(timing);
+  }
+ catch (  Throwable e) {
+    long timing=logProcessingEnd(description,profiler,timingSum);
+    listener.onError(e,timing);
+  }
+ finally {
+    listener.onEnd();
+  }
+}

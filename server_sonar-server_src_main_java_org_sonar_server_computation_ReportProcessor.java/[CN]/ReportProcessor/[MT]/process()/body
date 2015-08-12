@@ -1,28 +1,3 @@
 {
-  queueStatus.addInProgress();
-  String projectKey=item.dto.getProjectKey();
-  String message=format("Analysis of project %s (report %d)",projectKey,item.dto.getId());
-  Profiler profiler=Profiler.create(LOG).startDebug(message);
-  long timingSum=0L;
-  Profiler stepProfiler=Profiler.create(LOG);
-  try {
-    for (    ComputationStep step : steps.instances()) {
-      stepProfiler.start();
-      step.execute();
-      timingSum+=stepProfiler.stopInfo(step.getDescription());
-    }
-    item.dto.setStatus(SUCCESS);
-    long timing=logProcessingEnd(message,profiler,timingSum);
-    queueStatus.addSuccess(timing);
-  }
- catch (  Throwable e) {
-    item.dto.setStatus(FAILED);
-    long timing=logProcessingEnd(message,profiler,timingSum);
-    queueStatus.addError(timing);
-    throw Throwables.propagate(e);
-  }
- finally {
-    item.dto.setFinishedAt(system.now());
-    activityManager.saveActivity(item.dto);
-  }
+  this.executor.execute(this.steps.instances());
 }
