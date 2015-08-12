@@ -1,0 +1,13 @@
+{
+  AddedObjectsRecorderComputeEngineContainer container=new AddedObjectsRecorderComputeEngineContainer();
+  underTest.populateContainer(container);
+  assertThat(from(container.added).transform(new Function<Object,Class<?>>(){
+    @Nullable @Override public Class<?> apply(    Object input){
+      if (input instanceof Class) {
+        return (Class<?>)input;
+      }
+      return null;
+    }
+  }
+).filter(notNull()).filter(IsComputationStep.INSTANCE).transform(StepsExplorer.toCanonicalName()).toSet()).isEqualTo(StepsExplorer.retrieveStepPackageStepsCanonicalNames());
+}
