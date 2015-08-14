@@ -1,0 +1,34 @@
+{
+  restoreProfile("one-issue-per-line.xml");
+  orchestrator.getServer().provisionProject("sample","xoo-sample");
+  orchestrator.getServer().associateProjectToQualityProfile("sample","xoo","one-issue-per-line");
+  SonarRunner runner=configureRunner("shared/xoo-sample");
+  orchestrator.executeBuild(runner);
+  SonarClient client=orchestrator.getServer().adminWsClient();
+  Issues issues=client.issueClient().find(IssueQuery.create());
+  Issue issue=issues.list().get(0);
+  UserParameters creationParameters=UserParameters.create().login("julien").name("Julien H").password("password").passwordConfirmation("password");
+  client.userClient().create(creationParameters);
+  client.issueClient().assign(issue.key(),"julien");
+  runner=configureRunnerIssues("shared/xoo-sample");
+  BuildResult result=orchestrator.executeBuild(runner);
+  JSONObject obj=ItUtils.getJSONReport(result);
+  Map<String,String> userNameByLogin=Maps.newHashMap();
+  final JSONArray users=(JSONArray)obj.get("users");
+  if (users != null) {
+    for (    Object user : users) {
+      String login=ObjectUtils.toString(((JSONObject)user).get("login"));
+      String name=ObjectUtils.toString(((JSONObject)user).get("name"));
+      userNameByLogin.put(login,name);
+    }
+  }
+  assertThat(userNameByLogin.get("julien")).isEqualTo("Julien H");
+  for (  Object issueJson : (JSONArray)obj.get("issues")) {
+    JSONObject jsonObject=(JSONObject)issueJson;
+    if (issue.key().equals(jsonObject.get("key"))) {
+      assertThat(jsonObject.get("assignee")).isEqualTo("julien");
+      return;
+    }
+  }
+  fail("Issue not found");
+}

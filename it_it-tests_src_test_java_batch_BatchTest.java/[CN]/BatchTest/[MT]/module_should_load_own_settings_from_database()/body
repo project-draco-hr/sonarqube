@@ -1,0 +1,21 @@
+{
+  orchestrator.getServer().provisionProject("com.sonarsource.it.samples:multi-modules-sample","Sonar :: Integration Tests :: Multi-modules Sample");
+  orchestrator.getServer().associateProjectToQualityProfile("com.sonarsource.it.samples:multi-modules-sample","xoo","one-issue-per-line");
+  Sonar sonar=orchestrator.getServer().getAdminWsClient();
+  String propKey="myFakeProperty";
+  String rootModuleKey="com.sonarsource.it.samples:multi-modules-sample";
+  String moduleBKey=rootModuleKey + ":module_b";
+  sonar.delete(new PropertyDeleteQuery(propKey,rootModuleKey));
+  sonar.delete(new PropertyDeleteQuery(propKey,moduleBKey));
+  BuildResult result=scan("shared/xoo-multi-modules-sample","sonar.showSettings","true");
+  assertThat(result.getLogs()).doesNotContain(rootModuleKey + ":" + propKey);
+  assertThat(result.getLogs()).doesNotContain(moduleBKey + ":" + propKey);
+  sonar.update(new PropertyUpdateQuery(propKey,"project",rootModuleKey));
+  result=scan("shared/xoo-multi-modules-sample","sonar.showSettings","true");
+  assertThat(result.getLogs()).contains(rootModuleKey + ":" + propKey+ " = project");
+  assertThat(result.getLogs()).contains(moduleBKey + ":" + propKey+ " = project");
+  sonar.update(new PropertyUpdateQuery(propKey,"moduleB",moduleBKey));
+  result=scan("shared/xoo-multi-modules-sample","sonar.showSettings","true");
+  assertThat(result.getLogs()).contains(rootModuleKey + ":" + propKey+ " = project");
+  assertThat(result.getLogs()).contains(moduleBKey + ":" + propKey+ " = moduleB");
+}

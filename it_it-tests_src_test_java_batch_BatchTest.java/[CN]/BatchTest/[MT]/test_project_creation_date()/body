@@ -1,0 +1,9 @@
+{
+  long before=new Date().getTime() - 2000l;
+  orchestrator.getServer().provisionProject("sample","xoo-sample");
+  orchestrator.getServer().associateProjectToQualityProfile("sample","xoo","one-issue-per-line");
+  orchestrator.executeBuild(SonarRunner.create(ItUtils.projectDir("shared/xoo-sample")));
+  long after=new Date().getTime() + 2000l;
+  Resource xooSample=orchestrator.getServer().getWsClient().find(new ResourceQuery().setResourceKeyOrId("sample"));
+  assertThat(xooSample.getCreationDate().getTime()).isGreaterThan(before).isLessThan(after);
+}

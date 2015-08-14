@@ -1,0 +1,8 @@
+{
+  MavenBuild build=MavenBuild.create(ItUtils.projectPom("maven/project-with-module-without-sources")).setCleanSonarGoals();
+  orchestrator.executeBuild(build);
+  Resource project=orchestrator.getServer().getWsClient().find(ResourceQuery.createForMetrics("com.sonarsource.it.samples.project-with-module-without-sources:parent","files"));
+  assertThat(project.getMeasureIntValue("files")).isEqualTo(1);
+  Resource subProject=orchestrator.getServer().getWsClient().find(ResourceQuery.create("com.sonarsource.it.samples.project-with-module-without-sources:without-sources"));
+  assertThat(subProject).isNotNull();
+}

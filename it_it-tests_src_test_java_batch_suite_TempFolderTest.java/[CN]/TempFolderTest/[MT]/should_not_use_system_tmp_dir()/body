@@ -1,0 +1,14 @@
+{
+  String oldTmp=System.getProperty("java.io.tmpdir");
+  try {
+    File tmp=temp.newFolder();
+    assertThat(tmp.list()).isEmpty();
+    SonarRunner runner=configureRunner().setEnvironmentVariable("SONAR_RUNNER_OPTS","-Djava.io.tmpdir=" + tmp.getAbsolutePath());
+    orchestrator.executeBuild(runner);
+    assertThat(tmp.list()).hasSize(1);
+    assertThat(tmp.list()[0]).matches("sonar-runner-batch(.*).jar");
+  }
+  finally {
+    System.setProperty("java.io.tmpdir",oldTmp);
+  }
+}

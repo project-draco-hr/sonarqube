@@ -1,0 +1,16 @@
+{
+  restoreProfile("with-many-rules.xml");
+  orchestrator.getServer().provisionProject("sample","xoo-history");
+  orchestrator.getServer().associateProjectToQualityProfile("sample","xoo","with-many-rules");
+  SonarRunner runner=configureRunner("shared/xoo-history-v2");
+  BuildResult result=orchestrator.executeBuild(runner);
+  assertThat(getResource("sample:src/main/xoo/sample/ClassAdded.xoo")).isNotNull();
+  runner=configureRunner("shared/xoo-history-v1");
+  result=orchestrator.executeBuild(runner);
+  assertThat(getResource("sample:src/main/xoo/sample/ClassAdded.xoo")).isNull();
+  runner=configureRunnerIssues("shared/xoo-history-v2");
+  result=orchestrator.executeBuild(runner);
+  assertThat(getResource("sample:src/main/xoo/sample/ClassAdded.xoo")).isNull();
+  assertThat(result.getLogs()).contains("Issues");
+  assertThat(result.getLogs()).contains("ANALYSIS SUCCESSFUL");
+}

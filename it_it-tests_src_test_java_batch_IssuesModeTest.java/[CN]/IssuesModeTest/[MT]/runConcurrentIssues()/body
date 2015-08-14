@@ -1,0 +1,19 @@
+{
+  FileSystem fileSystem=orchestrator.getConfiguration().fileSystem();
+  new SonarRunnerInstaller(fileSystem).install(Version.create(SonarRunner.DEFAULT_RUNNER_VERSION),fileSystem.workspace());
+  final int nThreads=5;
+  ExecutorService executorService=Executors.newFixedThreadPool(nThreads);
+  List<Callable<BuildResult>> tasks=new ArrayList<>();
+  for (int i=0; i < nThreads; i++) {
+    tasks.add(new Callable<BuildResult>(){
+      public BuildResult call() throws Exception {
+        SonarRunner runner=configureRunnerIssues("shared/xoo-sample");
+        return orchestrator.executeBuild(runner);
+      }
+    }
+);
+  }
+  for (  Future<BuildResult> result : executorService.invokeAll(tasks)) {
+    result.get();
+  }
+}

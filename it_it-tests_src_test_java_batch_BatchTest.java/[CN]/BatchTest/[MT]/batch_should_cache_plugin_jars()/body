@@ -1,0 +1,14 @@
+{
+  File userHome=temp.newFolder();
+  BuildResult result=scan("shared/xoo-sample","sonar.userHome",userHome.getAbsolutePath());
+  File cache=new File(userHome,"cache");
+  assertThat(cache).exists().isDirectory();
+  int cachedFiles=FileUtils.listFiles(cache,new String[]{"jar"},true).size();
+  assertThat(cachedFiles).isGreaterThan(5);
+  assertThat(result.getLogs()).contains("User cache: " + cache.getAbsolutePath());
+  assertThat(result.getLogs()).contains("Download sonar-xoo-plugin-");
+  result=scan("shared/xoo-sample","sonar.userHome",userHome.getAbsolutePath());
+  assertThat(cachedFiles).isEqualTo(cachedFiles);
+  assertThat(result.getLogs()).contains("User cache: " + cache.getAbsolutePath());
+  assertThat(result.getLogs()).doesNotContain("Download sonar-xoo-plugin-");
+}

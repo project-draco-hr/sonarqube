@@ -1,0 +1,17 @@
+{
+  Pattern pattern=Pattern.compile("Export issues to (.*?).json");
+  Matcher m=pattern.matcher(result.getLogs());
+  if (m.find()) {
+    String s=m.group(1);
+    File path=new File(s + ".json");
+    assertThat(path).exists();
+    try {
+      return (JSONObject)JSONValue.parse(FileUtils.readFileToString(path));
+    }
+ catch (    IOException e) {
+      throw new RuntimeException("Unable to read JSON report",e);
+    }
+  }
+  fail("Unable to locate json report");
+  return null;
+}

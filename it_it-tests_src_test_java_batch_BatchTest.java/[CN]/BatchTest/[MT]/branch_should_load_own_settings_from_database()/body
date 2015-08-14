@@ -1,0 +1,17 @@
+{
+  orchestrator.getServer().provisionProject("com.sonarsource.it.samples:multi-modules-sample","Sonar :: Integration Tests :: Multi-modules Sample");
+  orchestrator.getServer().associateProjectToQualityProfile("com.sonarsource.it.samples:multi-modules-sample","xoo","one-issue-per-line");
+  scan("shared/xoo-multi-modules-sample");
+  assertThat(getResource("com.sonarsource.it.samples:multi-modules-sample:module_b")).isNotNull();
+  Sonar sonar=orchestrator.getServer().getAdminWsClient();
+  sonar.update(new PropertyUpdateQuery("sonar.skippedModules","multi-modules-sample:module_b","com.sonarsource.it.samples:multi-modules-sample"));
+  try {
+    scan("shared/xoo-multi-modules-sample");
+    assertThat(getResource("com.sonarsource.it.samples:multi-modules-sample:module_b")).isNull();
+    scan("shared/xoo-multi-modules-sample","sonar.branch","mybranch");
+    assertThat(getResource("com.sonarsource.it.samples:multi-modules-sample:module_b:mybranch")).isNotNull();
+  }
+  finally {
+    sonar.delete(new PropertyDeleteQuery("sonar.skippedModules","com.sonarsource.it.samples:multi-modules-sample"));
+  }
+}

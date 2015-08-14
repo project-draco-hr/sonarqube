@@ -1,0 +1,10 @@
+{
+  File projectDir=ItUtils.projectDir("shared/xoo-sample");
+  BuildResult result=scan();
+  assertThat(result.getLogs()).doesNotContain("Creating temp directory:");
+  assertThat(result.getLogs()).doesNotContain("Creating temp file:");
+  result=scan("sonar.createTempFiles","true");
+  assertThat(result.getLogs()).contains("Creating temp directory: " + projectDir.getAbsolutePath() + File.separator+ ".sonar"+ File.separator+ ".sonartmp"+ File.separator+ "sonar-it");
+  assertThat(result.getLogs()).contains("Creating temp file: " + projectDir.getAbsolutePath() + File.separator+ ".sonar"+ File.separator+ ".sonartmp"+ File.separator+ "sonar-it");
+  assertThat(new File(projectDir,".sonar/.sonartmp/sonar-it")).doesNotExist();
+}

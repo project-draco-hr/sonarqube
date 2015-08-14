@@ -1,0 +1,8 @@
+{
+  MavenBuild build=MavenBuild.create(ItUtils.projectPom("maven/maven-override-sources")).setGoals("sonar:sonar");
+  orchestrator.executeBuild(build);
+  Resource project=orchestrator.getServer().getWsClient().find(ResourceQuery.createForMetrics("com.sonarsource.it.samples:maven-override-sources","files"));
+  assertThat(project.getMeasureIntValue("files")).isEqualTo(1);
+  Resource file=orchestrator.getServer().getWsClient().find(ResourceQuery.create("com.sonarsource.it.samples:maven-override-sources:src/main/java2/Hello2.java"));
+  assertThat(file).isNotNull();
+}

@@ -1,0 +1,8 @@
+{
+  MavenBuild build=MavenBuild.create(ItUtils.projectPom("maven/inclusions_apply_to_source_dirs")).setGoals("sonar:sonar");
+  orchestrator.executeBuild(build);
+  Resource project=orchestrator.getServer().getWsClient().find(ResourceQuery.createForMetrics("com.sonarsource.it.samples:inclusions_apply_to_source_dirs","files"));
+  assertThat(project.getMeasureIntValue("files")).isEqualTo(1);
+  Resource file=orchestrator.getServer().getWsClient().find(ResourceQuery.create("com.sonarsource.it.samples:inclusions_apply_to_source_dirs:src/main/java/Hello2.java"));
+  assertThat(file).isNotNull();
+}

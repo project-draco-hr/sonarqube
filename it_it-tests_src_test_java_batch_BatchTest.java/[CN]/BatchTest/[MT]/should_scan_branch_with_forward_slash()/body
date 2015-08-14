@@ -1,0 +1,10 @@
+{
+  scan("shared/xoo-multi-modules-sample");
+  scan("shared/xoo-multi-modules-sample","sonar.branch","branch/0.x");
+  Sonar sonar=orchestrator.getServer().getWsClient();
+  assertThat(sonar.findAll(new ResourceQuery().setQualifiers("TRK"))).hasSize(2);
+  Resource master=sonar.find(new ResourceQuery("com.sonarsource.it.samples:multi-modules-sample"));
+  assertThat(master.getName()).isEqualTo("Sonar :: Integration Tests :: Multi-modules Sample");
+  Resource branch=sonar.find(new ResourceQuery("com.sonarsource.it.samples:multi-modules-sample:branch/0.x"));
+  assertThat(branch.getName()).isEqualTo("Sonar :: Integration Tests :: Multi-modules Sample branch/0.x");
+}

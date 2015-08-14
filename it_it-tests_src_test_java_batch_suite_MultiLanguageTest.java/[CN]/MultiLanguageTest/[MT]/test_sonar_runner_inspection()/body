@@ -1,0 +1,19 @@
+{
+  orchestrator.getServer().restoreProfile(FileLocation.ofClasspath("/batch/MultiLanguageTest/one-issue-per-line.xml"));
+  orchestrator.getServer().restoreProfile(FileLocation.ofClasspath("/batch/MultiLanguageTest/one-issue-per-line-xoo2.xml"));
+  orchestrator.getServer().provisionProject("multi-language-sample","multi-language-sample");
+  orchestrator.getServer().associateProjectToQualityProfile("multi-language-sample","xoo","one-issue-per-line");
+  orchestrator.getServer().associateProjectToQualityProfile("multi-language-sample","xoo2","one-issue-per-line-xoo2");
+  SonarRunner build=SonarRunner.create().setProjectDir(ItUtils.projectDir("batch/xoo-multi-languages"));
+  BuildResult result=orchestrator.executeBuild(build);
+  assertThat(result.getLogs()).contains("2 files indexed");
+  assertThat(result.getLogs()).contains("Quality profile for xoo: one-issue-per-line");
+  assertThat(result.getLogs()).contains("Quality profile for xoo2: one-issue-per-line-xoo2");
+  Resource project=getResource("multi-language-sample","files","violations");
+  assertThat(project.getMeasureIntValue("files")).isEqualTo(2);
+  assertThat(project.getMeasureIntValue("violations")).isEqualTo(26);
+  Resource xooFile=getResource("multi-language-sample:src/sample/Sample.xoo","violations");
+  assertThat(xooFile.getMeasureIntValue("violations")).isEqualTo(13);
+  Resource xoo2File=getResource("multi-language-sample:src/sample/Sample.xoo2","violations");
+  assertThat(xoo2File.getMeasureIntValue("violations")).isEqualTo(13);
+}

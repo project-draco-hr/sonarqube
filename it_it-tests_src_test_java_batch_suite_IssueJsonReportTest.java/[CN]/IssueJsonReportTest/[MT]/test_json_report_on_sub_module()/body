@@ -1,0 +1,16 @@
+{
+  orchestrator.getServer().restoreProfile(getResource("one-issue-per-line.xml"));
+  orchestrator.getServer().provisionProject("com.sonarsource.it.samples:multi-modules-sample","Multi-module sample");
+  orchestrator.getServer().associateProjectToQualityProfile("com.sonarsource.it.samples:multi-modules-sample","xoo","one-issue-per-line");
+  File rootDir=ItUtils.projectDir("shared/xoo-multi-modules-sample");
+  SonarRunner scan=SonarRunner.create(rootDir).setProperty("sonar.projectDate","2013-05-01");
+  orchestrator.executeBuild(scan);
+  File moduleDir=ItUtils.projectDir("shared/xoo-multi-modules-sample/module_a/module_a1");
+  SonarRunner issuesModeScan=SonarRunner.create(moduleDir).setProperty("sonar.projectKey","com.sonarsource.it.samples:multi-modules-sample:module_a:module_a1").setProperty("sonar.projectVersion","1.0-SNAPSHOT").setProperty("sonar.projectName","ModuleA1").setProperty("sonar.sources","src/main/xoo").setProperty("sonar.language","xoo").setProperty("sonar.analysis.mode","issues").setProperty("sonar.userHome",temp.newFolder().getAbsolutePath()).setProperty("sonar.report.export.path","sonar-report.json").setProperty("sonar.projectDate","2013-05-02");
+  orchestrator.executeBuild(issuesModeScan);
+  File report=new File(moduleDir,".sonar/sonar-report.json");
+  assertThat(report).isFile().exists();
+  String json=sanitize(FileUtils.readFileToString(report));
+  String expectedJson=sanitize(IOUtils.toString(getResourceInputStream("report-on-sub-module.json")));
+  JSONAssert.assertEquals(expectedJson,json,false);
+}

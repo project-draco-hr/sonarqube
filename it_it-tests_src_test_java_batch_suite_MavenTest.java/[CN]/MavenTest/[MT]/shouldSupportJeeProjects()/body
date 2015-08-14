@@ -1,0 +1,8 @@
+{
+  MavenBuild build=MavenBuild.create(ItUtils.projectPom("maven/jee")).setGoals("clean install","sonar:sonar");
+  orchestrator.executeBuild(build);
+  Resource project=orchestrator.getServer().getWsClient().find(ResourceQuery.createForMetrics("com.sonarsource.it.samples.jee:parent","files"));
+  assertThat(project.getMeasureIntValue("files")).isEqualTo(2);
+  List<Resource> modules=orchestrator.getServer().getWsClient().findAll(ResourceQuery.create("com.sonarsource.it.samples.jee:parent").setDepth(-1).setQualifiers("BRC"));
+  assertThat(modules).hasSize(4);
+}

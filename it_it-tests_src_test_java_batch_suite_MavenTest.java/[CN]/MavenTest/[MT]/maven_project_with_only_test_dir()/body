@@ -1,0 +1,7 @@
+{
+  MavenBuild build=MavenBuild.create(ItUtils.projectPom("maven/maven-only-test-dir")).setCleanPackageSonarGoals();
+  orchestrator.executeBuild(build);
+  Resource project=orchestrator.getServer().getWsClient().find(ResourceQuery.createForMetrics("com.sonarsource.it.samples:maven-only-test-dir","tests","files"));
+  assertThat(project.getMeasureIntValue("tests")).isEqualTo(1);
+  assertThat(project.getMeasure("files")).isNull();
+}

@@ -1,0 +1,9 @@
+{
+  orchestrator.getServer().provisionProject("com.sonarsource.it.projects.batch:duplicate-source","exclusions");
+  orchestrator.getServer().associateProjectToQualityProfile("com.sonarsource.it.projects.batch:duplicate-source","xoo","one-issue-per-line");
+  scan("batch/duplicate-source");
+  Sonar sonar=orchestrator.getServer().getAdminWsClient();
+  Resource project=sonar.find(new ResourceQuery("com.sonarsource.it.projects.batch:duplicate-source").setMetrics("files","directories"));
+  assertThat(project.getMeasureIntValue("files")).isEqualTo(2);
+  assertThat(project.getMeasureIntValue("directories")).isEqualTo(3);
+}

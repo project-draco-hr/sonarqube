@@ -1,0 +1,8 @@
+{
+  scan("sonar.dynamicAnalysis","false","sonar.inclusions","**/*One.xoo,**/*Two.xoo");
+  Resource project=projectWithMetrics("files");
+  assertThat(project.getMeasureIntValue("files")).isEqualTo(2);
+  List<Resource> sourceFiles=orchestrator.getServer().getWsClient().findAll(new ResourceQuery(PROJECT).setQualifiers("FIL").setDepth(-1));
+  assertThat(sourceFiles).hasSize(2);
+  assertThat(sourceFiles).extracting("name").containsOnly("ClassOne.xoo","ClassTwo.xoo");
+}
