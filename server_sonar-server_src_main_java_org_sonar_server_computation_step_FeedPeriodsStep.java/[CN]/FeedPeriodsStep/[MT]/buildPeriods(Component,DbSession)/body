@@ -1,0 +1,16 @@
+{
+  Optional<ComponentDto> projectDto=dbClient.componentDao().selectByKey(session,projectOrView.getKey());
+  if (!projectDto.isPresent()) {
+    return Collections.emptyList();
+  }
+  boolean isReportType=projectOrView.getType().isReportType();
+  PeriodResolver periodResolver=new PeriodResolver(session,projectDto.get().getId(),analysisMetadataHolder.getAnalysisDate().getTime(),isReportType ? projectOrView.getReportAttributes().getVersion() : null,isReportType ? Qualifiers.PROJECT : Qualifiers.VIEW);
+  List<Period> periods=new ArrayList<>(5);
+  for (int index=1; index <= NUMBER_OF_PERIODS; index++) {
+    Period period=periodResolver.resolve(index);
+    if (period != null) {
+      periods.add(period);
+    }
+  }
+  return periods;
+}
