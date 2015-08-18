@@ -1,0 +1,29 @@
+{
+  UserDto user1=insertUser(newUserDto());
+  UserDto user2=insertUser(newUserDto());
+  UserDto user3=insertUser(newUserDto());
+  ComponentDto jdk7=insertJdk7();
+  ComponentDto project2=insertClang();
+  ComponentDto dev=insertDeveloper();
+  ComponentDto view=insertView();
+  insertUserRole(UserRole.ISSUE_ADMIN,user1.getId(),jdk7.getId());
+  insertUserRole(UserRole.ADMIN,user1.getId(),jdk7.getId());
+  insertUserRole(UserRole.ADMIN,user2.getId(),jdk7.getId());
+  insertUserRole(UserRole.ADMIN,user3.getId(),jdk7.getId());
+  insertUserRole(UserRole.ISSUE_ADMIN,user1.getId(),project2.getId());
+  insertUserRole(UserRole.ISSUE_ADMIN,user1.getId(),dev.getId());
+  insertUserRole(UserRole.ISSUE_ADMIN,user1.getId(),view.getId());
+  insertUserRole(GlobalPermissions.SYSTEM_ADMIN,user1.getId(),null);
+  GroupDto group1=insertGroup(newGroupDto());
+  GroupDto group2=insertGroup(newGroupDto());
+  GroupDto group3=insertGroup(newGroupDto());
+  insertGroupRole(UserRole.ADMIN,jdk7.getId(),null);
+  insertGroupRole(UserRole.ADMIN,jdk7.getId(),group1.getId());
+  insertGroupRole(UserRole.ADMIN,jdk7.getId(),group2.getId());
+  insertGroupRole(UserRole.ADMIN,jdk7.getId(),group3.getId());
+  insertGroupRole(UserRole.ADMIN,dev.getId(),group2.getId());
+  insertGroupRole(UserRole.ADMIN,view.getId(),group2.getId());
+  commit();
+  String result=ws.newRequest().execute().getInput();
+  assertJson(result).isSimilarTo(getClass().getResource("search_project_permissions-example.json"));
+}

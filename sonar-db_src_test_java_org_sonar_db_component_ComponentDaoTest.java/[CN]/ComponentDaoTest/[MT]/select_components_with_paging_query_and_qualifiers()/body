@@ -1,0 +1,12 @@
+{
+  DbSession session=db.getSession();
+  underTest.insert(session,newProjectDto().setName("aaaa-name"));
+  underTest.insert(session,newView());
+  underTest.insert(session,newDeveloper("project-name"));
+  for (int i=9; i >= 1; i--) {
+    underTest.insert(session,newProjectDto().setName("project-" + i));
+  }
+  List<ComponentDto> result=underTest.selectComponents(session,singleton(Qualifiers.PROJECT),1,3,"project");
+  assertThat(result).hasSize(3);
+  assertThat(result).extracting("name").containsExactly("project-2","project-3","project-4");
+}

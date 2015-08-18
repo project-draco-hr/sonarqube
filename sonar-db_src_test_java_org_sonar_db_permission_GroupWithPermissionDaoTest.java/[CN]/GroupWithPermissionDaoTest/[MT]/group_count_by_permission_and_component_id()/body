@@ -1,0 +1,24 @@
+{
+  GroupDto group1=insertGroup(newGroupDto());
+  GroupDto group2=insertGroup(newGroupDto());
+  GroupDto group3=insertGroup(newGroupDto());
+  insertGroupRole(ISSUE_ADMIN,group1.getId(),42L);
+  insertGroupRole(ADMIN,group1.getId(),123L);
+  insertGroupRole(ADMIN,group2.getId(),123L);
+  insertGroupRole(ADMIN,group3.getId(),123L);
+  insertGroupRole(ADMIN,null,123L);
+  insertGroupRole(USER,group1.getId(),123L);
+  insertGroupRole(USER,group1.getId(),456L);
+  commit();
+  final List<CountByProjectAndPermissionDto> result=new ArrayList<>();
+  underTest.groupsCountByComponentIdAndPermission(session,Arrays.asList(123L,456L,789L),new ResultHandler(){
+    @Override public void handleResult(    ResultContext context){
+      result.add((CountByProjectAndPermissionDto)context.getResultObject());
+    }
+  }
+);
+  assertThat(result).hasSize(3);
+  assertThat(result).extracting("permission").containsOnly(ADMIN,USER);
+  assertThat(result).extracting("componentId").containsOnly(123L,456L);
+  assertThat(result).extracting("count").containsOnly(4,1);
+}

@@ -1,0 +1,16 @@
+{
+  SearchProjectPermissionsResponse.Builder response=SearchProjectPermissionsResponse.newBuilder();
+  Permission.Builder permissionResponse=Permission.newBuilder();
+  Project.Builder rootComponentBuilder=Project.newBuilder();
+  for (  ComponentDto rootComponent : data.rootComponents()) {
+    rootComponentBuilder.clear().setUuid(rootComponent.uuid()).setKey(rootComponent.key()).setName(rootComponent.name());
+    for (    String permission : data.permissions(rootComponent.getId())) {
+      rootComponentBuilder.addPermissions(permissionResponse.clear().setKey(permission).setUsersCount(data.userCount(rootComponent.getId(),permission)).setGroupsCount(data.groupCount(rootComponent.getId(),permission)));
+    }
+    response.addProjects(rootComponentBuilder);
+  }
+  for (  String permissionKey : ComponentPermissions.ALL) {
+    response.addPermissions(permissionResponse.clear().setKey(permissionKey).setName(i18nName(permissionKey)).setDescription(i18nDescriptionMessage(permissionKey)));
+  }
+  return response.build();
+}
