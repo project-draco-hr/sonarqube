@@ -1,19 +1,7 @@
 {
   try {
     final RemotePluginFile file=remote.file();
-    return fileCache.get(file.getFilename(),file.getHash(),new FileCache.Downloader(){
-      @Override public void download(      String filename,      File toFile) throws IOException {
-        String url="/deploy/plugins/" + remote.getKey() + "/"+ file.getFilename();
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Download {} to {}",url,toFile.getAbsolutePath());
-        }
- else {
-          LOG.info("Download {}",file.getFilename());
-        }
-        serverClient.download(url,toFile);
-      }
-    }
-);
+    return fileCache.get(file.getFilename(),file.getHash(),new FileDownloader(remote.getKey()));
   }
  catch (  Exception e) {
     throw new IllegalStateException("Fail to download plugin: " + remote.getKey(),e);
