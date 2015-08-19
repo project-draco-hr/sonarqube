@@ -13,7 +13,7 @@
       throw new NotFoundException(String.format("Could not find user group with id '%s'",groupId));
     }
     int total=dbClient.groupMembershipDao().countMembers(dbSession,query);
-    Paging paging=Paging.create(pageSize,page,total);
+    Paging paging=forPageIndex(page).withPageSize(pageSize).andTotal(total);
     List<UserMembershipDto> users=dbClient.groupMembershipDao().selectMembers(dbSession,query,paging.offset(),paging.pageSize());
     JsonWriter json=response.newJsonWriter().beginObject();
     writeMembers(json,users);

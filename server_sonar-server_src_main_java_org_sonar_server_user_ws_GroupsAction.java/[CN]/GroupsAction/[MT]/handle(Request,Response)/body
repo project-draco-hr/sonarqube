@@ -13,7 +13,7 @@
       throw new NotFoundException(String.format("User with login '%s' has not been found",login));
     }
     int total=dbClient.groupMembershipDao().countGroups(session,query,user.getId());
-    Paging paging=Paging.create(pageSize,page,total);
+    Paging paging=forPageIndex(page).withPageSize(pageSize).andTotal(total);
     List<GroupMembershipDto> groups=dbClient.groupMembershipDao().selectGroups(session,query,user.getId(),paging.offset(),pageSize);
     JsonWriter json=response.newJsonWriter().beginObject();
     writeGroups(json,groups);
