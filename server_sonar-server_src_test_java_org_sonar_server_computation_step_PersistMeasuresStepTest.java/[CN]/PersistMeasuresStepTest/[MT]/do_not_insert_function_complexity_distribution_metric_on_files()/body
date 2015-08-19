@@ -1,12 +1,13 @@
 {
+  setupReportComponents();
   metricRepository.add(1,FUNCTION_COMPLEXITY_DISTRIBUTION);
-  measureRepository.addRawMeasure(PROJECT_REF,FUNCTION_COMPLEXITY_DISTRIBUTION_KEY,Measure.newMeasureBuilder().create("0=1;2=10"));
-  measureRepository.addRawMeasure(FILE_REF,FUNCTION_COMPLEXITY_DISTRIBUTION_KEY,Measure.newMeasureBuilder().create("0=1;2=10"));
+  measureRepository.addRawMeasure(ROOT_REF,FUNCTION_COMPLEXITY_DISTRIBUTION_KEY,newMeasureBuilder().create("0=1;2=10"));
+  measureRepository.addRawMeasure(LEAF_REF,FUNCTION_COMPLEXITY_DISTRIBUTION_KEY,newMeasureBuilder().create("0=1;2=10"));
   underTest.execute();
   assertThat(dbTester.countRowsOfTable("project_measures")).isEqualTo(1);
   List<Map<String,Object>> dtos=selectSnapshots();
   Map<String,Object> dto=dtos.get(0);
-  assertThat(dto.get("snapshotId")).isEqualTo(3L);
-  assertThat(dto.get("componentId")).isEqualTo(projectDto.getId());
+  assertThat(dto.get("snapshotId")).isEqualTo(ROOT_SNAPSHOT_ID);
+  assertThat(dto.get("componentId")).isEqualTo(rootDto.getId());
   assertThat(dto.get("textValue")).isEqualTo("0=1;2=10");
 }

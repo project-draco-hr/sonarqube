@@ -1,0 +1,13 @@
+{
+  metricRepository.add(1,DOUBLE_METRIC);
+  measureRepository.addRawMeasure(ROOT_REF,DOUBLE_METRIC_KEY,newMeasureBuilder().setVariations(newMeasureVariationsBuilder().setVariation(createPeriod(1),1.1d).setVariation(createPeriod(2),2.2d).setVariation(createPeriod(3),3.3d).setVariation(createPeriod(4),4.4d).setVariation(createPeriod(5),5.5d).build()).create(10d));
+  underTest.execute();
+  assertThat(dbTester.countRowsOfTable("project_measures")).isEqualTo(1);
+  List<Map<String,Object>> dtos=selectSnapshots();
+  Map<String,Object> dto=dtos.get(0);
+  assertThat(dto.get("variation_value_1")).isEqualTo(1.1d);
+  assertThat(dto.get("variation_value_2")).isEqualTo(2.2d);
+  assertThat(dto.get("variation_value_3")).isEqualTo(3.3d);
+  assertThat(dto.get("variation_value_4")).isEqualTo(4.4d);
+  assertThat(dto.get("variation_value_5")).isEqualTo(5.5d);
+}
