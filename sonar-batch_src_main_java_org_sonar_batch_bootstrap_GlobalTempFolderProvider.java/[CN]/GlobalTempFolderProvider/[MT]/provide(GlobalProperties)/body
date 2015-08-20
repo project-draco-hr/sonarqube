@@ -1,9 +1,9 @@
 {
   if (tempFolder == null) {
     String workingPathName=StringUtils.defaultIfBlank(bootstrapProps.property(CoreProperties.GLOBAL_WORKING_DIRECTORY),CoreProperties.GLOBAL_WORKING_DIRECTORY_DEFAULT_VALUE);
-    Path workingPath=Paths.get(workingPathName).normalize();
+    Path workingPath=Paths.get(workingPathName);
     if (!workingPath.isAbsolute()) {
-      Path home=findHome(bootstrapProps);
+      Path home=findSonarHome(bootstrapProps);
       workingPath=home.resolve(workingPath).normalize();
     }
     try {
@@ -14,7 +14,6 @@
     }
     Path tempDir=createTempFolder(workingPath);
     tempFolder=new DefaultTempFolder(tempDir.toFile(),true);
-    this.instance=tempFolder;
   }
   return tempFolder;
 }
