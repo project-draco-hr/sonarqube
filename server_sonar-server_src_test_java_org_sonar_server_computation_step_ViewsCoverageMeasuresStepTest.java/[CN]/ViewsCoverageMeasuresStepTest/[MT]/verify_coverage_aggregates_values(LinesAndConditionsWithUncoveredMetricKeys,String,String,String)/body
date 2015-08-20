@@ -1,0 +1,11 @@
+{
+  measureRepository.addRawMeasure(PROJECTVIEW_1_REF,metricKeys.getLines(),newMeasureBuilder().create(3000)).addRawMeasure(PROJECTVIEW_1_REF,metricKeys.getConditions(),newMeasureBuilder().create(300)).addRawMeasure(PROJECTVIEW_1_REF,metricKeys.getUncoveredLines(),newMeasureBuilder().create(30)).addRawMeasure(PROJECTVIEW_1_REF,metricKeys.getUncoveredConditions(),newMeasureBuilder().create(9)).addRawMeasure(PROJECTVIEW_2_REF,metricKeys.getLines(),newMeasureBuilder().create(2000)).addRawMeasure(PROJECTVIEW_2_REF,metricKeys.getConditions(),newMeasureBuilder().create(400)).addRawMeasure(PROJECTVIEW_2_REF,metricKeys.getUncoveredLines(),newMeasureBuilder().create(200)).addRawMeasure(PROJECTVIEW_2_REF,metricKeys.getUncoveredConditions(),newMeasureBuilder().create(16)).addRawMeasure(PROJECTVIEW_3_REF,metricKeys.getLines(),newMeasureBuilder().create(1000)).addRawMeasure(PROJECTVIEW_3_REF,metricKeys.getConditions(),newMeasureBuilder().create(500)).addRawMeasure(PROJECTVIEW_3_REF,metricKeys.getUncoveredLines(),newMeasureBuilder().create(300)).addRawMeasure(PROJECTVIEW_3_REF,metricKeys.getUncoveredConditions(),newMeasureBuilder().create(19));
+  underTest.execute();
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(PROJECTVIEW_1_REF))).isEmpty();
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(PROJECTVIEW_2_REF))).isEmpty();
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(PROJECTVIEW_3_REF))).isEmpty();
+  MeasureRepoEntry[] subViewRepoEntries={entryOf(codeCoverageKey,newMeasureBuilder().create(95.5d)),entryOf(lineCoverageKey,newMeasureBuilder().create(95.4d)),entryOf(branchCoverageKey,newMeasureBuilder().create(96.4d))};
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(SUB_SUBVIEW_REF))).contains(subViewRepoEntries);
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(SUBVIEW_REF))).contains(subViewRepoEntries);
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(ROOT_REF))).contains(entryOf(codeCoverageKey,newMeasureBuilder().create(92d)),entryOf(lineCoverageKey,newMeasureBuilder().create(91.2d)),entryOf(branchCoverageKey,newMeasureBuilder().create(96.3d)));
+}
