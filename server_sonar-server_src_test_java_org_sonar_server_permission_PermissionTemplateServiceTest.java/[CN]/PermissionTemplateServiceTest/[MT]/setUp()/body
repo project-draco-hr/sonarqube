@@ -1,6 +1,8 @@
 {
   userSessionRule.login("admin").setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
-  MyBatis myBatis=mock(MyBatis.class);
-  when(myBatis.openSession(false)).thenReturn(session);
-  service=new PermissionTemplateService(myBatis,permissionTemplateDao,userDao,finder,userSessionRule);
+  DbClient dbClient=mock(DbClient.class);
+  when(dbClient.openSession(false)).thenReturn(session);
+  when(dbClient.permissionTemplateDao()).thenReturn(permissionTemplateDao);
+  when(dbClient.userDao()).thenReturn(userDao);
+  underTest=new PermissionTemplateService(dbClient,userSessionRule,finder);
 }
