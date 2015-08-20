@@ -2,9 +2,15 @@
   if (DefaultGroups.isAnyone(updatedReference)) {
     return null;
   }
-  GroupDto groupDto=userDao.selectGroupByName(updatedReference);
-  if (groupDto == null) {
-    throw new BadRequestException("Unknown group: " + updatedReference);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    GroupDto groupDto=dbClient.groupDao().selectByName(dbSession,updatedReference);
+    if (groupDto == null) {
+      throw new BadRequestException("Unknown group: " + updatedReference);
+    }
+    return groupDto.getId();
   }
-  return groupDto.getId();
+  finally {
+    dbClient.closeSession(dbSession);
+  }
 }

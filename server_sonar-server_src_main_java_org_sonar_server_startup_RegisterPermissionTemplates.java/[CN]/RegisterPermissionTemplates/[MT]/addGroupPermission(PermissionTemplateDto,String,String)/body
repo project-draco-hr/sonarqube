@@ -4,13 +4,19 @@
     groupId=null;
   }
  else {
-    GroupDto groupDto=userDao.selectGroupByName(groupName);
-    if (groupDto != null) {
-      groupId=groupDto.getId();
-    }
+    DbSession dbSession=dbClient.openSession(false);
+    try {
+      GroupDto groupDto=dbClient.groupDao().selectByName(dbSession,groupName);
+      if (groupDto != null) {
+        groupId=groupDto.getId();
+      }
  else {
-      LOG.error("Cannot setup default permission for group: " + groupName);
+        LOG.error("Cannot setup default permission for group: " + groupName);
+      }
+    }
+  finally {
+      dbClient.closeSession(dbSession);
     }
   }
-  permissionTemplateDao.insertGroupPermission(template.getId(),groupId,permission);
+  dbClient.permissionTemplateDao().insertGroupPermission(template.getId(),groupId,permission);
 }
