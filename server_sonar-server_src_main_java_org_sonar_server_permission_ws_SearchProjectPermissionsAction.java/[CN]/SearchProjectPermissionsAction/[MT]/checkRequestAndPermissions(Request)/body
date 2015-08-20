@@ -1,22 +1,19 @@
 {
   String projectUuid=wsRequest.param(PARAM_PROJECT_UUID);
   String projectKey=wsRequest.param(PARAM_PROJECT_KEY);
-  boolean isProjectUuidNonNull=projectUuid != null;
-  boolean isProjectKeyNonNull=projectKey != null;
-  if (isProjectUuidNonNull || isProjectKeyNonNull) {
+  boolean hasProjectUuid=projectUuid != null;
+  boolean hasProjectKey=projectKey != null;
+  if (hasProjectUuid || hasProjectKey) {
     checkRequest(projectUuid != null ^ projectKey != null,"Project id or project key can be provided, not both.");
   }
-  userSession.checkLoggedIn();
-  if (userSession.hasGlobalPermission(GlobalPermissions.SYSTEM_ADMIN)) {
+  if (hasProjectUuid) {
+    checkProjectAdminUserByComponentUuid(userSession,projectUuid);
     return;
   }
-  if (isProjectUuidNonNull) {
-    userSession.checkProjectUuidPermission(UserRole.ADMIN,projectUuid);
-    return;
+ else   if (hasProjectKey) {
+    checkProjectAdminUserByComponentKey(userSession,projectKey);
   }
-  if (isProjectKeyNonNull) {
-    userSession.checkProjectPermission(UserRole.ADMIN,projectKey);
-    return;
+ else {
+    checkGlobalAdminUser(userSession);
   }
-  userSession.checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
 }
