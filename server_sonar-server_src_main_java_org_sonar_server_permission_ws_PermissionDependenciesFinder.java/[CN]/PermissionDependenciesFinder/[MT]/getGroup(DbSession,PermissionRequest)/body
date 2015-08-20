@@ -1,0 +1,18 @@
+{
+  GroupDto group=null;
+  Long groupId=request.groupId();
+  if (groupId != null) {
+    group=dbClient.groupDao().selectById(dbSession,groupId);
+    if (group == null) {
+      throw new NotFoundException(String.format("Group with id '%d' is not found",groupId));
+    }
+  }
+  String groupName=request.groupName();
+  if (groupName != null) {
+    group=dbClient.groupDao().selectByKey(dbSession,groupName);
+    if (group == null) {
+      throw new NotFoundException(String.format("Group with name '%s' is not found",groupName));
+    }
+  }
+  return checkNotNull(group);
+}

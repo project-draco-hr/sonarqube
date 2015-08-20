@@ -1,8 +1,14 @@
 {
-  PermissionRequest request=new Builder(wsRequest).withPagination().build();
-  Optional<ComponentDto> project=permissionWsCommons.searchProject(request);
-  checkProjectAdminUserByComponentDto(userSession,project);
-  PermissionQuery permissionQuery=buildPermissionQuery(request,project);
-  Permissions.GroupsResponse groupsResponse=groupsResponse(permissionQuery,request);
-  writeProtobuf(groupsResponse,wsRequest,wsResponse);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    PermissionRequest request=new Builder(wsRequest).withPagination().build();
+    Optional<ComponentDto> project=dependenciesFinder.searchProject(dbSession,request);
+    checkProjectAdminUserByComponentDto(userSession,project);
+    PermissionQuery permissionQuery=buildPermissionQuery(request,project);
+    Permissions.GroupsResponse groupsResponse=groupsResponse(permissionQuery,request);
+    writeProtobuf(groupsResponse,wsRequest,wsResponse);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
 }
