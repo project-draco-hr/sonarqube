@@ -4,7 +4,7 @@
   Map<String,String> currentModuleProperties=new HashMap<>();
   String prefix=!currentModuleId.isEmpty() ? currentModuleId + "." : "";
   for (  Map.Entry<String,String> entry : allProperties.entrySet()) {
-    String key=(String)entry.getKey();
+    String key=entry.getKey();
     int prefixLength=prefix.length();
     if (key.startsWith(prefix)) {
       currentModuleProperties.put(key.substring(prefixLength),entry.getValue());
@@ -15,9 +15,11 @@
   Collections.sort(moduleIds);
   Collections.reverse(moduleIds);
   Map<String,Map<String,String>> result=new HashMap<>();
-  for (  String moduleId : moduleIds) {
-    result.putAll(extractPropertiesByModule(moduleId,currentModuleProperties));
-  }
   result.put(currentModuleId,currentModuleProperties);
+  for (  String moduleId : moduleIds) {
+    Map<String,Map<String,String>> subModuleProps=extractPropertiesByModule(moduleId,currentModuleProperties);
+    checkRepeatedModuleNames(result.keySet(),subModuleProps.keySet());
+    result.putAll(subModuleProps);
+  }
   return result;
 }
