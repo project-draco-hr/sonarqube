@@ -1,0 +1,11 @@
+{
+  InputFile file=mock(InputFile.class);
+  when(file.lines()).thenReturn(999);
+  when(component.path()).thenReturn("file");
+  when(inputPathCache.getFile("module","file")).thenReturn(file);
+  DefaultIssue issue=new DefaultIssue().setLine(1000).setProjectKey("module").setRuleKey(RuleKey.of("repo","rule")).setComponentKey("componentKey");
+  DefaultIssuable issuable=new DefaultIssuable(component,project,moduleIssues,cache,inputPathCache);
+  exception.expect(IllegalStateException.class);
+  exception.expectMessage("Invalid line 1000 (must be <= 999) in issue for 'componentKey' created by the rule 'repo:rule'");
+  issuable.addIssue(issue);
+}
