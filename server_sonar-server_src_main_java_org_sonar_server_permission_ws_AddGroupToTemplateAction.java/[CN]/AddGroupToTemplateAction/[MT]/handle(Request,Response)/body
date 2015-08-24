@@ -1,0 +1,22 @@
+{
+  checkGlobalAdminUser(userSession);
+  String templateKey=wsRequest.mandatoryParam(PARAM_TEMPLATE_KEY);
+  String permission=wsRequest.mandatoryParam(PARAM_PERMISSION);
+  Long groupIdParam=wsRequest.paramAsLong(PARAM_GROUP_ID);
+  String groupName=wsRequest.param(PARAM_GROUP_NAME);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    validateProjectPermission(permission);
+    validateNotAnyoneAndAdminPermission(permission,groupName);
+    PermissionTemplateDto template=dependenciesFinder.getTemplate(templateKey);
+    GroupDto group=dependenciesFinder.getGroup(dbSession,groupIdParam,groupName);
+    if (!groupAlreadyAdded(dbSession,template.getId(),group,permission)) {
+      Long groupId=group == null ? null : group.getId();
+      dbClient.permissionTemplateDao().insertGroupPermission(dbSession,template.getId(),groupId,permission);
+    }
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+  wsResponse.noContent();
+}
