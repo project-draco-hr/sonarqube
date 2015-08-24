@@ -1,9 +1,8 @@
 {
   String query=wsRequest.param(TEXT_QUERY);
-  String projectUuid=wsRequest.param(PARAM_PROJECT_UUID);
-  String projectKey=wsRequest.param(PARAM_PROJECT_KEY);
-  if (projectUuid != null || projectKey != null) {
-    return singletonList(componentFinder.getProjectByUuidOrKey(dbSession,projectUuid,projectKey));
+  Optional<WsProject> project=WsProject.fromRequest(wsRequest);
+  if (project.isPresent()) {
+    return singletonList(componentFinder.getProjectByUuidOrKey(dbSession,project.get().uuid(),project.get().key()));
   }
   return dbClient.componentDao().selectComponents(dbSession,rootQualifiers,paging.offset(),paging.pageSize(),query);
 }

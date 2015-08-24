@@ -1,17 +1,13 @@
 {
-  String projectUuid=wsRequest.param(PARAM_PROJECT_UUID);
-  String projectKey=wsRequest.param(PARAM_PROJECT_KEY);
-  boolean hasProjectUuid=projectUuid != null;
-  boolean hasProjectKey=projectKey != null;
-  if (hasProjectUuid || hasProjectKey) {
-    checkRequest(projectUuid != null ^ projectKey != null,"Project id or project key can be provided, not both.");
-  }
+  Optional<WsProject> project=WsProject.fromRequest(wsRequest);
+  boolean hasProject=project.isPresent();
+  boolean hasProjectUuid=hasProject && project.get().uuid() != null;
+  boolean hasProjectKey=hasProject && project.get().key() != null;
   if (hasProjectUuid) {
-    checkProjectAdminUserByComponentUuid(userSession,projectUuid);
-    return;
+    checkProjectAdminUserByComponentUuid(userSession,project.get().uuid());
   }
  else   if (hasProjectKey) {
-    checkProjectAdminUserByComponentKey(userSession,projectKey);
+    checkProjectAdminUserByComponentKey(userSession,project.get().key());
   }
  else {
     checkGlobalAdminUser(userSession);
