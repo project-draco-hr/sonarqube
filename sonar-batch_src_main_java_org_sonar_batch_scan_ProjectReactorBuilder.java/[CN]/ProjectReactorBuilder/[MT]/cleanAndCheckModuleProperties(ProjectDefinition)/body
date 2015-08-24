@@ -2,4 +2,12 @@
   Map<String,String> properties=project.properties();
   String[] sourcePaths=getListFromProperty(properties,PROPERTY_SOURCES);
   checkExistenceOfPaths(project.getKey(),project.getBaseDir(),sourcePaths,PROPERTY_SOURCES);
+  List<String> libPaths=Lists.newArrayList();
+  for (  String pattern : getListFromProperty(properties,PROPERTY_LIBRARIES)) {
+    for (    File file : getLibraries(project.getBaseDir(),pattern)) {
+      libPaths.add(file.getAbsolutePath());
+    }
+  }
+  properties.remove(PROPERTY_LIBRARIES);
+  properties.put(PROPERTY_LIBRARIES,StringUtils.join(libPaths,","));
 }
