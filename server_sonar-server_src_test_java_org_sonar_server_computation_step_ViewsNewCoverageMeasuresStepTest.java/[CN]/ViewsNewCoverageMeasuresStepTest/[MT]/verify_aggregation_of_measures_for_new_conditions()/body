@@ -1,0 +1,25 @@
+{
+  String newLinesToCover=CoreMetrics.NEW_IT_LINES_TO_COVER_KEY;
+  String newUncoveredLines=CoreMetrics.NEW_IT_UNCOVERED_LINES_KEY;
+  String newConditionsToCover=CoreMetrics.NEW_IT_CONDITIONS_TO_COVER_KEY;
+  String newUncoveredConditions=CoreMetrics.NEW_IT_UNCOVERED_CONDITIONS_KEY;
+  MetricKeys metricKeys=new MetricKeys(newLinesToCover,newUncoveredLines,newConditionsToCover,newUncoveredConditions);
+  treeRootHolder.setRoot(VIEWS_TREE);
+  measureRepository.addRawMeasure(PROJECT_VIEW_2_REF,newLinesToCover,createMeasure(1d,2d));
+  measureRepository.addRawMeasure(PROJECT_VIEW_2_REF,newUncoveredLines,createMeasure(10d,20d));
+  measureRepository.addRawMeasure(PROJECT_VIEW_2_REF,newConditionsToCover,createMeasure(4d,5d));
+  measureRepository.addRawMeasure(PROJECT_VIEW_2_REF,newUncoveredConditions,createMeasure(40d,50d));
+  measureRepository.addRawMeasure(PROJECT_VIEW_3_REF,newLinesToCover,createMeasure(11d,12d));
+  measureRepository.addRawMeasure(PROJECT_VIEW_3_REF,newUncoveredLines,createMeasure(20d,30d));
+  measureRepository.addRawMeasure(PROJECT_VIEW_3_REF,newConditionsToCover,createMeasure(14d,15d));
+  measureRepository.addRawMeasure(PROJECT_VIEW_3_REF,newUncoveredConditions,createMeasure(50d,60d));
+  measureRepository.addRawMeasure(PROJECT_VIEW_4_REF,newLinesToCover,createMeasure(21d,22d));
+  measureRepository.addRawMeasure(PROJECT_VIEW_4_REF,newUncoveredLines,createMeasure(30d,40d));
+  measureRepository.addRawMeasure(PROJECT_VIEW_4_REF,newConditionsToCover,createMeasure(24d,25d));
+  measureRepository.addRawMeasure(PROJECT_VIEW_4_REF,newUncoveredConditions,createMeasure(60d,70d));
+  underTest.execute();
+  assertNoAddedRawMeasureOnProjectViews();
+  assertNoAddedRawMeasures(SUB_SUBVIEW_1_REF);
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(SUB_SUBVIEW_2_REF))).contains(entryOf(metricKeys.newLinesToCover,createMeasure(12d,NO_PERIOD_4_OR_5_IN_VIEWS)),entryOf(metricKeys.newUncoveredLines,createMeasure(30d,NO_PERIOD_4_OR_5_IN_VIEWS)),entryOf(metricKeys.newConditionsToCover,createMeasure(18d,NO_PERIOD_4_OR_5_IN_VIEWS)),entryOf(metricKeys.newUncoveredConditions,createMeasure(90d,NO_PERIOD_4_OR_5_IN_VIEWS)));
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(ROOT_REF))).contains(entryOf(metricKeys.newLinesToCover,createMeasure(33d,NO_PERIOD_4_OR_5_IN_VIEWS)),entryOf(metricKeys.newUncoveredLines,createMeasure(60d,NO_PERIOD_4_OR_5_IN_VIEWS)),entryOf(metricKeys.newConditionsToCover,createMeasure(42d,NO_PERIOD_4_OR_5_IN_VIEWS)),entryOf(metricKeys.newUncoveredConditions,createMeasure(150d,NO_PERIOD_4_OR_5_IN_VIEWS)));
+}
