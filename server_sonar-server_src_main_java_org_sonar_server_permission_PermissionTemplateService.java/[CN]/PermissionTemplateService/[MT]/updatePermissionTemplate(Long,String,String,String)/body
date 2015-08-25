@@ -1,6 +1,12 @@
 {
-  checkGlobalAdminUser(userSession);
-  validateTemplateName(templateId,newName);
-  validateKeyPattern(newKeyPattern);
-  permissionTemplateDao.updatePermissionTemplate(templateId,newName,newDescription,newKeyPattern);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    checkGlobalAdminUser(userSession);
+    validateTemplateNameForUpdate(dbSession,dbClient,newName,templateId);
+    validateProjectPattern(projectPattern);
+    permissionTemplateDao.update(templateId,newName,newDescription,projectPattern);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
 }

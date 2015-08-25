@@ -1,8 +1,7 @@
 {
   expected.expect(BadRequestException.class);
-  expected.expectMessage("A template with that name already exists");
-  PermissionTemplateDto template1=new PermissionTemplateDto().setId(1L).setName("template1").setDescription("template1");
+  expected.expectMessage("A template with the name 'template2' already exists (case insensitive).");
   PermissionTemplateDto template2=new PermissionTemplateDto().setId(2L).setName("template2").setDescription("template2");
-  when(permissionTemplateDao.selectAllPermissionTemplates()).thenReturn(Lists.newArrayList(template1,template2));
-  underTest.updatePermissionTemplate(1L,"template2","template1",null);
+  when(permissionTemplateDao.selectByName(any(DbSession.class),eq("template2"))).thenReturn(template2);
+  underTest.updatePermissionTemplate(1L,"template2","template2",null);
 }

@@ -1,0 +1,17 @@
+{
+  String name=wsRequest.mandatoryParam(PARAM_TEMPLATE_NAME);
+  String description=wsRequest.param(PARAM_TEMPLATE_DESCRIPTION);
+  String projectPattern=wsRequest.param(PARAM_TEMPLATE_PATTERN);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    checkGlobalAdminUser(userSession);
+    validateTemplateNameForCreation(dbSession,name);
+    validateProjectPattern(projectPattern);
+    PermissionTemplateDto permissionTemplate=insertTemplate(dbSession,name,description,projectPattern);
+    Permissions.CreatePermissionTemplateResponse response=buildResponse(permissionTemplate);
+    writeProtobuf(response,wsRequest,wsResponse);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}
