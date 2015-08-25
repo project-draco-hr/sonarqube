@@ -1,17 +1,12 @@
 {
-  JsonWriter json=response.newJsonWriter();
-  json.beginObject();
-  if (userSession.isLoggedIn()) {
-    List<IssueFilterDto> filters=service.findFavoriteFilters(userSession);
-    List<IssueFilterDto> sharedFiltersWithoutUserFilters=service.findSharedFiltersWithoutUserFilters(userSession);
-    filters.addAll(sharedFiltersWithoutUserFilters);
-    ImmutableSortedSet<IssueFilterDto> allUniqueIssueFilters=FluentIterable.from(filters).toSortedSet(IssueFilterDtoIdComparator.INSTANCE);
-    json.name("issueFilters").beginArray();
-    for (    IssueFilterDto favorite : allUniqueIssueFilters) {
-      issueFilterJsonWriter.write(json,favorite,userSession);
-    }
-    json.endArray();
+  userSession.checkLoggedIn();
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    Set<IssueFilterDto> issueFilters=searchIssueFilters(dbSession);
+    Map<Long,IssueFilterFavouriteDto> userFavouritesByFilterId=searchUserFavouritesByFilterId(dbSession);
+    writeResponse(response,issueFilters,userFavouritesByFilterId);
   }
-  json.endObject();
-  json.close();
+  finally {
+    dbClient.closeSession(dbSession);
+  }
 }

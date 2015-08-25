@@ -1,0 +1,14 @@
+{
+  userSession.login("grace.hopper");
+  IssueFilterDto myUnresolvedIssues=insertIssueFilter(new IssueFilterDto().setName("My Unresolved Issues").setShared(true).setData("resolved=false|assignees=__me__"));
+  IssueFilterDto falsePositiveAndWontFixIssues=insertIssueFilter(new IssueFilterDto().setName("False Positive and Won't Fix Issues").setShared(true).setData("resolutions=FALSE-POSITIVE,WONTFIX"));
+  IssueFilterDto unresolvedIssues=insertIssueFilter(new IssueFilterDto().setName("Unresolved Issues").setShared(true).setUserLogin("grace.hopper").setData("resolved=false"));
+  IssueFilterDto myCustomFilter=insertIssueFilter(new IssueFilterDto().setName("My Custom Filter").setShared(false).setUserLogin("grace.hopper").setData("resolved=false|statuses=OPEN,REOPENED|assignees=__me__"));
+  linkFilterToUser(myUnresolvedIssues.getId(),"grace.hopper");
+  linkFilterToUser(myCustomFilter.getId(),"grace.hopper");
+  linkFilterToUser(falsePositiveAndWontFixIssues.getId(),"another-login");
+  linkFilterToUser(unresolvedIssues.getId(),"yet-another-login");
+  commit();
+  TestResponse result=newRequest();
+  assertJson(result.getInput()).isSimilarTo(getClass().getResource("SearchActionTest/search.json"));
+}
