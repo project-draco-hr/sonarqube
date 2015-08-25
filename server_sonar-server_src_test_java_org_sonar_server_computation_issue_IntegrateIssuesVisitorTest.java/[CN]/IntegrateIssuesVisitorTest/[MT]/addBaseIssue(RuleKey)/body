@@ -1,0 +1,11 @@
+{
+  ComponentDto project=ComponentTesting.newProjectDto(PROJECT_UUID).setKey(PROJECT_KEY);
+  ComponentDto file=ComponentTesting.newFileDto(project,FILE_UUID).setKey(FILE_KEY);
+  dbTester.getDbClient().componentDao().insert(dbTester.getSession(),project,file);
+  RuleDto ruleDto=RuleTesting.newDto(ruleKey);
+  dbTester.getDbClient().ruleDao().insert(dbTester.getSession(),ruleDto);
+  ruleRepositoryRule.add(ruleKey);
+  IssueDto issue=IssueTesting.newDto(ruleDto,file,project).setKee("ISSUE").setStatus(Issue.STATUS_OPEN).setSeverity(Severity.MAJOR);
+  dbTester.getDbClient().issueDao().insert(dbTester.getSession(),issue);
+  dbTester.getSession().commit();
+}

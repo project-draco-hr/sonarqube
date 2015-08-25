@@ -1,0 +1,15 @@
+{
+  String fileUuid="FILE1";
+  String issueUuid="ABCD";
+  when(componentsWithUnprocessedIssues.getUuids()).thenReturn(newHashSet(fileUuid));
+  DefaultIssue issue=new DefaultIssue().setKey(issueUuid);
+  when(baseIssuesLoader.loadForComponentUuid(fileUuid)).thenReturn(Collections.singletonList(issue));
+  underTest.visit(ReportComponent.builder(PROJECT,1).build());
+  verify(issueLifecycle).doAutomaticTransition(issue);
+  CloseableIterator<DefaultIssue> issues=issueCache.traverse();
+  assertThat(issues.hasNext()).isTrue();
+  DefaultIssue result=issues.next();
+  assertThat(result.key()).isEqualTo(issueUuid);
+  assertThat(result.isBeingClosed()).isTrue();
+  assertThat(result.isOnDisabledRule()).isFalse();
+}

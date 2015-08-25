@@ -1,0 +1,13 @@
+{
+  componentsWithUnprocessedIssues.setUuids(newHashSet(FILE_UUID));
+  RuleKey ruleKey=RuleKey.of(RuleKey.MANUAL_REPOSITORY_KEY,"architecture");
+  addBaseIssue(ruleKey);
+  underTest.visitAny(FILE);
+  verify(issueLifecycle).moveOpenManualIssue(defaultIssueCaptor.capture(),eq((Integer)null));
+  assertThat(defaultIssueCaptor.getValue().ruleKey()).isEqualTo(ruleKey);
+  verify(issueLifecycle).doAutomaticTransition(defaultIssueCaptor.capture());
+  assertThat(defaultIssueCaptor.getValue().ruleKey()).isEqualTo(ruleKey);
+  List<DefaultIssue> issues=newArrayList(issueCache.traverse());
+  assertThat(issues).hasSize(1);
+  assertThat(componentsWithUnprocessedIssues.getUuids()).isEmpty();
+}

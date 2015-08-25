@@ -1,0 +1,20 @@
+{
+  componentsWithUnprocessedIssues.setUuids(newHashSet(FILE_UUID));
+  RuleKey ruleKey=RuleTesting.XOO_X1;
+  addBaseIssue(ruleKey);
+  BatchReport.Issue reportIssue=BatchReport.Issue.newBuilder().setMsg("the message").setRuleRepository(ruleKey.repository()).setRuleKey(ruleKey.rule()).setSeverity(Constants.Severity.BLOCKER).build();
+  reportReader.putIssues(FILE_REF,asList(reportIssue));
+  reportReader.putFileSourceLines(FILE_REF,"line1");
+  underTest.visitAny(FILE);
+  ArgumentCaptor<DefaultIssue> rawIssueCaptor=ArgumentCaptor.forClass(DefaultIssue.class);
+  ArgumentCaptor<DefaultIssue> baseIssueCaptor=ArgumentCaptor.forClass(DefaultIssue.class);
+  verify(issueLifecycle).mergeExistingOpenIssue(rawIssueCaptor.capture(),baseIssueCaptor.capture());
+  assertThat(rawIssueCaptor.getValue().severity()).isEqualTo(Severity.BLOCKER);
+  assertThat(baseIssueCaptor.getValue().severity()).isEqualTo(Severity.MAJOR);
+  verify(issueLifecycle).doAutomaticTransition(defaultIssueCaptor.capture());
+  assertThat(defaultIssueCaptor.getValue().ruleKey()).isEqualTo(ruleKey);
+  List<DefaultIssue> issues=newArrayList(issueCache.traverse());
+  assertThat(issues).hasSize(1);
+  assertThat(issues.get(0).severity()).isEqualTo(Severity.BLOCKER);
+  assertThat(componentsWithUnprocessedIssues.getUuids()).isEmpty();
+}
