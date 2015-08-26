@@ -1,0 +1,10 @@
+{
+  treeRootHolder.setRoot(project);
+  when(settingsRepository.getSettings(project)).thenReturn(new Settings());
+  dbIdsRepository.setComponentId(project,PROJECT_ID);
+  underTest.execute();
+  ArgumentCaptor<IdUuidPair> argumentCaptor=ArgumentCaptor.forClass(IdUuidPair.class);
+  verify(projectCleaner).purge(any(DbSession.class),argumentCaptor.capture(),any(Settings.class));
+  assertThat(argumentCaptor.getValue().getId()).isEqualTo(PROJECT_ID);
+  assertThat(argumentCaptor.getValue().getUuid()).isEqualTo(PROJECT_UUID);
+}

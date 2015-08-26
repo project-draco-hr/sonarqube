@@ -1,11 +1,11 @@
 {
-  DbSession session=dbClient.openSession(true);
-  try {
-    Component project=treeRootHolder.getRoot();
-    projectCleaner.purge(session,new IdUuidPair(dbIdsRepository.getComponentId(project),project.getUuid()),settingsRepository.getSettings(project));
-    session.commit();
+  new DepthTraversalTypeAwareCrawler(new TypeAwareVisitorAdapter(reportMaxDepth(PROJECT).withViewsMaxDepth(VIEW),PRE_ORDER){
+    @Override public void visitProject(    Component project){
+      execute(project);
+    }
+    @Override public void visitView(    Component view){
+      execute(view);
+    }
   }
-  finally {
-    MyBatis.closeQuietly(session);
-  }
+).visit(treeRootHolder.getRoot());
 }
