@@ -1,0 +1,20 @@
+{
+  SnapshotDto period1ViewSnapshot=createForView(VIEW_DTO);
+  dbClient.snapshotDao().insert(session,period1ViewSnapshot);
+  dbClient.measureDao().insert(session,newMeasureDto(ISSUES_METRIC.getId(),VIEW_DTO.getId(),period1ViewSnapshot.getId(),60d));
+  ComponentDto subviewDto=ComponentTesting.newSubView(VIEW_DTO,"dir","who cares?");
+  dbClient.componentDao().insert(session,subviewDto);
+  SnapshotDto period1SubviewSnapshot=createForComponent(subviewDto,period1ViewSnapshot);
+  dbClient.snapshotDao().insert(session,period1SubviewSnapshot);
+  dbClient.measureDao().insert(session,newMeasureDto(ISSUES_METRIC.getId(),subviewDto.getId(),period1SubviewSnapshot.getId(),10d));
+  session.commit();
+  periodsHolder.setPeriods(newPeriod(1,period1ViewSnapshot));
+  Component subview=ViewsComponent.builder(Component.Type.SUBVIEW,2).setUuid(subviewDto.uuid()).build();
+  Component view=ViewsComponent.builder(Component.Type.VIEW,1).setUuid(VIEW_DTO.uuid()).addChildren(subview).build();
+  treeRootHolder.setRoot(view);
+  addRawMeasure(view,ISSUES_METRIC,Measure.newMeasureBuilder().create(80,null));
+  addRawMeasure(subview,ISSUES_METRIC,Measure.newMeasureBuilder().create(20,null));
+  underTest.execute();
+  assertThat(measureRepository.getRawMeasure(view,ISSUES_METRIC).get().getVariations().getVariation1()).isEqualTo(20d);
+  assertThat(measureRepository.getRawMeasure(subview,ISSUES_METRIC).get().getVariations().getVariation1()).isEqualTo(10d);
+}

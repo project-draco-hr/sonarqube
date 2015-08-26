@@ -1,0 +1,10 @@
+{
+  SnapshotDto period1ViewSnapshot=createForView(VIEW_DTO);
+  dbClient.snapshotDao().insert(session,period1ViewSnapshot);
+  dbClient.measureDao().insert(session,newMeasureDto(ISSUES_METRIC.getId(),VIEW_DTO.getId(),period1ViewSnapshot.getId(),60d));
+  session.commit();
+  periodsHolder.setPeriods(newPeriod(1,period1ViewSnapshot));
+  treeRootHolder.setRoot(VIEW);
+  underTest.execute();
+  assertThat(measureRepository.getRawMeasures(VIEW).keys()).isEmpty();
+}

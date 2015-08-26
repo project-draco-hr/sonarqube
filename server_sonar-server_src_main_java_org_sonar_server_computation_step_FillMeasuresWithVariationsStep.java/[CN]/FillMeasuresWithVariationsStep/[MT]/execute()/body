@@ -1,10 +1,10 @@
 {
   DbSession dbSession=dbClient.openSession(false);
   try {
-    Iterable<Metric> metrics=FluentIterable.from(metricRepository.getAll()).filter(NumericMetric.INSTANCE);
+    List<Metric> metrics=from(metricRepository.getAll()).filter(NumericMetric.INSTANCE).toList();
     new DepthTraversalTypeAwareCrawler(new VariationMeasuresVisitor(dbSession,metrics)).visit(treeRootHolder.getRoot());
   }
   finally {
-    dbSession.close();
+    dbClient.closeSession(dbSession);
   }
 }

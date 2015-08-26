@@ -1,0 +1,18 @@
+{
+  SnapshotDto period1ViewSnapshot=createForProject(VIEW_DTO);
+  dbClient.snapshotDao().insert(session,period1ViewSnapshot);
+  dbClient.measureDao().insert(session,newMeasureDto(ISSUES_METRIC.getId(),VIEW_DTO.getId(),period1ViewSnapshot.getId(),60d),newMeasureDto(DEBT_METRIC.getId(),VIEW_DTO.getId(),period1ViewSnapshot.getId(),10d),newMeasureDto(FILE_COMPLEXITY_METRIC.getId(),VIEW_DTO.getId(),period1ViewSnapshot.getId(),2d),newMeasureDto(BUILD_BREAKER_METRIC.getId(),VIEW_DTO.getId(),period1ViewSnapshot.getId(),1d));
+  session.commit();
+  periodsHolder.setPeriods(newPeriod(1,period1ViewSnapshot));
+  treeRootHolder.setRoot(VIEW);
+  addRawMeasure(VIEW,ISSUES_METRIC,Measure.newMeasureBuilder().create(80,null));
+  addRawMeasure(VIEW,DEBT_METRIC,Measure.newMeasureBuilder().create(5L,null));
+  addRawMeasure(VIEW,FILE_COMPLEXITY_METRIC,Measure.newMeasureBuilder().create(3d,null));
+  addRawMeasure(VIEW,BUILD_BREAKER_METRIC,Measure.newMeasureBuilder().create(false,null));
+  underTest.execute();
+  assertThat(measureRepository.getRawMeasures(VIEW).keys()).hasSize(4);
+  assertThat(measureRepository.getRawMeasure(VIEW,ISSUES_METRIC).get().getVariations().getVariation1()).isEqualTo(20d);
+  assertThat(measureRepository.getRawMeasure(VIEW,DEBT_METRIC).get().getVariations().getVariation1()).isEqualTo(-5d);
+  assertThat(measureRepository.getRawMeasure(VIEW,FILE_COMPLEXITY_METRIC).get().getVariations().getVariation1()).isEqualTo(1d);
+  assertThat(measureRepository.getRawMeasure(VIEW,BUILD_BREAKER_METRIC).get().getVariations().getVariation1()).isEqualTo(-1d);
+}
