@@ -1,10 +1,16 @@
 {
+  ClassLoader baseClassLoader=baseClassLoader();
   ClassloaderBuilder builder=new ClassloaderBuilder();
-  builder.newClassloader(API_CLASSLOADER_KEY,baseClassloader());
-  for (  PluginClassloaderDef def : defs) {
-    builder.setMask(API_CLASSLOADER_KEY,def.isServerExtension() ? new Mask() : apiMask());
+  builder.newClassloader(API_CLASSLOADER_KEY,baseClassLoader);
+  builder.setMask(API_CLASSLOADER_KEY,apiMask());
+  for (  PluginClassLoaderDef def : defs) {
     builder.newClassloader(def.getBasePluginKey());
-    builder.setParent(def.getBasePluginKey(),API_CLASSLOADER_KEY,new Mask());
+    if (def.isPrivileged()) {
+      builder.setParent(def.getBasePluginKey(),baseClassLoader,new Mask());
+    }
+ else {
+      builder.setParent(def.getBasePluginKey(),API_CLASSLOADER_KEY,new Mask());
+    }
     builder.setLoadingOrder(def.getBasePluginKey(),def.isSelfFirstStrategy() ? SELF_FIRST : PARENT_FIRST);
     for (    File jar : def.getFiles()) {
       builder.addURL(def.getBasePluginKey(),fileToUrl(jar));

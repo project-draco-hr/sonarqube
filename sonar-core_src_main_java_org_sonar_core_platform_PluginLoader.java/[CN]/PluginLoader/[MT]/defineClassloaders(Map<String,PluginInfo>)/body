@@ -1,10 +1,10 @@
 {
-  Map<String,PluginClassloaderDef> classloadersByBasePlugin=new HashMap<>();
+  Map<String,PluginClassLoaderDef> classloadersByBasePlugin=new HashMap<>();
   for (  PluginInfo info : infoByKeys.values()) {
     String baseKey=basePluginKey(info,infoByKeys);
-    PluginClassloaderDef def=classloadersByBasePlugin.get(baseKey);
+    PluginClassLoaderDef def=classloadersByBasePlugin.get(baseKey);
     if (def == null) {
-      def=new PluginClassloaderDef(baseKey);
+      def=new PluginClassLoaderDef(baseKey);
       classloadersByBasePlugin.put(baseKey,def);
     }
     ExplodedPlugin explodedPlugin=jarExploder.explode(info);
@@ -19,7 +19,7 @@
       Version minSqVersion=info.getMinimalSqVersion();
       boolean compatibilityMode=minSqVersion != null && minSqVersion.compareToIgnoreQualifier(COMPATIBILITY_MODE_MAX_VERSION) < 0;
       def.setCompatibilityMode(compatibilityMode);
-      def.setServerExtension(isServerExtension(baseKey));
+      def.setPrivileged(isPrivileged(baseKey));
       if (compatibilityMode) {
         Loggers.get(getClass()).debug("API compatibility mode is enabled on plugin {} [{}] " + "(built with API lower than {})",info.getName(),info.getKey(),COMPATIBILITY_MODE_MAX_VERSION);
       }
