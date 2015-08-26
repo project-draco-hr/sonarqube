@@ -1,12 +1,12 @@
 {
   checkGlobalAdminUser(userSession);
-  String templateKey=wsRequest.mandatoryParam(PARAM_TEMPLATE_KEY);
+  String templateKey=wsRequest.mandatoryParam(PARAM_LONG_TEMPLATE_KEY);
   String permission=wsRequest.mandatoryParam(PARAM_PERMISSION);
   final String userLogin=wsRequest.mandatoryParam(PARAM_USER_LOGIN);
   DbSession dbSession=dbClient.openSession(false);
   try {
     validateProjectPermission(permission);
-    PermissionTemplateDto template=dependenciesFinder.getTemplate(templateKey);
+    PermissionTemplateDto template=dependenciesFinder.getTemplate(dbSession,templateKey);
     UserDto user=dependenciesFinder.getUser(dbSession,userLogin);
     if (!isUserAlreadyAdded(dbSession,template.getId(),userLogin,permission)) {
       dbClient.permissionTemplateDao().insertUserPermission(dbSession,template.getId(),user.getId(),permission);
