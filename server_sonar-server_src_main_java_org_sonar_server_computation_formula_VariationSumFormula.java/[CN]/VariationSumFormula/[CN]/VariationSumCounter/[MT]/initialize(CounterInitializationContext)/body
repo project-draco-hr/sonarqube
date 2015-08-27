@@ -1,0 +1,15 @@
+{
+  Optional<Measure> measure=context.getMeasure(metricKey);
+  if (!measure.isPresent() || !measure.get().hasVariations()) {
+    return;
+  }
+  MeasureVariations variations=measure.get().getVariations();
+  for (  Period period : from(context.getPeriods()).filter(supportedPeriods)) {
+    if (variations.hasVariation(period.getIndex())) {
+      double variation=variations.getVariation(period.getIndex());
+      if (variation > 0) {
+        array.increment(period,variations.getVariation(period.getIndex()));
+      }
+    }
+  }
+}
