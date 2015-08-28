@@ -2,8 +2,13 @@
   userSession.login().setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
   dbClient=db.getDbClient();
   dbSession=db.getSession();
-  ws=new WsActionTester(new DeleteTemplateAction(dbClient,userSession));
-  permissionTemplate=insertTemplate(newPermissionTemplateDto().setKee("permission-template-key"));
-  commit();
-  assertThat(dbClient.permissionTemplateDao().selectByKey(dbSession,TEMPLATE_KEY)).isNotNull();
+  defautTemplatePermissionFinder=mock(DefaultPermissionTemplateFinder.class);
+  when(defautTemplatePermissionFinder.getDefaultTemplateUuids()).thenReturn(Collections.<String>emptySet());
+  PermissionDependenciesFinder finder=new PermissionDependenciesFinder(dbClient,new ComponentFinder(dbClient));
+  ws=new WsActionTester(new DeleteTemplateAction(dbClient,userSession,finder,defautTemplatePermissionFinder));
+  permissionTemplate=insertTemplateAndAssociatedPermissions(newPermissionTemplateDto().setKee(TEMPLATE_UUID));
+  PermissionTemplateDto permissionTemplateInDatabase=dbClient.permissionTemplateDao().selectByUuidWithUserAndGroupPermissions(dbSession,TEMPLATE_UUID);
+  assertThat(permissionTemplateInDatabase.getKee()).isEqualTo(TEMPLATE_UUID);
+  assertThat(permissionTemplateInDatabase.getGroupsPermissions()).isNotEmpty();
+  assertThat(permissionTemplateInDatabase.getUsersPermissions()).isNotEmpty();
 }

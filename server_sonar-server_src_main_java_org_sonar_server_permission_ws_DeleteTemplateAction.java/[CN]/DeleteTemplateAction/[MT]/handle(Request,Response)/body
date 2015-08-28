@@ -1,13 +1,7 @@
 {
   checkGlobalAdminUser(userSession);
-  String key=wsRequest.mandatoryParam(PARAM_TEMPLATE_ID);
-  DbSession dbSession=dbClient.openSession(false);
-  try {
-    dbClient.permissionTemplateDao().deleteByKey(dbSession,key);
-    dbSession.commit();
-    wsResponse.noContent();
-  }
-  finally {
-    dbClient.closeSession(dbSession);
-  }
+  String uuid=wsRequest.mandatoryParam(PARAM_TEMPLATE_ID);
+  checkTemplateUuidIsNotDefault(uuid);
+  deleteTemplate(uuid);
+  wsResponse.noContent();
 }
