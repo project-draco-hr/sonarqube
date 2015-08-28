@@ -1,6 +1,11 @@
 {
   DbFileSources.Data.Builder dataBuilder=DbFileSources.Data.newBuilder();
   dataBuilder.addLinesBuilder().setLine(line).setScmAuthor(scmAuthor).build();
-  FileSourcesUpdaterHelper.Row row=SourceLineResultSetIterator.toRow(file.projectUuid(),file.uuid(),new Date(),dataBuilder.build());
-  tester.get(SourceLineIndexer.class).index(Iterators.singletonIterator(row));
+  FileSourceDto dto=new FileSourceDto();
+  dto.setProjectUuid(file.projectUuid());
+  dto.setFileUuid(file.uuid());
+  dto.setCreatedAt(System.currentTimeMillis());
+  dto.setSourceData(dataBuilder.build());
+  dto.setDataType(FileSourceDto.Type.SOURCE);
+  tester.get(FileSourceDao.class).insert(dto);
 }

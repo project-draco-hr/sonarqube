@@ -1,0 +1,7 @@
+{
+  newFile();
+  userSessionRule.login("login").addProjectUuidPermissions(UserRole.CODEVIEWER,PROJECT_UUID);
+  dbTester.getDbClient().fileSourceDao().insert(new FileSourceDto().setProjectUuid(PROJECT_UUID).setFileUuid(FILE_UUID).setSourceData(FileSourceTesting.newFakeData(3).build()));
+  WsTester.TestRequest request=wsTester.newGetRequest("api/sources","lines").setParam("uuid",FILE_UUID).setParam("from","3").setParam("to","3");
+  request.execute().assertJson(getClass(),"show_paginated_lines.json");
+}

@@ -1,9 +1,0 @@
-{
-  checkArgument(line > 0,"Line should be greater than 0");
-  SearchRequestBuilder request=getClient().prepareSearch(SourceLineIndexDefinition.INDEX).setTypes(SourceLineIndexDefinition.TYPE).setSize(1).setQuery(QueryBuilders.boolQuery().must(QueryBuilders.termQuery(SourceLineIndexDefinition.FIELD_FILE_UUID,fileUuid)).must(QueryBuilders.rangeQuery(SourceLineIndexDefinition.FIELD_LINE).gte(line).lte(line))).addSort(SourceLineIndexDefinition.FIELD_LINE,SortOrder.ASC);
-  SearchHit[] result=request.get().getHits().getHits();
-  if (result.length == 1) {
-    return new SourceLineDoc(result[0].sourceAsMap());
-  }
-  throw new NotFoundException(String.format("No source found on line %s for file '%s'",line,fileUuid));
-}

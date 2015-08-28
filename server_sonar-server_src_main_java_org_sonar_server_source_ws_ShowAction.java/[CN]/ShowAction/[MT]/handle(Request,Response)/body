@@ -1,17 +1,22 @@
 {
   String fileKey=request.mandatoryParam("key");
-  userSession.checkComponentPermission(UserRole.CODEVIEWER,fileKey);
-  int from=Math.max(request.mandatoryParamAsInt("from"),1);
+  int from=Math.max(request.paramAsInt("from"),1);
   int to=(Integer)ObjectUtils.defaultIfNull(request.paramAsInt("to"),Integer.MAX_VALUE);
-  DbSession session=dbClient.openSession(false);
+  DbSession dbSession=dbClient.openSession(false);
   try {
-    ComponentDto componentDto=componentFinder.getByKey(session,fileKey);
-    List<String> linesHtml=sourceService.getLinesAsHtml(componentDto.uuid(),from,to);
-    JsonWriter json=response.newJsonWriter().beginObject();
-    writeSource(linesHtml,from,json);
-    json.endObject().close();
+    ComponentDto file=componentFinder.getByKey(dbSession,fileKey);
+    userSession.checkProjectUuidPermission(UserRole.CODEVIEWER,file.projectUuid());
+    Optional<Iterable<String>> linesHtml=sourceService.getLinesAsHtml(dbSession,file.uuid(),from,to);
+    if (linesHtml.isPresent()) {
+      JsonWriter json=response.newJsonWriter().beginObject();
+      writeSource(linesHtml.get(),from,json);
+      json.endObject().close();
+    }
+ else {
+      throw new NotFoundException();
+    }
   }
   finally {
-    session.close();
+    dbClient.closeSession(dbSession);
   }
 }

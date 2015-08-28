@@ -1,13 +1,13 @@
 {
   verifyLoggedIn();
-  DbSession session=dbClient.openSession(false);
+  DbSession dbSession=dbClient.openSession(false);
   try {
-    Optional<ComponentDto> componentOptional=dbClient.componentDao().selectByKey(session,componentKey);
+    Optional<ComponentDto> componentOptional=dbClient.componentDao().selectByKey(dbSession,componentKey);
     if (!componentOptional.isPresent()) {
       throw new BadRequestException(String.format("Component with key '%s' not found",componentKey));
     }
     ComponentDto component=componentOptional.get();
-    ComponentDto project=dbClient.componentDao().selectOrFailByUuid(session,component.projectUuid());
+    ComponentDto project=dbClient.componentDao().selectOrFailByUuid(dbSession,component.projectUuid());
     userSession.checkProjectPermission(UserRole.USER,project.getKey());
     if (!ruleKey.isManual()) {
       throw new IllegalArgumentException("Issues can be created only on rules marked as 'manual': " + ruleKey);
@@ -16,7 +16,7 @@
     if (rule == null) {
       throw new IllegalArgumentException("Unknown rule: " + ruleKey);
     }
-    DefaultIssue issue=new DefaultIssueBuilder().componentKey(component.getKey()).projectKey(project.getKey()).line(line).message(!Strings.isNullOrEmpty(message) ? message : rule.getName()).severity(Objects.firstNonNull(severity,Severity.MAJOR)).ruleKey(ruleKey).reporter(userSession.getLogin()).assignee(findSourceLineUser(component.uuid(),line)).build();
+    DefaultIssue issue=new DefaultIssueBuilder().componentKey(component.getKey()).projectKey(project.getKey()).line(line).message(!Strings.isNullOrEmpty(message) ? message : rule.getName()).severity(Objects.firstNonNull(severity,Severity.MAJOR)).ruleKey(ruleKey).reporter(userSession.getLogin()).assignee(findSourceLineUser(dbSession,component.uuid(),line)).build();
     Date now=new Date();
     issue.setCreationDate(now);
     issue.setUpdateDate(now);
@@ -24,6 +24,6 @@
     return issue;
   }
   finally {
-    session.close();
+    dbSession.close();
   }
 }

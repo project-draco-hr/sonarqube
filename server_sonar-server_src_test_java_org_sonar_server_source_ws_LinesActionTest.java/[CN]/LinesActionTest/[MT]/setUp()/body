@@ -1,9 +1,13 @@
 {
   dbTester.truncateTables();
-  esTester.truncateIndices();
-  htmlSourceDecorator=new HtmlSourceDecorator();
-  sourceLineIndex=new SourceLineIndex(esTester.client());
+  htmlSourceDecorator=mock(HtmlSourceDecorator.class);
+  when(htmlSourceDecorator.getDecoratedSourceAsHtml(anyString(),anyString(),anyString())).then(new Answer<String>(){
+    @Override public String answer(    InvocationOnMock invocationOnMock) throws Throwable {
+      return "<p>" + invocationOnMock.getArguments()[0] + "</p>";
+    }
+  }
+);
+  sourceService=new SourceService(dbTester.getDbClient(),htmlSourceDecorator);
   componentDao=new ComponentDao();
-  DbClient dbClient=dbTester.getDbClient();
-  wsTester=new WsTester(new SourcesWs(new LinesAction(dbClient,sourceLineIndex,htmlSourceDecorator,userSessionRule)));
+  wsTester=new WsTester(new SourcesWs(new LinesAction(new ComponentFinder(dbTester.getDbClient()),dbTester.getDbClient(),sourceService,htmlSourceDecorator,userSessionRule)));
 }

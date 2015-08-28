@@ -1,7 +1,7 @@
 {
   initFile();
   userSessionRule.addProjectUuidPermissions(UserRole.CODEVIEWER,PROJECT_UUID);
-  esTester.putDocuments(SourceLineIndexDefinition.INDEX,SourceLineIndexDefinition.TYPE,newSourceLine("julien","123-456-789",DateUtils.parseDateTime("2015-03-30T12:34:56+0000"),1),newSourceLine("julien","123-456-789",DateUtils.parseDateTime("2015-03-30T12:34:56+0000"),2),newSourceLine("julien","456-789-101",DateUtils.parseDateTime("2015-03-27T12:34:56+0000"),3),newSourceLine("simon","789-101-112",DateUtils.parseDateTime("2015-03-31T12:34:56+0000"),4));
+  dbTester.getDbClient().fileSourceDao().insert(new FileSourceDto().setProjectUuid(PROJECT_UUID).setFileUuid(FILE_UUID).setSourceData(DbFileSources.Data.newBuilder().addLines(newSourceLine("julien","123-456-789",DateUtils.parseDateTime("2015-03-30T12:34:56+0000"),1)).addLines(newSourceLine("julien","123-456-789",DateUtils.parseDateTime("2015-03-30T12:34:56+0000"),2)).addLines(newSourceLine("julien","456-789-101",DateUtils.parseDateTime("2015-03-27T12:34:56+0000"),3)).addLines(newSourceLine("simon","789-101-112",DateUtils.parseDateTime("2015-03-31T12:34:56+0000"),4)).build()));
   WsTester.TestRequest request=tester.newGetRequest("api/sources","scm").setParam("key",FILE_KEY).setParam("commits_by_line","true");
   request.execute().assertJson(getClass(),"not_group_lines_by_commit.json");
 }

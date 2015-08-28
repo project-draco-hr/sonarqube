@@ -1,7 +1,7 @@
 {
   initFile();
   userSessionRule.addProjectUuidPermissions(UserRole.CODEVIEWER,PROJECT_UUID);
-  esTester.putDocuments(SourceLineIndexDefinition.INDEX,SourceLineIndexDefinition.TYPE,newSourceLine("julien","123-456-789",DateUtils.parseDateTime("2015-03-30T12:34:56+0000"),1));
+  dbTester.getDbClient().fileSourceDao().insert(new FileSourceDto().setProjectUuid(PROJECT_UUID).setFileUuid(FILE_UUID).setSourceData(DbFileSources.Data.newBuilder().addLines(newSourceLine("julien","123-456-789",DateUtils.parseDateTime("2015-03-30T12:34:56+0000"),1)).build()));
   WsTester.TestRequest request=tester.newGetRequest("api/sources","scm").setParam("key",FILE_KEY);
   request.execute().assertJson(getClass(),"show_scm.json");
 }

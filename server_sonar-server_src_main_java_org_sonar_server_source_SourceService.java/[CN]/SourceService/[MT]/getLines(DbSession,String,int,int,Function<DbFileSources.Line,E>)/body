@@ -1,0 +1,10 @@
+{
+  verifyLine(from);
+  Preconditions.checkArgument(toInclusive >= from,String.format("Line number must greater than or equal to %d, got %d",from,toInclusive));
+  FileSourceDto dto=dbClient.fileSourceDao().selectSourceByFileUuid(dbSession,fileUuid);
+  if (dto == null) {
+    return Optional.absent();
+  }
+  DbFileSources.Data data=dto.getSourceData();
+  return Optional.of((Iterable<E>)FluentIterable.from(data.getLinesList()).filter(new IsGreaterOrEqualThanLine(from)).limit(toInclusive - from + 1).transform(function));
+}

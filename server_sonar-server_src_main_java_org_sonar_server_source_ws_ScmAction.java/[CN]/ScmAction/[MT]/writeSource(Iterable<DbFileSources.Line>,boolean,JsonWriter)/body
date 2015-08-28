@@ -1,0 +1,16 @@
+{
+  json.name("scm").beginArray();
+  DbFileSources.Line previousLine=null;
+  boolean started=false;
+  for (  DbFileSources.Line lineDoc : lines) {
+    if (hasScm(lineDoc) && (!started || showCommitsByLine || !isSameCommit(previousLine,lineDoc))) {
+      json.beginArray().value(lineDoc.getLine()).value(lineDoc.getScmAuthor());
+      json.value(lineDoc.hasScmDate() ? DateUtils.formatDateTime(new Date(lineDoc.getScmDate())) : null);
+      json.value(lineDoc.getScmRevision());
+      json.endArray();
+      started=true;
+    }
+    previousLine=lineDoc;
+  }
+  json.endArray();
+}

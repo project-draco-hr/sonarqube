@@ -1,8 +1,9 @@
 {
   String fileKey="src/Foo.java";
-  userSessionRule.addComponentPermission(UserRole.CODEVIEWER,"polop",fileKey);
+  userSessionRule.addProjectUuidPermissions(UserRole.CODEVIEWER,project.uuid());
   when(componentDao.selectByKey(session,fileKey)).thenReturn(Optional.of(file));
-  when(sourceService.getLinesAsTxt(file.uuid(),null,null)).thenReturn(newArrayList("public class HelloWorld {","}"));
+  Iterable<String> lines=newArrayList("public class HelloWorld {","}");
+  when(sourceService.getLinesAsRawText(session,file.uuid(),1,Integer.MAX_VALUE)).thenReturn(Optional.of(lines));
   WsTester.TestRequest request=tester.newGetRequest("api/sources","raw").setParam("key",fileKey);
   String result=request.execute().outputAsString();
   assertThat(result).isEqualTo("public class HelloWorld {\n}\n");
