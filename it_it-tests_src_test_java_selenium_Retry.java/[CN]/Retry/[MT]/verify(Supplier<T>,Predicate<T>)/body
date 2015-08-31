@@ -1,0 +1,33 @@
+{
+  Error error=Error.KO;
+  boolean retried=false;
+  long start=System.currentTimeMillis();
+  while ((System.currentTimeMillis() - start) < timeoutInMs) {
+    try {
+      if (predicate.apply(targetSupplier.get())) {
+        if (retried) {
+          System.out.println();
+        }
+        return true;
+      }
+      error=Error.KO;
+    }
+ catch (    InvalidElementStateException e) {
+      error=Error.KO;
+    }
+catch (    NotFoundException e) {
+      error=Error.NOT_FOUND;
+    }
+catch (    StaleElementReferenceException e) {
+    }
+    retried=true;
+    System.out.print(".");
+  }
+  if (retried) {
+    System.out.println();
+  }
+  if (error == Error.NOT_FOUND) {
+    throw new NoSuchElementException("Not found");
+  }
+  return false;
+}

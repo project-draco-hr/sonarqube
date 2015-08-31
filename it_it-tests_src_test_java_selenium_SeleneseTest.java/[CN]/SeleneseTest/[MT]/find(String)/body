@@ -1,0 +1,20 @@
+{
+  selector=replacePlaceholders(selector);
+  if (selector.startsWith("link=")) {
+    return find("a").withText(selector.substring(5));
+  }
+  By by;
+  if (selector.startsWith("//")) {
+    by=new By.ByXPath(selector);
+  }
+ else   if (selector.startsWith("xpath=")) {
+    by=new By.ByXPath(selector.substring(6));
+  }
+ else   if (selector.startsWith("id=")) {
+    by=new By.ById(selector.substring(3));
+  }
+ else {
+    by=new ByCssSelectorOrByNameOrById(cleanUp(selector));
+  }
+  return new LazyDomElement(driver,by);
+}

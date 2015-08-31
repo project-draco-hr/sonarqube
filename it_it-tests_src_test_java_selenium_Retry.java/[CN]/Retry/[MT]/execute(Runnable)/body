@@ -1,0 +1,28 @@
+{
+  WebDriverException lastError=null;
+  boolean retried=false;
+  long start=System.currentTimeMillis();
+  while ((System.currentTimeMillis() - start) < timeoutInMs) {
+    try {
+      action.run();
+      if (retried) {
+        System.out.println();
+      }
+      return;
+    }
+ catch (    StaleElementReferenceException e) {
+    }
+catch (    WebDriverException e) {
+      lastError=e;
+    }
+    retried=true;
+    System.out.print(".");
+  }
+  if (retried) {
+    System.out.println();
+  }
+  if (lastError != null) {
+    throw lastError;
+  }
+  throw new NoSuchElementException("Not found");
+}

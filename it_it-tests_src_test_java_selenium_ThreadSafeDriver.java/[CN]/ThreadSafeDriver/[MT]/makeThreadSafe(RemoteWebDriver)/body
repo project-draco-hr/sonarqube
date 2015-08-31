@@ -1,0 +1,26 @@
+{
+  Runtime.getRuntime().addShutdownHook(new Thread(new Runnable(){
+    @Override public void run(){
+      try {
+        driver.quit();
+      }
+ catch (      UnreachableBrowserException e) {
+      }
+    }
+  }
+));
+  return (SeleniumDriver)Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),findInterfaces(driver),new InvocationHandler(){
+    @Override public Object invoke(    Object proxy,    Method method,    Object[] args) throws Throwable {
+      if (method.getName().equals("quit")) {
+        return null;
+      }
+      try {
+        return method.invoke(driver,args);
+      }
+ catch (      InvocationTargetException e) {
+        throw e.getCause();
+      }
+    }
+  }
+);
+}

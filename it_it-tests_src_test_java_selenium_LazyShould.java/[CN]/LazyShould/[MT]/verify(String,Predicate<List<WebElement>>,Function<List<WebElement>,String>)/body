@@ -1,0 +1,18 @@
+{
+  String verification="verify that " + element + " "+ message;
+  System.out.println("   -> " + verification);
+  try {
+    if (!retry.verify(new Supplier<List<WebElement>>(){
+      @Override public List<WebElement> get(){
+        return LazyShould.this.findElements();
+      }
+    }
+,ok ? predicate : Predicates.not(predicate))) {
+      throw Failure.create("Failed to " + verification + ". "+ toErrorMessage.apply(findElements()));
+    }
+  }
+ catch (  NoSuchElementException e) {
+    throw Failure.create("Element not found. Failed to " + verification);
+  }
+  return ok ? this : not();
+}
