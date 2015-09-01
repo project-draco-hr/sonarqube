@@ -1,0 +1,24 @@
+{
+  if (propertiesByModuleId.containsKey(currentModuleId)) {
+    throw new IllegalStateException(String.format("Two modules have the same id: %s. Each module must have a unique id.",currentModuleId));
+  }
+  Map<String,String> currentModuleProperties=new HashMap<>();
+  String prefix=!currentModuleId.isEmpty() ? (currentModuleId + ".") : "";
+  int prefixLength=prefix.length();
+  Iterator<Entry<String,String>> it=parentProperties.entrySet().iterator();
+  while (it.hasNext()) {
+    Map.Entry<String,String> e=it.next();
+    String key=e.getKey();
+    if (key.startsWith(prefix)) {
+      currentModuleProperties.put(key.substring(prefixLength),e.getValue());
+      it.remove();
+    }
+  }
+  String[] moduleIds=getListFromProperty(currentModuleProperties,PROPERTY_MODULES);
+  Arrays.sort(moduleIds);
+  ArrayUtils.reverse(moduleIds);
+  propertiesByModuleId.put(currentModuleId,currentModuleProperties);
+  for (  String moduleId : moduleIds) {
+    extractPropertiesByModule(propertiesByModuleId,moduleId,currentModuleProperties);
+  }
+}
