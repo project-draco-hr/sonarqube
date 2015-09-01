@@ -1,0 +1,17 @@
+{
+  BatchReport.Changesets changesets=reportReader.readChangesets(file.getReportAttributes().getRef());
+  if (changesets == null) {
+    Optional<Measure> baseMeasure=measureRepository.getBaseMeasure(file,lastCommitDateMetric);
+    if (baseMeasure.isPresent()) {
+      path.current().addDate(baseMeasure.get().getLongValue());
+    }
+  }
+ else {
+    for (    BatchReport.Changesets.Changeset changeset : changesets.getChangesetList()) {
+      if (changeset.hasDate()) {
+        path.current().addDate(changeset.getDate());
+      }
+    }
+  }
+  saveAndAggregate(file,path);
+}
