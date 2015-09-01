@@ -1,0 +1,23 @@
+{
+  thrown.expect(IllegalArgumentException.class);
+  thrown.expectMessage("At least one output metric must be defined");
+  MeasureComputer measureComputer=new MeasureComputer(){
+    @Override public MeasureComputerDefinition define(    MeasureComputerDefinitionContext defContext){
+      return new MeasureComputer.MeasureComputerDefinition(){
+        @Override public Set<String> getInputMetrics(){
+          return ImmutableSet.of(NCLOC_KEY);
+        }
+        @Override public Set<String> getOutputMetrics(){
+          return Collections.emptySet();
+        }
+      }
+;
+    }
+    @Override public void compute(    MeasureComputerContext context){
+    }
+  }
+;
+  MeasureComputer[] computers=new MeasureComputer[]{measureComputer};
+  ComputationStep underTest=new FeedMeasureComputers(holder,array(new TestMetrics()),computers);
+  underTest.execute();
+}

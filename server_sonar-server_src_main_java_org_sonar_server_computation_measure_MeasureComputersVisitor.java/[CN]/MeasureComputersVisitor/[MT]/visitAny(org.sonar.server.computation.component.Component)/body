@@ -1,7 +1,9 @@
 {
-  for (  MeasureComputer computer : measureComputersHolder.getMeasureComputers()) {
-    LOGGER.trace("Measure computer '{}' is computing component {}",computer.getImplementation(),component);
-    MeasureComputerImplementationContext measureComputerContext=new MeasureComputerImplementationContext(component,computer,settings,measureRepository,metricRepository,componentIssuesRepository);
-    computer.getImplementation().compute(measureComputerContext);
+  MeasureComputerContextImpl context=new MeasureComputerContextImpl(component,settings,measureRepository,metricRepository,componentIssuesRepository);
+  for (  MeasureComputerWrapper measureComputerWrapper : measureComputersHolder.getMeasureComputers()) {
+    context.setDefinition(measureComputerWrapper.getDefinition());
+    MeasureComputer measureComputer=measureComputerWrapper.getComputer();
+    LOGGER.trace("Measure computer '{}' is computing component {}",measureComputer,component);
+    measureComputer.compute(context);
   }
 }

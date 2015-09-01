@@ -1,0 +1,18 @@
+{
+  Map<String,MeasureComputerWrapper> computersByOutputMetric=new HashMap<>();
+  Map<String,MeasureComputerWrapper> computersByInputMetric=new HashMap<>();
+  feedComputersByMetric(wrappers,computersByOutputMetric,computersByInputMetric);
+  ToComputerByKey toComputerByOutputMetricKey=new ToComputerByKey(computersByOutputMetric);
+  ToComputerByKey toComputerByInputMetricKey=new ToComputerByKey(computersByInputMetric);
+  DirectAcyclicGraph dag=new DirectAcyclicGraph();
+  for (  MeasureComputerWrapper computer : wrappers) {
+    dag.add(computer);
+    for (    MeasureComputerWrapper dependency : getDependencies(computer,toComputerByOutputMetricKey)) {
+      dag.add(computer,dependency);
+    }
+    for (    MeasureComputerWrapper generates : getDependents(computer,toComputerByInputMetricKey)) {
+      dag.add(generates,computer);
+    }
+  }
+  return dag.sort();
+}

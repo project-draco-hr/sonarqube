@@ -1,13 +1,13 @@
 {
-  MeasureComputer.Implementation implementation1=mock(MeasureComputer.Implementation.class);
-  MeasureComputer.Implementation implementation2=mock(MeasureComputer.Implementation.class);
-  MeasureComputer.Implementation implementation3=mock(MeasureComputer.Implementation.class);
-  MeasureComputerProvider[] providers=new MeasureComputerProvider[]{new NewMeasureComputerProvider(array(NEW_METRIC_3),array(NEW_METRIC_4),implementation3),new NewMeasureComputerProvider(array(NEW_METRIC_1),array(NEW_METRIC_2),implementation1),new NewMeasureComputerProvider(array(NEW_METRIC_2),array(NEW_METRIC_3),implementation2)};
-  ComputationStep underTest=new FeedMeasureComputers(holder,array(new TestMetrics()),providers);
+  MeasureComputer measureComputer1=newMeasureComputer(array(NEW_METRIC_3),array(NEW_METRIC_4));
+  MeasureComputer measureComputer2=newMeasureComputer(array(NEW_METRIC_1),array(NEW_METRIC_2));
+  MeasureComputer measureComputer3=newMeasureComputer(array(NEW_METRIC_2),array(NEW_METRIC_3));
+  MeasureComputer[] computers=new MeasureComputer[]{measureComputer1,measureComputer2,measureComputer3};
+  ComputationStep underTest=new FeedMeasureComputers(holder,array(new TestMetrics()),computers);
   underTest.execute();
-  List<MeasureComputer> computers=newArrayList(holder.getMeasureComputers());
-  assertThat(computers).hasSize(3);
-  assertThat(computers.get(0).getImplementation()).isEqualTo(implementation1);
-  assertThat(computers.get(1).getImplementation()).isEqualTo(implementation2);
-  assertThat(computers.get(2).getImplementation()).isEqualTo(implementation3);
+  List<MeasureComputerWrapper> result=newArrayList(holder.getMeasureComputers());
+  assertThat(result).hasSize(3);
+  assertThat(result.get(0).getComputer()).isEqualTo(measureComputer2);
+  assertThat(result.get(1).getComputer()).isEqualTo(measureComputer3);
+  assertThat(result.get(2).getComputer()).isEqualTo(measureComputer1);
 }
