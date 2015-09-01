@@ -1,0 +1,32 @@
+{
+  userSession.login("login").setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
+  dbClient=db.getDbClient();
+  dbSession=db.getSession();
+  PermissionRepository repository=new PermissionRepository(dbClient,new Settings());
+  PermissionFinder permissionFinder=new PermissionFinder(dbClient);
+  ComponentFinder componentFinder=new ComponentFinder(dbClient);
+  PermissionService permissionService=new PermissionService(dbClient,repository,permissionFinder,issueAuthorizationIndexer,userSession,componentFinder);
+  PermissionDependenciesFinder permissionDependenciesFinder=new PermissionDependenciesFinder(dbClient,componentFinder);
+  ApplyTemplateAction underTest=new ApplyTemplateAction(dbClient,permissionService,permissionDependenciesFinder);
+  ws=new WsActionTester(underTest);
+  user1=insertUser(newUserDto().setLogin("user-login-1"));
+  user2=insertUser(newUserDto().setLogin("user-login-2"));
+  group1=insertGroup(newGroupDto().setName("group-name-1"));
+  group2=insertGroup(newGroupDto().setName("group-name-2"));
+  template1=insertTemplate(newPermissionTemplateDto().setUuid("permission-template-uuid-1"));
+  addUserToTemplate(user1,template1,UserRole.CODEVIEWER);
+  addUserToTemplate(user2,template1,UserRole.ISSUE_ADMIN);
+  addGroupToTemplate(group1,template1,UserRole.ADMIN);
+  addGroupToTemplate(group2,template1,UserRole.USER);
+  template2=insertTemplate(newPermissionTemplateDto().setUuid("permission-template-uuid-2"));
+  addUserToTemplate(user1,template2,UserRole.USER);
+  addUserToTemplate(user2,template2,UserRole.USER);
+  addGroupToTemplate(group1,template2,UserRole.USER);
+  addGroupToTemplate(group2,template2,UserRole.USER);
+  project=insertProject(newProjectDto("project-uuid-1"));
+  addUserPermissionToProject(user1,project,UserRole.ADMIN);
+  addUserPermissionToProject(user2,project,UserRole.ADMIN);
+  addGroupPermissionToProject(group1,project,UserRole.ADMIN);
+  addGroupPermissionToProject(group2,project,UserRole.ADMIN);
+  commit();
+}
