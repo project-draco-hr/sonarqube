@@ -1,26 +1,20 @@
 {
-  query.validate();
-  boolean projectsChanged=false;
-  DbSession session=dbClient.openSession(false);
+  DbSession dbSession=dbClient.openSession(false);
   try {
-    if (query.getSelectedComponents().size() == 1) {
-      checkProjectAdminPermission(query.getSelectedComponents().get(0));
+    if (query.getComponentKeys().size() == 1) {
+      checkProjectAdminUserByComponentKey(userSession,query.getComponentKeys().get(0));
     }
  else {
-      checkProjectAdminPermission(null);
-      userSession.checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+      checkGlobalAdminUser(userSession);
     }
-    for (    String componentKey : query.getSelectedComponents()) {
-      ComponentDto component=componentFinder.getByKey(session,componentKey);
-      permissionRepository.applyPermissionTemplate(session,query.getTemplateKey(),component.getId());
-      projectsChanged=true;
+    for (    String componentKey : query.getComponentKeys()) {
+      ComponentDto component=componentFinder.getByKey(dbSession,componentKey);
+      permissionRepository.applyPermissionTemplate(dbSession,query.getTemplateUuid(),component.getId());
     }
-    session.commit();
+    dbSession.commit();
   }
   finally {
-    session.close();
+    dbClient.closeSession(dbSession);
   }
-  if (projectsChanged) {
-    indexProjectPermissions();
-  }
+  indexProjectPermissions();
 }

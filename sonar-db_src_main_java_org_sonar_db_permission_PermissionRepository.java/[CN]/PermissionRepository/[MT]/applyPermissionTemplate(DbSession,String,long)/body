@@ -1,0 +1,18 @@
+{
+  PermissionTemplateDto permissionTemplate=dbClient.permissionTemplateDao().selectPermissionTemplateWithPermissions(session,templateUuid);
+  updateProjectAuthorizationDate(session,resourceId);
+  dbClient.roleDao().removeAllPermissions(session,resourceId);
+  List<PermissionTemplateUserDto> usersPermissions=permissionTemplate.getUsersPermissions();
+  if (usersPermissions != null) {
+    for (    PermissionTemplateUserDto userPermission : usersPermissions) {
+      insertUserPermission(resourceId,userPermission.getUserId(),userPermission.getPermission(),false,session);
+    }
+  }
+  List<PermissionTemplateGroupDto> groupsPermissions=permissionTemplate.getGroupsPermissions();
+  if (groupsPermissions != null) {
+    for (    PermissionTemplateGroupDto groupPermission : groupsPermissions) {
+      Long groupId=groupPermission.getGroupId() == null ? null : groupPermission.getGroupId();
+      insertGroupPermission(resourceId,groupId,groupPermission.getPermission(),false,session);
+    }
+  }
+}
