@@ -1,13 +1,13 @@
 {
   checkGlobalAdminUser(userSession);
-  String templateKey=wsRequest.mandatoryParam(PARAM_TEMPLATE_ID_EXPLICIT);
+  String templateUuid=wsRequest.mandatoryParam(PARAM_TEMPLATE_ID_EXPLICIT);
   String permission=wsRequest.mandatoryParam(PARAM_PERMISSION);
   WsGroupRef group=WsGroupRef.fromRequest(wsRequest);
   DbSession dbSession=dbClient.openSession(false);
   try {
     validateProjectPermission(permission);
     validateNotAnyoneAndAdminPermission(permission,group.name());
-    PermissionTemplateDto template=dependenciesFinder.getTemplate(dbSession,templateKey);
+    PermissionTemplateDto template=dependenciesFinder.getTemplate(dbSession,templateUuid);
     GroupDto groupDto=dependenciesFinder.getGroup(dbSession,group);
     if (!groupAlreadyAdded(dbSession,template.getId(),groupDto,permission)) {
       Long groupId=groupDto == null ? null : groupDto.getId();
