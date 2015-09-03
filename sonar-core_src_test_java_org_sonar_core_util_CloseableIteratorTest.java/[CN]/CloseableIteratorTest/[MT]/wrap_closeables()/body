@@ -1,0 +1,14 @@
+{
+  AutoCloseable closeable1=mock(AutoCloseable.class);
+  AutoCloseable closeable2=mock(AutoCloseable.class);
+  CloseableIterator iterator=new SimpleCloseableIterator();
+  CloseableIterator wrapper=CloseableIterator.wrap(iterator,closeable1,closeable2);
+  assertThat(wrapper.next()).isEqualTo(1);
+  assertThat(wrapper.next()).isEqualTo(2);
+  assertThat(wrapper.hasNext()).isFalse();
+  assertThat(wrapper.isClosed).isTrue();
+  assertThat(iterator.isClosed).isTrue();
+  InOrder order=inOrder(closeable1,closeable2);
+  order.verify(closeable1).close();
+  order.verify(closeable2).close();
+}
