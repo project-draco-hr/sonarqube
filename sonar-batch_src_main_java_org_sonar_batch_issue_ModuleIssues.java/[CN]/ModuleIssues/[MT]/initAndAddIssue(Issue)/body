@@ -19,17 +19,15 @@
   locationBuilder.setMsg(primaryMessage);
   locationBuilder.setComponentRef(component.batchId());
   TextRange primaryTextRange=issue.primaryLocation().textRange();
-  applyTextRange(primaryTextRange);
   if (primaryTextRange != null) {
     builder.setLine(primaryTextRange.start().line());
+    builder.setTextRange(toProtobufTextRange(primaryTextRange));
   }
-  builder.setPrimaryLocation(locationBuilder.build());
   Double effortToFix=issue.effortToFix();
   if (effortToFix != null) {
     builder.setEffortToFix(effortToFix);
   }
-  applyAdditionalLocations(issue);
-  applyExecutionFlows(issue);
+  applyFlows(issue);
   BatchReport.Issue rawIssue=builder.build();
   if (filters.accept(inputComponent.key(),rawIssue)) {
     write(component,rawIssue);
