@@ -1,0 +1,11 @@
+{
+  measureRepository.addRawMeasure(FILE_1_REF,metricKey,newMeasureBuilder().create(file1Value));
+  measureRepository.addRawMeasure(FILE_2_REF,metricKey,newMeasureBuilder().create(file2Value));
+  underTest.execute();
+  assertThat(measureRepository.getAddedRawMeasure(FILE_1_REF,metricKey)).isAbsent();
+  assertThat(measureRepository.getAddedRawMeasure(FILE_2_REF,metricKey)).isAbsent();
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(DIRECTORY_REF))).containsOnly(entryOf(metricKey,newMeasureBuilder().create(expectedValue)));
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(SUB_MODULE_REF))).containsOnly(entryOf(metricKey,newMeasureBuilder().create(expectedValue)));
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(MODULE_REF))).containsOnly(entryOf(metricKey,newMeasureBuilder().create(expectedValue)));
+  assertThat(toEntries(measureRepository.getAddedRawMeasures(ROOT_REF))).containsOnly(entryOf(metricKey,newMeasureBuilder().create(expectedValue)));
+}
