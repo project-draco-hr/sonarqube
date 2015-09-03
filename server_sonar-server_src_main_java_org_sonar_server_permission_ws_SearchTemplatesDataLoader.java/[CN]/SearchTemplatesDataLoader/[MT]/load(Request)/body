@@ -1,0 +1,13 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    SearchTemplatesData.Builder data=newBuilder();
+    List<PermissionTemplateDto> templates=searchTemplates(dbSession,wsRequest);
+    List<Long> templateIds=Lists.transform(templates,TemplateToIdFunction.INSTANCE);
+    data.templates(templates).userCountByTemplateIdAndPermission(userCountByTemplateIdAndPermission(dbSession,templateIds)).groupCountByTemplateIdAndPermission(groupCountByTemplateIdAndPermission(dbSession,templateIds));
+    return data.build();
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

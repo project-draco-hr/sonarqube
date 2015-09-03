@@ -1,0 +1,27 @@
+{
+  PermissionTemplateDto template1=insertTemplate(newPermissionTemplateDto());
+  PermissionTemplateDto template2=insertTemplate(newPermissionTemplateDto());
+  PermissionTemplateDto template3=insertTemplate(newPermissionTemplateDto());
+  GroupDto group1=insertGroup(newGroupDto());
+  GroupDto group2=insertGroup(newGroupDto());
+  GroupDto group3=insertGroup(newGroupDto());
+  addGroupToTemplate(42L,group1.getId(),ISSUE_ADMIN);
+  addGroupToTemplate(template1.getId(),group1.getId(),CODEVIEWER);
+  addGroupToTemplate(template1.getId(),group2.getId(),CODEVIEWER);
+  addGroupToTemplate(template1.getId(),group3.getId(),CODEVIEWER);
+  addGroupToTemplate(template1.getId(),null,CODEVIEWER);
+  addGroupToTemplate(template1.getId(),group1.getId(),ADMIN);
+  addGroupToTemplate(template2.getId(),group1.getId(),ADMIN);
+  commit();
+  final List<CountByTemplateAndPermissionDto> result=new ArrayList<>();
+  underTest.groupsCountByTemplateIdAndPermission(session,Arrays.asList(template1.getId(),template2.getId(),template3.getId()),new ResultHandler(){
+    @Override public void handleResult(    ResultContext context){
+      result.add((CountByTemplateAndPermissionDto)context.getResultObject());
+    }
+  }
+);
+  assertThat(result).hasSize(3);
+  assertThat(result).extracting("permission").containsOnly(ADMIN,CODEVIEWER);
+  assertThat(result).extracting("templateId").containsOnly(template1.getId(),template2.getId());
+  assertThat(result).extracting("count").containsOnly(4,1);
+}

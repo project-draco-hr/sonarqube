@@ -1,0 +1,26 @@
+{
+  PermissionTemplateDto template1=insertTemplate(newPermissionTemplateDto());
+  PermissionTemplateDto template2=insertTemplate(newPermissionTemplateDto());
+  PermissionTemplateDto template3=insertTemplate(newPermissionTemplateDto());
+  UserDto user1=insertUser(newUserDto());
+  UserDto user2=insertUser(newUserDto());
+  UserDto user3=insertUser(newUserDto());
+  addUserToTemplate(42L,user1.getId(),ISSUE_ADMIN);
+  addUserToTemplate(template1.getId(),user1.getId(),ADMIN);
+  addUserToTemplate(template1.getId(),user2.getId(),ADMIN);
+  addUserToTemplate(template1.getId(),user3.getId(),ADMIN);
+  addUserToTemplate(template1.getId(),user1.getId(),USER);
+  addUserToTemplate(template2.getId(),user1.getId(),USER);
+  commit();
+  final List<CountByTemplateAndPermissionDto> result=new ArrayList<>();
+  underTest.usersCountByTemplateIdAndPermission(session,Arrays.asList(template1.getId(),template2.getId(),template3.getId()),new ResultHandler(){
+    @Override public void handleResult(    ResultContext context){
+      result.add((CountByTemplateAndPermissionDto)context.getResultObject());
+    }
+  }
+);
+  assertThat(result).hasSize(3);
+  assertThat(result).extracting("permission").containsOnly(ADMIN,USER);
+  assertThat(result).extracting("templateId").containsOnly(template1.getId(),template2.getId());
+  assertThat(result).extracting("count").containsOnly(3,1);
+}

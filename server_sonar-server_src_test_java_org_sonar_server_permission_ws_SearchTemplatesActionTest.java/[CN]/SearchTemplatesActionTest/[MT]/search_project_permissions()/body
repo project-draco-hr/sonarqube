@@ -1,0 +1,25 @@
+{
+  PermissionTemplateDto projectTemplate=insertProjectTemplate();
+  PermissionTemplateDto viewsTemplate=insertViewsTemplate();
+  PermissionTemplateDto developerTemplate=insertDeveloperTemplate();
+  UserDto user1=insertUser(newUserDto());
+  UserDto user2=insertUser(newUserDto());
+  UserDto user3=insertUser(newUserDto());
+  GroupDto group1=insertGroup(newGroupDto());
+  GroupDto group2=insertGroup(newGroupDto());
+  GroupDto group3=insertGroup(newGroupDto());
+  addUserToTemplate(projectTemplate.getId(),user1.getId(),UserRole.ISSUE_ADMIN);
+  addUserToTemplate(projectTemplate.getId(),user2.getId(),UserRole.ISSUE_ADMIN);
+  addUserToTemplate(projectTemplate.getId(),user3.getId(),UserRole.ISSUE_ADMIN);
+  addUserToTemplate(projectTemplate.getId(),user1.getId(),UserRole.CODEVIEWER);
+  addGroupToTemplate(projectTemplate.getId(),group1.getId(),UserRole.ADMIN);
+  addUserToTemplate(viewsTemplate.getId(),user1.getId(),UserRole.USER);
+  addUserToTemplate(viewsTemplate.getId(),user2.getId(),UserRole.USER);
+  addGroupToTemplate(viewsTemplate.getId(),group1.getId(),UserRole.ISSUE_ADMIN);
+  addGroupToTemplate(viewsTemplate.getId(),group2.getId(),UserRole.ISSUE_ADMIN);
+  addGroupToTemplate(viewsTemplate.getId(),group3.getId(),UserRole.ISSUE_ADMIN);
+  addGroupToTemplate(developerTemplate.getId(),group1.getId(),UserRole.USER);
+  commit();
+  String result=newRequest();
+  assertJson(result).withStrictArrayOrder().isSimilarTo(getClass().getResource("search_templates-example.json"));
+}
