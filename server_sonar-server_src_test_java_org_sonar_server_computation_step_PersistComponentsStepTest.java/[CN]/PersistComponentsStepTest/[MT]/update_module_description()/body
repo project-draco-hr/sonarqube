@@ -4,9 +4,7 @@
   ComponentDto module=ComponentTesting.newModuleDto("BCDE",project).setKey("MODULE_KEY").setName("Module");
   dbClient.componentDao().insert(dbTester.getSession(),module);
   dbTester.getSession().commit();
-  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).setName("Project").setDescription("New project description").addChildRef(2).build());
-  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey("MODULE_KEY").setName("Module").setDescription("New module description").build());
-  treeRootHolder.setRoot(ReportComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).addChildren(ReportComponent.builder(Component.Type.MODULE,2).setUuid("BCDE").setKey("MODULE_KEY").build()).build());
+  treeRootHolder.setRoot(builder(PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).setName("Project").setDescription("New project description").addChildren(builder(Component.Type.MODULE,2).setUuid("BCDE").setKey("MODULE_KEY").setName("Module").setDescription("New module description").build()).build());
   underTest.execute();
   ComponentDto projectReloaded=dbClient.componentDao().selectByKey(dbTester.getSession(),PROJECT_KEY).get();
   assertThat(projectReloaded.description()).isEqualTo("New project description");

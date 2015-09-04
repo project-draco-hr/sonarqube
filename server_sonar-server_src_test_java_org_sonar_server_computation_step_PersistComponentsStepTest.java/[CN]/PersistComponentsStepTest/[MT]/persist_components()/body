@@ -1,12 +1,8 @@
 {
-  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).setName("Project").setDescription("Project description").addChildRef(2).build());
-  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey("MODULE_KEY").setPath("module").setName("Module").setDescription("Module description").addChildRef(3).build());
-  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(3).setType(Constants.ComponentType.DIRECTORY).setPath("src/main/java/dir").addChildRef(4).build());
-  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(4).setType(Constants.ComponentType.FILE).setPath("src/main/java/dir/Foo.java").setLanguage("java").build());
-  Component file=ReportComponent.builder(Component.Type.FILE,4).setUuid("DEFG").setKey("MODULE_KEY:src/main/java/dir/Foo.java").build();
-  Component directory=ReportComponent.builder(Component.Type.DIRECTORY,3).setUuid("CDEF").setKey("MODULE_KEY:src/main/java/dir").addChildren(file).build();
-  Component module=ReportComponent.builder(Component.Type.MODULE,2).setUuid("BCDE").setKey("MODULE_KEY").addChildren(directory).build();
-  Component project=ReportComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).addChildren(module).build();
+  Component file=builder(FILE,4).setUuid("DEFG").setKey("MODULE_KEY:src/main/java/dir/Foo.java").setPath("src/main/java/dir/Foo.java").setFileAttributes(new FileAttributes(false,"java")).build();
+  Component directory=builder(DIRECTORY,3).setUuid("CDEF").setKey("MODULE_KEY:src/main/java/dir").setPath("src/main/java/dir").addChildren(file).build();
+  Component module=builder(Component.Type.MODULE,2).setUuid("BCDE").setKey("MODULE_KEY").setPath("module").setName("Module").setDescription("Module description").addChildren(directory).build();
+  Component project=builder(PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).setName("Project").setDescription("Project description").addChildren(module).build();
   treeRootHolder.setRoot(project);
   underTest.execute();
   dbTester.getSession().commit();

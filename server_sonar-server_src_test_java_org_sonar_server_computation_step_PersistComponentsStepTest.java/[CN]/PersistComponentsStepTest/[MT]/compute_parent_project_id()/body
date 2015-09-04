@@ -1,10 +1,5 @@
 {
-  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).setName("Project").addChildRef(2).build());
-  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(2).setType(Constants.ComponentType.MODULE).setKey("MODULE_KEY").setName("Module").addChildRef(3).build());
-  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(3).setType(Constants.ComponentType.MODULE).setKey("SUB_MODULE_1_KEY").setName("Sub Module 1").addChildRef(4).build());
-  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(4).setType(Constants.ComponentType.MODULE).setKey("SUB_MODULE_2_KEY").setName("Sub Module 2").addChildRef(5).build());
-  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(5).setType(Constants.ComponentType.DIRECTORY).setPath("src/main/java/dir").build());
-  treeRootHolder.setRoot(ReportComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).addChildren(ReportComponent.builder(Component.Type.MODULE,2).setUuid("BCDE").setKey("MODULE_KEY").addChildren(ReportComponent.builder(Component.Type.MODULE,3).setUuid("CDEF").setKey("SUB_MODULE_1_KEY").addChildren(ReportComponent.builder(Component.Type.MODULE,4).setUuid("DEFG").setKey("SUB_MODULE_2_KEY").addChildren(ReportComponent.builder(Component.Type.DIRECTORY,5).setUuid("EFGH").setKey("SUB_MODULE_2_KEY:src/main/java/dir").build()).build()).build()).build()).build());
+  treeRootHolder.setRoot(builder(PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).setName("Project").addChildren(builder(Component.Type.MODULE,2).setUuid("BCDE").setKey("MODULE_KEY").setName("Module").addChildren(builder(Component.Type.MODULE,3).setUuid("CDEF").setKey("SUB_MODULE_1_KEY").setName("Sub Module 1").addChildren(builder(Component.Type.MODULE,4).setUuid("DEFG").setKey("SUB_MODULE_2_KEY").setName("Sub Module 2").addChildren(builder(DIRECTORY,5).setUuid("EFGH").setKey("SUB_MODULE_2_KEY:src/main/java/dir").setPath("src/main/java/dir").build()).build()).build()).build()).build());
   underTest.execute();
   assertThat(dbTester.countRowsOfTable("projects")).isEqualTo(5);
   Optional<ComponentDto> project=dbClient.componentDao().selectByKey(dbTester.getSession(),PROJECT_KEY);

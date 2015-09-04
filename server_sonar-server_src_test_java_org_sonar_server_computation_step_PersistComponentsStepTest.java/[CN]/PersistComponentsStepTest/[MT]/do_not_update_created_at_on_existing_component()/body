@@ -5,8 +5,7 @@
   ComponentDto module=ComponentTesting.newModuleDto("BCDE",project).setKey("MODULE_KEY").setName("Module").setPath("path").setCreatedAt(oldDate);
   dbClient.componentDao().insert(dbTester.getSession(),module);
   dbTester.getSession().commit();
-  reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).setKey(PROJECT_KEY).setName("New project name").addChildRef(2).build());
-  treeRootHolder.setRoot(ReportComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).build());
+  treeRootHolder.setRoot(builder(PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).setName("New project name").build());
   underTest.execute();
   Optional<ComponentDto> projectReloaded=dbClient.componentDao().selectByKey(dbTester.getSession(),PROJECT_KEY);
   assertThat(projectReloaded.get().name()).isEqualTo("New project name");

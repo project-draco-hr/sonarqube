@@ -1,14 +1,11 @@
 {
   DbSession session=dbClient.openSession(false);
   try {
-    org.sonar.server.computation.component.Component root=treeRootHolder.getRoot();
-    List<ComponentDto> existingComponents=dbClient.componentDao().selectAllComponentsFromProjectKey(session,root.getKey());
-    Map<String,ComponentDto> existingComponentDtosByKey=componentDtosByKey(existingComponents);
-    PersistComponentExecutor persistComponentExecutor=new PersistComponentExecutor(session,existingComponentDtosByKey,reportReader);
-    persistComponentExecutor.recursivelyProcessComponent(root,null);
+    Map<String,ComponentDto> existingComponentDtosByKey=indexExistingDtosByKey(session);
+    new PathAwareCrawler<>(new PersistComponentStepsVisitor(existingComponentDtosByKey,session)).visit(treeRootHolder.getRoot());
     session.commit();
   }
   finally {
-    session.close();
+    dbClient.closeSession(session);
   }
 }
