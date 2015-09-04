@@ -1,14 +1,15 @@
 {
   Profiler profiler=Profiler.create(Loggers.get(getClass())).startInfo("Register permission templates");
-  if (shouldRegister()) {
-    if (hasExistingPermissionsConfig()) {
-      String projectsPermissionsKey=settings.getString(defaultRootQualifierTemplateProperty(Qualifiers.PROJECT));
-      setDefaultProperty(projectsPermissionsKey);
-    }
- else {
-      insertDefaultTemplate();
-      setDefaultProperty(PermissionTemplateDto.DEFAULT.getKee());
-    }
+  boolean shouldRegister=shouldRegister();
+  if (hasExistingPermissionsConfig()) {
+    String defaultProjectPermissionTemplateUuid=settings.getString(defaultRootQualifierTemplateProperty(Qualifiers.PROJECT));
+    setDefaultProperty(defaultProjectPermissionTemplateUuid);
+  }
+ else   if (shouldRegister) {
+    insertDefaultTemplate();
+    setDefaultProperty(PermissionTemplateDto.DEFAULT.getKee());
+  }
+  if (shouldRegister) {
     registerInitialization();
   }
   profiler.stopDebug();
