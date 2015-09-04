@@ -7,15 +7,15 @@
   String moduleBKey=rootModuleKey + ":module_b";
   sonar.delete(new PropertyDeleteQuery(propKey,rootModuleKey));
   sonar.delete(new PropertyDeleteQuery(propKey,moduleBKey));
-  BuildResult result=scan("shared/xoo-multi-modules-sample","sonar.showSettings","true");
+  BuildResult result=scan("shared/xoo-multi-modules-sample","sonar.showSettings",propKey);
   assertThat(result.getLogs()).doesNotContain(rootModuleKey + ":" + propKey);
   assertThat(result.getLogs()).doesNotContain(moduleBKey + ":" + propKey);
   sonar.update(new PropertyUpdateQuery(propKey,"project",rootModuleKey));
-  result=scan("shared/xoo-multi-modules-sample","sonar.showSettings","true");
+  result=scan("shared/xoo-multi-modules-sample","sonar.showSettings",propKey);
   assertThat(result.getLogs()).contains(rootModuleKey + ":" + propKey+ " = project");
   assertThat(result.getLogs()).contains(moduleBKey + ":" + propKey+ " = project");
   sonar.update(new PropertyUpdateQuery(propKey,"moduleB",moduleBKey));
-  result=scan("shared/xoo-multi-modules-sample","sonar.showSettings","true");
+  result=scan("shared/xoo-multi-modules-sample","sonar.showSettings",propKey);
   assertThat(result.getLogs()).contains(rootModuleKey + ":" + propKey+ " = project");
   assertThat(result.getLogs()).contains(moduleBKey + ":" + propKey+ " = moduleB");
 }
