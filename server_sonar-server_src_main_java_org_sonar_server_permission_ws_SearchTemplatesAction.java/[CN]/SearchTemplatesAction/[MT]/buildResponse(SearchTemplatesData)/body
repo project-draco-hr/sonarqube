@@ -1,22 +1,7 @@
 {
   WsSearchTemplatesResponse.Builder response=WsSearchTemplatesResponse.newBuilder();
-  Permission.Builder permissionResponse=Permission.newBuilder();
-  PermissionTemplate.Builder templateBuilder=PermissionTemplate.newBuilder();
-  for (  PermissionTemplateDto templateDto : data.templates()) {
-    templateBuilder.clear().setId(templateDto.getUuid()).setName(templateDto.getName()).setCreatedAt(formatDateTime(templateDto.getCreatedAt())).setUpdatedAt(formatDateTime(templateDto.getUpdatedAt()));
-    if (templateDto.getKeyPattern() != null) {
-      templateBuilder.setProjectKeyPattern(templateDto.getKeyPattern());
-    }
-    if (templateDto.getDescription() != null) {
-      templateBuilder.setDescription(templateDto.getDescription());
-    }
-    for (    String permission : data.permissions(templateDto.getId())) {
-      templateBuilder.addPermissions(permissionResponse.clear().setKey(permission).setUsersCount(data.userCount(templateDto.getId(),permission)).setGroupsCount(data.groupCount(templateDto.getId(),permission)));
-    }
-    response.addPermissionTemplates(templateBuilder);
-  }
-  for (  String permissionKey : ProjectPermissions.ALL) {
-    response.addPermissions(permissionResponse.clear().setKey(permissionKey).setName(i18nName(permissionKey)).setDescription(i18nDescriptionMessage(permissionKey)));
-  }
+  buildTemplatesResponse(response,data);
+  buildDefaultTemplatesResponse(response,data);
+  buildPermissionsResponse(response);
   return response.build();
 }

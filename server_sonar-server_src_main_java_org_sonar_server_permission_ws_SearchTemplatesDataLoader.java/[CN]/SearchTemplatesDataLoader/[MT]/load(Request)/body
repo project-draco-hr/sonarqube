@@ -4,7 +4,8 @@
     SearchTemplatesData.Builder data=newBuilder();
     List<PermissionTemplateDto> templates=searchTemplates(dbSession,wsRequest);
     List<Long> templateIds=Lists.transform(templates,TemplateToIdFunction.INSTANCE);
-    data.templates(templates).userCountByTemplateIdAndPermission(userCountByTemplateIdAndPermission(dbSession,templateIds)).groupCountByTemplateIdAndPermission(groupCountByTemplateIdAndPermission(dbSession,templateIds));
+    List<TemplateUuidQualifier> defaultTemplates=defaultPermissionTemplateFinder.getDefaultTemplatesByQualifier();
+    data.templates(templates).defaultTemplates(defaultTemplates).userCountByTemplateIdAndPermission(userCountByTemplateIdAndPermission(dbSession,templateIds)).groupCountByTemplateIdAndPermission(groupCountByTemplateIdAndPermission(dbSession,templateIds));
     return data.build();
   }
   finally {
