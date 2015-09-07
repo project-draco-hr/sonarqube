@@ -5,7 +5,8 @@
     Optional<ComponentDto> project=dependenciesFinder.searchProject(dbSession,request);
     checkProjectAdminUserByComponentDto(userSession,project);
     PermissionQuery permissionQuery=buildPermissionQuery(request,project);
-    WsUsersResponse wsUsersResponse=wsUsersResponse(permissionQuery,request.page(),request.pageSize());
+    UserWithPermissionQueryResult usersResult=permissionFinder.findUsersWithPermission(dbSession,permissionQuery);
+    WsUsersResponse wsUsersResponse=buildResponse(usersResult,request.page(),request.pageSize());
     writeProtobuf(wsUsersResponse,wsRequest,wsResponse);
   }
   finally {
