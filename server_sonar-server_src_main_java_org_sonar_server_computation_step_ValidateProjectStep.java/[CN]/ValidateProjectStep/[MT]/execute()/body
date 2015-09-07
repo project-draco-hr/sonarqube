@@ -2,7 +2,7 @@
   DbSession session=dbClient.openSession(false);
   try {
     List<ComponentDto> baseModules=dbClient.componentDao().selectEnabledModulesFromProjectKey(session,treeRootHolder.getRoot().getKey());
-    Map<String,ComponentDto> baseModulesByKey=FluentIterable.from(baseModules).uniqueIndex(ComponentDtoToKey.INSTANCE);
+    Map<String,ComponentDto> baseModulesByKey=FluentIterable.from(baseModules).uniqueIndex(toKey());
     ValidateProjectsVisitor visitor=new ValidateProjectsVisitor(session,dbClient.componentDao(),settings.getBoolean(CoreProperties.CORE_PREVENT_AUTOMATIC_PROJECT_CREATION),baseModulesByKey);
     new DepthTraversalTypeAwareCrawler(visitor).visit(treeRootHolder.getRoot());
     if (!visitor.validationMessages.isEmpty()) {
