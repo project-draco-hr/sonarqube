@@ -1,0 +1,17 @@
+{
+  WsGroupsResponse.Builder groupsResponse=WsGroupsResponse.newBuilder();
+  WsGroupsResponse.Group.Builder group=WsGroupsResponse.Group.newBuilder();
+  Common.Paging.Builder paging=Common.Paging.newBuilder();
+  for (  GroupWithPermissionDto groupWithPermission : groupsWithPermission) {
+    group.clear().setName(groupWithPermission.getName()).setSelected(groupWithPermission.getPermission() != null);
+    if (groupWithPermission.getId() != 0) {
+      group.setId(String.valueOf(groupWithPermission.getId()));
+    }
+    if (groupWithPermission.getDescription() != null) {
+      group.setDescription(groupWithPermission.getDescription());
+    }
+    groupsResponse.addGroups(group);
+  }
+  groupsResponse.setPaging(paging.setPageIndex(permissionRequest.page()).setPageSize(permissionRequest.pageSize()).setTotal(total));
+  return groupsResponse.build();
+}

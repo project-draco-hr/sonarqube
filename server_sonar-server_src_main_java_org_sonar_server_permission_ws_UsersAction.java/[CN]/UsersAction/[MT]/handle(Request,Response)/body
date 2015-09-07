@@ -5,8 +5,10 @@
     Optional<ComponentDto> project=dependenciesFinder.searchProject(dbSession,request);
     checkProjectAdminUserByComponentDto(userSession,project);
     PermissionQuery permissionQuery=buildPermissionQuery(request,project);
-    UserWithPermissionQueryResult usersResult=permissionFinder.findUsersWithPermission(dbSession,permissionQuery);
-    WsUsersResponse wsUsersResponse=buildResponse(usersResult,request.page(),request.pageSize());
+    Long projectIdIfPresent=project.isPresent() ? project.get().getId() : null;
+    int total=dbClient.permissionDao().countUsers(dbSession,permissionQuery,projectIdIfPresent);
+    List<UserWithPermissionDto> usersWithPermission=permissionFinder.findUsersWithPermission(dbSession,permissionQuery);
+    WsUsersResponse wsUsersResponse=buildResponse(usersWithPermission,forPageIndex(request.page()).withPageSize(request.pageSize()).andTotal(total));
     writeProtobuf(wsUsersResponse,wsRequest,wsResponse);
   }
   finally {
