@@ -1,5 +1,6 @@
 {
-  qualityProfileDao.insert(session,QualityProfileDto.createFor("sonar-way-xoo1-12345").setLanguage(xoo1.getKey()).setName("Sonar way"));
-  session.commit();
-  tester.newGetRequest("api/qualityprofiles","search").setParam("language",xoo1.getKey()).execute().assertJson(this.getClass(),"search_xoo1.json");
+  qualityProfileDao.insert(dbSession,QualityProfileDto.createFor("sonar-way-xoo1-12345").setLanguage(xoo1.getKey()).setName("Sonar way"));
+  commit();
+  String result=ws.newRequest().setParam("language",xoo1.getKey()).execute().getInput();
+  assertJson(result).isSimilarTo(getClass().getResource("SearchActionTest/search_xoo1.json"));
 }

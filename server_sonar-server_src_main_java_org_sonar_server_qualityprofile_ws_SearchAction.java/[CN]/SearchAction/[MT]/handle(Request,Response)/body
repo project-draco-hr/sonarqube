@@ -1,7 +1,7 @@
 {
   List<String> fields=request.paramAsStrings(Param.FIELDS);
   String language=request.param(PARAM_LANGUAGE);
-  List<QProfile> profiles=null;
+  List<QProfile> profiles;
   if (language == null) {
     profiles=profileLookup.allProfiles();
   }
@@ -14,7 +14,6 @@
     }
   }
 );
-  JsonWriter json=response.newJsonWriter().beginObject();
-  writeProfiles(json,profiles,fields);
-  json.endObject().close();
+  WsSearchResponse protobufResponse=buildResponse(profiles,fields);
+  writeProtobuf(protobufResponse,request,response);
 }
