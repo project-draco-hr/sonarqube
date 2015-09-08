@@ -1,13 +1,4 @@
 {
-  Set<BatchReport.Issue> rawIssues=Sets.newIdentityHashSet();
-  try (CloseableIterator<BatchReport.Issue> it=reader.readComponentIssues(component.batchId())){
-    while (it.hasNext()) {
-      rawIssues.add(it.next());
-    }
-  }
- catch (  Exception e) {
-    throw new IllegalStateException("Can't read issues for " + component.key(),e);
-  }
   List<DefaultIssue> trackedIssues=Lists.newArrayList();
   if (hasServerAnalysis) {
     Collection<ServerIssue> serverIssues=loadServerIssues(component);
@@ -16,12 +7,8 @@
     addUnmatchedFromServer(trackingResult.unmatched(),sourceHashHolder,trackedIssues);
     mergeMatched(component,trackingResult,trackedIssues,rawIssues);
   }
-  addUnmatchedRawIssues(component,rawIssues,trackedIssues);
   if (hasServerAnalysis && ResourceUtils.isRootProject(component.resource())) {
     addIssuesOnDeletedComponents(trackedIssues);
   }
-  for (  DefaultIssue issue : trackedIssues) {
-    workflow.doAutomaticTransition(issue,changeContext);
-    issueCache.put(issue);
-  }
+  return trackedIssues;
 }
