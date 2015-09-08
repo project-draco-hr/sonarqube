@@ -1,9 +1,7 @@
 {
-  projectRepositoryLoader=mock(DefaultProjectRepositoriesLoader.class);
   ProjectRepositories mockedProjectRepositories=mock(ProjectRepositories.class);
   when(mockedProjectRepositories.lastAnalysisDate()).thenReturn(null);
-  when(projectRepositoryLoader.load(any(ProjectDefinition.class),any(AnalysisProperties.class),any(MutableBoolean.class))).thenReturn(mockedProjectRepositories);
-  sync=new ProjectCacheSynchronizer(projectReactor,projectRepositoryLoader,properties,issuesLoader,lineHashesLoader,userRepositoryLoader,cacheStatus);
-  sync.load(true);
-  verify(cacheStatus).save("org.codehaus.sonar-plugins:sonar-scm-git-plugin");
+  ProjectCacheSynchronizer sync=create(mockedProjectRepositories);
+  sync.load(PROJECT_KEY,true);
+  verify(cacheStatus).save(PROJECT_KEY);
 }

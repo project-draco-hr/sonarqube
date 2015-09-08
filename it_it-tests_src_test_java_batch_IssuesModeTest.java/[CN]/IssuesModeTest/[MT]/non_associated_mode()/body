@@ -1,0 +1,12 @@
+{
+  restoreProfile("one-issue-per-line.xml");
+  setDefaultQualityProfile("xoo","one-issue-per-line");
+  SonarRunner runner=configureRunnerIssues("shared/xoo-sample-non-associated");
+  BuildResult result=orchestrator.executeBuild(runner);
+  assertThat(result.getLogs()).contains("is not associated");
+  assertThat(result.getLogs()).contains("Cache not found, synchronizing data");
+  assertThat(ItUtils.countIssuesInJsonReport(result,true)).isEqualTo(17);
+  result=orchestrator.executeBuild(runner);
+  assertThat(ItUtils.countIssuesInJsonReport(result,true)).isEqualTo(17);
+  assertThat(result.getLogs()).contains("Found cache");
+}

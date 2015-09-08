@@ -1,10 +1,10 @@
 {
   WSLoader server=mock(WSLoader.class);
-  when(server.loadString(anyString())).thenReturn(new WSLoaderResult<>("ae12\n\n43fb",true));
+  when(server.loadString(anyString(),any(LoadStrategy.class))).thenReturn(new WSLoaderResult<>("ae12\n\n43fb",true));
   ServerLineHashesLoader lastSnapshots=new DefaultServerLineHashesLoader(server);
   MutableBoolean fromCache=new MutableBoolean();
   String[] hashes=lastSnapshots.getLineHashes("myproject:org/foo/Foo Bar.c",fromCache);
   assertThat(fromCache.booleanValue()).isTrue();
   assertThat(hashes).containsOnly("ae12","","43fb");
-  verify(server).loadString("/api/sources/hash?key=myproject%3Aorg%2Ffoo%2FFoo+Bar.c");
+  verify(server).loadString("/api/sources/hash?key=myproject%3Aorg%2Ffoo%2FFoo+Bar.c",LoadStrategy.CACHE_FIRST);
 }

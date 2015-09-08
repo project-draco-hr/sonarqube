@@ -1,6 +1,9 @@
 {
   project.setProperty(CoreProperties.PROJECT_BRANCH_PROPERTY,"mybranch");
-  projectRef.addSettings("struts:mybranch",ImmutableMap.of("sonar.cpd.cross","true","sonar.java.coveragePlugin","jacoco"));
+  Table<String,String,String> settings=HashBasedTable.create();
+  settings.put("struts:mybranch","sonar.cpd.cross","true");
+  settings.put("struts:mybranch","sonar.java.coveragePlugin","jacoco");
+  projectRef=new ProjectSettingsRepo(settings,emptyFileData,null);
   ProjectSettings batchSettings=new ProjectSettings(new ProjectReactor(project),bootstrapProps,new PropertyDefinitions(),projectRef,mode);
   assertThat(batchSettings.getString("sonar.java.coveragePlugin")).isEqualTo("jacoco");
 }

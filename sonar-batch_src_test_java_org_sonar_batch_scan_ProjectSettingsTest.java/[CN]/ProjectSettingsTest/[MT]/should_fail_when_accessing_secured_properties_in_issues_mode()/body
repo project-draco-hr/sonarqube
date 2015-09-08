@@ -1,6 +1,9 @@
 {
-  projectRef.addSettings("struts",ImmutableMap.of("sonar.foo.secured","bar","sonar.foo.license.secured","bar2"));
+  Table<String,String,String> settings=HashBasedTable.create();
+  settings.put("struts","sonar.foo.secured","bar");
+  settings.put("struts","sonar.foo.license.secured","bar2");
   when(mode.isIssues()).thenReturn(true);
+  projectRef=new ProjectSettingsRepo(settings,emptyFileData,null);
   ProjectSettings batchSettings=new ProjectSettings(new ProjectReactor(project),bootstrapProps,new PropertyDefinitions(),projectRef,mode);
   assertThat(batchSettings.getString("sonar.foo.license.secured")).isEqualTo("bar2");
   thrown.expect(MessageException.class);

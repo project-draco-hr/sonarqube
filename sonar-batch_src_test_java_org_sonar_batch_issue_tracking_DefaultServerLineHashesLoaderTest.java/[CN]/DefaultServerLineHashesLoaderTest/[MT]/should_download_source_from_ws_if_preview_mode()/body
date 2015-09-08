@@ -1,8 +1,8 @@
 {
   WSLoader wsLoader=mock(WSLoader.class);
-  when(wsLoader.loadString(anyString())).thenReturn(new WSLoaderResult<>("ae12\n\n43fb",true));
+  when(wsLoader.loadString(anyString(),any(LoadStrategy.class))).thenReturn(new WSLoaderResult<>("ae12\n\n43fb",true));
   ServerLineHashesLoader lastSnapshots=new DefaultServerLineHashesLoader(wsLoader);
   String[] hashes=lastSnapshots.getLineHashes("myproject:org/foo/Bar.c",null);
   assertThat(hashes).containsOnly("ae12","","43fb");
-  verify(wsLoader).loadString("/api/sources/hash?key=myproject%3Aorg%2Ffoo%2FBar.c");
+  verify(wsLoader).loadString("/api/sources/hash?key=myproject%3Aorg%2Ffoo%2FBar.c",LoadStrategy.CACHE_FIRST);
 }
