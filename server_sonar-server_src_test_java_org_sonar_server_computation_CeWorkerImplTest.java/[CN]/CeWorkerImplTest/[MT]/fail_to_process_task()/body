@@ -1,0 +1,8 @@
+{
+  CeTask task=new CeTask("TASK_1",CeTaskTypes.REPORT,"PROJECT_1",null);
+  when(queue.peek()).thenReturn(Optional.of(task));
+  doThrow(new IllegalStateException()).when(taskProcessor).process(task);
+  underTest.run();
+  verify(taskProcessor).process(task);
+  verify(queue).remove(task,CeActivityDto.Status.FAILED);
+}

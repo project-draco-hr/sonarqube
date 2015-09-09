@@ -1,0 +1,10 @@
+{
+  CeTask task=new CeTask("TASK_1",CeTaskTypes.REPORT,"PROJECT_1","robert");
+  when(reportSubmitter.submit(eq("my_project"),eq("My Project"),any(InputStream.class))).thenReturn(task);
+  TestResponse wsResponse=tester.newRequest().setParam("projectKey","my_project").setParam("projectName","My Project").setParam("report","{binary}").setMediaType(MimeTypes.PROTOBUF).setMethod("POST").execute();
+  verify(reportSubmitter).submit(eq("my_project"),eq("My Project"),any(InputStream.class));
+  verify(reportProcessingScheduler).startAnalysisTaskNow();
+  WsCe.SubmitResponse submitResponse=Protobuf.read(wsResponse.getInputStream(),WsCe.SubmitResponse.PARSER);
+  assertThat(submitResponse.getTaskId()).isEqualTo("TASK_1");
+  assertThat(submitResponse.getProjectId()).isEqualTo("PROJECT_1");
+}

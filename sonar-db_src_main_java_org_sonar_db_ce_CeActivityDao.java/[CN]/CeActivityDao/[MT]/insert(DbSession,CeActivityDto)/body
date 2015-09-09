@@ -1,0 +1,11 @@
+{
+  dto.setCreatedAt(system2.now());
+  dto.setUpdatedAt(system2.now());
+  dto.setIsLast(false);
+  mapper(dbSession).insert(dto);
+  List<String> uuids=mapper(dbSession).selectUuidsOfRecentlyCreatedByIsLastKey(dto.getIsLastKey(),new RowBounds(0,1));
+  if (!uuids.isEmpty()) {
+    mapper(dbSession).updateIsLastToFalseForLastKey(dto.getIsLastKey(),dto.getUpdatedAt());
+    mapper(dbSession).updateIsLastToTrueForUuid(uuids.get(0),dto.getUpdatedAt());
+  }
+}

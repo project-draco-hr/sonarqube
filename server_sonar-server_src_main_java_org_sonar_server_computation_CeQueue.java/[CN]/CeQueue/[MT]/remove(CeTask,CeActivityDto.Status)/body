@@ -1,0 +1,27 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    Optional<CeQueueDto> queueDto=dbClient.ceQueueDao().selectByUuid(dbSession,task.getUuid());
+    if (!queueDto.isPresent()) {
+      throw new IllegalStateException(format("Task does not exist anymore: %s",task));
+    }
+    CeActivityDto activityDto=new CeActivityDto(queueDto.get());
+    activityDto.setStatus(status);
+    Long startedAt=activityDto.getStartedAt();
+    if (startedAt != null) {
+      activityDto.setFinishedAt(system2.now());
+      long executionTime=activityDto.getFinishedAt() - startedAt;
+      activityDto.setExecutionTimeMs(executionTime);
+      if (status == CeActivityDto.Status.SUCCESS) {
+        queueStatus.addSuccess(executionTime);
+      }
+ else {
+        queueStatus.addError(executionTime);
+      }
+    }
+    remove(dbSession,task,queueDto.get(),activityDto);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

@@ -1,0 +1,23 @@
+{
+  if (submitPaused) {
+    throw new IllegalStateException("Compute Engine does not currently accept new tasks");
+  }
+  CeTask task=new CeTask(submit);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    CeQueueDto dto=new CeQueueDto();
+    dto.setUuid(task.getUuid());
+    dto.setTaskType(task.getType());
+    dto.setComponentUuid(task.getComponentUuid());
+    dto.setStatus(CeQueueDto.Status.PENDING);
+    dto.setSubmitterLogin(task.getSubmitterLogin());
+    dto.setStartedAt(null);
+    dbClient.ceQueueDao().insert(dbSession,dto);
+    dbSession.commit();
+    queueStatus.addReceived();
+    return task;
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

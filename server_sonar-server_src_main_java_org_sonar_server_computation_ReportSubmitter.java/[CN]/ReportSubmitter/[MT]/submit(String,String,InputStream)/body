@@ -1,0 +1,15 @@
+{
+  userSession.checkGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
+  ComponentDto project=componentService.getNullableByKey(projectKey);
+  if (project == null) {
+    NewComponent newProject=new NewComponent(projectKey,StringUtils.defaultIfBlank(projectName,projectKey));
+    newProject.setQualifier(Qualifiers.PROJECT);
+    project=componentService.create(newProject);
+  }
+  CeTaskSubmit submit=queue.prepareSubmit();
+  reportFiles.save(submit,reportInput);
+  submit.setType(CeTaskTypes.REPORT);
+  submit.setComponentUuid(project.uuid());
+  submit.setSubmitterLogin(userSession.getLogin());
+  return queue.submit(submit);
+}

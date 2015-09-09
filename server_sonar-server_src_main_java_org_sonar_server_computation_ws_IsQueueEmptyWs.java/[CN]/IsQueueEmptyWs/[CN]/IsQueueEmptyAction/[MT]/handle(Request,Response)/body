@@ -1,5 +1,10 @@
 {
-  List<AnalysisReportDto> reports=queue.all();
-  boolean isQueueEmpty=reports.isEmpty();
-  IOUtils.write(String.valueOf(isQueueEmpty),response.stream().output());
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    boolean isQueueEmpty=dbClient.ceQueueDao().selectAllInAscOrder(dbSession).isEmpty();
+    IOUtils.write(String.valueOf(isQueueEmpty),response.stream().output());
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
 }
