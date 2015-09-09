@@ -2,16 +2,26 @@
   MessageJsonDescriptor fields=MessageJsonDescriptor.of(message);
   for (  MessageField field : fields.getFields()) {
     if (field.hasValue(message)) {
-      writer.name(field.getName());
-      if (field.isRepeated()) {
+      writer.name(field.getDescriptor().getName());
+      if (field.getDescriptor().isMapField()) {
+        writer.beginObject();
+        for (        Object o : (Collection)field.getValue(message)) {
+          MapEntry mapEntry=(MapEntry)o;
+          writer.name(mapEntry.getKey().toString());
+          Descriptors.FieldDescriptor valueDescriptor=mapEntry.getDescriptorForType().findFieldByName("value");
+          writeFieldValue(valueDescriptor,mapEntry.getValue(),writer);
+        }
+        writer.endObject();
+      }
+ else       if (field.getDescriptor().isRepeated()) {
         writer.beginArray();
         for (        Object o : (Collection)field.getValue(message)) {
-          writeFieldValue(field,o,writer);
+          writeFieldValue(field.getDescriptor(),o,writer);
         }
         writer.endArray();
       }
  else {
-        writeFieldValue(field,field.getValue(message),writer);
+        writeFieldValue(field.getDescriptor(),field.getValue(message),writer);
       }
     }
   }
