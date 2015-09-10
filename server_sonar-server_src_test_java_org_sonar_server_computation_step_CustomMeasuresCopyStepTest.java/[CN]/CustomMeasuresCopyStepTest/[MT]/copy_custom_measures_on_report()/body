@@ -1,0 +1,15 @@
+{
+  insertCustomMeasure(FILE1_UUID,FLOAT_METRIC,3.14);
+  insertCustomMeasure(DIR_UUID,FLOAT_METRIC,123d);
+  insertCustomMeasure(SUB_MODULE_UUID,STRING_METRIC,"sub-module");
+  insertCustomMeasure(MODULE_UUID,STRING_METRIC,"module");
+  insertCustomMeasure(PROJECT_UUID,STRING_METRIC,"project");
+  treeRootHolder.setRoot(builder(PROJECT,PROJECT_REF).setUuid(PROJECT_UUID).addChildren(ReportComponent.builder(MODULE,MODULE_REF).setUuid(MODULE_UUID).addChildren(ReportComponent.builder(MODULE,SUB_MODULE_REF).setUuid(SUB_MODULE_UUID).addChildren(ReportComponent.builder(DIRECTORY,DIR_REF).setUuid(DIR_UUID).addChildren(ReportComponent.builder(FILE,FILE1_REF).setUuid(FILE1_UUID).build(),ReportComponent.builder(FILE,FILE2_REF).setUuid(FILE2_UUID).build()).build()).build()).build()).build());
+  underTest.execute();
+  assertRawMeasureValue(FILE1_REF,FLOAT_METRIC.getKey(),3.1d);
+  assertNoRawMeasureValue(FILE2_REF);
+  assertRawMeasureValue(DIR_REF,FLOAT_METRIC.getKey(),123d);
+  assertRawMeasureValue(SUB_MODULE_REF,STRING_METRIC.getKey(),"sub-module");
+  assertRawMeasureValue(MODULE_REF,STRING_METRIC.getKey(),"module");
+  assertRawMeasureValue(PROJECT_REF,STRING_METRIC.getKey(),"project");
+}
