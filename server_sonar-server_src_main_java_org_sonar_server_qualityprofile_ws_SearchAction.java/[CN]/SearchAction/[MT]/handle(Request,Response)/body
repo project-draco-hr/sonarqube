@@ -1,19 +1,5 @@
 {
-  List<String> fields=request.paramAsStrings(Param.FIELDS);
-  String language=request.param(PARAM_LANGUAGE);
-  List<QProfile> profiles;
-  if (language == null) {
-    profiles=profileLookup.allProfiles();
-  }
- else {
-    profiles=profileLookup.profiles(language);
-  }
-  Collections.sort(profiles,new Comparator<QProfile>(){
-    @Override public int compare(    QProfile o1,    QProfile o2){
-      return new CompareToBuilder().append(o1.language(),o2.language()).append(o1.name(),o2.name()).toComparison();
-    }
-  }
-);
-  WsSearchResponse protobufResponse=buildResponse(profiles,fields);
+  SearchData data=dataLoader.load(request);
+  WsSearchResponse protobufResponse=buildResponse(data);
   writeProtobuf(protobufResponse,request,response);
 }

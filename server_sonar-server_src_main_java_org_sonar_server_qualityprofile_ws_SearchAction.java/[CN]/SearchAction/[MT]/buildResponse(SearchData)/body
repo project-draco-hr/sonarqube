@@ -1,0 +1,31 @@
+{
+  List<QProfile> profiles=data.getProfiles();
+  Map<String,QProfile> profilesByKey=uniqueIndex(profiles,new QProfileToKey());
+  WsSearchResponse.Builder response=WsSearchResponse.newBuilder();
+  QualityProfile.Builder profileBuilder=QualityProfile.newBuilder();
+  for (  QProfile profile : profiles) {
+    String profileKey=profile.key();
+    profileBuilder.clear();
+    if (isNotNull(profile.key())) {
+      profileBuilder.setKey(profile.key());
+    }
+    if (isNotNull(profile.name())) {
+      profileBuilder.setName(profile.name());
+    }
+    if (isNotNull(profile.getRulesUpdatedAt())) {
+      profileBuilder.setRulesUpdatedAt(profile.getRulesUpdatedAt());
+    }
+    if (isNotNull(data.getActiveRuleCount(profileKey))) {
+      profileBuilder.setActiveRuleCount(data.getActiveRuleCount(profileKey));
+    }
+    if (!profile.isDefault() && isNotNull(data.getProjectCount(profileKey))) {
+      profileBuilder.setProjectCount(data.getProjectCount(profileKey));
+    }
+    writeLanguageFields(profileBuilder,profile);
+    writeParentFields(profileBuilder,profile,profilesByKey);
+    profileBuilder.setIsInherited(profile.isInherited());
+    profileBuilder.setIsDefault(profile.isDefault());
+    response.addProfiles(profileBuilder);
+  }
+  return response.build();
+}

@@ -1,9 +1,11 @@
 {
-  db.truncateTables();
   dbClient=db.getDbClient();
-  qualityProfileDao=dbClient.qualityProfileDao();
   dbSession=db.getSession();
+  qualityProfileDao=dbClient.qualityProfileDao();
+  qualityProfileDb=new QualityProfileDbTester(db);
   xoo1=LanguageTesting.newLanguage("xoo1");
   xoo2=LanguageTesting.newLanguage("xoo2");
-  ws=new WsActionTester(new SearchAction(new Languages(xoo1,xoo2),new QProfileLookup(dbClient),profileLoader,qualityProfileDao));
+  Languages languages=new Languages(xoo1,xoo2);
+  org.sonar.server.db.DbClient oldDbClient=new org.sonar.server.db.DbClient(db.database(),db.myBatis(),dbClient.qualityProfileDao(),new ActiveRuleDao(dbClient.qualityProfileDao(),new RuleDao(System2.INSTANCE),System2.INSTANCE));
+  ws=new WsActionTester(new SearchAction(new SearchDataLoader(languages,new QProfileLookup(dbClient),profileLoader,new QProfileFactory(oldDbClient),dbClient),languages));
 }
