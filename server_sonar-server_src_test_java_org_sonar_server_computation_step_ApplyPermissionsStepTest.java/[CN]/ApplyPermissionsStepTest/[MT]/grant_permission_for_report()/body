@@ -1,0 +1,12 @@
+{
+  ComponentDto projectDto=ComponentTesting.newProjectDto(ROOT_UUID).setKey(ROOT_KEY);
+  dbClient.componentDao().insert(dbSession,projectDto);
+  createDefaultPermissionTemplate(UserRole.USER);
+  Component project=ReportComponent.builder(PROJECT,1).setUuid(ROOT_UUID).setKey(ROOT_KEY).build();
+  dbIdsRepository.setComponentId(project,projectDto.getId());
+  treeRootHolder.setRoot(project);
+  step.execute();
+  dbSession.commit();
+  assertThat(dbClient.componentDao().selectOrFailByKey(dbSession,ROOT_KEY).getAuthorizationUpdatedAt()).isNotNull();
+  assertThat(dbClient.roleDao().selectGroupPermissions(dbSession,DefaultGroups.ANYONE,projectDto.getId())).containsOnly(UserRole.USER);
+}

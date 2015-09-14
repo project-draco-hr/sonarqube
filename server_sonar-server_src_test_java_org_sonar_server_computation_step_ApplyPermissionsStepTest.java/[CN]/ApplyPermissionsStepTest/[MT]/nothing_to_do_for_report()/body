@@ -1,0 +1,12 @@
+{
+  ComponentDto projectDto=ComponentTesting.newProjectDto(ROOT_UUID).setKey(ROOT_KEY).setAuthorizationUpdatedAt(SOME_DATE);
+  dbClient.componentDao().insert(dbSession,projectDto);
+  dbClient.roleDao().insertGroupRole(dbSession,new GroupRoleDto().setRole(UserRole.USER).setGroupId(null).setResourceId(projectDto.getId()));
+  dbSession.commit();
+  Component project=ReportComponent.builder(PROJECT,1).setUuid(ROOT_UUID).setKey(ROOT_KEY).build();
+  dbIdsRepository.setComponentId(project,projectDto.getId());
+  treeRootHolder.setRoot(project);
+  step.execute();
+  dbSession.commit();
+  assertThat(projectDto.getAuthorizationUpdatedAt()).isEqualTo(SOME_DATE);
+}
