@@ -12,10 +12,4 @@
   dbSession.commit();
   assertThat(dbClient.componentDao().selectOrFailByKey(dbSession,PROJECT_KEY).getAuthorizationUpdatedAt()).isNotNull();
   assertThat(dbClient.roleDao().selectGroupPermissions(dbSession,DefaultGroups.ANYONE,projectDto.getId())).containsOnly(UserRole.USER);
-  List<SearchHit> issueAuthorizationHits=esTester.getDocuments(IssueIndexDefinition.INDEX,IssueIndexDefinition.TYPE_AUTHORIZATION);
-  assertThat(issueAuthorizationHits).hasSize(1);
-  Map<String,Object> issueAhutorization=issueAuthorizationHits.get(0).sourceAsMap();
-  assertThat(issueAhutorization.get("project")).isEqualTo(PROJECT_UUID);
-  assertThat((List<String>)issueAhutorization.get("groups")).containsOnly(DefaultGroups.ANYONE);
-  assertThat((List<String>)issueAhutorization.get("users")).isEmpty();
 }
