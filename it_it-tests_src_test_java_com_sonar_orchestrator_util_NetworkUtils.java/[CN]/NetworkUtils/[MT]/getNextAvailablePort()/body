@@ -1,18 +1,15 @@
 {
-  System.out.println("=== Override method provided by orchestrator");
-  if ("true".equals(System.getenv("TRAVIS"))) {
-    for (int i=0; i < 10; i++) {
+  if (isOnTravisCI()) {
+    for (int i=0; i < MAX_TRY; i++) {
       int port=nextPort.getAndIncrement();
       try {
-        System.out.println("=== Trying port " + port);
         Process process=new ProcessBuilder("nc","-z","localhost",Integer.toString(port)).start();
         if (process.waitFor() == 1) {
-          System.out.println("=== Using port " + port);
           return port;
         }
       }
  catch (      Exception e) {
-        System.out.println(e);
+        throw new IllegalStateException("Can't test that a network port is available",e);
       }
     }
     throw new IllegalStateException("Can't find a free network port");
