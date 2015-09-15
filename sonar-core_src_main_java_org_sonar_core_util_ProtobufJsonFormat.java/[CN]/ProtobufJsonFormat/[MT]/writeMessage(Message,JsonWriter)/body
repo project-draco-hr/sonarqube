@@ -1,28 +1,19 @@
 {
-  MessageJsonDescriptor fields=MessageJsonDescriptor.of(message);
-  for (  MessageField field : fields.getFields()) {
-    if (field.hasValue(message)) {
-      writer.name(field.getDescriptor().getName());
-      if (field.getDescriptor().isMapField()) {
-        writer.beginObject();
-        for (        Object o : (Collection)field.getValue(message)) {
-          MapEntry mapEntry=(MapEntry)o;
-          writer.name(mapEntry.getKey().toString());
-          Descriptors.FieldDescriptor valueDescriptor=mapEntry.getDescriptorForType().findFieldByName("value");
-          writeFieldValue(valueDescriptor,mapEntry.getValue(),writer);
-        }
-        writer.endObject();
-      }
- else       if (field.getDescriptor().isRepeated()) {
-        writer.beginArray();
-        for (        Object o : (Collection)field.getValue(message)) {
-          writeFieldValue(field.getDescriptor(),o,writer);
-        }
-        writer.endArray();
+  MessageType type=MessageType.of(message);
+  for (  Descriptors.FieldDescriptor fieldDescriptor : type.fieldDescriptors) {
+    if (fieldDescriptor.isRepeated()) {
+      writer.name(fieldDescriptor.getName());
+      if (fieldDescriptor.isMapField()) {
+        writeMap((Collection<MapEntry>)message.getField(fieldDescriptor),writer);
       }
  else {
-        writeFieldValue(field.getDescriptor(),field.getValue(message),writer);
+        writeArray(writer,fieldDescriptor,(Collection)message.getField(fieldDescriptor));
       }
+    }
+ else     if (message.hasField(fieldDescriptor)) {
+      writer.name(fieldDescriptor.getName());
+      Object fieldValue=message.getField(fieldDescriptor);
+      writeFieldValue(fieldDescriptor,fieldValue,writer);
     }
   }
 }

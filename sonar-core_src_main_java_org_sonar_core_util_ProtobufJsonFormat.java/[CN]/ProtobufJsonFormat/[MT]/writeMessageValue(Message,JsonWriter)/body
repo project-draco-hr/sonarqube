@@ -1,0 +1,17 @@
+{
+  MessageType messageType=MessageType.of(message);
+  if (messageType.doesWrapRepeated) {
+    Descriptors.FieldDescriptor repeatedDescriptor=messageType.fieldDescriptors[0];
+    if (repeatedDescriptor.isMapField()) {
+      writeMap((Collection<MapEntry>)message.getField(repeatedDescriptor),writer);
+    }
+ else {
+      writeArray(writer,repeatedDescriptor,(Collection)message.getField(repeatedDescriptor));
+    }
+  }
+ else {
+    writer.beginObject();
+    writeMessage(message,writer);
+    writer.endObject();
+  }
+}

@@ -1,15 +1,16 @@
 {
-  issueBuilder.setCommentsPresentIfEmpty(true);
+  Issues.Comments.Builder wsComments=Issues.Comments.newBuilder();
   List<IssueChangeDto> comments=data.getCommentsForIssueKey(dto.getKey());
   if (comments != null) {
-    Issues.Comment.Builder commentBuilder=Issues.Comment.newBuilder();
+    Issues.Comment.Builder wsComment=Issues.Comment.newBuilder();
     for (    IssueChangeDto comment : comments) {
       String markdown=comment.getChangeData();
-      commentBuilder.clear().setKey(comment.getKey()).setLogin(nullToEmpty(comment.getUserLogin())).setUpdatable(data.isUpdatableComment(comment.getKey())).setCreatedAt(DateUtils.formatDateTime(new Date(comment.getCreatedAt())));
+      wsComment.clear().setKey(comment.getKey()).setLogin(nullToEmpty(comment.getUserLogin())).setUpdatable(data.isUpdatableComment(comment.getKey())).setCreatedAt(DateUtils.formatDateTime(new Date(comment.getCreatedAt())));
       if (markdown != null) {
-        commentBuilder.setHtmlText(Markdown.convertToHtml(markdown)).setMarkdown(markdown);
+        wsComment.setHtmlText(Markdown.convertToHtml(markdown)).setMarkdown(markdown);
       }
-      issueBuilder.addComments(commentBuilder.build());
+      wsComments.addComments(wsComment);
     }
   }
+  wsIssue.setComments(wsComments);
 }
