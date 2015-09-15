@@ -1,0 +1,24 @@
+{
+  if (mode.isIssues()) {
+    return;
+  }
+  this.writer=writer;
+  File analysisLog=writer.getFileStructure().analysisLog();
+  try (BufferedWriter fileWriter=Files.newBufferedWriter(analysisLog.toPath(),StandardCharsets.UTF_8)){
+    fileWriter.append("Environement variables:\n");
+    for (    Map.Entry<String,String> env : System.getenv().entrySet()) {
+      fileWriter.append(String.format("  - %s=%s",env.getKey(),env.getValue())).append('\n');
+    }
+    fileWriter.write("System properties:\n");
+    for (    Map.Entry<Object,Object> env : System.getProperties().entrySet()) {
+      fileWriter.append(String.format("  - %s=%s",env.getKey(),env.getValue())).append('\n');
+    }
+    fileWriter.write("SonarQube plugins:\n");
+    for (    PluginInfo p : pluginRepo.getPluginInfos()) {
+      fileWriter.append(String.format("  - %s %s (%s)",p.getName(),p.getVersion(),p.getKey())).append('\n');
+    }
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Unable to write analysis log",e);
+  }
+}

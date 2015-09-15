@@ -1,0 +1,11 @@
+{
+  BatchReportWriter writer=new BatchReportWriter(temp.newFolder());
+  publisher.init(writer);
+  assertThat(writer.getFileStructure().analysisLog()).exists();
+  Settings settings=new Settings();
+  settings.setProperty("sonar.projectKey","foo");
+  settings.setProperty("sonar.password","azerty");
+  settings.setProperty("sonar.cpp.license.secured","AZERTY");
+  publisher.dumpSettings(ProjectDefinition.create().setProperty("sonar.projectKey","foo"),settings);
+  assertThat(FileUtils.readFileToString(writer.getFileStructure().analysisLog())).contains("sonar.projectKey=foo","sonar.password=******","sonar.cpp.license.secured=******");
+}
