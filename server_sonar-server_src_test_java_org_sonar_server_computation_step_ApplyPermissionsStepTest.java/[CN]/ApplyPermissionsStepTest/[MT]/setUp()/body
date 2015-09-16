@@ -1,5 +1,8 @@
 {
   dbSession=dbClient.openSession(false);
   settings=new Settings();
-  step=new ApplyPermissionsStep(dbClient,dbIdsRepository,new PermissionRepository(dbClient,settings),treeRootHolder);
+  esTester.truncateIndices();
+  issueAuthorizationIndexer=new IssueAuthorizationIndexer(dbClient,esTester.client());
+  issueAuthorizationIndexer.setEnabled(true);
+  step=new ApplyPermissionsStep(dbClient,dbIdsRepository,issueAuthorizationIndexer,new PermissionRepository(dbClient,settings),treeRootHolder);
 }
