@@ -1,0 +1,17 @@
+{
+  expectedException.expect(IllegalStateException.class);
+  expectedException.expectMessage("Component not found: class org.sonar.server.computation.step.BuildComponentTreeStep");
+  final ReportExtractionStep reportExtractionStep=mock(ReportExtractionStep.class);
+  ComponentContainer componentContainer=new ComponentContainer(){
+{
+      addSingleton(reportExtractionStep);
+    }
+  }
+;
+  ComputeEngineContainerImpl computeEngineContainer=new ComputeEngineContainerImpl(componentContainer,new ContainerPopulator<ComputeEngineContainer>(){
+    @Override public void populateContainer(    ComputeEngineContainer container){
+    }
+  }
+);
+  Lists.newArrayList(new ReportComputationSteps(computeEngineContainer).instances());
+}
