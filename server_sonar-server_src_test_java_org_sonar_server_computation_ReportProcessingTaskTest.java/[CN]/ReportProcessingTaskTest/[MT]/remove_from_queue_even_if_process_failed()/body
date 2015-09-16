@@ -3,7 +3,10 @@
   when(containerFactory.create(componentContainer,item)).thenReturn(computeEngineContainer);
   ReportProcessor reportProcessor=mock(ReportProcessor.class);
   when(computeEngineContainer.getComponentByType(ReportProcessor.class)).thenReturn(reportProcessor);
-  doThrow(new IllegalStateException("pb")).when(queue).remove(item);
+  doThrow(new IllegalArgumentException("This exception must be silently logged by ReportProcessingTask")).when(reportProcessor).process();
   underTest.run();
-  assertThat(logTester.logs()).contains("Failed to remove analysis report " + ANALYSIS_REPORT_DTO_ID + " from queue");
+  verify(containerFactory).create(componentContainer,item);
+  verify(reportProcessor).process();
+  verify(computeEngineContainer).cleanup();
+  verify(queue).remove(item);
 }
