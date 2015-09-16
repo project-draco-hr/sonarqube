@@ -2,11 +2,6 @@
   QueryContext context=getQueryContext(request);
   RuleQuery query=doQuery(request);
   Result<Rule> result=doSearch(query,context);
-  JsonWriter json=response.newJsonWriter().beginObject();
-  writeStatistics(json,result,context);
-  doContextResponse(request,result,json);
-  if (context.isFacet()) {
-    writeFacets(request,context,result,json);
-  }
-  json.endObject().close();
+  SearchResponse responseBuilder=buildResponse(request,context,result);
+  writeProtobuf(responseBuilder,request,response);
 }

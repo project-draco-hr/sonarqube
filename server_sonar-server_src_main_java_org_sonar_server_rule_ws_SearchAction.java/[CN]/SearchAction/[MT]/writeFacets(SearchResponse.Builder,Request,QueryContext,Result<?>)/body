@@ -1,0 +1,24 @@
+{
+  addMandatoryFacetValues(results,RuleIndex.FACET_DEBT_CHARACTERISTICS,request.paramAsStrings(PARAM_DEBT_CHARACTERISTICS));
+  addMandatoryFacetValues(results,RuleIndex.FACET_LANGUAGES,request.paramAsStrings(PARAM_LANGUAGES));
+  addMandatoryFacetValues(results,RuleIndex.FACET_REPOSITORIES,request.paramAsStrings(PARAM_REPOSITORIES));
+  addMandatoryFacetValues(results,RuleIndex.FACET_STATUSES,RuleIndex.ALL_STATUSES_EXCEPT_REMOVED);
+  addMandatoryFacetValues(results,RuleIndex.FACET_SEVERITIES,Severity.ALL);
+  addMandatoryFacetValues(results,RuleIndex.FACET_ACTIVE_SEVERITIES,Severity.ALL);
+  addMandatoryFacetValues(results,RuleIndex.FACET_TAGS,request.paramAsStrings(PARAM_TAGS));
+  mergeNoneAndEmptyBucketOnCharacteristics(results);
+  Common.Facet.Builder facet=Common.Facet.newBuilder();
+  Common.FacetValue.Builder value=Common.FacetValue.newBuilder();
+  for (  String facetName : context.facets()) {
+    facet.clear().setProperty(facetName);
+    if (results.getFacets().containsKey(facetName)) {
+      Set<String> itemsFromFacets=Sets.newHashSet();
+      for (      FacetValue facetValue : results.getFacets().get(facetName)) {
+        itemsFromFacets.add(facetValue.getKey());
+        facet.addValues(value.clear().setVal(facetValue.getKey()).setCount(facetValue.getValue()));
+      }
+      addZeroFacetsForSelectedItems(facet,request,facetName,itemsFromFacets);
+    }
+    response.getFacetsBuilder().addFacets(facet);
+  }
+}
