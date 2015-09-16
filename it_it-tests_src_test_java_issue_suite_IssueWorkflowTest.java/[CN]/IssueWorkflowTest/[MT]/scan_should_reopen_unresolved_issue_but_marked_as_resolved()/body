@@ -1,0 +1,15 @@
+{
+  adminIssueClient().doTransition(issue.key(),"resolve");
+  Issue resolvedIssue=searchIssueByKey(issue.key());
+  assertThat(resolvedIssue.status()).isEqualTo("RESOLVED");
+  assertThat(resolvedIssue.resolution()).isEqualTo("FIXED");
+  assertThat(resolvedIssue.creationDate()).isEqualTo(issue.creationDate());
+  assertThat(resolvedIssue.updateDate().before(resolvedIssue.creationDate())).isFalse();
+  assertThat(resolvedIssue.updateDate().before(issue.updateDate())).isFalse();
+  orchestrator.executeBuild(scan);
+  Issue reopenedIssue=searchIssueByKey(issue.key());
+  assertThat(reopenedIssue.status()).isEqualTo("REOPENED");
+  assertThat(reopenedIssue.resolution()).isNull();
+  assertThat(reopenedIssue.creationDate()).isEqualTo(issue.creationDate());
+  assertThat(reopenedIssue.updateDate().before(issue.updateDate())).isFalse();
+}

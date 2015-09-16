@@ -1,0 +1,13 @@
+{
+  adminIssueClient().doTransition(issue.key(),"confirm");
+  Issue confirmed=searchIssueByKey(issue.key());
+  assertThat(confirmed.status()).isEqualTo("CONFIRMED");
+  assertThat(confirmed.resolution()).isNull();
+  assertThat(confirmed.creationDate()).isEqualTo(issue.creationDate());
+  assertThat(adminIssueClient().transitions(confirmed.key())).contains("unconfirm");
+  adminIssueClient().doTransition(confirmed.key(),"unconfirm");
+  Issue unconfirmed=searchIssueByKey(issue.key());
+  assertThat(unconfirmed.status()).isEqualTo("REOPENED");
+  assertThat(unconfirmed.resolution()).isNull();
+  assertThat(unconfirmed.creationDate()).isEqualTo(confirmed.creationDate());
+}

@@ -1,0 +1,13 @@
+{
+  adminIssueClient().doTransition(issue.key(),"falsepositive");
+  Issue falsePositive=searchIssueByKey(issue.key());
+  assertThat(falsePositive.status()).isEqualTo("RESOLVED");
+  assertThat(falsePositive.resolution()).isEqualTo("FALSE-POSITIVE");
+  assertThat(falsePositive.creationDate()).isEqualTo(issue.creationDate());
+  assertThat(adminIssueClient().transitions(falsePositive.key())).contains("reopen");
+  adminIssueClient().doTransition(falsePositive.key(),"reopen");
+  Issue reopened=searchIssueByKey(issue.key());
+  assertThat(reopened.status()).isEqualTo("REOPENED");
+  assertThat(reopened.resolution()).isNull();
+  assertThat(reopened.creationDate()).isEqualTo(falsePositive.creationDate());
+}

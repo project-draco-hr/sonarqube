@@ -1,0 +1,13 @@
+{
+  adminIssueClient().doTransition(issue.key(),"confirm");
+  Issue confirmed=searchIssueByKey(issue.key());
+  assertThat(confirmed.status()).isEqualTo("CONFIRMED");
+  assertThat(confirmed.resolution()).isNull();
+  assertThat(confirmed.creationDate()).isEqualTo(issue.creationDate());
+  assertThat(adminIssueClient().transitions(confirmed.key())).contains("falsepositive");
+  adminIssueClient().doTransition(confirmed.key(),"falsepositive");
+  Issue falsePositive=searchIssueByKey(issue.key());
+  assertThat(falsePositive.status()).isEqualTo("RESOLVED");
+  assertThat(falsePositive.resolution()).isEqualTo("FALSE-POSITIVE");
+  assertThat(falsePositive.creationDate()).isEqualTo(confirmed.creationDate());
+}

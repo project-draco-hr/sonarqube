@@ -1,0 +1,13 @@
+{
+  adminIssueClient().doTransition(issue.key(),"falsepositive");
+  Issue falsePositive=searchIssueByKey(issue.key());
+  assertThat(falsePositive.status()).isEqualTo("RESOLVED");
+  assertThat(falsePositive.resolution()).isEqualTo("FALSE-POSITIVE");
+  assertThat(falsePositive.creationDate()).isEqualTo(issue.creationDate());
+  orchestrator.getServer().associateProjectToQualityProfile("workflow","xoo","empty");
+  orchestrator.executeBuild(scan);
+  Issue closed=searchIssueByKey(issue.key());
+  assertThat(closed.status()).isEqualTo("CLOSED");
+  assertThat(closed.resolution()).isEqualTo("REMOVED");
+  assertThat(closed.creationDate()).isEqualTo(issue.creationDate());
+}

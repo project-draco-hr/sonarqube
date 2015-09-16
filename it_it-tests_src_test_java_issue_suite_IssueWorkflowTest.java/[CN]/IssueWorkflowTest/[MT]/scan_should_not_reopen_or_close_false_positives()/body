@@ -1,0 +1,12 @@
+{
+  adminIssueClient().doTransition(issue.key(),"falsepositive");
+  Issue falsePositive=searchIssueByKey(issue.key());
+  assertThat(falsePositive.status()).isEqualTo("RESOLVED");
+  assertThat(falsePositive.resolution()).isEqualTo("FALSE-POSITIVE");
+  assertThat(falsePositive.creationDate()).isEqualTo(issue.creationDate());
+  orchestrator.executeBuild(scan);
+  Issue reloaded=searchIssueByKey(falsePositive.key());
+  assertThat(reloaded.status()).isEqualTo("RESOLVED");
+  assertThat(reloaded.resolution()).isEqualTo("FALSE-POSITIVE");
+  assertThat(reloaded.creationDate()).isEqualTo(issue.creationDate());
+}

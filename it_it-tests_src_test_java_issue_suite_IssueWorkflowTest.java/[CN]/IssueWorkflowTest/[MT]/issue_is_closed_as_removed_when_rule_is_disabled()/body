@@ -1,16 +1,9 @@
 {
-  orchestrator.getServer().restoreProfile(FileLocation.ofClasspath("/issue/suite/IssueWorkflowTest/xoo-one-issue-per-line-profile.xml"));
-  orchestrator.getServer().provisionProject("workflow","Workflow");
-  orchestrator.getServer().associateProjectToQualityProfile("workflow","xoo","xoo-one-issue-per-line-profile");
-  SonarRunner analysis=SonarRunner.create(projectDir("issue/workflow"));
-  orchestrator.executeBuild(analysis);
-  IssueClient issueClient=orchestrator.getServer().wsClient().issueClient();
-  List<Issue> issues=issueClient.find(IssueQuery.create().rules("xoo:OneIssuePerLine")).list();
+  List<Issue> issues=searchIssues(IssueQuery.create().rules("xoo:OneIssuePerLine"));
   assertThat(issues).isNotEmpty();
   orchestrator.getServer().associateProjectToQualityProfile("workflow","xoo","empty");
-  analysis=SonarRunner.create(projectDir("issue/workflow"));
-  orchestrator.executeBuild(analysis);
-  issues=issueClient.find(IssueQuery.create().rules("xoo:OneIssuePerLine").componentRoots("workflow")).list();
+  orchestrator.executeBuild(scan);
+  issues=searchIssues(IssueQuery.create().rules("xoo:OneIssuePerLine"));
   assertThat(issues).isNotEmpty();
   for (  Issue issue : issues) {
     assertThat(issue.status()).isEqualTo("CLOSED");
