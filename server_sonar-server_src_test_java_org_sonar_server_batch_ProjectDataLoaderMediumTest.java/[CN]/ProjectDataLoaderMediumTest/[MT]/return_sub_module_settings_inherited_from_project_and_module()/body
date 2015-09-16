@@ -1,0 +1,18 @@
+{
+  ComponentDto project=ComponentTesting.newProjectDto();
+  tester.get(DbClient.class).componentDao().insert(dbSession,project);
+  addDefaultProfile();
+  tester.get(DbClient.class).propertiesDao().insertProperty(dbSession,new PropertyDto().setKey("sonar.jira.login.secured").setValue("john").setResourceId(project.getId()));
+  tester.get(DbClient.class).propertiesDao().insertProperty(dbSession,new PropertyDto().setKey("sonar.coverage.exclusions").setValue("**/*.java").setResourceId(project.getId()));
+  ComponentDto module=ComponentTesting.newModuleDto(project);
+  tester.get(DbClient.class).componentDao().insert(dbSession,module);
+  tester.get(DbClient.class).propertiesDao().insertProperty(dbSession,new PropertyDto().setKey("sonar.jira.project.key").setValue("SONAR-SERVER").setResourceId(module.getId()));
+  ComponentDto subModule=ComponentTesting.newModuleDto(module);
+  userSessionRule.login("john").setGlobalPermissions(GlobalPermissions.SCAN_EXECUTION);
+  tester.get(DbClient.class).componentDao().insert(dbSession,subModule);
+  dbSession.commit();
+  ProjectRepositories ref=loader.load(ProjectDataQuery.create().setModuleKey(subModule.key()));
+  assertThat(ref.settings(project.key())).isEmpty();
+  assertThat(ref.settings(module.key())).isEmpty();
+  assertThat(ref.settings(subModule.key())).isEqualTo(ImmutableMap.of("sonar.jira.project.key","SONAR-SERVER","sonar.jira.login.secured","john","sonar.coverage.exclusions","**/*.java"));
+}

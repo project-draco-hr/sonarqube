@@ -1,0 +1,14 @@
+{
+  ComponentDto project=ComponentTesting.newProjectDto();
+  userSessionRule.login("john").setGlobalPermissions(GlobalPermissions.SCAN_EXECUTION);
+  tester.get(DbClient.class).componentDao().insert(dbSession,project);
+  addDefaultProfile();
+  ComponentDto file=ComponentTesting.newFileDto(project,"file");
+  tester.get(DbClient.class).componentDao().insert(dbSession,file);
+  tester.get(FileSourceDao.class).insert(newFileSourceDto(file).setSrcHash("123456"));
+  dbSession.commit();
+  ProjectRepositories ref=loader.load(ProjectDataQuery.create().setModuleKey(project.key()));
+  assertThat(ref.fileDataByPath(project.key())).hasSize(1);
+  FileData fileData=ref.fileData(project.key(),file.path());
+  assertThat(fileData.hash()).isEqualTo("123456");
+}

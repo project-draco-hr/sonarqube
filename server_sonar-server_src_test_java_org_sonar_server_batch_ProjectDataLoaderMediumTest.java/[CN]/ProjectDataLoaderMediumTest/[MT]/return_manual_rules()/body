@@ -1,0 +1,16 @@
+{
+  ComponentDto project=ComponentTesting.newProjectDto();
+  userSessionRule.login("john").setGlobalPermissions(GlobalPermissions.SCAN_EXECUTION);
+  tester.get(DbClient.class).componentDao().insert(dbSession,project);
+  addDefaultProfile();
+  RuleDto rule=RuleTesting.newManualRule("manualRuleKey").setName("Name manualRuleKey");
+  tester.get(DbClient.class).deprecatedRuleDao().insert(dbSession,rule);
+  dbSession.commit();
+  ProjectRepositories ref=loader.load(ProjectDataQuery.create().setModuleKey(project.key()));
+  List<ActiveRule> activeRules=newArrayList(ref.activeRules());
+  assertThat(activeRules).extracting("repositoryKey").containsOnly(RuleKey.MANUAL_REPOSITORY_KEY);
+  assertThat(activeRules).extracting("ruleKey").containsOnly("manualRuleKey");
+  assertThat(activeRules).extracting("name").containsOnly("Name manualRuleKey");
+  assertThat(activeRules).extracting("language").containsNull();
+  assertThat(activeRules).extracting("severity").containsNull();
+}
