@@ -1,38 +1,27 @@
 {
   boolean hasScanPerm=userSession.hasGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
-  checkPermission(query.isPreview());
+  checkPermission(query.isIssuesMode());
   DbSession session=dbClient.openSession(false);
   try {
-    ProjectRepositories ref=new ProjectRepositories();
-    String projectKey=query.getModuleKey();
-    Optional<ComponentDto> moduleOptional=dbClient.componentDao().selectByKey(session,query.getModuleKey());
-    if (moduleOptional.isPresent()) {
-      ComponentDto module=moduleOptional.get();
-      if (query.isPreview() && !userSession.hasProjectPermissionByUuid(UserRole.USER,module.projectUuid())) {
-        throw new ForbiddenException("You're not authorized to access to project '" + module.name() + "', please contact your SonarQube administrator.");
-      }
-      ComponentDto project=getProject(module,session);
-      if (!project.key().equals(module.key())) {
-        addSettings(ref,module.getKey(),getSettingsFromParents(module,hasScanPerm,session));
-        projectKey=project.key();
-      }
-      List<ComponentDto> modulesTree=dbClient.componentDao().selectEnabledDescendantModules(session,module.uuid());
-      Map<String,String> moduleUuidsByKey=moduleUuidsByKey(module,modulesTree);
-      Map<String,Long> moduleIdsByKey=moduleIdsByKey(module,modulesTree);
-      List<PropertyDto> modulesTreeSettings=dbClient.propertiesDao().selectEnabledDescendantModuleProperties(module.uuid(),session);
-      TreeModuleSettings treeModuleSettings=new TreeModuleSettings(moduleUuidsByKey,moduleIdsByKey,modulesTree,modulesTreeSettings,module);
-      addSettingsToChildrenModules(ref,query.getModuleKey(),Maps.<String,String>newHashMap(),treeModuleSettings,hasScanPerm,session);
-      List<FilePathWithHashDto> files=module.isRootProject() ? dbClient.componentDao().selectEnabledFilesFromProject(session,module.uuid()) : dbClient.componentDao().selectEnabledDescendantFiles(session,module.uuid());
-      addFileData(session,ref,modulesTree,files);
-      ref.setLastAnalysisDate(new Date());
+    ProjectRepositories data=new ProjectRepositories();
+    ComponentDto module=checkFound(dbClient.componentDao().selectByKey(session,query.getModuleKey()),format("Project or module with key '%s' is not found",query.getModuleKey()));
+    if (query.isIssuesMode() && !userSession.hasProjectPermissionByUuid(UserRole.USER,module.projectUuid())) {
+      throw new ForbiddenException("You're not authorized to access to project '" + module.name() + "', please contact your SonarQube administrator.");
     }
- else {
-      ref.setLastAnalysisDate(null);
+    ComponentDto project=getProject(module,session);
+    if (!project.key().equals(module.key())) {
+      addSettings(data,module.getKey(),getSettingsFromParents(module,hasScanPerm,session));
     }
-    addProfiles(ref,projectKey,query.getProfileName(),session);
-    addActiveRules(ref);
-    addManualRules(ref);
-    return ref;
+    List<ComponentDto> modulesTree=dbClient.componentDao().selectEnabledDescendantModules(session,module.uuid());
+    Map<String,String> moduleUuidsByKey=moduleUuidsByKey(modulesTree);
+    Map<String,Long> moduleIdsByKey=moduleIdsByKey(modulesTree);
+    List<PropertyDto> modulesTreeSettings=dbClient.propertiesDao().selectEnabledDescendantModuleProperties(module.uuid(),session);
+    TreeModuleSettings treeModuleSettings=new TreeModuleSettings(moduleUuidsByKey,moduleIdsByKey,modulesTree,modulesTreeSettings);
+    addSettingsToChildrenModules(data,query.getModuleKey(),Maps.<String,String>newHashMap(),treeModuleSettings,hasScanPerm);
+    List<FilePathWithHashDto> files=searchFilesWithHashAndRevision(session,module);
+    addFileData(data,modulesTree,files);
+    data.setLastAnalysisDate(new Date());
+    return data;
   }
   finally {
     MyBatis.closeQuietly(session);
