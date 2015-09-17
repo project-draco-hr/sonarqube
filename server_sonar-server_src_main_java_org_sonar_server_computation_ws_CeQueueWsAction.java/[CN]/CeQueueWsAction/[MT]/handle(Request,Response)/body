@@ -1,0 +1,21 @@
+{
+  String componentUuid=wsRequest.param(PARAM_COMPONENT_ID);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    List<CeQueueDto> dtos;
+    if (componentUuid == null) {
+      userSession.checkGlobalPermission(UserRole.ADMIN);
+      dtos=dbClient.ceQueueDao().selectAllInAscOrder(dbSession);
+    }
+ else {
+      userSession.checkProjectUuidPermission(UserRole.USER,componentUuid);
+      dtos=dbClient.ceQueueDao().selectByComponentUuid(dbSession,componentUuid);
+    }
+    WsCe.QueueResponse.Builder wsResponseBuilder=WsCe.QueueResponse.newBuilder();
+    wsResponseBuilder.addAllTasks(formatter.format(dbSession,dtos));
+    WsUtils.writeProtobuf(wsResponseBuilder.build(),wsRequest,wsResponse);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

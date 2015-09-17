@@ -1,0 +1,14 @@
+{
+  userSession.setGlobalPermissions(UserRole.ADMIN);
+  insert("T1","PROJECT_1",CeQueueDto.Status.PENDING);
+  insert("T2","PROJECT_2",CeQueueDto.Status.IN_PROGRESS);
+  TestResponse wsResponse=tester.newRequest().setMediaType(MimeTypes.PROTOBUF).execute();
+  WsCe.QueueResponse queueResponse=Protobuf.read(wsResponse.getInputStream(),WsCe.QueueResponse.PARSER);
+  assertThat(queueResponse.getTasksCount()).isEqualTo(2);
+  assertThat(queueResponse.getTasks(0).getId()).isEqualTo("T1");
+  assertThat(queueResponse.getTasks(0).getStatus()).isEqualTo(WsCe.TaskStatus.PENDING);
+  assertThat(queueResponse.getTasks(0).getComponentId()).isEqualTo("PROJECT_1");
+  assertThat(queueResponse.getTasks(1).getId()).isEqualTo("T2");
+  assertThat(queueResponse.getTasks(1).getStatus()).isEqualTo(WsCe.TaskStatus.IN_PROGRESS);
+  assertThat(queueResponse.getTasks(1).getComponentId()).isEqualTo("PROJECT_2");
+}
