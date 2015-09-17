@@ -1,0 +1,14 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    Calendar sixMonthsAgo=Calendar.getInstance();
+    sixMonthsAgo.setTimeInMillis(system2.now());
+    sixMonthsAgo.add(Calendar.DATE,-180);
+    LOGGER.info("Delete the Compute Engine tasks created before " + sixMonthsAgo.getTime());
+    dbClient.ceActivityDao().deleteOlderThan(dbSession,sixMonthsAgo.getTimeInMillis());
+    dbSession.commit();
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}
