@@ -1,8 +1,10 @@
 {
   userSession.checkGlobalPermission(GlobalPermissions.SCAN_EXECUTION);
-  ComponentDto project=componentService.getNullableByKey(projectKey);
+  String effectiveProjectKey=ComponentKeys.createKey(projectKey,projectBranch);
+  ComponentDto project=componentService.getNullableByKey(effectiveProjectKey);
   if (project == null) {
     NewComponent newProject=new NewComponent(projectKey,StringUtils.defaultIfBlank(projectName,projectKey));
+    newProject.setBranch(projectBranch);
     newProject.setQualifier(Qualifiers.PROJECT);
     project=componentService.create(newProject);
   }
