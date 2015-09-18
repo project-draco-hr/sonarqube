@@ -1,0 +1,16 @@
+{
+  userSession.checkGlobalPermission(UserRole.ADMIN);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    CeActivityQuery query=new CeActivityQuery();
+    List<CeActivityDto> dtos=dbClient.ceActivityDao().selectByQuery(dbSession,query,new RowBounds(0,100));
+    WsCe.ActivityResponse.Builder wsResponseBuilder=WsCe.ActivityResponse.newBuilder();
+    wsResponseBuilder.addAllTasks(formatter.formatActivity(dbSession,dtos));
+    Common.Paging paging=Common.Paging.newBuilder().setPageIndex(1).setPageSize(dtos.size()).setTotal(dtos.size()).build();
+    wsResponseBuilder.setPaging(paging);
+    WsUtils.writeProtobuf(wsResponseBuilder.build(),wsRequest,wsResponse);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}
