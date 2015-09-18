@@ -1,0 +1,16 @@
+{
+  Path p=getStatusFilePath();
+  try {
+    if (!Files.isRegularFile(p)) {
+      return null;
+    }
+    InputStream is=new FileInputStream(p.toFile());
+    try (ObjectInputStream objInput=new ObjectInputStream(is)){
+      return (Date)objInput.readObject();
+    }
+   }
+ catch (  IOException|ClassNotFoundException e) {
+    FileUtils.deleteQuietly(p.toFile());
+    throw new IllegalStateException("Failed to read cache sync status",e);
+  }
+}

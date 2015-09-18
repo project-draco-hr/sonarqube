@@ -1,0 +1,16 @@
+{
+  try {
+    return loadFromServer(id,serverLoader);
+  }
+ catch (  NotAvailableException serverNotAvailable) {
+    if (cacheLoader != null) {
+      try {
+        return loadFromCache(id,cacheLoader);
+      }
+ catch (      NotAvailableException cacheNotAvailable) {
+        throw new IllegalStateException(FAIL_MSG,serverNotAvailable.getCause());
+      }
+    }
+    throw new IllegalStateException("Server is not available",serverNotAvailable.getCause());
+  }
+}

@@ -1,0 +1,20 @@
+{
+  if (isOffline()) {
+    throw new NotAvailableException("Server not available");
+  }
+  try {
+    T t=loader.load(id);
+    switchToOnline();
+    return new WSLoaderResult<T>(t,false);
+  }
+ catch (  IllegalStateException e) {
+    if (e.getCause() instanceof HttpDownloader.HttpException) {
+      throw e;
+    }
+    switchToOffline();
+    throw new NotAvailableException(e);
+  }
+catch (  Exception e) {
+    throw new IllegalStateException(e);
+  }
+}

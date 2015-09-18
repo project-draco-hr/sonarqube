@@ -1,0 +1,13 @@
+{
+  InputStream is1=mock(InputStream.class);
+  InputStream is2=mock(InputStream.class);
+  when(client.load(anyString(),anyString(),anyBoolean(),anyInt(),anyInt())).thenReturn(is1);
+  when(cache.getStream(ID)).thenReturn(is2);
+  WSLoader loader=new WSLoader(LoadStrategy.SERVER_FIRST,cache,client);
+  WSLoaderResult<InputStream> result=loader.loadStream(ID);
+  assertThat(result.get()).isEqualTo(is2);
+  verify(client).load(anyString(),anyString(),anyBoolean(),anyInt(),anyInt());
+  verify(cache).put(ID,is1);
+  verify(cache).getStream(ID);
+  verifyNoMoreInteractions(cache,client);
+}

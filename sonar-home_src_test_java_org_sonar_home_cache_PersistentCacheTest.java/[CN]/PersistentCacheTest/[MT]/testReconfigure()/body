@@ -1,11 +1,13 @@
 {
-  cache=new PersistentCache(tmp.getRoot().toPath(),Long.MAX_VALUE,mock(Logger.class),null);
+  cache=new PersistentCache(tmp.getRoot().toPath(),Long.MAX_VALUE,mock(Logger.class),lock);
   assertCacheHit(false);
+  cache.put(URI,VALUE.getBytes(StandardCharsets.UTF_8));
   assertCacheHit(true);
   File root=tmp.getRoot();
   FileUtils.deleteQuietly(root);
   cache.reconfigure();
   assertThat(root).exists();
   assertCacheHit(false);
+  cache.put(URI,VALUE.getBytes(StandardCharsets.UTF_8));
   assertCacheHit(true);
 }

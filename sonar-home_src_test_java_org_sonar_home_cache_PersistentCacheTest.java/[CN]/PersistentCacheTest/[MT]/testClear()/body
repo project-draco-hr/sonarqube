@@ -1,5 +1,9 @@
 {
-  assertCacheHit(false);
+  Path lockFile=cache.getDirectory().resolve("lock");
+  cache.put(URI,VALUE.getBytes(StandardCharsets.UTF_8));
+  Files.write(lockFile,"test".getBytes(StandardCharsets.UTF_8));
+  assertCacheHit(true);
   cache.clear();
   assertCacheHit(false);
+  assertThat(new String(Files.readAllBytes(lockFile),StandardCharsets.UTF_8)).isEqualTo("test");
 }

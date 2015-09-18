@@ -1,6 +1,10 @@
 {
-  assertCacheHit(false);
-  cache=new PersistentCache(tmp.getRoot().toPath(),-100,mock(Logger.class),null);
+  Path lockFile=cache.getDirectory().resolve("lock");
+  cache.put(URI,VALUE.getBytes(StandardCharsets.UTF_8));
+  Files.write(lockFile,"test".getBytes(StandardCharsets.UTF_8));
+  assertCacheHit(true);
+  cache=new PersistentCache(tmp.getRoot().toPath(),-100,mock(Logger.class),lock);
   cache.clean();
   assertCacheHit(false);
+  assertThat(new String(Files.readAllBytes(lockFile),StandardCharsets.UTF_8)).isEqualTo("test");
 }
