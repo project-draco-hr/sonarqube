@@ -1,0 +1,15 @@
+{
+  provisionSampleProject();
+  setSampleProjectQualityProfile("empty");
+  runSampleProjectAnalysis("sonar.projectDate","2013-01-01");
+  defineQualityProfile("one-issue-per-line");
+  setSampleProjectQualityProfile("one-issue-per-line");
+  runSampleProjectAnalysis();
+  Resource newTechnicalDebt=getSampleProjectResourceWithVariations("new_technical_debt");
+  List<Measure> measures=newTechnicalDebt.getMeasures();
+  assertThat(measures.get(0).getVariation1()).isEqualTo(17);
+  assertThat(measures.get(0).getVariation2()).isEqualTo(17);
+  runSampleProjectAnalysis();
+  newTechnicalDebt=orchestrator.getServer().getWsClient().find(ResourceQuery.createForMetrics("sample:src/main/xoo/sample/Sample.xoo","new_technical_debt").setIncludeTrends(true));
+  assertThat(newTechnicalDebt).isNull();
+}
