@@ -1,0 +1,11 @@
+{
+  userSession.addProjectUuidPermissions(UserRole.ADMIN,"PROJECT_1");
+  insert("T1","PROJECT_1",CeActivityDto.Status.SUCCESS);
+  insert("T2","PROJECT_2",CeActivityDto.Status.FAILED);
+  TestResponse wsResponse=tester.newRequest().setParam("componentId","PROJECT_1").setMediaType(MimeTypes.PROTOBUF).execute();
+  WsCe.ActivityResponse activityResponse=Protobuf.read(wsResponse.getInputStream(),WsCe.ActivityResponse.PARSER);
+  assertThat(activityResponse.getTasksCount()).isEqualTo(1);
+  assertThat(activityResponse.getTasks(0).getId()).isEqualTo("T1");
+  assertThat(activityResponse.getTasks(0).getStatus()).isEqualTo(WsCe.TaskStatus.SUCCESS);
+  assertThat(activityResponse.getTasks(0).getComponentId()).isEqualTo("PROJECT_1");
+}

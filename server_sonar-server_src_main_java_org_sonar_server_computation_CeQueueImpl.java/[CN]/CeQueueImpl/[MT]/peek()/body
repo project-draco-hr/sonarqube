@@ -1,0 +1,18 @@
+{
+  if (peekPaused.get()) {
+    return Optional.absent();
+  }
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    Optional<CeQueueDto> dto=dbClient.ceQueueDao().peek(dbSession);
+    CeTask task=null;
+    if (dto.isPresent()) {
+      queueStatus.addInProgress();
+      task=new CeTask(dto.get());
+    }
+    return Optional.fromNullable(task);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

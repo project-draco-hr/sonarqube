@@ -1,0 +1,12 @@
+{
+  TestResponse wsResponse=tester.newRequest().setMediaType(MimeTypes.PROTOBUF).setParam(WebService.Param.PAGE,Integer.toString(pageIndex)).setParam(WebService.Param.PAGE_SIZE,Integer.toString(pageSize)).execute();
+  WsCe.ActivityResponse activityResponse=Protobuf.read(wsResponse.getInputStream(),WsCe.ActivityResponse.PARSER);
+  assertThat(activityResponse.getPaging().getPageIndex()).isEqualTo(pageIndex);
+  assertThat(activityResponse.getPaging().getPageSize()).isEqualTo(pageSize);
+  assertThat(activityResponse.getPaging().getTotal()).isEqualTo(expectedTotal);
+  assertThat(activityResponse.getTasksCount()).isEqualTo(expectedOrderedTaskIds.size());
+  for (int i=0; i < expectedOrderedTaskIds.size(); i++) {
+    String expectedTaskId=expectedOrderedTaskIds.get(i);
+    assertThat(activityResponse.getTasks(i).getId()).isEqualTo(expectedTaskId);
+  }
+}

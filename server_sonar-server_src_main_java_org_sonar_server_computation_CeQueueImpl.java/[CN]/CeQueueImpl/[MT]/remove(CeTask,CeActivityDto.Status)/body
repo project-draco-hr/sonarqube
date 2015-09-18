@@ -1,0 +1,16 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    Optional<CeQueueDto> queueDto=dbClient.ceQueueDao().selectByUuid(dbSession,task.getUuid());
+    if (!queueDto.isPresent()) {
+      throw new IllegalStateException(format("Task does not exist anymore: %s",task));
+    }
+    CeActivityDto activityDto=new CeActivityDto(queueDto.get());
+    activityDto.setStatus(status);
+    updateQueueStatus(status,activityDto);
+    remove(dbSession,task,queueDto.get(),activityDto);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

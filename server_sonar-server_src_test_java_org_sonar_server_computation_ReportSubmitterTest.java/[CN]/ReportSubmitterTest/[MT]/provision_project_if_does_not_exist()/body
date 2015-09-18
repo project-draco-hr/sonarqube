@@ -1,11 +1,11 @@
 {
-  when(queue.prepareSubmit()).thenReturn(new CeTaskSubmit("TASK_1"));
+  when(queue.prepareSubmit()).thenReturn(new TestTaskSubmission("TASK_1"));
   userSession.setGlobalPermissions(GlobalPermissions.SCAN_EXECUTION,GlobalPermissions.PROVISIONING);
   when(componentService.getNullableByKey("MY_PROJECT")).thenReturn(null);
   when(componentService.create(any(NewComponent.class))).thenReturn(new ComponentDto().setUuid("P1"));
   underTest.submit("MY_PROJECT",null,"My Project",IOUtils.toInputStream("{binary}"));
-  verify(queue).submit(argThat(new TypeSafeMatcher<CeTaskSubmit>(){
-    @Override protected boolean matchesSafely(    CeTaskSubmit submit){
+  verify(queue).submit(argThat(new TypeSafeMatcher<TaskSubmission>(){
+    @Override protected boolean matchesSafely(    TaskSubmission submit){
       return submit.getType().equals(CeTaskTypes.REPORT) && submit.getComponentUuid().equals("P1") && submit.getUuid().equals("TASK_1");
     }
     @Override public void describeTo(    Description description){

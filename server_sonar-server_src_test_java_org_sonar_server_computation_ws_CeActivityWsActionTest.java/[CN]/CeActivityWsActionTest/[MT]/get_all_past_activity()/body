@@ -1,0 +1,15 @@
+{
+  userSession.setGlobalPermissions(UserRole.ADMIN);
+  insert("T1","PROJECT_1",CeActivityDto.Status.SUCCESS);
+  insert("T2","PROJECT_2",CeActivityDto.Status.FAILED);
+  TestResponse wsResponse=tester.newRequest().setMediaType(MimeTypes.PROTOBUF).execute();
+  WsCe.ActivityResponse activityResponse=Protobuf.read(wsResponse.getInputStream(),WsCe.ActivityResponse.PARSER);
+  assertThat(activityResponse.getTasksCount()).isEqualTo(2);
+  assertThat(activityResponse.getTasks(0).getId()).isEqualTo("T2");
+  assertThat(activityResponse.getTasks(0).getStatus()).isEqualTo(WsCe.TaskStatus.FAILED);
+  assertThat(activityResponse.getTasks(0).getComponentId()).isEqualTo("PROJECT_2");
+  assertThat(activityResponse.getTasks(0).getExecutionTimeMs()).isEqualTo(500L);
+  assertThat(activityResponse.getTasks(1).getId()).isEqualTo("T1");
+  assertThat(activityResponse.getTasks(1).getStatus()).isEqualTo(WsCe.TaskStatus.SUCCESS);
+  assertThat(activityResponse.getTasks(1).getComponentId()).isEqualTo("PROJECT_1");
+}

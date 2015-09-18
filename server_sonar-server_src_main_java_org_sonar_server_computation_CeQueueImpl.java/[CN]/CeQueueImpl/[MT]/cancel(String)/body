@@ -1,0 +1,15 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    Optional<CeQueueDto> queueDto=dbClient.ceQueueDao().selectByUuid(dbSession,taskUuid);
+    if (queueDto.isPresent()) {
+      checkState(CeQueueDto.Status.PENDING.equals(queueDto.get().getStatus()),"Task is in progress and can't be canceled [uuid=%s]",taskUuid);
+      cancel(dbSession,queueDto.get());
+      return true;
+    }
+    return false;
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

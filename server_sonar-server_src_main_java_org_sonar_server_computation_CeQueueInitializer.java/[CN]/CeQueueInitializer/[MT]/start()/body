@@ -2,12 +2,8 @@
   DbSession dbSession=dbClient.openSession(false);
   try {
     initJmxCounters(dbSession);
-    if (serverUpgradeStatus.isUpgraded()) {
-      cleanOnUpgrade();
-    }
- else {
-      verifyConsistency(dbSession);
-    }
+    cleaner.clean(dbSession);
+    scheduler.schedule();
   }
   finally {
     dbClient.closeSession(dbSession);
