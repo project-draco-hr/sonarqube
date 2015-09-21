@@ -1,0 +1,27 @@
+{
+  if (periodsHolder.getPeriods().isEmpty()) {
+    return;
+  }
+  Optional<Measure> nclocDataMeasure=measureRepository.getRawMeasure(file,this.nclocDataMetric);
+  if (!nclocDataMeasure.isPresent()) {
+    return;
+  }
+  long lineDevCost=sqaleRatingSettings.getDevCost(file.getFileAttributes().getLanguageKey());
+  BatchReport.Changesets changesets=batchReportReader.readChangesets(file.getReportAttributes().getRef());
+  if (changesets == null) {
+    LOG.trace(String.format("No changeset for file %s. Dev cost will be zero.",file.getKey()));
+    return;
+  }
+  for (  Integer nclocLineIndex : nclocLineIndexes(nclocDataMeasure)) {
+    int changesetIndex=changesets.getChangesetIndexByLine(nclocLineIndex - 1);
+    BatchReport.Changesets.Changeset changeset=changesets.getChangeset(changesetIndex);
+    if (!changeset.hasDate()) {
+      continue;
+    }
+    for (    Period period : periodsHolder.getPeriods()) {
+      if (isLineInPeriod(changeset.getDate(),period)) {
+        path.current().increment(period,lineDevCost);
+      }
+    }
+  }
+}

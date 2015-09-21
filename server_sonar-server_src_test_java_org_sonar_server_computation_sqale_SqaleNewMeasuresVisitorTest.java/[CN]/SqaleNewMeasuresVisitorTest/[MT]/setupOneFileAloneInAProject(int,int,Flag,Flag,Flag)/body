@@ -1,0 +1,21 @@
+{
+  checkArgument(isUnitTest == Flag.UT_FILE || isUnitTest == Flag.SRC_FILE);
+  checkArgument(withNclocLines == Flag.WITH_NCLOC || withNclocLines == Flag.NO_NCLOC || withNclocLines == Flag.MISSING_MEASURE_NCLOC);
+  checkArgument(withChangeSets == Flag.WITH_CHANGESET || withChangeSets == Flag.NO_CHANGESET || withChangeSets == Flag.NO_DATE_CHANGESET);
+  treeRootHolder.setRoot(builder(PROJECT,ROOT_REF).addChildren(builder(FILE,LANGUAGE_1_FILE_REF).setFileAttributes(new FileAttributes(isUnitTest == Flag.UT_FILE,LANGUAGE_1_KEY)).build()).build());
+  Measure newDebtMeasure=createNewDebtMeasure(newDebtPeriod2,newDebtPeriod4);
+  measureRepository.addRawMeasure(LANGUAGE_1_FILE_REF,NEW_TECHNICAL_DEBT_KEY,newDebtMeasure);
+  measureRepository.addRawMeasure(ROOT_REF,NEW_TECHNICAL_DEBT_KEY,newDebtMeasure);
+  if (withNclocLines == Flag.WITH_NCLOC) {
+    measureRepository.addRawMeasure(LANGUAGE_1_FILE_REF,NCLOC_DATA_KEY,createNclocDataMeasure(2,3,4));
+  }
+ else   if (withNclocLines == Flag.NO_NCLOC) {
+    measureRepository.addRawMeasure(LANGUAGE_1_FILE_REF,NCLOC_DATA_KEY,createNoNclocDataMeasure(4));
+  }
+  if (withChangeSets == Flag.WITH_CHANGESET) {
+    reportReader.putChangesets(createChangesets(LANGUAGE_1_FILE_REF,PERIOD_2_SNAPSHOT_DATE - 100,2,PERIOD_2_SNAPSHOT_DATE + 100,2));
+  }
+ else   if (withChangeSets == Flag.NO_DATE_CHANGESET) {
+    reportReader.putChangesets(createNoDateChangesets(LANGUAGE_1_FILE_REF,4));
+  }
+}
