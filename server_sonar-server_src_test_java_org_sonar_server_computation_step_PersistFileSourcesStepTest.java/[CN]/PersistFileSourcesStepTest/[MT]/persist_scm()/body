@@ -3,7 +3,7 @@
   reportReader.putChangesets(BatchReport.Changesets.newBuilder().setComponentRef(FILE_REF).addChangeset(BatchReport.Changesets.Changeset.newBuilder().setAuthor("john").setDate(123456789L).setRevision("rev-1").build()).addChangesetIndexByLine(0).build());
   underTest.execute();
   assertThat(dbTester.countRowsOfTable("file_sources")).isEqualTo(1);
-  FileSourceDto fileSourceDto=dbClient.fileSourceDao().selectSource(FILE_UUID);
+  FileSourceDto fileSourceDto=dbClient.fileSourceDao().selectSourceByFileUuid(session,FILE_UUID);
   DbFileSources.Data data=FileSourceDto.decodeSourceData(fileSourceDto.getBinaryData());
   assertThat(data.getLinesList()).hasSize(1);
   assertThat(data.getLines(0).getScmAuthor()).isEqualTo("john");
