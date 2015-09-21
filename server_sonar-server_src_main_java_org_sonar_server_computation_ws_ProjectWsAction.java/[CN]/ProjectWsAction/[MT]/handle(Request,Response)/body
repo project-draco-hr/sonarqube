@@ -1,0 +1,19 @@
+{
+  String componentUuid=wsRequest.mandatoryParam(PARAM_COMPONENT_UUID);
+  userSession.checkProjectUuidPermission(UserRole.USER,componentUuid);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    List<CeQueueDto> queueDtos=dbClient.ceQueueDao().selectByComponentUuid(dbSession,componentUuid);
+    CeActivityQuery activityQuery=new CeActivityQuery().setComponentUuid(componentUuid).setOnlyCurrents(true);
+    List<CeActivityDto> activityDtos=dbClient.ceActivityDao().selectByQuery(dbSession,activityQuery,new RowBounds(0,1));
+    ProjectResponse.Builder wsResponseBuilder=ProjectResponse.newBuilder();
+    wsResponseBuilder.addAllQueue(formatter.formatQueue(dbSession,queueDtos));
+    if (activityDtos.size() == 1) {
+      wsResponseBuilder.setCurrent(formatter.formatActivity(dbSession,activityDtos.get(0)));
+    }
+    WsUtils.writeProtobuf(wsResponseBuilder.build(),wsRequest,wsResponse);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}
