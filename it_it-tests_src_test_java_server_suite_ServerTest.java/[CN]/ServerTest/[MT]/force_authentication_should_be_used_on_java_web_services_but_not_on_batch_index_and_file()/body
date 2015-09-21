@@ -1,16 +1,16 @@
 {
   try {
     orchestrator.getServer().getAdminWsClient().update(new PropertyUpdateQuery("sonar.forceAuthentication","true"));
-    String batchIndex=orchestrator.getServer().wsClient().get("/batch/index");
+    String batchIndex=orchestrator.getServer().wsClient().get("/scanner/index");
     assertThat(batchIndex).isNotEmpty();
     String jar=batchIndex.split("\\|")[0];
     HttpClient httpclient=new DefaultHttpClient();
     try {
-      HttpGet get=new HttpGet(orchestrator.getServer().getUrl() + "/batch/file?name=" + jar);
+      HttpGet get=new HttpGet(orchestrator.getServer().getUrl() + "/scanner/file?name=" + jar);
       HttpResponse response=httpclient.execute(get);
       assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
       EntityUtils.consume(response.getEntity());
-      get=new HttpGet(orchestrator.getServer().getUrl() + "/batch/" + jar);
+      get=new HttpGet(orchestrator.getServer().getUrl() + "/scanner/" + jar);
       response=httpclient.execute(get);
       assertThat(response.getStatusLine().getStatusCode()).isEqualTo(200);
       EntityUtils.consume(response.getEntity());

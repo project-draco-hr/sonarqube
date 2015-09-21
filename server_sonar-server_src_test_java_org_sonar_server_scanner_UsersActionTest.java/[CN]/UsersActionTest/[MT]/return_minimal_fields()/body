@@ -1,0 +1,13 @@
+{
+  es.putDocuments(UserIndexDefinition.INDEX,UserIndexDefinition.TYPE_USER,new UserDoc().setLogin("ada.lovelace").setName("Ada Lovelace").setActive(false),new UserDoc().setLogin("grace.hopper").setName("Grace Hopper").setActive(true));
+  userSessionRule.login("sonarqtech").setGlobalPermissions(GlobalPermissions.PREVIEW_EXECUTION);
+  WsTester.TestRequest request=tester.newGetRequest("scanner","users").setParam("logins","ada.lovelace,grace.hopper");
+  ByteArrayInputStream input=new ByteArrayInputStream(request.execute().output());
+  User user=User.parseDelimitedFrom(input);
+  assertThat(user.getLogin()).isEqualTo("ada.lovelace");
+  assertThat(user.getName()).isEqualTo("Ada Lovelace");
+  user=User.parseDelimitedFrom(input);
+  assertThat(user.getLogin()).isEqualTo("grace.hopper");
+  assertThat(user.getName()).isEqualTo("Grace Hopper");
+  assertThat(User.parseDelimitedFrom(input)).isNull();
+}
