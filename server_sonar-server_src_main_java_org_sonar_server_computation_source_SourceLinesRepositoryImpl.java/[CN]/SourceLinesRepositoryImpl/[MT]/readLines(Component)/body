@@ -1,0 +1,17 @@
+{
+  Preconditions.checkNotNull(component,"Component should not be bull");
+  if (!component.getType().equals(FILE)) {
+    throw new IllegalArgumentException(String.format("Component '%s' is not a file",component));
+  }
+  Optional<CloseableIterator<String>> linesIteratorOptional=reportReader.readFileSource(component.getReportAttributes().getRef());
+  if (linesIteratorOptional.isPresent()) {
+    return linesIteratorOptional.get();
+  }
+  DbSession session=dbClient.openSession(false);
+  try {
+    return readLinesFromDb(session,component);
+  }
+  finally {
+    dbClient.closeSession(session);
+  }
+}

@@ -1,10 +1,11 @@
 {
   LOGGER.info("Persist file sources");
-  DbClient dbClient=new DbClient(dbTester.database(),dbTester.myBatis(),new FileSourceDao(dbTester.myBatis()));
+  DbClient dbClient=dbTester.getDbClient();
   long start=System.currentTimeMillis();
   BatchReportDirectoryHolderImpl batchReportDirectoryHolder=new BatchReportDirectoryHolderImpl();
   batchReportDirectoryHolder.setDirectory(reportDir);
-  PersistFileSourcesStep step=new PersistFileSourcesStep(dbClient,System2.INSTANCE,treeRootHolder,new BatchReportReaderImpl(batchReportDirectoryHolder));
+  org.sonar.server.computation.batch.BatchReportReader batchReportReader=new BatchReportReaderImpl(batchReportDirectoryHolder);
+  PersistFileSourcesStep step=new PersistFileSourcesStep(dbClient,System2.INSTANCE,treeRootHolder,batchReportReader,new SourceLinesRepositoryImpl(dbClient,batchReportReader));
   step.execute();
   long end=System.currentTimeMillis();
   long duration=end - start;

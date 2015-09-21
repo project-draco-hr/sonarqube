@@ -1,0 +1,8 @@
+{
+  FileSourceDto dto=dbClient.fileSourceDao().selectSourceByFileUuid(session,component.getUuid());
+  if (dto == null) {
+    throw new IllegalStateException(String.format("The file '%s' has no source",component));
+  }
+  DbFileSources.Data data=dto.getSourceData();
+  return CloseableIterator.from(from(data.getLinesList()).transform(LineToRaw.INSTANCE).iterator());
+}

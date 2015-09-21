@@ -2,7 +2,7 @@
   treeRootHolder.setRoot(ReportComponent.builder(Component.Type.PROJECT,1).setUuid(PROJECT_UUID).setKey(PROJECT_KEY).addChildren(ReportComponent.builder(Component.Type.FILE,FILE_REF).setUuid(FILE_UUID).setKey("PROJECT_KEY:file").build()).build());
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).addChildRef(FILE_REF).build());
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(FILE_REF).setType(Constants.ComponentType.FILE).setLines(3).build());
-  reportReader.putFileSourceLines(FILE_REF,"line1","line2");
+  fileSourceRepository.addLine("line1").addLine("line2");
   underTest.execute();
   assertThat(dbTester.countRowsOfTable("file_sources")).isEqualTo(1);
   FileSourceDto fileSourceDto=dbClient.fileSourceDao().selectSourceByFileUuid(session,FILE_UUID);
