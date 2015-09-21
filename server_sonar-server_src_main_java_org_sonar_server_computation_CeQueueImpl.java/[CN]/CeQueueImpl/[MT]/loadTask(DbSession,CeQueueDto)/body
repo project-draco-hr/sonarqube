@@ -1,0 +1,16 @@
+{
+  CeTask.Builder builder=new CeTask.Builder();
+  builder.setUuid(dto.getUuid());
+  builder.setType(dto.getTaskType());
+  builder.setSubmitterLogin(dto.getSubmitterLogin());
+  String componentUuid=dto.getComponentUuid();
+  if (componentUuid != null) {
+    builder.setComponentUuid(componentUuid);
+    Optional<ComponentDto> component=dbClient.componentDao().selectByUuid(dbSession,componentUuid);
+    if (component.isPresent()) {
+      builder.setComponentKey(component.get().getKey());
+      builder.setComponentName(component.get().name());
+    }
+  }
+  return builder.build();
+}

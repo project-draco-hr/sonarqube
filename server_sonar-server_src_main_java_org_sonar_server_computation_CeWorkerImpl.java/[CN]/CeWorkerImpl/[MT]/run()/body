@@ -1,5 +1,4 @@
 {
-  Profiler profiler=Profiler.create(LOG).start();
   CeTask task;
   try {
     Optional<CeTask> taskOpt=queue.peek();
@@ -12,15 +11,16 @@
     LOG.error("Failed to pop the queue of analysis reports",e);
     return;
   }
+  Profiler profiler=Profiler.create(LOG).startInfo(format("Analysis of project %s (report %s)",task.getComponentKey(),task.getUuid()));
   try {
     reportTaskProcessor.process(task);
     queue.remove(task,CeActivityDto.Status.SUCCESS);
   }
  catch (  Throwable e) {
-    LOG.error(String.format("Failed to process task %s",task.getUuid()),e);
+    LOG.error(format("Failed to process task %s",task.getUuid()),e);
     queue.remove(task,CeActivityDto.Status.FAILED);
   }
  finally {
-    profiler.stopInfo(String.format("Total thread execution of project %s (report %s)",task.getComponentUuid(),task.getUuid()));
+    profiler.stopInfo();
   }
 }
