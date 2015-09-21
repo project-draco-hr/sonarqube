@@ -1,0 +1,16 @@
+{
+  if (this.profiles == null) {
+    List<QualityProfile> profileList;
+    MutableBoolean fromCache=new MutableBoolean();
+    Profiler profiler=Profiler.create(LOG).startInfo(LOG_MSG);
+    if (mode.isNotAssociated() || !projectRepositories.exists()) {
+      profileList=loader.loadDefault(fromCache);
+    }
+ else {
+      profileList=loader.load(projectKey.get(),getSonarProfile(props,mode),fromCache);
+    }
+    profiler.stopInfo(fromCache.booleanValue());
+    profiles=new ModuleQProfiles(profileList);
+  }
+  return profiles;
+}

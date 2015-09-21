@@ -1,0 +1,19 @@
+{
+  Collection<String> qProfileKeys=getKeys(qProfiles);
+  Map<String,Rule> loadedRulesByKey=new HashMap<>();
+  try {
+    for (    String qProfileKey : qProfileKeys) {
+      Collection<Rule> qProfileRules;
+      qProfileRules=load(loader,qProfileKey);
+      for (      Rule r : qProfileRules) {
+        if (!loadedRulesByKey.containsKey(r.getKey())) {
+          loadedRulesByKey.put(r.getKey(),r);
+        }
+      }
+    }
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Error loading active rules",e);
+  }
+  return transform(loadedRulesByKey.values());
+}

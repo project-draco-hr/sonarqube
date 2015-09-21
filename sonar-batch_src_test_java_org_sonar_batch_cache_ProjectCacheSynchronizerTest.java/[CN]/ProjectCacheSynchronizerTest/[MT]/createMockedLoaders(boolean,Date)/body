@@ -1,0 +1,17 @@
+{
+  issuesLoader=mock(DefaultServerIssuesLoader.class);
+  userRepositoryLoader=mock(UserRepositoryLoader.class);
+  qualityProfileLoader=mock(DefaultQualityProfileLoader.class);
+  activeRulesLoader=mock(DefaultActiveRulesLoader.class);
+  projectRepositoriesLoader=mock(DefaultProjectRepositoriesLoader.class);
+  QualityProfile pf=QualityProfile.newBuilder().setKey("profile").setName("profile").setLanguage("lang").build();
+  org.sonarqube.ws.Rules.Rule ar=org.sonarqube.ws.Rules.Rule.newBuilder().build();
+  ProjectRepositories repo=mock(ProjectRepositories.class);
+  when(qualityProfileLoader.load(PROJECT_KEY,null,null)).thenReturn(ImmutableList.of(pf));
+  when(qualityProfileLoader.loadDefault(null)).thenReturn(ImmutableList.of(pf));
+  when(activeRulesLoader.load("profile",null)).thenReturn(ImmutableList.of(ar));
+  when(repo.lastAnalysisDate()).thenReturn(lastAnalysisDate);
+  when(repo.exists()).thenReturn(projectExists);
+  when(projectRepositoriesLoader.load(anyString(),anyBoolean(),any(MutableBoolean.class))).thenReturn(repo);
+  return new ProjectCacheSynchronizer(qualityProfileLoader,projectRepositoriesLoader,activeRulesLoader,issuesLoader,userRepositoryLoader,cacheStatus);
+}

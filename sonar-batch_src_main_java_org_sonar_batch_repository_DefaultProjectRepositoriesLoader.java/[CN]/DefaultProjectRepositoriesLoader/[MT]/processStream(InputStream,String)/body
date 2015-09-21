@@ -1,0 +1,27 @@
+{
+  try {
+    WsProjectResponse response=WsProjectResponse.parseFrom(is);
+    Table<String,String,FileData> fileDataTable=HashBasedTable.create();
+    Table<String,String,String> settings=HashBasedTable.create();
+    Map<String,Settings> settingsByModule=response.getSettingsByModule();
+    for (    Map.Entry<String,Settings> e1 : settingsByModule.entrySet()) {
+      for (      Map.Entry<String,String> e2 : e1.getValue().getSettings().entrySet()) {
+        settings.put(e1.getKey(),e2.getKey(),e2.getValue());
+      }
+    }
+    Map<String,FileDataByPath> fileDataByModuleAndPath=response.getFileDataByModuleAndPath();
+    for (    Map.Entry<String,FileDataByPath> e1 : fileDataByModuleAndPath.entrySet()) {
+      for (      Map.Entry<String,org.sonarqube.ws.WsScanner.WsProjectResponse.FileData> e2 : e1.getValue().getFileDataByPath().entrySet()) {
+        FileData fd=new FileData(e2.getValue().getHash(),e2.getValue().getRevision());
+        fileDataTable.put(e1.getKey(),e2.getKey(),fd);
+      }
+    }
+    return new ProjectRepositories(settings,fileDataTable,new Date(response.getLastAnalysisDate()));
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Couldn't load project settings for " + projectKey,e);
+  }
+ finally {
+    IOUtils.closeQuietly(is);
+  }
+}

@@ -1,9 +1,12 @@
 {
   Profiler profiler=Profiler.create(Loggers.get(ProjectCacheSynchronizer.class));
   profiler.startInfo("Load default quality profiles");
-  Collection<QProfile> qProfiles=qualityProfileLoader.load(null,null);
+  Collection<QualityProfile> qProfiles=qualityProfileLoader.loadDefault(null);
   profiler.stopInfo();
   profiler.startInfo("Load default active rules");
-  activeRulesLoader.load(getKeys(qProfiles),null);
+  Collection<String> keys=getKeys(qProfiles);
+  for (  String k : keys) {
+    activeRulesLoader.load(k,null);
+  }
   profiler.stopInfo();
 }

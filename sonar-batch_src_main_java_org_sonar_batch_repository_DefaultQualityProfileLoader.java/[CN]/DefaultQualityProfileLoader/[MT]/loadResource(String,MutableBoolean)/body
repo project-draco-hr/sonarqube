@@ -1,0 +1,20 @@
+{
+  WSLoaderResult<InputStream> result=wsLoader.loadStream(url);
+  if (fromCache != null) {
+    fromCache.setValue(result.isFromCache());
+  }
+  InputStream is=result.get();
+  WsSearchResponse profiles=null;
+  try {
+    profiles=WsSearchResponse.parseFrom(is);
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Failed to load quality profiles",e);
+  }
+ finally {
+    IOUtils.closeQuietly(is);
+  }
+  List<QualityProfile> profilesList=profiles.getProfilesList();
+  validate(profilesList);
+  return profilesList;
+}
