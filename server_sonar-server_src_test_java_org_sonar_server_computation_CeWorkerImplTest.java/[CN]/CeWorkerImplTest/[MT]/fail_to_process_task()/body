@@ -3,6 +3,9 @@
   when(queue.peek()).thenReturn(Optional.of(task));
   doThrow(new IllegalStateException()).when(taskProcessor).process(task);
   underTest.run();
-  verify(taskProcessor).process(task);
-  verify(queue).remove(task,CeActivityDto.Status.FAILED);
+  InOrder inOrder=Mockito.inOrder(ceLogging,taskProcessor,queue);
+  inOrder.verify(ceLogging).initForTask(task);
+  inOrder.verify(taskProcessor).process(task);
+  inOrder.verify(queue).remove(task,CeActivityDto.Status.FAILED);
+  inOrder.verify(ceLogging).clearForTask();
 }

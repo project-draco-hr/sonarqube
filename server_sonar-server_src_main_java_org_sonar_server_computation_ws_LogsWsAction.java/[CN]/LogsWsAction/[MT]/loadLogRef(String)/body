@@ -1,0 +1,17 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    Optional<CeQueueDto> queueDto=dbClient.ceQueueDao().selectByUuid(dbSession,taskUuid);
+    if (queueDto.isPresent()) {
+      return LogFileRef.from(queueDto.get());
+    }
+    Optional<CeActivityDto> activityDto=dbClient.ceActivityDao().selectByUuid(dbSession,taskUuid);
+    if (activityDto.isPresent()) {
+      return LogFileRef.from(activityDto.get());
+    }
+    throw new NotFoundException(format("Task %s not found",taskUuid));
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

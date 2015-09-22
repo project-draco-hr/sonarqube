@@ -1,0 +1,14 @@
+{
+  File dataDir=temp.newFolder();
+  Settings settings=new Settings();
+  settings.setProperty(ProcessProperties.PATH_DATA,dataDir.getAbsolutePath());
+  CeLogging underTest=new CeLogging(settings);
+  LogFileRef ref=new LogFileRef("TYPE1","TASK1","COMPONENT1");
+  Optional<File> file=underTest.getFile(ref);
+  assertThat(file.isPresent()).isFalse();
+  File logFile=new File(dataDir,"ce/logs/" + ref.getRelativePath());
+  FileUtils.touch(logFile);
+  file=underTest.getFile(ref);
+  assertThat(file.isPresent()).isTrue();
+  assertThat(file.get()).isEqualTo(logFile);
+}

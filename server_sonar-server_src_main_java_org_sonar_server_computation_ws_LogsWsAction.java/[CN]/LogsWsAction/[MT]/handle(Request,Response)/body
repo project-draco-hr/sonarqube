@@ -1,0 +1,12 @@
+{
+  userSession.checkGlobalPermission(UserRole.ADMIN);
+  String taskUuid=wsRequest.mandatoryParam(PARAM_TASK_UUID);
+  LogFileRef ref=loadLogRef(taskUuid);
+  Optional<File> logFile=ceLogging.getFile(ref);
+  if (logFile.isPresent()) {
+    writeFile(logFile.get(),wsResponse);
+  }
+ else {
+    throw new NotFoundException(format("Logs of task %s not found",taskUuid));
+  }
+}
