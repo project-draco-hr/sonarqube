@@ -1,5 +1,8 @@
 {
-  BatchReport.Metadata metadata=reportReader.readMetadata();
-  treeRootHolder.setRoot(buildComponentRoot(metadata));
-  analysisMetadataHolder.setAnalysisDate(new Date(metadata.getAnalysisDate()));
+  analysisMetadataHolder.setAnalysisDate(new Date(reportReader.readMetadata().getAnalysisDate()));
+  BatchReport.Metadata reportMetadata=reportReader.readMetadata();
+  String branch=reportMetadata.hasBranch() ? reportMetadata.getBranch() : null;
+  BatchReport.Component reportProject=reportReader.readComponent(reportMetadata.getRootComponentRef());
+  UuidFactory uuidFactory=new UuidFactory(dbClient,moduleKey(reportProject,branch));
+  treeRootHolder.setRoot(new ComponentRootBuilder(reportProject,uuidFactory,branch).build());
 }
