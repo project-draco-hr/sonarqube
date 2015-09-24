@@ -1,5 +1,5 @@
 {
-  LOGGER.trace("Visitor '{}' is currently visiting component {}",visitor,component);
+  Profiler profiler=Profiler.create(Loggers.get(visitor.getWrappedVisitor().getClass())).startTrace("Visiting component {}",component.getKey());
   visitor.visitAny(component);
 switch (component.getType()) {
 case PROJECT:
@@ -26,4 +26,6 @@ break;
 default :
 throw new IllegalStateException(String.format("Unknown type %s",component.getType().name()));
 }
+long duration=profiler.stopTrace();
+incrementDuration(visitor,duration);
 }
