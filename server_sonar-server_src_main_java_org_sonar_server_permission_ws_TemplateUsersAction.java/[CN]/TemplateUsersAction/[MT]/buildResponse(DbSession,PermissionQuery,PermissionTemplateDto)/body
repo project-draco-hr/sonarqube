@@ -1,0 +1,10 @@
+{
+  List<UserWithPermissionDto> usersWithPermission=dbClient.permissionTemplateDao().selectUsers(dbSession,query,template.getId(),offset(query),query.pageSize());
+  int total=dbClient.permissionTemplateDao().countUsers(dbSession,query,template.getId());
+  WsTemplateUsersResponse.Builder responseBuilder=WsTemplateUsersResponse.newBuilder();
+  for (  UserWithPermissionDto userWithPermission : usersWithPermission) {
+    responseBuilder.addUsers(userDtoToUserResponse(userWithPermission));
+  }
+  responseBuilder.getPagingBuilder().setPageIndex(query.pageIndex()).setPageSize(query.pageSize()).setTotal(total).build();
+  return responseBuilder.build();
+}
