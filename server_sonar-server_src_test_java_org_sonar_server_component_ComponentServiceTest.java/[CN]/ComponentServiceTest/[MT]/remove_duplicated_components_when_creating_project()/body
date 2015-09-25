@@ -1,0 +1,23 @@
+{
+  String projectKey="PROJECT_KEY";
+  userSessionRule.login("john").setGlobalPermissions(PROVISIONING);
+  DbSession session=mock(DbSession.class);
+  ComponentDao componentDao=mock(ComponentDao.class);
+  when(componentDao.selectByKey(session,projectKey)).thenReturn(Optional.<ComponentDto>absent());
+  DbClient dbClient=mock(DbClient.class);
+  when(dbClient.openSession(false)).thenReturn(session);
+  when(dbClient.componentDao()).thenReturn(componentDao);
+  when(dbClient.componentIndexDao()).thenReturn(mock(ResourceIndexDao.class));
+  doAnswer(new Answer<Object>(){
+    public Object answer(    InvocationOnMock invocation){
+      ((ComponentDto)invocation.getArguments()[1]).setId(1L);
+      return null;
+    }
+  }
+).when(componentDao).insert(eq(session),any(ComponentDto.class));
+  when(componentDao.selectComponentsHavingSameKeyOrderedById(session,projectKey)).thenReturn(newArrayList(ComponentTesting.newProjectDto().setId(1L).setKey(projectKey),ComponentTesting.newProjectDto().setId(2L).setKey(projectKey),ComponentTesting.newProjectDto().setId(3L).setKey(projectKey)));
+  service=new ComponentService(dbClient,i18n,userSessionRule,System2.INSTANCE,new ComponentFinder(dbClient));
+  service.create(NewComponent.create(projectKey,projectKey));
+  verify(componentDao).delete(session,2L);
+  verify(componentDao).delete(session,3L);
+}
