@@ -1,0 +1,20 @@
+{
+  BatchReportWriter writer=new BatchReportWriter(temp.newFolder());
+  Map<String,String> env=new HashMap<>();
+  env.put(FOO,"BAR");
+  env.put(BIZ,"BAZ");
+  when(system2.envVariables()).thenReturn(env);
+  publisher.init(writer);
+  String content=FileUtils.readFileToString(writer.getFileStructure().analysisLog());
+  assertThat(content).containsOnlyOnce(FOO);
+  assertThat(content).containsOnlyOnce(BIZ);
+  Settings settings=new Settings();
+  settings.setProperty("env." + FOO,"BAR");
+  settings.setProperty("env.another","world");
+  publisher.dumpSettings(ProjectDefinition.create().setProperty("sonar.projectKey","foo"),settings);
+  content=FileUtils.readFileToString(writer.getFileStructure().analysisLog());
+  assertThat(content).containsOnlyOnce("env.another");
+  assertThat(content).containsOnlyOnce(FOO);
+  assertThat(content).containsOnlyOnce(BIZ);
+  assertThat(content).doesNotContain("env." + FOO);
+}

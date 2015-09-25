@@ -6,7 +6,7 @@
   try (BufferedWriter fileWriter=Files.newBufferedWriter(analysisLog.toPath(),StandardCharsets.UTF_8,StandardOpenOption.WRITE,StandardOpenOption.APPEND)){
     fileWriter.append(String.format("Settings for module: %s",moduleDefinition.getKey())).append('\n');
     for (    Map.Entry<String,String> prop : settings.getProperties().entrySet()) {
-      if (System.getProperties().containsKey(prop.getKey()) && !prop.getKey().startsWith(SONAR_PROP_PREFIX)) {
+      if (alreadyLoggedAsSystemProp(prop) || alreadyLoggedAsEnv(prop)) {
         continue;
       }
       fileWriter.append(String.format("  - %s=%s",prop.getKey(),sensitive(prop.getKey()) ? "******" : prop.getValue())).append('\n');
