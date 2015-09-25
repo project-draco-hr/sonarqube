@@ -1,5 +1,11 @@
 {
-  thrown.expect(IllegalStateException.class);
-  thrown.expectMessage("Two modules have the same id: module1");
-  loadProjectDefinition("multi-module-repeated-id");
+  ProjectDefinition rootProject=loadProjectDefinition("multi-module-repeated-id");
+  List<ProjectDefinition> modules=rootProject.getSubProjects();
+  assertThat(modules.size()).isEqualTo(1);
+  ProjectDefinition module1=modules.get(0);
+  assertThat(module1.getKey()).isEqualTo("com.foo.project:module1");
+  assertThat(module1.getName()).isEqualTo("Foo Module 1");
+  ProjectDefinition module1_module1=module1.getSubProjects().get(0);
+  assertThat(module1_module1.getKey()).isEqualTo("com.foo.project:module1:module1");
+  assertThat(module1_module1.getName()).isEqualTo("Foo Sub Module 1");
 }

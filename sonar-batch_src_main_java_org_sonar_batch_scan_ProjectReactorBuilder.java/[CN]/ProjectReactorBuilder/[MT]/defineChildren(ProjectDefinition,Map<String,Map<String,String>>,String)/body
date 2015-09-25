@@ -2,10 +2,11 @@
   Map<String,String> parentProps=parentProject.properties();
   if (parentProps.containsKey(PROPERTY_MODULES)) {
     for (    String moduleId : getListFromProperty(parentProps,PROPERTY_MODULES)) {
-      Map<String,String> moduleProps=propertiesByModuleId.get(moduleId);
+      String moduleIdPath=parentModuleIdPath.isEmpty() ? moduleId : (parentModuleIdPath + "." + moduleId);
+      Map<String,String> moduleProps=propertiesByModuleIdPath.get(moduleIdPath);
       ProjectDefinition childProject=loadChildProject(parentProject,moduleProps,moduleId);
       checkUniquenessOfChildKey(childProject,parentProject);
-      defineChildren(childProject,propertiesByModuleId);
+      defineChildren(childProject,propertiesByModuleIdPath,moduleIdPath);
       parentProject.addSubProject(childProject);
     }
   }

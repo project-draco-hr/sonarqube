@@ -1,12 +1,12 @@
 {
   Profiler profiler=Profiler.create(LOG).startInfo("Process project properties");
-  Map<String,Map<String,String>> propertiesByModuleId=new HashMap<>();
-  extractPropertiesByModule(propertiesByModuleId,"",taskProps.properties());
-  ProjectDefinition rootProject=defineRootProject(propertiesByModuleId.get(""),null);
+  Map<String,Map<String,String>> propertiesByModuleIdPath=new HashMap<>();
+  extractPropertiesByModule(propertiesByModuleIdPath,"","",taskProps.properties());
+  ProjectDefinition rootProject=defineRootProject(propertiesByModuleIdPath.get(""),null);
   rootProjectWorkDir=rootProject.getWorkDir();
-  defineChildren(rootProject,propertiesByModuleId);
+  defineChildren(rootProject,propertiesByModuleIdPath,"");
   cleanAndCheckProjectDefinitions(rootProject);
-  taskProps.properties().putAll(propertiesByModuleId.get(""));
+  taskProps.properties().putAll(propertiesByModuleIdPath.get(""));
   profiler.stopDebug();
   return new ProjectReactor(rootProject);
 }
