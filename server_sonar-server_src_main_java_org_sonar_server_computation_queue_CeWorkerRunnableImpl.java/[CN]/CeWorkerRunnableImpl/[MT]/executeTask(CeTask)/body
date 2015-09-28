@@ -1,16 +1,20 @@
 {
+  Profiler regularProfiler=startProfiler(task);
   ceLogging.initForTask(task);
-  Profiler profiler=Profiler.create(LOG).startInfo(format("Analysis of project %s (report %s)",task.getComponentKey(),task.getUuid()));
+  Profiler ceProfiler=startProfiler(task);
+  CeActivityDto.Status status=CeActivityDto.Status.FAILED;
   try {
     reportTaskProcessor.process(task);
-    queue.remove(task,CeActivityDto.Status.SUCCESS);
+    status=CeActivityDto.Status.SUCCESS;
+    queue.remove(task,status);
   }
  catch (  Throwable e) {
     LOG.error(format("Failed to process task %s",task.getUuid()),e);
-    queue.remove(task,CeActivityDto.Status.FAILED);
+    queue.remove(task,status);
   }
  finally {
-    profiler.stopInfo(String.format("Total thread execution of project %s (report %s)",task.getComponentUuid(),task.getUuid()));
+    stopProfiler(ceProfiler,task,status);
     ceLogging.clearForTask();
+    stopProfiler(regularProfiler,task,status);
   }
 }
