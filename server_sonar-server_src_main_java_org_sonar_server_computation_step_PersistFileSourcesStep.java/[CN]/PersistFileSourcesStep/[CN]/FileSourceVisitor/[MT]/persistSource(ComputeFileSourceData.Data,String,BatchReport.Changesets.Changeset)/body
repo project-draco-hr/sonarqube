@@ -6,7 +6,7 @@
   String lineHashes=fileSourceData.getLineHashes();
   FileSourceDto previousDto=previousFileSourcesByUuid.get(componentUuid);
   if (previousDto == null) {
-    FileSourceDto dto=new FileSourceDto().setProjectUuid(projectUuid).setFileUuid(componentUuid).setDataType(Type.SOURCE).setBinaryData(data).setSrcHash(srcHash).setDataHash(dataHash).setLineHashes(lineHashes).setCreatedAt(system2.now()).setUpdatedAt(system2.now());
+    FileSourceDto dto=new FileSourceDto().setProjectUuid(projectUuid).setFileUuid(componentUuid).setDataType(Type.SOURCE).setBinaryData(data).setSrcHash(srcHash).setDataHash(dataHash).setLineHashes(lineHashes).setCreatedAt(system2.now()).setUpdatedAt(system2.now()).setRevision(computeRevision(latestChange));
     dbClient.fileSourceDao().insert(session,dto);
     session.commit();
   }
@@ -14,7 +14,7 @@
     boolean binaryDataUpdated=!dataHash.equals(previousDto.getDataHash());
     boolean srcHashUpdated=!srcHash.equals(previousDto.getSrcHash());
     if (binaryDataUpdated || srcHashUpdated) {
-      previousDto.setBinaryData(data).setDataHash(dataHash).setSrcHash(srcHash).setLineHashes(lineHashes).setUpdatedAt(system2.now());
+      previousDto.setBinaryData(data).setDataHash(dataHash).setSrcHash(srcHash).setLineHashes(lineHashes).setRevision(computeRevision(previousDto,latestChange)).setUpdatedAt(system2.now());
       dbClient.fileSourceDao().update(previousDto);
       session.commit();
     }
