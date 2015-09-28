@@ -1,0 +1,19 @@
+{
+  dbClient=db.getDbClient();
+  dbSession=db.getSession();
+  underTest=new TemplateGroupsAction(dbClient,userSession,new PermissionDependenciesFinder(dbClient,new ComponentFinder(dbClient)));
+  ws=new WsActionTester(underTest);
+  userSession.login("login").setGlobalPermissions(SYSTEM_ADMIN);
+  template1=dbClient.permissionTemplateDao().insert(dbSession,newPermissionTemplateDto().setUuid("template-uuid-1"));
+  template2=dbClient.permissionTemplateDao().insert(dbSession,newPermissionTemplateDto().setUuid("template-uuid-2"));
+  GroupDto group1=insertGroup(new GroupDto().setName("group-1-name").setDescription("group-1-description"));
+  GroupDto group2=insertGroup(new GroupDto().setName("group-2-name").setDescription("group-2-description"));
+  GroupDto group3=insertGroup(new GroupDto().setName("group-3-name").setDescription("group-3-description"));
+  addGroupToTemplate(newPermissionTemplateGroup(UserRole.USER,template1.getId(),group1.getId()));
+  addGroupToTemplate(newPermissionTemplateGroup(UserRole.USER,template1.getId(),group2.getId()));
+  addGroupToTemplate(newPermissionTemplateGroup(UserRole.USER,template1.getId(),null));
+  addGroupToTemplate(newPermissionTemplateGroup(UserRole.ADMIN,template1.getId(),group3.getId()));
+  addGroupToTemplate(newPermissionTemplateGroup(UserRole.USER,template2.getId(),group1.getId()));
+  addGroupToTemplate(newPermissionTemplateGroup(UserRole.USER,template2.getId(),group2.getId()));
+  commit();
+}
