@@ -4,14 +4,6 @@
     throw new IllegalArgumentException(String.format("Component '%s' is not a file",component));
   }
   Optional<CloseableIterator<String>> linesIteratorOptional=reportReader.readFileSource(component.getReportAttributes().getRef());
-  if (linesIteratorOptional.isPresent()) {
-    return linesIteratorOptional.get();
-  }
-  DbSession session=dbClient.openSession(false);
-  try {
-    return readLinesFromDb(session,component);
-  }
-  finally {
-    dbClient.closeSession(session);
-  }
+  checkState(linesIteratorOptional.isPresent(),String.format("File '%s' has no source code",component));
+  return linesIteratorOptional.get();
 }

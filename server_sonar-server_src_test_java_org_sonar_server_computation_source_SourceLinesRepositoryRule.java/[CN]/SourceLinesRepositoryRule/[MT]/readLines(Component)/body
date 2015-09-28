@@ -1,7 +1,9 @@
 {
-  Preconditions.checkNotNull(component,"Component should not be bull");
+  checkNotNull(component,"Component should not be bull");
   if (!component.getType().equals(FILE)) {
     throw new IllegalArgumentException(String.format("Component '%s' is not a file",component));
   }
-  return CloseableIterator.from(lines.iterator());
+  Collection<String> componentLines=lines.get(component.getReportAttributes().getRef());
+  checkState(!componentLines.isEmpty(),String.format("File '%s' has no source code",component));
+  return CloseableIterator.from(componentLines.iterator());
 }
