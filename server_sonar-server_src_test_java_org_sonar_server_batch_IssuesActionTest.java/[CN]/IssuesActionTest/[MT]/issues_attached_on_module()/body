@@ -1,0 +1,23 @@
+{
+  ComponentDto project=ComponentTesting.newProjectDto("ABCD").setKey(PROJECT_KEY);
+  ComponentDto module=ComponentTesting.newModuleDto("BCDE",project).setKey(MODULE_KEY);
+  db.getDbClient().componentDao().insert(db.getSession(),project,module);
+  db.getSession().commit();
+  indexIssues(IssueTesting.newDoc("EFGH",module).setRuleKey("squid:AvoidCycle").setSeverity("BLOCKER").setStatus("RESOLVED").setResolution("FALSE-POSITIVE").setManualSeverity(false).setMessage("Do not use this method").setLine(200).setChecksum("123456").setAssignee("john"));
+  userSessionRule.login("henry").setGlobalPermissions(GlobalPermissions.PREVIEW_EXECUTION);
+  WsTester.TestRequest request=tester.newGetRequest("batch","issues").setParam("key",MODULE_KEY);
+  ServerIssue previousIssue=ServerIssue.parseDelimitedFrom(new ByteArrayInputStream(request.execute().output()));
+  assertThat(previousIssue.getKey()).isEqualTo("EFGH");
+  assertThat(previousIssue.getModuleKey()).isEqualTo(MODULE_KEY);
+  assertThat(previousIssue.hasPath()).isFalse();
+  assertThat(previousIssue.getRuleRepository()).isEqualTo("squid");
+  assertThat(previousIssue.getRuleKey()).isEqualTo("AvoidCycle");
+  assertThat(previousIssue.getLine()).isEqualTo(200);
+  assertThat(previousIssue.getMsg()).isEqualTo("Do not use this method");
+  assertThat(previousIssue.getResolution()).isEqualTo("FALSE-POSITIVE");
+  assertThat(previousIssue.getStatus()).isEqualTo("RESOLVED");
+  assertThat(previousIssue.getSeverity()).isEqualTo(Severity.BLOCKER);
+  assertThat(previousIssue.getManualSeverity()).isFalse();
+  assertThat(previousIssue.getChecksum()).isEqualTo("123456");
+  assertThat(previousIssue.getAssigneeLogin()).isEqualTo("john");
+}
