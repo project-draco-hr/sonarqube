@@ -2,8 +2,9 @@
   when(queue.prepareSubmit()).thenReturn(new CeTaskSubmit.Builder("TASK_1"));
   userSession.setGlobalPermissions(GlobalPermissions.SCAN_EXECUTION,GlobalPermissions.PROVISIONING);
   when(componentService.getNullableByKey("MY_PROJECT")).thenReturn(null);
-  when(componentService.create(any(NewComponent.class))).thenReturn(new ComponentDto().setUuid("P1"));
+  when(componentService.create(any(NewComponent.class))).thenReturn(new ComponentDto().setUuid("P1").setKey("MY_PROJECT"));
   underTest.submit("MY_PROJECT",null,"My Project",IOUtils.toInputStream("{binary}"));
+  verify(permissionService).applyDefaultPermissionTemplate("MY_PROJECT");
   verify(queue).submit(argThat(new TypeSafeMatcher<CeTaskSubmit>(){
     @Override protected boolean matchesSafely(    CeTaskSubmit submit){
       return submit.getType().equals(CeTaskTypes.REPORT) && submit.getComponentUuid().equals("P1") && submit.getUuid().equals("TASK_1");
