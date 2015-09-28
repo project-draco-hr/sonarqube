@@ -1,16 +1,14 @@
 {
+  if ("constant_resource".equals(function)) {
+    validationMessages.addWarningText(String.format("Constant/file function is no longer used, technical debt definitions on '%s' are ignored.",ruleKey));
+    return null;
+  }
   if ("linear_threshold".equals(function) && coefficient != null) {
     validationMessages.addWarningText(String.format("Linear with threshold function is no longer used, remediation function of '%s' is replaced by linear.",ruleKey));
-    return new RuleDebt().setRuleKey(ruleKey).setFunction(DebtRemediationFunction.Type.LINEAR.name()).setCoefficient(coefficient);
+    return createRuleDebt(ruleKey,LINEAR.name(),coefficient,null,validationMessages);
   }
- else   if ("constant_resource".equals(function)) {
-    validationMessages.addWarningText(String.format("Constant/file function is no longer used, technical debt definitions on '%s' are ignored.",ruleKey));
+  if (CONSTANT_ISSUE.name().equalsIgnoreCase(function) && coefficient != null && offset == null) {
+    return createRuleDebt(ruleKey,CONSTANT_ISSUE.name(),null,coefficient,validationMessages);
   }
- else   if (DebtRemediationFunction.Type.CONSTANT_ISSUE.name().equalsIgnoreCase(function) && coefficient != null && offset == null) {
-    return new RuleDebt().setRuleKey(ruleKey).setFunction(DebtRemediationFunction.Type.CONSTANT_ISSUE.name()).setOffset(coefficient);
-  }
- else {
-    return new RuleDebt().setRuleKey(ruleKey).setFunction(function.toUpperCase()).setCoefficient(coefficient).setOffset(offset);
-  }
-  return null;
+  return new RuleDebt().setRuleKey(ruleKey).setFunction(function.toUpperCase()).setCoefficient(coefficient).setOffset(offset);
 }
