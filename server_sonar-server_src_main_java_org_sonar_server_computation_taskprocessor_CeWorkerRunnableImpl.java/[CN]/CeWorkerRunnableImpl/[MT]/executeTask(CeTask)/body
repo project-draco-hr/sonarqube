@@ -1,0 +1,27 @@
+{
+  Profiler regularProfiler=startProfiler(task);
+  ceLogging.initForTask(task);
+  Profiler ceProfiler=startProfiler(task);
+  CeActivityDto.Status status=CeActivityDto.Status.FAILED;
+  try {
+    Optional<CeTaskProcessor> taskProcessor=taskProcessorRepository.getForCeTask(task);
+    if (taskProcessor.isPresent()) {
+      taskProcessor.get().process(task);
+      status=CeActivityDto.Status.SUCCESS;
+    }
+ else {
+      LOG.error("No CeTaskProcessor is defined for task of type {}. Plugin configuration may have changed",task.getType());
+      status=CeActivityDto.Status.FAILED;
+    }
+    queue.remove(task,status);
+  }
+ catch (  Throwable e) {
+    LOG.error(format("Failed to execute task %s",task.getUuid()),e);
+    queue.remove(task,status);
+  }
+ finally {
+    stopProfiler(ceProfiler,task,status);
+    ceLogging.clearForTask();
+    stopProfiler(regularProfiler,task,status);
+  }
+}
