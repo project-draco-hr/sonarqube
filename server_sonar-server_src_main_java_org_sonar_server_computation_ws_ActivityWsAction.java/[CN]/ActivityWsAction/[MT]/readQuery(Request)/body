@@ -13,8 +13,12 @@
     userSession.checkGlobalPermission(UserRole.ADMIN);
   }
  else {
-    userSession.checkProjectUuidPermission(UserRole.USER,componentUuid);
-    query.setComponentUuid(componentUuid);
+    if (userSession.hasGlobalPermission(GlobalPermissions.SYSTEM_ADMIN) || userSession.hasComponentUuidPermission(UserRole.ADMIN,componentUuid)) {
+      query.setComponentUuid(componentUuid);
+    }
+ else {
+      throw new ForbiddenException("Requires administration permission");
+    }
   }
   return query;
 }
