@@ -1,0 +1,12 @@
+{
+  DbFileSources.Data.Builder fileDataBuilder=DbFileSources.Data.newBuilder();
+  addLine(fileDataBuilder,1,"john",123456789L,"rev-1");
+  addLine(fileDataBuilder,2,"henry",1234567810L,"rev-2");
+  addLine(fileDataBuilder,3,"john",123456789L,"rev-1");
+  fileDataBuilder.build();
+  ScmInfo scmInfo=DbScmInfo.create(FILE,fileDataBuilder.getLinesList()).get();
+  Changeset latestChangeset=scmInfo.getLatestChangeset();
+  assertThat(latestChangeset.getAuthor()).isEqualTo("henry");
+  assertThat(latestChangeset.getDate()).isEqualTo(1234567810L);
+  assertThat(latestChangeset.getRevision()).isEqualTo("rev-2");
+}

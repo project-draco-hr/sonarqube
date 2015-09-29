@@ -1,0 +1,13 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    Optional<Iterable<DbFileSources.Line>> linesOpt=sourceService.getLines(dbSession,component.getUuid(),1,Integer.MAX_VALUE);
+    if (linesOpt.isPresent()) {
+      return DbScmInfo.create(component,linesOpt.get());
+    }
+    return Optional.absent();
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

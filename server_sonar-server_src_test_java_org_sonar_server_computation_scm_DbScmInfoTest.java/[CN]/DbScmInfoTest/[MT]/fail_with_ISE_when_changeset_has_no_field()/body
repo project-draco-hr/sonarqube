@@ -1,0 +1,9 @@
+{
+  thrown.expect(IllegalStateException.class);
+  thrown.expectMessage("Partial scm information stored in DB for component 'ReportComponent{ref=1, key='FILE_KEY', type=FILE}'. " + "Not all lines have SCM info. Can not proceed");
+  DbFileSources.Data.Builder fileDataBuilder=DbFileSources.Data.newBuilder();
+  fileDataBuilder.addLinesBuilder().setLine(1);
+  fileDataBuilder.addLinesBuilder().setScmAuthor("John").setLine(2);
+  fileDataBuilder.build();
+  DbScmInfo.create(FILE,fileDataBuilder.getLinesList()).get().getAllChangesets();
+}
