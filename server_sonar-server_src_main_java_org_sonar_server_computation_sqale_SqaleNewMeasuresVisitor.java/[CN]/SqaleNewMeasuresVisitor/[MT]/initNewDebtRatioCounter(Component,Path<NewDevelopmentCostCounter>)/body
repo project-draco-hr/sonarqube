@@ -6,10 +6,11 @@
   if (!nclocDataMeasure.isPresent()) {
     return;
   }
-  BatchReport.Changesets changesets=batchReportReader.readChangesets(file.getReportAttributes().getRef());
-  if (changesets == null) {
+  Optional<ScmInfo> scmInfoOptional=scmInfoRepository.getScmInfo(file);
+  if (!scmInfoOptional.isPresent()) {
     LOG.trace(String.format("No changeset for file %s. Dev cost will be zero.",file.getKey()));
     return;
   }
-  initNewDebtRatioCounter(path.current(),file.getFileAttributes().getLanguageKey(),nclocDataMeasure.get(),changesets);
+  ScmInfo scmInfo=scmInfoOptional.get();
+  initNewDebtRatioCounter(path.current(),file.getFileAttributes().getLanguageKey(),nclocDataMeasure.get(),scmInfo);
 }
