@@ -1,9 +1,10 @@
 {
   Component fileComponent=context.getLeaf();
-  BatchReport.Changesets componentScm=batchReportReader.readChangesets(fileComponent.getReportAttributes().getRef());
-  if (componentScm == null) {
+  Optional<ScmInfo> scmInfoOptional=scmInfoRepository.getScmInfo(fileComponent);
+  if (!scmInfoOptional.isPresent()) {
     return;
   }
+  ScmInfo componentScm=scmInfoOptional.get();
   Optional<Measure> hitsByLineMeasure=context.getMeasure(metricKeys.getCoverageLineHitsData());
   if (!hitsByLineMeasure.isPresent() || hitsByLineMeasure.get().getValueType() == Measure.ValueType.NO_VALUE) {
     return;
@@ -16,8 +17,7 @@
     int hits=entry.getValue();
     int conditions=(Integer)ObjectUtils.defaultIfNull(conditionsByLine.get(lineId),0);
     int coveredConditions=(Integer)ObjectUtils.defaultIfNull(coveredConditionsByLine.get(lineId),0);
-    BatchReport.Changesets.Changeset changeset=componentScm.getChangeset(componentScm.getChangesetIndexByLine(lineId - 1));
-    Long date=changeset.hasDate() ? changeset.getDate() : null;
+    long date=componentScm.getChangesetForLine(lineId).getDate();
     analyze(context.getPeriods(),date,hits,conditions,coveredConditions);
   }
 }
