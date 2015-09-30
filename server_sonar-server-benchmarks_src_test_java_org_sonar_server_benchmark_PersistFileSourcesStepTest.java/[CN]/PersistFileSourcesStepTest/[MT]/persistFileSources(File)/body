@@ -5,7 +5,9 @@
   BatchReportDirectoryHolderImpl batchReportDirectoryHolder=new BatchReportDirectoryHolderImpl();
   batchReportDirectoryHolder.setDirectory(reportDir);
   org.sonar.server.computation.batch.BatchReportReader batchReportReader=new BatchReportReaderImpl(batchReportDirectoryHolder);
-  PersistFileSourcesStep step=new PersistFileSourcesStep(dbClient,System2.INSTANCE,treeRootHolder,batchReportReader,new SourceLinesRepositoryImpl(batchReportReader));
+  SourceService sourceService=new SourceService(dbClient,null);
+  ScmInfoRepositoryImpl scmInfoRepository=new ScmInfoRepositoryImpl(batchReportReader,dbClient,sourceService);
+  PersistFileSourcesStep step=new PersistFileSourcesStep(dbClient,System2.INSTANCE,treeRootHolder,batchReportReader,new SourceLinesRepositoryImpl(batchReportReader),scmInfoRepository);
   step.execute();
   long end=System.currentTimeMillis();
   long duration=end - start;
