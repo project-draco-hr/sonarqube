@@ -1,18 +1,31 @@
 {
   Date lastSync=cacheStatus.getSyncStatus();
+  boolean failOnError=true;
   if (lastSync != null) {
-    if (!force) {
+    if (force) {
+      LOG.info("-- Found project [{}] cache [{}], synchronizing data (forced)..",projectKey,lastSync);
+    }
+ else     if (shouldUpdate(lastSync)) {
+      LOG.info("-- Found project [{}] cache [{}], synchronizing data..",projectKey,lastSync);
+      failOnError=false;
+    }
+ else {
       LOG.info("Found project [{}] cache [{}]",projectKey,lastSync);
       return;
     }
- else {
-      LOG.info("-- Found project [{}] cache [{}], synchronizing data..",projectKey,lastSync);
-    }
-    cacheStatus.delete();
   }
  else {
     LOG.info("-- Cache for project [{}] not found, synchronizing data..",projectKey);
   }
-  loadData(projectKey);
+  try {
+    loadData(projectKey);
+  }
+ catch (  Exception e) {
+    if (failOnError) {
+      throw e;
+    }
+    LOG.warn("-- Cache update for project [{}] failed, continuing from cache..",projectKey,e);
+    return;
+  }
   saveStatus();
 }
