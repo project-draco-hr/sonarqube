@@ -1,0 +1,15 @@
+{
+  componentDb.insertProjectAndSnapshot(dbSession,newProjectDto().setName("aaaa-name"));
+  componentDb.insertProjectAndSnapshot(dbSession,newView());
+  componentDb.insertProjectAndSnapshot(dbSession,newDeveloper("project-name"));
+  for (int i=9; i >= 1; i--) {
+    componentDb.insertProjectAndSnapshot(dbSession,newProjectDto().setName("project-" + i));
+  }
+  db.commit();
+  componentDb.indexProjects();
+  ComponentQuery query=new ComponentQuery(db.database(),"oJect",Qualifiers.PROJECT);
+  List<ComponentDto> result=underTest.selectByQuery(dbSession,query,1,3);
+  assertThat(result).hasSize(3);
+  assertThat(underTest.countByQuery(dbSession,query)).isEqualTo(9);
+  assertThat(result).extracting("name").containsExactly("project-2","project-3","project-4");
+}
