@@ -1,9 +1,9 @@
 {
   if (scmChangesets == null) {
-    scmChangesets=loadScmChangesetsFromReport(component);
-    if (scmChangesets == null) {
-      scmChangesets=loadScmChangesetsFromDb(component);
+    Optional<ScmInfo> scmInfoOptional=scmInfoRepository.getScmInfo(component);
+    if (scmInfoOptional.isPresent()) {
+      scmChangesets=scmInfoOptional.get();
+      lastCommitAuthor=scmChangesets.getLatestChangeset().getAuthor();
     }
-    computeLastCommitDateAndAuthor();
   }
 }
