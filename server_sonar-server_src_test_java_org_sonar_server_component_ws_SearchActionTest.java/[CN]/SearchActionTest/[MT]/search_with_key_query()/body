@@ -1,0 +1,9 @@
+{
+  componentDb.insertComponent(newProjectDto().setKey("project-_%-key"));
+  componentDb.insertComponent(newProjectDto().setKey("project-key-without-escaped-characters"));
+  db.commit();
+  InputStream responseStream=newRequest(Qualifiers.PROJECT).setParam(Param.TEXT_QUERY,"project-_%").execute().getInputStream();
+  WsSearchResponse response=WsSearchResponse.parseFrom(responseStream);
+  assertThat(response.getComponentsCount()).isEqualTo(1);
+  assertThat(response.getComponentsList()).extracting("key").containsExactly("project-_%-key");
+}

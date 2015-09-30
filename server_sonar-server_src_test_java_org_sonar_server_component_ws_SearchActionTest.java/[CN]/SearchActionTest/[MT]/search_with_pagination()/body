@@ -1,0 +1,10 @@
+{
+  for (int i=1; i <= 9; i++) {
+    componentDb.insertComponent(newProjectDto("project-uuid-" + i).setName("Project Name " + i));
+  }
+  db.commit();
+  InputStream responseStream=newRequest(Qualifiers.PROJECT).setParam(Param.PAGE,"2").setParam(Param.PAGE_SIZE,"3").execute().getInputStream();
+  WsSearchResponse response=WsSearchResponse.parseFrom(responseStream);
+  assertThat(response.getComponentsCount()).isEqualTo(3);
+  assertThat(response.getComponentsList()).extracting("id").containsExactly("project-uuid-4","project-uuid-5","project-uuid-6");
+}
