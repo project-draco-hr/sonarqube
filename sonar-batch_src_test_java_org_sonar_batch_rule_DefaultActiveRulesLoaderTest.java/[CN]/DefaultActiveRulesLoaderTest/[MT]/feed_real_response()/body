@@ -1,8 +1,14 @@
 {
-  InputStream response=loadResource("active_rule_search.protobuf");
-  when(ws.loadStream(anyString())).thenReturn(new WSLoaderResult<InputStream>(response,false));
-  Collection<Rule> activeRules=loader.load("java-sonar-way-26368",null);
-  assertThat(activeRules).hasSize(100);
-  verify(ws).loadStream("/api/rules/search.protobuf?ps=500&f=repo,name,severity,lang,internalKey,templateKey,params&activation=true&qprofile=java-sonar-way-26368");
+  InputStream response1=loadResource("active_rule_search1.protobuf");
+  InputStream response2=loadResource("active_rule_search2.protobuf");
+  String req1="/api/rules/search.protobuf?f=repo,name,severity,lang,internalKey,templateKey,params,actives&activation=true&qprofile=java-sonar-way-26368&p=1&ps=500";
+  String req2="/api/rules/search.protobuf?f=repo,name,severity,lang,internalKey,templateKey,params,actives&activation=true&qprofile=java-sonar-way-26368&p=2&ps=500";
+  when(ws.loadStream(req1)).thenReturn(new WSLoaderResult<InputStream>(response1,false));
+  when(ws.loadStream(req2)).thenReturn(new WSLoaderResult<InputStream>(response2,false));
+  Collection<LoadedActiveRule> activeRules=loader.load("java-sonar-way-26368",null);
+  assertThat(activeRules).hasSize(226);
+  assertActiveRule(activeRules);
+  verify(ws).loadStream(req1);
+  verify(ws).loadStream(req2);
   verifyNoMoreInteractions(ws);
 }

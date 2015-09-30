@@ -1,0 +1,23 @@
+{
+  List<LoadedActiveRule> loadedRules=new LinkedList<>();
+  List<Rule> rulesList=response.getRulesList();
+  Map<String,ActiveList> actives=response.getActives().getActives();
+  for (  Rule r : rulesList) {
+    ActiveList activeList=actives.get(r.getKey());
+    Active active=activeList.getActiveList(0);
+    LoadedActiveRule loadedRule=new LoadedActiveRule();
+    Map<String,String> params=new HashMap<>();
+    loadedRule.setRuleKey(RuleKey.parse(r.getKey()));
+    loadedRule.setName(r.getName());
+    loadedRule.setSeverity(active.getSeverity());
+    loadedRule.setLanguage(r.getLang());
+    loadedRule.setInternalKey(r.getInternalKey());
+    loadedRule.setTemplateRuleKey(r.getTemplateKey());
+    for (    Param param : active.getParamsList()) {
+      params.put(param.getKey(),param.getValue());
+    }
+    loadedRule.setParams(params);
+    loadedRules.add(loadedRule);
+  }
+  return loadedRules;
+}

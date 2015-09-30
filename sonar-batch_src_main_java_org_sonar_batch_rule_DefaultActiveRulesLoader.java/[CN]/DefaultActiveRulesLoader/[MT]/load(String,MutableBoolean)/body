@@ -1,8 +1,18 @@
 {
-  WSLoaderResult<InputStream> result=wsLoader.loadStream(getUrl(qualityProfileKey));
-  List<Rule> ruleList=loadFromStream(result.get());
-  if (fromCache != null) {
-    fromCache.setValue(result.isFromCache());
+  List<LoadedActiveRule> ruleList=new LinkedList<>();
+  int page=1;
+  int pageSize=500;
+  int loaded=0;
+  while (true) {
+    WSLoaderResult<InputStream> result=wsLoader.loadStream(getUrl(qualityProfileKey,page,pageSize));
+    SearchResponse response=loadFromStream(result.get());
+    List<LoadedActiveRule> pageRules=readPage(response);
+    ruleList.addAll(pageRules);
+    loaded+=response.getPs();
+    if (response.getTotal() <= loaded) {
+      break;
+    }
+    page++;
   }
   return ruleList;
 }
