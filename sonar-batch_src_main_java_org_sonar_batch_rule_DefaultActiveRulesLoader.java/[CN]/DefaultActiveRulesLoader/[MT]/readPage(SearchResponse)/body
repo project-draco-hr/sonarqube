@@ -6,13 +6,16 @@
     ActiveList activeList=actives.get(r.getKey());
     Active active=activeList.getActiveList(0);
     LoadedActiveRule loadedRule=new LoadedActiveRule();
-    Map<String,String> params=new HashMap<>();
     loadedRule.setRuleKey(RuleKey.parse(r.getKey()));
     loadedRule.setName(r.getName());
     loadedRule.setSeverity(active.getSeverity());
     loadedRule.setLanguage(r.getLang());
     loadedRule.setInternalKey(r.getInternalKey());
     loadedRule.setTemplateRuleKey(r.getTemplateKey());
+    Map<String,String> params=new HashMap<>();
+    for (    org.sonarqube.ws.Rules.Rule.Param param : r.getParams().getParamsList()) {
+      params.put(param.getKey(),param.getDefaultValue());
+    }
     for (    Param param : active.getParamsList()) {
       params.put(param.getKey(),param.getValue());
     }
