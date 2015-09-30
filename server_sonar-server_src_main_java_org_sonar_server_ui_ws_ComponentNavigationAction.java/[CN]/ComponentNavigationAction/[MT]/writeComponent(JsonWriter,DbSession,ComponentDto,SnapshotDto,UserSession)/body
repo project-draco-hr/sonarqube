@@ -4,11 +4,11 @@
   if (dashboards.isEmpty()) {
     dashboards=activeDashboardDao.selectProjectDashboardsForUserLogin(session,ANONYMOUS);
   }
-  writeDashboards(json,component,dashboards,userSession.locale());
+  writeDashboards(json,dashboards);
   if (snapshot != null) {
     json.prop("version",snapshot.getVersion()).prop("snapshotDate",DateUtils.formatDateTime(new Date(snapshot.getCreatedAt())));
-    String[] availableMeasures=dbClient.measureDao().selectMetricKeysForSnapshot(session,snapshot.getId()).toArray(new String[0]);
-    List<ViewProxy<Page>> pages=views.getPages(NavigationSection.RESOURCE,component.scope(),component.qualifier(),component.language(),availableMeasures);
+    List<String> availableMeasures=dbClient.measureDao().selectMetricKeysForSnapshot(session,snapshot.getId());
+    List<ViewProxy<Page>> pages=views.getPages(NavigationSection.RESOURCE,component.scope(),component.qualifier(),component.language(),availableMeasures.toArray(new String[availableMeasures.size()]));
     writeExtensions(json,component,pages,userSession.locale());
   }
 }
