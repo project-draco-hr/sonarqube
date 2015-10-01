@@ -1,6 +1,10 @@
 {
   userSession.checkGlobalPermission(GlobalPermissions.PROVISIONING);
-  ComponentDto project=createProject(newComponent);
-  removeDuplicatedProjects(project.getKey());
-  return project;
+  DbSession session=dbClient.openSession(false);
+  try {
+    return create(session,newComponent);
+  }
+  finally {
+    dbClient.closeSession(session);
+  }
 }
