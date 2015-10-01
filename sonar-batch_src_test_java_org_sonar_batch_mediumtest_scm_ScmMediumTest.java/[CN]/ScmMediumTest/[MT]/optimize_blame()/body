@@ -1,0 +1,20 @@
+{
+  File baseDir=prepareProject();
+  File changedContentScmOnServer=new File(baseDir,CHANGED_CONTENT_SCM_ON_SERVER_XOO);
+  FileUtils.write(changedContentScmOnServer,SAMPLE_XOO_CONTENT + "\nchanged");
+  File xooScmFile=new File(baseDir,CHANGED_CONTENT_SCM_ON_SERVER_XOO + ".scm");
+  FileUtils.write(xooScmFile,"1,foo,2013-01-04\n" + "1,bar,2013-01-04\n" + "2,biz,2014-01-04\n");
+  File sameContentScmOnServer=new File(baseDir,SAME_CONTENT_SCM_ON_SERVER_XOO);
+  FileUtils.write(sameContentScmOnServer,SAMPLE_XOO_CONTENT);
+  File sameContentNoScmOnServer=new File(baseDir,SAME_CONTENT_NO_SCM_ON_SERVER_XOO);
+  FileUtils.write(sameContentNoScmOnServer,SAMPLE_XOO_CONTENT);
+  xooScmFile=new File(baseDir,SAME_CONTENT_NO_SCM_ON_SERVER_XOO + ".scm");
+  FileUtils.write(xooScmFile,"1,foo,2013-01-04\n" + "1,bar,2013-01-04\n");
+  tester.newTask().properties(ImmutableMap.<String,String>builder().put("sonar.task","scan").put("sonar.projectBaseDir",baseDir.getAbsolutePath()).put("sonar.projectKey","com.foo.project").put("sonar.projectName","Foo Project").put("sonar.projectVersion","1.0-SNAPSHOT").put("sonar.projectDescription","Description of Foo Project").put("sonar.sources","src").put("sonar.scm.provider","xoo").build()).start();
+  assertThat(getChangesets(baseDir,"src/sample.xoo")).isNotNull();
+  assertThat(getChangesets(baseDir,CHANGED_CONTENT_SCM_ON_SERVER_XOO)).isNotNull();
+  assertThat(getChangesets(baseDir,SAME_CONTENT_SCM_ON_SERVER_XOO)).isNull();
+  assertThat(getChangesets(baseDir,SAME_CONTENT_NO_SCM_ON_SERVER_XOO)).isNotNull();
+  assertThat(logTester.logs()).containsSubsequence("3 files to be analyzed","3/3 files analyzed");
+  assertThat(logTester.logs()).doesNotContain(MISSING_BLAME_INFORMATION_FOR_THE_FOLLOWING_FILES);
+}

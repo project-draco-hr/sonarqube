@@ -4,12 +4,12 @@
   }
   List<InputFile> filesToBlame=new LinkedList<>();
   for (  InputFile f : fs.inputFiles(fs.predicates().all())) {
-    if (configuration.forceReloadAll()) {
+    if (configuration.forceReloadAll() || f.status() != Status.SAME) {
       addIfNotEmpty(filesToBlame,f);
     }
  else {
-      FileData fileData=projectSettings.fileData(projectDefinition.getKeyWithBranch(),f.relativePath());
-      if (f.status() != Status.SAME || fileData == null || fileData.revision() != null) {
+      FileData fileData=projectRepositories.fileData(projectDefinition.getKeyWithBranch(),f.relativePath());
+      if (StringUtils.isEmpty(fileData.revision())) {
         addIfNotEmpty(filesToBlame,f);
       }
     }

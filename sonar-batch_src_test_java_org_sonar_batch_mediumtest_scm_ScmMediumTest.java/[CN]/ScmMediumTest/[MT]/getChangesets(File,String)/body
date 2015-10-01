@@ -3,7 +3,11 @@
   BatchReportReader reader=new BatchReportReader(reportDir);
   Component project=reader.readComponent(reader.readMetadata().getRootComponentRef());
   Component dir=reader.readComponent(project.getChildRef(0));
-  Component file=reader.readComponent(dir.getChildRef(fileId));
-  BatchReport.Changesets fileScm=reader.readChangesets(file.getRef());
-  return fileScm;
+  for (  Integer fileRef : dir.getChildRefList()) {
+    Component file=reader.readComponent(fileRef);
+    if (file.getPath().equals(path)) {
+      return reader.readChangesets(file.getRef());
+    }
+  }
+  return null;
 }

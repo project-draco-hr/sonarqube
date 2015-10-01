@@ -1,0 +1,11 @@
+{
+  File baseDir=prepareProject();
+  File xooFileWithoutBlame=new File(baseDir,"src/sample_no_blame.xoo");
+  FileUtils.write(xooFileWithoutBlame,"Sample xoo\ncontent\n3\n4\n5");
+  tester.newTask().properties(ImmutableMap.<String,String>builder().put("sonar.task","scan").put("sonar.projectBaseDir",baseDir.getAbsolutePath()).put("sonar.projectKey","com.foo.project").put("sonar.projectName","Foo Project").put("sonar.projectVersion","1.0-SNAPSHOT").put("sonar.projectDescription","Description of Foo Project").put("sonar.sources","src").put("sonar.scm.provider","xoo").build()).start();
+  BatchReport.Changesets file1Scm=getChangesets(baseDir,"src/sample.xoo");
+  assertThat(file1Scm).isNotNull();
+  BatchReport.Changesets fileWithoutBlameScm=getChangesets(baseDir,"src/sample_no_blame.xoo");
+  assertThat(fileWithoutBlameScm).isNull();
+  assertThat(logTester.logs()).containsSubsequence("2 files to be analyzed","1/2 files analyzed",MISSING_BLAME_INFORMATION_FOR_THE_FOLLOWING_FILES,"  * " + PathUtils.sanitize(xooFileWithoutBlame.toPath().toString()));
+}
