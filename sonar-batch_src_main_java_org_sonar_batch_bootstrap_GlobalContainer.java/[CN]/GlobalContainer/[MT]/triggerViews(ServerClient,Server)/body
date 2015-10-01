@@ -1,0 +1,28 @@
+{
+  LOG.info("Trigger Views update");
+  URL url;
+  try {
+    url=new URL(serverClient.getURL() + "/api/views/run");
+  }
+ catch (  MalformedURLException e) {
+    throw new IllegalArgumentException("Invalid URL",e);
+  }
+  HttpRequest request=HttpRequest.post(url);
+  request.trustAllCerts();
+  request.trustAllHosts();
+  request.header("User-Agent",format("SonarQube %s",server.getVersion()));
+  request.basic(serverClient.getLogin(),serverClient.getPassword());
+  if (!request.ok()) {
+    int responseCode=request.code();
+    if (responseCode == 401) {
+      throw new IllegalStateException(format(serverClient.getMessageWhenNotAuthorized(),CoreProperties.LOGIN,CoreProperties.PASSWORD));
+    }
+    if (responseCode == 409) {
+      throw new IllegalStateException("A full refresh of Views is already queued or running");
+    }
+    if (responseCode == 403) {
+      throw new IllegalStateException(request.body());
+    }
+    throw new IllegalStateException(format("Fail to execute request [code=%s, url=%s]: %s",responseCode,url,request.body()));
+  }
+}
