@@ -1,0 +1,14 @@
+{
+  componentDb.insertProjectAndSnapshot(dbTester.getSession(),newProjectDto().setName("apache struts").setUuid("P1"));
+  componentDb.insertProjectAndSnapshot(dbTester.getSession(),newProjectDto().setName("apache zookeeper").setUuid("P2"));
+  componentDb.insertProjectAndSnapshot(dbTester.getSession(),newProjectDto().setName("eclipse").setUuid("P3"));
+  dbTester.commit();
+  componentDb.indexProjects();
+  userSession.setGlobalPermissions(UserRole.ADMIN);
+  insert("T1","P1",CeActivityDto.Status.SUCCESS);
+  insert("T2","P2",CeActivityDto.Status.SUCCESS);
+  insert("T3","P3",CeActivityDto.Status.SUCCESS);
+  TestResponse wsResponse=tester.newRequest().setParam("componentQuery","apac").setMediaType(MimeTypes.PROTOBUF).execute();
+  WsCe.ActivityResponse activityResponse=WsCe.ActivityResponse.parseFrom(wsResponse.getInputStream());
+  assertThat(activityResponse.getTasksList()).extracting("id").containsOnly("T1","T2");
+}

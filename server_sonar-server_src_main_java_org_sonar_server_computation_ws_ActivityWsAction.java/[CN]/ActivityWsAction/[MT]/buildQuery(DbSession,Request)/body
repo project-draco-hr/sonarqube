@@ -1,4 +1,7 @@
 {
+  String componentUuid=wsRequest.param(PARAM_COMPONENT_UUID);
+  String componentQuery=wsRequest.param(PARAM_COMPONENT_QUERY);
+  checkRequest(componentUuid == null || componentQuery == null,format("Only one of following parameters is accepted: %s or %s",PARAM_COMPONENT_UUID,PARAM_COMPONENT_QUERY));
   CeActivityQuery query=new CeActivityQuery();
   query.setType(wsRequest.param(PARAM_TYPE));
   query.setOnlyCurrents(wsRequest.mandatoryParamAsBoolean(PARAM_ONLY_CURRENTS));
@@ -8,17 +11,6 @@
   if (status != null) {
     query.setStatus(CeActivityDto.Status.valueOf(status));
   }
-  String componentUuid=wsRequest.param(PARAM_COMPONENT_UUID);
-  if (componentUuid == null) {
-    userSession.checkGlobalPermission(UserRole.ADMIN);
-  }
- else {
-    if (userSession.hasGlobalPermission(GlobalPermissions.SYSTEM_ADMIN) || userSession.hasComponentUuidPermission(UserRole.ADMIN,componentUuid)) {
-      query.setComponentUuid(componentUuid);
-    }
- else {
-      throw new ForbiddenException("Requires administration permission");
-    }
-  }
+  loadComponentUuids(dbSession,wsRequest,query);
   return query;
 }
