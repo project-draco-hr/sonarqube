@@ -1,17 +1,15 @@
 {
   userSession.checkLoggedIn().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
-  Long groupId=request.mandatoryParamAsLong(PARAM_ID);
+  WsGroupRef wsGroupRef=WsGroupRef.fromUserGroupsRequest(request);
   int pageSize=request.mandatoryParamAsInt(Param.PAGE_SIZE);
   int page=request.mandatoryParamAsInt(Param.PAGE);
   String queryString=request.param(Param.TEXT_QUERY);
   String selected=request.mandatoryParam(Param.SELECTED);
-  UserMembershipQuery query=UserMembershipQuery.builder().groupId(groupId).memberSearch(queryString).membership(getMembership(selected)).pageIndex(page).pageSize(pageSize).build();
   DbSession dbSession=dbClient.openSession(false);
   try {
-    GroupDto group=dbClient.groupDao().selectById(dbSession,groupId);
-    if (group == null) {
-      throw new NotFoundException(String.format("Could not find user group with id '%s'",groupId));
-    }
+    GroupDto group=userGroupFinder.getGroup(dbSession,wsGroupRef);
+    long groupId=group.getId();
+    UserMembershipQuery query=UserMembershipQuery.builder().groupId(groupId).memberSearch(queryString).membership(getMembership(selected)).pageIndex(page).pageSize(pageSize).build();
     int total=dbClient.groupMembershipDao().countMembers(dbSession,query);
     Paging paging=forPageIndex(page).withPageSize(pageSize).andTotal(total);
     List<UserMembershipDto> users=dbClient.groupMembershipDao().selectMembers(dbSession,query,paging.offset(),paging.pageSize());
