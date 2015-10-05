@@ -13,8 +13,10 @@
  else {
     boolean binaryDataUpdated=!dataHash.equals(previousDto.getDataHash());
     boolean srcHashUpdated=!srcHash.equals(previousDto.getSrcHash());
-    if (binaryDataUpdated || srcHashUpdated) {
-      previousDto.setBinaryData(data).setDataHash(dataHash).setSrcHash(srcHash).setLineHashes(lineHashes).setRevision(computeRevision(previousDto,latestChange)).setUpdatedAt(system2.now());
+    String revision=computeRevision(previousDto,latestChange);
+    boolean revisionUpdated=!ObjectUtils.equals(revision,previousDto.getRevision());
+    if (binaryDataUpdated || srcHashUpdated || revisionUpdated) {
+      previousDto.setBinaryData(data).setDataHash(dataHash).setSrcHash(srcHash).setLineHashes(lineHashes).setRevision(revision).setUpdatedAt(system2.now());
       dbClient.fileSourceDao().update(previousDto);
       session.commit();
     }
