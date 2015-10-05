@@ -5,11 +5,12 @@
   File analysisLog=writer.getFileStructure().analysisLog();
   try (BufferedWriter fileWriter=Files.newBufferedWriter(analysisLog.toPath(),StandardCharsets.UTF_8,StandardOpenOption.WRITE,StandardOpenOption.APPEND)){
     fileWriter.append(String.format("Settings for module: %s",moduleDefinition.getKey())).append('\n');
-    for (    Map.Entry<String,String> prop : settings.getProperties().entrySet()) {
-      if (alreadyLoggedAsSystemProp(prop) || alreadyLoggedAsEnv(prop)) {
+    Map<String,String> moduleSettings=settings.getProperties();
+    for (    String prop : new TreeSet<String>(moduleSettings.keySet())) {
+      if (isSystemProp(prop) || isEnvVariable(prop) || !isSqProp(prop)) {
         continue;
       }
-      fileWriter.append(String.format("  - %s=%s",prop.getKey(),sensitive(prop.getKey()) ? "******" : prop.getValue())).append('\n');
+      fileWriter.append(String.format("  - %s=%s",prop,sensitive(prop) ? "******" : moduleSettings.get(prop))).append('\n');
     }
   }
  catch (  IOException e) {

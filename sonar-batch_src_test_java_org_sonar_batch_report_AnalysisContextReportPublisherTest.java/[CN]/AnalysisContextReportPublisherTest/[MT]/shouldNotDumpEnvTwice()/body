@@ -1,4 +1,5 @@
 {
+  logTester.setLevel(LoggerLevel.DEBUG);
   BatchReportWriter writer=new BatchReportWriter(temp.newFolder());
   Map<String,String> env=new HashMap<>();
   env.put(FOO,"BAR");
@@ -8,12 +9,11 @@
   String content=FileUtils.readFileToString(writer.getFileStructure().analysisLog());
   assertThat(content).containsOnlyOnce(FOO);
   assertThat(content).containsOnlyOnce(BIZ);
+  assertThat(content).containsSequence(BIZ,FOO);
   Settings settings=new Settings();
   settings.setProperty("env." + FOO,"BAR");
-  settings.setProperty("env.another","world");
   publisher.dumpSettings(ProjectDefinition.create().setProperty("sonar.projectKey","foo"),settings);
   content=FileUtils.readFileToString(writer.getFileStructure().analysisLog());
-  assertThat(content).containsOnlyOnce("env.another");
   assertThat(content).containsOnlyOnce(FOO);
   assertThat(content).containsOnlyOnce(BIZ);
   assertThat(content).doesNotContain("env." + FOO);
