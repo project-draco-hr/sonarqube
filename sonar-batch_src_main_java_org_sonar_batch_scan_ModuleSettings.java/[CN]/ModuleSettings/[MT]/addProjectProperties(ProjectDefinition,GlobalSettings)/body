@@ -1,4 +1,12 @@
 {
   addProperties(batchSettings.getProperties());
-  addProperties(projectSettingsRepo.settings(moduleDefinition.getKeyWithBranch()));
+  ProjectDefinition def=moduleDefinition;
+  do {
+    if (projectRepos.moduleExists(def.getKeyWithBranch())) {
+      addProperties(projectRepos.settings(def.getKeyWithBranch()));
+      break;
+    }
+    def=def.getParent();
+  }
+ while (def != null);
 }
