@@ -1,16 +1,13 @@
 {
   userSession.checkLoggedIn().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
-  Long groupId=request.mandatoryParamAsLong(PARAM_ID);
+  WsGroupRef wsGroupRef=WsGroupRef.fromUserGroupsRequest(request);
   String login=request.mandatoryParam(PARAM_LOGIN);
   DbSession dbSession=dbClient.openSession(false);
   try {
-    GroupDto group=dbClient.groupDao().selectById(dbSession,groupId);
+    GroupDto group=userGroupFinder.getGroup(dbSession,wsGroupRef);
     UserDto user=dbClient.userDao().selectActiveUserByLogin(dbSession,login);
-    if (group == null) {
-      throw new NotFoundException(String.format("Could not find a user group with group id '%s'",groupId));
-    }
     if (user == null) {
-      throw new NotFoundException(String.format("Could not find a user with login '%s'",login));
+      throw new NotFoundException(format("Could not find a user with login '%s'",login));
     }
     if (userIsNotYetMemberOf(dbSession,login,group)) {
       UserGroupDto userGroup=new UserGroupDto().setGroupId(group.getId()).setUserId(user.getId());
