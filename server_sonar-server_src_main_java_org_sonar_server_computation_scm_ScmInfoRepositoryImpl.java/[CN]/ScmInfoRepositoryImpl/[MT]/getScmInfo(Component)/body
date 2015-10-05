@@ -1,12 +1,5 @@
 {
   checkNotNull(component,"Component cannot be bull");
-  BatchReport.Changesets changesets=batchReportReader.readChangesets(component.getReportAttributes().getRef());
-  if (changesets == null) {
-    LOGGER.trace("Reading SCM info from db for file '{}'",component);
-    return getFromDb(component);
-  }
- else {
-    LOGGER.trace("Reading SCM info from report for file '{}'",component);
-    return Optional.<ScmInfo>of(new ReportScmInfo(changesets));
-  }
+  initializeScmInfoForComponent(component);
+  return Optional.fromNullable(scmInfoCache.get(component));
 }
