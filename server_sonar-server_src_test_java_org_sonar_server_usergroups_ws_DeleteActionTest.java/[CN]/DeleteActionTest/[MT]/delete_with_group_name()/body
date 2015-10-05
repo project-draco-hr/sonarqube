@@ -1,0 +1,8 @@
+{
+  GroupDto group=groupDao.insert(dbSession,newGroupDto().setName("group_name"));
+  assertThat(groupDao.selectById(dbSession,group.getId())).isNotNull();
+  dbSession.commit();
+  loginAsAdmin();
+  newRequest().setParam(PARAM_GROUP_NAME,group.getName()).execute().assertNoContent();
+  assertThat(groupDao.selectById(dbSession,group.getId())).isNull();
+}

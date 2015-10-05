@@ -1,8 +1,8 @@
 {
-  GroupDto group=groupDao.insert(session,new GroupDto().setName("to-delete"));
-  roleDao.insertGroupRole(session,new GroupRoleDto().setGroupId(group.getId()).setResourceId(42L).setRole(UserRole.ADMIN));
-  session.commit();
+  GroupDto group=groupDao.insert(dbSession,new GroupDto().setName("to-delete"));
+  roleDao.insertGroupRole(dbSession,new GroupRoleDto().setGroupId(group.getId()).setResourceId(42L).setRole(UserRole.ADMIN));
+  dbSession.commit();
   loginAsAdmin();
-  ws.newPostRequest("api/usergroups","delete").setParam("id",group.getId().toString()).execute().assertNoContent();
-  assertThat(dbTester.select("SELECT group_id FROM group_roles")).isEmpty();
+  newRequest().setParam("id",group.getId().toString()).execute().assertNoContent();
+  assertThat(db.select("SELECT group_id FROM group_roles")).isEmpty();
 }

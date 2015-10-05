@@ -1,15 +1,14 @@
 {
   userSession.checkLoggedIn().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
-  long groupId=request.mandatoryParamAsLong(PARAM_ID);
+  WsGroupRef groupRef=WsGroupRef.fromUserGroupsRequest(request);
   DbSession dbSession=dbClient.openSession(false);
   try {
-    if (dbClient.groupDao().selectById(dbSession,groupId) == null) {
-      throw new NotFoundException(String.format("Could not find a group with id=%d",groupId));
-    }
+    GroupDto group=userGroupFinder.getGroup(dbSession,groupRef);
+    long groupId=group.getId();
     checkNotTryingToDeleteDefaultGroup(dbSession,groupId);
-    removeGroupMembers(groupId,dbSession);
-    removeGroupPermissions(groupId,dbSession);
-    removeFromPermissionTemplates(groupId,dbSession);
+    removeGroupMembers(dbSession,groupId);
+    removeGroupPermissions(dbSession,groupId);
+    removeFromPermissionTemplates(dbSession,groupId);
     dbClient.groupDao().deleteById(dbSession,groupId);
     dbSession.commit();
     response.noContent();

@@ -1,8 +1,8 @@
 {
-  GroupDto group=groupDao.insert(session,new GroupDto().setName("to-delete"));
+  GroupDto group=groupDao.insert(dbSession,new GroupDto().setName("to-delete"));
   permissionTemplateDao.insertGroupPermission(42L,group.getId(),UserRole.ADMIN);
-  session.commit();
+  dbSession.commit();
   loginAsAdmin();
-  ws.newPostRequest("api/usergroups","delete").setParam("id",group.getId().toString()).execute().assertNoContent();
-  assertThat(dbTester.select("SELECT group_id FROM perm_templates_groups")).isEmpty();
+  newRequest().setParam("id",group.getId().toString()).execute().assertNoContent();
+  assertThat(db.select("SELECT group_id FROM perm_templates_groups")).isEmpty();
 }
