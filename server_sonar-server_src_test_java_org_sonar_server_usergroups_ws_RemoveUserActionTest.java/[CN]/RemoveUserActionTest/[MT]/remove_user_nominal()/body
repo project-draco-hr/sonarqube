@@ -2,8 +2,8 @@
   GroupDto users=insertGroup("users");
   UserDto user=insertUser("my-admin");
   insertMember(users.getId(),user.getId());
-  session.commit();
+  dbSession.commit();
   userSession.login("admin").setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
-  tester.newPostRequest("api/usergroups","remove_user").setParam("id",users.getId().toString()).setParam("login",user.getLogin()).execute().assertNoContent();
-  assertThat(groupMembershipDao.selectGroupsByLogins(session,Arrays.asList(user.getLogin())).get(user.getLogin())).isEmpty();
+  newRequest().setParam("id",users.getId().toString()).setParam("login",user.getLogin()).execute().assertNoContent();
+  assertThat(groupMembershipDao.selectGroupsByLogins(dbSession,Arrays.asList(user.getLogin())).get(user.getLogin())).isEmpty();
 }

@@ -1,23 +1,18 @@
 {
   userSession.checkLoggedIn().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
-  Long groupId=request.mandatoryParamAsLong(PARAM_ID);
+  WsGroupRef wsGroupRef=WsGroupRef.fromUserGroupsRequest(request);
   String login=request.mandatoryParam(PARAM_LOGIN);
   DbSession dbSession=dbClient.openSession(false);
   try {
-    GroupDto group=dbClient.groupDao().selectById(dbSession,groupId);
-    if (group == null) {
-      throw new NotFoundException(String.format("Could not find a user group with id '%s'",groupId));
-    }
-    UserDto user=dbClient.userDao().selectActiveUserByLogin(dbSession,login);
-    if (user == null) {
-      throw new NotFoundException(String.format("Could not find a user with login '%s'",login));
-    }
+    GroupDto group=getGroup(dbSession,wsGroupRef);
+    checkRequest(group != null,"It is not possible to remove a user from the '%s' group.",DefaultGroups.ANYONE);
+    UserDto user=getUser(dbSession,login);
     UserGroupDto userGroup=new UserGroupDto().setGroupId(group.getId()).setUserId(user.getId());
     dbClient.userGroupDao().delete(dbSession,userGroup);
     dbSession.commit();
     response.noContent();
   }
   finally {
-    closeQuietly(dbSession);
+    dbClient.closeSession(dbSession);
   }
 }

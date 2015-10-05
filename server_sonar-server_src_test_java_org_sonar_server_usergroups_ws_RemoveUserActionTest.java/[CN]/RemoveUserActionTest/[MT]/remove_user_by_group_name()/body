@@ -1,0 +1,10 @@
+{
+  userSession.login("admin").setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
+  GroupDto group=insertGroup("group_name");
+  UserDto user=insertUser("user_login");
+  insertMember(group.getId(),user.getId());
+  assertThat(groupMembershipDao.selectGroupsByLogins(dbSession,Arrays.asList(user.getLogin())).get(user.getLogin())).isNotEmpty();
+  db.commit();
+  newRequest().setParam(PARAM_GROUP_NAME,group.getName()).setParam(PARAM_LOGIN,user.getLogin()).execute().assertNoContent();
+  assertThat(groupMembershipDao.selectGroupsByLogins(dbSession,Arrays.asList(user.getLogin())).get(user.getLogin())).isEmpty();
+}
