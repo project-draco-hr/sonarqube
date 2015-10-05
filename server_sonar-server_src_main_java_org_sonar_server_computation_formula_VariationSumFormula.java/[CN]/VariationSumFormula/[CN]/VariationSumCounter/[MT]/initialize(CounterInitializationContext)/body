@@ -1,6 +1,7 @@
 {
   Optional<Measure> measure=context.getMeasure(metricKey);
   if (!measure.isPresent() || !measure.get().hasVariations()) {
+    initializeWithDefaultInputValue(context);
     return;
   }
   MeasureVariations variations=measure.get().getVariations();
@@ -8,7 +9,10 @@
     if (variations.hasVariation(period.getIndex())) {
       double variation=variations.getVariation(period.getIndex());
       if (variation > 0) {
-        array.increment(period,variations.getVariation(period.getIndex()));
+        array.increment(period,variation);
+      }
+ else       if (defaultInputValue != null) {
+        array.increment(period,defaultInputValue);
       }
     }
   }
