@@ -15,7 +15,7 @@
   Statement statement=mock(Statement.class);
   when(connection.createStatement()).thenReturn(statement);
   when(statement.execute(sql)).thenReturn(true);
-  ProfiledDataSource ds=new ProfiledDataSource(originDataSource);
+  ProfiledDataSource ds=new ProfiledDataSource(originDataSource,ProfiledConnectionInterceptor.INSTANCE);
   assertThat(ds.getUrl()).isNull();
   assertThat(ds.getConnection().getClientInfo()).isNull();
   PreparedStatement preparedStatementProxy=ds.getConnection().prepareStatement(sqlWithParams);
@@ -29,6 +29,7 @@
   final Statement statementProxy=ds.getConnection().createStatement();
   assertThat(statementProxy.getConnection()).isNull();
   assertThat(statementProxy.execute(sql)).isTrue();
-  assertThat(logTester.logs()).hasSize(2);
-  assertThat(logTester.logs().get(1)).contains(sql);
+  assertThat(logTester.logs(LoggerLevel.TRACE)).hasSize(2);
+  assertThat(logTester.logs(LoggerLevel.TRACE).get(0)).containsSequence("sql=insert into polop (col1, col2, col3, col4) values (?, ?, ?, ?, ?);");
+  assertThat(logTester.logs(LoggerLevel.TRACE).get(1)).containsSequence("sql=select 'polop' from dual;");
 }

@@ -1,0 +1,8 @@
+{
+  LOG.info("Create JDBC data source for {}",properties.getProperty(DatabaseProperties.PROP_URL,DEFAULT_URL));
+  BasicDataSource basicDataSource=(BasicDataSource)BasicDataSourceFactory.createDataSource(extractCommonsDbcpProperties(properties));
+  datasource=new ProfiledDataSource(basicDataSource,NullConnectionInterceptor.INSTANCE);
+  datasource.setConnectionInitSqls(dialect.getConnectionInitStatements());
+  datasource.setValidationQuery(dialect.getValidationQuery());
+  enableSqlLogging(datasource,"TRACE".equals(settings.getString("sonar.log.level")));
+}
