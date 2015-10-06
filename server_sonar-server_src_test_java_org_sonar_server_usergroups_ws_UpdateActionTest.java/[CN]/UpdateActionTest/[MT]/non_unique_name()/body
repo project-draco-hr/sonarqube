@@ -1,10 +1,10 @@
 {
-  GroupDto existingGroup=groupDao.insert(session,new GroupDto().setName("old-name").setDescription("Old Description"));
+  GroupDto existingGroup=groupDao.insert(dbSession,new GroupDto().setName("old-name").setDescription("Old Description"));
   String groupName="conflicting-name";
-  groupDao.insert(session,new GroupDto().setName(groupName));
-  session.commit();
+  groupDao.insert(dbSession,new GroupDto().setName(groupName));
+  dbSession.commit();
   expectedException.expect(ServerException.class);
   expectedException.expectMessage("already taken");
   loginAsAdmin();
-  tester.newPostRequest("api/usergroups","update").setParam("id",existingGroup.getId().toString()).setParam("name",groupName).execute().assertStatus(HttpURLConnection.HTTP_CONFLICT);
+  newRequest().setParam("id",existingGroup.getId().toString()).setParam("name",groupName).execute().assertStatus(HttpURLConnection.HTTP_CONFLICT);
 }
