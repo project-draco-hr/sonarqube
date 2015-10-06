@@ -1,12 +1,13 @@
 {
   Profiler profiler=Profiler.create(LOG).startInfo("Process project properties");
+  new DroppedPropertyChecker(analysisProps.properties(),DROPPED_PROPERTIES).checkDroppedProperties();
   Map<String,Map<String,String>> propertiesByModuleIdPath=new HashMap<>();
-  extractPropertiesByModule(propertiesByModuleIdPath,"","",taskProps.properties());
+  extractPropertiesByModule(propertiesByModuleIdPath,"","",analysisProps.properties());
   ProjectDefinition rootProject=defineRootProject(propertiesByModuleIdPath.get(""),null);
   rootProjectWorkDir=rootProject.getWorkDir();
   defineChildren(rootProject,propertiesByModuleIdPath,"");
   cleanAndCheckProjectDefinitions(rootProject);
-  taskProps.properties().putAll(propertiesByModuleIdPath.get(""));
+  analysisProps.properties().putAll(propertiesByModuleIdPath.get(""));
   profiler.stopDebug();
   return new ProjectReactor(rootProject);
 }
