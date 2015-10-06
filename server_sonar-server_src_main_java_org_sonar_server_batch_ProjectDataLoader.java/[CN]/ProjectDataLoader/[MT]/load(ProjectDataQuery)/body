@@ -4,7 +4,7 @@
   DbSession session=dbClient.openSession(false);
   try {
     ProjectRepositories data=new ProjectRepositories();
-    ComponentDto module=checkFound(dbClient.componentDao().selectByKey(session,query.getModuleKey()),format("Project or module with key '%s' is not found",query.getModuleKey()));
+    ComponentDto module=checkFoundWithOptional(dbClient.componentDao().selectByKey(session,query.getModuleKey()),"Project or module with key '%s' is not found",query.getModuleKey());
     if (query.isIssuesMode() && !userSession.hasProjectPermissionByUuid(UserRole.USER,module.projectUuid())) {
       throw new ForbiddenException("You're not authorized to access to project '" + module.name() + "', please contact your SonarQube administrator.");
     }
