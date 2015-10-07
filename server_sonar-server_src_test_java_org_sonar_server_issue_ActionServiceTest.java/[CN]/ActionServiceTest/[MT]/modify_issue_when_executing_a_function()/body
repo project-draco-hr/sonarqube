@@ -1,0 +1,8 @@
+{
+  Function function=new TweetFunction();
+  when(issueService.getByKeyForUpdate(session,ISSUE_KEY)).thenReturn(issue);
+  actions.add(PLUGIN_ACTION).setConditions(new AlwaysMatch()).setFunctions(function);
+  assertThat(actionService.execute(ISSUE_KEY,PLUGIN_ACTION)).isNotNull();
+  verify(updater).addComment(any(DefaultIssue.class),eq("New tweet on issue ISSUE_KEY"),any(IssueChangeContext.class));
+  verify(updater).setAttribute(any(DefaultIssue.class),eq("tweet"),eq("tweet sent"),any(IssueChangeContext.class));
+}

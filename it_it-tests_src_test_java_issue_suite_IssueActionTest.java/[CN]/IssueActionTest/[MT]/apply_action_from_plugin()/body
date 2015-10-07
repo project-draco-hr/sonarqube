@@ -1,0 +1,8 @@
+{
+  adminIssueClient().doTransition(issue.key(),"resolve");
+  assertThat(adminIssueClient().actions(issue.key())).contains("fake");
+  adminIssueClient().doAction(issue.key(),"fake");
+  Issue reloaded=searchIssueByKey(issue.key());
+  assertThat(reloaded.comments()).hasSize(1);
+  assertThat(reloaded.comments().get(0).htmlText()).isEqualTo("New Comment from fake action");
+}

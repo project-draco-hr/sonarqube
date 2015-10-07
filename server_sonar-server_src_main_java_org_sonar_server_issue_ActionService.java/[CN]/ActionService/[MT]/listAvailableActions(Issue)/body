@@ -1,0 +1,23 @@
+{
+  List<String> availableActions=newArrayList();
+  String login=userSession.getLogin();
+  if (login != null) {
+    availableActions.add("comment");
+    if (issue.resolution() == null) {
+      availableActions.add("assign");
+      availableActions.add("set_tags");
+      if (!login.equals(issue.assignee())) {
+        availableActions.add("assign_to_me");
+      }
+      availableActions.add("plan");
+      String projectUuid=issue.projectUuid();
+      if (projectUuid != null && userSession.hasProjectPermissionByUuid(ISSUE_ADMIN,projectUuid)) {
+        availableActions.add("set_severity");
+      }
+    }
+    for (    String action : loadPluginActions(issue)) {
+      availableActions.add(action);
+    }
+  }
+  return availableActions;
+}

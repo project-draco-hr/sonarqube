@@ -1,0 +1,18 @@
+{
+  checkArgument(!Strings.isNullOrEmpty(actionKey),"Missing action");
+  DbSession session=dbClient.openSession(false);
+  try {
+    DefaultIssue issue=issueService.getByKeyForUpdate(session,issueKey).toDefaultIssue();
+    Action action=getAction(actionKey,issue);
+    IssueChangeContext changeContext=IssueChangeContext.createUser(new Date(),userSession.getLogin());
+    FunctionContext functionContext=new FunctionContext(issue,updater,changeContext,projectSettingsFactory.newProjectSettings(issue.projectKey()));
+    for (    Function function : action.functions()) {
+      function.execute(functionContext);
+    }
+    issueStorage.save(issue);
+    return issue;
+  }
+  finally {
+    dbClient.closeSession(session);
+  }
+}

@@ -1,0 +1,13 @@
+{
+  String componentKey="sample";
+  assertThat(searchIssuesBySeverities(componentKey,"BLOCKER")).isEmpty();
+  adminIssueClient().setSeverity(issue.key(),"BLOCKER");
+  assertThat(searchIssuesBySeverities(componentKey,"BLOCKER")).hasSize(1);
+  orchestrator.executeBuild(scan);
+  Issue reloaded=searchIssueByKey(issue.key());
+  assertThat(reloaded.severity()).isEqualTo("BLOCKER");
+  assertThat(reloaded.status()).isEqualTo("OPEN");
+  assertThat(reloaded.resolution()).isNull();
+  assertThat(reloaded.creationDate()).isEqualTo(issue.creationDate());
+  assertThat(reloaded.creationDate().before(reloaded.updateDate())).isTrue();
+}
