@@ -1,9 +1,9 @@
 {
-  Preconditions.checkNotNull(component,"Component should not be bull");
-  if (!component.getType().equals(FILE)) {
-    throw new IllegalArgumentException(String.format("Component '%s' is not a file",component));
-  }
+  requireNonNull(component,"Component should not be bull");
+  checkArgument(component.getType() == FILE,"Component '%s' is not a file",component);
   Optional<CloseableIterator<String>> linesIteratorOptional=reportReader.readFileSource(component.getReportAttributes().getRef());
   checkState(linesIteratorOptional.isPresent(),String.format("File '%s' has no source code",component));
-  return linesIteratorOptional.get();
+  int numberOfLines=reportReader.readComponent(component.getReportAttributes().getRef()).getLines();
+  CloseableIterator<String> lineIterator=linesIteratorOptional.get();
+  return new ComponentLinesCloseableIterator(lineIterator,numberOfLines);
 }
