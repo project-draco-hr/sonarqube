@@ -4,8 +4,8 @@
     return users.get(0).login();
   }
   if (!users.isEmpty()) {
-    Collection<String> logins=Collections2.transform(users,UserDocToLogin.INSTANCE);
-    log.warn(String.format("Multiple users share the SCM account '%s': %s",scmAccount,Joiner.on(", ").join(logins)));
+    Collection<String> logins=FluentIterable.from(users).transform(UserDocToLogin.INSTANCE).toSortedList(Ordering.natural());
+    LOGGER.warn(String.format("Multiple users share the SCM account '%s': %s",scmAccount,Joiner.on(", ").join(logins)));
   }
   return null;
 }
