@@ -1,0 +1,9 @@
+{
+  CodeColorizers codeColorizers=new CodeColorizers(Arrays.<CodeColorizerFormat>asList(new JavaScriptColorizerFormat(),new WebCodeColorizerFormat()));
+  File htmlFile=new File(this.getClass().getResource("CodeColorizersTest/package.html").toURI());
+  SensorStorage sensorStorage=mock(SensorStorage.class);
+  DefaultHighlighting highlighting=new DefaultHighlighting(sensorStorage);
+  highlighting.onFile(new DefaultInputFile("FOO","package.html").initMetadata(new FileMetadata().readMetadata(htmlFile,StandardCharsets.UTF_8)));
+  codeColorizers.toSyntaxHighlighting(htmlFile,StandardCharsets.UTF_8,"web",highlighting);
+  assertThat(highlighting.getSyntaxHighlightingRuleSet()).extracting("range.start.line","range.start.lineOffset","range.end.line","range.end.lineOffset","textType").containsExactly(tuple(1,0,1,132,TypeOfText.STRUCTURED_COMMENT),tuple(2,0,2,6,TypeOfText.KEYWORD),tuple(3,0,3,3,TypeOfText.KEYWORD),tuple(4,0,4,3,TypeOfText.KEYWORD),tuple(5,42,12,0,TypeOfText.STRING));
+}

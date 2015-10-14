@@ -6,11 +6,21 @@
     c=(char)i;
     if (afterCR) {
       for (      CharHandler handler : handlers) {
-        if (c != CARRIAGE_RETURN && c != LINE_FEED) {
-          handler.handleIgnoreEoL(c);
+        if (c == CARRIAGE_RETURN) {
+          handler.newLine();
+          handler.handleAll(c);
         }
-        handler.handleAll(c);
-        handler.newLine();
+ else         if (c == LINE_FEED) {
+          handler.handleAll(c);
+          handler.newLine();
+          afterCR=false;
+        }
+ else {
+          handler.newLine();
+          handler.handleIgnoreEoL(c);
+          handler.handleAll(c);
+          afterCR=false;
+        }
       }
       afterCR=c == CARRIAGE_RETURN;
     }
@@ -35,6 +45,9 @@
     i=reader.read();
   }
   for (  CharHandler handler : handlers) {
+    if (afterCR) {
+      handler.newLine();
+    }
     handler.eof();
   }
 }
