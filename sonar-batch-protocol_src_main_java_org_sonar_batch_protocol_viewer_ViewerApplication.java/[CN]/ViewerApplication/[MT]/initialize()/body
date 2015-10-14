@@ -1,0 +1,60 @@
+{
+  try {
+    for (    LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+      if ("Nimbus".equals(info.getName())) {
+        UIManager.setLookAndFeel(info.getClassName());
+        break;
+      }
+    }
+  }
+ catch (  Exception e) {
+  }
+  frame=new JFrame();
+  frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  splitPane=new JSplitPane();
+  frame.getContentPane().add(splitPane,BorderLayout.CENTER);
+  tabbedPane=new JTabbedPane(JTabbedPane.TOP);
+  tabbedPane.setPreferredSize(new Dimension(500,7));
+  splitPane.setRightComponent(tabbedPane);
+  componentDetailsTab=new JScrollPane();
+  tabbedPane.addTab("Component details",null,componentDetailsTab,null);
+  componentEditor=new JEditorPane();
+  componentDetailsTab.setViewportView(componentEditor);
+  sourceTab=new JScrollPane();
+  tabbedPane.addTab("Source",null,sourceTab,null);
+  sourceEditor=createSourceEditor();
+  sourceEditor.setEditable(false);
+  sourceTab.setViewportView(sourceEditor);
+  textLineNumber=createTextLineNumber();
+  sourceTab.setRowHeaderView(textLineNumber);
+  highlightingTab=new JScrollPane();
+  tabbedPane.addTab("Highlighting",null,highlightingTab,null);
+  highlightingEditor=new JEditorPane();
+  highlightingTab.setViewportView(highlightingEditor);
+  coverageTab=new JScrollPane();
+  tabbedPane.addTab("Coverage",null,coverageTab,null);
+  coverageEditor=new JEditorPane();
+  coverageTab.setViewportView(coverageEditor);
+  treeScrollPane=new JScrollPane();
+  treeScrollPane.setPreferredSize(new Dimension(200,400));
+  splitPane.setLeftComponent(treeScrollPane);
+  componentTree=new JTree();
+  componentTree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("empty"){
+{
+    }
+  }
+));
+  treeScrollPane.setViewportView(componentTree);
+  componentTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+  componentTree.addTreeSelectionListener(new TreeSelectionListener(){
+    public void valueChanged(    TreeSelectionEvent e){
+      DefaultMutableTreeNode node=(DefaultMutableTreeNode)componentTree.getLastSelectedPathComponent();
+      if (node == null) {
+        return;
+      }
+      updateDetails((Component)node.getUserObject());
+    }
+  }
+);
+  frame.pack();
+}

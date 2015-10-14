@@ -1,0 +1,24 @@
+{
+  super.paintComponent(g);
+  FontMetrics fontMetrics=component.getFontMetrics(component.getFont());
+  Insets insets=getInsets();
+  int availableWidth=getSize().width - insets.left - insets.right;
+  Rectangle clip=g.getClipBounds();
+  int rowStartOffset=component.viewToModel(new Point(0,clip.y));
+  int endOffset=component.viewToModel(new Point(0,clip.y + clip.height));
+  while (rowStartOffset <= endOffset) {
+    try {
+      if (isCurrentLine(rowStartOffset))       g.setColor(getCurrentLineForeground());
+ else       g.setColor(getForeground());
+      String lineNumber=getTextLineNumber(rowStartOffset);
+      int stringWidth=fontMetrics.stringWidth(lineNumber);
+      int x=getOffsetX(availableWidth,stringWidth) + insets.left;
+      int y=getOffsetY(rowStartOffset,fontMetrics);
+      g.drawString(lineNumber,x,y);
+      rowStartOffset=Utilities.getRowEnd(component,rowStartOffset) + 1;
+    }
+ catch (    Exception e) {
+      break;
+    }
+  }
+}

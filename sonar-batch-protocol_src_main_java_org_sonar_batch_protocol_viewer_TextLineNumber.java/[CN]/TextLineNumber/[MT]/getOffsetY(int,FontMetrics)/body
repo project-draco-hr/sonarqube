@@ -1,0 +1,30 @@
+{
+  Rectangle r=component.modelToView(rowStartOffset);
+  int lineHeight=fontMetrics.getHeight();
+  int y=r.y + r.height;
+  int descent=0;
+  if (r.height == lineHeight) {
+    descent=fontMetrics.getDescent();
+  }
+ else {
+    if (fonts == null)     fonts=new HashMap<String,FontMetrics>();
+    Element root=component.getDocument().getDefaultRootElement();
+    int index=root.getElementIndex(rowStartOffset);
+    Element line=root.getElement(index);
+    for (int i=0; i < line.getElementCount(); i++) {
+      Element child=line.getElement(i);
+      AttributeSet as=child.getAttributes();
+      String fontFamily=(String)as.getAttribute(StyleConstants.FontFamily);
+      Integer fontSize=(Integer)as.getAttribute(StyleConstants.FontSize);
+      String key=fontFamily + fontSize;
+      FontMetrics fm=fonts.get(key);
+      if (fm == null) {
+        Font font=new Font(fontFamily,Font.PLAIN,fontSize);
+        fm=component.getFontMetrics(font);
+        fonts.put(key,fm);
+      }
+      descent=Math.max(descent,fm.getDescent());
+    }
+  }
+  return y - descent;
+}
