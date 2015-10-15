@@ -1,12 +1,6 @@
 {
+  expectedException.expect(IllegalStateException.class);
+  expectedException.expectMessage("Fail to request http://localhost:1/api/issues");
   HttpRequestFactory factory=new HttpRequestFactory("http://localhost:1");
-  try {
-    factory.get("/api/issues",Collections.<String,Object>emptyMap());
-    fail();
-  }
- catch (  Exception e) {
-    assertThat(e).isInstanceOf(IllegalStateException.class);
-    assertThat(e).hasMessage("Fail to request http://localhost:1/api/issues");
-    assertThat(e.getCause().getMessage()).matches(".*(Connection refused|Connexion refus??e).*");
-  }
+  factory.execute(new WsRequest("/api/issues"));
 }
