@@ -5,8 +5,10 @@
   FileUtils.write(xooFile,"Sample xoo\ncontent");
   tester.newTask().properties(builder.put("sonar.sources","src").build()).start();
   assertNoStdOutput();
-  for (  LogEvent e : logOutput) {
-    assertMsgClean(e.msg);
-    savedStdOut.println("[captured]" + e.level + " "+ e.msg);
+synchronized (logOutput) {
+    for (    LogEvent e : logOutput) {
+      assertMsgClean(e.msg);
+      savedStdOut.println("[captured]" + e.level + " "+ e.msg);
+    }
   }
 }
