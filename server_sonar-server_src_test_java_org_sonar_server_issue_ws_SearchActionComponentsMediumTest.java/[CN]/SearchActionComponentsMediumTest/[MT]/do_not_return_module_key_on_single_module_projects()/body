@@ -1,0 +1,25 @@
+{
+  ComponentDto project=insertComponent(ComponentTesting.newProjectDto("P1").setKey("PK1"));
+  setDefaultProjectPermission(project);
+  ComponentDto module=insertComponent(ComponentTesting.newModuleDto("M1",project).setKey("MK1"));
+  ComponentDto file=insertComponent(ComponentTesting.newFileDto(module,"F1").setKey("FK1"));
+  RuleDto newRule=newRule();
+  IssueDto issueInModule=IssueTesting.newDto(newRule,file,project).setKee("ISSUE_IN_MODULE");
+  IssueDto issueInRootModule=IssueTesting.newDto(newRule,project,project).setKee("ISSUE_IN_ROOT_MODULE");
+  db.issueDao().insert(session,issueInModule,issueInRootModule);
+  session.commit();
+  tester.get(IssueIndexer.class).indexAll();
+  WsActionTester actionTester=new WsActionTester(tester.get(SearchAction.class));
+  TestResponse response=actionTester.newRequest().setMediaType(MimeTypes.PROTOBUF).execute();
+  Issues.Search searchResponse=Issues.Search.parseFrom(response.getInputStream());
+  assertThat(searchResponse.getIssuesCount()).isEqualTo(2);
+  for (  Issues.Issue issue : searchResponse.getIssuesList()) {
+    assertThat(issue.getProject()).isEqualTo("PK1");
+    if (issue.getKey().equals("ISSUE_IN_MODULE")) {
+      assertThat(issue.getSubProject()).isEqualTo("MK1");
+    }
+ else     if (issue.getKey().equals("ISSUE_IN_ROOT_MODULE")) {
+      assertThat(issue.hasSubProject()).isFalse();
+    }
+  }
+}
