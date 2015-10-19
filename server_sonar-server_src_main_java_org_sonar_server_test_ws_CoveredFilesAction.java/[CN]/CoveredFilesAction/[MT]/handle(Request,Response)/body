@@ -3,9 +3,19 @@
   userSession.checkComponentUuidPermission(UserRole.CODEVIEWER,index.searchByTestUuid(testUuid).fileUuid());
   List<CoveredFileDoc> coveredFiles=index.coveredFiles(testUuid);
   Map<String,ComponentDto> componentsByUuid=buildComponentsByUuid(coveredFiles);
-  JsonWriter json=response.newJsonWriter().beginObject();
+  WsTests.CoveredFilesResponse.Builder responseBuilder=WsTests.CoveredFilesResponse.newBuilder();
   if (!coveredFiles.isEmpty()) {
-    writeTests(coveredFiles,componentsByUuid,json);
+    for (    CoveredFileDoc doc : coveredFiles) {
+      WsTests.CoveredFilesResponse.CoveredFile.Builder fileBuilder=WsTests.CoveredFilesResponse.CoveredFile.newBuilder();
+      fileBuilder.setId(doc.fileUuid());
+      fileBuilder.setCoveredLines(doc.coveredLines().size());
+      ComponentDto component=componentsByUuid.get(doc.fileUuid());
+      if (component != null) {
+        fileBuilder.setKey(component.key());
+        fileBuilder.setLongName(component.longName());
+      }
+      responseBuilder.addFiles(fileBuilder);
+    }
   }
-  json.endObject().close();
+  WsUtils.writeProtobuf(responseBuilder.build(),request,response);
 }
