@@ -15,8 +15,28 @@
   finally {
     MyBatis.closeQuietly(dbSession);
   }
-  JsonWriter json=response.newJsonWriter().beginObject();
-  writeTests(tests.getDocs(),componentsByTestFileUuid,json);
-  searchOptions.writeJson(json,tests.getTotal());
-  json.endObject().close();
+  WsTests.ListResponse.Builder responseBuilder=WsTests.ListResponse.newBuilder();
+  responseBuilder.setPaging(Common.Paging.newBuilder().setPageIndex(searchOptions.getPage()).setPageSize(searchOptions.getLimit()).setTotal((int)tests.getTotal()).build());
+  for (  TestDoc testDoc : tests.getDocs()) {
+    WsTests.Test.Builder testBuilder=WsTests.Test.newBuilder();
+    testBuilder.setId(testDoc.testUuid());
+    testBuilder.setName(StringUtils.defaultString(testDoc.name()));
+    testBuilder.setFileId(testDoc.fileUuid());
+    ComponentDto component=componentsByTestFileUuid.get(testDoc.fileUuid());
+    if (component != null) {
+      testBuilder.setFileKey(component.getKey());
+      testBuilder.setFileName(component.longName());
+    }
+    testBuilder.setStatus(WsTests.TestStatus.valueOf(testDoc.status()));
+    testBuilder.setDurationInMs(testDoc.durationInMs());
+    testBuilder.setCoveredLines(coveredLines(testDoc.coveredFiles()));
+    if (testDoc.message() != null) {
+      testBuilder.setMessage(testDoc.message());
+    }
+    if (testDoc.stackTrace() != null) {
+      testBuilder.setStacktrace(testDoc.stackTrace());
+    }
+    responseBuilder.addTests(testBuilder.build());
+  }
+  WsUtils.writeProtobuf(responseBuilder.build(),request,response);
 }
