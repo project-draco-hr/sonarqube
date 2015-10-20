@@ -1,0 +1,14 @@
+{
+  assertIssueHasNoChange(issue.key());
+  adminIssueClient().assign(issue.key(),"admin");
+  List<IssueChange> changes=retrieveChangeForIssue(issue.key());
+  assertThat(changes).hasSize(1);
+  IssueChange change=changes.get(0);
+  assertThat(change.user()).isEqualTo("admin");
+  assertThat(change.creationDate()).isNotNull();
+  assertThat(change.diffs()).hasSize(1);
+  IssueChangeDiff changeDiff=change.diffs().get(0);
+  assertThat(changeDiff.key()).isEqualTo("assignee");
+  assertThat(changeDiff.oldValue()).isNull();
+  assertThat(changeDiff.newValue()).isEqualTo("Administrator");
+}
