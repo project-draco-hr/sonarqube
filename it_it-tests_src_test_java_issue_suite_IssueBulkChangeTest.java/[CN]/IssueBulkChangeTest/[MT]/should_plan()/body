@@ -1,0 +1,10 @@
+{
+  analyzeSampleProjectWillSmallNumberOfIssues();
+  ActionPlan newActionPlan=adminActionPlanClient().create(NewActionPlan.create().name("Short term").project("sample").description("Short term issues").deadLine(ItUtils.toDate("2113-01-31")));
+  String[] issueKeys=searchIssueKeys(BULK_EDITED_ISSUE_COUNT);
+  BulkChange bulkChange=adminIssueClient().bulkChange(BulkChangeQuery.create().issues(issueKeys).actions("plan").actionParameter("plan","plan",newActionPlan.key()));
+  assertThat(bulkChange.totalIssuesChanged()).isEqualTo(BULK_EDITED_ISSUE_COUNT);
+  for (  Issue issue : searchIssues(issueKeys)) {
+    assertThat(issue.actionPlan()).isEqualTo(newActionPlan.key());
+  }
+}
