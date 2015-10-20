@@ -3,8 +3,8 @@
   orchestrator.getServer().restoreProfile(FileLocation.ofClasspath("/issue/suite/CustomRulesTest/custom.xml"));
   orchestrator.getServer().provisionProject("sample","Sample");
   orchestrator.getServer().associateProjectToQualityProfile("sample","xoo","Custom");
-  orchestrator.executeBuild(SonarRunner.create().setProjectDir(ItUtils.projectDir("shared/xoo-sample")));
-  List<Issue> issues=orchestrator.getServer().adminWsClient().issueClient().find(IssueQuery.create()).list();
+  runProjectAnalysis(orchestrator,"shared/xoo-sample");
+  List<Issue> issues=searchIssues();
   assertThat(issues).hasSize(1);
   Issue issue=issues.get(0);
   assertThat(issue.ruleKey()).isEqualTo("xoo:MyCustomRule");

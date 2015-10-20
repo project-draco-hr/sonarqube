@@ -3,7 +3,7 @@
   Issues issues=search(IssueQuery.create().issues(issue.key()));
   assertThat(issues.users()).isEmpty();
   adminIssueClient().assign(issue.key(),"admin");
-  assertThat(search(IssueQuery.create().assignees("admin")).list()).hasSize(1);
+  assertThat(searchIssues(IssueQuery.create().assignees("admin"))).hasSize(1);
   orchestrator.executeBuild(scan);
   Issue reloaded=searchIssueByKey(issue.key());
   assertThat(reloaded.assignee()).isEqualTo("admin");
@@ -14,5 +14,5 @@
   adminIssueClient().assign(issue.key(),null);
   reloaded=searchIssueByKey(issue.key());
   assertThat(reloaded.assignee()).isNull();
-  assertThat(issueClient().find(IssueQuery.create().assignees("admin")).list()).isEmpty();
+  assertThat(searchIssues(IssueQuery.create().assignees("admin"))).isEmpty();
 }
