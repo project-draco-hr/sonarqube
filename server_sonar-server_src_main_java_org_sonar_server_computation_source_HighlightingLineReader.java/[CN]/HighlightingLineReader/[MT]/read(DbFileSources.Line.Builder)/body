@@ -1,11 +1,12 @@
 {
-  int line=lineBuilder.getLine();
-  StringBuilder highlighting=new StringBuilder();
-  incrementHighlightingListMatchingLine(line);
-  for (Iterator<BatchReport.SyntaxHighlighting> syntaxHighlightingIterator=highlightingList.iterator(); syntaxHighlightingIterator.hasNext(); ) {
-    processHighlighting(syntaxHighlightingIterator,highlighting,lineBuilder);
+  if (!isHighlightingValid) {
+    return;
   }
-  if (highlighting.length() > 0) {
-    lineBuilder.setHighlighting(highlighting.toString());
+  try {
+    processHighlightings(lineBuilder);
+  }
+ catch (  RangeOffsetConverterException e) {
+    isHighlightingValid=false;
+    LOG.warn("Inconsistency detected in Highlighting data. Highlighting will be ignored",e);
   }
 }

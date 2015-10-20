@@ -1,12 +1,17 @@
 {
-  List<BatchReport.Symbol> symbols=newArrayList(BatchReport.Symbol.newBuilder().setDeclaration(BatchReport.TextRange.newBuilder().setStartLine(1).setEndLine(2).setStartOffset(1).setEndOffset(3).build()).addReference(BatchReport.TextRange.newBuilder().setStartLine(3).setEndLine(4).setStartOffset(1).setEndOffset(3).build()).build());
-  SymbolsLineReader symbolsLineReader=new SymbolsLineReader(symbols.iterator());
+  TextRange declaration=newTextRange(LINE_1,LINE_2,OFFSET_1,OFFSET_3);
+  when(rangeOffsetConverter.offsetToString(declaration,LINE_1,DEFAULT_LINE_LENGTH)).thenReturn(RANGE_LABEL_1);
+  when(rangeOffsetConverter.offsetToString(declaration,LINE_2,DEFAULT_LINE_LENGTH)).thenReturn(RANGE_LABEL_2);
+  TextRange reference=newTextRange(LINE_3,LINE_4,OFFSET_1,OFFSET_3);
+  when(rangeOffsetConverter.offsetToString(reference,LINE_3,DEFAULT_LINE_LENGTH)).thenReturn(RANGE_LABEL_1);
+  when(rangeOffsetConverter.offsetToString(reference,LINE_4,DEFAULT_LINE_LENGTH)).thenReturn(RANGE_LABEL_2);
+  SymbolsLineReader symbolsLineReader=newReader(newSymbol(declaration,reference));
   symbolsLineReader.read(line1);
   symbolsLineReader.read(line2);
   symbolsLineReader.read(line3);
   symbolsLineReader.read(line4);
-  assertThat(line1.getSymbols()).isEqualTo("1,5,1");
-  assertThat(line2.getSymbols()).isEqualTo("0,3,1");
-  assertThat(line3.getSymbols()).isEqualTo("1,5,1");
-  assertThat(line4.getSymbols()).isEqualTo("0,3,1");
+  assertThat(line1.getSymbols()).isEqualTo(RANGE_LABEL_1 + ",1");
+  assertThat(line2.getSymbols()).isEqualTo(RANGE_LABEL_2 + ",1");
+  assertThat(line3.getSymbols()).isEqualTo(RANGE_LABEL_1 + ",1");
+  assertThat(line4.getSymbols()).isEqualTo(RANGE_LABEL_2 + ",1");
 }

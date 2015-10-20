@@ -1,15 +1,12 @@
 {
-  int line=lineBuilder.getLine();
-  List<BatchReport.Symbol> lineSymbols=findSymbolsMatchingLine(line);
-  for (  BatchReport.Symbol lineSymbol : lineSymbols) {
-    int symbolId=idsBySymbol.get(lineSymbol);
-    StringBuilder symbolString=new StringBuilder(lineBuilder.getSymbols());
-    appendSymbol(symbolString,lineSymbol.getDeclaration(),line,symbolId,lineBuilder.getSource());
-    for (    BatchReport.TextRange range : lineSymbol.getReferenceList()) {
-      appendSymbol(symbolString,range,line,symbolId,lineBuilder.getSource());
-    }
-    if (symbolString.length() > 0) {
-      lineBuilder.setSymbols(symbolString.toString());
-    }
+  if (!areSymbolsValid) {
+    return;
+  }
+  try {
+    processSymbols(lineBuilder);
+  }
+ catch (  RangeOffsetConverter.RangeOffsetConverterException e) {
+    areSymbolsValid=false;
+    LOG.warn("Inconsistency detected in Symbols data. Symbols will be ignored",e);
   }
 }
