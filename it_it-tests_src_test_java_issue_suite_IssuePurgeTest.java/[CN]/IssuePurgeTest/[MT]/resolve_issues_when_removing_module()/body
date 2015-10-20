@@ -1,0 +1,23 @@
+{
+  orchestrator.getServer().provisionProject("com.sonarsource.it.samples:multi-modules-sample","Sonar :: Integration Tests :: Multi-modules Sample");
+  orchestrator.getServer().associateProjectToQualityProfile("com.sonarsource.it.samples:multi-modules-sample","xoo","with-many-rules");
+  runProjectAnalysis(orchestrator,"shared/xoo-multi-modules-sample","sonar.dynamicAnalysis","false");
+  List<Issue> issues=searchIssues();
+  for (  Issue issue : issues) {
+    assertThat(issue.resolution()).isNull();
+  }
+  Issue issue=issues.get(0);
+  int issuesOnModuleB=searchIssues(IssueQuery.create().componentRoots("com.sonarsource.it.samples:multi-modules-sample:module_b")).size();
+  assertThat(issuesOnModuleB).isEqualTo(28);
+  runProjectAnalysis(orchestrator,"shared/xoo-multi-modules-sample","sonar.dynamicAnalysis","false","sonar.modules","module_a");
+  List<Issue> reloadedIssues=searchIssues(IssueQuery.create().resolved(true));
+  assertThat(reloadedIssues).hasSize(issuesOnModuleB);
+  for (  Issue reloadedIssue : reloadedIssues) {
+    assertThat(reloadedIssue.resolution()).isEqualTo("FIXED");
+    assertThat(reloadedIssue.status()).isEqualTo("CLOSED");
+    assertThat(reloadedIssue.componentKey()).contains("com.sonarsource.it.samples:multi-modules-sample:module_b");
+    assertThat(reloadedIssue.updateDate().before(issue.updateDate())).isFalse();
+    assertThat(reloadedIssue.closeDate()).isNotNull();
+    assertThat(reloadedIssue.closeDate().before(reloadedIssue.creationDate())).isFalse();
+  }
+}
