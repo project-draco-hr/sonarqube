@@ -1,0 +1,27 @@
+{
+  try {
+    URL resource=getClass().getResource(relativePathToProfile);
+    Document document=DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(resource.openStream());
+    String profileKey=null;
+    String languageKey=null;
+    Element documentElement=document.getDocumentElement();
+    checkArgument("profile".equals(documentElement.getNodeName()),"%s is not a quality profile file. Root node is not %s",resource.toURI().toString());
+    NodeList childNodes=documentElement.getChildNodes();
+    for (int i=0; i < childNodes.getLength(); i++) {
+      Node childNode=childNodes.item(i);
+      if ("name".equals(childNode.getNodeName())) {
+        profileKey=childNode.getChildNodes().item(0).getNodeValue();
+      }
+ else       if ("language".equals(childNode.getNodeName())) {
+        languageKey=childNode.getChildNodes().item(0).getNodeValue();
+      }
+    }
+    checkArgument(profileKey != null,"Quality profile file %s is missing profile key",resource.toURI().toString());
+    checkArgument(languageKey != null,"Quality profile file %s is missing language key",resource.toURI().toString());
+    this.profileStatesPerProfileKey.put(profileKey,new Profile(profileKey,languageKey,relativePathToProfile));
+    return profileKey;
+  }
+ catch (  URISyntaxException|SAXException|IOException|ParserConfigurationException e) {
+    throw new RuntimeException("Can not load quality profile " + relativePathToProfile,e);
+  }
+}

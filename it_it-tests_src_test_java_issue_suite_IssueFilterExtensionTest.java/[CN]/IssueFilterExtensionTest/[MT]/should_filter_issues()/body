@@ -1,15 +1,13 @@
 {
-  orchestrator.getServer().provisionProject(MULTI_MODULES_SAMPLE_PROJECT_NAME,"Sonar :: Integration Tests :: Multi-modules Sample");
-  orchestrator.getServer().associateProjectToQualityProfile(MULTI_MODULES_SAMPLE_PROJECT_NAME,"xoo","with-many-rules");
-  runProjectAnalysis(orchestrator,"shared/xoo-multi-modules-sample");
-  List<Issue> unresolvedIssues=searchResolvedIssues(MULTI_MODULES_SAMPLE_PROJECT_NAME);
+  analysis.run();
+  List<Issue> unresolvedIssues=searchResolvedIssues(xooMultiModuleProjectKey);
   int issuesBeforeLine5=countIssuesBeforeLine5(unresolvedIssues);
   int pmdIssues=countModuleIssues(unresolvedIssues);
   assertThat(issuesBeforeLine5).isGreaterThan(0);
   assertThat(pmdIssues).isGreaterThan(0);
-  runProjectAnalysis(orchestrator,"shared/xoo-multi-modules-sample","enableIssueFilters","true");
-  unresolvedIssues=searchResolvedIssues(MULTI_MODULES_SAMPLE_PROJECT_NAME);
-  List<Issue> resolvedIssues=searchUnresolvedIssues(MULTI_MODULES_SAMPLE_PROJECT_NAME);
+  analysis.withProperties("enableIssueFilters","true").run();
+  unresolvedIssues=searchResolvedIssues(xooMultiModuleProjectKey);
+  List<Issue> resolvedIssues=searchUnresolvedIssues(xooMultiModuleProjectKey);
   assertThat(countIssuesBeforeLine5(unresolvedIssues)).isZero();
   assertThat(countModuleIssues(unresolvedIssues)).isZero();
   assertThat(countModuleIssues(resolvedIssues)).isGreaterThan(0);
