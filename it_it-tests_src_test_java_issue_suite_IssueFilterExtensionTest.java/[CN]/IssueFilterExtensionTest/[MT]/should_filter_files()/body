@@ -1,0 +1,11 @@
+{
+  orchestrator.getServer().provisionProject(MULTI_MODULES_SAMPLE_PROJECT_NAME,"Sonar :: Integration Tests :: Multi-modules Sample");
+  orchestrator.getServer().associateProjectToQualityProfile(MULTI_MODULES_SAMPLE_PROJECT_NAME,"xoo","with-many-rules");
+  runProjectAnalysis(orchestrator,"shared/xoo-multi-modules-sample","sonar.exclusions","**/HelloA1.xoo");
+  List<Issue> issues=searchIssues();
+  assertThat(issues).isNotEmpty();
+  for (  Issue issue : issues) {
+    assertThat(issue.componentKey()).doesNotContain("HelloA1");
+  }
+  assertThat(getMeasure(MULTI_MODULES_SAMPLE_PROJECT_NAME,"violations").getIntValue()).isEqualTo(issues.size());
+}
