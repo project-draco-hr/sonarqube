@@ -1,11 +1,21 @@
 {
-  HighlightingLineReader highlightingLineReader=new HighlightingLineReader(newArrayList(BatchReport.SyntaxHighlighting.newBuilder().setRange(BatchReport.TextRange.newBuilder().setStartLine(1).setEndLine(3).setStartOffset(3).setEndOffset(2).build()).setType(Constants.HighlightingType.ANNOTATION).build(),BatchReport.SyntaxHighlighting.newBuilder().setRange(BatchReport.TextRange.newBuilder().setStartLine(2).setEndLine(4).setStartOffset(0).setEndOffset(3).build()).setType(Constants.HighlightingType.HIGHLIGHTING_STRING).build(),BatchReport.SyntaxHighlighting.newBuilder().setRange(BatchReport.TextRange.newBuilder().setStartLine(2).setEndLine(2).setStartOffset(1).setEndOffset(2).build()).setType(Constants.HighlightingType.COMMENT).build()).iterator());
+  TextRange textRange1=newTextRange(LINE_1,LINE_3);
+  when(rangeOffsetConverter.offsetToString(textRange1,LINE_1,DEFAULT_LINE_LENGTH)).thenReturn(RANGE_LABEL_1);
+  when(rangeOffsetConverter.offsetToString(textRange1,LINE_2,DEFAULT_LINE_LENGTH)).thenReturn(RANGE_LABEL_2);
+  when(rangeOffsetConverter.offsetToString(textRange1,LINE_3,DEFAULT_LINE_LENGTH)).thenReturn(RANGE_LABEL_3);
+  TextRange textRange2=newTextRange(LINE_2,LINE_4);
+  when(rangeOffsetConverter.offsetToString(textRange2,LINE_2,DEFAULT_LINE_LENGTH)).thenReturn(RANGE_LABEL_2);
+  when(rangeOffsetConverter.offsetToString(textRange2,LINE_3,DEFAULT_LINE_LENGTH)).thenReturn(RANGE_LABEL_2);
+  when(rangeOffsetConverter.offsetToString(textRange2,LINE_4,DEFAULT_LINE_LENGTH)).thenReturn(RANGE_LABEL_4);
+  TextRange textRange3=newTextRange(LINE_2,LINE_2);
+  when(rangeOffsetConverter.offsetToString(textRange3,LINE_2,DEFAULT_LINE_LENGTH)).thenReturn(RANGE_LABEL_5);
+  HighlightingLineReader highlightingLineReader=newReader(of(textRange1,ANNOTATION,textRange2,HIGHLIGHTING_STRING,textRange3,COMMENT));
   highlightingLineReader.read(line1);
   highlightingLineReader.read(line2);
   highlightingLineReader.read(line3);
   highlightingLineReader.read(line4);
-  assertThat(line1.getHighlighting()).isEqualTo("3,5,a");
-  assertThat(line2.getHighlighting()).isEqualTo("0,5,a;0,5,s;1,2,cd");
-  assertThat(line3.getHighlighting()).isEqualTo("0,2,a;0,5,s");
-  assertThat(line4.getHighlighting()).isEqualTo("0,3,s");
+  assertThat(line1.getHighlighting()).isEqualTo(RANGE_LABEL_1 + ",a");
+  assertThat(line2.getHighlighting()).isEqualTo(RANGE_LABEL_2 + ",a;" + RANGE_LABEL_2+ ",s;"+ RANGE_LABEL_5+ ",cd");
+  assertThat(line3.getHighlighting()).isEqualTo(RANGE_LABEL_3 + ",a;" + RANGE_LABEL_2+ ",s");
+  assertThat(line4.getHighlighting()).isEqualTo(RANGE_LABEL_4 + ",s");
 }

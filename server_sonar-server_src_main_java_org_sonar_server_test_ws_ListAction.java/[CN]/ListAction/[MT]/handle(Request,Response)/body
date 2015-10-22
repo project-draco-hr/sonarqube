@@ -1,8 +1,8 @@
 {
-  String testUuid=request.param(TEST_UUID);
-  String testFileUuid=request.param(TEST_FILE_UUID);
+  String testUuid=request.param(TEST_ID);
+  String testFileUuid=request.param(TEST_FILE_ID);
   String testFileKey=request.param(TEST_FILE_KEY);
-  String sourceFileUuid=request.param(SOURCE_FILE_UUID);
+  String sourceFileUuid=request.param(SOURCE_FILE_ID);
   Integer sourceFileLineNumber=request.paramAsInt(SOURCE_FILE_LINE_NUMBER);
   SearchOptions searchOptions=new SearchOptions().setPage(request.mandatoryParamAsInt(WebService.Param.PAGE),request.mandatoryParamAsInt(WebService.Param.PAGE_SIZE));
   DbSession dbSession=dbClient.openSession(false);
@@ -15,8 +15,30 @@
   finally {
     MyBatis.closeQuietly(dbSession);
   }
-  JsonWriter json=response.newJsonWriter().beginObject();
-  writeTests(tests.getDocs(),componentsByTestFileUuid,json);
-  searchOptions.writeJson(json,tests.getTotal());
-  json.endObject().close();
+  WsTests.ListResponse.Builder responseBuilder=WsTests.ListResponse.newBuilder();
+  responseBuilder.setPaging(Common.Paging.newBuilder().setPageIndex(searchOptions.getPage()).setPageSize(searchOptions.getLimit()).setTotal((int)tests.getTotal()).build());
+  for (  TestDoc testDoc : tests.getDocs()) {
+    WsTests.Test.Builder testBuilder=WsTests.Test.newBuilder();
+    testBuilder.setId(testDoc.testUuid());
+    testBuilder.setName(StringUtils.defaultString(testDoc.name()));
+    testBuilder.setFileId(testDoc.fileUuid());
+    ComponentDto component=componentsByTestFileUuid.get(testDoc.fileUuid());
+    if (component != null) {
+      testBuilder.setFileKey(component.getKey());
+      testBuilder.setFileName(component.longName());
+    }
+    testBuilder.setStatus(WsTests.TestStatus.valueOf(testDoc.status()));
+    if (testDoc.durationInMs() != null) {
+      testBuilder.setDurationInMs(testDoc.durationInMs());
+    }
+    testBuilder.setCoveredLines(coveredLines(testDoc.coveredFiles()));
+    if (testDoc.message() != null) {
+      testBuilder.setMessage(testDoc.message());
+    }
+    if (testDoc.stackTrace() != null) {
+      testBuilder.setStacktrace(testDoc.stackTrace());
+    }
+    responseBuilder.addTests(testBuilder.build());
+  }
+  WsUtils.writeProtobuf(responseBuilder.build(),request,response);
 }

@@ -1,0 +1,10 @@
+{
+  TextRange declaration=newTextRange(LINE_1,LINE_1,OFFSET_1,OFFSET_3);
+  doThrow(RangeOffsetConverter.RangeOffsetConverterException.class).when(rangeOffsetConverter).offsetToString(declaration,LINE_1,DEFAULT_LINE_LENGTH);
+  TextRange reference=newSingleLineTextRangeWithExpectedLabel(LINE_2,OFFSET_1,OFFSET_3,RANGE_LABEL_2);
+  SymbolsLineReader symbolsLineReader=newReader(newSymbol(declaration,reference));
+  symbolsLineReader.read(line1);
+  symbolsLineReader.read(line2);
+  assertNoSymbol();
+  assertThat(logTester.logs(WARN)).isNotEmpty();
+}

@@ -1,6 +1,7 @@
 {
   DefaultIssue raw=new DefaultIssue().setNew(true).setKey("RAW_KEY").setCreationDate(parseDate("2015-10-01")).setUpdateDate(parseDate("2015-10-02")).setCloseDate(parseDate("2015-10-03"));
-  DefaultIssue base=new DefaultIssue().setKey("BASE_KEY").setCreationDate(parseDate("2015-01-01")).setUpdateDate(parseDate("2015-01-02")).setCloseDate(parseDate("2015-01-03")).setActionPlanKey("BASE_ACTION_PLAN_KEY").setResolution(RESOLUTION_FIXED).setStatus(STATUS_CLOSED).setSeverity(BLOCKER).setAssignee("base assignee").setAuthorLogin("base author").setTags(newArrayList("base tag")).setOnDisabledRule(true).setSelectedAt(1000L).setLine(10).setMessage("message").setEffortToFix(15d).setDebt(Duration.create(15L)).setManualSeverity(false);
+  DbIssues.Locations issueLocations=DbIssues.Locations.newBuilder().setTextRange(DbCommons.TextRange.newBuilder().setStartLine(10).setEndLine(12).build()).build();
+  DefaultIssue base=new DefaultIssue().setKey("BASE_KEY").setCreationDate(parseDate("2015-01-01")).setUpdateDate(parseDate("2015-01-02")).setCloseDate(parseDate("2015-01-03")).setActionPlanKey("BASE_ACTION_PLAN_KEY").setResolution(RESOLUTION_FIXED).setStatus(STATUS_CLOSED).setSeverity(BLOCKER).setAssignee("base assignee").setAuthorLogin("base author").setTags(newArrayList("base tag")).setOnDisabledRule(true).setSelectedAt(1000L).setLine(10).setMessage("message").setEffortToFix(15d).setDebt(Duration.create(15L)).setManualSeverity(false).setLocations(issueLocations);
   when(debtCalculator.calculate(raw)).thenReturn(DEFAULT_DURATION);
   underTest.mergeExistingOpenIssue(raw,base);
   assertThat(raw.isNew()).isFalse();
@@ -21,4 +22,5 @@
   verify(updater).setPastLine(raw,10);
   verify(updater).setPastMessage(raw,"message",issueChangeContext);
   verify(updater).setPastTechnicalDebt(raw,Duration.create(15L),issueChangeContext);
+  verify(updater).setPastLocations(raw,issueLocations);
 }

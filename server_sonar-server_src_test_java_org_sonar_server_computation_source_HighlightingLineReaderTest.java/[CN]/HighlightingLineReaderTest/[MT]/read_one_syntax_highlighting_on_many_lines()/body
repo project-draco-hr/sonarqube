@@ -1,10 +1,14 @@
 {
-  HighlightingLineReader highlightingLineReader=new HighlightingLineReader(newArrayList(BatchReport.SyntaxHighlighting.newBuilder().setRange(BatchReport.TextRange.newBuilder().setStartLine(1).setEndLine(3).setStartOffset(3).setEndOffset(2).build()).setType(Constants.HighlightingType.ANNOTATION).build()).iterator());
+  TextRange textRange=newTextRange(LINE_1,LINE_3);
+  when(rangeOffsetConverter.offsetToString(textRange,LINE_1,DEFAULT_LINE_LENGTH)).thenReturn(RANGE_LABEL_1);
+  when(rangeOffsetConverter.offsetToString(textRange,LINE_2,6)).thenReturn(RANGE_LABEL_2);
+  when(rangeOffsetConverter.offsetToString(textRange,LINE_3,DEFAULT_LINE_LENGTH)).thenReturn(RANGE_LABEL_3);
+  HighlightingLineReader highlightingLineReader=newReader(of(textRange,ANNOTATION));
   highlightingLineReader.read(line1);
   DbFileSources.Line.Builder line2=sourceData.addLinesBuilder().setSource("line 2").setLine(2);
   highlightingLineReader.read(line2);
   highlightingLineReader.read(line3);
-  assertThat(line1.getHighlighting()).isEqualTo("3,5,a");
-  assertThat(line2.getHighlighting()).isEqualTo("0,6,a");
-  assertThat(line3.getHighlighting()).isEqualTo("0,2,a");
+  assertThat(line1.getHighlighting()).isEqualTo(RANGE_LABEL_1 + ",a");
+  assertThat(line2.getHighlighting()).isEqualTo(RANGE_LABEL_2 + ",a");
+  assertThat(line3.getHighlighting()).isEqualTo(RANGE_LABEL_3 + ",a");
 }

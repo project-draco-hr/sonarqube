@@ -1,0 +1,10 @@
+{
+  TextRange textRange2=newTextRange(LINE_2,LINE_2);
+  doThrow(RangeOffsetConverterException.class).when(rangeOffsetConverter).offsetToString(textRange2,LINE_2,DEFAULT_LINE_LENGTH);
+  HighlightingLineReader highlightingLineReader=newReader(of(newSingleLineTextRangeWithExpectingLabel(LINE_1,RANGE_LABEL_1),ANNOTATION,textRange2,HIGHLIGHTING_STRING));
+  highlightingLineReader.read(line1);
+  highlightingLineReader.read(line2);
+  assertThat(line1.hasHighlighting()).isTrue();
+  assertThat(line2.hasHighlighting()).isFalse();
+  assertThat(logTester.logs(WARN)).isNotEmpty();
+}
