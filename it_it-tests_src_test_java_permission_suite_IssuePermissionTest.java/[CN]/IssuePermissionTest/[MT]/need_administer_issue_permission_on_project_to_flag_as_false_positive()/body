@@ -1,0 +1,21 @@
+{
+  SonarClient client=orchestrator.getServer().adminWsClient();
+  Issue issueOnSample=client.issueClient().find(IssueQuery.create().componentRoots("sample")).list().get(0);
+  Issue issueOnSample2=client.issueClient().find(IssueQuery.create().componentRoots("sample2")).list().get(0);
+  String user="user";
+  try {
+    client.userClient().create(UserParameters.create().login(user).name(user).password("password").passwordConfirmation("password"));
+    addUserPermission(user,"sample","issueadmin");
+    try {
+      orchestrator.getServer().wsClient(user,"password").issueClient().doTransition(issueOnSample2.key(),"falsepositive");
+      fail();
+    }
+ catch (    Exception e) {
+      assertThat(e).isInstanceOf(HttpException.class).describedAs("404");
+    }
+    assertThat(orchestrator.getServer().wsClient(user,"password").issueClient().doTransition(issueOnSample.key(),"falsepositive").status()).isEqualTo("RESOLVED");
+  }
+  finally {
+    client.userClient().deactivate(user);
+  }
+}

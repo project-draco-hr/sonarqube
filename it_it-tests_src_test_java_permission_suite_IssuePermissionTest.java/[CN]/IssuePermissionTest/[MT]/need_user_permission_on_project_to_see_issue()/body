@@ -1,0 +1,17 @@
+{
+  SonarClient client=orchestrator.getServer().adminWsClient();
+  String withBrowsePermission="with-browse-permission";
+  String withoutBrowsePermission="without-browse-permission";
+  try {
+    client.userClient().create(UserParameters.create().login(withBrowsePermission).name(withBrowsePermission).password("password").passwordConfirmation("password"));
+    addUserPermission(withBrowsePermission,"sample","user");
+    client.userClient().create(UserParameters.create().login(withoutBrowsePermission).name(withoutBrowsePermission).password("password").passwordConfirmation("password"));
+    removeGroupPermission("anyone","sample","user");
+    assertThat(orchestrator.getServer().wsClient(withoutBrowsePermission,"password").issueClient().find(IssueQuery.create().componentRoots("sample")).list()).isEmpty();
+    assertThat(orchestrator.getServer().wsClient(withBrowsePermission,"password").issueClient().find(IssueQuery.create().componentRoots("sample")).list()).isNotEmpty();
+  }
+  finally {
+    client.userClient().deactivate(withBrowsePermission);
+    client.userClient().deactivate(withoutBrowsePermission);
+  }
+}

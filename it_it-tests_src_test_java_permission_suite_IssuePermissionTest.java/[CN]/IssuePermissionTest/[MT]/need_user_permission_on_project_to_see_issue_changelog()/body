@@ -1,0 +1,25 @@
+{
+  SonarClient client=orchestrator.getServer().adminWsClient();
+  Issue issue=client.issueClient().find(IssueQuery.create().componentRoots("sample")).list().get(0);
+  client.issueClient().assign(issue.key(),"admin");
+  String withBrowsePermission="with-browse-permission";
+  String withoutBrowsePermission="without-browse-permission";
+  try {
+    client.userClient().create(UserParameters.create().login(withBrowsePermission).name(withBrowsePermission).password("password").passwordConfirmation("password"));
+    addUserPermission(withBrowsePermission,"sample","user");
+    client.userClient().create(UserParameters.create().login(withoutBrowsePermission).name(withoutBrowsePermission).password("password").passwordConfirmation("password"));
+    removeGroupPermission("anyone","sample","user");
+    try {
+      orchestrator.getServer().wsClient(withoutBrowsePermission,"password").issueClient().changes(issue.key());
+      fail();
+    }
+ catch (    Exception e) {
+      assertThat(e).isInstanceOf(HttpException.class).describedAs("404");
+    }
+    assertThat(orchestrator.getServer().wsClient(withBrowsePermission,"password").issueClient().changes(issue.key())).isNotEmpty();
+  }
+  finally {
+    client.userClient().deactivate(withBrowsePermission);
+    client.userClient().deactivate(withoutBrowsePermission);
+  }
+}

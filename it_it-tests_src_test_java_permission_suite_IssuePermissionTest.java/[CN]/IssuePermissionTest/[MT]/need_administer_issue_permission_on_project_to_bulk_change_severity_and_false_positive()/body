@@ -1,0 +1,16 @@
+{
+  SonarClient client=orchestrator.getServer().adminWsClient();
+  Issue issueOnSample=client.issueClient().find(IssueQuery.create().componentRoots("sample")).list().get(0);
+  Issue issueOnSample2=client.issueClient().find(IssueQuery.create().componentRoots("sample2")).list().get(0);
+  String user="user";
+  try {
+    client.userClient().create(UserParameters.create().login(user).name(user).password("password").passwordConfirmation("password"));
+    addUserPermission(user,"sample","issueadmin");
+    BulkChange bulkChange=orchestrator.getServer().wsClient(user,"password").issueClient().bulkChange(BulkChangeQuery.create().issues(issueOnSample.key(),issueOnSample2.key()).actions("set_severity","do_transition").actionParameter("do_transition","transition","falsepositive").actionParameter("set_severity","severity","BLOCKER"));
+    assertThat(bulkChange.totalIssuesChanged()).isEqualTo(1);
+    assertThat(bulkChange.totalIssuesNotChanged()).isEqualTo(1);
+  }
+  finally {
+    client.userClient().deactivate(user);
+  }
+}
