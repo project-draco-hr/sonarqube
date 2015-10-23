@@ -1,0 +1,13 @@
+{
+  orchestrator.getServer().restoreProfile(getResource("one-issue-per-line.xml"));
+  orchestrator.getServer().provisionProject("sample","tracking");
+  orchestrator.getServer().associateProjectToQualityProfile("sample","xoo","one-issue-per-line");
+  File projectDir=ItUtils.projectDir("analysis/tracking/v1");
+  SonarRunner issuesModeScan=SonarRunner.create(projectDir).setProperty("sonar.analysis.mode","issues").setProperty("sonar.userHome",temp.newFolder().getAbsolutePath()).setProperty("sonar.report.export.path","sonar-report.json").setProperty("sonar.projectDate","2013-05-02");
+  orchestrator.executeBuild(issuesModeScan);
+  File report=new File(projectDir,".sonar/sonar-report.json");
+  assertThat(report).isFile().exists();
+  String json=sanitize(FileUtils.readFileToString(report));
+  String expectedJson=sanitize(IOUtils.toString(getResourceInputStream("no-server-analysis.json")));
+  JSONAssert.assertEquals(expectedJson,json,false);
+}

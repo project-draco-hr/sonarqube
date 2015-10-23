@@ -1,0 +1,18 @@
+{
+  setProperty("sonar.timemachine.period4","30");
+  setProperty("sonar.timemachine.period5","previous_analysis");
+  orchestrator.getServer().provisionProject("sample","sample");
+  orchestrator.getServer().associateProjectToQualityProfile("sample","xoo","empty");
+  orchestrator.executeBuild(SonarRunner.create(ItUtils.projectDir("shared/xoo-sample")).setProperty("sonar.projectDate","2013-01-01"));
+  orchestrator.getServer().restoreProfile(FileLocation.ofClasspath("/measureHistory/one-issue-per-line-profile.xml"));
+  orchestrator.getServer().associateProjectToQualityProfile("sample","xoo","one-issue-per-line");
+  orchestrator.executeBuild(SonarRunner.create(ItUtils.projectDir("shared/xoo-sample")));
+  Resource newTechnicalDebt=orchestrator.getServer().getWsClient().find(ResourceQuery.createForMetrics("sample:src/main/xoo/sample/Sample.xoo","new_technical_debt").setIncludeTrends(true));
+  List<Measure> measures=newTechnicalDebt.getMeasures();
+  assertThat(measures.get(0).getVariation4()).isEqualTo(17);
+  assertThat(measures.get(0).getVariation5()).isEqualTo(17);
+  orchestrator.getServer().associateProjectToQualityProfile("sample","xoo","one-issue-per-line");
+  orchestrator.executeBuild(SonarRunner.create(ItUtils.projectDir("shared/xoo-sample")));
+  newTechnicalDebt=orchestrator.getServer().getWsClient().find(ResourceQuery.createForMetrics("sample:src/main/xoo/sample/Sample.xoo","new_technical_debt").setIncludeTrends(true));
+  assertThat(newTechnicalDebt).isNull();
+}

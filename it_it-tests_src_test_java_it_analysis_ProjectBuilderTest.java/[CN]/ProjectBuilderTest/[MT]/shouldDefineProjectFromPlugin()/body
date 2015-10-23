@@ -1,0 +1,10 @@
+{
+  MavenBuild build=MavenBuild.create(ItUtils.projectPom("analysis/project-builder")).setCleanSonarGoals().setProperty("sonar.enableProjectBuilder","true").setProperty("sonar.dynamicAnalysis","false");
+  orchestrator.executeBuild(build);
+  checkProject();
+  checkSubProject("project-builder-module-a");
+  checkSubProject("project-builder-module-b");
+  checkFile("project-builder-module-a","src/HelloA.java");
+  checkFile("project-builder-module-b","src/HelloB.java");
+  assertThat(getResource("com.sonarsource.it.projects.batch:project-builder-module-b:src/IgnoredFile.java")).isNull();
+}

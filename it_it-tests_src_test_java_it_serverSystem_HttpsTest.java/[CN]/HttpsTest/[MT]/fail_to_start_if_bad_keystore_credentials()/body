@@ -1,0 +1,12 @@
+{
+  try {
+    URL jksKeystore=getClass().getResource("/serverSystem/HttpsTest/keystore.jks");
+    orchestrator=Orchestrator.builderEnv().setServerProperty("sonar.web.https.port",String.valueOf(httpsPort)).setServerProperty("sonar.web.https.keyAlias","tests").setServerProperty("sonar.web.https.keyPass","__wrong__").setServerProperty("sonar.web.https.keystoreFile",new File(jksKeystore.toURI()).getAbsolutePath()).setServerProperty("sonar.web.https.keystorePass","__wrong__").build();
+    orchestrator.start();
+    fail();
+  }
+ catch (  Exception e) {
+    File logFile=orchestrator.getServer().getLogs();
+    assertThat(FileUtils.readFileToString(logFile)).contains("Password verification failed");
+  }
+}

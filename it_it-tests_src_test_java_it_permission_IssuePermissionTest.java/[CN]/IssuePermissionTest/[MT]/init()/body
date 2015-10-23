@@ -1,0 +1,12 @@
+{
+  orchestrator.resetData();
+  orchestrator.getServer().restoreProfile(FileLocation.ofClasspath("/permission/one-issue-per-line-profile.xml"));
+  orchestrator.getServer().provisionProject("sample","Sample");
+  orchestrator.getServer().associateProjectToQualityProfile("sample","xoo","one-issue-per-line");
+  SonarRunner sampleProject=SonarRunner.create(projectDir("shared/xoo-sample"));
+  orchestrator.executeBuild(sampleProject);
+  orchestrator.getServer().provisionProject("sample2","Sample2");
+  orchestrator.getServer().associateProjectToQualityProfile("sample2","xoo","one-issue-per-line");
+  SonarRunner sampleProject2=SonarRunner.create(projectDir("shared/xoo-sample")).setProperty("sonar.projectKey","sample2").setProperty("sonar.projectName","Sample2");
+  orchestrator.executeBuild(sampleProject2);
+}
