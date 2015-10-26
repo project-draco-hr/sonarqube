@@ -1,24 +1,15 @@
 {
   NewIssuesStatistics newIssuesStats=new NewIssuesStatistics();
   CloseableIterator<DefaultIssue> issues=issueCache.traverse();
-  String projectName=reportReader.readComponent(reportReader.readMetadata().getRootComponentRef()).getName();
   try {
-    while (issues.hasNext()) {
-      DefaultIssue issue=issues.next();
-      if (issue.isNew() && issue.resolution() == null) {
-        newIssuesStats.add(issue);
-      }
- else       if (issue.isChanged() && issue.mustSendNotifications()) {
-        IssueChangeNotification changeNotification=new IssueChangeNotification();
-        changeNotification.setRuleName(rules.getByKey(issue.ruleKey()).getName());
-        changeNotification.setIssue(issue);
-        changeNotification.setProject(project.getKey(),projectName);
-        service.deliver(changeNotification);
-      }
-    }
+    processIssues(newIssuesStats,issues,project);
   }
   finally {
     issues.close();
   }
-  sendNewIssuesStatistics(newIssuesStats,project,projectName);
+  if (newIssuesStats.hasIssues()) {
+    long analysisDate=reportReader.readMetadata().getAnalysisDate();
+    sendNewIssuesNotification(newIssuesStats,project,analysisDate);
+    sendNewIssuesNotificationToAssignees(newIssuesStats,project,analysisDate);
+  }
 }
