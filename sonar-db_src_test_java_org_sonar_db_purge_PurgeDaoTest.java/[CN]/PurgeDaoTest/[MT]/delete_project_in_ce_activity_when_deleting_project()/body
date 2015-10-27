@@ -1,0 +1,11 @@
+{
+  ComponentDto projectToBeDeleted=ComponentTesting.newProjectDto();
+  ComponentDto anotherLivingProject=ComponentTesting.newProjectDto();
+  dbClient.componentDao().insert(dbSession,projectToBeDeleted,anotherLivingProject);
+  insertCeActivity(projectToBeDeleted.uuid());
+  insertCeActivity(anotherLivingProject.uuid());
+  dbSession.commit();
+  underTest.deleteProject(dbSession,projectToBeDeleted.uuid());
+  dbSession.commit();
+  assertThat(dbTester.countRowsOfTable("ce_activity")).isEqualTo(1);
+}
