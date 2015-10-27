@@ -1,0 +1,10 @@
+{
+  issueCache.newAppender().append(new DefaultIssue().setSeverity(Severity.BLOCKER).setDebt(ISSUE_DURATION)).close();
+  when(notificationService.hasProjectSubscribersForTypes(PROJECT_UUID,SendIssueNotificationsStep.NOTIF_TYPES)).thenReturn(true);
+  underTest.execute();
+  verify(notificationService).deliver(any(NewIssuesNotification.class));
+  verify(newIssuesNotificationMock).setProject(PROJECT_KEY,PROJECT_UUID,PROJECT_NAME);
+  verify(newIssuesNotificationMock).setAnalysisDate(new Date(ANALYSE_DATE));
+  verify(newIssuesNotificationMock).setStatistics(eq(PROJECT_NAME),any(NewIssuesStatistics.Stats.class));
+  verify(newIssuesNotificationMock).setDebt(ISSUE_DURATION);
+}
