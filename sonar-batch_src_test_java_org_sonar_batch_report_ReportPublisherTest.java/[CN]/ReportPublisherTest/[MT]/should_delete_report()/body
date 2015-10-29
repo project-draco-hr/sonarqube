@@ -1,8 +1,8 @@
 {
-  when(mode.isIssues()).thenReturn(true);
+  Path reportDir=temp.getRoot().toPath().resolve("batch-report");
+  Files.createDirectory(reportDir);
   ReportPublisher job=new ReportPublisher(settings,mock(ServerClient.class),mock(Server.class),mock(AnalysisContextReportPublisher.class),reactor,mode,mock(TempFolder.class),new ReportPublisherStep[0]);
-  Logger logger=mock(Logger.class);
-  job.logSuccess(logger,null);
-  verify(logger).info("ANALYSIS SUCCESSFUL");
-  verifyNoMoreInteractions(logger);
+  job.start();
+  job.stop();
+  assertThat(reportDir).doesNotExist();
 }
