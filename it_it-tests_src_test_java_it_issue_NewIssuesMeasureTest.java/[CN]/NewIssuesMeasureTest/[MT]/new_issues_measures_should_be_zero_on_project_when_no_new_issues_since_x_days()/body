@@ -1,0 +1,12 @@
+{
+  ORCHESTRATOR.getServer().provisionProject("sample","Sample");
+  ORCHESTRATOR.getServer().restoreProfile(FileLocation.ofClasspath("/issue/one-issue-per-line-profile.xml"));
+  ORCHESTRATOR.getServer().associateProjectToQualityProfile("sample","xoo","one-issue-per-line-profile");
+  ORCHESTRATOR.executeBuild(SonarRunner.create(projectDir("shared/xoo-sample")).setProperty("sonar.projectDate","2013-01-01"));
+  ORCHESTRATOR.executeBuild(SonarRunner.create(projectDir("shared/xoo-sample")));
+  Resource file=ORCHESTRATOR.getServer().getWsClient().find(ResourceQuery.createForMetrics("sample","new_violations").setIncludeTrends(true));
+  List<Measure> measures=file.getMeasures();
+  Measure newIssues=find(measures,"new_violations");
+  assertThat(newIssues.getVariation1().intValue()).isEqualTo(0);
+  assertThat(newIssues.getVariation2().intValue()).isEqualTo(0);
+}

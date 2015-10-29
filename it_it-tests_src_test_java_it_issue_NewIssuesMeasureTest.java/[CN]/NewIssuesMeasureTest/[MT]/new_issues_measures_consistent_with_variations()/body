@@ -1,0 +1,21 @@
+{
+  ORCHESTRATOR.getServer().provisionProject("sample","Sample");
+  ORCHESTRATOR.getServer().restoreProfile(FileLocation.ofClasspath("/issue/one-issue-per-line-profile.xml"));
+  ORCHESTRATOR.getServer().associateProjectToQualityProfile("sample","xoo","one-issue-per-line-profile");
+  ORCHESTRATOR.executeBuilds(SonarRunner.create(projectDir("shared/xoo-history-v1")));
+  ORCHESTRATOR.executeBuilds(SonarRunner.create(projectDir("shared/xoo-history-v2")));
+  assertThat(ORCHESTRATOR.getServer().wsClient().issueClient().find(IssueQuery.create()).list()).isNotEmpty();
+  Resource file=ORCHESTRATOR.getServer().getWsClient().find(ResourceQuery.createForMetrics("sample","new_violations","violations","ncloc").setIncludeTrends(true));
+  List<Measure> measures=file.getMeasures();
+  Measure newIssues=find(measures,"new_violations");
+  assertThat(newIssues.getVariation1().intValue()).isEqualTo(17);
+  assertThat(newIssues.getVariation2().intValue()).isEqualTo(17);
+  Measure violations=find(measures,"violations");
+  assertThat(violations.getValue().intValue()).isEqualTo(43);
+  assertThat(violations.getVariation1().intValue()).isEqualTo(17);
+  assertThat(violations.getVariation2().intValue()).isEqualTo(17);
+  Measure ncloc=find(measures,"ncloc");
+  assertThat(ncloc.getValue().intValue()).isEqualTo(40);
+  assertThat(ncloc.getVariation1().intValue()).isEqualTo(16);
+  assertThat(ncloc.getVariation2().intValue()).isEqualTo(16);
+}
