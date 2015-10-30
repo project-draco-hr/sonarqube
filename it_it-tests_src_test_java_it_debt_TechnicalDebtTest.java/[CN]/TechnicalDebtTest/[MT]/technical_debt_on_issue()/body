@@ -1,0 +1,11 @@
+{
+  orchestrator.getServer().restoreProfile(FileLocation.ofClasspath("/debt/one-issue-per-line.xml"));
+  orchestrator.getServer().provisionProject("sample","sample");
+  orchestrator.getServer().associateProjectToQualityProfile("sample","xoo","one-issue-per-line");
+  orchestrator.executeBuild(SonarRunner.create(projectDir("shared/xoo-sample")));
+  List<Issue> issues=orchestrator.getServer().wsClient().issueClient().find(IssueQuery.create()).list();
+  assertThat(issues).isNotEmpty();
+  for (  Issue issue : issues) {
+    assertThat(issue.debt()).isEqualTo("1min");
+  }
+}

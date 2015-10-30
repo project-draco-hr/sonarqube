@@ -1,0 +1,10 @@
+{
+  orchestrator.getServer().restoreProfile(FileLocation.ofClasspath("/debt/one-issue-per-file.xml"));
+  orchestrator.getServer().provisionProject("sample","sample");
+  orchestrator.getServer().associateProjectToQualityProfile("sample","xoo","one-issue-per-file");
+  setServerProperty(orchestrator,"sonar.technicalDebt.hoursInDay","10");
+  orchestrator.executeBuild(SonarRunner.create(projectDir("shared/xoo-sample")).setProperties("sonar.oneIssuePerFile.effortToFix","72"));
+  IssueClient issueClient=orchestrator.getServer().wsClient().issueClient();
+  Issue issue=issueClient.find(IssueQuery.create()).list().get(0);
+  assertThat(issue.debt()).isEqualTo("1d2h");
+}
