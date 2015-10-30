@@ -1,16 +1,12 @@
 {
-  try {
-    new WebService(){
-      @Override public void define(      Context context){
-        NewController controller=context.createController("rule");
-        controller.createAction("show");
-        controller.done();
-      }
+  expectedException.expect(IllegalStateException.class);
+  expectedException.expectMessage("RequestHandler is not set on action rule/show");
+  new WebService(){
+    @Override public void define(    Context context){
+      NewController controller=context.createController("rule");
+      newDefaultAction(controller,"show").setHandler(null);
+      controller.done();
     }
+  }
 .define(context);
-    fail();
-  }
- catch (  IllegalArgumentException e) {
-    assertThat(e).hasMessage("RequestHandler is not set on action rule/show");
-  }
 }
