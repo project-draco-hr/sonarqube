@@ -1,18 +1,14 @@
 {
+  expectedException.expect(IllegalStateException.class);
+  expectedException.expectMessage("The web service 'api/metric' is defined multiple times");
   MetricWs metricWs=new MetricWs();
   metricWs.define(context);
-  try {
-    new WebService(){
-      @Override public void define(      Context context){
-        NewController newController=context.createController("api/metric");
-        newController.createAction("delete");
-        newController.done();
-      }
+  new WebService(){
+    @Override public void define(    Context context){
+      NewController newController=context.createController("api/metric");
+      newDefaultAction(newController,"delete");
+      newController.done();
     }
+  }
 .define(context);
-    fail();
-  }
- catch (  IllegalStateException e) {
-    assertThat(e).hasMessage("The web service 'api/metric' is defined multiple times");
-  }
 }

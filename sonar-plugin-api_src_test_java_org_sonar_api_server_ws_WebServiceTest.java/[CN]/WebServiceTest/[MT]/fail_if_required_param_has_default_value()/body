@@ -1,17 +1,13 @@
 {
-  try {
-    new WebService(){
-      @Override public void define(      Context context){
-        NewController controller=context.createController("api/rule");
-        NewAction action=controller.createAction("create").setHandler(mock(RequestHandler.class));
-        action.createParam("key").setRequired(true).setDefaultValue("abc");
-        controller.done();
-      }
+  expectedException.expect(IllegalArgumentException.class);
+  expectedException.expectMessage("Default value must not be set on parameter 'api/rule/create?key' as it's marked as required");
+  new WebService(){
+    @Override public void define(    Context context){
+      NewController controller=context.createController("api/rule");
+      NewAction action=newDefaultAction(controller,"create");
+      action.createParam("key").setRequired(true).setDefaultValue("abc");
+      controller.done();
     }
+  }
 .define(context);
-    fail();
-  }
- catch (  IllegalArgumentException e) {
-    assertThat(e).hasMessage("Default value must not be set on parameter 'api/rule/create?key' as it's marked as required");
-  }
 }
