@@ -2,10 +2,15 @@
   List<DefaultIssue> trackedIssues=Lists.newArrayList();
   if (hasServerAnalysis) {
     Collection<ServerIssue> serverIssues=loadServerIssues(component);
-    SourceHashHolder sourceHashHolder=loadSourceHashes(component);
-    IssueTrackingResult trackingResult=tracking.track(sourceHashHolder,serverIssues,rawIssues);
-    addUnmatchedFromServer(trackingResult.unmatched(),sourceHashHolder,trackedIssues);
-    mergeMatched(component,trackingResult,trackedIssues,rawIssues);
+    if (shouldCopyServerIssues(component)) {
+      copyServerIssues(serverIssues,trackedIssues);
+    }
+ else {
+      SourceHashHolder sourceHashHolder=loadSourceHashes(component);
+      IssueTrackingResult trackingResult=tracking.track(sourceHashHolder,serverIssues,rawIssues);
+      addUnmatchedFromServer(trackingResult.unmatched(),sourceHashHolder,trackedIssues);
+      mergeMatched(component,trackingResult,trackedIssues,rawIssues);
+    }
   }
   if (hasServerAnalysis && ResourceUtils.isRootProject(component.resource())) {
     addIssuesOnDeletedComponents(trackedIssues);

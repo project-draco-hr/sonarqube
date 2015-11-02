@@ -1,0 +1,20 @@
+{
+  restoreProfile("one-issue-per-line.xml");
+  orchestrator.getServer().provisionProject("sample","xoo-sample");
+  orchestrator.getServer().associateProjectToQualityProfile("sample","xoo","one-issue-per-line");
+  SonarRunner runner=configureRunner("shared/xoo-sample","sonar.verbose","true");
+  BuildResult result=orchestrator.executeBuild(runner);
+  List<Issue> serverIssues=ItUtils.getAllServerIssues(orchestrator);
+  for (  Issue i : serverIssues) {
+    assertThat(i.status()).isEqualTo("OPEN");
+  }
+  assertThat(serverIssues).hasSize(17);
+  IssueClient issueClient=orchestrator.getServer().wsClient("admin","admin").issueClient();
+  issueClient.doTransition(serverIssues.get(0).key(),"wontfix");
+  issueClient.doTransition(serverIssues.get(1).key(),"wontfix");
+  runner=configureRunnerIssues("shared/xoo-sample","sonar.verbose","true","sonar.scanChangedFilesOnly","true");
+  result=orchestrator.executeBuild(runner);
+  assertThat(result.getLogs()).contains("Scanning only changed files");
+  assertThat(result.getLogs()).contains("'One Issue Per Line' skipped because there is no related file in current project");
+  ItUtils.assertIssuesInJsonReport(result,0,0,15);
+}
