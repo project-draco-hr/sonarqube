@@ -1,0 +1,8 @@
+{
+  ActionPlan newActionPlan=adminActionPlanClient().create(NewActionPlan.create().name("Short term").project(PROJECT_KEY).description("Short term issues").deadLine(toDate("2113-01-31")));
+  Issue issue=searchRandomIssue();
+  adminIssueClient().plan(issue.key(),newActionPlan.key());
+  adminActionPlanClient().delete(newActionPlan.key());
+  Issue reloaded=searchIssueByKey(issue.key());
+  assertThat(reloaded.actionPlan()).isNull();
+}
