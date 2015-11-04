@@ -22,15 +22,17 @@
     }
   }
   if (relativePathFromSourceDir != null) {
-    List<java.io.File> dirs;
+    List<String> dirs;
+    ProjectDefinition projectDef=projectTree.getProjectDefinition(getProject());
     if (isTest) {
-      dirs=getProject().getFileSystem().getTestDirs();
+      dirs=projectDef.getTestDirs();
     }
  else {
-      dirs=getProject().getFileSystem().getSourceDirs();
+      dirs=projectDef.getSourceDirs();
     }
-    for (    java.io.File src : dirs) {
-      java.io.File abs=new java.io.File(src,relativePathFromSourceDir);
+    for (    String src : dirs) {
+      java.io.File dirOrFile=pathResolver.relativeFile(projectDef.getBaseDir(),src);
+      java.io.File abs=new java.io.File(dirOrFile,relativePathFromSourceDir);
       Bucket b=getBucket(isDir ? Directory.fromIOFile(abs,getProject()) : File.fromIOFile(abs,getProject()));
       if (b != null) {
         return b;
