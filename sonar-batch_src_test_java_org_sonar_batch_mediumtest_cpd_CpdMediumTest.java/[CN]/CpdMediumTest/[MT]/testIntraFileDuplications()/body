@@ -8,13 +8,12 @@
   Map<String,List<org.sonar.batch.protocol.output.BatchReport.Measure>> allMeasures=result.allMeasures();
   assertThat(allMeasures.get("com.foo.project:src/sample.xoo")).extracting("metricKey","intValue").contains(tuple("duplicated_blocks",2),tuple("duplicated_files",1),tuple("duplicated_lines",4));
   InputFile inputFile=result.inputFile("src/sample.xoo");
-  List<Duplication> duplicationGroups=result.duplicationsFor(inputFile);
+  List<org.sonar.batch.protocol.output.BatchReport.Duplication> duplicationGroups=result.duplicationsFor(inputFile);
   assertThat(duplicationGroups).hasSize(1);
-  Duplication cloneGroup=duplicationGroups.get(0);
-  assertThat(cloneGroup.duplicates()).hasSize(1);
-  assertThat(cloneGroup.originBlock().startLine()).isEqualTo(1);
-  assertThat(cloneGroup.originBlock().length()).isEqualTo(2);
-  assertThat(cloneGroup.duplicates()).hasSize(1);
-  assertThat(cloneGroup.duplicates().get(0).startLine()).isEqualTo(5);
-  assertThat(cloneGroup.duplicates().get(0).length()).isEqualTo(2);
+  org.sonar.batch.protocol.output.BatchReport.Duplication cloneGroup=duplicationGroups.get(0);
+  assertThat(cloneGroup.getOriginPosition().getStartLine()).isEqualTo(1);
+  assertThat(cloneGroup.getOriginPosition().getEndLine()).isEqualTo(2);
+  assertThat(cloneGroup.getDuplicateList()).hasSize(1);
+  assertThat(cloneGroup.getDuplicate(0).getRange().getStartLine()).isEqualTo(5);
+  assertThat(cloneGroup.getDuplicate(0).getRange().getEndLine()).isEqualTo(6);
 }

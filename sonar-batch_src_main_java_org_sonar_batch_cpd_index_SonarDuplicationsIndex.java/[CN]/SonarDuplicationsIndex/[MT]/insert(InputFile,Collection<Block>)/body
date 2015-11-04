@@ -1,4 +1,22 @@
 {
+  if (isCrossProjectDuplicationEnabled(settings)) {
+    int id=batchComponentCache.get(inputFile).batchId();
+    final BatchReport.DuplicationBlock.Builder builder=BatchReport.DuplicationBlock.newBuilder();
+    publisher.getWriter().writeDuplicationBlocks(id,Iterables.transform(blocks,new Function<Block,BatchReport.DuplicationBlock>(){
+      @Override public DuplicationBlock apply(      Block input){
+        builder.clear();
+        builder.setStartLine(input.getStartLine());
+        builder.setEndLine(input.getEndLine());
+        builder.setStartTokenIndex(input.getStartUnit());
+        builder.setEndTokenIndex(input.getEndUnit());
+        for (        int i : input.getBlockHash().toIntArray()) {
+          builder.addHash(i);
+        }
+        return builder.build();
+      }
+    }
+));
+  }
   for (  Block block : blocks) {
     mem.insert(block);
   }
