@@ -2,14 +2,14 @@
   Stream stream=response.stream();
   stream.setMediaType(MimeTypes.XML);
   OutputStreamWriter writer=new OutputStreamWriter(stream.output(),StandardCharsets.UTF_8);
-  DbSession dbSession=dbClient.openSession(false);
+  DbSession session=dbClient.openSession(false);
   try {
-    String profileKey=QProfileIdentificationParamUtils.getProfileKeyFromParameters(request,profileFactory,dbSession);
+    String profileKey=QProfileIdentificationParamUtils.getProfileKeyFromParameters(request,profileFactory,session);
     backuper.backup(profileKey,writer);
     response.setHeader("Content-Disposition",String.format("attachment; filename=%s.xml",profileKey));
   }
   finally {
-    dbSession.close();
+    session.close();
     IOUtils.closeQuietly(writer);
   }
 }
