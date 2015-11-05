@@ -1,6 +1,4 @@
 {
-  File projectDir=copyProject("/mediumtest/xoo/sample");
-  TaskResult result=tester.newScanTask(new File(projectDir,"sonar-project.properties")).property("sonar.scanChangedFilesOnly","true").start();
   int newIssues=0;
   int openIssues=0;
   int resolvedIssue=0;
@@ -17,13 +15,7 @@
     }
   }
   System.out.println("new: " + newIssues + " open: "+ openIssues+ " resolved "+ resolvedIssue);
-  assertThat(newIssues).isEqualTo(8);
-  assertThat(openIssues).isEqualTo(3);
-  assertThat(resolvedIssue).isEqualTo(0);
-  assertThat(result.trackedIssues()).haveExactly(2,new Condition<Issue>(){
-    @Override public boolean matches(    Issue value){
-      return value.componentKey().endsWith("HelloJava.xoo");
-    }
-  }
-);
+  assertThat(newIssues).isEqualTo(expectedNew);
+  assertThat(openIssues).isEqualTo(expectedOpen);
+  assertThat(resolvedIssue).isEqualTo(expectedResolved);
 }
