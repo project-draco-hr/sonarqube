@@ -1,14 +1,18 @@
 {
-  expectedException.expect(IllegalStateException.class);
-  expectedException.expectMessage("The action 'delete' is defined multiple times in the web service 'rule'");
-  new WebService(){
-    @Override public void define(    Context context){
-      NewController newController=context.createController("rule");
-      newDefaultAction(newController,"create");
-      newDefaultAction(newController,"delete");
-      newDefaultAction(newController,"delete");
-      newController.done();
+  try {
+    new WebService(){
+      @Override public void define(      Context context){
+        NewController newController=context.createController("rule");
+        newController.createAction("create");
+        newController.createAction("delete");
+        newController.createAction("delete");
+        newController.done();
+      }
     }
-  }
 .define(context);
+    fail();
+  }
+ catch (  IllegalStateException e) {
+    assertThat(e).hasMessage("The action 'delete' is defined multiple times in the web service 'rule'");
+  }
 }

@@ -1,14 +1,18 @@
 {
-  expectedException.expect(IllegalStateException.class);
-  expectedException.expectMessage("The parameter 'key' is defined multiple times in the action 'create'");
-  new WebService(){
-    @Override public void define(    Context context){
-      NewController controller=context.createController("api/rule");
-      NewAction action=newDefaultAction(controller,"create");
-      action.createParam("key");
-      action.createParam("key");
-      controller.done();
+  try {
+    new WebService(){
+      @Override public void define(      Context context){
+        NewController controller=context.createController("api/rule");
+        NewAction action=controller.createAction("create").setHandler(mock(RequestHandler.class));
+        action.createParam("key");
+        action.createParam("key");
+        controller.done();
+      }
     }
-  }
 .define(context);
+    fail();
+  }
+ catch (  IllegalStateException e) {
+    assertThat(e).hasMessage("The parameter 'key' is defined multiple times in the action 'create'");
+  }
 }
