@@ -1,0 +1,23 @@
+{
+  RuleKey ruleKey=RuleKey.of(rawIssue.getRuleRepository(),rawIssue.getRuleKey());
+  Preconditions.checkNotNull(component.key(),"Component key must be set");
+  Preconditions.checkNotNull(ruleKey,"Rule key must be set");
+  TrackedIssue issue=new TrackedIssue();
+  issue.setKey(Uuids.create());
+  issue.setComponentKey(component.key());
+  issue.setRuleKey(ruleKey);
+  issue.setEffortToFix(rawIssue.hasEffortToFix() ? rawIssue.getEffortToFix() : null);
+  issue.setSeverity(rawIssue.getSeverity().name());
+  issue.setMessage(rawIssue.hasMsg() ? rawIssue.getMsg() : null);
+  issue.setResolution(null);
+  issue.setStatus(Issue.STATUS_OPEN);
+  issue.setNew(true);
+  if (rawIssue.hasTextRange()) {
+    TextRange r=rawIssue.getTextRange();
+    issue.setStartLine(r.hasStartLine() ? rawIssue.getTextRange().getStartLine() : null);
+    issue.setStartLineOffset(r.hasStartOffset() ? r.getStartOffset() : null);
+    issue.setEndLine(r.hasEndLine() ? r.getEndLine() : issue.startLine());
+    issue.setEndLineOffset(r.hasEndOffset() ? r.getEndOffset() : null);
+  }
+  return issue;
+}

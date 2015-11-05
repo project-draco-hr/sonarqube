@@ -1,0 +1,29 @@
+{
+  ReportRuleKey reportRuleKey=new ReportRuleKey(rule,severity);
+  initMaps(reportRuleKey);
+  issues.add(issue);
+  Integer line=issue.startLine();
+  line=line != null ? line : 0;
+  if (!issuesPerLine.containsKey(line)) {
+    issuesPerLine.put(line,new ArrayList<TrackedIssue>());
+  }
+  issuesPerLine.get(line).add(issue);
+  if (!issuesByRule.containsKey(rule)) {
+    issuesByRule.put(rule,new AtomicInteger());
+  }
+  issuesByRule.get(rule).incrementAndGet();
+  if (!issuesBySeverity.containsKey(severity)) {
+    issuesBySeverity.put(severity,new AtomicInteger());
+  }
+  issuesBySeverity.get(severity).incrementAndGet();
+  ruleReportByRuleKey.get(reportRuleKey).getTotal().incrementCountInCurrentAnalysis();
+  total.incrementCountInCurrentAnalysis();
+  if (issue.isNew()) {
+    if (!newIssuesPerLine.containsKey(line)) {
+      newIssuesPerLine.put(line,new ArrayList<TrackedIssue>());
+    }
+    newIssuesPerLine.get(line).add(issue);
+    total.incrementNewIssuesCount();
+    ruleReportByRuleKey.get(reportRuleKey).getTotal().incrementNewIssuesCount();
+  }
+}
