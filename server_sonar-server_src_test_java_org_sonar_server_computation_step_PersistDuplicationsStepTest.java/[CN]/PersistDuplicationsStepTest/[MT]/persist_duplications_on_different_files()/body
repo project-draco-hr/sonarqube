@@ -1,17 +1,8 @@
 {
   saveDuplicationMetric();
-  Component file2=ReportComponent.builder(Component.Type.FILE,3).setUuid("CDEF").setKey("PROJECT_KEY:file2").build();
-  Component file=ReportComponent.builder(Component.Type.FILE,2).setUuid("BCDE").setKey("PROJECT_KEY:file").build();
-  Component project=ReportComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).addChildren(file,file2).build();
-  treeRootHolder.setRoot(project);
-  dbIdsRepository.setComponentId(project,1);
-  dbIdsRepository.setSnapshotId(project,10);
-  dbIdsRepository.setComponentId(file,2);
-  dbIdsRepository.setSnapshotId(file,11);
-  dbIdsRepository.setComponentId(file2,2);
-  dbIdsRepository.setSnapshotId(file2,12);
-  BatchReport.Duplication duplication=BatchReport.Duplication.newBuilder().setOriginPosition(BatchReport.TextRange.newBuilder().setStartLine(1).setEndLine(5).build()).addDuplicate(BatchReport.Duplicate.newBuilder().setOtherFileRef(3).setRange(BatchReport.TextRange.newBuilder().setStartLine(6).setEndLine(10).build()).build()).build();
-  reportReader.putDuplications(2,newArrayList(duplication));
+  initReportWithProjectAndFile();
+  BatchReport.Duplication duplication=BatchReport.Duplication.newBuilder().setOriginPosition(BatchReport.TextRange.newBuilder().setStartLine(1).setEndLine(5).build()).addDuplicate(BatchReport.Duplicate.newBuilder().setOtherFileRef(FILE_2_REF).setRange(BatchReport.TextRange.newBuilder().setStartLine(6).setEndLine(10).build()).build()).build();
+  reportReader.putDuplications(FILE_1_REF,newArrayList(duplication));
   underTest.execute();
   assertThat(dbTester.countRowsOfTable("project_measures")).isEqualTo(1);
   Map<String,Object> dto=dbTester.selectFirst("select snapshot_id as \"snapshotId\", text_value as \"textValue\" from project_measures");
