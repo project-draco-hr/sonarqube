@@ -1,0 +1,9 @@
+{
+  DefaultDuplication dup1=new DefaultDuplication().setOriginBlock(new Duplication.Block("foo:src/Foo.php",11,10)).isDuplicatedBy("another",20,50);
+  when(duplicationCache.byComponent("foo:src/Foo.php")).thenReturn(Arrays.asList(dup1));
+  expectedException.expect(ContextException.class);
+  expectedException.expectCause(new CauseMatcher(IllegalStateException.class,"No cross project duplication supported on batch side: another"));
+  File outputDir=temp.newFolder();
+  BatchReportWriter writer=new BatchReportWriter(outputDir);
+  publisher.publish(writer);
+}
