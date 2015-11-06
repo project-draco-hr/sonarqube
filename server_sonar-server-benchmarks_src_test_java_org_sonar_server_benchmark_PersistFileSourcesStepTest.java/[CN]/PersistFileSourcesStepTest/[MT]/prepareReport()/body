@@ -6,10 +6,14 @@
   BatchReport.Component.Builder project=BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT);
   List<Component> components=new ArrayList<>();
   for (int fileRef=2; fileRef <= NUMBER_OF_FILES + 1; fileRef++) {
-    components.add(generateFileReport(writer,fileRef));
-    project.addChildRef(fileRef);
+    ReportComponent component=ReportComponent.builder(Component.Type.FILE,fileRef).setUuid(Uuids.create()).setKey("PROJECT:" + fileRef).build();
+    components.add(component);
   }
   treeRootHolder.setRoot(ReportComponent.builder(Component.Type.PROJECT,1).setUuid(PROJECT_UUID).setKey("PROJECT").addChildren(components.toArray(new Component[components.size()])).build());
+  for (int fileRef=2; fileRef <= NUMBER_OF_FILES + 1; fileRef++) {
+    generateFileReport(writer,fileRef);
+    project.addChildRef(fileRef);
+  }
   writer.writeComponent(project.build());
   return reportDir;
 }

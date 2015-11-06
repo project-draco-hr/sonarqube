@@ -9,11 +9,11 @@
   SourceLinesRepositoryImpl sourceLinesRepository=new SourceLinesRepositoryImpl(batchReportReader);
   SourceHashRepositoryImpl sourceHashRepository=new SourceHashRepositoryImpl(sourceLinesRepository);
   ScmInfoRepositoryImpl scmInfoRepository=new ScmInfoRepositoryImpl(batchReportReader,analysisMetadataHolder,dbClient,sourceHashRepository);
-  PersistFileSourcesStep step=new PersistFileSourcesStep(dbClient,System2.INSTANCE,treeRootHolder,batchReportReader,sourceLinesRepository,scmInfoRepository);
+  PersistFileSourcesStep step=new PersistFileSourcesStep(dbClient,System2.INSTANCE,treeRootHolder,batchReportReader,sourceLinesRepository,scmInfoRepository,duplicationRepository);
   step.execute();
   long end=System.currentTimeMillis();
   long duration=end - start;
   assertThat(dbTester.countRowsOfTable("file_sources")).isEqualTo(NUMBER_OF_FILES);
-  LOGGER.info(String.format("File sources has been persisted in %d ms",duration));
+  LOGGER.info(String.format("File sources have been persisted in %d ms",duration));
   benchmark.expectAround("Duration to persist FILE_SOURCES",duration,125000,Benchmark.DEFAULT_ERROR_MARGIN_PERCENTS);
 }

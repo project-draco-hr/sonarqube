@@ -1,7 +1,6 @@
 {
-  int line=lineBuilder.getLine();
-  List<BatchReport.TextRange> blocks=findDuplicationBlockMatchingLine(line);
-  for (  BatchReport.TextRange block : blocks) {
-    lineBuilder.addDuplication(duplicationIdsByRange.get(block));
+  Predicate<Map.Entry<TextBlock,Integer>> containsLine=new TextBlockContainsLine(lineBuilder.getLine());
+  for (  Integer textBlockIndex : from(duplicatedTextBlockIndexByTextBlock.entrySet()).filter(containsLine).transform(MapEntryToBlockId.INSTANCE).toSortedList(Ordering.natural())) {
+    lineBuilder.addDuplication(textBlockIndex);
   }
 }

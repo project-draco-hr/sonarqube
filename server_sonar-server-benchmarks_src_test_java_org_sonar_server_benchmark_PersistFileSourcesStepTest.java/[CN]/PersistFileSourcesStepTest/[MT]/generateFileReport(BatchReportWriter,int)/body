@@ -2,6 +2,7 @@
   LineData lineData=new LineData();
   for (int line=1; line <= NUMBER_OF_LINES; line++) {
     lineData.generateLineData(line);
+    duplicationRepository.addDuplication(fileRef,new TextBlock(line,line),new TextBlock(line + 1,line + 1));
   }
   writer.writeComponent(BatchReport.Component.newBuilder().setRef(fileRef).setType(Constants.ComponentType.FILE).setLines(NUMBER_OF_LINES).build());
   FileUtils.writeLines(writer.getSourceFile(fileRef),lineData.lines);
@@ -9,6 +10,5 @@
   writer.writeComponentChangesets(lineData.changesetsBuilder.setComponentRef(fileRef).build());
   writer.writeComponentSyntaxHighlighting(fileRef,lineData.highlightings);
   writer.writeComponentSymbols(fileRef,lineData.symbols);
-  writer.writeComponentDuplications(fileRef,lineData.duplications);
   return ReportComponent.builder(Component.Type.FILE,fileRef).setUuid(Uuids.create()).setKey("PROJECT:" + fileRef).build();
 }
