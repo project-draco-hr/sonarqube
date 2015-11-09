@@ -1,0 +1,19 @@
+{
+  Set<Duplication> duplications=requireNonNull(this.duplicationRepository,"DuplicationRepository missing").getDuplications(file);
+  if (duplications.isEmpty()) {
+    return;
+  }
+  Set<Integer> duplicatedLineNumbers=new HashSet<>();
+  long blocks=0;
+  for (  Duplication duplication : duplications) {
+    blocks++;
+    addLines(duplication.getOriginal(),duplicatedLineNumbers);
+    for (    InnerDuplicate innerDuplicate : from(duplication.getDuplicates()).filter(InnerDuplicate.class)) {
+      blocks++;
+      addLines(innerDuplicate.getTextBlock(),duplicatedLineNumbers);
+    }
+  }
+  this.fileCount+=1;
+  this.blockCount+=blocks;
+  this.lineCount+=duplicatedLineNumbers.size();
+}
