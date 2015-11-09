@@ -1,5 +1,5 @@
 {
-  Set<BatchReport.Issue> rawIssues=Sets.newIdentityHashSet();
+  List<BatchReport.Issue> rawIssues=new LinkedList<>();
   try (CloseableIterator<BatchReport.Issue> it=reader.readComponentIssues(component.batchId())){
     while (it.hasNext()) {
       rawIssues.add(it.next());
@@ -10,12 +10,11 @@
   }
   List<TrackedIssue> trackedIssues;
   if (localIssueTracking != null) {
-    trackedIssues=localIssueTracking.trackIssues(component,rawIssues);
+    trackedIssues=localIssueTracking.trackIssues(component,rawIssues,analysisDate);
   }
  else {
-    trackedIssues=Lists.newArrayList();
+    trackedIssues=doTransition(rawIssues,component);
   }
-  addUnmatchedRawIssues(component,rawIssues,trackedIssues);
   for (  TrackedIssue issue : trackedIssues) {
     issueCache.put(issue);
   }

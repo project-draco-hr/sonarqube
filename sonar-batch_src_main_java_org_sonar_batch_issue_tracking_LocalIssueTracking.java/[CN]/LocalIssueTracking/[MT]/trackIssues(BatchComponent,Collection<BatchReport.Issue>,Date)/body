@@ -1,0 +1,24 @@
+{
+  List<TrackedIssue> trackedIssues=new LinkedList<>();
+  if (hasServerAnalysis) {
+    Collection<ServerIssueFromWs> serverIssues=loadServerIssues(component);
+    if (shouldCopyServerIssues(component)) {
+      copyServerIssues(serverIssues,trackedIssues);
+    }
+ else {
+      SourceHashHolder sourceHashHolder=loadSourceHashes(component);
+      Collection<TrackedIssue> rIssues=IssueTransformer.toTrackedIssue(component,reportIssues,sourceHashHolder);
+      Input<ServerIssueFromWs> baseIssues=createBaseInput(serverIssues,sourceHashHolder);
+      Input<TrackedIssue> rawIssues=createRawInput(rIssues,sourceHashHolder);
+      Tracking<TrackedIssue,ServerIssueFromWs> track=tracker.track(rawIssues,baseIssues);
+      addUnmatchedFromServer(track.getUnmatchedBases(),sourceHashHolder,trackedIssues);
+      addUnmatchedFromServer(track.getOpenManualIssuesByLine().values(),sourceHashHolder,trackedIssues);
+      mergeMatched(track,trackedIssues,rIssues);
+      addUnmatchedFromReport(track.getUnmatchedRaws(),trackedIssues,analysisDate);
+    }
+  }
+  if (hasServerAnalysis && ResourceUtils.isRootProject(component.resource())) {
+    addIssuesOnDeletedComponents(trackedIssues);
+  }
+  return trackedIssues;
+}
