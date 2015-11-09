@@ -1,0 +1,13 @@
+{
+  if (componentsByRef != null) {
+    return;
+  }
+  final ImmutableMap.Builder<Integer,Component> builder=ImmutableMap.builder();
+  new DepthTraversalTypeAwareCrawler(new TypeAwareVisitorAdapter(CrawlerDepthLimit.FILE,POST_ORDER){
+    @Override public void visitAny(    Component component){
+      builder.put(component.getReportAttributes().getRef(),component);
+    }
+  }
+).visit(this.root);
+  this.componentsByRef=builder.build();
+}
