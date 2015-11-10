@@ -11,7 +11,7 @@
   TaskResult result=tester.newTask().properties(builder.put("sonar.sources","src").put("sonar.cpd.xoo.minimumTokens","1").put("sonar.cpd.xoo.minimumLines","1").build()).start();
   Map<String,List<Measure>> allMeasures=result.allMeasures();
   assertThat(allMeasures.get("com.foo.project")).extracting("metricKey","intValue","doubleValue","stringValue").containsOnly(Tuple.tuple(CoreMetrics.QUALITY_PROFILES_KEY,0,0.0,"[{\"key\":\"Sonar Way\",\"language\":\"xoo\",\"name\":\"Sonar Way\",\"rulesUpdatedAt\":\"2009-02-13T23:31:31+0000\"}]"));
-  assertThat(allMeasures.get("com.foo.project:src/sample.xoo")).extracting("metricKey","intValue").containsOnly(Tuple.tuple(CoreMetrics.LINES_KEY,blockCount * 2 + 1),Tuple.tuple(CoreMetrics.DUPLICATED_FILES_KEY,1),Tuple.tuple(CoreMetrics.DUPLICATED_BLOCKS_KEY,blockCount),Tuple.tuple(CoreMetrics.DUPLICATED_LINES_KEY,blockCount));
+  assertThat(allMeasures.get("com.foo.project:src/sample.xoo")).extracting("metricKey","intValue").containsOnly(Tuple.tuple(CoreMetrics.LINES_KEY,blockCount * 2 + 1));
   List<org.sonar.batch.protocol.output.BatchReport.Duplication> duplicationGroups=result.duplicationsFor(result.inputFile("src/sample.xoo"));
   assertThat(duplicationGroups).hasSize(1);
   org.sonar.batch.protocol.output.BatchReport.Duplication cloneGroup=duplicationGroups.get(0);
