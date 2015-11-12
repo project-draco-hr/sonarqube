@@ -1,0 +1,16 @@
+{
+  String permission=request.getPermission();
+  final String userLogin=request.getLogin();
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    validateProjectPermission(permission);
+    PermissionTemplateDto template=dependenciesFinder.getTemplate(dbSession,newTemplateRef(request.getTemplateId(),request.getTemplateName()));
+    UserDto user=dependenciesFinder.getUser(dbSession,userLogin);
+    if (!isUserAlreadyAdded(dbSession,template.getId(),userLogin,permission)) {
+      dbClient.permissionTemplateDao().insertUserPermission(dbSession,template.getId(),user.getId(),permission);
+    }
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}
