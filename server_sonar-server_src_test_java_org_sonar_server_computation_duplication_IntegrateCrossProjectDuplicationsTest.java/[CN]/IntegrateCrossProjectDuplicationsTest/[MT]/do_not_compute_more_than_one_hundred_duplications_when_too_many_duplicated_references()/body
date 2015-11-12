@@ -1,0 +1,12 @@
+{
+  Collection<Block> originBlocks=new ArrayList<>();
+  Collection<Block> duplicatedBlocks=new ArrayList<>();
+  Block.Builder blockBuilder=new Block.Builder().setResourceId(ORIGIN_FILE_KEY).setBlockHash(new ByteArray("a8998353e96320ec")).setIndexInFile(0).setLines(30,45).setUnit(0,100);
+  originBlocks.add(blockBuilder.build());
+  for (int i=0; i < 110; i++) {
+    duplicatedBlocks.add(blockBuilder.setResourceId(randomAlphanumeric(16)).build());
+  }
+  underTest.computeCpd(ORIGIN_FILE,originBlocks,duplicatedBlocks);
+  assertThat(logTester.logs(LoggerLevel.WARN)).containsOnly("Too many duplication references on file " + ORIGIN_FILE_KEY + " for block at line 30. Keeping only the first 100 references.");
+  verify(duplicationRepository,times(100)).addDuplication(eq(ORIGIN_FILE),any(TextBlock.class),anyString(),any(TextBlock.class));
+}

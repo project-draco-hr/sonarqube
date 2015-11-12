@@ -1,0 +1,16 @@
+{
+  when(crossProjectDuplicationStatusHolder.isEnabled()).thenReturn(true);
+  analysisMetadataHolder.setBaseProjectSnapshot(baseProjectSnapshot);
+  ComponentDto otherProject=createProject("OTHER_PROJECT_KEY");
+  SnapshotDto otherProjectSnapshot=createProjectSnapshot(otherProject);
+  ComponentDto otherFIle=createFile("OTHER_FILE_KEY",otherProject);
+  SnapshotDto otherFileSnapshot=createFileSnapshot(otherFIle,otherProjectSnapshot);
+  String hash="a8998353e96320ec";
+  DuplicationUnitDto duplicate=new DuplicationUnitDto().setHash(hash).setStartLine(40).setEndLine(55).setIndexInFile(0).setProjectSnapshotId(otherProjectSnapshot.getId()).setSnapshotId(otherFileSnapshot.getId());
+  dbClient.duplicationDao().insert(dbSession,singletonList(duplicate));
+  dbSession.commit();
+  BatchReport.CpdTextBlock originBlock=BatchReport.CpdTextBlock.newBuilder().setHash(hash).setStartLine(30).setEndLine(45).setStartTokenIndex(0).setEndTokenIndex(10).build();
+  batchReportReader.putDuplicationBlocks(FILE_REF,asList(originBlock));
+  underTest.execute();
+  verify(integrateCrossProjectDuplications).computeCpd(CURRENT_FILE,Arrays.asList(new Block.Builder().setResourceId(CURRENT_FILE_KEY).setBlockHash(new ByteArray(hash)).setIndexInFile(0).setLines(originBlock.getStartLine(),originBlock.getEndLine()).setUnit(originBlock.getStartTokenIndex(),originBlock.getEndTokenIndex()).build()),Arrays.asList(new Block.Builder().setResourceId(otherFIle.getKey()).setBlockHash(new ByteArray(hash)).setIndexInFile(duplicate.getIndexInFile()).setLines(duplicate.getStartLine(),duplicate.getEndLine()).build()));
+}

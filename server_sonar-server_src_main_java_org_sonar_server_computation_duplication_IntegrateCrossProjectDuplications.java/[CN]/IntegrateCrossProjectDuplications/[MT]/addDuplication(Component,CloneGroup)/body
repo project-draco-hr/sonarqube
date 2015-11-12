@@ -1,0 +1,13 @@
+{
+  ClonePart originPart=duplication.getOriginPart();
+  TextBlock originTextBlock=new TextBlock(originPart.getStartLine(),originPart.getEndLine());
+  int clonePartCount=0;
+  for (  ClonePart part : from(duplication.getCloneParts()).filter(new DoesNotMatchOriginalPart(originPart))) {
+    clonePartCount++;
+    if (clonePartCount > MAX_CLONE_PART_PER_GROUP) {
+      LOGGER.warn("Too many duplication references on file {} for block at line {}. Keeping only the first {} references.",file.getKey(),originPart.getStartLine(),MAX_CLONE_PART_PER_GROUP);
+      break;
+    }
+    duplicationRepository.addDuplication(file,originTextBlock,part.getResourceId(),new TextBlock(part.getStartLine(),part.getEndLine()));
+  }
+}

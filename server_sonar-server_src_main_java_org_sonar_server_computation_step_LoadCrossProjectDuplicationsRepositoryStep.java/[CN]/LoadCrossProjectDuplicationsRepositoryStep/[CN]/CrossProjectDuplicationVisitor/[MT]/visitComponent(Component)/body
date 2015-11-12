@@ -1,0 +1,12 @@
+{
+  List<CpdTextBlock> cpdTextBlocks=newArrayList(reportReader.readCpdTextBlocks(component.getReportAttributes().getRef()));
+  LOGGER.trace("Found {} cpd blocks on file {}",cpdTextBlocks.size(),component.getKey());
+  if (cpdTextBlocks.isEmpty()) {
+    return;
+  }
+  Collection<String> hashes=from(cpdTextBlocks).transform(CpdTextBlockToHash.INSTANCE).toList();
+  List<DuplicationUnitDto> dtos=selectDuplicates(component,hashes);
+  Collection<Block> duplicatedBlocks=from(dtos).transform(DtoToBlock.INSTANCE).toList();
+  Collection<Block> originBlocks=from(cpdTextBlocks).transform(new CpdTextBlockToBlock(component.getKey())).toList();
+  integrateCrossProjectDuplications.computeCpd(component,originBlocks,duplicatedBlocks);
+}
