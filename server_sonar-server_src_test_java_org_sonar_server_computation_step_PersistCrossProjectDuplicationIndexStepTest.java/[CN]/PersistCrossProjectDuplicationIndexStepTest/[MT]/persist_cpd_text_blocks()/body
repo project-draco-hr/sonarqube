@@ -1,0 +1,12 @@
+{
+  when(crossProjectDuplicationStatusHolder.isEnabled()).thenReturn(true);
+  reportReader.putDuplicationBlocks(FILE_REF,singletonList(CPD_TEXT_BLOCK));
+  underTest.execute();
+  Map<String,Object> dto=dbTester.selectFirst("select hash as \"hash\", start_line as \"startLine\", end_line as \"endLine\", index_in_file as \"indexInFile\", " + "snapshot_id as \"snapshotId\", project_snapshot_id as \"projectSnapshotId\" from duplications_index");
+  assertThat(dto.get("hash")).isEqualTo(CPD_TEXT_BLOCK.getHash());
+  assertThat(dto.get("startLine")).isEqualTo(30L);
+  assertThat(dto.get("endLine")).isEqualTo(45L);
+  assertThat(dto.get("indexInFile")).isEqualTo(0L);
+  assertThat(dto.get("snapshotId")).isEqualTo(FILE_SNAPSHOT_ID);
+  assertThat(dto.get("projectSnapshotId")).isEqualTo(PROJECT_SNAPSHOT_ID);
+}

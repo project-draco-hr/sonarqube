@@ -1,0 +1,14 @@
+{
+  DbSession session=dbClient.openSession(true);
+  try {
+    if (crossProjectDuplicationStatusHolder.isEnabled()) {
+      Component project=treeRootHolder.getRoot();
+      long projectSnapshotId=dbIdsRepository.getSnapshotId(project);
+      new DepthTraversalTypeAwareCrawler(new DuplicationVisitor(session,projectSnapshotId)).visit(project);
+    }
+    session.commit();
+  }
+  finally {
+    dbClient.closeSession(session);
+  }
+}

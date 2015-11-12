@@ -1,0 +1,9 @@
+{
+  int indexInFile=0;
+  try (CloseableIterator<BatchReport.CpdTextBlock> blocks=reportReader.readCpdTextBlocks(component.getReportAttributes().getRef())){
+    while (blocks.hasNext()) {
+      BatchReport.CpdTextBlock block=blocks.next();
+      dbClient.duplicationDao().insert(session,new DuplicationUnitDto().setHash(block.getHash()).setStartLine(block.getStartLine()).setEndLine(block.getEndLine()).setIndexInFile(indexInFile++).setSnapshotId(dbIdsRepository.getSnapshotId(component)).setProjectSnapshotId(projectSnapshotId));
+    }
+  }
+ }
