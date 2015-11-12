@@ -1,0 +1,16 @@
+{
+  String name=request.getName();
+  String description=request.getDescription();
+  String projectPattern=request.getProjectKeyPattern();
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    checkGlobalAdminUser(userSession);
+    validateTemplateNameForCreation(dbSession,name);
+    validateProjectPattern(projectPattern);
+    PermissionTemplateDto permissionTemplate=insertTemplate(dbSession,name,description,projectPattern);
+    return buildResponse(permissionTemplate);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}
