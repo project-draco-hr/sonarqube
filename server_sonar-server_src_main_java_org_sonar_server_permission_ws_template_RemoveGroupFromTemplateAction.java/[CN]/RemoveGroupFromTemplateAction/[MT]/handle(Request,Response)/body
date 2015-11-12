@@ -1,17 +1,5 @@
 {
   checkGlobalAdminUser(userSession);
-  String permission=wsRequest.mandatoryParam(PARAM_PERMISSION);
-  WsGroupRef group=WsGroupRef.newWsGroupRefFromPermissionRequest(wsRequest);
-  DbSession dbSession=dbClient.openSession(false);
-  try {
-    validateProjectPermission(permission);
-    PermissionTemplateDto template=dependenciesFinder.getTemplate(dbSession,WsTemplateRef.fromRequest(wsRequest));
-    GroupDto groupDto=dependenciesFinder.getGroup(dbSession,group);
-    Long groupId=groupDto == null ? null : groupDto.getId();
-    dbClient.permissionTemplateDao().deleteGroupPermission(dbSession,template.getId(),groupId,permission);
-  }
-  finally {
-    dbClient.closeSession(dbSession);
-  }
-  wsResponse.noContent();
+  doHandle(toRemoveGroupFromTemplateWsRequest(request));
+  response.noContent();
 }

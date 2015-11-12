@@ -1,0 +1,16 @@
+{
+  String permission=request.getPermission();
+  Long groupIdInRequest=request.getGroupId() == null ? null : Long.valueOf(request.getGroupId());
+  WsGroupRef group=newWsGroupRef(groupIdInRequest,request.getGroupName());
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    validateProjectPermission(permission);
+    PermissionTemplateDto template=dependenciesFinder.getTemplate(dbSession,newTemplateRef(request.getTemplateId(),request.getTemplateName()));
+    GroupDto groupDto=dependenciesFinder.getGroup(dbSession,group);
+    Long groupId=groupDto == null ? null : groupDto.getId();
+    dbClient.permissionTemplateDao().deleteGroupPermission(dbSession,template.getId(),groupId,permission);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}
