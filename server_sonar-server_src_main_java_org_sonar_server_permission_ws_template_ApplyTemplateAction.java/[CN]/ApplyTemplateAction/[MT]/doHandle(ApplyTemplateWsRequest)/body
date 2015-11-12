@@ -1,0 +1,12 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    PermissionTemplateDto template=finder.getTemplate(dbSession,newTemplateRef(request.getTemplateId(),request.getTemplateName()));
+    ComponentDto project=finder.getRootComponentOrModule(dbSession,newWsProjectRef(request.getProjectId(),request.getProjectKey()));
+    ApplyPermissionTemplateQuery query=ApplyPermissionTemplateQuery.create(template.getUuid(),singletonList(project.key()));
+    permissionService.applyPermissionTemplate(query);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}
