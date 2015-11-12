@@ -1,0 +1,16 @@
+{
+  checkGlobalAdminUser(userSession);
+  String permission=request.getPermission();
+  String userLogin=request.getLogin();
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    validateProjectPermission(permission);
+    PermissionTemplateDto template=dependenciesFinder.getTemplate(dbSession,WsTemplateRef.newTemplateRef(request.getTemplateId(),request.getTemplateName()));
+    UserDto user=dependenciesFinder.getUser(dbSession,userLogin);
+    dbClient.permissionTemplateDao().deleteUserPermission(dbSession,template.getId(),user.getId(),permission);
+    dbSession.commit();
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

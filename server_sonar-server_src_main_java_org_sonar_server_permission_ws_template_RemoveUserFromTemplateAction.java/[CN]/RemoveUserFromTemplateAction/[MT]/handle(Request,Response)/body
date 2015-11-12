@@ -1,17 +1,4 @@
 {
-  checkGlobalAdminUser(userSession);
-  String permission=wsRequest.mandatoryParam(PARAM_PERMISSION);
-  String userLogin=wsRequest.mandatoryParam(PARAM_USER_LOGIN);
-  DbSession dbSession=dbClient.openSession(false);
-  try {
-    validateProjectPermission(permission);
-    PermissionTemplateDto template=dependenciesFinder.getTemplate(dbSession,WsTemplateRef.fromRequest(wsRequest));
-    UserDto user=dependenciesFinder.getUser(dbSession,userLogin);
-    dbClient.permissionTemplateDao().deleteUserPermission(dbSession,template.getId(),user.getId(),permission);
-    dbSession.commit();
-  }
-  finally {
-    dbClient.closeSession(dbSession);
-  }
-  wsResponse.noContent();
+  doHandle(toRemoveUserFromTemplateWsRequest(request));
+  response.noContent();
 }
