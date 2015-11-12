@@ -1,14 +1,5 @@
 {
   checkGlobalAdminUser(userSession);
-  DbSession dbSession=dbClient.openSession(false);
-  try {
-    PermissionTemplateDto template=finder.getTemplate(dbSession,fromRequest(wsRequest));
-    checkTemplateUuidIsNotDefault(template.getUuid());
-    dbClient.permissionTemplateDao().deleteById(dbSession,template.getId());
-    dbSession.commit();
-  }
-  finally {
-    dbClient.closeSession(dbSession);
-  }
-  wsResponse.noContent();
+  doHandle(toDeleteTemplateWsRequest(request));
+  response.noContent();
 }
