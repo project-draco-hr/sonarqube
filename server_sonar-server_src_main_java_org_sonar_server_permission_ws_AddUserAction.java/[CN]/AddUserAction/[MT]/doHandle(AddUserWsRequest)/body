@@ -1,0 +1,12 @@
+{
+  Optional<WsProjectRef> projectRef=newOptionalWsProjectRef(request.getProjectId(),request.getProjectKey());
+  validatePermission(request.getPermission(),projectRef);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    PermissionChange permissionChange=permissionChangeBuilder.buildUserPermissionChange(dbSession,request.getPermission(),projectRef,request.getLogin());
+    permissionUpdater.addPermission(permissionChange);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}
