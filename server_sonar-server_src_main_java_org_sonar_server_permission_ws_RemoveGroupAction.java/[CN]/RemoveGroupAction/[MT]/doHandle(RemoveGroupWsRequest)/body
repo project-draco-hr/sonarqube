@@ -1,0 +1,13 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    Optional<WsProjectRef> projectRef=newOptionalWsProjectRef(request.getProjectId(),request.getProjectKey());
+    Long groupId=request.getGroupId() == null ? null : Long.valueOf(request.getGroupId());
+    validatePermission(request.getPermission(),projectRef);
+    PermissionChange permissionChange=permissionChangeBuilder.buildGroupPermissionChange(dbSession,request.getPermission(),projectRef,newWsGroupRef(groupId,request.getGroupName()));
+    permissionUpdater.removePermission(permissionChange);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}
