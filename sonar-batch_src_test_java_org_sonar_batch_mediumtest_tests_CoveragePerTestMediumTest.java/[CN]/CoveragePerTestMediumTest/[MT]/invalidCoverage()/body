@@ -1,0 +1,17 @@
+{
+  File baseDir=createTestFiles();
+  File srcDir=new File(baseDir,"src");
+  File coverageFile=new File(srcDir,"sample.xoo.coverage");
+  FileUtils.write(coverageFile,"0:2\n");
+  exception.expect(IllegalStateException.class);
+  exception.expectMessage("Error processing line 1 of file");
+  exception.expectCause(new TypeSafeMatcher<Throwable>(){
+    @Override public void describeTo(    Description description){
+    }
+    @Override protected boolean matchesSafely(    Throwable item){
+      return item.getMessage().contains("Line number must be strictly positive");
+    }
+  }
+);
+  runTask(baseDir);
+}
