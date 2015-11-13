@@ -1,7 +1,8 @@
 {
   ComponentDto component=componentsByKey.get(componentKey);
   if (component == null) {
-    component=componentDao.selectOrFailByKey(session,componentKey);
+    Optional<ComponentDto> componentDtoOptional=componentDao.selectByKey(session,componentKey);
+    component=componentDtoOptional.isPresent() ? componentDtoOptional.get() : null;
     componentsByKey.put(componentKey,component);
   }
   return new Duplication(component,Integer.valueOf(from),Integer.valueOf(size));
