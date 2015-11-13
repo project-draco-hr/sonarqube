@@ -1,0 +1,17 @@
+{
+  String moduleKey=request.getProjectKey();
+  String profileName=request.getProfileName();
+  List<QProfile> profiles=new ArrayList<>();
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    for (    Language language : languages.all()) {
+      String languageKey=language.getKey();
+      ComponentDto project=getProject(moduleKey,dbSession);
+      profiles.add(getProfile(dbSession,languageKey,project.key(),profileName));
+    }
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+  return profiles;
+}
