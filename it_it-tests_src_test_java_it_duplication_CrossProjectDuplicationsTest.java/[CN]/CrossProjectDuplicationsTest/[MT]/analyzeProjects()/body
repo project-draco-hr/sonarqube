@@ -1,9 +1,10 @@
 {
   orchestrator.resetData();
-  MavenBuild build=MavenBuild.create(ItUtils.projectPom("duplications/cross-project/a")).setCleanSonarGoals().setProperty("sonar.cpd.cross_project","true").setProperty("sonar.dynamicAnalysis","false");
-  orchestrator.executeBuild(build);
-  build=MavenBuild.create(ItUtils.projectPom("duplications/cross-project/b")).setCleanSonarGoals().setProperty("sonar.cpd.cross_project","true").setProperty("sonar.dynamicAnalysis","false");
-  orchestrator.executeBuild(build);
-  build=MavenBuild.create(ItUtils.projectPom("duplications/cross-project/b")).setCleanSonarGoals().setProperty("sonar.cpd.cross_project","true").setProperty("sonar.branch","branch").setProperty("sonar.dynamicAnalysis","false");
-  orchestrator.executeBuild(build);
+  orchestrator.getServer().restoreProfile(FileLocation.ofClasspath("/duplication/xoo-duplication-profile.xml"));
+  analyzeProject(ORIGIN_PROJECT,ORIGIN_PATH);
+  analyzeProject(DUPLICATE_PROJECT,DUPLICATE_PATH);
+  analyzeProjectWithBranch(DUPLICATE_PROJECT,DUPLICATE_PATH,BRANCH);
+  analyzeProject(PROJECT_WITH_EXCLUSION,DUPLICATE_PATH,"sonar.cpd.exclusions","**/File*");
+  setServerProperty(orchestrator,"sonar.cpd.xoo.minimumTokens","1000");
+  analyzeProject(PROJECT_WITHOUT_ENOUGH_TOKENS,DUPLICATE_PATH);
 }
