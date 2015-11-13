@@ -1,0 +1,17 @@
+{
+  checkGlobalAdminUser(userSession);
+  String uuid=request.getId();
+  String nameParam=request.getName();
+  String descriptionParam=request.getDescription();
+  String projectPatternParam=request.getProjectKeyPattern();
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    PermissionTemplateDto templateToUpdate=getAndBuildTemplateToUpdate(dbSession,uuid,nameParam,descriptionParam,projectPatternParam);
+    validateTemplate(dbSession,templateToUpdate);
+    PermissionTemplateDto updatedTemplate=updateTemplate(dbSession,templateToUpdate);
+    return buildResponse(updatedTemplate);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

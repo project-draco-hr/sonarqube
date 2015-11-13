@@ -1,18 +1,4 @@
 {
-  checkGlobalAdminUser(userSession);
-  String uuid=wsRequest.mandatoryParam(PARAM_ID);
-  String nameParam=wsRequest.param(PARAM_NAME);
-  String descriptionParam=wsRequest.param(PARAM_DESCRIPTION);
-  String projectPatternParam=wsRequest.param(PARAM_PROJECT_KEY_PATTERN);
-  DbSession dbSession=dbClient.openSession(false);
-  try {
-    PermissionTemplateDto templateToUpdate=getAndBuildTemplateToUpdate(dbSession,uuid,nameParam,descriptionParam,projectPatternParam);
-    validateTemplate(dbSession,templateToUpdate);
-    PermissionTemplateDto updatedTemplate=updateTemplate(dbSession,templateToUpdate);
-    WsUpdatePermissionTemplateResponse response=buildResponse(updatedTemplate);
-    writeProtobuf(response,wsRequest,wsResponse);
-  }
-  finally {
-    dbClient.closeSession(dbSession);
-  }
+  UpdateTemplateWsResponse updateTemplateWsResponse=doHandle(toUpdateTemplateWsRequest(request));
+  writeProtobuf(updateTemplateWsResponse,request,response);
 }
