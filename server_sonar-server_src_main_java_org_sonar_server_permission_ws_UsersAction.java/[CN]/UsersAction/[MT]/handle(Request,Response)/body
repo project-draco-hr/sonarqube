@@ -1,17 +1,4 @@
 {
-  DbSession dbSession=dbClient.openSession(false);
-  try {
-    PermissionRequest request=new Builder(wsRequest).withPagination().build();
-    Optional<ComponentDto> project=dependenciesFinder.searchProject(dbSession,request.project());
-    checkProjectAdminUserByComponentDto(userSession,project);
-    PermissionQuery permissionQuery=buildPermissionQuery(request,project);
-    Long projectIdIfPresent=project.isPresent() ? project.get().getId() : null;
-    int total=dbClient.permissionDao().countUsers(dbSession,permissionQuery,projectIdIfPresent);
-    List<UserWithPermissionDto> usersWithPermission=permissionFinder.findUsersWithPermission(dbSession,permissionQuery);
-    WsUsersResponse wsUsersResponse=buildResponse(usersWithPermission,forPageIndex(request.page()).withPageSize(request.pageSize()).andTotal(total));
-    writeProtobuf(wsUsersResponse,wsRequest,wsResponse);
-  }
-  finally {
-    dbClient.closeSession(dbSession);
-  }
+  UsersWsResponse usersWsResponse=doHandle(toUsersWsRequest(wsRequest));
+  writeProtobuf(usersWsResponse,wsRequest,wsResponse);
 }
