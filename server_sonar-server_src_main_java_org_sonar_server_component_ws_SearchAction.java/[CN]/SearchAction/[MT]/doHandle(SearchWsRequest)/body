@@ -1,0 +1,15 @@
+{
+  userSession.checkLoggedIn().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+  List<String> qualifiers=request.getQualifiers();
+  validateQualifiers(qualifiers);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    ComponentQuery query=buildQuery(request,qualifiers);
+    Paging paging=buildPaging(dbSession,request,query);
+    List<ComponentDto> components=searchComponents(dbSession,query,paging);
+    return buildResponse(components,paging);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

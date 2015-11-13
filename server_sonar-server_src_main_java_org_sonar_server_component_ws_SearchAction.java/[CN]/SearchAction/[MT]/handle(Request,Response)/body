@@ -1,16 +1,4 @@
 {
-  userSession.checkLoggedIn().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
-  List<String> qualifiers=wsRequest.mandatoryParamAsStrings(PARAM_QUALIFIERS);
-  validateQualifiers(qualifiers);
-  DbSession dbSession=dbClient.openSession(false);
-  try {
-    ComponentQuery query=buildQuery(wsRequest,qualifiers);
-    Paging paging=buildPaging(dbSession,wsRequest,query);
-    List<ComponentDto> components=searchComponents(dbSession,query,paging);
-    WsSearchResponse response=buildResponse(components,paging);
-    writeProtobuf(response,wsRequest,wsResponse);
-  }
-  finally {
-    dbClient.closeSession(dbSession);
-  }
+  SearchWsResponse searchWsResponse=doHandle(toSearchWsRequest(wsRequest));
+  writeProtobuf(searchWsResponse,wsRequest,wsResponse);
 }
