@@ -11,18 +11,14 @@
   scmBuilder.setComponentRef(batchComponent.batchId());
   Map<String,Integer> changesetsIdByRevision=new HashMap<>();
   for (  BlameLine line : lines) {
-    if (StringUtils.isNotBlank(line.revision())) {
-      Integer changesetId=changesetsIdByRevision.get(line.revision());
-      if (changesetId == null) {
-        addChangeset(scmBuilder,line);
-        changesetId=scmBuilder.getChangesetCount() - 1;
-        changesetsIdByRevision.put(line.revision(),changesetId);
-      }
-      scmBuilder.addChangesetIndexByLine(changesetId);
-    }
- else {
+    validateLine(line);
+    Integer changesetId=changesetsIdByRevision.get(line.revision());
+    if (changesetId == null) {
       addChangeset(scmBuilder,line);
+      changesetId=scmBuilder.getChangesetCount() - 1;
+      changesetsIdByRevision.put(line.revision(),changesetId);
     }
+    scmBuilder.addChangesetIndexByLine(changesetId);
   }
   writer.writeComponentChangesets(scmBuilder.build());
   allFilesToBlame.remove(file);
