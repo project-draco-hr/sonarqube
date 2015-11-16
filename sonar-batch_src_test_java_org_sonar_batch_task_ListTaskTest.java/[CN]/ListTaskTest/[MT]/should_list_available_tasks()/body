@@ -1,0 +1,8 @@
+{
+  Tasks tasks=mock(Tasks.class);
+  when(tasks.definitions()).thenReturn(Arrays.asList(TaskDefinition.builder().key("foo").description("Foo").taskClass(FooTask.class).build(),TaskDefinition.builder().key("purge").description("Purge database").taskClass(FakePurgeTask.class).build()));
+  ListTask task=new ListTask(tasks);
+  task.execute();
+  assertThat(logTester.logs(LoggerLevel.INFO)).hasSize(1);
+  assertThat(logTester.logs(LoggerLevel.INFO).get(0)).contains("Available tasks:","  - foo: Foo","  - purge: Purge database");
+}

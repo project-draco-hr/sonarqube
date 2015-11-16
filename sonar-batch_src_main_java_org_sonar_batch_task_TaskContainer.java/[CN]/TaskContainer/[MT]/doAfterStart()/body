@@ -1,0 +1,15 @@
+{
+  String taskKey=StringUtils.defaultIfEmpty(taskProperties.get(CoreProperties.TASK),CoreProperties.SCAN_TASK);
+  taskProperties.clear();
+  TaskDefinition def=getComponentByType(Tasks.class).definition(taskKey);
+  if (def == null) {
+    throw MessageException.of("Task '" + taskKey + "' does not exist. Please use '"+ ListTask.KEY+ "' task to see all available tasks.");
+  }
+  Task task=getComponentByType(def.taskClass());
+  if (task != null) {
+    task.execute();
+  }
+ else {
+    throw new IllegalStateException("Task " + taskKey + " is badly defined");
+  }
+}
