@@ -1,14 +1,8 @@
 {
-  Issue issue=new IssueAdapterForFilter(project,rawIssue,componentKey);
-  if (new DefaultIssueFilterChain(filters).accept(issue)) {
-    for (    org.sonar.api.issue.IssueFilter filter : exclusionFilters) {
-      if (!filter.accept(issue)) {
-        return false;
-      }
-    }
-    return true;
+  IssueFilterChain filterChain=new DefaultIssueFilterChain(filters);
+  FilterableIssue fIssue=new DefaultFilterableIssue(project,rawIssue,componentKey);
+  if (filterChain.accept(fIssue)) {
+    return acceptDeprecated(componentKey,rawIssue);
   }
- else {
-    return false;
-  }
+  return false;
 }
