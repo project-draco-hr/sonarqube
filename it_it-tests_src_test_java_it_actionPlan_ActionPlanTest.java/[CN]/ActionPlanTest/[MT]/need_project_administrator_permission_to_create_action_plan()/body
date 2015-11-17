@@ -4,9 +4,9 @@
   SonarClient adminClient=orchestrator.getServer().adminWsClient();
   try {
     adminClient.userClient().create(UserParameters.create().login(projectAdminUser).name(projectAdminUser).password("password").passwordConfirmation("password"));
-    orchestrator.getServer().adminWsClient().post("api/permissions/add_user","login",projectAdminUser,"projectKey",PROJECT_KEY,"permission","admin");
+    adminWsClient.permissionsClient().addUser(new AddUserWsRequest().setLogin(projectAdminUser).setProjectKey(PROJECT_KEY).setPermission("admin"));
     adminClient.userClient().create(UserParameters.create().login(projectUser).name(projectUser).password("password").passwordConfirmation("password"));
-    orchestrator.getServer().adminWsClient().post("api/permissions/add_user","login",projectUser,"projectKey",PROJECT_KEY,"permission","user");
+    adminWsClient.permissionsClient().addUser(new AddUserWsRequest().setLogin(projectUser).setProjectKey(PROJECT_KEY).setPermission("user"));
     try {
       orchestrator.getServer().wsClient(projectUser,"password").actionPlanClient().create(NewActionPlan.create().name("Short term").project(PROJECT_KEY).description("Short term issues"));
       fail();

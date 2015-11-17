@@ -1,0 +1,15 @@
+{
+  WsPermissions.CreateTemplateWsResponse createTemplateWsResponse=permissionsWsClient.createTemplate(new CreateTemplateWsRequest().setName("my-new-template").setDescription("template-used-in-tests"));
+  assertThat(createTemplateWsResponse.getPermissionTemplate().getName()).isEqualTo("my-new-template");
+  permissionsWsClient.addUserToTemplate(new AddUserToTemplateWsRequest().setPermission("admin").setTemplateName("my-new-template").setLogin(LOGIN));
+  permissionsWsClient.addGroupToTemplate(new AddGroupToTemplateWsRequest().setPermission("admin").setTemplateName("my-new-template").setGroupName(GROUP_NAME));
+  SearchTemplatesWsResponse searchTemplatesWsResponse=permissionsWsClient.searchTemplates(new SearchTemplatesWsRequest().setQuery("my-new-template"));
+  assertThat(searchTemplatesWsResponse.getPermissionTemplates(0).getName()).isEqualTo("my-new-template");
+  assertThat(searchTemplatesWsResponse.getPermissionTemplates(0).getPermissions(0).getKey()).isEqualTo("admin");
+  assertThat(searchTemplatesWsResponse.getPermissionTemplates(0).getPermissions(0).getUsersCount()).isEqualTo(1);
+  assertThat(searchTemplatesWsResponse.getPermissionTemplates(0).getPermissions(0).getGroupsCount()).isEqualTo(1);
+  permissionsWsClient.removeGroupFromTemplate(new RemoveGroupFromTemplateWsRequest().setPermission("admin").setTemplateName("my-new-template").setGroupName(GROUP_NAME));
+  permissionsWsClient.removeUserFromTemplate(new RemoveUserFromTemplateWsRequest().setPermission("admin").setTemplateName("my-new-template").setLogin(LOGIN));
+  SearchTemplatesWsResponse clearedSearchTemplatesWsResponse=permissionsWsClient.searchTemplates(new SearchTemplatesWsRequest().setQuery("my-new-template"));
+  assertThat(clearedSearchTemplatesWsResponse.getPermissionTemplates(0).getPermissionsList()).isEmpty();
+}
