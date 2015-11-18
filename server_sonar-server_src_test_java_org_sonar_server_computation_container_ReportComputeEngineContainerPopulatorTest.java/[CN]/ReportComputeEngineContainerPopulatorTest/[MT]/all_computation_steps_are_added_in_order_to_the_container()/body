@@ -1,4 +1,5 @@
 {
+  underTest=new ReportComputeEngineContainerPopulator(task,null);
   AddedObjectsRecorderComputeEngineContainer container=new AddedObjectsRecorderComputeEngineContainer();
   underTest.populateContainer(container);
   Set<String> computationStepClassNames=from(container.added).transform(new Function<Object,Class<?>>(){
@@ -10,5 +11,5 @@
     }
   }
 ).filter(notNull()).filter(IsComputationStep.INSTANCE).transform(StepsExplorer.toCanonicalName()).toSet();
-  assertThat(difference(StepsExplorer.retrieveStepPackageStepsCanonicalNames(),computationStepClassNames)).isEmpty();
+  assertThat(difference(StepsExplorer.retrieveStepPackageStepsCanonicalNames(),computationStepClassNames)).containsOnly(PersistDevelopersStep.class.getCanonicalName());
 }
