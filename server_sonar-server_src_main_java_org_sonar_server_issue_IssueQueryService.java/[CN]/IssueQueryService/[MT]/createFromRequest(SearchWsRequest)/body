@@ -1,0 +1,18 @@
+{
+  DbSession session=dbClient.openSession(false);
+  try {
+    IssueQuery.Builder builder=IssueQuery.builder(userSession).issueKeys(request.getIssues()).severities(request.getSeverities()).statuses(request.getStatuses()).resolutions(request.getResolutions()).resolved(request.getResolved()).rules(stringsToRules(request.getRules())).actionPlans(request.getActionPlans()).reporters(request.getReporters()).assignees(buildAssignees(request.getAssignees())).languages(request.getLanguages()).tags(request.getTags()).assigned(request.getAssigned()).planned(request.getPlanned()).createdAt(parseAsDateTime(request.getCreatedAt())).createdAfter(buildCreatedAfter(parseAsDateTime(request.getCreatedAfter()),request.getCreatedInLast())).createdBefore(parseAsDateTime(request.getCreatedBefore())).facetMode(request.getFacetMode());
+    Set<String> allComponentUuids=Sets.newHashSet();
+    boolean effectiveOnComponentOnly=mergeDeprecatedComponentParameters(session,request.getOnComponentOnly(),request.getComponents(),request.getComponentUuids(),request.getComponentKeys(),request.getComponentRootUuids(),request.getComponentRoots(),allComponentUuids);
+    addComponentParameters(builder,session,effectiveOnComponentOnly,allComponentUuids,request.getProjectUuids(),request.getProjectKeys(),request.getModuleUuids(),request.getDirectories(),request.getFileUuids(),request.getAuthors());
+    String sort=request.getSort();
+    if (!Strings.isNullOrEmpty(sort)) {
+      builder.sort(sort);
+      builder.asc(request.getAsc());
+    }
+    return builder.build();
+  }
+  finally {
+    session.close();
+  }
+}
