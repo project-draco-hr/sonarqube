@@ -1,0 +1,12 @@
+{
+  File srcDir=new File(baseDir,"src");
+  srcDir.mkdir();
+  File xooFile=new File(srcDir,"sample.xoo");
+  FileUtils.write(xooFile,"Sample xoo\ncontent");
+  tester.newTask().properties(builder.put("sonar.sources","src").put("sonar.verbose","true").build()).start();
+  tester.stop();
+  for (  LogEvent e : logOutput) {
+    savedStdOut.println("[captured]" + e.level + " "+ e.msg);
+  }
+  assertThat(logOutputStr.toString()).contains("Post-jobs : ");
+}
