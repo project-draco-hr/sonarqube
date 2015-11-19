@@ -1,10 +1,13 @@
 {
   dbTester.prepareDbUnit(getClass(),"shouldPreventAuthorsDuplication.xml");
+  dbSession.commit();
+  expectedException.expect(RuntimeException.class);
   try {
-    dao.insertAuthor("godin",20L);
-    fail();
+    dao.insertAuthor(dbSession,"godin",20L);
   }
  catch (  RuntimeException ex) {
+    dbSession.commit();
+    dbTester.assertDbUnit(getClass(),"shouldPreventAuthorsDuplication-result.xml",new String[]{"created_at","updated_at"},"authors");
+    throw ex;
   }
-  dbTester.assertDbUnit(getClass(),"shouldPreventAuthorsDuplication-result.xml",new String[]{"created_at","updated_at"},"authors");
 }
