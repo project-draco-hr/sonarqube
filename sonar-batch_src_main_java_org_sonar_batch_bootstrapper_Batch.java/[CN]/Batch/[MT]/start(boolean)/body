@@ -3,8 +3,13 @@
     throw new IllegalStateException("Batch is already started");
   }
   configureLogging();
-  bootstrapContainer=GlobalContainer.create(bootstrapProperties,components,preferCache);
-  bootstrapContainer.startComponents();
+  try {
+    bootstrapContainer=GlobalContainer.create(bootstrapProperties,components,preferCache);
+    bootstrapContainer.startComponents();
+  }
+ catch (  RuntimeException e) {
+    throw handleException(e);
+  }
   this.started=true;
   return this;
 }
