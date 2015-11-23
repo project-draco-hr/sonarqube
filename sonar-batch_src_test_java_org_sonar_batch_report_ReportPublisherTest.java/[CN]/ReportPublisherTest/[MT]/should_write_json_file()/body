@@ -1,0 +1,10 @@
+{
+  settings.setProperty(CoreProperties.SERVER_BASE_URL,"http://myserver/");
+  ReportPublisher job=new ReportPublisher(settings,mock(ServerClient.class),mock(Server.class),mock(AnalysisContextReportPublisher.class),reactor,mode,mock(TempFolder.class),new ReportPublisherStep[0]);
+  job.logSuccess(mock(Logger.class),"abc123");
+  File jsonFile=new File(temp.getRoot(),"analysis-details.json");
+  assertThat(jsonFile).exists();
+  String jsonFileContent=new String(Files.readAllBytes(jsonFile.toPath()),StandardCharsets.UTF_8);
+  String expectedContent="\"dashboardUrl\":\"http://myserver/dashboard/index/struts\",\"ceTaskUrl\":\"http://myserver/api/ce/task?id=abc123\"";
+  assertThat(jsonFileContent).contains(expectedContent);
+}
