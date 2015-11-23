@@ -1,14 +1,13 @@
 {
-  db.truncateTables();
   es.truncateIndices();
   settings=new Settings();
-  session=db.myBatis().openSession(false);
+  session=db.getSession();
   userDao=new UserDao(db.myBatis(),system2);
   groupDao=new GroupDao(system2);
   UserGroupDao userGroupDao=new UserGroupDao();
   GroupMembershipDao groupMembershipDao=new GroupMembershipDao(db.myBatis());
   groupMembershipFinder=new GroupMembershipFinder(userDao,groupMembershipDao);
-  DbClient dbClient=new DbClient(db.database(),db.myBatis(),userDao,groupDao,userGroupDao);
+  DbClient dbClient=new DbClient(db.database(),db.myBatis(),userDao,groupDao,userGroupDao,new UserTokenDao());
   userIndexer=(UserIndexer)new UserIndexer(dbClient,es.client()).setEnabled(true);
   userUpdater=new UserUpdater(newUserNotifier,settings,dbClient,userIndexer,system2,realmFactory);
 }

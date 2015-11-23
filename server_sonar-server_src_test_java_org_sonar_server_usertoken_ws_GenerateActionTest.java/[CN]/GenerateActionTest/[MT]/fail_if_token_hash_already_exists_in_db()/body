@@ -1,0 +1,8 @@
+{
+  when(tokenGenerator.hash(anyString())).thenReturn("987654321");
+  db.getDbClient().userTokenDao().insert(db.getSession(),newUserToken().setTokenHash("987654321"));
+  db.commit();
+  expectedException.expect(ServerException.class);
+  expectedException.expectMessage("Error while generating token. Please try again.");
+  newRequest(GRACE_HOPPER,TOKEN_NAME);
+}

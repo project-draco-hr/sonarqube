@@ -2,7 +2,7 @@
   userSessionRule.login("admin").setLocale(Locale.FRENCH).setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
   dbClient.userDao().insert(session,new UserDto().setEmail("john@email.com").setLogin("john").setName("John").setActive(true));
   session.commit();
-  dbClient.userDao().deactivateUserByLogin("john");
+  dbClient.userDao().deactivateUserByLogin(session,"john");
   userIndexer.index();
   when(i18n.message(Locale.FRENCH,"user.reactivated","user.reactivated","john")).thenReturn("The user 'john' has been reactivated.");
   tester.newPostRequest("api/users","create").setParam("login","john").setParam("name","John").setParam("email","john@email.com").setParam("scm_accounts","jn").setParam("password","1234").execute().assertJson(getClass(),"reactivate_user.json");

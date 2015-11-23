@@ -1,4 +1,11 @@
 {
-  dbClient.userDao().deactivateUserByLogin(login);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    dbClient.userTokenDao().deleteByLogin(dbSession,login);
+    dbClient.userDao().deactivateUserByLogin(dbSession,login);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
   userIndexer.index();
 }

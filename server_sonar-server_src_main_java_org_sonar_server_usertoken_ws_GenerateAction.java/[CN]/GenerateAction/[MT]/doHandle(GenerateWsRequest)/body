@@ -1,0 +1,14 @@
+{
+  userSession.checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    checkWsRequest(dbSession,request);
+    String token=tokenGenerator.generate();
+    String tokenHash=hashToken(dbSession,token);
+    UserTokenDto userTokenDto=insertTokenInDb(dbSession,request,tokenHash);
+    return buildResponse(userTokenDto,token);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

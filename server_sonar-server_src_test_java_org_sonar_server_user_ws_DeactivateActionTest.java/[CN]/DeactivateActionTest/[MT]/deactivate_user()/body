@@ -1,7 +1,10 @@
 {
   createUser();
+  assertThat(dbClient.userTokenDao().selectByLogin(dbSession,"john")).isNotEmpty();
+  db.commit();
   userSessionRule.login("admin").setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
-  tester.newPostRequest("api/users","deactivate").setParam("login","john").execute().assertJson(getClass(),"deactivate_user.json");
+  ws.newPostRequest("api/users","deactivate").setParam("login","john").execute().assertJson(getClass(),"deactivate_user.json");
   UserDoc user=index.getByLogin("john");
   assertThat(user.active()).isFalse();
+  assertThat(dbClient.userTokenDao().selectByLogin(dbSession,"john")).isEmpty();
 }

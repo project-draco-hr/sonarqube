@@ -1,0 +1,14 @@
+{
+  UserTokenDto userToken=newUserToken().setLogin("login").setName("name").setTokenHash("token");
+  insertToken(userToken);
+  Optional<UserTokenDto> optionalResultByLoginAndName=underTest.selectByLoginAndName(dbSession,userToken.getLogin(),userToken.getName());
+  UserTokenDto resultByLoginAndName=optionalResultByLoginAndName.get();
+  Optional<UserTokenDto> unfoundResult1=underTest.selectByLoginAndName(dbSession,"unknown-login",userToken.getName());
+  Optional<UserTokenDto> unfoundResult2=underTest.selectByLoginAndName(dbSession,userToken.getLogin(),"unknown-name");
+  Assertions.assertThat(unfoundResult1).isAbsent();
+  Assertions.assertThat(unfoundResult2).isAbsent();
+  assertThat(resultByLoginAndName.getLogin()).isEqualTo(userToken.getLogin());
+  assertThat(resultByLoginAndName.getName()).isEqualTo(userToken.getName());
+  assertThat(resultByLoginAndName.getCreatedAt()).isEqualTo(userToken.getCreatedAt());
+  assertThat(resultByLoginAndName.getTokenHash()).isEqualTo(userToken.getTokenHash());
+}
