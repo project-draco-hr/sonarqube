@@ -1,0 +1,14 @@
+{
+  String tokenHash=tokenGenerator.hash(token);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    Optional<UserTokenDto> userToken=dbClient.userTokenDao().selectByTokenHash(dbSession,tokenHash);
+    if (userToken.isPresent()) {
+      return Optional.of(userToken.get().getLogin());
+    }
+    return Optional.absent();
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

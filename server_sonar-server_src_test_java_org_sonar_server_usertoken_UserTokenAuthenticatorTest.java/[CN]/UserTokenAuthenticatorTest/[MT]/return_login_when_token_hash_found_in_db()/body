@@ -1,0 +1,11 @@
+{
+  String token="known-token";
+  String tokenHash="123456789";
+  when(tokenGenerator.hash(token)).thenReturn(tokenHash);
+  dbClient.userTokenDao().insert(dbSession,newUserToken().setLogin(GRACE_HOPPER).setTokenHash(tokenHash));
+  dbClient.userTokenDao().insert(dbSession,newUserToken().setLogin(ADA_LOVELACE).setTokenHash("another-token-hash"));
+  db.commit();
+  Optional<String> login=underTest.authenticate(token);
+  assertThat(login.isPresent()).isTrue();
+  assertThat(login.get()).isEqualTo(GRACE_HOPPER);
+}

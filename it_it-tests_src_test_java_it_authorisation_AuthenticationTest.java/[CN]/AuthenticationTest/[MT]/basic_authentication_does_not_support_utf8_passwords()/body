@@ -1,0 +1,9 @@
+{
+  String userId=UUID.randomUUID().toString();
+  String login=format("login-%s",userId);
+  String password="??????????";
+  createUser(login,format("name-%s",userId),password);
+  WsClient wsClient=new WsClient(newHttpConnector().url(ORCHESTRATOR.getServer().getUrl()).login(login).password(password).build());
+  String response=wsClient.execute(newGetRequest("api/authentication/validate"));
+  assertThat(response).isEqualTo("{\"valid\":false}");
+}
