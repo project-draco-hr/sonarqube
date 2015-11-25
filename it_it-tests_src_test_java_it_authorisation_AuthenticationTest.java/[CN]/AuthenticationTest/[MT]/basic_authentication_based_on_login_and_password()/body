@@ -4,7 +4,7 @@
   String name=format("name-%s",userId);
   String password="!ascii-only:-)@";
   createUser(login,name,password);
-  WsClient wsClient=new WsClient(newHttpConnector().url(ORCHESTRATOR.getServer().getUrl()).login(login).password(password).build());
-  String response=wsClient.execute(newGetRequest("api/authentication/validate"));
-  assertThat(response).isEqualTo("{\"valid\":true}");
+  WsClient wsClient=new HttpWsClient(new HttpConnector.Builder().url(ORCHESTRATOR.getServer().getUrl()).credentials(login,password).build());
+  WsResponse response=wsClient.wsConnector().call(new GetRequest("api/authentication/validate"));
+  assertThat(response.getContent()).isEqualTo("{\"valid\":true}");
 }

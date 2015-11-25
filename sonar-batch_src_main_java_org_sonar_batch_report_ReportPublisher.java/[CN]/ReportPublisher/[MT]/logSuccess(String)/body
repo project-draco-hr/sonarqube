@@ -1,0 +1,19 @@
+{
+  if (taskId == null) {
+    LOG.info("ANALYSIS SUCCESSFUL");
+  }
+ else {
+    Map<String,String> metadata=new LinkedHashMap<>();
+    String effectiveKey=projectReactor.getRoot().getKeyWithBranch();
+    metadata.put("projectKey",effectiveKey);
+    URL dashboardUrl=HttpUrl.parse(publicUrl()).newBuilder().addPathSegment("dashboard").addPathSegment("index").addPathSegment(effectiveKey).build().url();
+    metadata.put("dashboardUrl",dashboardUrl.toExternalForm());
+    URL taskUrl=HttpUrl.parse(publicUrl()).newBuilder().addPathSegment("api").addPathSegment("ce").addPathSegment("task").addQueryParameter("id",taskId).build().url();
+    metadata.put("ceTaskId",taskId);
+    metadata.put("ceTaskUrl",taskUrl.toExternalForm());
+    LOG.info("ANALYSIS SUCCESSFUL, you can browse {}",dashboardUrl);
+    LOG.info("Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report");
+    LOG.info("More about the report processing at {}",taskUrl);
+    dumpMetadata(metadata);
+  }
+}

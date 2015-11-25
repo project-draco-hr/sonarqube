@@ -1,6 +1,6 @@
 {
   WsUserTokens.GenerateWsResponse generateWsResponse=userTokensWsClient.generate(new GenerateWsRequest().setLogin(LOGIN).setName("Validate token based authentication"));
-  WsClient wsClient=new WsClient(newHttpConnector().url(ORCHESTRATOR.getServer().getUrl()).login(generateWsResponse.getToken()).password("").build());
-  String response=wsClient.execute(newGetRequest("api/authentication/validate"));
-  assertThat(response).isEqualTo("{\"valid\":true}");
+  WsClient wsClient=new HttpWsClient(new HttpConnector.Builder().url(ORCHESTRATOR.getServer().getUrl()).token(generateWsResponse.getToken()).build());
+  WsResponse response=wsClient.wsConnector().call(new GetRequest("api/authentication/validate"));
+  assertThat(response.getContent()).isEqualTo("{\"valid\":true}");
 }

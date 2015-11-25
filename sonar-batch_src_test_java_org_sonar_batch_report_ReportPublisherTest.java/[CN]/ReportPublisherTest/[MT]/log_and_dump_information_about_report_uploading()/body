@@ -1,0 +1,7 @@
+{
+  ReportPublisher underTest=new ReportPublisher(settings,wsClient,contextPublisher,reactor,mode,mock(TempFolder.class),new ReportPublisherStep[0]);
+  underTest.logSuccess("TASK-123");
+  assertThat(logTester.logs(LoggerLevel.INFO)).contains("ANALYSIS SUCCESSFUL, you can browse https://localhost/dashboard/index/struts").contains("Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report").contains("More about the report processing at https://localhost/api/ce/task?id=TASK-123");
+  File detailsFile=new File(temp.getRoot(),"analysis-details.json");
+  JsonAssert.assertJson(readFileToString(detailsFile)).isSimilarTo("{" + "\"projectKey\": \"struts\"," + "\"dashboardUrl\": \"https://localhost/dashboard/index/struts\","+ "\"ceTaskId\": \"TASK-123\","+ "\"ceTaskUrl\": \"https://localhost/api/ce/task?id=TASK-123\""+ "}");
+}

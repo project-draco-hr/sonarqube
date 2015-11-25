@@ -1,0 +1,17 @@
+{
+  HttpUrl.Builder urlBuilder=prepareUrlBuilder(postRequest);
+  Request.Builder okRequestBuilder=prepareOkRequestBuilder(postRequest,urlBuilder);
+  Map<String,PostRequest.Part> parts=postRequest.getParts();
+  if (parts.isEmpty()) {
+    okRequestBuilder.post(RequestBody.create(null,""));
+  }
+ else {
+    MultipartBuilder body=new MultipartBuilder().type(MultipartBuilder.FORM);
+    for (    Map.Entry<String,PostRequest.Part> param : parts.entrySet()) {
+      PostRequest.Part part=param.getValue();
+      body.addPart(Headers.of("Content-Disposition",format("form-data; name=\"%s\"",param.getKey())),RequestBody.create(MediaType.parse(part.getMediaType()),part.getFile()));
+    }
+    okRequestBuilder.post(body.build());
+  }
+  return doCall(okRequestBuilder.build());
+}

@@ -1,3 +1,22 @@
 {
-  this.requestFactory=new HttpRequestFactory(builder.url).setLogin(builder.login).setPassword(builder.password).setProxyHost(builder.proxyHost).setProxyPort(builder.proxyPort).setProxyLogin(builder.proxyLogin).setProxyPassword(builder.proxyPassword).setConnectTimeoutInMilliseconds(builder.connectTimeoutMs).setReadTimeoutInMilliseconds(builder.readTimeoutMs);
+  this.baseUrl=HttpUrl.parse(builder.url.endsWith("/") ? builder.url : format("%s/",builder.url));
+  this.userAgent=builder.userAgent;
+  if (isNullOrEmpty(builder.login)) {
+    this.credentials=null;
+  }
+ else {
+    this.credentials=Credentials.basic(builder.login,nullToEmpty(builder.password));
+  }
+  if (builder.proxy != null) {
+    this.okHttpClient.setProxy(builder.proxy);
+  }
+  if (isNullOrEmpty(builder.proxyLogin)) {
+    this.proxyCredentials=null;
+  }
+ else {
+    this.proxyCredentials=Credentials.basic(builder.proxyLogin,nullToEmpty(builder.proxyPassword));
+  }
+  this.okHttpClient.setConnectTimeout(builder.connectTimeoutMs,TimeUnit.MILLISECONDS);
+  this.okHttpClient.setReadTimeout(builder.readTimeoutMs,TimeUnit.MILLISECONDS);
+  this.okHttpClient.interceptors().addAll(builder.interceptors);
 }

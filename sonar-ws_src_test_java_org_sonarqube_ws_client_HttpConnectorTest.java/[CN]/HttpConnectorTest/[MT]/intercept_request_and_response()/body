@@ -1,0 +1,14 @@
+{
+  final AtomicBoolean called=new AtomicBoolean(false);
+  Interceptor interceptor=new Interceptor(){
+    @Override public Response intercept(    Chain chain) throws IOException {
+      called.set(true);
+      return chain.proceed(chain.request());
+    }
+  }
+;
+  answerHelloWorld();
+  HttpConnector underTest=new HttpConnector.Builder().url(serverUrl).interceptor(interceptor).build();
+  underTest.call(new GetRequest(""));
+  assertThat(called.get()).isTrue();
+}

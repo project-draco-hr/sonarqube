@@ -1,0 +1,16 @@
+{
+  new BaseService(wsConnector,"api/issues"){
+    public void test(){
+      GetRequest get=new GetRequest(path("issue")).setParam("key","ABC");
+      when(wsConnector.call(get)).thenReturn(MockWsResponse.createJson("{}").setRequestUrl("http://local/api/issues/issue?key=ABC"));
+      try {
+        call(get,Testing.Fake.parser());
+        fail();
+      }
+ catch (      IllegalStateException e) {
+        assertThat(e).hasMessage("Fail to parse protobuf response of http://local/api/issues/issue?key=ABC");
+      }
+    }
+  }
+.test();
+}

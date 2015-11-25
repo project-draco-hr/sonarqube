@@ -1,0 +1,19 @@
+{
+  try {
+    long startTime=System.currentTimeMillis();
+    for (    ReportPublisherStep publisher : publishers) {
+      publisher.publish(writer);
+    }
+    long stopTime=System.currentTimeMillis();
+    LOG.info("Analysis report generated in " + (stopTime - startTime) + "ms, dir size="+ FileUtils.byteCountToDisplaySize(FileUtils.sizeOfDirectory(reportDir)));
+    startTime=System.currentTimeMillis();
+    File reportZip=temp.newFile("batch-report",".zip");
+    ZipUtils.zipDir(reportDir,reportZip);
+    stopTime=System.currentTimeMillis();
+    LOG.info("Analysis reports compressed in " + (stopTime - startTime) + "ms, zip size="+ FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(reportZip)));
+    return reportZip;
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Unable to prepare analysis report",e);
+  }
+}

@@ -1,10 +1,13 @@
 {
-  String url="/deploy/plugins/" + key + "/"+ filename;
+  String url=format("/deploy/plugins/%s/%s",key,filename);
   if (LOG.isDebugEnabled()) {
-    LOG.debug("Download {} to {}",url,toFile.getAbsolutePath());
+    LOG.debug("Download plugin {} to {}",filename,toFile);
   }
  else {
     LOG.info("Download {}",filename);
   }
-  serverClient.download(url,toFile);
-}
+  WsResponse response=wsClient.wsConnector().call(new GetRequest(url));
+  try (InputStream stream=response.getContentStream()){
+    FileUtils.copyInputStreamToFile(stream,toFile);
+  }
+ }

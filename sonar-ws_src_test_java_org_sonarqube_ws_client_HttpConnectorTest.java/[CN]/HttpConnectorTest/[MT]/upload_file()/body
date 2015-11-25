@@ -1,0 +1,14 @@
+{
+  answerHelloWorld();
+  File reportFile=temp.newFile();
+  FileUtils.write(reportFile,"the report content");
+  PostRequest request=new PostRequest("api/report/upload").setParam("project","theKey").setPart("report",new PostRequest.Part(MediaTypes.TXT,reportFile)).setMediaType(MediaTypes.PROTOBUF);
+  HttpConnector underTest=new HttpConnector.Builder().url(serverUrl).build();
+  WsResponse response=underTest.call(request);
+  assertThat(response.hasContent()).isTrue();
+  RecordedRequest recordedRequest=server.takeRequest();
+  assertThat(recordedRequest.getMethod()).isEqualTo("POST");
+  assertThat(recordedRequest.getPath()).isEqualTo("/api/report/upload?project=theKey");
+  String body=IOUtils.toString(recordedRequest.getBody().inputStream());
+  assertThat(body).contains("Content-Disposition: form-data; name=\"report\"").contains("Content-Type: text/plain").contains("the report content");
+}

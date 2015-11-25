@@ -1,0 +1,18 @@
+{
+  answerHelloWorld();
+  HttpConnector underTest=new HttpConnector.Builder().url(serverUrl).build();
+  assertThat(underTest.baseUrl()).isEqualTo(serverUrl);
+  GetRequest request=new GetRequest("api/issues/search").setMediaType(MediaTypes.PROTOBUF);
+  WsResponse response=underTest.call(request);
+  assertThat(underTest.okHttpClient().getConnectTimeout()).isEqualTo(HttpConnector.DEFAULT_CONNECT_TIMEOUT_MILLISECONDS);
+  assertThat(underTest.okHttpClient().getReadTimeout()).isEqualTo(HttpConnector.DEFAULT_READ_TIMEOUT_MILLISECONDS);
+  assertThat(response.hasContent()).isTrue();
+  assertThat(response.getContent()).isEqualTo("hello, world!");
+  RecordedRequest recordedRequest=server.takeRequest();
+  assertThat(recordedRequest.getMethod()).isEqualTo("GET");
+  assertThat(recordedRequest.getPath()).isEqualTo("/api/issues/search");
+  assertThat(recordedRequest.getHeader("Accept")).isEqualTo(MediaTypes.PROTOBUF);
+  assertThat(recordedRequest.getHeader("Accept-Charset")).isEqualTo("UTF-8");
+  assertThat(recordedRequest.getHeader("User-Agent")).startsWith("okhttp/");
+  assertThat(recordedRequest.getHeader("Accept-Encoding")).isEqualTo("gzip");
+}

@@ -1,0 +1,9 @@
+{
+  expectedException.expect(MessageException.class);
+  expectedException.expectMessage("Not authorized. Please check the properties sonar.login and sonar.password.");
+  Request request=new Request.Builder().url("https://localhost:9000/api/issues/search").header("Authorization","Basic BAD_CREDENTIALS").get().build();
+  Response response=newResponse(request,401,"");
+  when(chain.request()).thenReturn(request);
+  when(chain.proceed(request)).thenReturn(response);
+  underTest.intercept(chain);
+}

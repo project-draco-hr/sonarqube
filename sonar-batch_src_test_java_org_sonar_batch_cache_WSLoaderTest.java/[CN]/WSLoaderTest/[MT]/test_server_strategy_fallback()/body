@@ -1,8 +1,9 @@
 {
   turnServerOffline();
-  WSLoader loader=new WSLoader(LoadStrategy.SERVER_FIRST,cache,client,props);
+  when(cache.getString(ID)).thenReturn(cacheValue);
+  WSLoader loader=new WSLoader(LoadStrategy.SERVER_FIRST,cache,ws);
   assertResult(loader.loadString(ID),cacheValue,true);
-  InOrder inOrder=Mockito.inOrder(client,cache);
-  inOrder.verify(client).load(eq(ID),anyString(),anyBoolean(),anyInt(),anyInt());
+  InOrder inOrder=inOrder(ws.wsConnector(),cache);
+  inOrder.verify(ws.wsConnector()).call(any(WsRequest.class));
   inOrder.verify(cache).getString(ID);
 }

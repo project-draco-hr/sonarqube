@@ -1,13 +1,14 @@
 {
-  InputStream is1=mock(InputStream.class);
-  InputStream is2=mock(InputStream.class);
-  when(client.load(anyString(),anyString(),anyBoolean(),anyInt(),anyInt())).thenReturn(is1);
-  when(cache.getStream(ID)).thenReturn(is2);
-  WSLoader loader=new WSLoader(LoadStrategy.SERVER_FIRST,cache,client,props);
-  WSLoaderResult<InputStream> result=loader.loadStream(ID);
-  assertThat(result.get()).isEqualTo(is2);
-  verify(client).load(anyString(),anyString(),anyBoolean(),anyInt(),anyInt());
-  verify(cache).put(ID,is1);
-  verify(cache).getStream(ID);
-  verifyNoMoreInteractions(cache,client);
+  InputStream input=IOUtils.toInputStream("is");
+  when(ws.wsConnector().call(any(WsRequest.class))).thenReturn(new MockWsResponse().setContent(input));
+  when(cache.getStream(ID)).thenReturn(input);
+  WSLoader underTest=new WSLoader(LoadStrategy.SERVER_FIRST,cache,ws);
+  WSLoaderResult<InputStream> result=underTest.loadStream(ID);
+  assertThat(result.get()).isEqualTo(input);
+  WsConnector wsConnector=ws.wsConnector();
+  InOrder inOrder=inOrder(wsConnector,cache);
+  inOrder.verify(wsConnector).call(any(WsRequest.class));
+  inOrder.verify(cache).put(eq(ID),any(InputStream.class));
+  inOrder.verify(cache).getStream(ID);
+  verifyNoMoreInteractions(cache,wsConnector);
 }

@@ -1,0 +1,13 @@
+{
+  new BaseService(wsConnector,"api/issues"){
+    public void test(){
+      GetRequest get=new GetRequest(path("issue")).setParam("key","ABC");
+      when(wsConnector.call(get)).thenReturn(newProtobufFakeResponse());
+      Testing.Fake message=call(get,Testing.Fake.parser());
+      assertThat(message.getLabel()).isEqualTo("ok");
+      assertThat(get.getPath()).isEqualTo("api/issues/issue");
+      assertThat(get.getMediaType()).isEqualTo(MediaTypes.PROTOBUF);
+    }
+  }
+.test();
+}

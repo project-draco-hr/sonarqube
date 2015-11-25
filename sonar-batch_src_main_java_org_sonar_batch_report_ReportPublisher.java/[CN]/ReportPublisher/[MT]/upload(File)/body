@@ -1,0 +1,14 @@
+{
+  LOG.debug("Upload report");
+  long startTime=System.currentTimeMillis();
+  ProjectDefinition projectDefinition=projectReactor.getRoot();
+  SubmitWsRequest submitRequest=new SubmitWsRequest();
+  submitRequest.setProjectKey(projectDefinition.getKey());
+  submitRequest.setProjectName(projectDefinition.getName());
+  submitRequest.setProjectBranch(projectDefinition.getBranch());
+  submitRequest.setReport(report);
+  WsCe.SubmitResponse submitResponse=wsClient.computeEngine().submit(submitRequest);
+  long stopTime=System.currentTimeMillis();
+  LOG.info("Analysis report uploaded in " + (stopTime - startTime) + "ms");
+  return submitResponse.getTaskId();
+}
