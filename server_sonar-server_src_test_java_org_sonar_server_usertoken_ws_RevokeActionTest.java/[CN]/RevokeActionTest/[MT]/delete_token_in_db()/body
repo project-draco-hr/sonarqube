@@ -1,0 +1,10 @@
+{
+  insertUserToken(newUserToken().setLogin(GRACE_HOPPER).setName("token-to-delete"));
+  insertUserToken(newUserToken().setLogin(GRACE_HOPPER).setName("token-to-keep-1"));
+  insertUserToken(newUserToken().setLogin(GRACE_HOPPER).setName("token-to-keep-2"));
+  insertUserToken(newUserToken().setLogin(ADA_LOVELACE).setName("token-to-delete"));
+  String response=newRequest(GRACE_HOPPER,"token-to-delete");
+  assertThat(response).isEmpty();
+  assertThat(dbClient.userTokenDao().selectByLogin(dbSession,GRACE_HOPPER)).extracting("name").containsOnly("token-to-keep-1","token-to-keep-2");
+  assertThat(dbClient.userTokenDao().selectByLogin(dbSession,ADA_LOVELACE)).extracting("name").containsOnly("token-to-delete");
+}

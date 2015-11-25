@@ -1,0 +1,10 @@
+{
+  insertToken(newUserToken().setLogin("login").setName("name"));
+  insertToken(newUserToken().setLogin("login").setName("another-name"));
+  insertToken(newUserToken().setLogin("another-login").setName("name"));
+  underTest.deleteByLoginAndName(dbSession,"login","name");
+  db.commit();
+  Assertions.assertThat(underTest.selectByLoginAndName(dbSession,"login","name")).isAbsent();
+  Assertions.assertThat(underTest.selectByLoginAndName(dbSession,"login","another-name")).isPresent();
+  Assertions.assertThat(underTest.selectByLoginAndName(dbSession,"another-login","name")).isPresent();
+}
