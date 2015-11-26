@@ -1,0 +1,13 @@
+{
+  userSession.checkLoggedIn().checkGlobalPermission(GlobalPermissions.SYSTEM_ADMIN);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    String login=request.getLogin();
+    checkLoginExists(dbSession,login);
+    List<UserTokenDto> userTokens=dbClient.userTokenDao().selectByLogin(dbSession,login);
+    return buildResponse(login,userTokens);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}
