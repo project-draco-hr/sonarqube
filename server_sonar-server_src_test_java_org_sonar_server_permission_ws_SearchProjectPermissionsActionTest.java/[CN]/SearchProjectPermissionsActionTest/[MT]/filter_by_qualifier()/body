@@ -1,0 +1,9 @@
+{
+  insertComponent(newView("view-uuid"));
+  insertComponent(newDeveloper("developer-name"));
+  insertComponent(newProjectDto("project-uuid"));
+  commit();
+  TestResponse wsResponse=ws.newRequest().setMediaType(MediaTypes.PROTOBUF).setParam(PARAM_QUALIFIER,Qualifiers.PROJECT).execute();
+  SearchProjectPermissionsWsResponse result=SearchProjectPermissionsWsResponse.parseFrom(wsResponse.getInputStream());
+  assertThat(result.getProjectsList()).extracting("id").contains("project-uuid").doesNotContain("view-uuid").doesNotContain("developer-name");
+}
