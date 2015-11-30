@@ -1,16 +1,16 @@
 {
   QualityProfileDto profile=QProfileTesting.newXooP1();
-  tester.get(QualityProfileDao.class).insert(session,profile);
+  tester.get(QualityProfileDao.class).insert(dbSession,profile);
   QualityProfileDto profile2=QProfileTesting.newXooP2().setParentKee(profile.getKee());
-  tester.get(QualityProfileDao.class).insert(session,profile2);
-  session.commit();
+  tester.get(QualityProfileDao.class).insert(dbSession,profile2);
+  dbSession.commit();
   RuleDto rule=RuleTesting.newXooX1();
-  ruleDao.insert(session,rule);
+  ruleDao.insert(dbSession,rule);
   ActiveRuleDto activeRule=newActiveRule(profile,rule);
-  tester.get(ActiveRuleDao.class).insert(session,activeRule);
+  tester.get(ActiveRuleDao.class).insert(dbSession,activeRule);
   ActiveRuleDto activeRule2=newActiveRule(profile2,rule).setInheritance(ActiveRuleDto.OVERRIDES).setSeverity(Severity.CRITICAL);
-  tester.get(ActiveRuleDao.class).insert(session,activeRule2);
-  session.commit();
+  tester.get(ActiveRuleDao.class).insert(dbSession,activeRule2);
+  dbSession.commit();
   WsTester.TestRequest request=tester.wsTester().newGetRequest(API_ENDPOINT,API_SEARCH_METHOD);
   request.setParam(WebService.Param.TEXT_QUERY,"x1");
   request.setParam(SearchAction.PARAM_ACTIVATION,"true");
