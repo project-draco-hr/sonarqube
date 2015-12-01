@@ -6,19 +6,19 @@
       LOG.debug("Detection of duplications for {}",inputFile);
       String resourceEffectiveKey=((DefaultInputFile)inputFile).key();
       Collection<Block> fileBlocks=index.getByInputFile(inputFile,resourceEffectiveKey);
-      Iterable<CloneGroup> filtered;
+      List<CloneGroup> filtered;
       try {
         List<CloneGroup> duplications=executorService.submit(new JavaCpdEngine.Task(index,fileBlocks)).get(TIMEOUT,TimeUnit.SECONDS);
-        filtered=Iterables.filter(duplications,minimumTokensPredicate);
+        filtered=from(duplications).filter(minimumTokensPredicate).toList();
       }
  catch (      TimeoutException e) {
-        filtered=null;
+        filtered=Collections.emptyList();
         LOG.warn("Timeout during detection of duplications for " + inputFile,e);
       }
 catch (      InterruptedException|ExecutionException e) {
         throw new IllegalStateException("Fail during detection of duplication for " + inputFile,e);
       }
-      JavaCpdEngine.save(context,inputFile,filtered);
+      saveDuplications(inputFile,filtered);
     }
   }
   finally {

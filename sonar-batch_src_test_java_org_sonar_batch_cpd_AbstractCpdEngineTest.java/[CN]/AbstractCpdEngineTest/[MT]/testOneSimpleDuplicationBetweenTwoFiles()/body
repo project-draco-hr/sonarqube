@@ -1,0 +1,14 @@
+{
+  List<CloneGroup> groups=Arrays.asList(newCloneGroup(new ClonePart(batchComponent1.key(),0,2,4),new ClonePart(batchComponent2.key(),0,15,17)));
+  engine.saveDuplications(inputFile1,groups);
+  assertThat(reader.readComponentDuplications(batchComponent1.batchId())).hasSize(1);
+  CloseableIterator<Duplication> dups=reader.readComponentDuplications(batchComponent1.batchId());
+  Duplication duplication=dups.next();
+  dups.close();
+  assertThat(duplication.getOriginPosition().getStartLine()).isEqualTo(2);
+  assertThat(duplication.getOriginPosition().getEndLine()).isEqualTo(4);
+  assertThat(duplication.getDuplicateList()).hasSize(1);
+  assertThat(duplication.getDuplicate(0).getOtherFileRef()).isEqualTo(batchComponent2.batchId());
+  assertThat(duplication.getDuplicate(0).getRange().getStartLine()).isEqualTo(15);
+  assertThat(duplication.getDuplicate(0).getRange().getEndLine()).isEqualTo(17);
+}

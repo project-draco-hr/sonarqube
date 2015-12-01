@@ -1,0 +1,24 @@
+{
+  File outputDir=temp.newFolder();
+  ReportPublisher reportPublisher=mock(ReportPublisher.class);
+  when(reportPublisher.getWriter()).thenReturn(new BatchReportWriter(outputDir));
+  reader=new BatchReportReader(outputDir);
+  BatchComponentCache componentCache=new BatchComponentCache();
+  Project p=new Project("foo");
+  componentCache.add(p,null).setInputComponent(new DefaultInputModule("foo"));
+  org.sonar.api.resources.Resource sampleFile=org.sonar.api.resources.File.create("src/Foo.php").setEffectiveKey("foo:src/Foo.php");
+  inputFile1=new DefaultInputFile("foo","src/Foo.php").setLines(5);
+  batchComponent1=componentCache.add(sampleFile,null).setInputComponent(inputFile1);
+  org.sonar.api.resources.Resource sampleFile2=org.sonar.api.resources.File.create("src/Foo2.php").setEffectiveKey("foo:src/Foo2.php");
+  batchComponent2=componentCache.add(sampleFile2,null).setInputComponent(new DefaultInputFile("foo","src/Foo2.php").setLines(5));
+  org.sonar.api.resources.Resource sampleFile3=org.sonar.api.resources.File.create("src/Foo3.php").setEffectiveKey("foo:src/Foo3.php");
+  batchComponent3=componentCache.add(sampleFile3,null).setInputComponent(new DefaultInputFile("foo","src/Foo3.php").setLines(5));
+  engine=new AbstractCpdEngine(reportPublisher,componentCache){
+    @Override boolean isLanguageSupported(    String language){
+      return false;
+    }
+    @Override void analyse(    String language,    SensorContext context){
+    }
+  }
+;
+}

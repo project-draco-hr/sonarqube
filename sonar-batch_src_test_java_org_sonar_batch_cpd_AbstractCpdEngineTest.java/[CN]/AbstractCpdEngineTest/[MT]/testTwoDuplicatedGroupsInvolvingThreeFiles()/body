@@ -1,0 +1,21 @@
+{
+  List<CloneGroup> groups=Arrays.asList(newCloneGroup(new ClonePart(batchComponent1.key(),0,5,204),new ClonePart(batchComponent2.key(),0,15,214)),newCloneGroup(new ClonePart(batchComponent1.key(),0,15,214),new ClonePart(batchComponent3.key(),0,15,214)));
+  engine.saveDuplications(inputFile1,groups);
+  assertThat(reader.readComponentDuplications(batchComponent1.batchId())).hasSize(2);
+  CloseableIterator<Duplication> dups=reader.readComponentDuplications(batchComponent1.batchId());
+  Duplication duplication1=dups.next();
+  Duplication duplication2=dups.next();
+  dups.close();
+  assertThat(duplication1.getOriginPosition().getStartLine()).isEqualTo(5);
+  assertThat(duplication1.getOriginPosition().getEndLine()).isEqualTo(204);
+  assertThat(duplication1.getDuplicateList()).hasSize(1);
+  assertThat(duplication1.getDuplicate(0).getOtherFileRef()).isEqualTo(batchComponent2.batchId());
+  assertThat(duplication1.getDuplicate(0).getRange().getStartLine()).isEqualTo(15);
+  assertThat(duplication1.getDuplicate(0).getRange().getEndLine()).isEqualTo(214);
+  assertThat(duplication2.getOriginPosition().getStartLine()).isEqualTo(15);
+  assertThat(duplication2.getOriginPosition().getEndLine()).isEqualTo(214);
+  assertThat(duplication2.getDuplicateList()).hasSize(1);
+  assertThat(duplication2.getDuplicate(0).getOtherFileRef()).isEqualTo(batchComponent3.batchId());
+  assertThat(duplication2.getDuplicate(0).getRange().getStartLine()).isEqualTo(15);
+  assertThat(duplication2.getDuplicate(0).getRange().getEndLine()).isEqualTo(214);
+}

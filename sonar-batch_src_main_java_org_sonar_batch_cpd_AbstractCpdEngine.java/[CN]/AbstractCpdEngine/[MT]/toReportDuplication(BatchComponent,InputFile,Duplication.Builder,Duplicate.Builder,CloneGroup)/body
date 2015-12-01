@@ -1,0 +1,24 @@
+{
+  dupBuilder.clear();
+  ClonePart originBlock=input.getOriginPart();
+  blockBuilder.clear();
+  dupBuilder.setOriginPosition(BatchReport.TextRange.newBuilder().setStartLine(originBlock.getStartLine()).setEndLine(originBlock.getEndLine()).build());
+  int clonePartCount=0;
+  for (  ClonePart duplicate : input.getCloneParts()) {
+    if (!duplicate.equals(originBlock)) {
+      clonePartCount++;
+      if (clonePartCount > MAX_CLONE_PART_PER_GROUP) {
+        LOG.warn("Too many duplication references on file " + inputFile.relativePath() + " for block at line "+ originBlock.getStartLine()+ ". Keep only the first "+ MAX_CLONE_PART_PER_GROUP+ " references.");
+        break;
+      }
+      blockBuilder.clear();
+      String componentKey=duplicate.getResourceId();
+      if (!component.key().equals(componentKey)) {
+        BatchComponent sameProjectComponent=batchComponentCache.get(componentKey);
+        blockBuilder.setOtherFileRef(sameProjectComponent.batchId());
+      }
+      dupBuilder.addDuplicate(blockBuilder.setRange(BatchReport.TextRange.newBuilder().setStartLine(duplicate.getStartLine()).setEndLine(duplicate.getEndLine()).build()).build());
+    }
+  }
+  return dupBuilder.build();
+}
