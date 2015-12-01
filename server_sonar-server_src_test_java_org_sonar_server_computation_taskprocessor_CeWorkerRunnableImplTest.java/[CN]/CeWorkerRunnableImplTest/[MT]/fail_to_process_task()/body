@@ -3,7 +3,7 @@
   when(queue.peek()).thenReturn(Optional.of(task));
   taskProcessorRepository.setProcessorForTask(task.getType(),taskProcessor);
   doThrow(new IllegalStateException("simulate exception thrown by TaskProcessor#process")).when(taskProcessor).process(task);
-  underTest.run();
+  assertThat(underTest.call()).isTrue();
   inOrder.verify(ceLogging).initForTask(task);
   inOrder.verify(taskProcessor).process(task);
   inOrder.verify(queue).remove(task,CeActivityDto.Status.FAILED);

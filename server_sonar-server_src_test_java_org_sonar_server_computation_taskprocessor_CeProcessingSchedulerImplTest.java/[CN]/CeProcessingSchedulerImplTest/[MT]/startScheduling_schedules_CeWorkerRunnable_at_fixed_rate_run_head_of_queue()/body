@@ -1,5 +1,5 @@
 {
-  underTest.startScheduling();
-  verify(processingExecutorService).scheduleAtFixedRate(same(workerRunnable),eq(0L),eq(2L),eq(TimeUnit.SECONDS));
-  verifyNoMoreInteractions(processingExecutorService);
+  when(ceWorkerRunnable.call()).thenReturn(true).thenReturn(true).thenReturn(false).thenReturn(true).thenReturn(false).thenThrow(new Exception("IAE should not cause scheduling to stop")).thenReturn(false).thenReturn(false).thenReturn(false).thenThrow(ERROR_TO_INTERRUPT_CHAINING);
+  startSchedulingAndRun();
+  assertThat(processingExecutorService.getScheduleCalls()).containsExactly(regularDelayedPoll,notDelayedPoll,notDelayedPoll,regularDelayedPoll,notDelayedPoll,regularDelayedPoll,notDelayedPoll,regularDelayedPoll,regularDelayedPoll,regularDelayedPoll);
 }

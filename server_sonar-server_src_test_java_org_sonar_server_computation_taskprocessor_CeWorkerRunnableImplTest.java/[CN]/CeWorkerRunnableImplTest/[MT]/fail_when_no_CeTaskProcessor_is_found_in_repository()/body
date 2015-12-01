@@ -2,7 +2,7 @@
   CeTask task=new CeTask.Builder().setUuid("TASK_1").setType(CeTaskTypes.REPORT).setComponentUuid("PROJECT_1").setSubmitterLogin(null).build();
   taskProcessorRepository.setNoProcessorForTask(CeTaskTypes.REPORT);
   when(queue.peek()).thenReturn(Optional.of(task));
-  underTest.run();
+  assertThat(underTest.call()).isTrue();
   inOrder.verify(ceLogging).initForTask(task);
   inOrder.verify(queue).remove(task,CeActivityDto.Status.FAILED);
   inOrder.verify(ceLogging).clearForTask();
