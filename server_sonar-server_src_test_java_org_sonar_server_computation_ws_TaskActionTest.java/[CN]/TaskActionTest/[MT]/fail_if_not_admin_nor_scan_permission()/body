@@ -1,0 +1,11 @@
+{
+  expectedException.expect(ForbiddenException.class);
+  userSession.setGlobalPermissions(GlobalPermissions.PREVIEW_EXECUTION);
+  CeQueueDto queueDto=new CeQueueDto();
+  queueDto.setTaskType("fake");
+  queueDto.setUuid("TASK_1");
+  queueDto.setStatus(CeQueueDto.Status.PENDING);
+  dbTester.getDbClient().ceQueueDao().insert(dbTester.getSession(),queueDto);
+  dbTester.commit();
+  ws.newRequest().setMediaType(MediaTypes.PROTOBUF).setParam("id","TASK_1").execute();
+}
