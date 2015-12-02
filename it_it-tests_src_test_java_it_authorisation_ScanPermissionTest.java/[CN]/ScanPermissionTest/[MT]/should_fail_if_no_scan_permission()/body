@@ -1,0 +1,19 @@
+{
+  runProjectAnalysis(orchestrator,"shared/xoo-sample","sonar.login",USER_LOGIN,"sonar.password","thewhite");
+  removeGroupPermission("anyone","scan");
+  try {
+    runProjectAnalysis(orchestrator,"shared/xoo-sample","sonar.login",USER_LOGIN,"sonar.password","thewhite");
+    fail();
+  }
+ catch (  BuildFailureException e) {
+    assertThat(e.getResult().getLogs()).contains("You're only authorized to execute a local (preview) SonarQube analysis without pushing the results to the SonarQube server. Please contact your SonarQube administrator.");
+  }
+  removeGroupPermission("anyone","dryRunScan");
+  try {
+    runProjectAnalysis(orchestrator,"shared/xoo-sample","sonar.login",USER_LOGIN,"sonar.password","thewhite");
+    fail();
+  }
+ catch (  BuildFailureException e) {
+    assertThat(e.getResult().getLogs()).contains("You're not authorized to execute any SonarQube analysis. Please contact your SonarQube administrator.");
+  }
+}
