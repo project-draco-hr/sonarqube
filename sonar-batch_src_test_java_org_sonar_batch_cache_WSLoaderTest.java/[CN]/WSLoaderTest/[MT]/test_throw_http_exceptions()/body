@@ -1,13 +1,11 @@
 {
-  HttpException httpException=new HttpException("url",500,"Internal Error");
-  IllegalStateException wrapperException=new IllegalStateException(httpException);
-  when(ws.wsConnector().call(any(WsRequest.class))).thenThrow(wrapperException);
+  when(ws.call(any(WsRequest.class))).thenThrow(new HttpException("url",500));
   WSLoader loader=new WSLoader(LoadStrategy.SERVER_FIRST,cache,ws);
   try {
     loader.loadString(ID);
     fail("IllegalStateException expected");
   }
- catch (  IllegalStateException e) {
+ catch (  HttpException e) {
     verifyNoMoreInteractions(cache);
   }
 }

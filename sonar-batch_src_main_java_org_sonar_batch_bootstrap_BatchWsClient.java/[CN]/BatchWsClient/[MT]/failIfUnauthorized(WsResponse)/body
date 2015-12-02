@@ -1,0 +1,12 @@
+{
+  if (response.code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+    if (hasCredentials) {
+      throw MessageException.of(format("Not authorized. Please check the properties %s and %s.",CoreProperties.LOGIN,CoreProperties.PASSWORD));
+    }
+    throw MessageException.of(format("Not authorized. Analyzing this project requires to be authenticated. " + "Please provide the values of the properties %s and %s.",CoreProperties.LOGIN,CoreProperties.PASSWORD));
+  }
+  if (response.code() == HttpURLConnection.HTTP_FORBIDDEN) {
+    throw MessageException.of(tryParseAsJsonError(response.content()));
+  }
+  response.failIfNotSuccessful();
+}

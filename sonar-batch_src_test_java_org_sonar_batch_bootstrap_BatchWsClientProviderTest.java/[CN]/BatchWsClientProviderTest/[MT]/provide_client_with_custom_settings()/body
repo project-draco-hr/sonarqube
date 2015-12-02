@@ -1,0 +1,14 @@
+{
+  Map<String,String> props=new HashMap<>();
+  props.put("sonar.host.url","https://here/sonarqube");
+  props.put("sonar.login","theLogin");
+  props.put("sonar.password","thePassword");
+  props.put("sonar.ws.timeout","42");
+  GlobalProperties settings=new GlobalProperties(props);
+  BatchWsClient client=underTest.provide(settings,env);
+  assertThat(client).isNotNull();
+  HttpConnector httpConnector=(HttpConnector)client.wsConnector();
+  assertThat(httpConnector.baseUrl()).isEqualTo("https://here/sonarqube/");
+  assertThat(httpConnector.okHttpClient().getProxy()).isNull();
+  assertThat(httpConnector.userAgent()).isEqualTo("Maven Plugin/2.3");
+}

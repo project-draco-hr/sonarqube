@@ -1,0 +1,12 @@
+{
+  WsRequest request=newRequest();
+  WsResponse response=newResponse().setRequestUrl("https://local/api/issues/search");
+  when(wsClient.wsConnector().call(request)).thenReturn(response);
+  logTester.setLevel(LoggerLevel.DEBUG);
+  BatchWsClient underTest=new BatchWsClient(wsClient,false,null);
+  WsResponse result=underTest.call(request);
+  assertThat(result).isSameAs(response);
+  List<String> debugLogs=logTester.logs(LoggerLevel.DEBUG);
+  assertThat(debugLogs).hasSize(1);
+  assertThat(debugLogs.get(0)).contains("GET 200 https://local/api/issues/search | time=");
+}
