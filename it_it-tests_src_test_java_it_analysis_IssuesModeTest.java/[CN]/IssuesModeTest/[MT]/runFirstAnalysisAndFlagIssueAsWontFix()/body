@@ -4,13 +4,12 @@
   orchestrator.getServer().associateProjectToQualityProfile("sample","xoo","one-issue-per-line");
   SonarRunner runner=configureRunner("shared/xoo-sample");
   orchestrator.executeBuild(runner);
-  runner=configureRunnerIssues("shared/xoo-sample");
+  File homeDir=temp.newFolder();
+  runner=configureRunnerIssues("shared/xoo-sample",homeDir);
   BuildResult result=orchestrator.executeBuild(runner);
   assertThat(ItUtils.countIssuesInJsonReport(result,false)).isEqualTo(17);
   JSONObject obj=ItUtils.getJSONReport(result);
   String key=((JSONObject)((JSONArray)obj.get("issues")).get(0)).get("key").toString();
   orchestrator.getServer().adminWsClient().issueClient().doTransition(key,"falsepositive");
-  runner=configureRunnerIssues("shared/xoo-sample");
-  result=orchestrator.executeBuild(runner);
-  assertThat(ItUtils.countIssuesInJsonReport(result,false)).isEqualTo(16);
+  return homeDir;
 }
