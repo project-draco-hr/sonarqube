@@ -1,0 +1,13 @@
+{
+  SnapshotDto period1ProjectSnapshot=newSnapshotForProject(PROJECT_DTO);
+  dbClient.snapshotDao().insert(session,period1ProjectSnapshot);
+  dbClient.measureDao().insert(session,newMeasureDto(ISSUES_METRIC.getId(),PROJECT_DTO.getId(),period1ProjectSnapshot.getId(),60d));
+  session.commit();
+  periodsHolder.setPeriods(newPeriod(1,period1ProjectSnapshot));
+  treeRootHolder.setRoot(PROJECT);
+  DumbDeveloper developer=new DumbDeveloper("a");
+  measureRepository.addRawMeasure(PROJECT_REF,ISSUES_METRIC.getKey(),newMeasureBuilder().forDeveloper(developer).create(80,null));
+  underTest.execute();
+  assertThat(measureRepository.getRawMeasures(PROJECT).keys()).hasSize(1);
+  assertThat(measureRepository.getRawMeasure(PROJECT,ISSUES_METRIC,developer).get().hasVariations()).isFalse();
+}
