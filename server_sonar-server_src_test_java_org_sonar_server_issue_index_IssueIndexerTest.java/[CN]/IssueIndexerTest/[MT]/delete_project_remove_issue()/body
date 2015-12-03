@@ -1,0 +1,8 @@
+{
+  dbTester.prepareDbUnit(getClass(),"index.xml");
+  IssueIndexer indexer=createIndexer();
+  indexer.index();
+  assertThat(esTester.countDocuments("issues","issue")).isEqualTo(1);
+  indexer.deleteProject("THE_PROJECT",true);
+  assertThat(esTester.countDocuments("issues","issue")).isZero();
+}

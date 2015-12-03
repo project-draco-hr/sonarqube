@@ -1,9 +1,15 @@
 {
   try {
     String sql=afterDate > 0L ? SQL_AFTER_DATE : SQL_ALL;
+    sql+=projectUuid == null ? "" : PROJECT_FILTER;
     PreparedStatement stmt=dbClient.getMyBatis().newScrollingSelectStatement(session,sql);
+    int index=1;
     if (afterDate > 0L) {
-      stmt.setLong(1,afterDate);
+      stmt.setLong(index,afterDate);
+      index++;
+    }
+    if (projectUuid != null) {
+      stmt.setString(index,projectUuid);
     }
     return new IssueResultSetIterator(stmt);
   }
