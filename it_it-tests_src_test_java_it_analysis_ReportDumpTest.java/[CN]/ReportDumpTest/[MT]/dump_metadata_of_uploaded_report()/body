@@ -1,0 +1,13 @@
+{
+  File projectDir=ItUtils.projectDir("shared/xoo-sample");
+  orchestrator.executeBuild(SonarRunner.create(projectDir,"sonar.projectKey","dump_metadata_of_uploaded_report","sonar.projectName","dump_metadata_of_uploaded_report"));
+  File metadata=new File(projectDir,".sonar/report-task.txt");
+  assertThat(metadata).exists().isFile();
+  Properties props=new Properties();
+  props.load(new StringReader(FileUtils.readFileToString(metadata,StandardCharsets.UTF_8)));
+  assertThat(props).hasSize(4);
+  assertThat(props.getProperty("projectKey")).isEqualTo("dump_metadata_of_uploaded_report");
+  assertThat(props.getProperty("ceTaskId")).isNotEmpty();
+  verifyUrl(props.getProperty("dashboardUrl"));
+  verifyUrl(props.getProperty("ceTaskUrl"));
+}
