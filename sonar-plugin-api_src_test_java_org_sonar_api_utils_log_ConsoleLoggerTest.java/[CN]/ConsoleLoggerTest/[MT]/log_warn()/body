@@ -1,0 +1,14 @@
+{
+  Throwable throwable=mock(Throwable.class);
+  underTest.warn("message");
+  underTest.warn("message {}","foo");
+  underTest.warn("message {} {}","foo","bar");
+  underTest.warn("message {} {} {}","foo","bar","baz");
+  underTest.warn("message",throwable);
+  ArgumentCaptor<String> captor=ArgumentCaptor.forClass(String.class);
+  verify(stream,times(5)).println(captor.capture());
+  for (  String msg : captor.getAllValues()) {
+    assertThat(msg).startsWith("WARN ");
+  }
+  verify(throwable).printStackTrace();
+}
