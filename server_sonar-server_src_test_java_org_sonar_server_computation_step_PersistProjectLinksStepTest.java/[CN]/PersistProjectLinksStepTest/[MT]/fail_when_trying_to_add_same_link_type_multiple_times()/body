@@ -4,9 +4,10 @@
   reportReader.putComponent(BatchReport.Component.newBuilder().setRef(1).setType(Constants.ComponentType.PROJECT).addLink(BatchReport.ComponentLink.newBuilder().setType(Constants.ComponentLinkType.HOME).setHref("http://www.sonarqube.org").build()).addLink(BatchReport.ComponentLink.newBuilder().setType(Constants.ComponentLinkType.HOME).setHref("http://www.sonarqube.org").build()).build());
   try {
     step.execute();
-    failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    failBecauseExceptionWasNotThrown(VisitException.class);
   }
- catch (  IllegalArgumentException e) {
-    assertThat(e).hasMessage("Link of type 'homepage' has already been declared on component 'ABCD'");
+ catch (  VisitException e) {
+    assertThat(e.getCause()).isInstanceOf(IllegalArgumentException.class);
+    assertThat(e.getCause()).hasMessage("Link of type 'homepage' has already been declared on component 'ABCD'");
   }
 }

@@ -1,14 +1,8 @@
 {
-  if (!verifyDepth(component)) {
-    return;
+  try {
+    visitImpl(component);
   }
-  stack.add(new PathElementImpl<>(component,createForComponent(component)));
-  if (this.visitor.getOrder() == PRE_ORDER) {
-    visitNode(component);
+ catch (  RuntimeException e) {
+    VisitException.rethrowOrWrap(e,"Visit failed for Component %s:%s%s",component.getType(),component.getKey(),new ComponentPathPrinter<>(stack));
   }
-  visitChildren(component);
-  if (this.visitor.getOrder() == POST_ORDER) {
-    visitNode(component);
-  }
-  stack.pop();
 }

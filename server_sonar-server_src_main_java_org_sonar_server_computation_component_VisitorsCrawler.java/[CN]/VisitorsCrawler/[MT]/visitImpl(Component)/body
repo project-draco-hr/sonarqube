@@ -1,0 +1,21 @@
+{
+  MatchVisitorMaxDepth visitorMaxDepth=MatchVisitorMaxDepth.forComponent(component);
+  List<VisitorWrapper> preOrderVisitorWrappersToExecute=from(preOrderVisitorWrappers).filter(visitorMaxDepth).toList();
+  List<VisitorWrapper> postOrderVisitorWrappersToExecute=from(postOrderVisitorWrappers).filter(visitorMaxDepth).toList();
+  if (preOrderVisitorWrappersToExecute.isEmpty() && postOrderVisitorWrappersToExecute.isEmpty()) {
+    return;
+  }
+  for (  VisitorWrapper visitorWrapper : concat(preOrderVisitorWrappers,postOrderVisitorWrappers)) {
+    visitorWrapper.beforeComponent(component);
+  }
+  for (  VisitorWrapper visitorWrapper : preOrderVisitorWrappersToExecute) {
+    visitNode(component,visitorWrapper);
+  }
+  visitChildren(component);
+  for (  VisitorWrapper visitorWrapper : postOrderVisitorWrappersToExecute) {
+    visitNode(component,visitorWrapper);
+  }
+  for (  VisitorWrapper visitorWrapper : concat(preOrderVisitorWrappersToExecute,postOrderVisitorWrappersToExecute)) {
+    visitorWrapper.afterComponent(component);
+  }
+}
