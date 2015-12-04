@@ -1,3 +1,15 @@
 {
-  throw new UnsupportedOperationException("submit(Callable<T> task) not implemented");
+  Future<T> res=new AbstractPartiallyImplementedFuture<T>(){
+    @Override public T get() throws InterruptedException, ExecutionException {
+      try {
+        return task.call();
+      }
+ catch (      Exception e) {
+        throw new ExecutionException(e);
+      }
+    }
+  }
+;
+  futures.add(res);
+  return res;
 }

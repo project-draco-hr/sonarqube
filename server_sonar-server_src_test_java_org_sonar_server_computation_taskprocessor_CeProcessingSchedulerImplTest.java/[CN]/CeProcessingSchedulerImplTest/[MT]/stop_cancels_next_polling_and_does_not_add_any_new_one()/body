@@ -1,0 +1,21 @@
+{
+  when(ceWorkerRunnable.call()).thenReturn(false).thenReturn(true).thenReturn(false).thenReturn(false).thenReturn(false).thenReturn(false).thenReturn(false).thenThrow(ERROR_TO_INTERRUPT_CHAINING);
+  underTest.startScheduling();
+  int cancelledTaskFutureCount=0;
+  int i=0;
+  while (processingExecutorService.futures.peek() != null) {
+    Future<?> future=processingExecutorService.futures.poll();
+    if (future.isCancelled()) {
+      cancelledTaskFutureCount++;
+    }
+ else {
+      future.get();
+    }
+    if (i == 1) {
+      underTest.stop();
+    }
+    i++;
+  }
+  assertThat(cancelledTaskFutureCount).isEqualTo(1);
+  assertThat(processingExecutorService.getSchedulerCalls()).containsExactly(regularDelayedPoll,regularDelayedPoll,notDelayedPoll,regularDelayedPoll);
+}
