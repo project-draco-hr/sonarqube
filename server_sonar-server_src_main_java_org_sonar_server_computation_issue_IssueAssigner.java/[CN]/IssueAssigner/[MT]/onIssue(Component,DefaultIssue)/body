@@ -1,16 +1,15 @@
 {
-  if (issue.isNew()) {
-    loadScmChangesetsIfNeeded(component);
+  boolean authorWasSet=false;
+  if (issue.authorLogin() == null) {
+    loadScmChangesets(component);
     String scmAuthor=guessScmAuthor(issue);
-    issue.setAuthorLogin(scmAuthor);
-    if (scmAuthor != null) {
-      String assigneeLogin=scmAccountToUser.getNullable(scmAuthor);
-      if (assigneeLogin == null) {
-        issue.setAssignee(defaultAssigne.getLogin());
-      }
- else {
-        issue.setAssignee(assigneeLogin);
-      }
+    if (!Strings.isNullOrEmpty(scmAuthor)) {
+      issueUpdater.setNewAuthor(issue,scmAuthor,changeContext);
+      authorWasSet=true;
     }
+  }
+  if (authorWasSet && issue.assignee() == null) {
+    String assigneeLogin=StringUtils.defaultIfEmpty(scmAccountToUser.getNullable(issue.authorLogin()),defaultAssigne.getLogin());
+    issueUpdater.setNewAssignee(issue,assigneeLogin,changeContext);
   }
 }
