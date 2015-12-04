@@ -1,0 +1,12 @@
+{
+  if (context.settings().getBoolean(DecimalScaleProperty.KEY)) {
+    FilePredicate all=context.fileSystem().predicates().all();
+    Iterable<InputFile> files=context.fileSystem().inputFiles(all);
+    double value=0.0001;
+    for (    InputFile file : files) {
+      LOG.info("Value for {}: {}",file.relativePath(),value);
+      context.newMeasure().on(file).forMetric(DecimalScaleMetric.definition()).withValue(value).save();
+      value+=0.0001;
+    }
+  }
+}
