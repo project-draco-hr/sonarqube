@@ -1,0 +1,10 @@
+{
+  ComponentDto project=newProjectDto("project-uuid");
+  dbClient.componentDao().insert(dbSession,project);
+  SnapshotDto snapshot=dbClient.snapshotDao().insert(dbSession,newSnapshotForProject(project).setPeriodMode(1,"last_period").setPeriodDate(1,956789123456L).setPeriodMode(2,"last_version").setPeriodParam(2,"2015-12-07").setPeriodDate(2,956789123987L).setPeriodMode(3,"last_analysis").setPeriodMode(5,"last_30_days").setPeriodParam(5,"2015-11-07"));
+  MetricDto metric=dbClient.metricDao().insert(dbSession,newMetricDto().setEnabled(true).setKey(CoreMetrics.QUALITY_GATE_DETAILS_KEY));
+  dbClient.measureDao().insert(dbSession,newMeasureDto(metric,snapshot.getId()).setData(IOUtils.toString(getClass().getResource("ProjectStatusActionTest/measure_data.json"))));
+  dbSession.commit();
+  String response=ws.newRequest().setParam("analysisId",snapshot.getId().toString()).execute().getInput();
+  assertJson(response).isSimilarTo(getClass().getResource("project_status-example.json"));
+}

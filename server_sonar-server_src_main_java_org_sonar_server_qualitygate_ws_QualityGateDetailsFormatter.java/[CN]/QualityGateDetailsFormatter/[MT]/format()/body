@@ -1,0 +1,12 @@
+{
+  if (isNullOrEmpty(measureData)) {
+    return newResponseWithoutQualityGateDetails();
+  }
+  JsonParser parser=new JsonParser();
+  JsonObject json=parser.parse(measureData).getAsJsonObject();
+  ProjectStatusWsResponse.Status qualityGateStatus=measureLevelToQualityGateStatus(json.get("level").getAsString());
+  projectStatusBuilder.setStatus(qualityGateStatus);
+  formatConditions(json.getAsJsonArray("conditions"));
+  formatPeriods();
+  return projectStatusBuilder.build();
+}

@@ -1,0 +1,13 @@
+{
+  checkScanOrAdminPermission();
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    String snapshotId=request.getAnalysisId();
+    SnapshotDto snapshotDto=getSnapshot(dbSession,snapshotId);
+    String measureData=getQualityGateDetailsMeasureData(dbSession,snapshotDto);
+    return ProjectStatusWsResponse.newBuilder().setProjectStatus(new QualityGateDetailsFormatter(measureData,snapshotDto).format()).build();
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}
