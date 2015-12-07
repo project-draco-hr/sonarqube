@@ -1,0 +1,17 @@
+{
+  createUser(SIMON_USER,SIMON_USER);
+  projectAnalysis.withProperties("sonar.scm.disabled","true").run();
+  List<Issue> issues=searchIssues();
+  assertThat(issues).isNotEmpty();
+  for (  Issue issue : issues) {
+    assertThat(issue.author()).isEmpty();
+  }
+  assertThat(search(IssueQuery.create().assigned(true)).list()).isEmpty();
+  projectAnalysis.run();
+  issues=searchIssues();
+  assertThat(issues).isNotEmpty();
+  for (  Issue issue : issues) {
+    assertThat(issue.author()).isNotEmpty();
+  }
+  assertThat(search(IssueQuery.create().assignees(SIMON_USER)).list()).hasSize(3);
+}
