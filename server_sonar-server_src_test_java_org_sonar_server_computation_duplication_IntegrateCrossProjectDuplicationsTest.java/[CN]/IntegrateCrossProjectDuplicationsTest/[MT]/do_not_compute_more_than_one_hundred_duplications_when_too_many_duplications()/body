@@ -3,9 +3,9 @@
   Collection<Block> duplicatedBlocks=new ArrayList<>();
   Block.Builder blockBuilder=new Block.Builder().setIndexInFile(0).setLines(30,45).setUnit(0,100);
   for (int i=0; i < 110; i++) {
-    String hash=randomAlphanumeric(16);
+    String hash=padStart("hash" + i,16,'a');
     originBlocks.add(blockBuilder.setResourceId(ORIGIN_FILE_KEY).setBlockHash(new ByteArray(hash)).build());
-    duplicatedBlocks.add(blockBuilder.setResourceId(randomAlphanumeric(16)).setBlockHash(new ByteArray(hash)).build());
+    duplicatedBlocks.add(blockBuilder.setResourceId("resource" + i).setBlockHash(new ByteArray(hash)).build());
   }
   underTest.computeCpd(ORIGIN_FILE,originBlocks,duplicatedBlocks);
   verify(duplicationRepository,times(100)).addDuplication(eq(ORIGIN_FILE),any(TextBlock.class),anyString(),any(TextBlock.class));
