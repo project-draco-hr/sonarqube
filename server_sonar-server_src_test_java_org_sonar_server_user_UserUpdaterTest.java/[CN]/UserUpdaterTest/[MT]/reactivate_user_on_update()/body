@@ -2,10 +2,10 @@
   db.prepareDbUnit(getClass(),"reactivate_user.xml");
   when(system2.now()).thenReturn(1418215735486L);
   createDefaultGroup();
-  userUpdater.update(UpdateUser.create("marius").setName("Marius2").setEmail("marius2@mail.com").setPassword("password2").setPasswordConfirmation("password2").setScmAccounts(newArrayList("ma2")));
+  userUpdater.update(UpdateUser.create(DEFAULT_LOGIN).setName("Marius2").setEmail("marius2@mail.com").setPassword("password2").setPasswordConfirmation("password2").setScmAccounts(newArrayList("ma2")));
   session.commit();
   session.clearCache();
-  UserDto dto=userDao.selectByLogin(session,"marius");
+  UserDto dto=userDao.selectByLogin(session,DEFAULT_LOGIN);
   assertThat(dto.isActive()).isTrue();
   assertThat(dto.getName()).isEqualTo("Marius2");
   assertThat(dto.getEmail()).isEqualTo("marius2@mail.com");
@@ -16,5 +16,5 @@
   assertThat(dto.getUpdatedAt()).isEqualTo(1418215735486L);
   List<SearchHit> indexUsers=es.getDocuments(UserIndexDefinition.INDEX,UserIndexDefinition.TYPE_USER);
   assertThat(indexUsers).hasSize(1);
-  assertThat(indexUsers.get(0).getSource()).contains(entry("login","marius"),entry("name","Marius2"),entry("email","marius2@mail.com"));
+  assertThat(indexUsers.get(0).getSource()).contains(entry("login",DEFAULT_LOGIN),entry("name","Marius2"),entry("email","marius2@mail.com"));
 }
