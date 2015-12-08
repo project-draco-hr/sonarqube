@@ -1,0 +1,23 @@
+{
+  QualityGate simple=qgClient().create("SimpleWithLowThresholdForBuildBreakStrategy");
+  qgClient().setDefault(simple.id());
+  qgClient().createCondition(NewCondition.create(simple.id()).metricKey("ncloc").operator("GT").errorThreshold("7"));
+  try {
+    File projectDir=projectDir("qualitygate/xoo-sample");
+    SonarRunner build=SonarRunner.create(projectDir);
+    orchestrator.executeBuild(build);
+    String taskId=getTaskIdInLocalReport(projectDir);
+    String analysisId=getAnalysisId(taskId);
+    ProjectStatusWsResponse projectStatusWsResponse=wsClient.qualityGates().projectStatus(new ProjectStatusWsRequest().setAnalysisId(analysisId));
+    ProjectStatusWsResponse.ProjectStatus projectStatus=projectStatusWsResponse.getProjectStatus();
+    assertThat(projectStatus.getStatus()).isEqualTo(ProjectStatusWsResponse.Status.ERROR);
+    assertThat(projectStatus.getConditionsCount()).isEqualTo(1);
+    ProjectStatusWsResponse.Condition condition=projectStatus.getConditionsList().get(0);
+    assertThat(condition.getMetricKey()).isEqualTo("ncloc");
+    assertThat(condition.getErrorThreshold()).isEqualTo("7");
+  }
+  finally {
+    qgClient().unsetDefault();
+    qgClient().destroy(simple.id());
+  }
+}
