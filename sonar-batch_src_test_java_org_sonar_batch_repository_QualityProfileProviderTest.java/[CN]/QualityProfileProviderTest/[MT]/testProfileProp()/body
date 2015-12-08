@@ -2,8 +2,10 @@
   when(mode.isNotAssociated()).thenReturn(false);
   when(loader.load(eq("project"),eq("custom"),any(MutableBoolean.class))).thenReturn(response);
   when(props.property(ModuleQProfiles.SONAR_PROFILE_PROP)).thenReturn("custom");
+  when(props.properties()).thenReturn(ImmutableMap.of(ModuleQProfiles.SONAR_PROFILE_PROP,"custom"));
   ModuleQProfiles qps=qualityProfileProvider.provide(key,loader,projectRepo,props,mode);
   assertResponse(qps);
   verify(loader).load(eq("project"),eq("custom"),any(MutableBoolean.class));
   verifyNoMoreInteractions(loader);
+  assertThat(logTester.logs(LoggerLevel.WARN)).contains("Ability to set quality profile from command line using '" + ModuleQProfiles.SONAR_PROFILE_PROP + "' is deprecated and will be dropped in a future SonarQube version. Please configure quality profile used by your project on SonarQube server.");
 }
