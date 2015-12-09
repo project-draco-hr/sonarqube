@@ -1,17 +1,18 @@
 {
   Preconditions.checkNotNull(file);
   Preconditions.checkNotNull(lines);
-  Preconditions.checkArgument(allFilesToBlame.contains(file),"It was not expected to blame file " + file.relativePath());
+  Preconditions.checkArgument(allFilesToBlame.contains(file),"It was not expected to blame file %s",file.relativePath());
   if (lines.size() != file.lines()) {
-    LOG.debug("Ignoring blame result since provider returned " + lines.size() + " blame lines but file "+ file.relativePath()+ " has "+ file.lines()+ " lines");
+    LOG.debug("Ignoring blame result since provider returned {} blame lines but file {} has {} lines",lines.size(),file.relativePath(),file.lines());
     return;
   }
   BatchComponent batchComponent=componentCache.get(file);
   Builder scmBuilder=BatchReport.Changesets.newBuilder();
   scmBuilder.setComponentRef(batchComponent.batchId());
   Map<String,Integer> changesetsIdByRevision=new HashMap<>();
+  int lineId=1;
   for (  BlameLine line : lines) {
-    validateLine(line);
+    validateLine(line,lineId,file);
     Integer changesetId=changesetsIdByRevision.get(line.revision());
     if (changesetId == null) {
       addChangeset(scmBuilder,line);
@@ -19,6 +20,7 @@
       changesetsIdByRevision.put(line.revision(),changesetId);
     }
     scmBuilder.addChangesetIndexByLine(changesetId);
+    lineId++;
   }
   writer.writeComponentChangesets(scmBuilder.build());
   allFilesToBlame.remove(file);
