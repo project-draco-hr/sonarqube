@@ -1,14 +1,12 @@
 {
   coverageEditor.setText("");
-  if (reader.hasCoverage(component.getRef())) {
-    try (CloseableIterator<BatchReport.Coverage> it=reader.readComponentCoverage(component.getRef())){
-      while (it.hasNext()) {
-        BatchReport.Coverage coverage=it.next();
-        coverageEditor.getDocument().insertString(coverageEditor.getDocument().getEndPosition().getOffset(),coverage.toString() + "\n",null);
-      }
+  try (CloseableIterator<BatchReport.Coverage> it=reader.readComponentCoverage(component.getRef())){
+    while (it.hasNext()) {
+      BatchReport.Coverage coverage=it.next();
+      coverageEditor.getDocument().insertString(coverageEditor.getDocument().getEndPosition().getOffset(),coverage.toString() + "\n",null);
     }
- catch (    Exception e) {
-      throw new IllegalStateException("Can't read code coverage for " + getNodeName(component),e);
-    }
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Can't read code coverage for " + getNodeName(component),e);
   }
 }

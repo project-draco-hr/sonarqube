@@ -1,0 +1,14 @@
+{
+  duplicationEditor.setText("");
+  if (reader.hasCoverage(component.getRef())) {
+    try (CloseableIterator<BatchReport.Duplication> it=reader.readComponentDuplications(component.getRef())){
+      while (it.hasNext()) {
+        BatchReport.Duplication dup=it.next();
+        duplicationEditor.getDocument().insertString(duplicationEditor.getDocument().getEndPosition().getOffset(),dup.toString() + "\n",null);
+      }
+    }
+ catch (    Exception e) {
+      throw new IllegalStateException("Can't read duplications for " + getNodeName(component),e);
+    }
+  }
+}
