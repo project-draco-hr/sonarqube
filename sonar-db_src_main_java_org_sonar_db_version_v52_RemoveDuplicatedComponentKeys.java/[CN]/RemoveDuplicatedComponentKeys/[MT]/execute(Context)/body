@@ -1,10 +1,12 @@
 {
   Upsert componentUpdate=context.prepareUpsert("DELETE FROM projects WHERE id=?");
   Upsert issuesUpdate=context.prepareUpsert("UPDATE issues SET component_uuid=?, project_uuid=? WHERE component_uuid=?");
+  DbSession readSession=dbClient.openSession(false);
+  Migration53Mapper mapper=readSession.getMapper(Migration53Mapper.class);
   ProgressLogger progress=ProgressLogger.create(getClass(),counter);
   progress.start();
   try {
-    RemoveDuplicatedComponentHandler handler=new RemoveDuplicatedComponentHandler(context,componentUpdate,issuesUpdate);
+    RemoveDuplicatedComponentHandler handler=new RemoveDuplicatedComponentHandler(mapper,componentUpdate,issuesUpdate);
     context.prepareSelect("SELECT p.kee, COUNT(p.kee) FROM projects p " + "GROUP BY p.kee " + "HAVING COUNT(p.kee) > 1").scroll(handler);
     if (!handler.isEmpty) {
       componentUpdate.execute().commit();
@@ -14,6 +16,7 @@
   }
   finally {
     progress.stop();
+    dbClient.closeSession(readSession);
     componentUpdate.close();
     issuesUpdate.close();
   }

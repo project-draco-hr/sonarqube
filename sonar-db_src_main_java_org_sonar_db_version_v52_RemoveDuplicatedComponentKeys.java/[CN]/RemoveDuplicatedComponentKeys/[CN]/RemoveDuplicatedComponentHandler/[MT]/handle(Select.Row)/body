@@ -1,9 +1,10 @@
 {
-  List<Component> components=context.prepareSelect("SELECT p.id, p.uuid, p.project_uuid, p.enabled FROM projects p WHERE p.kee=? ORDER BY id").setString(1,row.getString(1)).list(ComponentRowReader.INSTANCE);
+  String componentKey=row.getString(1);
+  List<Component> components=mapper.selectComponentsByKey(componentKey);
   Component refComponent=FluentIterable.from(components).firstMatch(EnabledComponent.INSTANCE).or(components.get(components.size() - 1));
-  for (  Component componentToRemove : FluentIterable.from(components).filter(Predicates.not(new MatchComponentId(refComponent.id)))) {
-    componentUpdate.setLong(1,componentToRemove.id).addBatch();
-    issuesUpdate.setString(1,refComponent.uuid).setString(2,refComponent.projectUuid).setString(3,componentToRemove.uuid).addBatch();
+  for (  Component componentToRemove : FluentIterable.from(components).filter(Predicates.not(new MatchComponentId(refComponent.getId())))) {
+    componentUpdate.setLong(1,componentToRemove.getId()).addBatch();
+    issuesUpdate.setString(1,refComponent.getUuid()).setString(2,refComponent.getProjectUuid()).setString(3,componentToRemove.getUuid()).addBatch();
     counter.getAndIncrement();
     isEmpty=false;
   }
