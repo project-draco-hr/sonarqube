@@ -1,0 +1,20 @@
+{
+  String expectedValue=Long.toString(System.currentTimeMillis());
+  Sonar wsClient=createWsClient(username,password);
+  try {
+    wsClient.create(new UserPropertyCreateQuery("auth",expectedValue));
+  }
+ catch (  ConnectionException e) {
+    return NOT_AUTHORIZED;
+  }
+  try {
+    String value=wsClient.find(new UserPropertyQuery("auth")).getValue();
+    if (!Objects.equal(value,expectedValue)) {
+      throw new IllegalStateException("Expected " + expectedValue + " , but got "+ value);
+    }
+  }
+ catch (  ConnectionException e) {
+    throw new IllegalStateException(e);
+  }
+  return AUTHORIZED;
+}

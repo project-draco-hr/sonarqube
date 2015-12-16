@@ -1,0 +1,15 @@
+{
+  setServerProperty(orchestrator,"sonar.security.savePassword","false");
+  String login="localuser";
+  String localPassword="1234567";
+  String remotePassword="7654321";
+  Map<String,String> users=Maps.newHashMap();
+  users.put(login + ".password",remotePassword);
+  updateUsersInExtAuth(users);
+  createUserInDb(login,localPassword);
+  assertThat(loginAttempt(login,remotePassword)).isEqualTo(AUTHORIZED);
+  assertThat(loginAttempt(login,localPassword)).isEqualTo(NOT_AUTHORIZED);
+  orchestrator.getServer().getAdminWsClient().update(new PropertyUpdateQuery("sonar.security.localUsers","admin," + login));
+  assertThat(loginAttempt(login,remotePassword)).isEqualTo(NOT_AUTHORIZED);
+  assertThat(loginAttempt(login,localPassword)).isEqualTo(AUTHORIZED);
+}

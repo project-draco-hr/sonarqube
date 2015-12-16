@@ -1,0 +1,17 @@
+{
+  String username=USER_LOGIN;
+  String password="123";
+  Map<String,String> users=Maps.newHashMap();
+  users.put(username + ".password",password);
+  users.put(username + ".name","Tester Testerovich");
+  users.put(username + ".email","tester@example.org");
+  users.put(username + ".groups","sonar-user");
+  updateUsersInExtAuth(users);
+  assertThat(loginAttempt(username,password)).isEqualTo(AUTHORIZED);
+  new SeleneseTest(Selenese.builder().setHtmlTestsInClasspath("external-user-details","/user/ExternalAuthenticationTest/external-user-details.html").build()).runOn(orchestrator);
+  users.put(username + ".name","Tester2 Testerovich");
+  users.put(username + ".email","tester2@example.org");
+  updateUsersInExtAuth(users);
+  assertThat(loginAttempt(username,password)).isEqualTo(AUTHORIZED);
+  new SeleneseTest(Selenese.builder().setHtmlTestsInClasspath("external-user-details2","/user/ExternalAuthenticationTest/external-user-details2.html").build()).runOn(orchestrator);
+}
