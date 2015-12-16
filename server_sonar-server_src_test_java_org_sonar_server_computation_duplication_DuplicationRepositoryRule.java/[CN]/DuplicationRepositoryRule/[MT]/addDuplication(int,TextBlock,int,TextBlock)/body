@@ -1,5 +1,9 @@
 {
-  componentProvider.ensureInitialized();
-  delegate.addDuplication(componentProvider.getByRef(fileRef),original,componentProvider.getByRef(otherFileRef),duplicate);
+  ensureComponentProviderInitialized();
+  Component component=componentProvider.getByRef(fileRef);
+  checkArgument(!componentRefsWithInProjectDuplications.containsEntry(component,original),"InProject duplications for file %s and original %s already set",fileRef,original);
+  checkArgument(!componentRefsWithInnerDuplications.containsEntry(component,original),"Inner duplications for file %s and original %s already set. Use add(int, Duplication) instead",fileRef,original);
+  componentRefsWithInProjectDuplications.put(component,original);
+  delegate.add(component,new Duplication(original,Arrays.<Duplicate>asList(new InProjectDuplicate(componentProvider.getByRef(otherFileRef),duplicate))));
   return this;
 }
