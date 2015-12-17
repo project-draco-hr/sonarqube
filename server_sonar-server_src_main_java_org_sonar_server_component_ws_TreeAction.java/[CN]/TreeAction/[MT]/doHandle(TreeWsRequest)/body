@@ -1,0 +1,31 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    ComponentDto baseComponent=componentFinder.getByUuidOrKey(dbSession,treeWsRequest.getBaseComponentId(),treeWsRequest.getBaseComponentKey());
+    checkPermissions(baseComponent);
+    SnapshotDto baseSnapshot=dbClient.snapshotDao().selectLastSnapshotByComponentId(dbSession,baseComponent.getId());
+    if (baseSnapshot == null) {
+      return emptyResponse(treeWsRequest);
+    }
+    ComponentTreeQuery query=toComponentTreeQuery(treeWsRequest,baseSnapshot);
+    List<ComponentDto> components;
+    int total;
+switch (treeWsRequest.getStrategy()) {
+case CHILDREN_STRATEGY:
+      components=dbClient.componentDao().selectDirectChildren(dbSession,query);
+    total=dbClient.componentDao().countDirectChildren(dbSession,query);
+  break;
+case LEAVES_STRATEGY:
+case ALL_STRATEGY:
+components=dbClient.componentDao().selectAllChildren(dbSession,query);
+total=dbClient.componentDao().countAllChildren(dbSession,query);
+break;
+default :
+throw new IllegalStateException("Unknown component tree strategy");
+}
+return buildResponse(components,Paging.forPageIndex(query.getPage()).withPageSize(query.getPageSize()).andTotal(total));
+}
+  finally {
+dbClient.closeSession(dbSession);
+}
+}

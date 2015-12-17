@@ -1,0 +1,19 @@
+{
+  userSession.anonymous().login().addProjectUuidPermissions(UserRole.ADMIN,"project-uuid");
+  ComponentDto project=newProjectDto("project-uuid");
+  SnapshotDto projectSnapshot=componentDb.insertProjectAndSnapshot(project);
+  SnapshotDto moduleSnapshot=componentDb.insertComponentAndSnapshot(newModuleDto("module-uuid-1",project),projectSnapshot);
+  componentDb.insertComponentAndSnapshot(newFileDto(project,1),projectSnapshot);
+  for (int i=2; i <= 9; i++) {
+    componentDb.insertComponentAndSnapshot(newFileDto(project,i),moduleSnapshot);
+  }
+  SnapshotDto directorySnapshot=componentDb.insertComponentAndSnapshot(newDirectory(project,"directory-path-1"),moduleSnapshot);
+  componentDb.insertComponentAndSnapshot(newFileDto(project,10),directorySnapshot);
+  db.commit();
+  componentDb.indexProjects();
+  InputStream responseStream=ws.newRequest().setMediaType(MediaTypes.PROTOBUF).setParam(PARAM_STRATEGY,"children").setParam(PARAM_BASE_COMPONENT_ID,"module-uuid-1").setParam(Param.PAGE,"2").setParam(Param.PAGE_SIZE,"3").setParam(Param.TEXT_QUERY,"file-name").setParam(Param.ASCENDING,"false").setParam(Param.SORT,"name").execute().getInputStream();
+  WsComponents.TreeWsResponse response=WsComponents.TreeWsResponse.parseFrom(responseStream);
+  assertThat(response.getComponentsCount()).isEqualTo(3);
+  assertThat(response.getPaging().getTotal()).isEqualTo(8);
+  assertThat(response.getComponentsList()).extracting("id").containsExactly("file-uuid-6","file-uuid-5","file-uuid-4");
+}

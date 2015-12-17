@@ -1,0 +1,12 @@
+{
+  ComponentDto project=newProjectDto();
+  SnapshotDto projectSnapshot=componentDb.insertProjectAndSnapshot(project);
+  SnapshotDto moduleSnapshot=componentDb.insertComponentAndSnapshot(newModuleDto("module-1-uuid",project),projectSnapshot);
+  componentDb.insertComponentAndSnapshot(newFileDto(project,"file-1-uuid"),projectSnapshot);
+  componentDb.insertComponentAndSnapshot(newFileDto(project,"file-2-uuid"),moduleSnapshot);
+  db.commit();
+  componentDb.indexProjects();
+  ComponentTreeQuery query=newTreeQuery(moduleSnapshot).build();
+  List<ComponentDto> result=underTest.selectDirectChildren(dbSession,query);
+  assertThat(result).extracting("uuid").containsOnly("file-2-uuid");
+}

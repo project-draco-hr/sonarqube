@@ -1,0 +1,10 @@
+{
+  componentDb.insertComponent(newProjectDto("project-uuid"));
+  db.commit();
+  InputStream responseStream=ws.newRequest().setMediaType(MediaTypes.PROTOBUF).setParam(PARAM_BASE_COMPONENT_ID,"project-uuid").execute().getInputStream();
+  WsComponents.TreeWsResponse response=WsComponents.TreeWsResponse.parseFrom(responseStream);
+  assertThat(response.getComponentsList()).isEmpty();
+  assertThat(response.getPaging().getTotal()).isEqualTo(0);
+  assertThat(response.getPaging().getPageSize()).isEqualTo(100);
+  assertThat(response.getPaging().getPageIndex()).isEqualTo(1);
+}
