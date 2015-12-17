@@ -8,5 +8,7 @@
   }
   underTest.computeCpd(ORIGIN_FILE,originBlocks,duplicatedBlocks);
   assertThat(logTester.logs(LoggerLevel.WARN)).containsOnly("Too many duplication references on file " + ORIGIN_FILE_KEY + " for block at line 30. Keeping only the first 100 references.");
-  verify(duplicationRepository,times(100)).addDuplication(eq(ORIGIN_FILE),any(TextBlock.class),anyString(),any(TextBlock.class));
+  Iterable<Duplication> duplications=duplicationRepository.getDuplications(ORIGIN_FILE);
+  assertThat(duplications).hasSize(1);
+  assertThat(duplications.iterator().next().getDuplicates()).hasSize(100);
 }

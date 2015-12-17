@@ -1,5 +1,8 @@
 {
-  componentProvider.ensureInitialized();
-  delegate.addDuplication(componentProvider.getByRef(fileRef),original,otherFileKey,duplicate);
+  ensureComponentProviderInitialized();
+  Component component=componentProvider.getByRef(fileRef);
+  checkArgument(!componentRefsWithCrossProjectDuplications.containsEntry(component,original),"CrossProject duplications for file %s and original %s already set",fileRef);
+  componentRefsWithCrossProjectDuplications.put(component,original);
+  delegate.add(componentProvider.getByRef(fileRef),new Duplication(original,Arrays.<Duplicate>asList(new CrossProjectDuplicate(otherFileKey,duplicate))));
   return this;
 }
