@@ -18,4 +18,14 @@
   }
   this.okHttpClient.setConnectTimeout(builder.connectTimeoutMs,TimeUnit.MILLISECONDS);
   this.okHttpClient.setReadTimeout(builder.readTimeoutMs,TimeUnit.MILLISECONDS);
+  ConnectionSpec tls=new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS).allEnabledTlsVersions().allEnabledCipherSuites().supportsTlsExtensions(true).build();
+  this.okHttpClient.setConnectionSpecs(asList(tls,ConnectionSpec.CLEARTEXT));
+  if (javaVersion.isJava7()) {
+    try {
+      this.okHttpClient.setSslSocketFactory(new Tls12Java7SocketFactory((SSLSocketFactory)SSLSocketFactory.getDefault()));
+    }
+ catch (    Exception e) {
+      throw new IllegalStateException("Fail to init TLS context",e);
+    }
+  }
 }
