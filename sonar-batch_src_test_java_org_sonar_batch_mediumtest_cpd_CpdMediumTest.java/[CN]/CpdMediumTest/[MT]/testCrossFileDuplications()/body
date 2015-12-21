@@ -1,14 +1,13 @@
 {
   File srcDir=new File(baseDir,"src");
   srcDir.mkdir();
-  String duplicatedStuff="Sample xoo\ncontent\nfoo\nbar\ntoto\ntiti\nfoo\nbar\ntoto\ntiti\nbar\ntoto\ntiti\nfoo\nbar\ntoto\ntiti";
+  String duplicatedStuff="Sample xoo\ncontent\n" + "foo\nbar\ntoto\ntiti\n" + "foo\nbar\ntoto\ntiti\n"+ "bar\ntoto\ntiti\n"+ "foo\nbar\ntoto\ntiti";
   File xooFile1=new File(srcDir,"sample1.xoo");
   FileUtils.write(xooFile1,duplicatedStuff);
   File xooFile2=new File(srcDir,"sample2.xoo");
   FileUtils.write(xooFile2,duplicatedStuff);
   TaskResult result=tester.newTask().properties(builder.put("sonar.sources","src").put("sonar.cpd.xoo.minimumTokens","10").put("sonar.verbose","true").build()).start();
   assertThat(result.inputFiles()).hasSize(2);
-  Map<String,List<org.sonar.batch.protocol.output.BatchReport.Measure>> allMeasures=result.allMeasures();
   InputFile inputFile1=result.inputFile("src/sample1.xoo");
   InputFile inputFile2=result.inputFile("src/sample2.xoo");
   List<org.sonar.batch.protocol.output.BatchReport.Duplication> duplicationGroupsFile1=result.duplicationsFor(inputFile1);

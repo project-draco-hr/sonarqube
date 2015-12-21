@@ -1,0 +1,19 @@
+{
+  LOG.debug("Detection of duplications for {}",resource);
+  BatchComponent component=batchComponentCache.get(resource);
+  if (component == null) {
+    LOG.error("Resource not found in component cache: {}. Skipping CPD computation for it",resource);
+    return;
+  }
+  List<CloneGroup> duplications;
+  try {
+    duplications=SuffixTreeCloneDetectionAlgorithm.detect(index,fileBlocks);
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Fail during detection of duplication for " + resource,e);
+  }
+  InputFile inputFile=(InputFile)component.inputComponent();
+  Predicate<CloneGroup> minimumTokensPredicate=DuplicationPredicates.numberOfUnitsNotLessThan(getMinimumTokens(inputFile.language()));
+  List<CloneGroup> filtered=from(duplications).filter(minimumTokensPredicate).toList();
+  saveDuplications(component,filtered);
+}

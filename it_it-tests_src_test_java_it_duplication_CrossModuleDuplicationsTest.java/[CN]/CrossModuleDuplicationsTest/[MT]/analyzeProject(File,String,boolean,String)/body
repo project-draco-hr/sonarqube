@@ -1,0 +1,14 @@
+{
+  if (create) {
+    orchestrator.getServer().provisionProject(projectKey,projectKey);
+    orchestrator.getServer().associateProjectToQualityProfile(projectKey,"xoo","xoo-duplication-profile");
+  }
+  SonarRunner sonarRunner=SonarRunner.create(projectDir);
+  ImmutableMap.Builder<String,String> builder=ImmutableMap.builder();
+  for (int i=0; i < additionalProperties.length; i+=2) {
+    builder.put(additionalProperties[i],additionalProperties[i + 1]);
+  }
+  SonarRunner scan=sonarRunner.setDebugLogs(true).setProperties(builder.build());
+  orchestrator.executeBuild(scan);
+  return scan;
+}

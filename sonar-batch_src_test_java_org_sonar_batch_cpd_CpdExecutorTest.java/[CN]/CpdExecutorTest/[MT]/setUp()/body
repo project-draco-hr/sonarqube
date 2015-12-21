@@ -1,0 +1,15 @@
+{
+  File outputDir=temp.newFolder();
+  settings=new Settings();
+  index=mock(SonarDuplicationsIndex.class);
+  publisher=mock(ReportPublisher.class);
+  when(publisher.getWriter()).thenReturn(new BatchReportWriter(outputDir));
+  componentCache=new BatchComponentCache();
+  executor=new CpdExecutor(settings,index,publisher,componentCache);
+  reader=new BatchReportReader(outputDir);
+  Project p=new Project("foo");
+  componentCache.add(p,null).setInputComponent(new DefaultInputModule("foo"));
+  batchComponent1=createComponent("src/Foo.php",5);
+  batchComponent2=createComponent("src/Foo2.php",5);
+  batchComponent3=createComponent("src/Foo3.php",5);
+}

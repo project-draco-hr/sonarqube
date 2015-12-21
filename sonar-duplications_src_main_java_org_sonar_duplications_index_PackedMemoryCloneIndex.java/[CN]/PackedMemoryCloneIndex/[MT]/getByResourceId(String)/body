@@ -6,18 +6,7 @@
   List<Block> result=new ArrayList<>();
   int realIndex=resourceIdsIndex[index];
   while (index < size && FastStringComparator.INSTANCE.compare(resourceIds[realIndex],resourceId) == 0) {
-    int offset=realIndex * blockInts;
-    int[] hash=new int[hashInts];
-    for (int j=0; j < hashInts; j++) {
-      hash[j]=blockData[offset++];
-    }
-    int indexInFile=blockData[offset++];
-    int firstLineNumber=blockData[offset++];
-    int lastLineNumber=blockData[offset++];
-    int startUnit=blockData[offset++];
-    int endUnit=blockData[offset];
-    Block block=blockBuilder.setResourceId(resourceId).setBlockHash(new ByteArray(hash)).setIndexInFile(indexInFile).setLines(firstLineNumber,lastLineNumber).setUnit(startUnit,endUnit).build();
-    result.add(block);
+    result.add(getBlock(realIndex,resourceId));
     index++;
     realIndex=resourceIdsIndex[index];
   }
