@@ -1,0 +1,9 @@
+{
+  componentDb.insertComponent(newProjectDto().setKey("java-project").setLanguage("java"));
+  componentDb.insertComponent(newProjectDto().setKey("cpp-project").setLanguage("cpp"));
+  db.commit();
+  InputStream responseStream=newRequest(Qualifiers.PROJECT).setParam(PARAM_LANGUAGE,"java").execute().getInputStream();
+  SearchWsResponse response=SearchWsResponse.parseFrom(responseStream);
+  assertThat(response.getComponentsCount()).isEqualTo(1);
+  assertThat(response.getComponentsList().get(0).getKey()).isEqualTo("java-project");
+}
