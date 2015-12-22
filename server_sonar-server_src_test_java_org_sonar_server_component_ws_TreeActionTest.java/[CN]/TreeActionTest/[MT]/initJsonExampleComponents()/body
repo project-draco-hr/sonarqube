@@ -1,0 +1,15 @@
+{
+  ComponentDto project=newProjectDto("AVHE6JiwEplJjXTo0Rza");
+  SnapshotDto projectSnapshot=componentDb.insertProjectAndSnapshot(project);
+  Date now=new Date();
+  JsonParser jsonParser=new JsonParser();
+  JsonElement jsonTree=jsonParser.parse(IOUtils.toString(getClass().getResource("tree-example.json"),Charsets.UTF_8));
+  JsonArray components=jsonTree.getAsJsonObject().getAsJsonArray("components");
+  for (  JsonElement componentAsJsonElement : components) {
+    JsonObject componentAsJsonObject=componentAsJsonElement.getAsJsonObject();
+    componentDb.insertComponentAndSnapshot(new ComponentDto().setUuid(getJsonField(componentAsJsonObject,"id")).setKey(getJsonField(componentAsJsonObject,"key")).setName(getJsonField(componentAsJsonObject,"name")).setPath(getJsonField(componentAsJsonObject,"path")).setProjectUuid(project.projectUuid()).setQualifier(getJsonField(componentAsJsonObject,"qualifier")).setDescription(getJsonField(componentAsJsonObject,"description")).setEnabled(true).setCreatedAt(now),projectSnapshot);
+  }
+  db.commit();
+  componentDb.indexProjects();
+  return project;
+}

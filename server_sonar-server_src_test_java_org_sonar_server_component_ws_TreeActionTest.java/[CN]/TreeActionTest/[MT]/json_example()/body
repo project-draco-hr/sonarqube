@@ -1,11 +1,5 @@
 {
-  ComponentDto project=newProjectDto("project-id");
-  SnapshotDto projectSnapshot=componentDb.insertProjectAndSnapshot(project);
-  for (int i=1; i <= 10; i++) {
-    componentDb.insertComponentAndSnapshot(ComponentTesting.newFileDto(project,"file-id-" + i).setKey("file-key-" + i).setName("file-name-" + i).setPath("path/to/file-name-" + i).setProjectUuid("project-id").setDescription("description " + i).setCreatedAt(DateUtils.parseDateTime("2015-12-17T22:07:14+0100")),projectSnapshot);
-  }
-  db.commit();
-  componentDb.indexProjects();
-  String response=ws.newRequest().setParam(PARAM_BASE_COMPONENT_ID,"project-id").execute().getInput();
+  ComponentDto project=initJsonExampleComponents();
+  String response=ws.newRequest().setParam(PARAM_BASE_COMPONENT_ID,project.uuid()).execute().getInput();
   JsonAssert.assertJson(response).withStrictArrayOrder().isSimilarTo(getClass().getResource("tree-example.json"));
 }

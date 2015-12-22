@@ -1,19 +1,16 @@
 {
-  String fileKey=request.param("key");
-  String fileUuid=request.param("uuid");
-  Preconditions.checkArgument(fileKey != null || fileUuid != null,"At least one of 'key' or 'uuid' must be provided");
-  DbSession session=dbClient.openSession(false);
+  DbSession dbSession=dbClient.openSession(false);
   try {
-    ComponentDto component=componentFinder.getByUuidOrKey(session,fileUuid,fileKey);
+    ComponentDto component=componentFinder.getByUuidOrKey(dbSession,request.param("uuid"),request.param("key"),UUID_AND_KEY);
     String componentKey=component.key();
     userSession.checkComponentPermission(UserRole.CODEVIEWER,componentKey);
     JsonWriter json=response.newJsonWriter().beginObject();
-    String duplications=findDataFromComponent(componentKey,CoreMetrics.DUPLICATIONS_DATA_KEY,session);
-    List<DuplicationsParser.Block> blocks=parser.parse(component,duplications,session);
-    duplicationsJsonWriter.write(blocks,json,session);
+    String duplications=findDataFromComponent(componentKey,CoreMetrics.DUPLICATIONS_DATA_KEY,dbSession);
+    List<DuplicationsParser.Block> blocks=parser.parse(component,duplications,dbSession);
+    duplicationsJsonWriter.write(blocks,json,dbSession);
     json.endObject().close();
   }
   finally {
-    MyBatis.closeQuietly(session);
+    dbClient.closeSession(dbSession);
   }
 }
