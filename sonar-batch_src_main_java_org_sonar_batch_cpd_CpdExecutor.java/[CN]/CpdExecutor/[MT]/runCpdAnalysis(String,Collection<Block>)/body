@@ -13,7 +13,13 @@
     throw new IllegalStateException("Fail during detection of duplication for " + resource,e);
   }
   InputFile inputFile=(InputFile)component.inputComponent();
-  Predicate<CloneGroup> minimumTokensPredicate=DuplicationPredicates.numberOfUnitsNotLessThan(getMinimumTokens(inputFile.language()));
-  List<CloneGroup> filtered=from(duplications).filter(minimumTokensPredicate).toList();
+  List<CloneGroup> filtered;
+  if (!"java".equalsIgnoreCase(inputFile.language())) {
+    Predicate<CloneGroup> minimumTokensPredicate=DuplicationPredicates.numberOfUnitsNotLessThan(getMinimumTokens(inputFile.language()));
+    filtered=from(duplications).filter(minimumTokensPredicate).toList();
+  }
+ else {
+    filtered=duplications;
+  }
   saveDuplications(component,filtered);
 }
