@@ -1,10 +1,12 @@
 {
   DbSession dbSession=myBatis.openSession(false);
   Connection connection=dbSession.getConnection();
+  Statement statement=null;
   try {
+    statement=connection.createStatement();
     for (    String table : DatabaseVersion.TABLES) {
       try {
-        connection.createStatement().execute("TRUNCATE TABLE " + table.toLowerCase());
+        statement.execute("TRUNCATE TABLE " + table.toLowerCase());
         connection.commit();
       }
  catch (      Exception e) {
@@ -12,7 +14,11 @@
       }
     }
   }
-  finally {
+ catch (  Exception e) {
+    throw new IllegalStateException("Fail to clear db",e);
+  }
+ finally {
+    DbUtils.closeQuietly(statement);
     DbUtils.closeQuietly(connection);
     MyBatis.closeQuietly(dbSession);
   }

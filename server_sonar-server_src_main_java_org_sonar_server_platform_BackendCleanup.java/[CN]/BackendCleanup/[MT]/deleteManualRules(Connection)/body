@@ -1,9 +1,14 @@
 {
+  PreparedStatement statement=null;
   try {
-    connection.prepareStatement("DELETE FROM rules WHERE rules.plugin_name='manual'").execute();
+    statement=connection.prepareStatement("DELETE FROM rules WHERE rules.plugin_name='manual'");
+    statement.execute();
     connection.commit();
   }
  catch (  SQLException e) {
     throw new IllegalStateException("Fail to remove manual rules",e);
+  }
+ finally {
+    DbUtils.closeQuietly(statement);
   }
 }

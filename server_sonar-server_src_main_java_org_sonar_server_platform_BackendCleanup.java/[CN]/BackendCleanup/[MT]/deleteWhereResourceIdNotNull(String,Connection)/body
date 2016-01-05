@@ -1,9 +1,14 @@
 {
+  PreparedStatement statement=null;
   try {
-    connection.prepareStatement("DELETE FROM " + tableName + " WHERE resource_id IS NOT NULL").execute();
+    statement=connection.prepareStatement("DELETE FROM " + tableName + " WHERE resource_id IS NOT NULL");
+    statement.execute();
     connection.commit();
   }
  catch (  SQLException e) {
     throw new IllegalStateException("Fail to delete table : " + tableName,e);
+  }
+ finally {
+    DbUtils.closeQuietly(statement);
   }
 }
