@@ -1,0 +1,15 @@
+{
+  orchestrator.getServer().provisionProject(PROJECT_KEY,PROJECT_KEY);
+  setServerProperty(orchestrator,"sonar.timemachine.period1","previous_analysis");
+  setServerProperty(orchestrator,PROJECT_KEY,"sonar.timemachine.period1","30");
+  orchestrator.getServer().associateProjectToQualityProfile(PROJECT_KEY,"xoo","empty");
+  orchestrator.executeBuild(SonarRunner.create(projectDir("shared/xoo-sample")).setProperty("sonar.projectDate",formatDate(addDays(new Date(),-15))));
+  orchestrator.getServer().restoreProfile(FileLocation.ofClasspath("/measureHistory/one-issue-per-line-profile.xml"));
+  orchestrator.getServer().associateProjectToQualityProfile(PROJECT_KEY,"xoo","one-issue-per-line");
+  orchestrator.executeBuild(SonarRunner.create(projectDir("shared/xoo-sample")));
+  orchestrator.executeBuild(SonarRunner.create(projectDir("shared/xoo-sample")));
+  Resource newTechnicalDebt=orchestrator.getServer().getWsClient().find(ResourceQuery.createForMetrics(PROJECT_KEY,"violations").setIncludeTrends(true));
+  List<Measure> measures=newTechnicalDebt.getMeasures();
+  assertThat(measures.get(0).getVariation1()).isEqualTo(17);
+  new SeleneseTest(Selenese.builder().setHtmlTestsInClasspath("define-leak-period-on-project","/measureHistory/DifferentialPeriodsTest/define-leak-period-on-project.html").build()).runOn(orchestrator);
+}
