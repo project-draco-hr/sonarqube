@@ -1,0 +1,13 @@
+{
+  ComponentDto projectDto=newProjectDto("project-uuid");
+  SnapshotDto projectSnapshot=componentDb.insertProjectAndSnapshot(projectDto);
+  SnapshotDto fileSnapshot3=componentDb.insertComponentAndSnapshot(newFileDto(projectDto,"file-uuid-3"),projectSnapshot);
+  SnapshotDto fileSnapshot1=componentDb.insertComponentAndSnapshot(newFileDto(projectDto,"file-uuid-1"),projectSnapshot);
+  SnapshotDto fileSnapshot2=componentDb.insertComponentAndSnapshot(newFileDto(projectDto,"file-uuid-2"),projectSnapshot);
+  MetricDto ncloc=newMetricDtoWithoutOptimization().setKey("ncloc").setValueType(ValueType.INT.name()).setDirection(1);
+  dbClient.metricDao().insert(dbSession,ncloc);
+  dbClient.measureDao().insert(dbSession,newMeasureDto(ncloc,fileSnapshot1.getId()).setValue(1.0d),newMeasureDto(ncloc,fileSnapshot2.getId()).setValue(2.0d),newMeasureDto(ncloc,fileSnapshot3.getId()).setValue(3.0d));
+  db.commit();
+  ComponentTreeWsResponse response=call(ws.newRequest().setParam(PARAM_BASE_COMPONENT_ID,"project-uuid").setParam(Param.SORT,METRIC_SORT).setParam(PARAM_METRIC_SORT,"ncloc").setParam(PARAM_METRIC_KEYS,"ncloc"));
+  assertThat(response.getComponentsList()).extracting("id").containsExactly("file-uuid-1","file-uuid-2","file-uuid-3");
+}

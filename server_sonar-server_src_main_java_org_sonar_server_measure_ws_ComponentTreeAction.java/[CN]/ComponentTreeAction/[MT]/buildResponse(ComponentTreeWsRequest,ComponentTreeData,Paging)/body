@@ -1,0 +1,18 @@
+{
+  ComponentTreeWsResponse.Builder response=ComponentTreeWsResponse.newBuilder();
+  response.getPagingBuilder().setPageIndex(paging.pageIndex()).setPageSize(paging.pageSize()).setTotal(paging.total()).build();
+  response.setBaseComponent(componentDtoToWsComponent(data.getBaseComponent()));
+  for (  ComponentDto componentDto : data.getComponents()) {
+    response.addComponents(componentDtoToWsComponent(componentDto,data.getMeasuresByComponentUuidAndMetric().row(componentDto.uuid()),data.getReferenceComponentUuidsById()));
+  }
+  if (areMetricsInResponse(request)) {
+    WsMeasures.Metrics.Builder metricsBuilder=response.getMetricsBuilder();
+    for (    MetricDto metricDto : data.getMetrics()) {
+      metricsBuilder.addMetrics(metricDtoToWsMetric(metricDto));
+    }
+  }
+  if (arePeriodsInResponse(request)) {
+    response.getPeriodsBuilder().addAllPeriods(data.getPeriods());
+  }
+  return response.build();
+}

@@ -1,0 +1,25 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    ComponentDto baseComponent=componentFinder.getByUuidOrKey(dbSession,wsRequest.getBaseComponentId(),wsRequest.getBaseComponentKey(),BASE_COMPONENT_ID_AND_KEY);
+    checkPermissions(baseComponent);
+    SnapshotDto baseSnapshot=dbClient.snapshotDao().selectLastSnapshotByComponentId(dbSession,baseComponent.getId());
+    if (baseSnapshot == null) {
+      return ComponentTreeData.builder().setBaseComponent(baseComponent).build();
+    }
+    ComponentTreeQuery dbQuery=toComponentTreeQuery(wsRequest,baseSnapshot);
+    ComponentDtosAndTotal componentDtosAndTotal=searchComponents(dbSession,dbQuery,wsRequest);
+    List<ComponentDtoWithSnapshotId> components=componentDtosAndTotal.componentDtos;
+    int componentCount=componentDtosAndTotal.total;
+    List<MetricDto> metrics=searchMetrics(dbSession,wsRequest);
+    List<WsMeasures.Period> periods=periodsFromSnapshot(baseSnapshot);
+    Table<String,MetricDto,MeasureDto> measuresByComponentUuidAndMetric=searchMeasuresByComponentUuidAndMetric(dbSession,components,metrics,periods);
+    components=sortComponents(components,wsRequest,metrics,measuresByComponentUuidAndMetric);
+    components=paginateComponents(components,componentCount,wsRequest);
+    Map<Long,String> referenceComponentUuidsById=searchReferenceComponentUuidsById(dbSession,components);
+    return ComponentTreeData.builder().setBaseComponent(baseComponent).setComponentsFromDb(components).setComponentCount(componentCount).setMeasuresByComponentUuidAndMetric(measuresByComponentUuidAndMetric).setMetrics(metrics).setPeriods(periods).setReferenceComponentUuidsById(referenceComponentUuidsById).build();
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

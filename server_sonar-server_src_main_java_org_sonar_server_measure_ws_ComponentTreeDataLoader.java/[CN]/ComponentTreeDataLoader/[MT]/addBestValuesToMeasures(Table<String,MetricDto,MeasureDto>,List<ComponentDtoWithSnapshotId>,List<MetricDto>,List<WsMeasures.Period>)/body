@@ -1,0 +1,14 @@
+{
+  List<ComponentDtoWithSnapshotId> componentsEligibleForBestValue=from(components).filter(IsFileComponent.INSTANCE).toList();
+  List<MetricDtoWithBestValue> metricDtosWithBestValueMeasure=from(metrics).filter(IsMetricOptimizedForBestValue.INSTANCE).transform(new MetricDtoToMetricDtoWithBestValue(periods)).toList();
+  if (metricDtosWithBestValueMeasure.isEmpty()) {
+    return;
+  }
+  for (  ComponentDtoWithSnapshotId component : componentsEligibleForBestValue) {
+    for (    MetricDtoWithBestValue metricWithBestValue : metricDtosWithBestValueMeasure) {
+      if (measuresByComponentUuidAndMetric.get(component.uuid(),metricWithBestValue.metric) == null) {
+        measuresByComponentUuidAndMetric.put(component.uuid(),metricWithBestValue.metric,metricWithBestValue.bestValue);
+      }
+    }
+  }
+}
