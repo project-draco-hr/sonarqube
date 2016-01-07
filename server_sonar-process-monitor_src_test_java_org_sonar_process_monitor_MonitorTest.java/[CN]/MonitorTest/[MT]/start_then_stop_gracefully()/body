@@ -2,10 +2,8 @@
   monitor=newDefaultMonitor();
   HttpProcessClient client=new HttpProcessClient("test");
   monitor.start(Arrays.asList(client.newCommand()));
-  assertThat(client.isReady()).isTrue();
-  assertThat(client.wasReadyAt()).isLessThanOrEqualTo(System.currentTimeMillis());
+  assertThat(client).isReady().wasStartedBefore(System.currentTimeMillis());
   monitor.stop();
-  assertThat(client.isReady()).isFalse();
-  assertThat(client.wasGracefullyTerminated()).isTrue();
+  assertThat(client).isNotReady().wasGracefullyTerminated();
   assertThat(monitor.getState()).isEqualTo(State.STOPPED);
 }

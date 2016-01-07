@@ -1,7 +1,17 @@
 {
-  File file=new File(tempDir,filename);
-  if (file.isFile() && file.exists()) {
-    return Long.parseLong(FileUtils.readFileToString(file));
+  try {
+    File file=new File(tempDir,filename);
+    if (file.isFile() && file.exists()) {
+      String[] split=StringUtils.split(FileUtils.readFileToString(file),',');
+      List<Long> res=new ArrayList<>(split.length);
+      for (      String s : split) {
+        res.add(Long.parseLong(s));
+      }
+      return res;
+    }
+  }
+ catch (  IOException e) {
+    return Collections.emptyList();
   }
   throw new IllegalStateException("File does not exist");
 }

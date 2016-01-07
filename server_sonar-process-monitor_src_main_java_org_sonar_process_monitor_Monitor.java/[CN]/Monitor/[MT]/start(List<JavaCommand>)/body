@@ -2,22 +2,10 @@
   if (commands.isEmpty()) {
     throw new IllegalArgumentException("At least one command is required");
   }
-  if (!lifecycle.tryToMoveTo(State.STARTING)) {
+  if (lifecycle != null) {
     throw new IllegalStateException("Can not start multiple times");
   }
   Runtime.getRuntime().addShutdownHook(shutdownHook);
-  for (  JavaCommand command : commands) {
-    try {
-      ProcessRef processRef=launcher.launch(command);
-      monitor(processRef);
-    }
- catch (    RuntimeException e) {
-      stop();
-      throw e;
-    }
-  }
-  if (!lifecycle.tryToMoveTo(State.STARTED)) {
-    stop();
-    throw new IllegalStateException("Stopped during startup");
-  }
+  this.javaCommands=commands;
+  start();
 }
