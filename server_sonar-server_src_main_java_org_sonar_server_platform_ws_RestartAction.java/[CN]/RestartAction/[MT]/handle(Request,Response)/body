@@ -1,9 +1,14 @@
 {
-  if (!settings.getBoolean("sonar.web.dev")) {
-    throw new ForbiddenException("Webservice available only in dev mode");
+  if (settings.getBoolean("sonar.web.dev")) {
+    LOGGER.info("Restart server");
+    platform.restart();
+    LOGGER.info("Server restarted");
   }
-  LOGGER.info("Restart server");
-  platform.restart();
-  LOGGER.info("Server restarted");
+ else {
+    LOGGER.info("Requesting SonarQube restart");
+    userSession.checkPermission(UserRole.ADMIN);
+    ProcessCommands commands=new DefaultProcessCommands(nonNullValueAsFile(PROPERTY_SHARED_PATH),nonNullAsInt(PROPERTY_PROCESS_INDEX));
+    commands.askForRestart();
+  }
   response.noContent();
 }
