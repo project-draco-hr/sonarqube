@@ -1,0 +1,27 @@
+{
+  ArrayList<WatcherThread> watcherThreads=new ArrayList<>(this.watcherThreads);
+  Collections.reverse(watcherThreads);
+  for (  WatcherThread watcherThread : watcherThreads) {
+    ProcessRef ref=watcherThread.getProcessRef();
+    if (!ref.isStopped()) {
+      LOG.info("{} is stopping",ref);
+      ref.askForGracefulAsyncStop();
+      long killAt=System.currentTimeMillis() + TIMEOUTS.getTerminationTimeout();
+      while (!ref.isStopped() && System.currentTimeMillis() < killAt) {
+        try {
+          Thread.sleep(10L);
+        }
+ catch (        InterruptedException e) {
+          break;
+        }
+      }
+      if (!ref.isStopped()) {
+        LOG.info("{} failed to stop in a timely fashion. Killing it.",ref);
+      }
+      ref.stop();
+      LOG.info("{} is stopped",ref);
+    }
+  }
+  trace("all processes stopped, clean list of watcherThreads...");
+  this.watcherThreads.clear();
+}

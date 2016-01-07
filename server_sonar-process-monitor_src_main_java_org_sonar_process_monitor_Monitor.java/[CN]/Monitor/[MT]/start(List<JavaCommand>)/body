@@ -2,10 +2,11 @@
   if (commands.isEmpty()) {
     throw new IllegalArgumentException("At least one command is required");
   }
-  if (lifecycle != null) {
+  if (lifecycle.getState() != State.INIT) {
     throw new IllegalStateException("Can not start multiple times");
   }
   Runtime.getRuntime().addShutdownHook(shutdownHook);
+  this.restartWatcher.start();
   this.javaCommands=commands;
-  start();
+  startProcesses();
 }
