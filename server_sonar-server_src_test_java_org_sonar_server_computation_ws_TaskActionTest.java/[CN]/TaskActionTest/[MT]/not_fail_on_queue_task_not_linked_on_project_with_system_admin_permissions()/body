@@ -1,11 +1,10 @@
 {
-  userSession.setGlobalPermissions(GlobalPermissions.SCAN_EXECUTION);
+  userSession.login("john").setGlobalPermissions(SYSTEM_ADMIN);
   CeQueueDto queueDto=new CeQueueDto();
   queueDto.setTaskType("fake");
   queueDto.setUuid("TASK_1");
   queueDto.setStatus(CeQueueDto.Status.PENDING);
   dbTester.getDbClient().ceQueueDao().insert(dbTester.getSession(),queueDto);
   dbTester.commit();
-  TestResponse wsResponse=ws.newRequest().setMediaType(MediaTypes.JSON).setParam("id","TASK_1").execute();
-  assertJson(wsResponse.getInput()).isSimilarTo("{\"task\":{}}");
+  ws.newRequest().setMediaType(MediaTypes.JSON).setParam("id","TASK_1").execute();
 }

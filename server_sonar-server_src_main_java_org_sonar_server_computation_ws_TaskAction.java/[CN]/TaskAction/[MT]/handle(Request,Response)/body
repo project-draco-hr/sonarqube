@@ -1,16 +1,17 @@
 {
-  userSession.checkAnyPermissions(AUTHORIZED_PERMISSIONS);
   String taskUuid=wsRequest.mandatoryParam(PARAM_TASK_UUID);
   DbSession dbSession=dbClient.openSession(false);
   try {
     WsCe.TaskResponse.Builder wsTaskResponse=WsCe.TaskResponse.newBuilder();
     Optional<CeQueueDto> queueDto=dbClient.ceQueueDao().selectByUuid(dbSession,taskUuid);
     if (queueDto.isPresent()) {
+      checkPermission(queueDto.get().getComponentUuid());
       wsTaskResponse.setTask(wsTaskFormatter.formatQueue(dbSession,queueDto.get()));
     }
  else {
       Optional<CeActivityDto> activityDto=dbClient.ceActivityDao().selectByUuid(dbSession,taskUuid);
       if (activityDto.isPresent()) {
+        checkPermission(activityDto.get().getComponentUuid());
         wsTaskResponse.setTask(wsTaskFormatter.formatActivity(dbSession,activityDto.get()));
       }
  else {
