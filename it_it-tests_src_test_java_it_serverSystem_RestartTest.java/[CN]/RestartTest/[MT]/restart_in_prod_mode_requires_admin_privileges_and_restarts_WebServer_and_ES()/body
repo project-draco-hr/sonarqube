@@ -1,0 +1,16 @@
+{
+  if (!SystemUtils.IS_OS_WINDOWS) {
+    orchestrator=Orchestrator.builderEnv().setOrchestratorProperty("orchestrator.keepWorkspace","true").build();
+    orchestrator.start();
+    try {
+      orchestrator.getServer().wsClient().systemClient().restart();
+      fail();
+    }
+ catch (    Exception e) {
+      assertThat(e.getMessage()).contains("403");
+    }
+    orchestrator.getServer().adminWsClient().systemClient().restart();
+    Thread.sleep(5000);
+    assertThat(FileUtils.readFileToString(orchestrator.getServer().getLogs())).contains("Requesting SonarQube restart");
+  }
+}
