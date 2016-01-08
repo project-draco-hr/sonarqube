@@ -2,11 +2,12 @@
   trace("go to STOPPED...");
   if (lifecycle.tryToMoveTo(State.STOPPED)) {
     trace("await termination of restartWatcher...");
-    awaitTermination(restartWatcher);
+    awaitTermination(restartWatcher,hardStopWatcher);
     trace("restartWatcher done");
     if (!systemExit.isInShutdownHook()) {
       trace("removing shutdown hook...");
       Runtime.getRuntime().removeShutdownHook(shutdownHook);
     }
+    launcher.close();
   }
 }

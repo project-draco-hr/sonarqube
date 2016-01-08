@@ -1,12 +1,11 @@
 {
   List<JavaCommand> commands=new ArrayList<>();
   File homeDir=props.nonNullValueAsFile(ProcessProperties.PATH_HOME);
-  File tempDir=props.nonNullValueAsFile(ProcessProperties.PATH_TEMP);
   JavaCommand elasticsearch=new JavaCommand("search");
-  elasticsearch.setWorkDir(homeDir).addJavaOptions("-Djava.awt.headless=true").addJavaOptions(props.nonNullValue(ProcessProperties.SEARCH_JAVA_OPTS)).addJavaOptions(props.nonNullValue(ProcessProperties.SEARCH_JAVA_ADDITIONAL_OPTS)).setTempDir(tempDir.getAbsoluteFile()).setClassName("org.sonar.search.SearchServer").setArguments(props.rawProperties()).addClasspath("./lib/common/*").addClasspath("./lib/search/*");
+  elasticsearch.setWorkDir(homeDir).addJavaOptions("-Djava.awt.headless=true").addJavaOptions(props.nonNullValue(ProcessProperties.SEARCH_JAVA_OPTS)).addJavaOptions(props.nonNullValue(ProcessProperties.SEARCH_JAVA_ADDITIONAL_OPTS)).setClassName("org.sonar.search.SearchServer").setArguments(props.rawProperties()).addClasspath("./lib/common/*").addClasspath("./lib/search/*");
   commands.add(elasticsearch);
   if (StringUtils.isBlank(props.value(ProcessProperties.CLUSTER_MASTER_HOST))) {
-    JavaCommand webServer=new JavaCommand("web").setWorkDir(homeDir).addJavaOptions(ProcessProperties.WEB_ENFORCED_JVM_ARGS).addJavaOptions(props.nonNullValue(ProcessProperties.WEB_JAVA_OPTS)).addJavaOptions(props.nonNullValue(ProcessProperties.WEB_JAVA_ADDITIONAL_OPTS)).setTempDir(tempDir.getAbsoluteFile()).setEnvVariable(ProcessProperties.PATH_LOGS,props.nonNullValue(ProcessProperties.PATH_LOGS)).setClassName("org.sonar.server.app.WebServer").setArguments(props.rawProperties()).addClasspath("./lib/common/*").addClasspath("./lib/server/*");
+    JavaCommand webServer=new JavaCommand("web").setWorkDir(homeDir).addJavaOptions(ProcessProperties.WEB_ENFORCED_JVM_ARGS).addJavaOptions(props.nonNullValue(ProcessProperties.WEB_JAVA_OPTS)).addJavaOptions(props.nonNullValue(ProcessProperties.WEB_JAVA_ADDITIONAL_OPTS)).setEnvVariable(ProcessProperties.PATH_LOGS,props.nonNullValue(ProcessProperties.PATH_LOGS)).setClassName("org.sonar.server.app.WebServer").setArguments(props.rawProperties()).addClasspath("./lib/common/*").addClasspath("./lib/server/*");
     String driverPath=props.value(ProcessProperties.JDBC_DRIVER_PATH);
     if (driverPath != null) {
       webServer.addClasspath(driverPath);
