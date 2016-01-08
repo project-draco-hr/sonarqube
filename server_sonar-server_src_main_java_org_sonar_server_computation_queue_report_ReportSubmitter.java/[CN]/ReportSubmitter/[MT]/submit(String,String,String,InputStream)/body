@@ -1,13 +1,16 @@
 {
-  userSession.checkPermission(GlobalPermissions.SCAN_EXECUTION);
   String effectiveProjectKey=ComponentKeys.createKey(projectKey,projectBranch);
   ComponentDto project=componentService.getNullableByKey(effectiveProjectKey);
   if (project == null) {
+    userSession.checkPermission(SCAN_EXECUTION);
     NewComponent newProject=new NewComponent(projectKey,StringUtils.defaultIfBlank(projectName,projectKey));
     newProject.setBranch(projectBranch);
     newProject.setQualifier(Qualifiers.PROJECT);
     project=componentService.create(newProject);
     permissionService.applyDefaultPermissionTemplate(project.getKey());
+  }
+ else {
+    userSession.checkComponentPermission(SCAN_EXECUTION,projectKey);
   }
   CeTaskSubmit.Builder submit=queue.prepareSubmit();
   reportFiles.save(submit.getUuid(),reportInput);
