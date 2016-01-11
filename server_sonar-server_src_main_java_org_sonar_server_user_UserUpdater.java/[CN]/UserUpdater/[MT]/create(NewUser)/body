@@ -1,30 +1,9 @@
 {
-  boolean isUserReactivated=false;
   DbSession dbSession=dbClient.openSession(false);
   try {
-    UserDto userDto=createNewUserDto(dbSession,newUser);
-    String login=userDto.getLogin();
-    UserDto existingUser=dbClient.userDao().selectByLogin(dbSession,login);
-    if (existingUser == null) {
-      saveUser(dbSession,userDto);
-      addDefaultGroup(dbSession,userDto);
-    }
- else {
-      if (existingUser.isActive()) {
-        throw new IllegalArgumentException(String.format("An active user with login '%s' already exists",login));
-      }
-      UpdateUser updateUser=UpdateUser.create(login).setName(newUser.name()).setEmail(newUser.email()).setScmAccounts(newUser.scmAccounts()).setPassword(newUser.password()).setPasswordConfirmation(newUser.passwordConfirmation());
-      updateUserDto(dbSession,updateUser,existingUser);
-      updateUser(dbSession,existingUser);
-      addDefaultGroup(dbSession,existingUser);
-      isUserReactivated=true;
-    }
-    dbSession.commit();
-    notifyNewUser(userDto.getLogin(),userDto.getName(),newUser.email());
-    userIndexer.index();
+    return create(dbSession,newUser);
   }
   finally {
-    dbSession.close();
+    dbClient.closeSession(dbSession);
   }
-  return isUserReactivated;
 }

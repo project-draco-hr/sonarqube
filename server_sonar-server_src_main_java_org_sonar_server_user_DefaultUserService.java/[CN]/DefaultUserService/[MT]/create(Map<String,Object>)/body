@@ -1,4 +1,11 @@
 {
-  NewUser newUser=NewUser.create().setLogin((String)params.get("login")).setName((String)params.get("name")).setEmail((String)params.get("email")).setScmAccounts(RubyUtils.toStrings(params.get("scm_accounts"))).setPassword((String)params.get("password")).setPasswordConfirmation((String)params.get("password_confirmation"));
+  String password=(String)params.get("password");
+  String passwordConfirmation=(String)params.get("password_confirmation");
+  checkMandatoryParameter(password,"Password");
+  checkMandatoryParameter(passwordConfirmation,"Password confirmation");
+  if (!StringUtils.equals(password,passwordConfirmation)) {
+    throw new BadRequestException("user.password_doesnt_match_confirmation");
+  }
+  NewUser newUser=NewUser.create().setLogin((String)params.get("login")).setName((String)params.get("name")).setEmail((String)params.get("email")).setScmAccounts(RubyUtils.toStrings(params.get("scm_accounts"))).setPassword(password);
   return userUpdater.create(newUser);
 }
