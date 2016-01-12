@@ -1,0 +1,9 @@
+{
+  UserSession session=newServerUserSession().setLogin(LOGIN).setUserId(1);
+  String componentUuid=FILE_UUID;
+  when(resourceDao.selectResource(componentUuid)).thenReturn(new ResourceDto().setUuid(componentUuid).setProjectUuid(PROJECT_UUID));
+  when(authorizationDao.selectGlobalPermissions(LOGIN)).thenReturn(Arrays.asList(UserRole.USER));
+  assertThat(session.hasComponentUuidPermission(UserRole.USER,componentUuid)).isTrue();
+  assertThat(session.hasComponentUuidPermission(UserRole.CODEVIEWER,componentUuid)).isFalse();
+  assertThat(session.hasComponentUuidPermission(UserRole.ADMIN,componentUuid)).isFalse();
+}

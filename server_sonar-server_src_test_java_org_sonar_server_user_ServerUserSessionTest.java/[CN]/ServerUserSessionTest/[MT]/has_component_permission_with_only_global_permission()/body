@@ -1,0 +1,9 @@
+{
+  UserSession session=newServerUserSession().setLogin(LOGIN).setUserId(1);
+  String componentKey=FILE_KEY;
+  when(resourceDao.getRootProjectByComponentKey(componentKey)).thenReturn(new ResourceDto().setKey(componentKey));
+  when(authorizationDao.selectGlobalPermissions(LOGIN)).thenReturn(Arrays.asList(UserRole.USER));
+  assertThat(session.hasComponentPermission(UserRole.USER,componentKey)).isTrue();
+  assertThat(session.hasComponentPermission(UserRole.CODEVIEWER,componentKey)).isFalse();
+  assertThat(session.hasComponentPermission(UserRole.ADMIN,componentKey)).isFalse();
+}
