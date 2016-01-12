@@ -1,0 +1,11 @@
+{
+  ComponentDto project=newProjectDto("project-uuid");
+  ComponentDto view=newView("view-uuid");
+  componentDb.insertViewAndSnapshot(view);
+  componentDb.insertProjectAndSnapshot(project);
+  componentDb.insertProjectAndSnapshot(newProjectCopy("project-uuid-copy",project,view));
+  insertNclocMetric();
+  ComponentWsResponse response=newRequest("project-uuid-copy","ncloc");
+  assertThat(response.getComponent().getId()).isEqualTo("project-uuid-copy");
+  assertThat(response.getComponent().getRefId()).isEqualTo("project-uuid");
+}

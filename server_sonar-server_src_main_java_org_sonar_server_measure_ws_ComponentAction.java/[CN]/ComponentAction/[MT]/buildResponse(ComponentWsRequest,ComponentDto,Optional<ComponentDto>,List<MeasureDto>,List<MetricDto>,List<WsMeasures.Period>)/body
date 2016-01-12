@@ -1,0 +1,26 @@
+{
+  ComponentWsResponse.Builder response=ComponentWsResponse.newBuilder();
+  Map<Integer,MetricDto> metricsById=Maps.uniqueIndex(metrics,MetricDtoFunctions.toId());
+  Map<MetricDto,MeasureDto> measuresByMetric=new HashMap<>();
+  for (  MeasureDto measure : measures) {
+    MetricDto metric=metricsById.get(measure.getMetricId());
+    measuresByMetric.put(metric,measure);
+  }
+  Map<Long,String> referenceComponentUuidById=new HashMap<>();
+  if (refComponent.isPresent()) {
+    referenceComponentUuidById.put(refComponent.get().getId(),refComponent.get().uuid());
+  }
+  response.setComponent(componentDtoToWsComponent(component,measuresByMetric,referenceComponentUuidById));
+  List<String> additionalFields=request.getAdditionalFields();
+  if (additionalFields != null) {
+    if (additionalFields.contains(ADDITIONAL_METRICS)) {
+      for (      MetricDto metric : metrics) {
+        response.getMetricsBuilder().addMetrics(metricDtoToWsMetric(metric));
+      }
+    }
+    if (additionalFields.contains(ADDITIONAL_PERIODS)) {
+      response.getPeriodsBuilder().addAllPeriods(periods);
+    }
+  }
+  return response.build();
+}

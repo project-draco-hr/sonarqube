@@ -1,0 +1,12 @@
+{
+  if (!QUALIFIERS_ELIGIBLE_FOR_BEST_VALUE.contains(component.qualifier())) {
+    return;
+  }
+  List<MetricDtoWithBestValue> metricWithBestValueList=from(metrics).filter(MetricDtoFunctions.isOptimizedForBestValue()).transform(new MetricDtoToMetricDtoWithBestValueFunction(periods)).toList();
+  Map<Integer,MeasureDto> measuresByMetricId=Maps.uniqueIndex(measures,MeasureDtoFunctions.toMetricId());
+  for (  MetricDtoWithBestValue metricWithBestValue : metricWithBestValueList) {
+    if (measuresByMetricId.get(metricWithBestValue.getMetric().getId()) == null) {
+      measures.add(metricWithBestValue.getBestValue());
+    }
+  }
+}

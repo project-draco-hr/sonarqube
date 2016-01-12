@@ -1,0 +1,16 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    ComponentDto component=componentFinder.getByUuidOrKey(dbSession,request.getComponentId(),request.getComponentKey(),COMPONENT_ID_AND_KEY);
+    Optional<ComponentDto> refComponent=getReferenceComponent(dbSession,component);
+    checkPermissions(component);
+    SnapshotDto lastSnapshot=dbClient.snapshotDao().selectLastSnapshotByComponentId(dbSession,component.getId());
+    List<MetricDto> metrics=searchMetrics(dbSession,request);
+    List<WsMeasures.Period> periods=snapshotsToPeriods(lastSnapshot);
+    List<MeasureDto> measures=searchMeasures(dbSession,component,lastSnapshot,metrics,periods);
+    return buildResponse(request,component,refComponent,measures,metrics,periods);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

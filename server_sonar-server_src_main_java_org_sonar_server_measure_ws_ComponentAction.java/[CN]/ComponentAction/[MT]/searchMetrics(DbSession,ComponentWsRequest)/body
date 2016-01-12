@@ -1,0 +1,9 @@
+{
+  List<MetricDto> metrics=dbClient.metricDao().selectByKeys(dbSession,request.getMetricKeys());
+  if (metrics.size() < request.getMetricKeys().size()) {
+    List<String> foundMetricKeys=Lists.transform(metrics,MetricDtoFunctions.toKey());
+    Set<String> missingMetricKeys=Sets.difference(new LinkedHashSet<>(request.getMetricKeys()),new LinkedHashSet<>(foundMetricKeys));
+    throw new NotFoundException(format("The following metric keys are not found: %s",Joiner.on(", ").join(missingMetricKeys)));
+  }
+  return metrics;
+}
