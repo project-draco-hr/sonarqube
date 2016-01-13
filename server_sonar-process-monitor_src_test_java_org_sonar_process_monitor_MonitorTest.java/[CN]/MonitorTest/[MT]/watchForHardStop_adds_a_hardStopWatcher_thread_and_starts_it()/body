@@ -1,7 +1,11 @@
 {
-  Monitor monitor=newDefaultMonitor(tempDir);
-  assertThat(monitor.hardStopWatcher).isNull();
-  monitor.watchForHardStop();
-  assertThat(monitor.hardStopWatcher).isNotNull();
-  assertThat(monitor.hardStopWatcher.isAlive()).isTrue();
+  underTest=newDefaultMonitor(tempDir,true);
+  assertThat(underTest.hardStopWatcher).isNull();
+  HttpProcessClient p1=new HttpProcessClient(tempDir,"p1");
+  underTest.start(singletonList(p1.newCommand()));
+  assertThat(underTest.hardStopWatcher).isNotNull();
+  assertThat(underTest.hardStopWatcher.isAlive()).isTrue();
+  p1.kill();
+  underTest.awaitTermination();
+  assertThat(underTest.hardStopWatcher.isAlive()).isFalse();
 }

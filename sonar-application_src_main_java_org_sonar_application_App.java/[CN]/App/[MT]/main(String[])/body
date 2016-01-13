@@ -3,9 +3,11 @@
   CommandLineParser cli=new CommandLineParser();
   Properties rawProperties=cli.parseArguments(args);
   Props props=new PropsBuilder(rawProperties,new JdbcSettings()).build();
+  AppFileSystem appFileSystem=new AppFileSystem(props);
+  appFileSystem.verifyProps();
   AppLogging logging=new AppLogging();
   logging.configure(props);
-  File tempDir=props.nonNullValueAsFile(ProcessProperties.PATH_TEMP);
-  App app=new App(tempDir);
+  boolean watchForHardStop=props.valueAsBoolean(ProcessProperties.ENABLE_STOP_COMMAND,false);
+  App app=new App(appFileSystem,watchForHardStop);
   app.start(props);
 }

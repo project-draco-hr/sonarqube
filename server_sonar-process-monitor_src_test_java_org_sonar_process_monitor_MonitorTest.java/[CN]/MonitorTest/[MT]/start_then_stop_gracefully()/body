@@ -1,9 +1,10 @@
 {
-  monitor=newDefaultMonitor(tempDir);
+  underTest=newDefaultMonitor(tempDir);
   HttpProcessClient client=new HttpProcessClient(tempDir,"test");
-  monitor.start(Arrays.asList(client.newCommand()));
+  underTest.start(singletonList(client.newCommand()));
   assertThat(client).isReady().wasStartedBefore(System.currentTimeMillis());
-  monitor.stop();
+  underTest.stop();
   assertThat(client).isNotReady().wasGracefullyTerminated();
-  assertThat(monitor.getState()).isEqualTo(State.STOPPED);
+  assertThat(underTest.getState()).isEqualTo(State.STOPPED);
+  verify(fileSystem).reset();
 }
