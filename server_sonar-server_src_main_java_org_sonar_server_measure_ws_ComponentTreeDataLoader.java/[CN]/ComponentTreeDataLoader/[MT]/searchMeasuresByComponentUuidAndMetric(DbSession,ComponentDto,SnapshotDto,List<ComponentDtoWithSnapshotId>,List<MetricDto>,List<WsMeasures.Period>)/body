@@ -1,5 +1,9 @@
 {
-  Map<Long,ComponentDtoWithSnapshotId> componentsBySnapshotId=Maps.uniqueIndex(components,ComponentDtoWithSnapshotIdToSnapshotIdFunction.INSTANCE);
+  Map<Long,ComponentDto> componentsBySnapshotId=new HashMap<>();
+  componentsBySnapshotId.put(baseSnapshot.getId(),baseComponent);
+  for (  ComponentDtoWithSnapshotId component : components) {
+    componentsBySnapshotId.put(component.getSnapshotId(),component);
+  }
   Map<Integer,MetricDto> metricsById=Maps.uniqueIndex(metrics,MetricDtoFunctions.toId());
   List<MeasureDto> measureDtos=dbClient.measureDao().selectBySnapshotIdsAndMetricIds(dbSession,new ArrayList<>(componentsBySnapshotId.keySet()),new ArrayList<>(metricsById.keySet()));
   Table<String,MetricDto,MeasureDto> measuresByComponentUuidAndMetric=HashBasedTable.create(components.size(),metrics.size());
