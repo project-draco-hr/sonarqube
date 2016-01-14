@@ -1,11 +1,13 @@
 {
   components=newArrayList(newComponentWithoutSnapshotId("name-1","qualifier-2","path-9"),newComponentWithoutSnapshotId("name-3","qualifier-3","path-8"),newComponentWithoutSnapshotId("name-2","qualifier-4","path-7"),newComponentWithoutSnapshotId("name-4","qualifier-5","path-6"),newComponentWithoutSnapshotId("name-7","qualifier-6","path-5"),newComponentWithoutSnapshotId("name-6","qualifier-7","path-4"),newComponentWithoutSnapshotId("name-5","qualifier-8","path-3"),newComponentWithoutSnapshotId("name-9","qualifier-9","path-2"),newComponentWithoutSnapshotId("name-8","qualifier-1","path-1"));
-  MetricDto metric=newMetricDto().setKey(METRIC_KEY).setDirection(1);
-  metrics=newArrayList(metric);
+  MetricDto violationsMetric=newMetricDto().setKey(NUM_METRIC_KEY).setValueType(ValueType.INT.name());
+  MetricDto sqaleIndexMetric=newMetricDto().setKey(TEXT_METRIC_KEY).setValueType(ValueType.DATA.name());
+  metrics=newArrayList(violationsMetric,sqaleIndexMetric);
   measuresByComponentUuidAndMetric=HashBasedTable.create(components.size(),1);
   double currentValue=9;
   for (  ComponentDtoWithSnapshotId component : components) {
-    measuresByComponentUuidAndMetric.put(component.uuid(),metric,new MeasureDto().setValue(currentValue));
+    measuresByComponentUuidAndMetric.put(component.uuid(),violationsMetric,new MeasureDto().setValue(currentValue));
+    measuresByComponentUuidAndMetric.put(component.uuid(),sqaleIndexMetric,new MeasureDto().setData(String.valueOf(currentValue)));
     currentValue--;
   }
 }

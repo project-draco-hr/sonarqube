@@ -1,7 +1,25 @@
 {
-  Ordering<Double> ordering=Ordering.natural().nullsLast();
-  if (!wsRequest.getAsc()) {
-    ordering=ordering.reverse();
+  if (wsRequest.getMetricSort() == null) {
+    return componentNameOrdering(wsRequest.getAsc());
   }
-  return ordering.onResultOf(new ComponentDtoWithSnapshotIdToMeasureValue(wsRequest,metrics,measuresByComponentUuidAndMetric));
+  Map<String,MetricDto> metricsByKey=Maps.uniqueIndex(metrics,MetricDtoFunctions.toKey());
+  MetricDto metric=metricsByKey.get(wsRequest.getMetricSort());
+  boolean isAscending=wsRequest.getAsc();
+switch (ValueType.valueOf(metric.getValueType())) {
+case BOOL:
+case INT:
+case MILLISEC:
+case WORK_DUR:
+case FLOAT:
+case PERCENT:
+case RATING:
+    return numericalMetricOrdering(isAscending,metric,measuresByComponentUuidAndMetric);
+case DATA:
+case DISTRIB:
+case LEVEL:
+case STRING:
+  return stringOrdering(isAscending,new ComponentDtoWithSnapshotIdToTextualMeasureValue(metric,measuresByComponentUuidAndMetric));
+default :
+throw new IllegalStateException("Unrecognized metric value type: " + metric.getValueType());
+}
 }
