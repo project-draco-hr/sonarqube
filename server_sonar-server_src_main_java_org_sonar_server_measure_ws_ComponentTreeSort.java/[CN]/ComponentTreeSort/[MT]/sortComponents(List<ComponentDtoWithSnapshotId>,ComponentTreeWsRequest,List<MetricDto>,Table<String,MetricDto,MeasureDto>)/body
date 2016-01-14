@@ -1,7 +1,10 @@
 {
+  List<String> sortParameters=wsRequest.getSort();
+  if (sortParameters == null || sortParameters.isEmpty()) {
+    return components;
+  }
   boolean isAscending=wsRequest.getAsc();
   Map<String,Ordering<ComponentDtoWithSnapshotId>> orderingsBySortField=ImmutableMap.<String,Ordering<ComponentDtoWithSnapshotId>>builder().put(NAME_SORT,componentNameOrdering(isAscending)).put(QUALIFIER_SORT,componentQualifierOrdering(isAscending)).put(PATH_SORT,componentPathOrdering(isAscending)).put(METRIC_SORT,metricOrdering(wsRequest,metrics,measuresByComponentUuidAndMetric)).build();
-  List<String> sortParameters=wsRequest.getSort();
   String firstSortParameter=sortParameters.get(0);
   Ordering<ComponentDtoWithSnapshotId> primaryOrdering=orderingsBySortField.get(firstSortParameter);
   if (sortParameters.size() > 1) {
