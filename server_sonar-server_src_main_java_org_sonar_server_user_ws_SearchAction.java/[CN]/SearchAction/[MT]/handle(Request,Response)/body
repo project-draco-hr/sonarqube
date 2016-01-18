@@ -3,21 +3,23 @@
   List<String> fields=request.paramAsStrings(Param.FIELDS);
   SearchResult<UserDoc> result=userIndex.search(request.param(Param.TEXT_QUERY),options);
   Multimap<String,String> groupsByLogin=ArrayListMultimap.create();
+  Map<String,Integer> tokenCountsByLogin=new HashMap<>();
   DbSession dbSession=dbClient.openSession(false);
   try {
-    Collection<String> logins=Collections2.transform(result.getDocs(),new Function<UserDoc,String>(){
+    List<String> logins=Lists.transform(result.getDocs(),new Function<UserDoc,String>(){
       @Override public String apply(      @Nonnull UserDoc input){
         return input.login();
       }
     }
 );
     groupsByLogin=dbClient.groupMembershipDao().selectGroupsByLogins(dbSession,logins);
+    tokenCountsByLogin=dbClient.userTokenDao().countTokensByLogins(dbSession,logins);
   }
   finally {
-    MyBatis.closeQuietly(dbSession);
+    dbClient.closeSession(dbSession);
   }
   JsonWriter json=response.newJsonWriter().beginObject();
   options.writeJson(json,result.getTotal());
-  writeUsers(json,result,fields,groupsByLogin);
+  writeUsers(json,result,groupsByLogin,tokenCountsByLogin,fields);
   json.endObject().close();
 }

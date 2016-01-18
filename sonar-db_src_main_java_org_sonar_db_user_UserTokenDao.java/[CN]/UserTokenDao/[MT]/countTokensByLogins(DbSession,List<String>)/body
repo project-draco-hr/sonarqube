@@ -1,0 +1,14 @@
+{
+  final Map<String,Integer> result=new HashMap<>();
+  DatabaseUtils.executeLargeInputs(logins,new Function<List<String>,List<UserTokenCount>>(){
+    @Override public List<UserTokenCount> apply(    @Nonnull List<String> input){
+      List<UserTokenCount> userTokenCounts=mapper(dbSession).countTokensByLogins(input);
+      for (      UserTokenCount userTokenCount : userTokenCounts) {
+        result.put(userTokenCount.getLogin(),userTokenCount.tokenCount());
+      }
+      return userTokenCounts;
+    }
+  }
+);
+  return result;
+}
