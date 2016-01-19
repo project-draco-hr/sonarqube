@@ -1,0 +1,16 @@
+{
+  long otherDeveloperId=666l;
+  ComponentDto projectDto=insertProject("aa");
+  SnapshotDto snapshotDto=insertSnapshot(projectDto,true);
+  insertMeasure(snapshotDto,DEVELOPER_ID,NCLOC_METRIC_ID,12d);
+  List<MeasureDto> measureDtos=underTest.selectProjectMeasuresByDeveloperForMetrics(dbSession,DEVELOPER_ID,ImmutableList.of(NCLOC_METRIC_ID));
+  assertThat(measureDtos).hasSize(1);
+  MeasureDto measureDto=measureDtos.iterator().next();
+  assertThat(measureDto.getId()).isNotNull();
+  assertThat(measureDto.getMetricId()).isEqualTo(NCLOC_METRIC_ID);
+  assertThat(measureDto.getSnapshotId()).isEqualTo(snapshotDto.getId());
+  assertThat(measureDto.getComponentId()).isEqualTo(projectDto.getId());
+  assertThat(measureDto.getDeveloperId()).isEqualTo(DEVELOPER_ID);
+  assertThat(underTest.selectProjectMeasuresByDeveloperForMetrics(dbSession,otherDeveloperId,ImmutableList.of(NCLOC_METRIC_ID))).isEmpty();
+  assertThat(underTest.selectProjectMeasuresByDeveloperForMetrics(dbSession,DEVELOPER_ID,ImmutableList.of(AUTHORS_BY_LINE_METRIC_ID))).isEmpty();
+}
