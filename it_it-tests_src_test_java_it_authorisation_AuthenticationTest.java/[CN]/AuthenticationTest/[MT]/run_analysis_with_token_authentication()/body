@@ -1,7 +1,9 @@
 {
-  WsUserTokens.GenerateWsResponse generateWsResponse=userTokensWsClient.generate(new GenerateWsRequest().setLogin(LOGIN).setName("Analyze Project"));
+  String tokenName="Analyze Project";
+  WsUserTokens.GenerateWsResponse generateWsResponse=userTokensWsClient.generate(new GenerateWsRequest().setLogin(LOGIN).setName(tokenName));
   SonarRunner sampleProject=SonarRunner.create(projectDir("shared/xoo-sample"));
   sampleProject.setProperties("sonar.login",generateWsResponse.getToken(),"sonar.password","");
   BuildResult buildResult=ORCHESTRATOR.executeBuild(sampleProject);
   assertThat(buildResult.isSuccess()).isTrue();
+  userTokensWsClient.revoke(new RevokeWsRequest().setLogin(LOGIN).setName(tokenName));
 }
