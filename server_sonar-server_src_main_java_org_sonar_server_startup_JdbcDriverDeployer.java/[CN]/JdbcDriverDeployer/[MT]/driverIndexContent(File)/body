@@ -1,7 +1,12 @@
 {
   if (deployedDriver != null) {
-    String hash=new FileHashes().of(deployedDriver);
-    return deployedDriver.getName() + "|" + hash;
+    try (FileInputStream fis=new FileInputStream(deployedDriver)){
+      String hash=DigestUtils.md5Hex(fis);
+      return deployedDriver.getName() + "|" + hash;
+    }
+ catch (    IOException e) {
+      throw new IllegalStateException("Fail to compute hash",e);
+    }
   }
   return "";
 }

@@ -6,7 +6,12 @@
     for (    File file : files) {
       String filename=file.getName();
       if (StringUtils.endsWith(filename,".jar")) {
-        sb.append(filename).append('|').append(new FileHashes().of(file)).append(CharUtils.LF);
+        try (FileInputStream fis=new FileInputStream(file)){
+          sb.append(filename).append('|').append(DigestUtils.md5Hex(fis)).append(CharUtils.LF);
+        }
+ catch (        IOException e) {
+          throw new IllegalStateException("Fail to compute hash",e);
+        }
       }
     }
   }
