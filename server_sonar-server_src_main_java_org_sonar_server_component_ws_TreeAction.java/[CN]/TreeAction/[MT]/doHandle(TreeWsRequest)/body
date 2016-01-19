@@ -5,7 +5,7 @@
     checkPermissions(baseComponent);
     SnapshotDto baseSnapshot=dbClient.snapshotDao().selectLastSnapshotByComponentId(dbSession,baseComponent.getId());
     if (baseSnapshot == null) {
-      return emptyResponse(treeWsRequest);
+      return emptyResponse(baseComponent,treeWsRequest);
     }
     ComponentTreeQuery query=toComponentTreeQuery(treeWsRequest,baseSnapshot);
     List<ComponentDtoWithSnapshotId> components;
@@ -23,7 +23,8 @@ break;
 default :
 throw new IllegalStateException("Unknown component tree strategy");
 }
-return buildResponse(components,Paging.forPageIndex(query.getPage()).withPageSize(query.getPageSize()).andTotal(total));
+Map<Long,String> referenceComponentUuidsById=searchReferenceComponentUuidsById(dbSession,components);
+return buildResponse(baseComponent,components,referenceComponentUuidsById,Paging.forPageIndex(query.getPage()).withPageSize(query.getPageSize()).andTotal(total));
 }
   finally {
 dbClient.closeSession(dbSession);
