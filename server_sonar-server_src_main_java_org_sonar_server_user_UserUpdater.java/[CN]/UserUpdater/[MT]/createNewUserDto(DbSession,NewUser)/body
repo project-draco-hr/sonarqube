@@ -22,6 +22,15 @@
     validateScmAccounts(dbSession,scmAccounts,login,email,null,messages);
     userDto.setScmAccounts(scmAccounts);
   }
+  NewUser.ExternalIdentity externalIdentity=newUser.externalIdentity();
+  if (externalIdentity == null) {
+    userDto.setExternalIdentity(login);
+    userDto.setExternalIdentityProvider(SQ_AUTHORITY);
+  }
+ else {
+    userDto.setExternalIdentity(externalIdentity.getId());
+    userDto.setExternalIdentityProvider(externalIdentity.getProvider());
+  }
   if (!messages.isEmpty()) {
     throw new BadRequestException(messages);
   }
