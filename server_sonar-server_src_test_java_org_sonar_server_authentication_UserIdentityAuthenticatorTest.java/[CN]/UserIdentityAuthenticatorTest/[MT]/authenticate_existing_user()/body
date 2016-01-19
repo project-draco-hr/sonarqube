@@ -1,0 +1,10 @@
+{
+  when(userDao.selectByExternalIdentity(dbSession,USER_IDENTITY.getId(),IDENTITY_PROVIDER.getKey())).thenReturn(Optional.of(ACTIVE_USER));
+  underTest.authenticate(USER_IDENTITY,IDENTITY_PROVIDER,httpSession);
+  ArgumentCaptor<UpdateUser> updateUserArgumentCaptor=ArgumentCaptor.forClass(UpdateUser.class);
+  verify(userUpdater).update(eq(dbSession),updateUserArgumentCaptor.capture());
+  UpdateUser newUser=updateUserArgumentCaptor.getValue();
+  assertThat(newUser.login()).isEqualTo(USER_LOGIN);
+  assertThat(newUser.name()).isEqualTo("John");
+  assertThat(newUser.email()).isEqualTo("john@email.com");
+}

@@ -1,0 +1,11 @@
+{
+  UserDto user=dbClient.userDao().selectByLogin(dbSession,updateUser.login());
+  if (user == null) {
+    throw new NotFoundException(String.format("User with login '%s' has not been found",updateUser.login()));
+  }
+  updateUserDto(dbSession,updateUser,user);
+  updateUser(dbSession,user);
+  dbSession.commit();
+  notifyNewUser(user.getLogin(),user.getName(),user.getEmail());
+  userIndexer.index();
+}

@@ -1,0 +1,28 @@
+{
+  HttpServletRequest httpRequest=(HttpServletRequest)request;
+  String requestUri=httpRequest.getRequestURI();
+  final String keyProvider=requestUri.replace(INIT_CONTEXT + "/","");
+  try {
+    if (isNullOrEmpty(keyProvider)) {
+      throw new IllegalArgumentException("A valid identity provider key is required");
+    }
+    IdentityProvider provider=identityProviderRepository.getEnabledByKey(keyProvider);
+    if (provider instanceof BaseIdentityProvider) {
+      BaseIdentityProvider baseIdentityProvider=(BaseIdentityProvider)provider;
+      baseIdentityProvider.init(baseContextFactory.newContext(httpRequest,(HttpServletResponse)response,baseIdentityProvider));
+    }
+ else     if (provider instanceof OAuth2IdentityProvider) {
+      OAuth2IdentityProvider oAuth2IdentityProvider=(OAuth2IdentityProvider)provider;
+      oAuth2IdentityProvider.init(oAuth2ContextFactory.newContext(httpRequest,(HttpServletResponse)response,oAuth2IdentityProvider));
+    }
+ else {
+      throw new UnsupportedOperationException(format("Unsupported IdentityProvider class: %s ",provider.getClass()));
+    }
+  }
+ catch (  NotAllowUserToSignUpException e) {
+    handleNotAllowedToSignUpError(e,(HttpServletResponse)response);
+  }
+catch (  Exception e) {
+    handleError(e,(HttpServletResponse)response,String.format("Fail to initialize authentication with provider '%s'",keyProvider));
+  }
+}

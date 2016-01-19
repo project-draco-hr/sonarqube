@@ -1,0 +1,12 @@
+{
+  String state="state";
+  when(request.getCookies()).thenReturn(new Cookie[]{new Cookie("OAUTHSTATE",sha256Hex(state))});
+  when(request.getParameter("state")).thenReturn(state);
+  underTest.verifyState(request,response);
+  verify(response).addCookie(cookieArgumentCaptor.capture());
+  Cookie updatedCookie=cookieArgumentCaptor.getValue();
+  assertThat(updatedCookie.getName()).isEqualTo("OAUTHSTATE");
+  assertThat(updatedCookie.getValue()).isNull();
+  assertThat(updatedCookie.getPath()).isEqualTo("/");
+  assertThat(updatedCookie.getMaxAge()).isEqualTo(0);
+}

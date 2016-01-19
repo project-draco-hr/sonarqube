@@ -1,0 +1,24 @@
+{
+  final String unsupportedKey="unsupported";
+  when(request.getRequestURI()).thenReturn("/sessions/init/" + unsupportedKey);
+  identityProviderRepository.addIdentityProvider(new IdentityProvider(){
+    @Override public String getKey(){
+      return unsupportedKey;
+    }
+    @Override public String getName(){
+      return null;
+    }
+    @Override public String getIconPath(){
+      return null;
+    }
+    @Override public boolean isEnabled(){
+      return true;
+    }
+    @Override public boolean allowsUsersToSignUp(){
+      return false;
+    }
+  }
+);
+  underTest.doFilter(request,response,chain);
+  assertError("Fail to initialize authentication with provider 'unsupported'");
+}

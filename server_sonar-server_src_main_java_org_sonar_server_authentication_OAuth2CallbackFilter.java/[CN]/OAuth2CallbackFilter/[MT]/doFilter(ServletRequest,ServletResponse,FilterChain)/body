@@ -1,0 +1,21 @@
+{
+  HttpServletRequest httpRequest=(HttpServletRequest)request;
+  String requestUri=httpRequest.getRequestURI();
+  String keyProvider=requestUri.replace(CALLBACK_PATH + "/","");
+  try {
+    IdentityProvider provider=identityProviderRepository.getEnabledByKey(keyProvider);
+    if (provider instanceof OAuth2IdentityProvider) {
+      OAuth2IdentityProvider oauthProvider=(OAuth2IdentityProvider)provider;
+      oauthProvider.callback(oAuth2ContextFactory.newCallback(httpRequest,(HttpServletResponse)response,oauthProvider));
+    }
+ else {
+      handleError((HttpServletResponse)response,String.format("Not an OAuth2IdentityProvider: %s",provider.getClass()));
+    }
+  }
+ catch (  NotAllowUserToSignUpException e) {
+    handleNotAllowedToSignUpError(e,(HttpServletResponse)response);
+  }
+catch (  Exception e) {
+    handleError(e,(HttpServletResponse)response,String.format("Fail to callback authentication with %s",keyProvider));
+  }
+}
