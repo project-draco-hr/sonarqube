@@ -1,3 +1,8 @@
 {
-  return this.setFile(f.getName(),new FileHashes().of(f));
+  try (FileInputStream fis=new FileInputStream(f)){
+    return this.setFile(f.getName(),DigestUtils.md5Hex(fis));
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Fail to compute hash",e);
+  }
 }
