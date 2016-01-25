@@ -10,6 +10,10 @@
     if (!provider.allowsUsersToSignUp()) {
       throw new NotAllowUserToSignUpException(provider);
     }
+    String email=user.getEmail();
+    if (email != null && dbClient.userDao().doesEmailExist(dbSession,email)) {
+      throw new EmailAlreadyExistsException(email);
+    }
     userUpdater.create(dbSession,NewUser.create().setLogin(uuidFactory.create()).setEmail(user.getEmail()).setName(user.getName()).setExternalIdentity(new NewUser.ExternalIdentity(provider.getKey(),userId)));
     return dbClient.userDao().selectOrFailByExternalIdentity(dbSession,userId,provider.getKey()).getId();
   }
