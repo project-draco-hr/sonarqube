@@ -1,0 +1,10 @@
+{
+  MassUpdate update=context.prepareMassUpdate().rowPluralName("quality gate conditions");
+  update.select("select qgc.id, qg.name " + "from quality_gate_conditions qgc " + "inner join quality_gates qg on qgc.qgate_id=qg.id "+ "where qgc.period is not null and qgc.period <> 1");
+  update.update("update quality_gate_conditions set period=1, updated_at=? where id=?");
+  MigrationHandler migrationHandler=new MigrationHandler(system2.now());
+  update.execute(migrationHandler);
+  if (!migrationHandler.updatedQualityGates.isEmpty()) {
+    LOG.warn("The following Quality Gates have been updated to compare with the leak period: {}.",Joiner.on(", ").join(migrationHandler.updatedQualityGates));
+  }
+}
