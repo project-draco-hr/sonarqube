@@ -1,0 +1,14 @@
+{
+  String userInfoProperty=settings.getString(USER_INFO);
+  if (userInfoProperty == null) {
+    throw new IllegalStateException(String.format("The property %s is required",USER_INFO));
+  }
+  String[] userInfos=userInfoProperty.split(",");
+  context.authenticate(UserIdentity.builder().setId(userInfos[0]).setName(userInfos[1]).setEmail(userInfos[2]).build());
+  try {
+    context.getResponse().sendRedirect("/");
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Fail to redirect to home",e);
+  }
+}
