@@ -1,0 +1,17 @@
+{
+  db.prepareDbUnit(getClass(),"reactivate_user_not_having_password.xml");
+  when(system2.now()).thenReturn(1418215735486L);
+  createDefaultGroup();
+  boolean result=userUpdater.create(NewUser.create().setLogin(DEFAULT_LOGIN).setName("Marius2").setEmail("marius2@mail.com"));
+  session.commit();
+  UserDto dto=userDao.selectByLogin(session,DEFAULT_LOGIN);
+  assertThat(dto.isActive()).isTrue();
+  assertThat(dto.getName()).isEqualTo("Marius2");
+  assertThat(dto.getEmail()).isEqualTo("marius2@mail.com");
+  assertThat(dto.getScmAccounts()).isNull();
+  assertThat(dto.getSalt()).isNull();
+  assertThat(dto.getCryptedPassword()).isNull();
+  assertThat(dto.getCreatedAt()).isEqualTo(1418215735482L);
+  assertThat(dto.getUpdatedAt()).isEqualTo(1418215735486L);
+  assertThat(result).isTrue();
+}
