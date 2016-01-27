@@ -1,0 +1,12 @@
+{
+  userSessionRule.login("obiwan.kenobi").setName("Obiwan Kenobi").setGlobalPermissions(GlobalPermissions.ALL.toArray(new String[0]));
+  UserDto obiwan=userDb.insertUser(newUserDto("obiwan.kenobi","Obiwan Kenobi","obiwan.kenobi@starwars.com").setScmAccounts(newArrayList("obiwan:github","obiwan:bitbucket")));
+  GroupDto jedi=groupDb.insertGroup(newGroupDto().setName("Jedi"));
+  GroupDto rebel=groupDb.insertGroup(newGroupDto().setName("Rebel"));
+  groupDb.insertGroup(newGroupDto().setName("Sith"));
+  dbClient.userGroupDao().insert(db.getSession(),new UserGroupDto().setUserId(obiwan.getId()).setGroupId(jedi.getId()));
+  dbClient.userGroupDao().insert(db.getSession(),new UserGroupDto().setUserId(obiwan.getId()).setGroupId(rebel.getId()));
+  db.commit();
+  String response=ws.newRequest().execute().getInput();
+  assertJson(response).isSimilarTo(getClass().getResource("current-example.json"));
+}

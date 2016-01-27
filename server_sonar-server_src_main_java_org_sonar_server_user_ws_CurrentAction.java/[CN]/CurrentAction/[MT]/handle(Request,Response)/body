@@ -1,5 +1,15 @@
 {
-  JsonWriter json=response.newJsonWriter().beginObject();
-  writeUserDetails(json,userSession);
-  json.endObject().close();
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    Optional<UserDto> user=Optional.absent();
+    Collection<String> groups=emptyList();
+    if (userSession.isLoggedIn()) {
+      user=selectCurrentUser(dbSession);
+      groups=selectGroups(dbSession);
+    }
+    writeResponse(response,user,groups);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
 }
