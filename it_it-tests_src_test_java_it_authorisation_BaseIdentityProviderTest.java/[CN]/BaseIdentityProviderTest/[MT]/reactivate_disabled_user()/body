@@ -1,11 +1,10 @@
 {
-  setServerProperty(ORCHESTRATOR,"sonar.auth.fake-base-id-provider.enabled","true");
-  setServerProperty(ORCHESTRATOR,"sonar.auth.fake-base-id-provider.user",USER_PROVIDER_LOGIN + "," + USER_NAME+ ","+ USER_EMAIL);
-  userRule.verifyUserDoesNotExist(USER_EMAIL);
+  setUserCreatedByAuthPlugin(USER_LOGIN,USER_PROVIDER_ID,USER_NAME,USER_EMAIL);
+  userRule.verifyUserDoesNotExist(USER_LOGIN);
   authenticateWithFakeAuthProvider();
-  Optional<Users.User> user=userRule.getUserByEmail(USER_EMAIL);
+  Optional<Users.User> user=userRule.getUserByLogin(USER_EMAIL);
   assertThat(user).isPresent();
   userRule.deactivateUsers(user.get());
   authenticateWithFakeAuthProvider();
-  userRule.verifyUserExists(USER_NAME,USER_EMAIL);
+  userRule.verifyUserExists(USER_LOGIN,USER_NAME,USER_EMAIL);
 }
