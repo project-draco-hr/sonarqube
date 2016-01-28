@@ -6,18 +6,23 @@
   builder.setLogs(ceLogging.getFile(LogFileRef.from(dto)).isPresent());
   if (dto.getComponentUuid() != null) {
     builder.setComponentId(dto.getComponentUuid());
-    buildComponent(builder,componentCache.get(dto.getComponentUuid()));
+    buildComponent(builder,componentDtoCache.get(dto.getComponentUuid()));
+  }
+  if (dto.getSnapshotId() != null) {
+    builder.setAnalysisId(String.valueOf(dto.getSnapshotId()));
   }
   if (dto.getSubmitterLogin() != null) {
     builder.setSubmitterLogin(dto.getSubmitterLogin());
   }
-  builder.setSubmittedAt(DateUtils.formatDateTime(new Date(dto.getCreatedAt())));
+  builder.setSubmittedAt(DateUtils.formatDateTime(new Date(dto.getSubmittedAt())));
   if (dto.getStartedAt() != null) {
     builder.setStartedAt(DateUtils.formatDateTime(new Date(dto.getStartedAt())));
   }
-  Long executionTimeMs=computeExecutionTimeMs(dto);
-  if (executionTimeMs != null) {
-    builder.setExecutionTimeMs(executionTimeMs);
+  if (dto.getExecutedAt() != null) {
+    builder.setExecutedAt(DateUtils.formatDateTime(new Date(dto.getExecutedAt())));
+  }
+  if (dto.getExecutionTimeMs() != null) {
+    builder.setExecutionTimeMs(dto.getExecutionTimeMs());
   }
   return builder.build();
 }
