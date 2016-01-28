@@ -2,14 +2,7 @@
   checkState(!submitPaused.get(),"Compute Engine does not currently accept new tasks");
   DbSession dbSession=dbClient.openSession(false);
   try {
-    CeQueueDto dto=new CeQueueDto();
-    dto.setUuid(submission.getUuid());
-    dto.setTaskType(submission.getType());
-    dto.setComponentUuid(submission.getComponentUuid());
-    dto.setStatus(CeQueueDto.Status.PENDING);
-    dto.setSubmitterLogin(submission.getSubmitterLogin());
-    dto.setStartedAt(null);
-    dbClient.ceQueueDao().insert(dbSession,dto);
+    CeQueueDto dto=new CeTaskSubmitToInsertedCeQueueDto(dbSession,dbClient).apply(submission);
     CeTask task=loadTask(dbSession,dto);
     dbSession.commit();
     queueStatus.addReceived();

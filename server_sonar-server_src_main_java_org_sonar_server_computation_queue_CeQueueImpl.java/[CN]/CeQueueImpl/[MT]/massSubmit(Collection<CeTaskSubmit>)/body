@@ -1,0 +1,17 @@
+{
+  checkState(!submitPaused.get(),"Compute Engine does not currently accept new tasks");
+  if (submissions.isEmpty()) {
+    return Collections.emptyList();
+  }
+  DbSession dbSession=dbClient.openSession(true);
+  try {
+    List<CeQueueDto> ceQueueDtos=from(submissions).transform(new CeTaskSubmitToInsertedCeQueueDto(dbSession,dbClient)).toList();
+    List<CeTask> tasks=loadTasks(dbSession,ceQueueDtos);
+    dbSession.commit();
+    queueStatus.addReceived(tasks.size());
+    return tasks;
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

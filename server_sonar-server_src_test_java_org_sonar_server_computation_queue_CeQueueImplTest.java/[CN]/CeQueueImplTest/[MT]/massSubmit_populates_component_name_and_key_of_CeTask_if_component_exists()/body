@@ -1,0 +1,9 @@
+{
+  ComponentDto componentDto1=insertComponent(newComponentDto("PROJECT_1"));
+  CeTaskSubmit taskSubmit1=createTaskSubmit(CeTaskTypes.REPORT,componentDto1.uuid(),null);
+  CeTaskSubmit taskSubmit2=createTaskSubmit("something","non existing component uuid",null);
+  List<CeTask> tasks=underTest.massSubmit(asList(taskSubmit1,taskSubmit2));
+  assertThat(tasks).hasSize(2);
+  verifyCeTask(taskSubmit1,tasks.get(0),componentDto1);
+  verifyCeTask(taskSubmit2,tasks.get(1),null);
+}

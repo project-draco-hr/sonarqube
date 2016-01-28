@@ -1,0 +1,5 @@
+{
+  Set<String> componentUuids=from(dtos).transform(CeQueueDtoToComponentUuid.INSTANCE).filter(notNull()).toSet();
+  Map<String,ComponentDto> componentDtoByUuid=from(dbClient.componentDao().selectByUuids(dbSession,componentUuids)).uniqueIndex(toUuid());
+  return from(dtos).transform(new CeQueueDtoToCeTask(componentDtoByUuid)).toList();
+}
