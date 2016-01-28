@@ -1,0 +1,6 @@
+{
+  MassUpdate update=context.prepareMassUpdate().rowPluralName("users");
+  update.select("SELECT u.id FROM users u WHERE u.active=? " + "AND email IS NOT NULL " + "AND scm_accounts IS NOT NULL "+ "AND external_identity IS NOT NULL "+ "AND external_identity_provider IS NOT NULL "+ "AND crypted_password IS NOT NULL "+ "AND salt IS NOT NULL "+ "AND remember_token IS NOT NULL "+ "AND remember_token_expires_at IS NOT NULL ").setBoolean(1,false);
+  update.update("UPDATE users SET email=null, scm_accounts=null, " + "external_identity=null, external_identity_provider=null, " + "crypted_password=null, salt=null, "+ "remember_token=null, remember_token_expires_at=null, "+ "updated_at=? WHERE id=?");
+  update.execute(new MigrationHandler(system2.now()));
+}
