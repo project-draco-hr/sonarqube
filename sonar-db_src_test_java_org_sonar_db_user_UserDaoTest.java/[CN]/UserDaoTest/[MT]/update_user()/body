@@ -1,7 +1,7 @@
 {
   db.prepareDbUnit(getClass(),"update_user.xml");
   Long date=DateUtils.parseDate("2014-06-21").getTime();
-  UserDto userDto=new UserDto().setId(1L).setLogin("john").setName("John Doo").setEmail("jodoo@hn.com").setScmAccounts(",jo.hn,john2,johndoo,").setActive(false).setSalt("12345").setCryptedPassword("abcde").setUpdatedAt(date);
+  UserDto userDto=new UserDto().setId(1L).setLogin("john").setName("John Doo").setEmail("jodoo@hn.com").setScmAccounts(",jo.hn,john2,johndoo,").setActive(false).setSalt("12345").setCryptedPassword("abcde").setExternalIdentity("johngithub").setExternalIdentityProvider("github").setUpdatedAt(date);
   underTest.update(db.getSession(),userDto);
   db.getSession().commit();
   UserDto user=underTest.selectUserById(1);
@@ -14,6 +14,8 @@
   assertThat(user.getScmAccounts()).isEqualTo(",jo.hn,john2,johndoo,");
   assertThat(user.getSalt()).isEqualTo("12345");
   assertThat(user.getCryptedPassword()).isEqualTo("abcde");
+  assertThat(user.getExternalIdentity()).isEqualTo("johngithub");
+  assertThat(user.getExternalIdentityProvider()).isEqualTo("github");
   assertThat(user.getCreatedAt()).isEqualTo(1418215735482L);
   assertThat(user.getUpdatedAt()).isEqualTo(date);
 }

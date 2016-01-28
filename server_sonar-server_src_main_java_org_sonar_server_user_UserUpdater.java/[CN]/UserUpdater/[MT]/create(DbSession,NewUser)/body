@@ -2,13 +2,13 @@
   boolean isUserReactivated=false;
   UserDto userDto=createNewUserDto(dbSession,newUser);
   String login=userDto.getLogin();
-  Optional<UserDto> existingUser=dbClient.userDao().selectByExternalIdentity(dbSession,userDto.getExternalIdentity(),userDto.getExternalIdentityProvider());
-  if (!existingUser.isPresent()) {
+  UserDto existingUser=dbClient.userDao().selectByLogin(dbSession,userDto.getLogin());
+  if (existingUser == null) {
     saveUser(dbSession,userDto);
     addDefaultGroup(dbSession,userDto);
   }
  else {
-    isUserReactivated=reactivateUser(dbSession,existingUser.get(),login,newUser);
+    isUserReactivated=reactivateUser(dbSession,existingUser,login,newUser);
   }
   dbSession.commit();
   notifyNewUser(userDto.getLogin(),userDto.getName(),newUser.email());

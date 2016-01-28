@@ -1,11 +1,11 @@
 {
   DbSession dbSession=dbClient.openSession(false);
   try {
-    String userId=user.getId();
-    Optional<UserDto> userDto=dbClient.userDao().selectByExternalIdentity(dbSession,userId,provider.getKey());
-    if (userDto.isPresent() && userDto.get().isActive()) {
-      userUpdater.update(dbSession,UpdateUser.create(userDto.get().getLogin()).setEmail(user.getEmail()).setName(user.getName()));
-      return userDto.get().getId();
+    String userLogin=user.getLogin();
+    UserDto userDto=dbClient.userDao().selectByLogin(dbSession,userLogin);
+    if (userDto != null && userDto.isActive()) {
+      userUpdater.update(dbSession,UpdateUser.create(userDto.getLogin()).setEmail(user.getEmail()).setName(user.getName()).setExternalIdentity(new ExternalIdentity(provider.getKey(),user.getProviderLogin())));
+      return userDto.getId();
     }
     if (!provider.allowsUsersToSignUp()) {
       throw new NotAllowUserToSignUpException(provider);
@@ -14,8 +14,8 @@
     if (email != null && dbClient.userDao().doesEmailExist(dbSession,email)) {
       throw new EmailAlreadyExistsException(email);
     }
-    userUpdater.create(dbSession,NewUser.create().setLogin(uuidFactory.create()).setEmail(user.getEmail()).setName(user.getName()).setExternalIdentity(new NewUser.ExternalIdentity(provider.getKey(),userId)));
-    return dbClient.userDao().selectOrFailByExternalIdentity(dbSession,userId,provider.getKey()).getId();
+    userUpdater.create(dbSession,NewUser.create().setLogin(userLogin).setEmail(user.getEmail()).setName(user.getName()).setExternalIdentity(new ExternalIdentity(provider.getKey(),user.getProviderLogin())));
+    return dbClient.userDao().selectOrFailByLogin(dbSession,userLogin).getId();
   }
   finally {
     dbClient.closeSession(dbSession);

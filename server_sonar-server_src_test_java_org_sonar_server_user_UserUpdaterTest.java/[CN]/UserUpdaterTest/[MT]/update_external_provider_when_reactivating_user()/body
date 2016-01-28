@@ -1,0 +1,10 @@
+{
+  db.prepareDbUnit(getClass(),"reactivate_user.xml");
+  when(system2.now()).thenReturn(1418215735486L);
+  createDefaultGroup();
+  userUpdater.create(NewUser.create().setLogin(DEFAULT_LOGIN).setName("Marius2").setPassword("password2").setExternalIdentity(new ExternalIdentity("github","john")));
+  session.commit();
+  UserDto dto=userDao.selectByLogin(session,DEFAULT_LOGIN);
+  assertThat(dto.getExternalIdentity()).isEqualTo("john");
+  assertThat(dto.getExternalIdentityProvider()).isEqualTo("github");
+}
