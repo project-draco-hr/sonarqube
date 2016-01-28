@@ -1,0 +1,12 @@
+{
+  UserDto user=newActiveUser();
+  DashboardDto notSharedDashboard=newDashboard(user,false);
+  DashboardDto sharedDashboard=newDashboard(user,true);
+  session.commit();
+  boolean deactivated=underTest.deactivateUserByLogin(session,user.getLogin());
+  assertThat(deactivated).isTrue();
+  assertThat(dbClient.dashboardDao().selectById(session,notSharedDashboard.getId())).isNull();
+  DashboardDto sharedDashboardReloaded=dbClient.dashboardDao().selectById(session,sharedDashboard.getId());
+  assertThat(sharedDashboardReloaded).isNotNull();
+  assertThat(sharedDashboardReloaded.getUserId()).isEqualTo(user.getId());
+}

@@ -1,6 +1,6 @@
 {
   Long date=DateUtils.parseDate("2014-06-20").getTime();
-  UserDto userDto=new UserDto().setId(1L).setLogin("john").setName("John").setEmail("jo@hn.com").setScmAccounts(",jo.hn,john2,").setActive(true).setSalt("1234").setCryptedPassword("abcd").setExternalIdentity("johngithub").setExternalIdentityProvider("github").setCreatedAt(date).setUpdatedAt(date);
+  UserDto userDto=new UserDto().setId(1L).setLogin("john").setName("John").setEmail("jo@hn.com").setScmAccounts(",jo.hn,john2,").setActive(true).setSalt("1234").setCryptedPassword("abcd").setExternalIdentity("johngithub").setExternalIdentityProvider("github").setRememberToken("1234").setRememberTokenExpiresAt(new Date()).setCreatedAt(date).setUpdatedAt(date);
   underTest.insert(db.getSession(),userDto);
   db.getSession().commit();
   UserDto user=underTest.selectActiveUserByLogin("john");
@@ -15,6 +15,8 @@
   assertThat(user.getCryptedPassword()).isEqualTo("abcd");
   assertThat(user.getExternalIdentity()).isEqualTo("johngithub");
   assertThat(user.getExternalIdentityProvider()).isEqualTo("github");
+  assertThat(user.getRememberToken()).isEqualTo("1234");
+  assertThat(user.getRememberTokenExpiresAt()).isNotNull();
   assertThat(user.getCreatedAt()).isEqualTo(date);
   assertThat(user.getUpdatedAt()).isEqualTo(date);
 }

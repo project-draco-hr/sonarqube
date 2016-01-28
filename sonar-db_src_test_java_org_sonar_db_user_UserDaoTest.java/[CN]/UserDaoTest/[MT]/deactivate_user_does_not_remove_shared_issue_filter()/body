@@ -1,0 +1,12 @@
+{
+  UserDto user=newActiveUser();
+  IssueFilterDto notSharedFilter=newIssueFilter(user,false);
+  IssueFilterDto sharedFilter=newIssueFilter(user,true);
+  session.commit();
+  boolean deactivated=underTest.deactivateUserByLogin(session,user.getLogin());
+  assertThat(deactivated).isTrue();
+  assertThat(dbClient.issueFilterDao().selectById(session,notSharedFilter.getId())).isNull();
+  IssueFilterDto sharedFilterReloaded=dbClient.issueFilterDao().selectById(session,sharedFilter.getId());
+  assertThat(sharedFilterReloaded).isNotNull();
+  assertThat(sharedFilterReloaded.getUserLogin()).isEqualTo(user.getLogin());
+}
