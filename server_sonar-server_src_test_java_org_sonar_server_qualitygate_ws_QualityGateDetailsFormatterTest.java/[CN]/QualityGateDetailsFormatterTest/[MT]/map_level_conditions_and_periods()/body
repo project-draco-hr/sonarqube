@@ -1,7 +1,7 @@
 {
   String measureData=IOUtils.toString(getClass().getResource("QualityGateDetailsFormatterTest/quality_gate_details.json"));
   SnapshotDto snapshot=new SnapshotDto().setPeriodMode(1,"last_period").setPeriodDate(1,1449490731764L).setPeriodMode(2,"last_version").setPeriodParam(2,"2015-12-07").setPeriodDate(2,1449404331764L).setPeriodMode(3,"last_analysis").setPeriodMode(5,"last_30_days").setPeriodParam(5,"2015-11-07");
-  underTest=new QualityGateDetailsFormatter(measureData,snapshot);
+  underTest=newQualityGateDetailsFormatter(measureData,snapshot);
   ProjectStatus result=underTest.format();
   assertThat(result.getStatus()).isEqualTo(ProjectStatusWsResponse.Status.ERROR);
   assertThat(result.getConditionsCount()).isEqualTo(5);
@@ -18,7 +18,6 @@
   assertThat(periods).extracting("index").containsExactly(1,2,3,5);
   assertThat(periods).extracting("mode").containsExactly("last_period","last_version","last_analysis","last_30_days");
   assertThat(periods).extracting("parameter").containsExactly("","2015-12-07","","2015-11-07");
-  System.out.println(System.currentTimeMillis());
   assertThat(periods.get(0).getDate()).startsWith("2015-12-07T");
   assertThat(periods.get(1).getDate()).startsWith("2015-12-06T");
 }

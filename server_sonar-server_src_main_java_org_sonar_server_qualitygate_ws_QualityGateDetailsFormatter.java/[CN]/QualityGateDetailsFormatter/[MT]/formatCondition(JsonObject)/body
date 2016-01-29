@@ -1,34 +1,11 @@
 {
   ProjectStatusWsResponse.Condition.Builder conditionBuilder=ProjectStatusWsResponse.Condition.newBuilder();
-  JsonElement measureLevel=jsonCondition.get("level");
-  if (measureLevel != null && !isNullOrEmpty(measureLevel.getAsString())) {
-    conditionBuilder.setStatus(measureLevelToQualityGateStatus(measureLevel.getAsString()));
-  }
-  JsonElement metric=jsonCondition.get("metric");
-  if (metric != null && !isNullOrEmpty(metric.getAsString())) {
-    conditionBuilder.setMetricKey(metric.getAsString());
-  }
-  JsonElement op=jsonCondition.get("op");
-  if (op != null && !isNullOrEmpty(op.getAsString())) {
-    String stringOp=op.getAsString();
-    ProjectStatusWsResponse.Comparator comparator=measureOpToQualityGateComparator(stringOp);
-    conditionBuilder.setComparator(comparator);
-  }
-  JsonElement periodIndex=jsonCondition.get("period");
-  if (periodIndex != null && !isNullOrEmpty(periodIndex.getAsString())) {
-    conditionBuilder.setPeriodIndex(periodIndex.getAsInt());
-  }
-  JsonElement warning=jsonCondition.get("warning");
-  if (warning != null && !isNullOrEmpty(warning.getAsString())) {
-    conditionBuilder.setWarningThreshold(warning.getAsString());
-  }
-  JsonElement error=jsonCondition.get("error");
-  if (error != null && !isNullOrEmpty(error.getAsString())) {
-    conditionBuilder.setErrorThreshold(error.getAsString());
-  }
-  JsonElement actual=jsonCondition.get("actual");
-  if (actual != null && !isNullOrEmpty(actual.getAsString())) {
-    conditionBuilder.setActualValue(actual.getAsString());
-  }
+  formatConditionLevel(conditionBuilder,jsonCondition);
+  formatConditionMetric(conditionBuilder,jsonCondition);
+  formatConditionOperation(conditionBuilder,jsonCondition);
+  formatConditionPeriod(conditionBuilder,jsonCondition);
+  formatConditionWarningThreshold(conditionBuilder,jsonCondition);
+  formatConditionErrorThreshold(conditionBuilder,jsonCondition);
+  formatConditionActual(conditionBuilder,jsonCondition);
   projectStatusBuilder.addConditions(conditionBuilder);
 }

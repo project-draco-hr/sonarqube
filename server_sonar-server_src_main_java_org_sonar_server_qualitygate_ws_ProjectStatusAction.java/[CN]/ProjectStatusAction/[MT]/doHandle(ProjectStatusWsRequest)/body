@@ -1,12 +1,10 @@
 {
   DbSession dbSession=dbClient.openSession(false);
   try {
-    String snapshotId=request.getAnalysisId();
-    SnapshotDto snapshotDto=getSnapshot(dbSession,snapshotId);
-    ComponentDto projectDto=dbClient.componentDao().selectOrFailById(dbSession,snapshotDto.getComponentId());
-    checkPermission(projectDto.uuid());
-    String measureData=getQualityGateDetailsMeasureData(dbSession,snapshotDto);
-    return ProjectStatusWsResponse.newBuilder().setProjectStatus(new QualityGateDetailsFormatter(measureData,snapshotDto).format()).build();
+    ProjectAndSnapshot projectAndSnapshot=getProjectAndSnapshot(dbSession,request);
+    checkPermission(projectAndSnapshot.project.uuid());
+    Optional<String> measureData=getQualityGateDetailsMeasureData(dbSession,projectAndSnapshot.snapshotDto);
+    return ProjectStatusWsResponse.newBuilder().setProjectStatus(new QualityGateDetailsFormatter(measureData,projectAndSnapshot.snapshotDto).format()).build();
   }
   finally {
     dbClient.closeSession(dbSession);
