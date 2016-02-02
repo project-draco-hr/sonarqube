@@ -12,9 +12,15 @@
   }
   String password=updateUser.password();
   if (updateUser.isPasswordChanged()) {
-    checkPasswordChangeAllowed(updateUser.login(),messages);
     validatePasswords(password,messages);
-    setEncryptedPassWord(password,userDto);
+    checkPasswordChangeAllowed(updateUser.login(),messages);
+    if (Strings.isNullOrEmpty(password)) {
+      userDto.setSalt(null);
+      userDto.setCryptedPassword(null);
+    }
+ else {
+      setEncryptedPassWord(password,userDto);
+    }
   }
   if (updateUser.isScmAccountsChanged()) {
     List<String> scmAccounts=sanitizeScmAccounts(updateUser.scmAccounts());
