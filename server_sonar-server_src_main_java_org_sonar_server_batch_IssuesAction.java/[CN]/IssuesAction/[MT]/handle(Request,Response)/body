@@ -1,10 +1,10 @@
 {
-  userSession.checkPermission(GlobalPermissions.PREVIEW_EXECUTION);
-  final String moduleKey=request.mandatoryParam(PARAM_KEY);
+  String componentKey=request.mandatoryParam(PARAM_KEY);
+  userSession.checkComponentPermission(USER,componentKey);
   response.stream().setMediaType(MediaTypes.PROTOBUF);
   DbSession session=dbClient.openSession(false);
   try {
-    ComponentDto component=componentFinder.getByKey(session,moduleKey);
+    ComponentDto component=componentFinder.getByKey(session,componentKey);
     Map<String,String> keysByUUid=keysByUUid(session,component);
     BatchInput.ServerIssue.Builder issueBuilder=BatchInput.ServerIssue.newBuilder();
     for (Iterator<IssueDoc> issueDocIterator=issueIndex.selectIssuesForBatch(component); issueDocIterator.hasNext(); ) {

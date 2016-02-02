@@ -1,14 +1,14 @@
 {
-  boolean hasScanPerm=userSession.hasPermission(GlobalPermissions.SCAN_EXECUTION);
-  boolean hasPreviewPerm=userSession.hasPermission(GlobalPermissions.PREVIEW_EXECUTION);
-  if (!hasPreviewPerm && !hasScanPerm) {
+  boolean hasScanPerm=userSession.hasPermission(SCAN_EXECUTION);
+  boolean isLogged=userSession.isLoggedIn();
+  if (!isLogged && !hasScanPerm) {
     throw new ForbiddenException(Messages.NO_PERMISSION);
   }
   DbSession session=dbClient.openSession(false);
   try {
     GlobalRepositories ref=new GlobalRepositories();
     addMetrics(ref,session);
-    addSettings(ref,hasScanPerm,hasPreviewPerm,session);
+    addSettings(ref,hasScanPerm,isLogged,session);
     response.stream().setMediaType(MediaTypes.JSON);
     IOUtils.write(ref.toJson(),response.stream().output());
   }

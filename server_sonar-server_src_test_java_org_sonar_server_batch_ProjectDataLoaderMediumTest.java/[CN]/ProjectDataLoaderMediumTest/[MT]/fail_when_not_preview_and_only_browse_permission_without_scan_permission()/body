@@ -1,0 +1,9 @@
+{
+  ComponentDto project=ComponentTesting.newProjectDto();
+  tester.get(DbClient.class).componentDao().insert(dbSession,project);
+  dbSession.commit();
+  userSessionRule.login("john").addProjectUuidPermissions(UserRole.USER,project.projectUuid());
+  thrown.expect(ForbiddenException.class);
+  thrown.expectMessage("You're only authorized to execute a local (preview) SonarQube analysis without pushing the results to the SonarQube server. " + "Please contact your SonarQube administrator.");
+  underTest.load(ProjectDataQuery.create().setModuleKey(project.key()).setIssuesMode(false));
+}
