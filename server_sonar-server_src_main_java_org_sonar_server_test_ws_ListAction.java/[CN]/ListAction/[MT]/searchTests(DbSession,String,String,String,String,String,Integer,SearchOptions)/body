@@ -11,5 +11,9 @@
   if (sourceFileUuid != null && sourceFileLineNumber != null) {
     return searchTestsBySourceFileUuidAndLineNumber(dbSession,sourceFileUuid,sourceFileLineNumber,searchOptions);
   }
-  throw new IllegalArgumentException("One (and only one) of the following combination of parameters must be provided: 1) test UUID. 2) test file UUID. " + "3) test file key. 4) source file UUID and source file line number.");
+  if (sourceFileKey != null && sourceFileLineNumber != null) {
+    ComponentDto component=componentFinder.getByKey(dbSession,sourceFileKey);
+    return searchTestsBySourceFileUuidAndLineNumber(dbSession,component.uuid(),sourceFileLineNumber,searchOptions);
+  }
+  throw new IllegalArgumentException("One (and only one) of the following combination of parameters must be provided: 1) test UUID. 2) test file UUID. " + "3) test file key. 4) source file ID or key with a source file line number.");
 }
