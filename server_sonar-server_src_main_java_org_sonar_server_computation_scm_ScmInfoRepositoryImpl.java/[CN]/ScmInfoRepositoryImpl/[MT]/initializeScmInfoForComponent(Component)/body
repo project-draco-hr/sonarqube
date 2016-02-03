@@ -1,7 +1,12 @@
 {
-  if (scmInfoCache.containsKey(component)) {
-    return;
+  if (component.getType() != Component.Type.FILE) {
+    return Optional.absent();
   }
-  Optional<ScmInfo> scmInfoOptional=getScmInfoForComponent(component);
-  scmInfoCache.put(component,scmInfoOptional.orNull());
+  ScmInfo scmInfo=scmInfoCache.get(component);
+  if (scmInfo != null) {
+    return optionalOf(scmInfo);
+  }
+  scmInfo=getScmInfoForComponent(component);
+  scmInfoCache.put(component,scmInfo);
+  return optionalOf(scmInfo);
 }
