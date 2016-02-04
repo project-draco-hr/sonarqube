@@ -1,0 +1,9 @@
+{
+  ComponentDto project=ComponentTesting.newProjectDto();
+  tester.get(DbClient.class).componentDao().insert(dbSession,project);
+  dbSession.commit();
+  userSessionRule.login("john").addProjectUuidPermissions(GlobalPermissions.SCAN_EXECUTION,project.projectUuid());
+  thrown.expect(ForbiddenException.class);
+  thrown.expectMessage("You don't have the required permissions to access this project. Please contact your SonarQube administrator.");
+  underTest.load(ProjectDataQuery.create().setModuleKey(project.key()).setIssuesMode(true));
+}
