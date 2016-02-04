@@ -1,0 +1,9 @@
+{
+  File dataDir=temp.newFolder();
+  expectedException.expect(IllegalStateException.class);
+  expectedException.expectMessage("Fail to create or clean-up directory " + dataDir.getAbsolutePath());
+  props.setProperty(ProcessProperties.PATH_DATA,dataDir.getAbsolutePath());
+  WebDeployContext.Fs fs=mock(WebDeployContext.Fs.class);
+  doThrow(new IOException()).when(fs).createOrCleanupDir(any(File.class));
+  new WebDeployContext(fs).configureTomcat(tomcat,new Props(props));
+}
