@@ -1,0 +1,26 @@
+{
+  File baseDir=temp.newFolder();
+  File srcDir=new File(baseDir,"src");
+  srcDir.mkdir();
+  int nbFiles=100;
+  int ruleCount=100000;
+  int nblines=1000;
+  int linesize=ruleCount / nblines;
+  for (int nb=1; nb <= nbFiles; nb++) {
+    File xooFile=new File(srcDir,"sample" + nb + ".xoo");
+    File xoohighlightingFile=new File(srcDir,"sample" + nb + ".xoo.highlighting");
+    FileUtils.write(xooFile,StringUtils.repeat(StringUtils.repeat("a",linesize) + "\n",nblines));
+    StringBuilder sb=new StringBuilder(16 * ruleCount);
+    for (int i=0; i < ruleCount; i++) {
+      sb.append(i).append(":").append(i + 1).append(":s\n");
+    }
+    FileUtils.write(xoohighlightingFile,sb.toString());
+  }
+  SonarScanner scanner=SonarScanner.create().setProperties("sonar.projectKey","highlighting","sonar.projectName","highlighting","sonar.projectVersion","1.0","sonar.sources","src","sonar.showProfiling","true");
+  scanner.setEnvironmentVariable("SONAR_RUNNER_OPTS","-Xmx512m -server -XX:MaxPermSize=64m").setProjectDir(baseDir);
+  BuildResult result=orchestrator.executeBuild(scanner);
+  System.out.println("Total time: " + MavenLogs.extractTotalTime(result.getLogs()));
+  perfRule.assertDurationAround(MavenLogs.extractTotalTime(result.getLogs()),28200L);
+  Properties prof=readProfiling(baseDir,"highlighting");
+  perfRule.assertDurationAround(Long.valueOf(prof.getProperty("Xoo Highlighting Sensor")),10700L);
+}

@@ -1,22 +1,28 @@
 {
-  Connection connection=dataSource.getConnection();
-  connection.setAutoCommit(false);
-  Statement statement=connection.createStatement();
-  for (  String table : DatabaseVersion.TABLES) {
-    try {
-      ResultSet result=statement.executeQuery("SELECT CASE WHEN MAX(ID) IS NULL THEN 1 ELSE MAX(ID)+1 END FROM " + table);
-      result.next();
-      int maxId=result.getInt(1);
-      result.close();
-      for (      String resetCommand : resetSequenceSql(table,maxId)) {
-        statement.executeUpdate(resetCommand);
+  Connection connection=null;
+  Statement statement=null;
+  ResultSet resultSet=null;
+  try {
+    connection=dataSource.getConnection();
+    connection.setAutoCommit(false);
+    statement=connection.createStatement();
+    for (    String table : DatabaseVersion.TABLES) {
+      try {
+        resultSet=statement.executeQuery("SELECT CASE WHEN MAX(ID) IS NULL THEN 1 ELSE MAX(ID)+1 END FROM " + table);
+        resultSet.next();
+        int maxId=resultSet.getInt(1);
+        resultSet.close();
+        for (        String resetCommand : resetSequenceSql(table,maxId)) {
+          statement.executeUpdate(resetCommand);
+        }
+        connection.commit();
       }
-      connection.commit();
-    }
- catch (    Exception e) {
-      connection.rollback();
+ catch (      Exception e) {
+        connection.rollback();
+      }
     }
   }
-  statement.close();
-  connection.close();
+  finally {
+    DbUtils.closeQuietly(connection,statement,resultSet);
+  }
 }

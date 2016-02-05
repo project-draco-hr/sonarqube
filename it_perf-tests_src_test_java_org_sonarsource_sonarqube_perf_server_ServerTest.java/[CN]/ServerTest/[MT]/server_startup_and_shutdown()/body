@@ -1,0 +1,13 @@
+{
+  String defaultWebJavaOptions="-Xmx768m -XX:MaxPermSize=160m -XX:+HeapDumpOnOutOfMemoryError -Djava.awt.headless=true -Dfile.encoding=UTF-8 -Djruby.management.enabled=false";
+  Orchestrator orchestrator=Orchestrator.builderEnv().setOrchestratorProperty("javaVersion","LATEST_RELEASE").addPlugin("java").setServerProperty("sonar.web.javaOpts",defaultWebJavaOptions + " -Djava.security.egd=file:/dev/./urandom").build();
+  try {
+    long startupDuration=start(orchestrator);
+    assertDurationAround(startupDuration,46000);
+    long shutdownDuration=stop(orchestrator);
+    assertDurationLessThan(shutdownDuration,4000);
+  }
+  finally {
+    orchestrator.stop();
+  }
+}

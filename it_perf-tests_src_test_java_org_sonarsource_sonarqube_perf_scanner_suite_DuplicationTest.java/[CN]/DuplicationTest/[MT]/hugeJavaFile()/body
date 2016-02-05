@@ -1,0 +1,6 @@
+{
+  MavenBuild build=MavenBuild.create(FileLocation.of("projects/huge-file/pom.xml").getFile()).setEnvironmentVariable("MAVEN_OPTS","-Xmx1024m").setProperty("sonar.sourceEncoding","UTF-8").setCleanSonarGoals();
+  orchestrator.executeBuild(build);
+  Resource file=getResource("com.sonarsource.it.samples:huge-file:src/main/java/huge/HugeFile.java");
+  assertThat(file.getMeasureValue("duplicated_lines")).isGreaterThan(50000.0);
+}

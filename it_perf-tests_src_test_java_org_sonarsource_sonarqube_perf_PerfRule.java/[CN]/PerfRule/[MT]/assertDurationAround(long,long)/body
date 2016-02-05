@@ -1,0 +1,13 @@
+{
+  currentResults().add(duration);
+  if (isLastRun()) {
+    long meanDuration=computeAverageDurationOfCurrentStep();
+    double variation=100.0 * (0.0 + meanDuration - expectedDuration) / expectedDuration;
+    checkThat(String.format("Expected %d ms in average, got %d ms [%s]",expectedDuration,meanDuration,Joiner.on(",").join(getAllResultsOfCurrentStep())),Math.abs(variation),new CustomMatcher<Double>("a value less than " + PerfTestCase.ACCEPTED_DURATION_VARIATION_IN_PERCENTS){
+      @Override public boolean matches(      Object item){
+        return ((item instanceof Double) && ((Double)item).compareTo(PerfTestCase.ACCEPTED_DURATION_VARIATION_IN_PERCENTS) < 0);
+      }
+    }
+);
+  }
+}

@@ -1,0 +1,19 @@
+{
+  File rootDir=temp.newFolder();
+  File projectProperties=new File(rootDir,"sonar-project.properties");
+  StringBuilder moduleListBuilder=new StringBuilder(nbDirByLayer * ("module".length() + 2));
+  for (int i=1; i <= nbDirByLayer; i++) {
+    moduleListBuilder.append("module").append(i);
+    File moduleDir=new File(rootDir,"module" + i + "/src");
+    moduleDir.mkdirs();
+    if (i != nbDirByLayer) {
+      moduleListBuilder.append(",");
+    }
+    createProjectFiles(moduleDir,dirDepth - 1,nbDirByLayer,nbIssuesByFile);
+  }
+  FileUtils.write(projectProperties,"sonar.modules=",true);
+  FileUtils.write(projectProperties,moduleListBuilder.toString(),true);
+  FileUtils.write(projectProperties,"\n",true);
+  FileUtils.write(projectProperties,"sonar.source=src",true);
+  return rootDir;
+}
