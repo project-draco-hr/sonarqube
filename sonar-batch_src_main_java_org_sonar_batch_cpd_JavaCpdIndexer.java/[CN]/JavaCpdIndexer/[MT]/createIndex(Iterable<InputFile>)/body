@@ -6,16 +6,14 @@
     LOG.debug("Populating index from {}",inputFile);
     String resourceEffectiveKey=((DefaultInputFile)inputFile).key();
     List<Statement> statements;
-    Reader reader=null;
-    try {
-      reader=new InputStreamReader(new FileInputStream(inputFile.file()),fs.encoding());
+    try (Reader reader=new InputStreamReader(new FileInputStream(inputFile.file()),fs.encoding())){
       statements=statementChunker.chunk(tokenChunker.chunk(reader));
     }
  catch (    FileNotFoundException e) {
       throw new IllegalStateException("Cannot find file " + inputFile.file(),e);
     }
- finally {
-      IOUtils.closeQuietly(reader);
+catch (    IOException e) {
+      throw new IllegalStateException("Exception hnadling file: " + inputFile.file(),e);
     }
     List<Block> blocks=blockChunker.chunk(resourceEffectiveKey,statements);
     index.insert(inputFile,blocks);
