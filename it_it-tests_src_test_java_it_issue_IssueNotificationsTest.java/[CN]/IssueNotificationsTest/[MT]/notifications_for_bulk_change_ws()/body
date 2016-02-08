@@ -1,0 +1,16 @@
+{
+  runProjectAnalysis(ORCHESTRATOR,"shared/xoo-sample","sonar.projectDate","2011-12-15");
+  Issues issues=issueClient.find(IssueQuery.create().componentRoots(PROJECT_KEY));
+  Issue issue=issues.list().get(0);
+  issueClient.bulkChange(BulkChangeQuery.create().issues(issue.key()).actions("assign","set_severity").actionParameter("assign","assignee",USER_LOGIN).actionParameter("set_severity","severity","MINOR"));
+  issueClient.bulkChange(BulkChangeQuery.create().issues(issue.key()).actions("set_severity").actionParameter("set_severity","severity","BLOCKER").sendNotifications(true));
+  waitUntilAllNotificationsAreDelivered();
+  Iterator<WiserMessage> emails=smtpServer.getMessages().iterator();
+  emails.next();
+  MimeMessage message=emails.next().getMimeMessage();
+  assertThat(message.getHeader("To",null)).isEqualTo("<tester@example.org>");
+  assertThat((String)message.getContent()).contains("sample/Sample.xoo");
+  assertThat((String)message.getContent()).contains("Severity: BLOCKER (was MINOR)");
+  assertThat((String)message.getContent()).contains("See it in SonarQube: http://localhost:9000/issues/search#issues=" + issue.key());
+  assertThat(emails.hasNext()).isFalse();
+}

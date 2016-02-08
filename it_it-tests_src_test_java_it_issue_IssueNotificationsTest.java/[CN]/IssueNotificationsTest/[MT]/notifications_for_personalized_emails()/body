@@ -1,0 +1,10 @@
+{
+  setServerProperty(ORCHESTRATOR,"sonar.issues.defaultAssigneeLogin",USER_LOGIN);
+  runProjectAnalysis(ORCHESTRATOR,"issue/xoo-with-scm","sonar.scm.provider","xoo","sonar.scm.disabled","false");
+  waitUntilAllNotificationsAreDelivered();
+  Iterator<WiserMessage> emails=smtpServer.getMessages().iterator();
+  emails.next();
+  MimeMessage message=emails.next().getMimeMessage();
+  assertThat(message.getHeader("To",null)).isEqualTo("<tester@example.org>");
+  assertThat(message.getSubject()).contains("You have 13 new issues");
+}
