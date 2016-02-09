@@ -1,0 +1,24 @@
+{
+  Date today=toDate(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+  Date past=toDate("2013-01-01");
+  Date future=toDate("2020-12-31");
+  try {
+    search(IssueQuery.create().createdAfter(future)).list();
+    Fail.fail("Expecting 400 from issues search WS");
+  }
+ catch (  HttpException exception) {
+    assertThat(exception.getMessage()).contains("Start bound cannot be in the future");
+  }
+  assertThat(search(IssueQuery.create().createdAfter(today)).list().size()).isGreaterThan(0);
+  assertThat(search(IssueQuery.create().createdAfter(past)).list().size()).isGreaterThan(0);
+  assertThat(search(IssueQuery.create().createdBefore(future)).list().size()).isGreaterThan(0);
+  assertThat(search(IssueQuery.create().createdBefore(past)).list()).isEmpty();
+  assertThat(search(IssueQuery.create().createdBefore(future).createdAfter(past)).list().size()).isGreaterThan(0);
+  try {
+    search(IssueQuery.create().createdBefore(past).createdAfter(today)).list();
+    Fail.fail("Expecting 400 from issues search WS");
+  }
+ catch (  HttpException exception) {
+    assertThat(exception.getMessage()).contains("Start bound cannot be larger than end bound");
+  }
+}

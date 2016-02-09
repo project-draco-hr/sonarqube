@@ -1,0 +1,9 @@
+{
+  final Issue issue=search(IssueQuery.create()).list().get(0);
+  assertThat(issue.creationDate()).isNotNull();
+  assertThat(search(IssueQuery.create().issues().issues(issue.key()).createdAt(issue.creationDate())).list()).hasSize(1);
+  assertThat(search(IssueQuery.create().issues().issues(issue.key()).createdAt(DateUtils.addSeconds(issue.creationDate(),1))).size()).isEqualTo(0);
+  assertThat(search(IssueQuery.create().issues().issues(issue.key()).createdAt(DateUtils.addSeconds(issue.creationDate(),-1))).size()).isEqualTo(0);
+  assertThat(search(IssueQuery.create().createdAt(toDate("2020-01-01"))).size()).isEqualTo(0);
+  assertThat(search(IssueQuery.create().createdAt(toDate("2010-01-01"))).size()).isEqualTo(0);
+}
