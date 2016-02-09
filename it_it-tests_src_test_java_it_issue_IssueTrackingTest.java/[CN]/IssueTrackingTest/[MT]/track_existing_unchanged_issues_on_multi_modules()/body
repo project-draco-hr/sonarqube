@@ -1,0 +1,16 @@
+{
+  ORCHESTRATOR.getServer().provisionProject("com.sonarsource.it.samples:multi-modules-sample","com.sonarsource.it.samples:multi-modules-sample");
+  ORCHESTRATOR.getServer().associateProjectToQualityProfile("com.sonarsource.it.samples:multi-modules-sample","xoo","one-issue-per-module");
+  runProjectAnalysis(ORCHESTRATOR,"shared/xoo-multi-modules-sample");
+  List<Issue> issues=search(IssueQuery.create()).list();
+  assertThat(issues).hasSize(4);
+  runProjectAnalysis(ORCHESTRATOR,"shared/xoo-multi-modules-sample");
+  assertThat(search(IssueQuery.create()).list()).hasSize(issues.size());
+  for (  Issue issue : issues) {
+    Issue reloadIssue=searchIssueByKey(issue.key());
+    assertThat(reloadIssue.status()).isEqualTo("OPEN");
+    assertThat(reloadIssue.resolution()).isNull();
+    assertThat(reloadIssue.creationDate()).isEqualTo(issue.creationDate());
+    assertThat(reloadIssue.updateDate()).isEqualTo(issue.updateDate());
+  }
+}

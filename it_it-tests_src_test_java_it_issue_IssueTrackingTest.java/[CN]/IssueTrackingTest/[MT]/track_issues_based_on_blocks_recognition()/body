@@ -1,0 +1,14 @@
+{
+  ORCHESTRATOR.getServer().associateProjectToQualityProfile(SAMPLE_PROJECT_KEY,"xoo","issue-on-tag-foobar");
+  ORCHESTRATOR.getServer().associateProjectToQualityProfile(SAMPLE_PROJECT_KEY,"xoo","issue-on-tag-foobar");
+  runProjectAnalysis(ORCHESTRATOR,"issue/xoo-tracking-v1","sonar.projectDate",OLD_DATE);
+  List<Issue> issues=searchUnresolvedIssuesByComponent("sample:src/main/xoo/sample/Sample.xoo");
+  assertThat(issues).hasSize(1);
+  Date issueDate=issues.iterator().next().creationDate();
+  runProjectAnalysis(ORCHESTRATOR,"issue/xoo-tracking-v2","sonar.projectDate",NEW_DATE);
+  issues=searchUnresolvedIssuesByComponent("sample:src/main/xoo/sample/Sample.xoo");
+  assertThat(issues).hasSize(3);
+  assertThat(getIssueOnLine(6,"xoo","HasTag",issues).creationDate()).isEqualTo(issueDate);
+  assertThat(getIssueOnLine(10,"xoo","HasTag",issues).creationDate()).isAfter(issueDate);
+  assertThat(getIssueOnLine(14,"xoo","HasTag",issues).creationDate()).isAfter(issueDate);
+}

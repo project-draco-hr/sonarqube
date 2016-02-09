@@ -1,0 +1,12 @@
+{
+  ORCHESTRATOR.getServer().associateProjectToQualityProfile(SAMPLE_PROJECT_KEY,"xoo","one-issue-per-module");
+  runProjectAnalysis(ORCHESTRATOR,"shared/xoo-sample");
+  assertThat(search(IssueQuery.create()).list()).hasSize(1);
+  Issue issue=searchRandomIssue();
+  runProjectAnalysis(ORCHESTRATOR,"shared/xoo-sample");
+  assertThat(search(IssueQuery.create()).list()).hasSize(1);
+  Issue reloadIssue=searchIssueByKey(issue.key());
+  assertThat(reloadIssue.creationDate()).isEqualTo(issue.creationDate());
+  assertThat(reloadIssue.status()).isEqualTo("OPEN");
+  assertThat(reloadIssue.resolution()).isNull();
+}
