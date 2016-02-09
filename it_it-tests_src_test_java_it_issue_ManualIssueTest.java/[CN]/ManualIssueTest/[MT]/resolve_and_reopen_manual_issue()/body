@@ -1,0 +1,14 @@
+{
+  Issue issue=adminIssueClient().create(NewIssue.create().component(COMPONENT_KEY).rule("manual:invalidclassname").line(3).severity("CRITICAL").message("The name 'Sample' is too generic"));
+  adminIssueClient().doTransition(issue.key(),"resolve");
+  assertThat(searchIssueByKey(issue.key()).status()).isEqualTo("RESOLVED");
+  analyzeProject();
+  assertThat(searchIssueByKey(issue.key()).status()).isEqualTo("CLOSED");
+  adminIssueClient().doTransition(issue.key(),"reopen");
+  analyzeProject();
+  Issue reloaded=searchIssueByKey(issue.key());
+  assertThat(reloaded.status()).isEqualTo("REOPENED");
+  assertThat(reloaded.resolution()).isNull();
+  assertThat(reloaded.creationDate()).isEqualTo(issue.creationDate());
+  assertThat(reloaded.updateDate().before(issue.updateDate())).isFalse();
+}

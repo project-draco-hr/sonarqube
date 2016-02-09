@@ -1,0 +1,13 @@
+{
+  ORCHESTRATOR.getServer().adminWsClient().post("/api/rules/create",ImmutableMap.<String,Object>of("manual_key","ruletoberemoved","name","RuleToBeRemoved","markdown_description","Rule to be removed"));
+  Issue newIssue=adminIssueClient().create(NewIssue.create().component(COMPONENT_KEY).rule("manual:ruletoberemoved").line(3).severity("CRITICAL").message("The name 'Sample' is too generic"));
+  assertThat(newIssue.status()).isEqualTo("OPEN");
+  ORCHESTRATOR.getServer().adminWsClient().post("/api/rules/delete",ImmutableMap.<String,Object>of("key","manual:ruletoberemoved"));
+  analyzeProject();
+  Issue closedIssue=searchIssueByKey(newIssue.key());
+  assertThat(closedIssue.status()).isEqualTo("CLOSED");
+  assertThat(closedIssue.resolution()).isEqualTo("REMOVED");
+  assertThat(closedIssue.creationDate()).isEqualTo(newIssue.creationDate());
+  assertThat(closedIssue.updateDate().before(newIssue.updateDate())).isFalse();
+  assertThat(closedIssue.closeDate().before(closedIssue.creationDate())).isFalse();
+}
