@@ -1,0 +1,13 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    CeActivityQuery query=buildQuery(dbSession,request);
+    checkPermissions(query);
+    TaskResult queuedTasks=loadQueuedTasks(dbSession,request,query);
+    TaskResult pastTasks=loadPastTasks(dbSession,request,query,queuedTasks.total);
+    return buildResponse(queuedTasks.tasks,pastTasks.tasks,Paging.forPageIndex(request.getPage()).withPageSize(request.getPageSize()).andTotal(queuedTasks.total + pastTasks.total));
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

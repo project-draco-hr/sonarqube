@@ -1,0 +1,18 @@
+{
+  WsCe.ActivityResponse.Builder wsResponseBuilder=WsCe.ActivityResponse.newBuilder();
+  int nbInsertedTasks=0;
+  for (  WsCe.Task queuedTask : queuedTasks) {
+    if (nbInsertedTasks < paging.pageSize()) {
+      wsResponseBuilder.addTasks(queuedTask);
+      nbInsertedTasks++;
+    }
+  }
+  for (  WsCe.Task pastTask : pastTasks) {
+    if (nbInsertedTasks < paging.pageSize()) {
+      wsResponseBuilder.addTasks(pastTask);
+      nbInsertedTasks++;
+    }
+  }
+  wsResponseBuilder.setPaging(Common.Paging.newBuilder().setPageIndex(paging.pageIndex()).setPageSize(paging.pageSize()).setTotal(paging.total()));
+  return wsResponseBuilder.build();
+}

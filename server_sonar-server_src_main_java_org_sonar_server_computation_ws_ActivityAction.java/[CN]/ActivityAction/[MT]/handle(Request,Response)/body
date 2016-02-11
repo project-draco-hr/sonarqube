@@ -1,17 +1,4 @@
 {
-  DbSession dbSession=dbClient.openSession(false);
-  try {
-    CeActivityQuery query=buildQuery(dbSession,wsRequest);
-    checkPermissions(query);
-    RowBounds rowBounds=readMyBatisRowBounds(wsRequest);
-    List<CeActivityDto> dtos=dbClient.ceActivityDao().selectByQuery(dbSession,query,rowBounds);
-    int total=dbClient.ceActivityDao().countByQuery(dbSession,query);
-    WsCe.ActivityResponse.Builder wsResponseBuilder=WsCe.ActivityResponse.newBuilder();
-    wsResponseBuilder.addAllTasks(formatter.formatActivity(dbSession,dtos));
-    wsResponseBuilder.setPaging(Common.Paging.newBuilder().setPageIndex(wsRequest.mandatoryParamAsInt(WebService.Param.PAGE)).setPageSize(wsRequest.mandatoryParamAsInt(WebService.Param.PAGE_SIZE)).setTotal(total));
-    WsUtils.writeProtobuf(wsResponseBuilder.build(),wsRequest,wsResponse);
-  }
-  finally {
-    dbClient.closeSession(dbSession);
-  }
+  ActivityResponse activityResponse=doHandle(toSearchWsRequest(wsRequest));
+  writeProtobuf(activityResponse,wsRequest,wsResponse);
 }

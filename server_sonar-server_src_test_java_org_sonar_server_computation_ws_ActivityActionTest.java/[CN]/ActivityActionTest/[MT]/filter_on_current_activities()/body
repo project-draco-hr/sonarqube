@@ -1,9 +1,10 @@
 {
   userSession.setGlobalPermissions(UserRole.ADMIN);
-  insert("T1","PROJECT_1",CeActivityDto.Status.SUCCESS);
-  insert("T2","PROJECT_1",CeActivityDto.Status.FAILED);
-  TestResponse wsResponse=tester.newRequest().setParam("onlyCurrents","true").setMediaType(MediaTypes.PROTOBUF).execute();
-  WsCe.ActivityResponse activityResponse=Protobuf.read(wsResponse.getInputStream(),WsCe.ActivityResponse.PARSER);
+  insertActivity("T1","PROJECT_1",CeActivityDto.Status.SUCCESS);
+  insertActivity("T2","PROJECT_1",CeActivityDto.Status.FAILED);
+  insertQueue("T3","PROJECT_1",CeQueueDto.Status.PENDING);
+  TestResponse wsResponse=ws.newRequest().setParam("onlyCurrents","true").setMediaType(MediaTypes.PROTOBUF).execute();
+  WsCe.ActivityResponse activityResponse=Protobuf.read(wsResponse.getInputStream(),WsCe.ActivityResponse.parser());
   assertThat(activityResponse.getTasksCount()).isEqualTo(1);
   assertThat(activityResponse.getTasks(0).getId()).isEqualTo("T2");
 }
