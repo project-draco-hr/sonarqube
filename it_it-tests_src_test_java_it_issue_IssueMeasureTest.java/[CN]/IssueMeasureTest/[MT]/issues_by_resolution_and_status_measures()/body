@@ -1,0 +1,18 @@
+{
+  ORCHESTRATOR.getServer().provisionProject(SAMPLE_PROJECT_KEY,SAMPLE_PROJECT_KEY);
+  ORCHESTRATOR.getServer().restoreProfile(FileLocation.ofClasspath("/issue/one-issue-per-line-profile.xml"));
+  ORCHESTRATOR.getServer().associateProjectToQualityProfile(SAMPLE_PROJECT_KEY,"xoo","one-issue-per-line-profile");
+  runProjectAnalysis(ORCHESTRATOR,"shared/xoo-sample");
+  List<Issue> issues=searchIssuesByProject(SAMPLE_PROJECT_KEY);
+  assertThat(issues).hasSize(17);
+  adminIssueClient().doTransition(issues.get(0).key(),"falsepositive");
+  adminIssueClient().doTransition(issues.get(1).key(),"confirm");
+  adminIssueClient().doTransition(issues.get(2).key(),"resolve");
+  adminIssueClient().doTransition(issues.get(2).key(),"reopen");
+  runProjectAnalysis(ORCHESTRATOR,"shared/xoo-sample");
+  Resource project=ORCHESTRATOR.getServer().getWsClient().find(ResourceQuery.createForMetrics(SAMPLE_PROJECT_KEY,"false_positive_issues","open_issues","reopened_issues","confirmed_issues"));
+  assertThat(project.getMeasureIntValue("false_positive_issues")).isEqualTo(1);
+  assertThat(project.getMeasureIntValue("open_issues")).isEqualTo(14);
+  assertThat(project.getMeasureIntValue("reopened_issues")).isEqualTo(1);
+  assertThat(project.getMeasureIntValue("confirmed_issues")).isEqualTo(1);
+}

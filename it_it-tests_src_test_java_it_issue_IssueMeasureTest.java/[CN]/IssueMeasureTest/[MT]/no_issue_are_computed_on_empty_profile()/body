@@ -1,0 +1,9 @@
+{
+  ORCHESTRATOR.getServer().provisionProject(SAMPLE_PROJECT_KEY,SAMPLE_PROJECT_KEY);
+  ORCHESTRATOR.getServer().associateProjectToQualityProfile(SAMPLE_PROJECT_KEY,"xoo","empty");
+  runProjectAnalysis(ORCHESTRATOR,"shared/xoo-sample");
+  assertThat(searchIssuesByProject(SAMPLE_PROJECT_KEY)).isEmpty();
+  Resource project=ORCHESTRATOR.getServer().getWsClient().find(ResourceQuery.createForMetrics(SAMPLE_PROJECT_KEY,"violations","blocker_violations"));
+  assertThat(project.getMeasureIntValue("violations")).isEqualTo(0);
+  assertThat(project.getMeasureIntValue("blocker_violations")).isEqualTo(0);
+}

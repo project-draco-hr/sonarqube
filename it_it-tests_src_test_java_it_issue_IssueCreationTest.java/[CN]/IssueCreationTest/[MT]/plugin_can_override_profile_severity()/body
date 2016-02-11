@@ -1,0 +1,11 @@
+{
+  ORCHESTRATOR.getServer().provisionProject(SAMPLE_PROJECT_KEY,SAMPLE_PROJECT_KEY);
+  ORCHESTRATOR.getServer().restoreProfile(FileLocation.ofClasspath("/issue/IssueCreationTest/override-profile-severity.xml"));
+  ORCHESTRATOR.getServer().associateProjectToQualityProfile(SAMPLE_PROJECT_KEY,"xoo","override-profile-severity");
+  runProjectAnalysis(ORCHESTRATOR,"shared/xoo-sample");
+  Issues issues=search(IssueQuery.create().rules("xoo:OneBlockerIssuePerFile"));
+  assertThat(issues.size()).isGreaterThan(0);
+  for (  Issue issue : issues.list()) {
+    assertThat(issue.severity()).isEqualTo("BLOCKER");
+  }
+}

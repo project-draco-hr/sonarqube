@@ -1,0 +1,16 @@
+{
+  String projectKey="sample-with-tests";
+  String testKey="sample-with-tests:src/test/xoo/sample/SampleTest.xoo";
+  ORCHESTRATOR.getServer().provisionProject(projectKey,projectKey);
+  ORCHESTRATOR.getServer().restoreProfile(FileLocation.ofClasspath("/issue/one-issue-per-line-profile.xml"));
+  ORCHESTRATOR.getServer().associateProjectToQualityProfile(projectKey,"xoo","one-issue-per-line-profile");
+  runProjectAnalysis(ORCHESTRATOR,"shared/xoo-sample-with-tests");
+  Sonar wsClient=ORCHESTRATOR.getServer().getAdminWsClient();
+  Resource project=wsClient.find(ResourceQuery.createForMetrics(projectKey,"violations"));
+  int issues=project.getMeasureIntValue("violations");
+  createManualRule();
+  adminIssueClient().create(NewIssue.create().component(testKey).severity("MAJOR").rule("manual:invalidclassname").line(8).message("The name 'SampleTest' is too generic"));
+  runProjectAnalysis(ORCHESTRATOR,"shared/xoo-sample-with-tests");
+  project=wsClient.find(ResourceQuery.createForMetrics(projectKey,"violations"));
+  assertThat(project.getMeasureIntValue("violations")).isEqualTo(issues + 1);
+}

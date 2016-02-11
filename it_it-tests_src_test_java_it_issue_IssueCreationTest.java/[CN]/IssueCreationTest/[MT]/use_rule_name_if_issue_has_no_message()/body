@@ -1,0 +1,11 @@
+{
+  ORCHESTRATOR.getServer().provisionProject(SAMPLE_PROJECT_KEY,SAMPLE_PROJECT_KEY);
+  ORCHESTRATOR.getServer().restoreProfile(FileLocation.ofClasspath("/issue/IssueCreationTest/with-custom-message.xml"));
+  ORCHESTRATOR.getServer().associateProjectToQualityProfile(SAMPLE_PROJECT_KEY,"xoo","with-custom-message");
+  runProjectAnalysis(ORCHESTRATOR,"shared/xoo-sample","sonar.customMessage.message","a message");
+  Issue issue=issueClient().find(IssueQuery.create()).list().get(0);
+  assertThat(issue.message()).isEqualTo("a message");
+  runProjectAnalysis(ORCHESTRATOR,"shared/xoo-sample");
+  issue=issueClient().find(IssueQuery.create()).list().get(0);
+  assertThat(issue.message()).isEqualTo("Issue With Custom Message");
+}
