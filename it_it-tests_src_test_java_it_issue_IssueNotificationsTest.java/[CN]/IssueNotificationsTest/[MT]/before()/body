@@ -4,7 +4,7 @@
   System.out.println("SMTP Server port: " + smtpServer.getServer().getPort());
   setServerProperty(ORCHESTRATOR,"email.smtp_host.secured","localhost");
   setServerProperty(ORCHESTRATOR,"email.smtp_port.secured",Integer.toString(smtpServer.getServer().getPort()));
-  ORCHESTRATOR.getServer().adminWsClient().userClient().create(UserParameters.create().login(USER_LOGIN).password(USER_LOGIN).passwordConfirmation(USER_LOGIN).email("tester@example.org").name("Tester"));
+  userRule.createUser(USER_LOGIN,"Tester","tester@example.org",USER_LOGIN);
   new SeleneseTest(Selenese.builder().setHtmlTestsInClasspath("issue-notifications","/issue/IssueNotificationsTest/email_configuration.html","/issue/IssueNotificationsTest/user_notifications_settings.html").build()).runOn(ORCHESTRATOR);
   waitUntilAllNotificationsAreDelivered();
   Iterator<WiserMessage> emails=smtpServer.getMessages().iterator();
