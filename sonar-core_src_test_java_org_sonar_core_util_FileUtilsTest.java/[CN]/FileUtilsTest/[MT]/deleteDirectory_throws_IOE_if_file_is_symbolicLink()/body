@@ -1,0 +1,10 @@
+{
+  Path folder=temporaryFolder.newFolder().toPath();
+  Path file1=Files.createFile(folder.resolve("file1.txt"));
+  Path symLink=Files.createSymbolicLink(folder.resolve("link1"),file1);
+  assertThat(file1).isRegularFile();
+  assertThat(symLink).isSymbolicLink();
+  expectedException.expect(IOException.class);
+  expectedException.expectMessage("Directory '" + symLink.toFile().getAbsolutePath() + "' is a symbolic link");
+  FileUtils.deleteDirectory(symLink.toFile());
+}
