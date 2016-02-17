@@ -3,8 +3,7 @@
   insertActivity("T1","PROJECT_1",CeActivityDto.Status.SUCCESS);
   insertActivity("T2","PROJECT_2",CeActivityDto.Status.FAILED);
   insertQueue("T3","PROJECT_1",CeQueueDto.Status.IN_PROGRESS);
-  TestResponse wsResponse=ws.newRequest().setParam("status","FAILED,IN_PROGRESS").setMediaType(MediaTypes.PROTOBUF).execute();
-  WsCe.ActivityResponse activityResponse=Protobuf.read(wsResponse.getInputStream(),WsCe.ActivityResponse.parser());
+  ActivityResponse activityResponse=call(ws.newRequest().setParam("status","FAILED,IN_PROGRESS"));
   assertThat(activityResponse.getTasksCount()).isEqualTo(2);
   assertThat(activityResponse.getTasks(0).getId()).isEqualTo("T3");
   assertThat(activityResponse.getTasks(1).getId()).isEqualTo("T2");

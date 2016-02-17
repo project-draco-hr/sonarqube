@@ -2,8 +2,7 @@
   userSession.addComponentUuidPermission(UserRole.ADMIN,"PROJECT_1","PROJECT_1");
   insertActivity("T1","PROJECT_1",CeActivityDto.Status.SUCCESS);
   insertActivity("T2","PROJECT_2",CeActivityDto.Status.FAILED);
-  TestResponse wsResponse=ws.newRequest().setParam("componentId","PROJECT_1").setMediaType(MediaTypes.PROTOBUF).execute();
-  WsCe.ActivityResponse activityResponse=Protobuf.read(wsResponse.getInputStream(),WsCe.ActivityResponse.parser());
+  ActivityResponse activityResponse=call(ws.newRequest().setParam("componentId","PROJECT_1"));
   assertThat(activityResponse.getTasksCount()).isEqualTo(1);
   assertThat(activityResponse.getTasks(0).getId()).isEqualTo("T1");
   assertThat(activityResponse.getTasks(0).getStatus()).isEqualTo(WsCe.TaskStatus.SUCCESS);
