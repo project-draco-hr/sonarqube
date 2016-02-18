@@ -1,0 +1,18 @@
+{
+  RuleKey ruleKey=RuleKey.of(ruleDef.repository().key(),ruleDef.key());
+  RuleDto rule=allRules.containsKey(ruleKey) ? allRules.remove(ruleKey) : createRuleDto(ruleDef,session);
+  boolean executeUpdate=false;
+  if (mergeRule(ruleDef,rule)) {
+    executeUpdate=true;
+  }
+  if (mergeDebtDefinitions(ruleDef,rule)) {
+    executeUpdate=true;
+  }
+  if (mergeTags(ruleDef,rule)) {
+    executeUpdate=true;
+  }
+  if (executeUpdate) {
+    dbClient.deprecatedRuleDao().update(session,rule);
+  }
+  mergeParams(ruleDef,rule,session);
+}

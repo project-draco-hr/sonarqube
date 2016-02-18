@@ -6,15 +6,7 @@
     if (ruleDto == null) {
       throw new NotFoundException(String.format("Unknown rule '%s'",ruleChange.ruleKey()));
     }
-    String subCharacteristicKey=ruleChange.debtCharacteristicKey();
-    CharacteristicDto subCharacteristic=null;
-    if (!Strings.isNullOrEmpty(subCharacteristicKey)) {
-      subCharacteristic=dbClient.debtCharacteristicDao().selectByKey(subCharacteristicKey,session);
-      if (subCharacteristic == null) {
-        throw new NotFoundException(String.format("Unknown sub characteristic '%s'",ruleChange.debtCharacteristicKey()));
-      }
-    }
-    boolean needUpdate=updateRule(ruleDto,subCharacteristic,ruleChange.debtRemediationFunction(),ruleChange.debtRemediationCoefficient(),ruleChange.debtRemediationOffset(),session);
+    boolean needUpdate=updateRule(ruleDto,ruleChange.debtRemediationFunction(),ruleChange.debtRemediationCoefficient(),ruleChange.debtRemediationOffset(),session);
     if (needUpdate) {
       session.commit();
     }

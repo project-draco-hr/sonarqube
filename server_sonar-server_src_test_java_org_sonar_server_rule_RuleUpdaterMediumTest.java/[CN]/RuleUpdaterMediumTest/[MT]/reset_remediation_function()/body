@@ -1,0 +1,15 @@
+{
+  ruleDao.insert(dbSession,RuleTesting.newDto(RULE_KEY).setDefaultRemediationFunction(DebtRemediationFunction.Type.LINEAR.name()).setDefaultRemediationCoefficient("1d").setDefaultRemediationOffset("5min").setRemediationFunction(DebtRemediationFunction.Type.CONSTANT_ISSUE.name()).setRemediationCoefficient(null).setRemediationOffset("1min"));
+  dbSession.commit();
+  RuleUpdate update=RuleUpdate.createForPluginRule(RULE_KEY).setDebtRemediationFunction(null);
+  updater.update(update,userSessionRule);
+  dbSession.clearCache();
+  Rule indexedRule=tester.get(RuleIndex.class).getByKey(RULE_KEY);
+  assertThat(indexedRule.debtRemediationFunction().type()).isEqualTo(DebtRemediationFunction.Type.LINEAR);
+  assertThat(indexedRule.debtRemediationFunction().coefficient()).isEqualTo("1d");
+  assertThat(indexedRule.debtRemediationFunction().offset()).isEqualTo("5min");
+  assertThat(indexedRule.debtOverloaded()).isFalse();
+  assertThat(indexedRule.defaultDebtRemediationFunction().type()).isEqualTo(DebtRemediationFunction.Type.LINEAR);
+  assertThat(indexedRule.defaultDebtRemediationFunction().coefficient()).isEqualTo("1d");
+  assertThat(indexedRule.defaultDebtRemediationFunction().offset()).isEqualTo("5min");
+}

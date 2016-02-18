@@ -1,0 +1,28 @@
+{
+  boolean needUpdate=false;
+  if (newFunction != null) {
+    if (isRuleDebtSameAsDefaultValues(ruleDto,newFunction,newCoefficient,newOffset)) {
+      ruleDto.setRemediationFunction(null);
+      ruleDto.setRemediationCoefficient(null);
+      ruleDto.setRemediationOffset(null);
+      needUpdate=true;
+    }
+ else     if (!isRuleDebtSameAsOverriddenValues(ruleDto,newFunction,newCoefficient,newOffset)) {
+      DefaultDebtRemediationFunction debtRemediationFunction=new DefaultDebtRemediationFunction(DebtRemediationFunction.Type.valueOf(newFunction),newCoefficient,newOffset);
+      ruleDto.setRemediationFunction(debtRemediationFunction.type().name());
+      ruleDto.setRemediationCoefficient(debtRemediationFunction.coefficient());
+      ruleDto.setRemediationOffset(debtRemediationFunction.offset());
+      needUpdate=true;
+    }
+  }
+ else {
+    ruleDto.setRemediationFunction(null);
+    ruleDto.setRemediationCoefficient(null);
+    ruleDto.setRemediationOffset(null);
+    needUpdate=true;
+  }
+  if (needUpdate) {
+    dbClient.deprecatedRuleDao().update(session,ruleDto);
+  }
+  return needUpdate;
+}

@@ -1,11 +1,9 @@
 {
-  RuleDto dto=new RuleDto().setId(1).setRepositoryKey("squid").setRuleKey("UselessImportCheck").setSubCharacteristicId(2).setRemediationFunction("LINEAR").setRemediationCoefficient("1h");
+  RuleDto dto=new RuleDto().setId(1).setRepositoryKey("squid").setRuleKey("UselessImportCheck").setRemediationFunction("LINEAR").setRemediationCoefficient("1h");
   RuleKey ruleKey=RuleKey.of("squid","UselessImportCheck");
   when(ruleDao.getNullableByKey(session,ruleKey)).thenReturn(dto);
-  CharacteristicDto subCharacteristic=new CharacteristicDto().setId(2).setKey("COMPILER").setName("Compiler").setParentId(1);
-  when(characteristicDao.selectByKey("COMPILER",session)).thenReturn(subCharacteristic);
   try {
-    operations.updateRule(new RuleChange().setRuleKey(ruleKey).setDebtCharacteristicKey("COMPILER").setDebtRemediationFunction("LINEAR").setDebtRemediationCoefficient("foo"),authorizedUserSession);
+    operations.updateRule(new RuleChange().setRuleKey(ruleKey).setDebtRemediationFunction("LINEAR").setDebtRemediationCoefficient("foo"),authorizedUserSession);
   }
  catch (  Exception e) {
     assertThat(e).isInstanceOf(BadRequestException.class).hasMessage("Invalid coefficient: foo (Duration 'foo' is invalid, it should use the following sample format : 2d 10h 15min)");

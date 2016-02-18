@@ -3,15 +3,14 @@
   Date updateDate=new Date(system2.now());
   DbSession session=dbClient.openSession(false);
   try {
-    List<CharacteristicDto> allCharacteristicDtos=restoreCharacteristics(session,loadModelFromPlugin(DebtModelPluginRepository.DEFAULT_MODEL),updateDate);
-    List<RuleDto> ruleDtos=dbClient.deprecatedRuleDao().selectEnabledAndNonManual(session);
+    List<RuleDto> ruleDtos=dbClient.ruleDao().selectEnabledAndNonManual(session);
     if (!ruleDtos.isEmpty()) {
       RulesDefinition.Context context=defLoader.load();
       List<RulesDefinition.Rule> rules=newArrayList();
       for (      RulesDefinition.Repository repoDef : context.repositories()) {
         rules.addAll(repoDef.rules());
       }
-      resetRules(ruleDtos,rules,allCharacteristicDtos,updateDate,session);
+      resetRules(ruleDtos,rules,updateDate,session);
     }
     session.commit();
   }

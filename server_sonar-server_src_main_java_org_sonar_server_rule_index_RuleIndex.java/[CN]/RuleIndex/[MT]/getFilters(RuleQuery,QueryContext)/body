@@ -22,19 +22,6 @@
   if (!CollectionUtils.isEmpty(query.getTags())) {
     filters.put(RuleNormalizer.RuleField.ALL_TAGS.field(),FilterBuilders.termsFilter(RuleNormalizer.RuleField.ALL_TAGS.field(),query.getTags()));
   }
-  Collection<String> debtCharacteristics=query.getDebtCharacteristics();
-  if (debtCharacteristics != null && !debtCharacteristics.isEmpty()) {
-    filters.put(FILTER_DEBT_CHARACTERISTICS,FilterBuilders.boolFilter().must(FilterBuilders.orFilter(FilterBuilders.andFilter(FilterBuilders.notFilter(FilterBuilders.termsFilter(RuleNormalizer.RuleField.SUB_CHARACTERISTIC.field(),DebtCharacteristic.NONE)),FilterBuilders.orFilter(FilterBuilders.termsFilter(RuleNormalizer.RuleField.SUB_CHARACTERISTIC.field(),debtCharacteristics),FilterBuilders.termsFilter(RuleNormalizer.RuleField.CHARACTERISTIC.field(),debtCharacteristics))))));
-  }
-  Boolean hasDebtCharacteristic=query.getHasDebtCharacteristic();
-  if (hasDebtCharacteristic != null) {
-    if (hasDebtCharacteristic) {
-      filters.put(FILTER_HAS_DEBT_CHARACTERISTICS,FilterBuilders.boolFilter().mustNot(FilterBuilders.termsFilter(RuleNormalizer.RuleField.SUB_CHARACTERISTIC.field(),DebtCharacteristic.NONE)).should(FilterBuilders.existsFilter(RuleNormalizer.RuleField.SUB_CHARACTERISTIC.field())).should(FilterBuilders.existsFilter(RuleNormalizer.RuleField.DEFAULT_SUB_CHARACTERISTIC.field())));
-    }
- else {
-      filters.put(FILTER_HAS_DEBT_CHARACTERISTICS,FilterBuilders.orFilter(FilterBuilders.termsFilter(RuleNormalizer.RuleField.SUB_CHARACTERISTIC.field(),DebtCharacteristic.NONE),FilterBuilders.andFilter(FilterBuilders.missingFilter(RuleNormalizer.RuleField.SUB_CHARACTERISTIC.field()),FilterBuilders.missingFilter(RuleNormalizer.RuleField.DEFAULT_SUB_CHARACTERISTIC.field()))));
-    }
-  }
   if (query.getAvailableSince() != null) {
     filters.put("availableSince",FilterBuilders.rangeFilter(RuleNormalizer.RuleField.CREATED_AT.field()).gte(query.getAvailableSince()));
   }

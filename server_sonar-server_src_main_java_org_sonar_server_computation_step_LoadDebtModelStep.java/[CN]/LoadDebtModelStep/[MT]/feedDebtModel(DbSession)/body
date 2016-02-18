@@ -1,7 +1,0 @@
-{
-  List<CharacteristicDto> characteristicDtos=dbClient.debtCharacteristicDao().selectEnabledCharacteristics(session);
-  Map<Integer,CharacteristicDto> rootCharacteristicsById=from(characteristicDtos).filter(IsRootPredicate.INSTANCE).uniqueIndex(CharacteristicDtoToId.INSTANCE);
-  for (  Map.Entry<Integer,Collection<CharacteristicDto>> entry : from(characteristicDtos).filter(not(IsRootPredicate.INSTANCE)).index(CharacteristicDtoToParentId.INSTANCE).asMap().entrySet()) {
-    mutableDebtModelHolder.addCharacteristics(toCharacteristic(rootCharacteristicsById.get(entry.getKey())),from(entry.getValue()).transform(CharacteristicDtoToCharacteristic.INSTANCE));
-  }
-}

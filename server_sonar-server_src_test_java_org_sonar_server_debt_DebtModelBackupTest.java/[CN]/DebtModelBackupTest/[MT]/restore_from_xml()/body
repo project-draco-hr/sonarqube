@@ -1,11 +1,8 @@
 {
-  when(characteristicsXMLImporter.importXML(anyString())).thenReturn(new DebtModel().addRootCharacteristic(new DefaultDebtCharacteristic().setKey("PORTABILITY").setName("Portability").setOrder(1)).addSubCharacteristic(new DefaultDebtCharacteristic().setKey("COMPILER").setName("Compiler"),"PORTABILITY"));
-  CharacteristicDto compiler=new CharacteristicDto().setId(2).setKey("COMPILER").setName("Compiler").setParentId(1).setCreatedAt(oldDate);
-  when(dao.selectEnabledCharacteristics(session)).thenReturn(newArrayList(new CharacteristicDto().setId(1).setKey("PORTABILITY").setName("Portability").setOrder(1).setCreatedAt(oldDate),new CharacteristicDto().setId(3).setKey("HARDWARE").setName("Hardware").setParentId(1).setCreatedAt(oldDate),compiler));
-  when(rulesXMLImporter.importXML(anyString(),any(ValidationMessages.class))).thenReturn(newArrayList(new RuleDebt().setRuleKey(RuleKey.of("squid","UselessImportCheck")).setSubCharacteristicKey("COMPILER").setFunction(DebtRemediationFunction.Type.LINEAR.name()).setCoefficient("2h")));
-  when(ruleDao.selectEnabledAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setId(1).setRepositoryKey("squid").setRuleKey("UselessImportCheck").setDefaultSubCharacteristicId(3).setDefaultRemediationFunction("LINEAR").setDefaultRemediationCoefficient("2h")));
+  when(rulesXMLImporter.importXML(anyString(),any(ValidationMessages.class))).thenReturn(newArrayList(new RuleDebt().setRuleKey(RuleKey.of("squid","UselessImportCheck")).setFunction(DebtRemediationFunction.Type.LINEAR.name()).setCoefficient("2h")));
+  when(ruleDao.selectEnabledAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setId(1).setRepositoryKey("squid").setRuleKey("UselessImportCheck").setDefaultRemediationFunction("LINEAR").setDefaultRemediationCoefficient("2h")));
   underTest.restoreFromXml("<xml/>");
-  verify(ruleOperations).updateRule(ruleCaptor.capture(),eq(compiler),eq("LINEAR"),eq("2h"),isNull(String.class),eq(session));
+  verify(ruleOperations).updateRule(ruleCaptor.capture(),eq("LINEAR"),eq("2h"),isNull(String.class),eq(session));
   verify(ruleDao).selectEnabledAndNonManual(session);
   verify(session).commit();
 }

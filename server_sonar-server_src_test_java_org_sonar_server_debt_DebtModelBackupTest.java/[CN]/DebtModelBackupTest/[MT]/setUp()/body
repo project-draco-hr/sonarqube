@@ -2,19 +2,8 @@
   userSessionRule.setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
   when(system2.now()).thenReturn(now.getTime());
   currentId=10;
-  doAnswer(new Answer(){
-    public Object answer(    InvocationOnMock invocation){
-      Object[] args=invocation.getArguments();
-      CharacteristicDto dto=(CharacteristicDto)args[1];
-      dto.setId(currentId++);
-      return null;
-    }
-  }
-).when(dao).insert(any(DbSession.class),any(CharacteristicDto.class));
   when(dbClient.openSession(false)).thenReturn(session);
-  when(dbClient.deprecatedRuleDao()).thenReturn(ruleDao);
-  when(dbClient.debtCharacteristicDao()).thenReturn(dao);
-  Reader defaultModelReader=mock(Reader.class);
-  when(debtModelPluginRepository.createReaderForXMLFile("technical-debt")).thenReturn(defaultModelReader);
-  underTest=new DebtModelBackup(dbClient,debtModelOperations,ruleOperations,debtModelPluginRepository,characteristicsXMLImporter,rulesXMLImporter,debtModelXMLExporter,defLoader,system2,userSessionRule);
+  when(dbClient.ruleDao()).thenReturn(ruleDao);
+  when(dbClient.deprecatedRuleDao()).thenReturn(deprecatedRuleDao);
+  underTest=new DebtModelBackup(dbClient,ruleOperations,rulesXMLImporter,debtModelXMLExporter,defLoader,system2,userSessionRule);
 }

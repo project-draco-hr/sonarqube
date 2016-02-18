@@ -2,26 +2,16 @@
   checkPermission();
   DbSession session=dbClient.openSession(false);
   try {
-    DebtModel debtModel=new DebtModel();
-    List<CharacteristicDto> characteristicDtos=dbClient.debtCharacteristicDao().selectEnabledCharacteristics(session);
-    for (    CharacteristicDto characteristicDto : characteristicDtos) {
-      if (characteristicDto.getParentId() == null) {
-        debtModel.addRootCharacteristic(toDebtCharacteristic(characteristicDto));
-        for (        CharacteristicDto sub : subCharacteristics(characteristicDto.getId(),characteristicDtos)) {
-          debtModel.addSubCharacteristic(toDebtCharacteristic(sub),characteristicDto.getKey());
-        }
-      }
-    }
     List<RuleDebt> rules=newArrayList();
-    for (    RuleDto rule : dbClient.deprecatedRuleDao().selectEnabledAndNonManual(session)) {
+    for (    RuleDto rule : dbClient.ruleDao().selectEnabledAndNonManual(session)) {
       if (languageKey == null || languageKey.equals(rule.getLanguage())) {
-        RuleDebt ruleDebt=toRuleDebt(rule,debtModel);
+        RuleDebt ruleDebt=toRuleDebt(rule);
         if (ruleDebt != null) {
           rules.add(ruleDebt);
         }
       }
     }
-    return debtModelXMLExporter.export(debtModel,rules);
+    return debtModelXMLExporter.export(rules);
   }
   finally {
     MyBatis.closeQuietly(session);

@@ -40,58 +40,6 @@
       }
     }
     update.put(RuleField.TEMPLATE_KEY.field(),templateKeyFieldValue);
-    update.put(RuleField.CHARACTERISTIC.field(),null);
-    update.put(RuleField.SUB_CHARACTERISTIC.field(),null);
-    update.put(RuleField.DEFAULT_CHARACTERISTIC.field(),null);
-    update.put(RuleField.DEFAULT_SUB_CHARACTERISTIC.field(),null);
-    update.put(RuleField.DEFAULT_CHARACTERISTIC.field(),null);
-    update.put(RuleField.DEFAULT_SUB_CHARACTERISTIC.field(),null);
-    String defaultCharacteristicKey=null;
-    String defaultSubCharacteristicKey=null;
-    Integer defaultSubCharacteristicId=rule.getDefaultSubCharacteristicId();
-    if (defaultSubCharacteristicId != null) {
-      CharacteristicDto subCharacteristic=db.debtCharacteristicDao().selectById(session,defaultSubCharacteristicId);
-      if (subCharacteristic != null) {
-        Integer characteristicId=subCharacteristic.getParentId();
-        if (characteristicId != null) {
-          CharacteristicDto characteristic=db.debtCharacteristicDao().selectById(characteristicId);
-          if (characteristic != null) {
-            defaultCharacteristicKey=characteristic.getKey();
-            update.put(RuleField.DEFAULT_CHARACTERISTIC.field(),defaultCharacteristicKey);
-            defaultSubCharacteristicKey=subCharacteristic.getKey();
-            update.put(RuleField.DEFAULT_SUB_CHARACTERISTIC.field(),defaultSubCharacteristicKey);
-          }
-        }
-      }
-    }
-    Integer subCharacteristicId=rule.getSubCharacteristicId();
-    if (subCharacteristicId != null) {
-      if (subCharacteristicId.equals(-1)) {
-        update.put(RuleField.CHARACTERISTIC.field(),DebtCharacteristic.NONE);
-        update.put(RuleField.SUB_CHARACTERISTIC.field(),DebtCharacteristic.NONE);
-      }
- else {
-        CharacteristicDto subCharacteristic=db.debtCharacteristicDao().selectById(session,subCharacteristicId);
-        if (subCharacteristic != null) {
-          Integer characteristicId=subCharacteristic.getParentId();
-          if (characteristicId != null) {
-            CharacteristicDto characteristic=db.debtCharacteristicDao().selectById(characteristicId);
-            if (characteristic != null) {
-              update.put(RuleField.CHARACTERISTIC.field(),characteristic.getKey());
-              update.put(RuleField.SUB_CHARACTERISTIC.field(),subCharacteristic.getKey());
-            }
-          }
-        }
-      }
-      update.put(RuleField.CHARACTERISTIC_OVERLOADED.field(),true);
-      update.put(RuleField.SUB_CHARACTERISTIC_OVERLOADED.field(),true);
-    }
- else {
-      update.put(RuleField.CHARACTERISTIC.field(),defaultCharacteristicKey);
-      update.put(RuleField.SUB_CHARACTERISTIC.field(),defaultSubCharacteristicKey);
-      update.put(RuleField.CHARACTERISTIC_OVERLOADED.field(),false);
-      update.put(RuleField.SUB_CHARACTERISTIC_OVERLOADED.field(),false);
-    }
     if (rule.getDefaultRemediationFunction() != null) {
       update.put(RuleField.DEFAULT_DEBT_FUNCTION_TYPE.field(),rule.getDefaultRemediationFunction());
       update.put(RuleField.DEFAULT_DEBT_FUNCTION_COEFFICIENT.field(),rule.getDefaultRemediationCoefficient());
