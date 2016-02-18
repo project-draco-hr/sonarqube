@@ -1,0 +1,19 @@
+{
+  indexRules(newDoc(RuleKey.of("java","S001")).setAllTags(singleton("tag1")),newDoc(RuleKey.of("java","S002")).setAllTags(singleton("tag2")));
+  RuleQuery query=new RuleQuery();
+  assertThat(index.search(query,new SearchOptions()).getIds()).hasSize(2);
+  query=new RuleQuery().setQueryText("tag1");
+  assertThat(index.search(query,new SearchOptions()).getIds()).containsOnly(RuleKey.of("java","S001"));
+  query=new RuleQuery().setQueryText("tag1 tag2");
+  assertThat(index.search(query,new SearchOptions()).getIds()).hasSize(2);
+  query=new RuleQuery().setTags(ImmutableSet.of("tag2"));
+  assertThat(index.search(query,new SearchOptions()).getIds()).containsOnly(RuleKey.of("java","S002"));
+  query=new RuleQuery().setTags(ImmutableSet.of("tag2")).setQueryText("tag1");
+  assertThat(index.search(query,new SearchOptions()).getIds()).hasSize(0);
+  query=new RuleQuery().setTags(ImmutableSet.of("tag2")).setQueryText("tag1 tag2");
+  assertThat(index.search(query,new SearchOptions()).getIds()).containsOnly(RuleKey.of("java","S002"));
+  query=new RuleQuery().setTags(Collections.<String>emptySet());
+  assertThat(index.search(query,new SearchOptions()).getIds()).hasSize(2);
+  query=new RuleQuery().setTags(null);
+  assertThat(index.search(query,new SearchOptions()).getIds()).hasSize(2);
+}

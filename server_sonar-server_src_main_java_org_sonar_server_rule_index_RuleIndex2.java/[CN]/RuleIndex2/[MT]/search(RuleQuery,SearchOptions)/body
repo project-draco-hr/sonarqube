@@ -1,0 +1,18 @@
+{
+  SearchRequestBuilder esSearch=getClient().prepareSearch(RuleIndexDefinition.INDEX).setTypes(RuleIndexDefinition.TYPE_RULE);
+  QueryBuilder qb=buildQuery(query);
+  Map<String,FilterBuilder> filters=buildFilters(query);
+  if (!options.getFacets().isEmpty()) {
+    for (    AggregationBuilder aggregation : getFacets(query,options,qb,filters).values()) {
+      esSearch.addAggregation(aggregation);
+    }
+  }
+  setSorting(query,esSearch);
+  setPagination(options,esSearch);
+  BoolFilterBuilder fb=FilterBuilders.boolFilter();
+  for (  FilterBuilder filterBuilder : filters.values()) {
+    fb.must(filterBuilder);
+  }
+  esSearch.setQuery(QueryBuilders.filteredQuery(qb,fb));
+  return new SearchIdResult<>(esSearch.get(),ToRuleKey.INSTANCE);
+}

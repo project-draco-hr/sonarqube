@@ -1,0 +1,10 @@
+{
+  indexRules(newDoc(RuleKey.of("findbugs","S001")),newDoc(RuleKey.of("pmd","S002")));
+  RuleQuery query=new RuleQuery().setRepositories(asList("checkstyle","pmd"));
+  SearchIdResult results=index.search(query,new SearchOptions());
+  assertThat(results.getIds()).containsOnly(RuleKey.of("pmd","S002"));
+  query=new RuleQuery().setRepositories(singletonList("checkstyle"));
+  assertThat(index.search(query,new SearchOptions()).getIds()).isEmpty();
+  query=new RuleQuery().setRepositories(Collections.<String>emptyList());
+  assertThat(index.search(query,new SearchOptions()).getIds()).hasSize(2);
+}

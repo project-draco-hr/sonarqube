@@ -1,0 +1,62 @@
+{
+  Map<String,FilterBuilder> filters=new HashMap<>();
+  filters.put(RuleIndexDefinition.FIELD_RULE_STATUS,FilterBuilders.boolFilter().mustNot(FilterBuilders.termFilter(RuleIndexDefinition.FIELD_RULE_STATUS,RuleStatus.REMOVED.toString())));
+  if (!StringUtils.isEmpty(query.getInternalKey())) {
+    filters.put(RuleIndexDefinition.FIELD_RULE_INTERNAL_KEY,FilterBuilders.termFilter(RuleIndexDefinition.FIELD_RULE_INTERNAL_KEY,query.getInternalKey()));
+  }
+  if (!StringUtils.isEmpty(query.getRuleKey())) {
+    filters.put(RuleIndexDefinition.FIELD_RULE_RULE_KEY,FilterBuilders.termFilter(RuleIndexDefinition.FIELD_RULE_RULE_KEY,query.getRuleKey()));
+  }
+  if (!CollectionUtils.isEmpty(query.getLanguages())) {
+    filters.put(RuleIndexDefinition.FIELD_RULE_LANGUAGE,FilterBuilders.termsFilter(RuleIndexDefinition.FIELD_RULE_LANGUAGE,query.getLanguages()));
+  }
+  if (!CollectionUtils.isEmpty(query.getRepositories())) {
+    filters.put(RuleIndexDefinition.FIELD_RULE_REPOSITORY,FilterBuilders.termsFilter(RuleIndexDefinition.FIELD_RULE_REPOSITORY,query.getRepositories()));
+  }
+  if (!CollectionUtils.isEmpty(query.getSeverities())) {
+    filters.put(RuleIndexDefinition.FIELD_RULE_SEVERITY,FilterBuilders.termsFilter(RuleIndexDefinition.FIELD_RULE_SEVERITY,query.getSeverities()));
+  }
+  if (!StringUtils.isEmpty(query.getKey())) {
+    filters.put(RuleIndexDefinition.FIELD_RULE_KEY,FilterBuilders.termFilter(RuleIndexDefinition.FIELD_RULE_KEY,query.getKey()));
+  }
+  if (!CollectionUtils.isEmpty(query.getTags())) {
+    filters.put(RuleIndexDefinition.FIELD_RULE_ALL_TAGS,FilterBuilders.termsFilter(RuleIndexDefinition.FIELD_RULE_ALL_TAGS,query.getTags()));
+  }
+  if (query.getAvailableSinceLong() != null) {
+    filters.put("availableSince",FilterBuilders.rangeFilter(RuleIndexDefinition.FIELD_RULE_CREATED_AT).gte(query.getAvailableSinceLong()));
+  }
+  Collection<RuleStatus> statusValues=query.getStatuses();
+  if (statusValues != null && !statusValues.isEmpty()) {
+    Collection<String> stringStatus=new ArrayList<>();
+    for (    RuleStatus status : statusValues) {
+      stringStatus.add(status.name());
+    }
+    filters.put(RuleIndexDefinition.FIELD_RULE_STATUS,FilterBuilders.termsFilter(RuleIndexDefinition.FIELD_RULE_STATUS,stringStatus));
+  }
+  Boolean isTemplate=query.isTemplate();
+  if (isTemplate != null) {
+    filters.put(RuleIndexDefinition.FIELD_RULE_IS_TEMPLATE,FilterBuilders.termFilter(RuleIndexDefinition.FIELD_RULE_IS_TEMPLATE,Boolean.toString(isTemplate)));
+  }
+  String template=query.templateKey();
+  if (template != null) {
+    filters.put(RuleIndexDefinition.FIELD_RULE_TEMPLATE_KEY,FilterBuilders.termFilter(RuleIndexDefinition.FIELD_RULE_TEMPLATE_KEY,template));
+  }
+  BoolFilterBuilder childrenFilter=FilterBuilders.boolFilter();
+  this.addTermFilter(childrenFilter,ActiveRuleNormalizer.ActiveRuleField.PROFILE_KEY.field(),query.getQProfileKey());
+  this.addTermFilter(childrenFilter,ActiveRuleNormalizer.ActiveRuleField.INHERITANCE.field(),query.getInheritance());
+  this.addTermFilter(childrenFilter,ActiveRuleNormalizer.ActiveRuleField.SEVERITY.field(),query.getActiveSeverities());
+  FilterBuilder childQuery;
+  if (childrenFilter.hasClauses()) {
+    childQuery=childrenFilter;
+  }
+ else {
+    childQuery=FilterBuilders.matchAllFilter();
+  }
+  if (Boolean.TRUE.equals(query.getActivation())) {
+    filters.put("activation",FilterBuilders.hasChildFilter(IndexDefinition.ACTIVE_RULE.getIndexType(),childQuery));
+  }
+ else   if (Boolean.FALSE.equals(query.getActivation())) {
+    filters.put("activation",FilterBuilders.boolFilter().mustNot(FilterBuilders.hasChildFilter(IndexDefinition.ACTIVE_RULE.getIndexType(),childQuery)));
+  }
+  return filters;
+}

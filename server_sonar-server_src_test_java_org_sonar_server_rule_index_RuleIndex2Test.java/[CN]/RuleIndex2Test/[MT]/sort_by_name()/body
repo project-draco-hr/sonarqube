@@ -1,0 +1,9 @@
+{
+  indexRules(newDoc(RuleKey.of("java","S001")).setName("abcd"),newDoc(RuleKey.of("java","S002")).setName("ABC"),newDoc(RuleKey.of("java","S003")).setName("FGH"));
+  RuleQuery query=new RuleQuery().setSortField(RuleIndexDefinition.FIELD_RULE_NAME);
+  SearchIdResult<RuleKey> results=index.search(query,new SearchOptions());
+  assertThat(results.getIds()).containsExactly(RuleKey.of("java","S002"),RuleKey.of("java","S001"),RuleKey.of("java","S003"));
+  query=new RuleQuery().setSortField(RuleIndexDefinition.FIELD_RULE_NAME).setAscendingSort(false);
+  results=index.search(query,new SearchOptions());
+  assertThat(results.getIds()).containsExactly(RuleKey.of("java","S003"),RuleKey.of("java","S001"),RuleKey.of("java","S002"));
+}

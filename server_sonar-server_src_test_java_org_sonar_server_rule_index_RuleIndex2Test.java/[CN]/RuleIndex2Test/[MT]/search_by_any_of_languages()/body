@@ -1,0 +1,12 @@
+{
+  indexRules(newDoc(RuleKey.of("java","S001")).setLanguage("java"),newDoc(RuleKey.of("javascript","S002")).setLanguage("js"));
+  RuleQuery query=new RuleQuery().setLanguages(asList("cobol","js"));
+  SearchIdResult results=index.search(query,new SearchOptions());
+  assertThat(results.getIds()).containsOnly(RuleKey.of("javascript","S002"));
+  query=new RuleQuery().setLanguages(singletonList("cpp"));
+  assertThat(index.search(query,new SearchOptions()).getIds()).isEmpty();
+  query=new RuleQuery().setLanguages(Collections.<String>emptyList());
+  assertThat(index.search(query,new SearchOptions()).getIds()).hasSize(2);
+  query=new RuleQuery().setLanguages(null);
+  assertThat(index.search(query,new SearchOptions()).getIds()).hasSize(2);
+}

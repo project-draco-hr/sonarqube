@@ -1,0 +1,12 @@
+{
+  indexRules(newDoc(RuleKey.of("java","S001")).setSeverity(BLOCKER),newDoc(RuleKey.of("java","S002")).setSeverity(INFO));
+  RuleQuery query=new RuleQuery().setSeverities(asList(INFO,MINOR));
+  SearchIdResult results=index.search(query,new SearchOptions());
+  assertThat(results.getIds()).containsOnly(RuleKey.of("java","S002"));
+  query=new RuleQuery().setSeverities(singletonList(MINOR));
+  assertThat(index.search(query,new SearchOptions()).getIds()).isEmpty();
+  query=new RuleQuery().setSeverities(Collections.<String>emptyList());
+  assertThat(index.search(query,new SearchOptions()).getIds()).hasSize(2);
+  query=new RuleQuery().setSeverities(null);
+  assertThat(index.search(query,new SearchOptions()).getIds()).hasSize(2);
+}

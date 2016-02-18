@@ -1,0 +1,13 @@
+{
+  dbTester.prepareDbUnit(getClass(),"custom_rule.xml");
+  RuleResultSetIterator it=RuleResultSetIterator.create(dbTester.getDbClient(),dbTester.getSession(),0L);
+  Map<String,RuleDoc> rulesByKey=rulesByKey(it);
+  it.close();
+  assertThat(rulesByKey).hasSize(2);
+  RuleDoc rule=rulesByKey.get("S001");
+  assertThat(rule.isTemplate()).isTrue();
+  assertThat(rule.templateKey()).isNull();
+  rule=rulesByKey.get("S002");
+  assertThat(rule.isTemplate()).isFalse();
+  assertThat(rule.templateKey()).isEqualTo(RuleKey.of("xoo","S001"));
+}

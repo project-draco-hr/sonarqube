@@ -1,0 +1,16 @@
+{
+  indexRules(newDoc(RuleKey.of("php","S001")).setAllTags(singletonList("sysTag")),newDoc(RuleKey.of("php","S002")).setAllTags(singletonList("tag1")),newDoc(RuleKey.of("javascript","S002")).setAllTags(asList("tag1","tag2")));
+  RuleQuery query=new RuleQuery();
+  SearchIdResult result=index.search(query,new SearchOptions());
+  assertThat(result.getFacets().getAll()).isEmpty();
+  result=index.search(new RuleQuery().setQueryText("aeiou"),new SearchOptions().addFacets(singletonList("repositories")));
+  assertThat(result.getFacets().getAll()).hasSize(1);
+  assertThat(result.getFacets().getAll().get("repositories")).isEmpty();
+  result=index.search(query,new SearchOptions().addFacets(asList("repositories","tags")));
+  assertThat(result.getFacets()).isNotNull();
+  assertThat(result.getFacets().getAll()).hasSize(2);
+  Map<String,Long> repoFacets=result.getFacets().get("repositories");
+  assertThat(repoFacets).containsOnly(entry("php",2L),entry("javascript",1L));
+  Map<String,Long> tagFacets=result.getFacets().get("tags");
+  assertThat(tagFacets).containsOnly(entry("tag1",2L),entry("sysTag",1L),entry("tag2",1L));
+}

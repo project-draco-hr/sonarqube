@@ -1,0 +1,11 @@
+{
+  Map<String,AggregationBuilder> aggregations=new HashMap<>();
+  StickyFacetBuilder stickyFacetBuilder=stickyFacetBuilder(queryBuilder,filters);
+  addDefaultFacets(query,options,aggregations,stickyFacetBuilder);
+  addStatusFacetIfNeeded(options,aggregations,stickyFacetBuilder);
+  if (options.getFacets().contains(FACET_SEVERITIES)) {
+    aggregations.put(FACET_SEVERITIES,stickyFacetBuilder.buildStickyFacet(RuleIndexDefinition.FIELD_RULE_SEVERITY,FACET_SEVERITIES,Severity.ALL.toArray()));
+  }
+  addActiveSeverityFacetIfNeeded(query,options,aggregations,stickyFacetBuilder);
+  return aggregations;
+}

@@ -1,0 +1,11 @@
+{
+  indexRules(newDoc(RuleKey.of("java","S001")).setIsTemplate(true),newDoc(RuleKey.of("java","S001_MY_CUSTOM")).setTemplateKey("java:S001"));
+  RuleQuery query=new RuleQuery();
+  SearchIdResult results=index.search(query,new SearchOptions());
+  assertThat(results.getIds()).hasSize(2);
+  query=new RuleQuery().setTemplateKey("java:S001");
+  results=index.search(query,new SearchOptions());
+  assertThat(results.getIds()).containsOnly(RuleKey.of("java","S001_MY_CUSTOM"));
+  query=new RuleQuery().setTemplateKey(null);
+  assertThat(index.search(query,new SearchOptions()).getIds()).hasSize(2);
+}

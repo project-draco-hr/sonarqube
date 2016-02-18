@@ -1,0 +1,8 @@
+{
+  indexRules(newDoc(RuleKey.of("java","S001")).setCreatedAt(1000L),newDoc(RuleKey.of("java","S002")).setCreatedAt(2000L));
+  assertThat(index.search(new RuleQuery(),new SearchOptions()).getIds()).hasSize(2);
+  RuleQuery availableSinceQuery=new RuleQuery().setAvailableSince(2000L);
+  assertThat(index.search(availableSinceQuery,new SearchOptions()).getIds()).containsOnly(RuleKey.of("java","S002"));
+  RuleQuery availableSinceNowQuery=new RuleQuery().setAvailableSince(3000L);
+  assertThat(index.search(availableSinceNowQuery,new SearchOptions()).getIds()).hasSize(0);
+}

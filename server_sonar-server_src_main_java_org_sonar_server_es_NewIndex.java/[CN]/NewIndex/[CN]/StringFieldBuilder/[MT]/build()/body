@@ -1,14 +1,14 @@
 {
   validate();
   Map<String,Object> hash=new TreeMap<>();
-  if (!subFields.isEmpty()) {
+  if (subFields.isEmpty()) {
+    hash.putAll(ImmutableMap.of("type","string","index",disableSearch ? "no" : "not_analyzed","omit_norms","true","doc_values",docValues));
+  }
+ else {
     hash.put("type","multi_field");
     Map<String,Object> multiFields=new TreeMap<>(subFields);
     multiFields.put(fieldName,ImmutableMap.of("type","string","index","not_analyzed","omit_norms","true","doc_values",docValues));
     hash.put("fields",multiFields);
-  }
- else {
-    hash.putAll(ImmutableMap.of("type","string","index",disableSearch ? "no" : "not_analyzed","omit_norms","true","doc_values",docValues));
   }
   indexType.setProperty(fieldName,hash);
 }
