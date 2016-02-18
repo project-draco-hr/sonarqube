@@ -6,13 +6,13 @@
   }
 ;
   register(rules);
-  Rule templateRule=ruleIndex.getByKey(RuleKey.of("xoo","T1"));
-  RuleKey customRuleKey=TESTER.get(RuleCreator.class).create(NewRule.createForCustomRule("CUSTOM_RULE",templateRule.key()).setName("My custom").setHtmlDescription("Some description").setSeverity(Severity.MAJOR).setStatus(RuleStatus.READY).setParameters(ImmutableMap.of("format","txt")));
-  assertThat(ruleIndex.getByKey(customRuleKey).status()).isEqualTo(RuleStatus.READY);
+  RuleDto templateRule=ruleDao.selectOrFailByKey(dbSession,RuleKey.of("xoo","T1"));
+  RuleKey customRuleKey=TESTER.get(RuleCreator.class).create(NewRule.createForCustomRule("CUSTOM_RULE",templateRule.getKey()).setName("My custom").setHtmlDescription("Some description").setSeverity(Severity.MAJOR).setStatus(RuleStatus.READY).setParameters(ImmutableMap.of("format","txt")));
+  assertThat(ruleDao.selectOrFailByKey(dbSession,customRuleKey).getStatus()).isEqualTo(RuleStatus.READY);
   register(null);
-  assertThat(ruleIndex.getByKey(templateRule.key()).status()).isEqualTo(RuleStatus.REMOVED);
-  assertThat(ruleIndex.getByKey(customRuleKey).status()).isEqualTo(RuleStatus.REMOVED);
+  assertThat(ruleDao.selectOrFailByKey(dbSession,templateRule.getKey()).getStatus()).isEqualTo(RuleStatus.REMOVED);
+  assertThat(ruleDao.selectOrFailByKey(dbSession,customRuleKey).getStatus()).isEqualTo(RuleStatus.REMOVED);
   register(rules);
-  assertThat(ruleIndex.getByKey(templateRule.key()).status()).isEqualTo(RuleStatus.READY);
-  assertThat(ruleIndex.getByKey(customRuleKey).status()).isEqualTo(RuleStatus.READY);
+  assertThat(ruleDao.selectOrFailByKey(dbSession,templateRule.getKey()).getStatus()).isEqualTo(RuleStatus.READY);
+  assertThat(ruleDao.selectOrFailByKey(dbSession,customRuleKey).getStatus()).isEqualTo(RuleStatus.READY);
 }

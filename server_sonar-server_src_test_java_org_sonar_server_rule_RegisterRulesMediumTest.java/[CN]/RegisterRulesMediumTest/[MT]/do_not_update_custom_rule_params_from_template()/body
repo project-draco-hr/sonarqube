@@ -5,14 +5,14 @@
     }
   }
 );
-  Rule templateRule=ruleIndex.getByKey(RuleKey.of("xoo","T1"));
-  RuleKey customRuleKey=TESTER.get(RuleCreator.class).create(NewRule.createForCustomRule("CUSTOM_RULE",templateRule.key()).setName("My custom").setHtmlDescription("Some description").setSeverity(Severity.MAJOR).setStatus(RuleStatus.READY).setParameters(ImmutableMap.of("format","txt")));
+  RuleDto templateRule=ruleDao.selectOrFailByKey(dbSession,RuleKey.of("xoo","T1"));
+  RuleKey customRuleKey=TESTER.get(RuleCreator.class).create(NewRule.createForCustomRule("CUSTOM_RULE",templateRule.getKey()).setName("My custom").setHtmlDescription("Some description").setSeverity(Severity.MAJOR).setStatus(RuleStatus.READY).setParameters(ImmutableMap.of("format","txt")));
   register(new Rules(){
     @Override public void init(    RulesDefinition.NewRepository repository){
       repository.createRule("T1").setName("template1 name").setHtmlDescription("template1 desc").setSeverity(Severity.MAJOR).setTemplate(true).createParam("format2").setDefaultValue("csv").setType(RuleParamType.STRING).setDescription("format parameter");
     }
   }
 );
-  Rule customRuleReloaded=ruleIndex.getByKey(customRuleKey);
-  assertThat(customRuleReloaded.params().get(0).key()).isEqualTo("format");
+  List<RuleParamDto> customRuleParams=ruleDao.selectRuleParamsByRuleKey(dbSession,customRuleKey);
+  assertThat(customRuleParams.get(0).getName()).isEqualTo("format");
 }

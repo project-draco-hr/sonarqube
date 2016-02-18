@@ -1,0 +1,14 @@
+{
+  when(system.now()).thenReturn(DATE1.getTime());
+  execute(new FakeRepositoryV1());
+  when(system.now()).thenReturn(DATE2.getTime());
+  execute();
+  RuleDto rule=dbClient.ruleDao().selectOrFailByKey(dbTester.getSession(),RULE_KEY1);
+  assertThat(rule.getStatus()).isEqualTo(RuleStatus.REMOVED);
+  assertThat(ruleIndex.search(new RuleQuery().setKey(RULE_KEY1.toString()),new SearchOptions()).getTotal()).isEqualTo(0);
+  when(system.now()).thenReturn(DATE3.getTime());
+  execute(new FakeRepositoryV1());
+  rule=dbClient.ruleDao().selectOrFailByKey(dbTester.getSession(),RULE_KEY1);
+  assertThat(rule.getStatus()).isEqualTo(RuleStatus.BETA);
+  assertThat(ruleIndex.search(new RuleQuery().setKey(RULE_KEY1.toString()),new SearchOptions()).getTotal()).isEqualTo(1);
+}

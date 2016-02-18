@@ -1,20 +1,23 @@
 {
   execute(new FakeRepositoryV1());
-  assertThat(dbClient.deprecatedRuleDao().selectAll(dbTester.getSession())).hasSize(2);
-  RuleKey ruleKey1=RuleKey.of("fake","rule1");
-  RuleDto rule1=dbClient.deprecatedRuleDao().getNullableByKey(dbTester.getSession(),ruleKey1);
+  assertThat(dbClient.ruleDao().selectAll(dbTester.getSession())).hasSize(2);
+  RuleDto rule1=dbClient.ruleDao().selectOrFailByKey(dbTester.getSession(),RULE_KEY1);
   assertThat(rule1.getName()).isEqualTo("One");
   assertThat(rule1.getDescription()).isEqualTo("Description of One");
-  assertThat(rule1.getSeverityString()).isEqualTo(Severity.BLOCKER);
+  assertThat(rule1.getSeverityString()).isEqualTo(BLOCKER);
   assertThat(rule1.getTags()).isEmpty();
   assertThat(rule1.getSystemTags()).containsOnly("tag1","tag2","tag3");
   assertThat(rule1.getConfigKey()).isEqualTo("config1");
   assertThat(rule1.getStatus()).isEqualTo(RuleStatus.BETA);
   assertThat(rule1.getCreatedAt()).isEqualTo(DATE1);
   assertThat(rule1.getUpdatedAt()).isEqualTo(DATE1);
-  List<RuleParamDto> params=dbClient.deprecatedRuleDao().selectRuleParamsByRuleKey(dbTester.getSession(),ruleKey1);
+  assertThat(rule1.getDefaultRemediationFunction()).isEqualTo(DebtRemediationFunction.Type.LINEAR_OFFSET.name());
+  assertThat(rule1.getDefaultRemediationCoefficient()).isEqualTo("5d");
+  assertThat(rule1.getDefaultRemediationOffset()).isEqualTo("10h");
+  List<RuleParamDto> params=dbClient.ruleDao().selectRuleParamsByRuleKey(dbTester.getSession(),RULE_KEY1);
   assertThat(params).hasSize(2);
   RuleParamDto param=getParam(params,"param1");
   assertThat(param.getDescription()).isEqualTo("parameter one");
   assertThat(param.getDefaultValue()).isEqualTo("default1");
+  assertThat(ruleIndex.search(new RuleQuery(),new SearchOptions()).getIds()).containsOnly(RULE_KEY1,RULE_KEY2);
 }

@@ -1,10 +1,9 @@
 {
   execute(new FakeRepositoryV1());
-  assertThat(dbClient.deprecatedRuleDao().selectAll(dbTester.getSession())).hasSize(2);
+  assertThat(dbClient.ruleDao().selectAll(dbTester.getSession())).hasSize(2);
   when(system.now()).thenReturn(DATE2.getTime());
   execute(new FakeRepositoryV1());
-  RuleKey ruleKey1=RuleKey.of("fake","rule1");
-  RuleDto rule1=dbClient.deprecatedRuleDao().getNullableByKey(dbTester.getSession(),ruleKey1);
+  RuleDto rule1=dbClient.ruleDao().selectOrFailByKey(dbTester.getSession(),RULE_KEY1);
   assertThat(rule1.getCreatedAt()).isEqualTo(DATE1);
   assertThat(rule1.getUpdatedAt()).isEqualTo(DATE1);
 }

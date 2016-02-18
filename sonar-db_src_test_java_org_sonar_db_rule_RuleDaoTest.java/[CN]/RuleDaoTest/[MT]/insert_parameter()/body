@@ -1,0 +1,8 @@
+{
+  dbTester.prepareDbUnit(getClass(),"insert_parameter.xml");
+  RuleDto rule1=underTest.selectOrFailByKey(dbTester.getSession(),RuleKey.of("plugin","NewRuleKey"));
+  RuleParamDto param=RuleParamDto.createFor(rule1).setName("max").setType("INTEGER").setDefaultValue("30").setDescription("My Parameter");
+  underTest.insertRuleParam(dbTester.getSession(),rule1,param);
+  dbTester.getSession().commit();
+  dbTester.assertDbUnit(getClass(),"insert_parameter-result.xml","rules_parameters");
+}

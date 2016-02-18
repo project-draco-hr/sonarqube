@@ -1,0 +1,25 @@
+{
+  when(system.now()).thenReturn(DATE1.getTime());
+  execute(new RulesDefinition(){
+    @Override public void define(    Context context){
+      NewRepository repo=context.createRepository("fake","java");
+      repo.createRule("rule").setName("Name").setHtmlDescription("Desc1");
+      repo.done();
+    }
+  }
+);
+  when(system.now()).thenReturn(DATE2.getTime());
+  execute(new RulesDefinition(){
+    @Override public void define(    Context context){
+      NewRepository repo=context.createRepository("fake","java");
+      repo.createRule("rule").setName("Name").setHtmlDescription("Desc2");
+      repo.done();
+    }
+  }
+);
+  RuleDto rule1=dbClient.ruleDao().selectOrFailByKey(dbTester.getSession(),RuleKey.of("fake","rule"));
+  assertThat(rule1.getName()).isEqualTo("Name");
+  assertThat(rule1.getDescription()).isEqualTo("Desc2");
+  assertThat(ruleIndex.search(new RuleQuery().setQueryText("Desc2"),new SearchOptions()).getTotal()).isEqualTo(1);
+  assertThat(ruleIndex.search(new RuleQuery().setQueryText("Desc1"),new SearchOptions()).getTotal()).isEqualTo(0);
+}

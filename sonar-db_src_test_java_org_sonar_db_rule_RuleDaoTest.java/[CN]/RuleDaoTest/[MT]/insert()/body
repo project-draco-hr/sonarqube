@@ -1,9 +1,31 @@
 {
-  dbTester.getDbClient().ruleDao().insert(dbTester.getSession(),RuleTesting.newDto(RuleKey.of("java","S001")).setConfigKey(null));
-  dbTester.getDbClient().ruleDao().insert(dbTester.getSession(),RuleTesting.newDto(RuleKey.of("java","S002")).setConfigKey("I002"));
+  RuleDto newRule=new RuleDto().setRuleKey("NewRuleKey").setRepositoryKey("plugin").setName("new name").setDescription("new description").setDescriptionFormat(RuleDto.Format.MARKDOWN).setStatus(RuleStatus.DEPRECATED).setConfigKey("NewConfigKey").setSeverity(Severity.INFO).setIsTemplate(true).setLanguage("dart").setTemplateId(3).setNoteData("My note").setNoteUserLogin("admin").setNoteCreatedAt(DateUtils.parseDate("2013-12-19")).setNoteUpdatedAt(DateUtils.parseDate("2013-12-20")).setRemediationFunction(DebtRemediationFunction.Type.LINEAR.toString()).setDefaultRemediationFunction(DebtRemediationFunction.Type.LINEAR_OFFSET.toString()).setRemediationCoefficient("1h").setDefaultRemediationCoefficient("5d").setRemediationOffset("5min").setDefaultRemediationOffset("10h").setEffortToFixDescription("squid.S115.effortToFix").setCreatedAtInMs(1500000000000L).setUpdatedAtInMs(2000000000000L);
+  underTest.insert(dbTester.getSession(),newRule);
   dbTester.getSession().commit();
-  List<Map<String,Object>> rows=dbTester.select("select plugin_rule_key as \"ruleKey\" from rules order by plugin_rule_key");
-  assertThat(rows).hasSize(2);
-  assertThat(rows.get(0).get("ruleKey")).isEqualTo("S001");
-  assertThat(rows.get(1).get("ruleKey")).isEqualTo("S002");
+  RuleDto ruleDto=underTest.selectOrFailByKey(dbTester.getSession(),RuleKey.of("plugin","NewRuleKey"));
+  assertThat(ruleDto.getId()).isNotNull();
+  assertThat(ruleDto.getName()).isEqualTo("new name");
+  assertThat(ruleDto.getDescription()).isEqualTo("new description");
+  assertThat(ruleDto.getDescriptionFormat()).isEqualTo(RuleDto.Format.MARKDOWN);
+  assertThat(ruleDto.getStatus()).isEqualTo(RuleStatus.DEPRECATED);
+  assertThat(ruleDto.getRuleKey()).isEqualTo("NewRuleKey");
+  assertThat(ruleDto.getRepositoryKey()).isEqualTo("plugin");
+  assertThat(ruleDto.getConfigKey()).isEqualTo("NewConfigKey");
+  assertThat(ruleDto.getSeverity()).isEqualTo(0);
+  assertThat(ruleDto.getLanguage()).isEqualTo("dart");
+  assertThat(ruleDto.isTemplate()).isTrue();
+  assertThat(ruleDto.getTemplateId()).isEqualTo(3);
+  assertThat(ruleDto.getNoteData()).isEqualTo("My note");
+  assertThat(ruleDto.getNoteUserLogin()).isEqualTo("admin");
+  assertThat(ruleDto.getNoteCreatedAt()).isNotNull();
+  assertThat(ruleDto.getNoteUpdatedAt()).isNotNull();
+  assertThat(ruleDto.getRemediationFunction()).isEqualTo("LINEAR");
+  assertThat(ruleDto.getDefaultRemediationFunction()).isEqualTo("LINEAR_OFFSET");
+  assertThat(ruleDto.getRemediationCoefficient()).isEqualTo("1h");
+  assertThat(ruleDto.getDefaultRemediationCoefficient()).isEqualTo("5d");
+  assertThat(ruleDto.getRemediationOffset()).isEqualTo("5min");
+  assertThat(ruleDto.getDefaultRemediationOffset()).isEqualTo("10h");
+  assertThat(ruleDto.getEffortToFixDescription()).isEqualTo("squid.S115.effortToFix");
+  assertThat(ruleDto.getCreatedAtInMs()).isEqualTo(1500000000000L);
+  assertThat(ruleDto.getUpdatedAtInMs()).isEqualTo(2000000000000L);
 }

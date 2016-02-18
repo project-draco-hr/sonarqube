@@ -5,8 +5,8 @@
     }
   }
 );
-  Rule template=ruleIndex.getByKey(RuleKey.of("xoo","T1"));
-  RuleKey customRuleKey=TESTER.get(RuleCreator.class).create(NewRule.createForCustomRule("CUSTOM_RULE",template.key()).setName("My custom").setHtmlDescription("Some description").setSeverity(Severity.MAJOR).setStatus(RuleStatus.READY).setParameters(ImmutableMap.of("format","txt")));
+  RuleDto template=ruleDao.selectOrFailByKey(dbSession,RuleKey.of("xoo","T1"));
+  RuleKey customRuleKey=TESTER.get(RuleCreator.class).create(NewRule.createForCustomRule("CUSTOM_RULE",template.getKey()).setName("My custom").setHtmlDescription("Some description").setSeverity(Severity.MAJOR).setStatus(RuleStatus.READY).setParameters(ImmutableMap.of("format","txt")));
   register(new Rules(){
     @Override public void init(    RulesDefinition.NewRepository repository){
       RulesDefinition.NewRule rule=repository.createRule("T1").setName("template1 name").setHtmlDescription("template1 desc").setSeverity(Severity.BLOCKER).setStatus(RuleStatus.BETA).setTemplate(true).setInternalKey("new_internal");
@@ -14,11 +14,12 @@
     }
   }
 );
-  Rule customRule=ruleIndex.getByKey(customRuleKey);
-  assertThat(customRule.language()).isEqualTo("xoo");
-  assertThat(customRule.internalKey()).isEqualTo("new_internal");
-  assertThat(customRule.severity()).isEqualTo(Severity.BLOCKER);
-  assertThat(customRule.status()).isEqualTo(RuleStatus.BETA);
-  assertThat(customRule.debtRemediationFunction().type()).isEqualTo(DebtRemediationFunction.Type.LINEAR_OFFSET);
-  assertThat(customRule.effortToFixDescription()).isEqualTo("Effort");
+  RuleDto customRule=ruleDao.selectOrFailByKey(dbSession,customRuleKey);
+  assertThat(customRule.getLanguage()).isEqualTo("xoo");
+  assertThat(customRule.getConfigKey()).isEqualTo("new_internal");
+  assertThat(customRule.getSeverityString()).isEqualTo(Severity.BLOCKER);
+  assertThat(customRule.getStatus()).isEqualTo(RuleStatus.BETA);
+  assertThat(customRule.getDefaultRemediationFunction()).isEqualTo(DebtRemediationFunction.Type.LINEAR_OFFSET.name());
+  assertThat(customRule.getEffortToFixDescription()).isEqualTo("Effort");
+  assertThat(ruleIndex.search(new RuleQuery().setKey(customRuleKey.toString()),new SearchOptions()).getTotal()).isEqualTo(1);
 }

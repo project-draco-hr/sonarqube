@@ -5,21 +5,21 @@
     }
   }
 );
-  Rule rule=ruleIndex.getByKey(RuleTesting.XOO_X1);
-  assertThat(rule.systemTags()).containsOnly("tag1");
-  assertThat(rule.tags()).isEmpty();
+  RuleDto rule=ruleDao.selectOrFailByKey(dbSession,RuleTesting.XOO_X1);
+  assertThat(rule.getSystemTags()).containsOnly("tag1");
+  assertThat(rule.getTags()).isEmpty();
   TESTER.get(RuleUpdater.class).update(dbSession,RuleUpdate.createForPluginRule(RuleTesting.XOO_X1).setTags(newHashSet("tag2")),userSessionRule);
   dbSession.clearCache();
-  rule=ruleIndex.getByKey(RuleTesting.XOO_X1);
-  assertThat(rule.systemTags()).containsOnly("tag1");
-  assertThat(rule.tags()).containsOnly("tag2");
+  rule=ruleDao.selectOrFailByKey(dbSession,RuleTesting.XOO_X1);
+  assertThat(rule.getSystemTags()).containsOnly("tag1");
+  assertThat(rule.getTags()).containsOnly("tag2");
   register(new Rules(){
     @Override public void init(    RulesDefinition.NewRepository repository){
       repository.createRule("x1").setName("x1 name").setHtmlDescription("x1 desc").setTags("tag1","tag2");
     }
   }
 );
-  rule=ruleIndex.getByKey(RuleTesting.XOO_X1);
-  assertThat(rule.systemTags()).containsOnly("tag1","tag2");
-  assertThat(rule.tags()).isEmpty();
+  rule=ruleDao.selectOrFailByKey(dbSession,RuleTesting.XOO_X1);
+  assertThat(rule.getSystemTags()).containsOnly("tag1","tag2");
+  assertThat(rule.getTags()).isEmpty();
 }

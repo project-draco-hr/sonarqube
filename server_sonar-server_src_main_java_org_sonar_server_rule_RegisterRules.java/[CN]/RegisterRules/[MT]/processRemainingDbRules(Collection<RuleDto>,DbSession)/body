@@ -10,10 +10,12 @@
     }
   }
   for (  RuleDto customRule : customRules) {
-    RuleDto template=dbClient.deprecatedRuleDao().selectTemplate(customRule,session);
-    if (template != null && template.getStatus() != RuleStatus.REMOVED) {
-      if (updateCustomRuleFromTemplateRule(customRule,template)) {
-        dbClient.deprecatedRuleDao().update(session,customRule);
+    Integer templateId=customRule.getTemplateId();
+    checkNotNull(templateId,"Template id of the custom rule '%s' is null",customRule);
+    Optional<RuleDto> template=dbClient.ruleDao().selectById(templateId,session);
+    if (template.isPresent() && template.get().getStatus() != RuleStatus.REMOVED) {
+      if (updateCustomRuleFromTemplateRule(customRule,template.get())) {
+        update(session,customRule);
       }
     }
  else {

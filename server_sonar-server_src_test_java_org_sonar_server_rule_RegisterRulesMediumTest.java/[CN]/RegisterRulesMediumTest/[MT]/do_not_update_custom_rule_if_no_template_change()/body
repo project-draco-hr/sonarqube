@@ -6,10 +6,10 @@
   }
 ;
   register(rules);
-  Rule template=ruleIndex.getByKey(RuleKey.of("xoo","T1"));
-  RuleKey customRuleKey=TESTER.get(RuleCreator.class).create(NewRule.createForCustomRule("CUSTOM_RULE",template.key()).setName("My custom").setHtmlDescription("Some description").setSeverity(Severity.MAJOR).setStatus(RuleStatus.READY).setParameters(ImmutableMap.of("format","txt")));
-  Date updatedAt=ruleIndex.getByKey(customRuleKey).updatedAt();
+  RuleDto template=ruleDao.selectOrFailByKey(dbSession,RuleKey.of("xoo","T1"));
+  RuleKey customRuleKey=TESTER.get(RuleCreator.class).create(NewRule.createForCustomRule("CUSTOM_RULE",template.getKey()).setName("My custom").setHtmlDescription("Some description").setSeverity(Severity.MAJOR).setStatus(RuleStatus.READY).setParameters(ImmutableMap.of("format","txt")));
+  Long updatedAt=ruleDao.selectOrFailByKey(dbSession,customRuleKey).getUpdatedAtInMs();
   register(rules);
-  Rule customRuleReloaded=ruleIndex.getByKey(customRuleKey);
-  assertThat(customRuleReloaded.updatedAt()).isEqualTo(updatedAt);
+  RuleDto customRuleReloaded=ruleDao.selectOrFailByKey(dbSession,customRuleKey);
+  assertThat(customRuleReloaded.getUpdatedAtInMs()).isEqualTo(updatedAt);
 }

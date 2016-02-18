@@ -1,18 +1,21 @@
 {
   execute(new FakeRepositoryV1());
-  assertThat(dbClient.deprecatedRuleDao().selectAll(dbTester.getSession())).hasSize(2);
-  RuleDto rule2=dbClient.deprecatedRuleDao().getByKey(dbTester.getSession(),RuleKey.of("fake","rule2"));
+  assertThat(dbClient.ruleDao().selectAll(dbTester.getSession())).hasSize(2);
+  assertThat(esTester.getIds(RuleIndexDefinition.INDEX,RuleIndexDefinition.TYPE_RULE)).containsOnly(RULE_KEY1.toString(),RULE_KEY2.toString());
+  RuleDto rule2=dbClient.ruleDao().selectOrFailByKey(dbTester.getSession(),RULE_KEY2);
   assertThat(rule2.getStatus()).isEqualTo(RuleStatus.READY);
   when(system.now()).thenReturn(DATE2.getTime());
   execute(new FakeRepositoryV2());
-  dbClient.deprecatedRuleDao().update(dbTester.getSession(),dbClient.deprecatedRuleDao().getByKey(dbTester.getSession(),RuleKey.of("fake","rule1")));
+  dbClient.ruleDao().update(dbTester.getSession(),dbClient.ruleDao().selectOrFailByKey(dbTester.getSession(),RULE_KEY1));
   dbTester.getSession().commit();
-  rule2=dbClient.deprecatedRuleDao().getNullableByKey(dbTester.getSession(),RuleKey.of("fake","rule2"));
+  rule2=dbClient.ruleDao().selectOrFailByKey(dbTester.getSession(),RULE_KEY2);
   assertThat(rule2.getStatus()).isEqualTo(RuleStatus.REMOVED);
+  assertThat(ruleIndex.search(new RuleQuery(),new SearchOptions()).getIds()).containsOnly(RULE_KEY1,RULE_KEY3);
   when(system.now()).thenReturn(DATE3.getTime());
   execute(new FakeRepositoryV2());
   dbTester.getSession().commit();
-  rule2=dbClient.deprecatedRuleDao().getNullableByKey(dbTester.getSession(),RuleKey.of("fake","rule2"));
+  rule2=dbClient.ruleDao().selectOrFailByKey(dbTester.getSession(),RULE_KEY2);
   assertThat(rule2.getStatus()).isEqualTo(RuleStatus.REMOVED);
   assertThat(rule2.getUpdatedAt()).isEqualTo(DATE2);
+  assertThat(ruleIndex.search(new RuleQuery(),new SearchOptions()).getIds()).containsOnly(RULE_KEY1,RULE_KEY3);
 }
