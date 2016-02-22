@@ -1,0 +1,25 @@
+{
+  String value=null;
+  value=evaluateBean(bean,field);
+  if (!GenericValidator.isBlankOrNull(value)) {
+    try {
+      String minVar=Resources.getVarValue("min",field,validator,request,true);
+      String maxVar=Resources.getVarValue("max",field,validator,request,true);
+      int min=Integer.parseInt(minVar);
+      int max=Integer.parseInt(maxVar);
+      int intValue=Integer.parseInt(value);
+      if (min > max) {
+        throw new IllegalArgumentException(sysmsgs.getMessage("invalid.range",minVar,maxVar));
+      }
+      if (!GenericValidator.isInRange(intValue,min,max)) {
+        errors.add(field.getKey(),Resources.getActionMessage(validator,request,va,field));
+        return false;
+      }
+    }
+ catch (    Exception e) {
+      processFailure(errors,field,"intRange",e);
+      return false;
+    }
+  }
+  return true;
+}

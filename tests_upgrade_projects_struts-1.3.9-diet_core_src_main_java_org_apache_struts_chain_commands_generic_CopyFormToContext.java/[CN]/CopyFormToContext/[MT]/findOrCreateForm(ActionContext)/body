@@ -1,0 +1,20 @@
+{
+  String effectiveFormName;
+  String effectiveScope;
+  if (!(isEmpty(this.getActionPath()))) {
+    ActionConfig actionConfig=context.getModuleConfig().findActionConfig(this.getActionPath());
+    if (actionConfig == null) {
+      throw new IllegalArgumentException("No ActionConfig found for path " + this.getActionPath());
+    }
+    effectiveFormName=actionConfig.getName();
+    effectiveScope=actionConfig.getScope();
+  }
+ else {
+    effectiveFormName=this.getFormName();
+    effectiveScope=this.getScope();
+  }
+  if (isEmpty(effectiveScope) || isEmpty(effectiveFormName)) {
+    throw new IllegalStateException("Both scope [" + effectiveScope + "] and formName ["+ effectiveFormName+ "] must be defined.");
+  }
+  return findOrCreateForm(context,effectiveFormName,effectiveScope);
+}

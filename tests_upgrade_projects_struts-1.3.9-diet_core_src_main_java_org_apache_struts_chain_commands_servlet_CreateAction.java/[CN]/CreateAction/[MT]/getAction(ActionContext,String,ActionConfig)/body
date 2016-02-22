@@ -1,0 +1,23 @@
+{
+  ModuleConfig moduleConfig=actionConfig.getModuleConfig();
+  String actionsKey=Constants.ACTIONS_KEY + moduleConfig.getPrefix();
+  Map actions=(Map)context.getApplicationScope().get(actionsKey);
+  if (actions == null) {
+    actions=new HashMap();
+    context.getApplicationScope().put(actionsKey,actions);
+  }
+  Action action=null;
+synchronized (actions) {
+    action=(Action)actions.get(type);
+    if (action == null) {
+      action=createAction(context,type);
+      actions.put(type,action);
+    }
+  }
+  if (action.getServlet() == null) {
+    ServletActionContext saContext=(ServletActionContext)context;
+    ActionServlet actionServlet=saContext.getActionServlet();
+    action.setServlet(actionServlet);
+  }
+  return (action);
+}

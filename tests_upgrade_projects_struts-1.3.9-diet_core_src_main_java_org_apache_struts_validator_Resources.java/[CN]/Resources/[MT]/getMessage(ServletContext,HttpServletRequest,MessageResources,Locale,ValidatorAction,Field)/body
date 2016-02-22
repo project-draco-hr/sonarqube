@@ -1,0 +1,25 @@
+{
+  Msg msg=field.getMessage(va.getName());
+  if ((msg != null) && !msg.isResource()) {
+    return msg.getKey();
+  }
+  String msgKey=null;
+  String msgBundle=null;
+  MessageResources messages=defaultMessages;
+  if (msg == null) {
+    msgKey=va.getMsg();
+  }
+ else {
+    msgKey=msg.getKey();
+    msgBundle=msg.getBundle();
+    if (msg.getBundle() != null) {
+      messages=getMessageResources(application,request,msg.getBundle());
+    }
+  }
+  if ((msgKey == null) || (msgKey.length() == 0)) {
+    return "??? " + va.getName() + "."+ field.getProperty()+ " ???";
+  }
+  Arg[] args=field.getArgs(va.getName());
+  String[] argValues=getArgValues(application,request,messages,locale,args);
+  return messages.getMessage(locale,msgKey,argValues);
+}

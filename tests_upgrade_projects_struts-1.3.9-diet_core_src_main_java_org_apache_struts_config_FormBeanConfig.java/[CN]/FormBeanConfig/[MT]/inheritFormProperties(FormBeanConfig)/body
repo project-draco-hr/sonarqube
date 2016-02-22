@@ -1,0 +1,14 @@
+{
+  throwIfConfigured();
+  FormPropertyConfig[] baseFpcs=config.findFormPropertyConfigs();
+  for (int i=0; i < baseFpcs.length; i++) {
+    FormPropertyConfig baseFpc=baseFpcs[i];
+    FormPropertyConfig prop=this.findFormPropertyConfig(baseFpc.getName());
+    if (prop == null) {
+      prop=(FormPropertyConfig)RequestUtils.applicationInstance(baseFpc.getClass().getName());
+      BeanUtils.copyProperties(prop,baseFpc);
+      this.addFormPropertyConfig(prop);
+      prop.setProperties(baseFpc.copyProperties());
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  if (configured) {
+    throw new IllegalStateException("Configuration is frozen");
+  }
+  String ancestorName=getExtends();
+  if ((!extensionProcessed) && (ancestorName != null)) {
+    ForwardConfig baseConfig=null;
+    boolean checkActionConfig=(this != moduleConfig.findForwardConfig(getName()));
+    checkActionConfig&=(actionConfig != null);
+    checkActionConfig&=!ancestorName.equals(getName());
+    if (checkActionConfig) {
+      baseConfig=actionConfig.findForwardConfig(ancestorName);
+    }
+    if (baseConfig == null) {
+      baseConfig=moduleConfig.findForwardConfig(ancestorName);
+    }
+    if (baseConfig == null) {
+      throw new NullPointerException("Unable to find " + "forward '" + ancestorName + "' to extend.");
+    }
+    if (checkCircularInheritance(moduleConfig,actionConfig)) {
+      throw new IllegalArgumentException("Circular inheritance detected for forward " + getName());
+    }
+    if (!baseConfig.isExtensionProcessed()) {
+      baseConfig.processExtends(moduleConfig,actionConfig);
+    }
+    inheritFrom(baseConfig);
+  }
+  extensionProcessed=true;
+}

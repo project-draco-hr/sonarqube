@@ -1,0 +1,79 @@
+{
+  SelectTag selectTag=(SelectTag)pageContext.getAttribute(Constants.SELECT_KEY);
+  if (selectTag == null) {
+    throw new JspException(messages.getMessage("optionsTag.select"));
+  }
+  StringBuffer sb=new StringBuffer();
+  if (collection != null) {
+    Iterator collIterator=getIterator(collection,null);
+    while (collIterator.hasNext()) {
+      Object bean=collIterator.next();
+      Object value=null;
+      Object label=null;
+      try {
+        value=PropertyUtils.getProperty(bean,property);
+        if (value == null) {
+          value="";
+        }
+      }
+ catch (      IllegalAccessException e) {
+        throw new JspException(messages.getMessage("getter.access",property,collection));
+      }
+catch (      InvocationTargetException e) {
+        Throwable t=e.getTargetException();
+        throw new JspException(messages.getMessage("getter.result",property,t.toString()));
+      }
+catch (      NoSuchMethodException e) {
+        throw new JspException(messages.getMessage("getter.method",property,collection));
+      }
+      try {
+        if (labelProperty != null) {
+          label=PropertyUtils.getProperty(bean,labelProperty);
+        }
+ else {
+          label=value;
+        }
+        if (label == null) {
+          label="";
+        }
+      }
+ catch (      IllegalAccessException e) {
+        throw new JspException(messages.getMessage("getter.access",labelProperty,collection));
+      }
+catch (      InvocationTargetException e) {
+        Throwable t=e.getTargetException();
+        throw new JspException(messages.getMessage("getter.result",labelProperty,t.toString()));
+      }
+catch (      NoSuchMethodException e) {
+        throw new JspException(messages.getMessage("getter.method",labelProperty,collection));
+      }
+      String stringValue=value.toString();
+      addOption(sb,stringValue,label.toString(),selectTag.isMatched(stringValue));
+    }
+  }
+ else {
+    Iterator valuesIterator=getIterator(name,property);
+    Iterator labelsIterator=null;
+    if ((labelName != null) || (labelProperty != null)) {
+      labelsIterator=getIterator(labelName,labelProperty);
+    }
+    while (valuesIterator.hasNext()) {
+      Object valueObject=valuesIterator.next();
+      if (valueObject == null) {
+        valueObject="";
+      }
+      String value=valueObject.toString();
+      String label=value;
+      if ((labelsIterator != null) && labelsIterator.hasNext()) {
+        Object labelObject=labelsIterator.next();
+        if (labelObject == null) {
+          labelObject="";
+        }
+        label=labelObject.toString();
+      }
+      addOption(sb,value,label,selectTag.isMatched(value));
+    }
+  }
+  TagUtils.getInstance().write(pageContext,sb.toString());
+  return EVAL_PAGE;
+}

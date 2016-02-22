@@ -1,0 +1,22 @@
+{
+  ActionMessages actionErrors=new ActionMessages();
+  actionErrors.add("prop",new ActionMessage("key.key"));
+  request.setAttribute("errors",actionErrors);
+  try {
+    ActionMessages errors=tagutils.getActionMessages(pageContext,"errors");
+    assertNotNull("errors should not be null",errors);
+    assertNotNull("errors prop should not be null",errors.get("prop"));
+    String val=null;
+    int i=0;
+    for (Iterator iter=errors.get("prop"); iter.hasNext(); ) {
+      ActionMessage error=(ActionMessage)iter.next();
+      val=error.getKey();
+      i++;
+    }
+    assertEquals("only 1 error",i,1);
+    assertEquals("errors prop should match",val,"key.key");
+  }
+ catch (  JspException e) {
+    fail(e.getMessage());
+  }
+}

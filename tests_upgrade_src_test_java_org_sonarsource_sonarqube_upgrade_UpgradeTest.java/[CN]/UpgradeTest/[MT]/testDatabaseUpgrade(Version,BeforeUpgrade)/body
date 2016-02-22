@@ -1,0 +1,19 @@
+{
+  startServer(fromVersion,false);
+  scanProject();
+  int files=countFiles(PROJECT_KEY);
+  assertThat(files).isGreaterThan(0);
+  for (  BeforeUpgrade task : tasks) {
+    task.execute();
+  }
+  stopServer();
+  startServer(Version.create(Orchestrator.builderEnv().getSonarVersion()),true);
+  checkSystemStatus(ServerStatusResponse.Status.DB_MIGRATION_NEEDED);
+  upgradeDatabase();
+  checkSystemStatus(ServerStatusResponse.Status.UP);
+  assertThat(countFiles(PROJECT_KEY)).isEqualTo(files);
+  browseWebapp();
+  scanProject();
+  assertThat(countFiles(PROJECT_KEY)).isEqualTo(files);
+  browseWebapp();
+}

@@ -1,0 +1,26 @@
+{
+  if (log.isDebugEnabled()) {
+    log.debug("Initializing module path '" + config.getPrefix() + "' form beans");
+  }
+  FormBeanConfig[] formBeans=config.findFormBeanConfigs();
+  for (int i=0; i < formBeans.length; i++) {
+    FormBeanConfig beanConfig=formBeans[i];
+    processFormBeanExtension(beanConfig,config);
+  }
+  for (int i=0; i < formBeans.length; i++) {
+    FormBeanConfig formBean=formBeans[i];
+    if (formBean.getType() == null) {
+      handleValueRequiredException("type",formBean.getName(),"form bean");
+    }
+    FormPropertyConfig[] fpcs=formBean.findFormPropertyConfigs();
+    for (int j=0; j < fpcs.length; j++) {
+      FormPropertyConfig property=fpcs[j];
+      if (property.getType() == null) {
+        handleValueRequiredException("type",property.getName(),"form property");
+      }
+    }
+    if (formBean.getDynamic()) {
+      formBean.getDynaActionFormClass();
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  CustomFormBeanConfig customBase=new CustomFormBeanConfig();
+  customBase.setName("customBase");
+  moduleConfig.addFormBeanConfig(customBase);
+  FormBeanConfig customSub=new FormBeanConfig();
+  customSub.setName("customSub");
+  customSub.setExtends("customBase");
+  customSub.setType("org.apache.struts.action.DynaActionForm");
+  moduleConfig.addFormBeanConfig(customSub);
+  FormBeanConfig result=actionServlet.processFormBeanConfigClass(customSub,moduleConfig);
+  assertTrue("Incorrect class of form bean config",result instanceof CustomFormBeanConfig);
+  assertEquals("Incorrect name",customSub.getName(),result.getName());
+  assertEquals("Incorrect type",customSub.getType(),result.getType());
+  assertEquals("Incorrect extends",customSub.getExtends(),result.getExtends());
+  assertEquals("Incorrect 'restricted' value",customSub.isRestricted(),result.isRestricted());
+  assertSame("Result was not registered in the module config",result,moduleConfig.findFormBeanConfig("customSub"));
+}

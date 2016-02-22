@@ -1,0 +1,34 @@
+{
+  StringBuffer results=new StringBuffer();
+  ModuleConfig config=TagUtils.getInstance().getModuleConfig(pageContext);
+  ValidatorResources resources=(ValidatorResources)pageContext.getAttribute(ValidatorPlugIn.VALIDATOR_KEY + config.getPrefix(),PageContext.APPLICATION_SCOPE);
+  if (resources == null) {
+    throw new JspException("ValidatorResources not found in application scope under key \"" + ValidatorPlugIn.VALIDATOR_KEY + config.getPrefix()+ "\"");
+  }
+  Locale locale=TagUtils.getInstance().getUserLocale(this.pageContext,null);
+  Form form=null;
+  if ("true".equalsIgnoreCase(dynamicJavascript)) {
+    form=resources.getForm(locale,formName);
+    if (form == null) {
+      throw new JspException("No form found under '" + formName + "' in locale '"+ locale+ "'.  A form must be defined in the "+ "Commons Validator configuration when "+ "dynamicJavascript=\"true\" is set.");
+    }
+  }
+  if (form != null) {
+    if ("true".equalsIgnoreCase(dynamicJavascript)) {
+      results.append(this.createDynamicJavascript(config,resources,locale,form));
+    }
+ else     if ("true".equalsIgnoreCase(staticJavascript)) {
+      results.append(this.renderStartElement());
+      if ("true".equalsIgnoreCase(htmlComment)) {
+        results.append(HTML_BEGIN_COMMENT);
+      }
+    }
+  }
+  if ("true".equalsIgnoreCase(staticJavascript)) {
+    results.append(getJavascriptStaticMethods(resources));
+  }
+  if ((form != null) && ("true".equalsIgnoreCase(dynamicJavascript) || "true".equalsIgnoreCase(staticJavascript))) {
+    results.append(getJavascriptEnd());
+  }
+  return results.toString();
+}

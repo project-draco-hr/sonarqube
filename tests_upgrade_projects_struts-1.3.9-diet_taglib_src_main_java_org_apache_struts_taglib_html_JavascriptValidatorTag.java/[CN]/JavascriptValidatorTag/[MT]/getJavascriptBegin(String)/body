@@ -1,0 +1,38 @@
+{
+  StringBuffer sb=new StringBuffer();
+  String name=jsFormName.replace('/','_');
+  name=jsFormName.substring(0,1).toUpperCase() + jsFormName.substring(1,jsFormName.length());
+  sb.append(this.renderStartElement());
+  if (this.isXhtml() && "true".equalsIgnoreCase(this.cdata)) {
+    sb.append("//<![CDATA[\r\n");
+  }
+  if (!this.isXhtml() && "true".equals(htmlComment)) {
+    sb.append(HTML_BEGIN_COMMENT);
+  }
+  sb.append("\n    var bCancel = false; \n\n");
+  if ((methodName == null) || (methodName.length() == 0)) {
+    sb.append("    function validate" + name + "(form) { \n");
+  }
+ else {
+    sb.append("    function " + methodName + "(form) { \n");
+  }
+  sb.append("        if (bCancel) { \n");
+  sb.append("            return true; \n");
+  sb.append("        } else { \n");
+  if ((methods == null) || (methods.length() == 0)) {
+    sb.append("            return true; \n");
+  }
+ else {
+    sb.append("            var formValidationResult; \n");
+    sb.append("            formValidationResult = " + methods + "; \n");
+    if (methods.indexOf("&&") >= 0) {
+      sb.append("            return (formValidationResult); \n");
+    }
+ else {
+      sb.append("            return (formValidationResult == 1); \n");
+    }
+  }
+  sb.append("        } \n");
+  sb.append("    } \n\n");
+  return sb.toString();
+}

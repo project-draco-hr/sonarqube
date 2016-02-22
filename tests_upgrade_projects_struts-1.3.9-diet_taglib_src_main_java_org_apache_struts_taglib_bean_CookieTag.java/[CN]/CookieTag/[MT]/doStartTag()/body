@@ -1,0 +1,29 @@
+{
+  ArrayList values=new ArrayList();
+  Cookie[] cookies=((HttpServletRequest)pageContext.getRequest()).getCookies();
+  if (cookies == null) {
+    cookies=new Cookie[0];
+  }
+  for (int i=0; i < cookies.length; i++) {
+    if (name.equals(cookies[i].getName())) {
+      values.add(cookies[i]);
+    }
+  }
+  if ((values.size() < 1) && (value != null)) {
+    values.add(new Cookie(name,value));
+  }
+  if (values.size() < 1) {
+    JspException e=new JspException(messages.getMessage("cookie.get",name));
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw e;
+  }
+  if (multiple == null) {
+    Cookie cookie=(Cookie)values.get(0);
+    pageContext.setAttribute(id,cookie);
+  }
+ else {
+    cookies=new Cookie[values.size()];
+    pageContext.setAttribute(id,values.toArray(cookies));
+  }
+  return (SKIP_BODY);
+}

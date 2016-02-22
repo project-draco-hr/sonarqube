@@ -1,0 +1,19 @@
+{
+  Object bean=TagUtils.getInstance().lookup(this.pageContext,beanName,null);
+  if (bean == null) {
+    throw new JspException(messages.getMessage("getter.bean",beanName));
+  }
+  try {
+    return BeanUtils.getProperty(bean,property);
+  }
+ catch (  IllegalAccessException e) {
+    throw new JspException(messages.getMessage("getter.access",property,beanName));
+  }
+catch (  InvocationTargetException e) {
+    Throwable t=e.getTargetException();
+    throw new JspException(messages.getMessage("getter.result",property,t.toString()));
+  }
+catch (  NoSuchMethodException e) {
+    throw new JspException(messages.getMessage("getter.method",property,beanName));
+  }
+}

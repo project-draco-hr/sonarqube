@@ -1,0 +1,16 @@
+{
+  MockHttpServletRequest request=new MockHttpServletRequest("foo/","bar.do",null,null);
+  MockServletConfig servletConfig=new MockServletConfig();
+  MockServletContext servletContext=new MockServletContext();
+  MockActionServlet servlet=new MockActionServlet(servletContext,servletConfig);
+  servlet.initInternal();
+  ServletActionContext saContext=new ServletActionContext(servletContext,request,new MockHttpServletResponse());
+  saContext.setActionServlet(servlet);
+  boolean result=command.execute(saContext);
+  assertTrue(!result);
+  String uri=(String)request.getAttribute(Globals.ORIGINAL_URI_KEY);
+  assertTrue("Original uri not correct: " + uri,"bar.do".equals(uri));
+  request.setPathElements("foo/","bar2.do",null,null);
+  uri=(String)request.getAttribute(Globals.ORIGINAL_URI_KEY);
+  assertTrue("Original uri not correct: " + uri,"bar.do".equals(uri));
+}

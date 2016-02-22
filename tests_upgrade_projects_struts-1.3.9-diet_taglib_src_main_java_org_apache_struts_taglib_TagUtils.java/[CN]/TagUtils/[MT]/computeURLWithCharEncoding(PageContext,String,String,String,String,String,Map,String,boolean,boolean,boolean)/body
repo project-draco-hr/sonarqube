@@ -1,0 +1,156 @@
+{
+  String charEncoding="UTF-8";
+  if (useLocalEncoding) {
+    charEncoding=pageContext.getResponse().getCharacterEncoding();
+  }
+  int n=0;
+  if (forward != null) {
+    n++;
+  }
+  if (href != null) {
+    n++;
+  }
+  if (page != null) {
+    n++;
+  }
+  if (action != null) {
+    n++;
+  }
+  if (n != 1) {
+    throw new MalformedURLException(messages.getMessage("computeURL.specifier"));
+  }
+  ModuleConfig moduleConfig=getModuleConfig(module,pageContext);
+  StringBuffer url=new StringBuffer();
+  HttpServletRequest request=(HttpServletRequest)pageContext.getRequest();
+  if (forward != null) {
+    ForwardConfig forwardConfig=moduleConfig.findForwardConfig(forward);
+    if (forwardConfig == null) {
+      throw new MalformedURLException(messages.getMessage("computeURL.forward",forward));
+    }
+    if (forwardConfig.getPath().startsWith("/")) {
+      url.append(request.getContextPath());
+      url.append(RequestUtils.forwardURL(request,forwardConfig,moduleConfig));
+    }
+ else {
+      url.append(forwardConfig.getPath());
+    }
+  }
+ else   if (href != null) {
+    url.append(href);
+  }
+ else   if (action != null) {
+    ActionServlet servlet=(ActionServlet)pageContext.getServletContext().getAttribute(Globals.ACTION_SERVLET_KEY);
+    String actionIdPath=RequestUtils.actionIdURL(action,moduleConfig,servlet);
+    if (actionIdPath != null) {
+      action=actionIdPath;
+      url.append(request.getContextPath());
+      url.append(actionIdPath);
+    }
+ else {
+      url.append(instance.getActionMappingURL(action,module,pageContext,false));
+    }
+  }
+ else {
+    url.append(request.getContextPath());
+    url.append(this.pageURL(request,page,moduleConfig));
+  }
+  if (anchor != null) {
+    String temp=url.toString();
+    int hash=temp.indexOf('#');
+    if (hash >= 0) {
+      url.setLength(hash);
+    }
+    url.append('#');
+    url.append(this.encodeURL(anchor,charEncoding));
+  }
+  if ((params != null) && (params.size() > 0)) {
+    String temp=url.toString();
+    int hash=temp.indexOf('#');
+    if (hash >= 0) {
+      anchor=temp.substring(hash + 1);
+      url.setLength(hash);
+      temp=url.toString();
+    }
+ else {
+      anchor=null;
+    }
+    String separator=null;
+    if (redirect) {
+      separator="&";
+    }
+ else     if (encodeSeparator) {
+      separator="&amp;";
+    }
+ else {
+      separator="&";
+    }
+    boolean question=temp.indexOf('?') >= 0;
+    Iterator keys=params.keySet().iterator();
+    while (keys.hasNext()) {
+      String key=(String)keys.next();
+      Object value=params.get(key);
+      if (value == null) {
+        if (!question) {
+          url.append('?');
+          question=true;
+        }
+ else {
+          url.append(separator);
+        }
+        url.append(this.encodeURL(key,charEncoding));
+        url.append('=');
+      }
+ else       if (value instanceof String) {
+        if (!question) {
+          url.append('?');
+          question=true;
+        }
+ else {
+          url.append(separator);
+        }
+        url.append(this.encodeURL(key,charEncoding));
+        url.append('=');
+        url.append(this.encodeURL((String)value,charEncoding));
+      }
+ else       if (value instanceof String[]) {
+        String[] values=(String[])value;
+        for (int i=0; i < values.length; i++) {
+          if (!question) {
+            url.append('?');
+            question=true;
+          }
+ else {
+            url.append(separator);
+          }
+          url.append(this.encodeURL(key,charEncoding));
+          url.append('=');
+          url.append(this.encodeURL(values[i],charEncoding));
+        }
+      }
+ else {
+        if (!question) {
+          url.append('?');
+          question=true;
+        }
+ else {
+          url.append(separator);
+        }
+        url.append(this.encodeURL(key,charEncoding));
+        url.append('=');
+        url.append(this.encodeURL(value.toString(),charEncoding));
+      }
+    }
+    if (anchor != null) {
+      url.append('#');
+      url.append(this.encodeURL(anchor,charEncoding));
+    }
+  }
+  if ((href == null) && (pageContext.getSession() != null)) {
+    HttpServletResponse response=(HttpServletResponse)pageContext.getResponse();
+    if (redirect) {
+      return (response.encodeRedirectURL(url.toString()));
+    }
+    return (response.encodeURL(url.toString()));
+  }
+  return (url.toString());
+}

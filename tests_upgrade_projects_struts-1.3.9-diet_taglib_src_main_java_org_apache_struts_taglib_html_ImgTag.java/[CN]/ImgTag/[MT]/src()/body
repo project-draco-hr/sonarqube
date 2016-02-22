@@ -1,0 +1,42 @@
+{
+  if (this.page != null) {
+    if ((this.src != null) || (this.srcKey != null) || (this.pageKey != null)) {
+      throwImgTagSrcException();
+    }
+    ModuleConfig config=ModuleUtils.getInstance().getModuleConfig(this.module,(HttpServletRequest)pageContext.getRequest(),pageContext.getServletContext());
+    HttpServletRequest request=(HttpServletRequest)pageContext.getRequest();
+    String pageValue=this.page;
+    if (!srcDefaultReference(config)) {
+      pageValue=TagUtils.getInstance().pageURL(request,this.page,config);
+    }
+    return (request.getContextPath() + pageValue);
+  }
+  if (this.pageKey != null) {
+    if ((this.src != null) || (this.srcKey != null)) {
+      throwImgTagSrcException();
+    }
+    ModuleConfig config=ModuleUtils.getInstance().getModuleConfig(this.module,(HttpServletRequest)pageContext.getRequest(),pageContext.getServletContext());
+    HttpServletRequest request=(HttpServletRequest)pageContext.getRequest();
+    String pageValue=TagUtils.getInstance().message(pageContext,getBundle(),getLocale(),this.pageKey);
+    if (!srcDefaultReference(config)) {
+      pageValue=TagUtils.getInstance().pageURL(request,pageValue,config);
+    }
+    return (request.getContextPath() + pageValue);
+  }
+  if (this.action != null) {
+    if ((this.src != null) || (this.srcKey != null)) {
+      throwImgTagSrcException();
+    }
+    return TagUtils.getInstance().getActionMappingURL(action,module,pageContext,false);
+  }
+  if (this.src != null) {
+    if (this.srcKey != null) {
+      throwImgTagSrcException();
+    }
+    return (this.src);
+  }
+  if (this.srcKey == null) {
+    throwImgTagSrcException();
+  }
+  return TagUtils.getInstance().message(pageContext,getBundle(),getLocale(),this.srcKey);
+}

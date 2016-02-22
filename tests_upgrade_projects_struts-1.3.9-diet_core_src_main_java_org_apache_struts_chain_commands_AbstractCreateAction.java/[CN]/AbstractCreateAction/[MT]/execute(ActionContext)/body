@@ -1,0 +1,29 @@
+{
+  Boolean valid=actionCtx.getFormValid();
+  if ((valid == null) || !valid.booleanValue()) {
+    LOG.trace("Invalid form; not going to execute.");
+    return (false);
+  }
+  if (actionCtx.getAction() != null) {
+    LOG.trace("already have an action [" + actionCtx.getAction() + "]");
+    return (false);
+  }
+  ActionConfig actionConfig=actionCtx.getActionConfig();
+  String type=actionConfig.getType();
+  if (type == null) {
+    String command=actionConfig.getCommand();
+    if ((command == null) && (actionConfig.getForward() == null) && (actionConfig.getInclude() == null)) {
+      LOG.error("no type or command for " + actionConfig.getPath());
+    }
+ else {
+      LOG.trace("no type for " + actionConfig.getPath());
+    }
+    return (false);
+  }
+  Action action=getAction(actionCtx,type,actionConfig);
+  if (LOG.isTraceEnabled()) {
+    LOG.trace("setting action to " + action);
+  }
+  actionCtx.setAction(action);
+  return (false);
+}

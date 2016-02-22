@@ -1,0 +1,27 @@
+{
+  try {
+    if (!actionConfig.isExtensionProcessed()) {
+      if (log.isDebugEnabled()) {
+        log.debug("Processing extensions for '" + actionConfig.getPath() + "'");
+      }
+      actionConfig=processActionConfigClass(actionConfig,moduleConfig);
+      actionConfig.processExtends(moduleConfig);
+    }
+    ForwardConfig[] forwards=actionConfig.findForwardConfigs();
+    for (int i=0; i < forwards.length; i++) {
+      ForwardConfig forward=forwards[i];
+      processForwardExtension(forward,moduleConfig,actionConfig);
+    }
+    ExceptionConfig[] exceptions=actionConfig.findExceptionConfigs();
+    for (int i=0; i < exceptions.length; i++) {
+      ExceptionConfig exception=exceptions[i];
+      processExceptionExtension(exception,moduleConfig,actionConfig);
+    }
+  }
+ catch (  ServletException e) {
+    throw e;
+  }
+catch (  Exception e) {
+    handleGeneralExtensionException("Action",actionConfig.getPath(),e);
+  }
+}

@@ -1,0 +1,32 @@
+{
+  Object result=null;
+  String value=null;
+  value=evaluateBean(bean,field);
+  boolean isStrict=false;
+  String datePattern=Resources.getVarValue("datePattern",field,validator,request,false);
+  if (GenericValidator.isBlankOrNull(datePattern)) {
+    datePattern=Resources.getVarValue("datePatternStrict",field,validator,request,false);
+    if (!GenericValidator.isBlankOrNull(datePattern)) {
+      isStrict=true;
+    }
+  }
+  Locale locale=RequestUtils.getUserLocale(request,null);
+  if (GenericValidator.isBlankOrNull(value)) {
+    return Boolean.TRUE;
+  }
+  try {
+    if (GenericValidator.isBlankOrNull(datePattern)) {
+      result=GenericTypeValidator.formatDate(value,locale);
+    }
+ else {
+      result=GenericTypeValidator.formatDate(value,datePattern,isStrict);
+    }
+  }
+ catch (  Exception e) {
+    log.error(e.getMessage(),e);
+  }
+  if (result == null) {
+    errors.add(field.getKey(),Resources.getActionMessage(validator,request,va,field));
+  }
+  return (result == null) ? Boolean.FALSE : result;
+}

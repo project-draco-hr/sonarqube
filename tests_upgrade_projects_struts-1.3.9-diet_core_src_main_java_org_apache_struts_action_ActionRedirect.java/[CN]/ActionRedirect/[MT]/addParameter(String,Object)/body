@@ -1,0 +1,23 @@
+{
+  String value=(valueObj != null) ? valueObj.toString() : "";
+  if (parameterValues == null) {
+    initializeParameters();
+  }
+  value=ResponseUtils.encodeURL(value);
+  Object currentValue=parameterValues.get(fieldName);
+  if (currentValue == null) {
+    parameterValues.put(fieldName,value);
+  }
+ else   if (currentValue instanceof String) {
+    String[] newValue=new String[2];
+    newValue[0]=(String)currentValue;
+    newValue[1]=value;
+    parameterValues.put(fieldName,newValue);
+  }
+ else   if (currentValue instanceof String[]) {
+    List newValues=new ArrayList(Arrays.asList((Object[])currentValue));
+    newValues.add(value);
+    parameterValues.put(fieldName,newValues.toArray(new String[newValues.size()]));
+  }
+  return this;
+}

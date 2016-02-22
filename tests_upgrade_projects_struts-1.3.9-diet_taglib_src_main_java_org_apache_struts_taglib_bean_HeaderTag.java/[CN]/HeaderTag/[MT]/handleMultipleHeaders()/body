@@ -1,0 +1,17 @@
+{
+  ArrayList values=new ArrayList();
+  Enumeration items=((HttpServletRequest)pageContext.getRequest()).getHeaders(name);
+  while (items.hasMoreElements()) {
+    values.add(items.nextElement());
+  }
+  if (values.isEmpty() && (this.value != null)) {
+    values.add(this.value);
+  }
+  String[] headers=new String[values.size()];
+  if (headers.length == 0) {
+    JspException e=new JspException(messages.getMessage("header.get",name));
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw e;
+  }
+  pageContext.setAttribute(id,values.toArray(headers));
+}

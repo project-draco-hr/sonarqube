@@ -1,0 +1,15 @@
+{
+  RequestProcessor processor=this.getProcessorForModule(config);
+  if (processor == null) {
+    try {
+      processor=(RequestProcessor)RequestUtils.applicationInstance(config.getControllerConfig().getProcessorClass());
+    }
+ catch (    Exception e) {
+      throw new UnavailableException("Cannot initialize RequestProcessor of class " + config.getControllerConfig().getProcessorClass() + ": "+ e);
+    }
+    processor.init(this,config);
+    String key=Globals.REQUEST_PROCESSOR_KEY + config.getPrefix();
+    getServletContext().setAttribute(key,processor);
+  }
+  return (processor);
+}

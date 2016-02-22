@@ -1,0 +1,18 @@
+{
+  String path=baseConfig.getPath();
+  String module=actionBaseConfig.getModule();
+  boolean redirect=subConfig.getRedirect();
+  String inherit=subConfig.getExtends();
+  String name=subConfig.getName();
+  moduleConfig.addForwardConfig(baseConfig);
+  actionConfig.addForwardConfig(actionBaseConfig);
+  actionConfig.addForwardConfig(subConfig);
+  subConfig.processExtends(moduleConfig,actionConfig);
+  assertTrue("baseConfig's processExtends() should've been called",baseConfig.extensionProcessed);
+  assertTrue("actionBaseConfig's processExtends() should've been called",actionBaseConfig.extensionProcessed);
+  assertEquals("Path wasn't inherited",path,subConfig.getPath());
+  assertEquals("Module wasn't inherited",module,subConfig.getModule());
+  assertEquals("Name shouldn't have changed",name,subConfig.getName());
+  assertEquals("Extends shouldn't have changed",inherit,subConfig.getExtends());
+  assertEquals("Redirect shouldn't have changed",redirect,subConfig.getRedirect());
+}

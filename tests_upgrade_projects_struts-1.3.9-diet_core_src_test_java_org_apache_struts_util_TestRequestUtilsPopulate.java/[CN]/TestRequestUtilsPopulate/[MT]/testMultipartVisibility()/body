@@ -1,0 +1,23 @@
+{
+  String mockMappingName="mockMapping";
+  String stringValue="Test";
+  MockFormBean mockForm=new MockFormBean();
+  ActionMapping mapping=new ActionMapping();
+  mapping.setName(mockMappingName);
+  request.setMethod("POST");
+  request.setContentType("multipart/form-data");
+  request.setAttribute(Globals.MULTIPART_KEY,MockMultipartRequestHandler.class.getName());
+  request.setAttribute(Globals.MAPPING_KEY,mapping);
+  request.addParameter("stringProperty",stringValue);
+  request.addParameter("multipartRequestHandler.mapping.name","Bad");
+  assertNull("Multipart Handler already set",mockForm.getMultipartRequestHandler());
+  assertEquals("Mapping name not set correctly",mockMappingName,mapping.getName());
+  try {
+    RequestUtils.populate(mockForm,request);
+  }
+ catch (  ServletException se) {
+    assertEquals("Unexpected type of Exception thrown","BeanUtils.populate",se.getMessage());
+  }
+  assertNotNull("Multipart Handler Missing",mockForm.getMultipartRequestHandler());
+  assertEquals("Mapping name has been modified",mockMappingName,mapping.getName());
+}

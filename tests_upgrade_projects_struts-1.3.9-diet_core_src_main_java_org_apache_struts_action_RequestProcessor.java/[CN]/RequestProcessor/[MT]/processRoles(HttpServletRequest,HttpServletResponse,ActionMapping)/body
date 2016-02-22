@@ -1,0 +1,19 @@
+{
+  String[] roles=mapping.getRoleNames();
+  if ((roles == null) || (roles.length < 1)) {
+    return (true);
+  }
+  for (int i=0; i < roles.length; i++) {
+    if (request.isUserInRole(roles[i])) {
+      if (log.isDebugEnabled()) {
+        log.debug(" User '" + request.getRemoteUser() + "' has role '"+ roles[i]+ "', granting access");
+      }
+      return (true);
+    }
+  }
+  if (log.isDebugEnabled()) {
+    log.debug(" User '" + request.getRemoteUser() + "' does not have any required role, denying access");
+  }
+  response.sendError(HttpServletResponse.SC_FORBIDDEN,getInternal().getMessage("notAuthorized",mapping.getPath()));
+  return (false);
+}

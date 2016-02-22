@@ -1,0 +1,30 @@
+{
+  String rulesets=getServletConfig().getInitParameter("rulesets");
+  if (rulesets == null) {
+    rulesets="";
+  }
+  rulesets=rulesets.trim();
+  String ruleset;
+  while (rulesets.length() > 0) {
+    int comma=rulesets.indexOf(",");
+    if (comma < 0) {
+      ruleset=rulesets.trim();
+      rulesets="";
+    }
+ else {
+      ruleset=rulesets.substring(0,comma).trim();
+      rulesets=rulesets.substring(comma + 1).trim();
+    }
+    if (log.isDebugEnabled()) {
+      log.debug("Configuring custom Digester Ruleset of type " + ruleset);
+    }
+    try {
+      RuleSet instance=(RuleSet)RequestUtils.applicationInstance(ruleset);
+      this.configDigester.addRuleSet(instance);
+    }
+ catch (    Exception e) {
+      log.error("Exception configuring custom Digester RuleSet",e);
+      throw new ServletException(e);
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  StringBuffer sb=new StringBuffer("<html");
+  String language=null;
+  String country="";
+  Locale currentLocale=TagUtils.getInstance().getUserLocale(pageContext,Globals.LOCALE_KEY);
+  language=currentLocale.getLanguage();
+  country=currentLocale.getCountry();
+  boolean validLanguage=isValidRfc2616(language);
+  boolean validCountry=isValidRfc2616(country);
+  if (this.xhtml) {
+    this.pageContext.setAttribute(Globals.XHTML_KEY,"true",PageContext.PAGE_SCOPE);
+    sb.append(" xmlns=\"http://www.w3.org/1999/xhtml\"");
+  }
+  if ((this.lang || this.xhtml) && validLanguage) {
+    sb.append(" lang=\"");
+    sb.append(language);
+    if (validCountry) {
+      sb.append("-");
+      sb.append(country);
+    }
+    sb.append("\"");
+  }
+  if (this.xhtml && validLanguage) {
+    sb.append(" xml:lang=\"");
+    sb.append(language);
+    if (validCountry) {
+      sb.append("-");
+      sb.append(country);
+    }
+    sb.append("\"");
+  }
+  sb.append(">");
+  return sb.toString();
+}

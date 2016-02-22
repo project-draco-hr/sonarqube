@@ -1,0 +1,26 @@
+{
+  if (exception == null) {
+    return (false);
+  }
+  if (LOG.isDebugEnabled()) {
+    LOG.debug("Attempting to handle a thrown exception");
+  }
+  ActionContext actionCtx=(ActionContext)context;
+  actionCtx.setException(exception);
+  try {
+    Command command=lookupExceptionCommand();
+    if (command == null) {
+      LOG.error("Cannot find exceptionCommand '" + exceptionCommand + "'");
+      throw new IllegalStateException("Cannot find exceptionCommand '" + exceptionCommand + "'");
+    }
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Calling exceptionCommand '" + exceptionCommand + "'");
+    }
+    command.execute(context);
+  }
+ catch (  Exception e) {
+    LOG.warn("Exception from exceptionCommand '" + exceptionCommand + "'",e);
+    throw new IllegalStateException("Exception chain threw exception");
+  }
+  return (true);
+}

@@ -1,0 +1,18 @@
+{
+  Map scope=this.getScope(scopeName);
+  ActionForm instance;
+  FormBeanConfig formBeanConfig=moduleConfig.findFormBeanConfig(formName);
+  if (formBeanConfig == null) {
+    throw new IllegalArgumentException("No form config found under " + formName + " in module "+ moduleConfig.getPrefix());
+  }
+  instance=(ActionForm)scope.get(formName);
+  if (instance != null) {
+    getLogger().trace("Found an instance in scope " + scopeName + "; test for reusability");
+    if (formBeanConfig.canReuse(instance)) {
+      return instance;
+    }
+  }
+  ActionForm form=formBeanConfig.createActionForm(this);
+  scope.put(formName,form);
+  return form;
+}

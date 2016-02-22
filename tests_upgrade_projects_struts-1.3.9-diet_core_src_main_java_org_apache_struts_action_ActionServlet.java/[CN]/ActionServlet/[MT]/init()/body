@@ -1,0 +1,45 @@
+{
+  final String configPrefix="config/";
+  final int configPrefixLength=configPrefix.length() - 1;
+  try {
+    initInternal();
+    initOther();
+    initServlet();
+    initChain();
+    getServletContext().setAttribute(Globals.ACTION_SERVLET_KEY,this);
+    initModuleConfigFactory();
+    ModuleConfig moduleConfig=initModuleConfig("",config);
+    initModuleMessageResources(moduleConfig);
+    initModulePlugIns(moduleConfig);
+    initModuleFormBeans(moduleConfig);
+    initModuleForwards(moduleConfig);
+    initModuleExceptionConfigs(moduleConfig);
+    initModuleActions(moduleConfig);
+    moduleConfig.freeze();
+    Enumeration names=getServletConfig().getInitParameterNames();
+    while (names.hasMoreElements()) {
+      String name=(String)names.nextElement();
+      if (!name.startsWith(configPrefix)) {
+        continue;
+      }
+      String prefix=name.substring(configPrefixLength);
+      moduleConfig=initModuleConfig(prefix,getServletConfig().getInitParameter(name));
+      initModuleMessageResources(moduleConfig);
+      initModulePlugIns(moduleConfig);
+      initModuleFormBeans(moduleConfig);
+      initModuleForwards(moduleConfig);
+      initModuleExceptionConfigs(moduleConfig);
+      initModuleActions(moduleConfig);
+      moduleConfig.freeze();
+    }
+    this.initModulePrefixes(this.getServletContext());
+    this.destroyConfigDigester();
+  }
+ catch (  UnavailableException ex) {
+    throw ex;
+  }
+catch (  Throwable t) {
+    log.error("Unable to initialize Struts ActionServlet due to an " + "unexpected exception or error thrown, so marking the " + "servlet as unavailable.  Most likely, this is due to an "+ "incorrect or missing library dependency.",t);
+    throw new UnavailableException(t.getMessage());
+  }
+}

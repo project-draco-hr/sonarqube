@@ -1,0 +1,32 @@
+{
+  HttpServletRequest request=(HttpServletRequest)pageContext.getRequest();
+  String serverName=(this.server == null) ? request.getServerName() : this.server;
+  int port=request.getServerPort();
+  String headerHost=request.getHeader("Host");
+  if ((serverName == null) && (headerHost != null)) {
+    StringTokenizer tokenizer=new StringTokenizer(headerHost,":");
+    serverName=tokenizer.nextToken();
+    if (tokenizer.hasMoreTokens()) {
+      String portS=tokenizer.nextToken();
+      try {
+        port=Integer.parseInt(portS);
+      }
+ catch (      Exception e) {
+        port=80;
+      }
+    }
+ else {
+      port=80;
+    }
+  }
+  String baseTag=renderBaseElement(request.getScheme(),serverName,port,request.getRequestURI());
+  JspWriter out=pageContext.getOut();
+  try {
+    out.write(baseTag);
+  }
+ catch (  IOException e) {
+    pageContext.setAttribute(Globals.EXCEPTION_KEY,e,PageContext.REQUEST_SCOPE);
+    throw new JspException(messages.getMessage("common.io",e.toString()));
+  }
+  return EVAL_BODY_INCLUDE;
+}

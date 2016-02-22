@@ -1,0 +1,26 @@
+{
+  origName=super.getName();
+  origProperty=super.getProperty();
+  origParamProperty=super.getParamProperty();
+  boolean doProperty=((origProperty != null) && (origProperty.length() > 0));
+  boolean doParam=((origParamProperty != null) && (origParamProperty.length() > 0));
+  HttpServletRequest request=(HttpServletRequest)pageContext.getRequest();
+  boolean hasName=((getName() != null) && (getName().trim().length() > 0));
+  String currentName;
+  if (hasName) {
+    currentName=getName();
+  }
+ else {
+    currentName=NestedPropertyHelper.getCurrentName(request,this);
+  }
+  super.setName(currentName);
+  if (doProperty && !hasName) {
+    super.setProperty(NestedPropertyHelper.getAdjustedProperty(request,origProperty));
+  }
+  if (doParam) {
+    super.setName(null);
+    super.setParamName(currentName);
+    super.setParamProperty(NestedPropertyHelper.getAdjustedProperty(request,origParamProperty));
+  }
+  return super.doStartTag();
+}

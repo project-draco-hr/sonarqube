@@ -1,0 +1,23 @@
+{
+  ActionConfig actionConfig=actionCtx.getActionConfig();
+  if (!isAuthorizationRequired(actionConfig)) {
+    return (false);
+  }
+  boolean throwEx;
+  try {
+    throwEx=!(isAuthorized(actionCtx,actionConfig.getRoleNames(),actionConfig));
+  }
+ catch (  UnauthorizedActionException ex) {
+    throw ex;
+  }
+catch (  Exception ex) {
+    throwEx=true;
+    LOG.error("Unable to complete authorization process",ex);
+  }
+  if (throwEx) {
+    throw new UnauthorizedActionException(getErrorMessage(actionCtx,actionConfig));
+  }
+ else {
+    return (false);
+  }
+}

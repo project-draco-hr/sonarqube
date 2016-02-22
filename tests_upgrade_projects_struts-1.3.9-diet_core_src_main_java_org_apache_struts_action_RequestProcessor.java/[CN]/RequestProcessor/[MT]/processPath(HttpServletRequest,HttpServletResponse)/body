@@ -1,0 +1,28 @@
+{
+  String path;
+  path=(String)request.getAttribute(INCLUDE_PATH_INFO);
+  if (path == null) {
+    path=request.getPathInfo();
+  }
+  if ((path != null) && (path.length() > 0)) {
+    return (path);
+  }
+  path=(String)request.getAttribute(INCLUDE_SERVLET_PATH);
+  if (path == null) {
+    path=request.getServletPath();
+  }
+  String prefix=moduleConfig.getPrefix();
+  if (!path.startsWith(prefix)) {
+    String msg=getInternal().getMessage("processPath");
+    log.error(msg + " " + request.getRequestURI());
+    response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
+    return null;
+  }
+  path=path.substring(prefix.length());
+  int slash=path.lastIndexOf("/");
+  int period=path.lastIndexOf(".");
+  if ((period >= 0) && (period > slash)) {
+    path=path.substring(0,period);
+  }
+  return (path);
+}

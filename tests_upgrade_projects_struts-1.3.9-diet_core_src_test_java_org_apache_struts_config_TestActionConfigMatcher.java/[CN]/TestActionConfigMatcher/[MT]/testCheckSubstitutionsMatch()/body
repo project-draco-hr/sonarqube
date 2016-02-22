@@ -1,0 +1,34 @@
+{
+  ActionConfig[] configs=new ActionConfig[1];
+  ActionConfig mapping=buildActionConfig("/foo*");
+  configs[0]=mapping;
+  ActionConfigMatcher matcher=new ActionConfigMatcher(configs);
+  ActionConfig m=matcher.match("/fooBar");
+  assertTrue("Name hasn't been replaced","name,Bar".equals(m.getName()));
+  assertTrue("Path hasn't been replaced","/fooBar".equals(m.getPath()));
+  assertTrue("Scope isn't correct","request".equals(m.getScope()));
+  assertTrue("Unknown isn't correct",!m.getUnknown());
+  assertTrue("Validate isn't correct",m.getValidate());
+  assertTrue("Prefix hasn't been replaced","foo,Bar".equals(m.getPrefix()));
+  assertTrue("Suffix hasn't been replaced","bar,Bar".equals(m.getSuffix()));
+  assertTrue("Type hasn't been replaced","foo.bar.BarAction".equals(m.getType()));
+  assertTrue("Roles hasn't been replaced","public,Bar".equals(m.getRoles()));
+  assertTrue("Parameter hasn't been replaced","param,Bar".equals(m.getParameter()));
+  assertTrue("Attribute hasn't been replaced","attrib,Bar".equals(m.getAttribute()));
+  assertTrue("Forward hasn't been replaced","fwd,Bar".equals(m.getForward()));
+  assertTrue("Include hasn't been replaced","include,Bar".equals(m.getInclude()));
+  assertTrue("Input hasn't been replaced","input,Bar".equals(m.getInput()));
+  assertTrue("ActionConfig property not replaced","testBar".equals(m.getProperty("testprop2")));
+  ForwardConfig[] fConfigs=m.findForwardConfigs();
+  boolean found=false;
+  for (int x=0; x < fConfigs.length; x++) {
+    ForwardConfig cfg=fConfigs[x];
+    if ("name".equals(cfg.getName())) {
+      found=true;
+      assertTrue("Path hasn't been replaced","path,Bar".equals(cfg.getPath()));
+      assertTrue("Property foo hasn't been replaced","bar,Bar".equals(cfg.getProperty("foo")));
+      assertTrue("Module hasn't been replaced","modBar".equals(cfg.getModule()));
+    }
+  }
+  assertTrue("The forward config 'name' cannot be found",found);
+}

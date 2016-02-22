@@ -1,0 +1,86 @@
+{
+  if (url == null) {
+    return (url);
+  }
+  String charEncoding="UTF-8";
+  if (useLocalEncoding) {
+    charEncoding=pageContext.getResponse().getCharacterEncoding();
+  }
+  StringBuffer src=new StringBuffer(url);
+  if ((paramId != null) && (paramName != null)) {
+    if (src.toString().indexOf('?') < 0) {
+      src.append('?');
+    }
+ else {
+      src.append("&amp;");
+    }
+    src.append(paramId);
+    src.append('=');
+    Object value=TagUtils.getInstance().lookup(pageContext,paramName,paramProperty,paramScope);
+    if (value != null) {
+      src.append(TagUtils.getInstance().encodeURL(value.toString(),charEncoding));
+    }
+  }
+  if ((property != null) && (name == null)) {
+    JspException e=new JspException(messages.getMessage("getter.name"));
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw e;
+  }
+  if (name == null) {
+    return (src.toString());
+  }
+  Object mapObject=TagUtils.getInstance().lookup(pageContext,name,property,scope);
+  Map map=null;
+  try {
+    map=(Map)mapObject;
+  }
+ catch (  ClassCastException e) {
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw new JspException(messages.getMessage("imgTag.type"));
+  }
+  boolean question=(src.toString().indexOf("?") >= 0);
+  Iterator keys=map.keySet().iterator();
+  while (keys.hasNext()) {
+    String key=(String)keys.next();
+    Object value=map.get(key);
+    if (value == null) {
+      if (question) {
+        src.append("&amp;");
+      }
+ else {
+        src.append('?');
+        question=true;
+      }
+      src.append(key);
+      src.append('=');
+    }
+ else     if (value instanceof String[]) {
+      String[] values=(String[])value;
+      for (int i=0; i < values.length; i++) {
+        if (question) {
+          src.append("&amp;");
+        }
+ else {
+          src.append('?');
+          question=true;
+        }
+        src.append(key);
+        src.append('=');
+        src.append(TagUtils.getInstance().encodeURL(values[i],charEncoding));
+      }
+    }
+ else {
+      if (question) {
+        src.append("&amp;");
+      }
+ else {
+        src.append('?');
+        question=true;
+      }
+      src.append(key);
+      src.append('=');
+      src.append(TagUtils.getInstance().encodeURL(value.toString(),charEncoding));
+    }
+  }
+  return (src.toString());
+}

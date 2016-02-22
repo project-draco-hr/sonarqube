@@ -1,0 +1,44 @@
+{
+  if (this.page != null) {
+    if ((this.src != null) || (this.srcKey != null) || (this.pageKey != null)) {
+      JspException e=new JspException(messages.getMessage("imgTag.src"));
+      TagUtils.getInstance().saveException(pageContext,e);
+      throw e;
+    }
+    HttpServletRequest request=(HttpServletRequest)pageContext.getRequest();
+    ModuleConfig config=ModuleUtils.getInstance().getModuleConfig(this.module,request,pageContext.getServletContext());
+    String pageValue=this.page;
+    if (config != null) {
+      pageValue=TagUtils.getInstance().pageURL(request,this.page,config);
+    }
+    return (request.getContextPath() + pageValue);
+  }
+  if (this.pageKey != null) {
+    if ((this.src != null) || (this.srcKey != null)) {
+      JspException e=new JspException(messages.getMessage("imgTag.src"));
+      TagUtils.getInstance().saveException(pageContext,e);
+      throw e;
+    }
+    HttpServletRequest request=(HttpServletRequest)pageContext.getRequest();
+    ModuleConfig config=ModuleUtils.getInstance().getModuleConfig(this.module,request,pageContext.getServletContext());
+    String pageValue=TagUtils.getInstance().message(pageContext,getBundle(),getLocale(),this.pageKey);
+    if (config != null) {
+      pageValue=TagUtils.getInstance().pageURL(request,pageValue,config);
+    }
+    return (request.getContextPath() + pageValue);
+  }
+  if (this.src != null) {
+    if (this.srcKey != null) {
+      JspException e=new JspException(messages.getMessage("imgTag.src"));
+      TagUtils.getInstance().saveException(pageContext,e);
+      throw e;
+    }
+    return (this.src);
+  }
+  if (this.srcKey == null) {
+    JspException e=new JspException(messages.getMessage("imgTag.src"));
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw e;
+  }
+  return TagUtils.getInstance().message(pageContext,getBundle(),getLocale(),this.srcKey);
+}

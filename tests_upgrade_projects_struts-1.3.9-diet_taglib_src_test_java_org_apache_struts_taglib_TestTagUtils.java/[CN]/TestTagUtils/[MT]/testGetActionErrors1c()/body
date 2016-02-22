@@ -1,0 +1,23 @@
+{
+  String[] vals=new String[]{"bar","baz"};
+  request.setAttribute("foo",vals);
+  try {
+    ActionMessages errors=tagutils.getActionMessages(pageContext,"foo");
+    assertNotNull("errors should not be null",errors);
+    assertNotNull("errors prop should not be null",errors.get("prop"));
+    String key=null;
+    int i=0;
+    for (Iterator iter=errors.get(ActionMessages.GLOBAL_MESSAGE); iter.hasNext(); ) {
+      ActionMessage error=(ActionMessage)iter.next();
+      key=error.getKey();
+      Object[] values=error.getValues();
+      assertNull((values));
+      assertEquals("1st key should match",key,vals[i]);
+      i++;
+    }
+    assertEquals("only 1 error",i,2);
+  }
+ catch (  JspException e) {
+    fail(e.getMessage());
+  }
+}

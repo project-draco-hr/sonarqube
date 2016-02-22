@@ -1,0 +1,35 @@
+{
+  String ancestor=actionConfig.getExtends();
+  if (ancestor == null) {
+    return actionConfig;
+  }
+  ActionConfig baseConfig=moduleConfig.findActionConfig(ancestor);
+  if (baseConfig == null) {
+    throw new UnavailableException("Unable to find " + "action config for '" + ancestor + "' to extend.");
+  }
+  if (actionConfig.getClass().equals(ActionMapping.class)) {
+    if (!baseConfig.getClass().equals(actionConfig.getClass())) {
+      ActionConfig newActionConfig=null;
+      String baseConfigClassName=baseConfig.getClass().getName();
+      try {
+        newActionConfig=(ActionConfig)RequestUtils.applicationInstance(baseConfigClassName);
+        BeanUtils.copyProperties(newActionConfig,actionConfig);
+        ForwardConfig[] forwards=actionConfig.findForwardConfigs();
+        for (int i=0; i < forwards.length; i++) {
+          newActionConfig.addForwardConfig(forwards[i]);
+        }
+        ExceptionConfig[] exceptions=actionConfig.findExceptionConfigs();
+        for (int i=0; i < exceptions.length; i++) {
+          newActionConfig.addExceptionConfig(exceptions[i]);
+        }
+      }
+ catch (      Exception e) {
+        handleCreationException(baseConfigClassName,e);
+      }
+      moduleConfig.removeActionConfig(actionConfig);
+      moduleConfig.addActionConfig(newActionConfig);
+      actionConfig=newActionConfig;
+    }
+  }
+  return actionConfig;
+}

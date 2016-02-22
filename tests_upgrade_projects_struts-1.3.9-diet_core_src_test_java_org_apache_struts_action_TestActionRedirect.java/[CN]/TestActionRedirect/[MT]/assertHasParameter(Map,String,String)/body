@@ -1,0 +1,23 @@
+{
+  Object value=parameters.get(paramName);
+  if (value == null) {
+    throw new AssertionFailedError("Parameter [" + paramName + "] not found");
+  }
+  if (value instanceof String) {
+    if (!paramValue.equals(value)) {
+      throw new ComparisonFailure("Incorrect value found",paramValue,(String)value);
+    }
+  }
+ else   if (value instanceof String[]) {
+    String[] values=(String[])value;
+    for (int i=0; i < values.length; i++) {
+      if (paramValue.equals(values[i])) {
+        return;
+      }
+    }
+    throw new AssertionFailedError("Expected value not found for parameter [" + paramName + "]");
+  }
+ else {
+    throw new AssertionFailedError("Unexpected type found as parameter value for [" + paramName + "]");
+  }
+}

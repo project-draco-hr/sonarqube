@@ -1,0 +1,30 @@
+{
+  Boolean valid=actionCtx.getFormValid();
+  if ((valid != null) && valid.booleanValue()) {
+    return (false);
+  }
+  ActionConfig actionConfig=actionCtx.getActionConfig();
+  ModuleConfig moduleConfig=actionConfig.getModuleConfig();
+  ForwardConfig forwardConfig;
+  String input=actionConfig.getInput();
+  if (moduleConfig.getControllerConfig().getInputForward()) {
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Finding ForwardConfig for '" + input + "'");
+    }
+    forwardConfig=actionConfig.findForwardConfig(input);
+    if (forwardConfig == null) {
+      forwardConfig=moduleConfig.findForwardConfig(input);
+    }
+  }
+ else {
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Delegating to forward() for '" + input + "'");
+    }
+    forwardConfig=forward(actionCtx,moduleConfig,input);
+  }
+  if (LOG.isDebugEnabled()) {
+    LOG.debug("Forwarding back to " + forwardConfig);
+  }
+  actionCtx.setForwardConfig(forwardConfig);
+  return (false);
+}

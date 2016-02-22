@@ -1,0 +1,28 @@
+{
+  if (multiple == null) {
+    String value=pageContext.getRequest().getParameter(name);
+    if ((value == null) && (this.value != null)) {
+      value=this.value;
+    }
+    if (value == null) {
+      JspException e=new JspException(messages.getMessage("parameter.get",name));
+      TagUtils.getInstance().saveException(pageContext,e);
+      throw e;
+    }
+    pageContext.setAttribute(id,value);
+    return (SKIP_BODY);
+  }
+  String[] values=pageContext.getRequest().getParameterValues(name);
+  if ((values == null) || (values.length == 0)) {
+    if (this.value != null) {
+      values=new String[]{this.value};
+    }
+  }
+  if ((values == null) || (values.length == 0)) {
+    JspException e=new JspException(messages.getMessage("parameter.get",name));
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw e;
+  }
+  pageContext.setAttribute(id,values);
+  return (SKIP_BODY);
+}

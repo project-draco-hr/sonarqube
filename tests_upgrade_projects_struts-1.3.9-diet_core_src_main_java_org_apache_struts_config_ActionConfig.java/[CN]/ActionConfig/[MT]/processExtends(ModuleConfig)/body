@@ -1,0 +1,20 @@
+{
+  if (configured) {
+    throw new IllegalStateException("Configuration is frozen");
+  }
+  String ancestorPath=getExtends();
+  if ((!extensionProcessed) && (ancestorPath != null)) {
+    ActionConfig baseConfig=moduleConfig.findActionConfig(ancestorPath);
+    if (baseConfig == null) {
+      throw new NullPointerException("Unable to find " + "action for '" + ancestorPath + "' to extend.");
+    }
+    if (checkCircularInheritance(moduleConfig)) {
+      throw new IllegalArgumentException("Circular inheritance detected for action " + getPath());
+    }
+    if (!baseConfig.isExtensionProcessed()) {
+      baseConfig.processExtends(moduleConfig);
+    }
+    inheritFrom(baseConfig);
+  }
+  extensionProcessed=true;
+}

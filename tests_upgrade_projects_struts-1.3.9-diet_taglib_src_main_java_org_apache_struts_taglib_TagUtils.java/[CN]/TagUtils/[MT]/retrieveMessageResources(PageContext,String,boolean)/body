@@ -1,0 +1,25 @@
+{
+  MessageResources resources=null;
+  if (bundle == null) {
+    bundle=Globals.MESSAGES_KEY;
+  }
+  if (checkPageScope) {
+    resources=(MessageResources)pageContext.getAttribute(bundle,PageContext.PAGE_SCOPE);
+  }
+  if (resources == null) {
+    resources=(MessageResources)pageContext.getAttribute(bundle,PageContext.REQUEST_SCOPE);
+  }
+  if (resources == null) {
+    ModuleConfig moduleConfig=getModuleConfig(pageContext);
+    resources=(MessageResources)pageContext.getAttribute(bundle + moduleConfig.getPrefix(),PageContext.APPLICATION_SCOPE);
+  }
+  if (resources == null) {
+    resources=(MessageResources)pageContext.getAttribute(bundle,PageContext.APPLICATION_SCOPE);
+  }
+  if (resources == null) {
+    JspException e=new JspException(messages.getMessage("message.bundle",bundle));
+    saveException(pageContext,e);
+    throw e;
+  }
+  return resources;
+}

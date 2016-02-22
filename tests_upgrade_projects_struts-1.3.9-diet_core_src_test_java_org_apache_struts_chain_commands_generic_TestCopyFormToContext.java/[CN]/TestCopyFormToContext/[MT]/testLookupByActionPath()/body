@@ -1,0 +1,16 @@
+{
+  CopyFormToContext command=new CopyFormToContext();
+  command.setActionPath("/Test");
+  command.setToKey(POST_EXECUTION_CONTEXT_KEY);
+  String formName="foo";
+  assertNull(context.get(POST_EXECUTION_CONTEXT_KEY));
+  assertNull(context.getRequestScope().get(formName));
+  assertNull(context.getSessionScope().get(formName));
+  command.execute(context);
+  assertNotNull(context.get(POST_EXECUTION_CONTEXT_KEY));
+  assertNotNull(context.getRequestScope().get(formName));
+  assertNull(context.getSessionScope().get(formName));
+  assertSame(context.get(POST_EXECUTION_CONTEXT_KEY),context.getRequestScope().get(formName));
+  ActionForm theForm=(ActionForm)context.get(POST_EXECUTION_CONTEXT_KEY);
+  assertTrue(theForm instanceof MockFormBean);
+}

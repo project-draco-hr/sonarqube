@@ -1,0 +1,11 @@
+{
+  String jdbcUrl=conf.getString("sonar.jdbc.url");
+  if (jdbcUrl.startsWith("jdbc:sqlserver:") && !sqVersion.isGreaterThanOrEquals("5.2")) {
+    String host=StringUtils.substringBetween(jdbcUrl,"jdbc:sqlserver://",";databaseName=");
+    String db=StringUtils.substringAfter(jdbcUrl,"databaseName=");
+    jdbcUrl="jdbc:jtds:sqlserver://" + host + "/"+ db;
+    System.out.println("Replaced JDBC url to: " + jdbcUrl);
+    return jdbcUrl;
+  }
+  return jdbcUrl;
+}

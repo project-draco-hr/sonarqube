@@ -1,0 +1,50 @@
+{
+  this.servletName=getServletConfig().getServletName();
+  Digester digester=new Digester();
+  digester.push(this);
+  digester.setNamespaceAware(true);
+  digester.setValidating(false);
+  for (int i=0; i < registrations.length; i+=2) {
+    URL url=this.getClass().getResource(registrations[i + 1]);
+    if (url != null) {
+      digester.register(registrations[i],url.toString());
+    }
+  }
+  digester.addCallMethod("web-app/servlet-mapping","addServletMapping",2);
+  digester.addCallParam("web-app/servlet-mapping/servlet-name",0);
+  digester.addCallParam("web-app/servlet-mapping/url-pattern",1);
+  if (log.isDebugEnabled()) {
+    log.debug("Scanning web.xml for controller servlet mapping");
+  }
+  InputStream input=getServletContext().getResourceAsStream("/WEB-INF/web.xml");
+  if (input == null) {
+    log.error(internal.getMessage("configWebXml"));
+    throw new ServletException(internal.getMessage("configWebXml"));
+  }
+  try {
+    digester.parse(input);
+  }
+ catch (  IOException e) {
+    log.error(internal.getMessage("configWebXml"),e);
+    throw new ServletException(e);
+  }
+catch (  SAXException e) {
+    log.error(internal.getMessage("configWebXml"),e);
+    throw new ServletException(e);
+  }
+ finally {
+    try {
+      input.close();
+    }
+ catch (    IOException e) {
+      log.error(internal.getMessage("configWebXml"),e);
+      throw new ServletException(e);
+    }
+  }
+  if (log.isDebugEnabled()) {
+    log.debug("Mapping for servlet '" + servletName + "' = '"+ servletMapping+ "'");
+  }
+  if (servletMapping != null) {
+    getServletContext().setAttribute(Globals.SERVLET_KEY,servletMapping);
+  }
+}

@@ -1,0 +1,22 @@
+{
+  this.config=config;
+  try {
+    beanClass=RequestUtils.applicationClass(config.getType());
+  }
+ catch (  Throwable t) {
+    throw new IllegalArgumentException("Cannot instantiate ActionFormBean class '" + config.getType() + "': "+ t);
+  }
+  if (!DynaActionForm.class.isAssignableFrom(beanClass)) {
+    throw new IllegalArgumentException("Class '" + config.getType() + "' is not a subclass of "+ "'org.apache.struts.action.DynaActionForm'");
+  }
+  this.name=config.getName();
+  FormPropertyConfig[] descriptors=config.findFormPropertyConfigs();
+  if (descriptors == null) {
+    descriptors=new FormPropertyConfig[0];
+  }
+  properties=new DynaProperty[descriptors.length];
+  for (int i=0; i < descriptors.length; i++) {
+    properties[i]=new DynaProperty(descriptors[i].getName(),descriptors[i].getTypeClass());
+    propertiesMap.put(properties[i].getName(),properties[i]);
+  }
+}

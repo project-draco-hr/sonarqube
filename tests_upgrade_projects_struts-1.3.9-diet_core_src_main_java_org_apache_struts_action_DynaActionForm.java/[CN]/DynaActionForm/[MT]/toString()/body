@@ -1,0 +1,64 @@
+{
+  StringBuffer sb=new StringBuffer("DynaActionForm[dynaClass=");
+  DynaClass dynaClass=getDynaClass();
+  if (dynaClass == null) {
+    return sb.append("null]").toString();
+  }
+  sb.append(dynaClass.getName());
+  DynaProperty[] props=dynaClass.getDynaProperties();
+  if (props == null) {
+    props=new DynaProperty[0];
+  }
+  for (int i=0; i < props.length; i++) {
+    sb.append(',');
+    sb.append(props[i].getName());
+    sb.append('=');
+    Object value=get(props[i].getName());
+    if (value == null) {
+      sb.append("<NULL>");
+    }
+ else     if (value.getClass().isArray()) {
+      int n=Array.getLength(value);
+      sb.append("{");
+      for (int j=0; j < n; j++) {
+        if (j > 0) {
+          sb.append(',');
+        }
+        sb.append(Array.get(value,j));
+      }
+      sb.append("}");
+    }
+ else     if (value instanceof List) {
+      int n=((List)value).size();
+      sb.append("{");
+      for (int j=0; j < n; j++) {
+        if (j > 0) {
+          sb.append(',');
+        }
+        sb.append(((List)value).get(j));
+      }
+      sb.append("}");
+    }
+ else     if (value instanceof Map) {
+      int n=0;
+      Iterator keys=((Map)value).keySet().iterator();
+      sb.append("{");
+      while (keys.hasNext()) {
+        if (n > 0) {
+          sb.append(',');
+        }
+        n++;
+        Object key=keys.next();
+        sb.append(key);
+        sb.append('=');
+        sb.append(((Map)value).get(key));
+      }
+      sb.append("}");
+    }
+ else {
+      sb.append(value);
+    }
+  }
+  sb.append("]");
+  return (sb.toString());
+}

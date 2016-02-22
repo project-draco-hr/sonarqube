@@ -1,0 +1,33 @@
+{
+  if (this.value != null) {
+    this.match=new String[1];
+    this.match[0]=this.value;
+  }
+ else {
+    Object bean=TagUtils.getInstance().lookup(pageContext,name,null);
+    if (bean == null) {
+      JspException e=new JspException(messages.getMessage("getter.bean",name));
+      TagUtils.getInstance().saveException(pageContext,e);
+      throw e;
+    }
+    try {
+      this.match=BeanUtils.getArrayProperty(bean,property);
+      if (this.match == null) {
+        this.match=new String[0];
+      }
+    }
+ catch (    IllegalAccessException e) {
+      TagUtils.getInstance().saveException(pageContext,e);
+      throw new JspException(messages.getMessage("getter.access",property,name));
+    }
+catch (    InvocationTargetException e) {
+      Throwable t=e.getTargetException();
+      TagUtils.getInstance().saveException(pageContext,t);
+      throw new JspException(messages.getMessage("getter.result",property,t.toString()));
+    }
+catch (    NoSuchMethodException e) {
+      TagUtils.getInstance().saveException(pageContext,e);
+      throw new JspException(messages.getMessage("getter.method",property,name));
+    }
+  }
+}

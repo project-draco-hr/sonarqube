@@ -1,0 +1,26 @@
+{
+  String[] paths={"foo","foo.do","foo?foo=bar","foo?foo=bar&bar=baz","foo?foo=bar&amp;bar=baz"};
+  String[][] prepends={{"","/foo"},{"/","/foo"},{"bar/","/bar/foo"},{"/bar/","/bar/foo"}};
+  String[] appends={"","#anchor","?","?#","?foo=bar","?foo1=bar1&foo2=bar2","?foo1=bar1&amp;foo2=bar2"};
+  String finalResult=null;
+  String path=null;
+  String results=null;
+  boolean equality=false;
+  int ct=0;
+  for (int i=0; i < appends.length; i++) {
+    for (int j=0; j < prepends.length; j++) {
+      finalResult=prepends[j][1];
+      for (int k=0; k < paths.length; k++) {
+        path=prepends[j][0] + paths[k] + appends[i];
+        results=tagutils.getActionMappingName(path);
+        equality=finalResult.equals(results);
+        if (!equality) {
+          fail("Path does not return correct result\n" + "\nexpected: " + results + "\nfound: "+ path);
+        }
+        assertTrue("Path should translate to result",equality);
+        ct++;
+      }
+    }
+  }
+  log.debug(ct + " assertions run in this test");
+}

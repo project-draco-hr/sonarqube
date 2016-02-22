@@ -1,0 +1,33 @@
+{
+  ModuleConfig ac=(ModuleConfig)request.getAttribute(Globals.MODULE_KEY);
+  DiskFileUpload upload=new DiskFileUpload();
+  upload.setHeaderEncoding(request.getCharacterEncoding());
+  upload.setSizeMax(getSizeMax(ac));
+  upload.setSizeThreshold((int)getSizeThreshold(ac));
+  upload.setRepositoryPath(getRepositoryPath(ac));
+  elementsText=new Hashtable();
+  elementsFile=new Hashtable();
+  elementsAll=new Hashtable();
+  List items=null;
+  try {
+    items=upload.parseRequest(request);
+  }
+ catch (  DiskFileUpload.SizeLimitExceededException e) {
+    request.setAttribute(MultipartRequestHandler.ATTRIBUTE_MAX_LENGTH_EXCEEDED,Boolean.TRUE);
+    return;
+  }
+catch (  FileUploadException e) {
+    log.error("Failed to parse multipart request",e);
+    throw new ServletException(e);
+  }
+  Iterator iter=items.iterator();
+  while (iter.hasNext()) {
+    FileItem item=(FileItem)iter.next();
+    if (item.isFormField()) {
+      addTextParameter(request,item);
+    }
+ else {
+      addFileParameter(item);
+    }
+  }
+}

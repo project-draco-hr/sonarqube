@@ -1,0 +1,21 @@
+{
+  HttpURLConnection connection=null;
+  try {
+    URL url=new URL(orchestrator.getServer().getUrl() + path);
+    connection=(HttpURLConnection)url.openConnection();
+    connection.connect();
+    assertThat(connection.getResponseCode()).as("Fail to load " + path).isEqualTo(HttpURLConnection.HTTP_OK);
+    String content=IOUtils.toString(connection.getInputStream());
+    assertThat(content).as("Fail to load " + path).doesNotContain("something went wrong");
+    assertThat(content).as("Fail to load " + path).doesNotContain("The page you were looking for doesn't exist");
+    assertThat(content).as("Fail to load " + path).doesNotContain("Unauthorized access");
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Error with " + path,e);
+  }
+ finally {
+    if (connection != null) {
+      connection.disconnect();
+    }
+  }
+}

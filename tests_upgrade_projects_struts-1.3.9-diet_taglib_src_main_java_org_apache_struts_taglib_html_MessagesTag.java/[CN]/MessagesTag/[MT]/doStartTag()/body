@@ -1,0 +1,28 @@
+{
+  processed=false;
+  ActionMessages messages=null;
+  String name=this.name;
+  if ((message != null) && "true".equalsIgnoreCase(message)) {
+    name=Globals.MESSAGE_KEY;
+  }
+  try {
+    messages=TagUtils.getInstance().getActionMessages(pageContext,name);
+  }
+ catch (  JspException e) {
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw e;
+  }
+  this.iterator=(property == null) ? messages.get() : messages.get(property);
+  if (!this.iterator.hasNext()) {
+    return SKIP_BODY;
+  }
+  processMessage((ActionMessage)iterator.next());
+  if ((header != null) && (header.length() > 0)) {
+    String headerMessage=TagUtils.getInstance().message(pageContext,bundle,locale,header);
+    if (headerMessage != null) {
+      TagUtils.getInstance().write(pageContext,headerMessage);
+    }
+  }
+  processed=true;
+  return (EVAL_BODY_TAG);
+}

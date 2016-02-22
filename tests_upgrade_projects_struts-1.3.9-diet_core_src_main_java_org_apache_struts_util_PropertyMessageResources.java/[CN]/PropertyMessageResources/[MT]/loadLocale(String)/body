@@ -1,0 +1,61 @@
+{
+  if (log.isTraceEnabled()) {
+    log.trace("loadLocale(" + localeKey + ")");
+  }
+  if (locales.get(localeKey) != null) {
+    return;
+  }
+  locales.put(localeKey,localeKey);
+  String name=config.replace('.','/');
+  if (localeKey.length() > 0) {
+    name+=("_" + localeKey);
+  }
+  name+=".properties";
+  InputStream is=null;
+  Properties props=new Properties();
+  if (log.isTraceEnabled()) {
+    log.trace("  Loading resource '" + name + "'");
+  }
+  ClassLoader classLoader=Thread.currentThread().getContextClassLoader();
+  if (classLoader == null) {
+    classLoader=this.getClass().getClassLoader();
+  }
+  is=classLoader.getResourceAsStream(name);
+  if (is != null) {
+    try {
+      props.load(is);
+    }
+ catch (    IOException e) {
+      log.error("loadLocale()",e);
+    }
+ finally {
+      try {
+        is.close();
+      }
+ catch (      IOException e) {
+        log.error("loadLocale()",e);
+      }
+    }
+    if (log.isTraceEnabled()) {
+      log.trace("  Loading resource completed");
+    }
+  }
+ else {
+    if (log.isWarnEnabled()) {
+      log.warn("  Resource " + name + " Not Found.");
+    }
+  }
+  if (props.size() < 1) {
+    return;
+  }
+synchronized (messages) {
+    Iterator names=props.keySet().iterator();
+    while (names.hasNext()) {
+      String key=(String)names.next();
+      if (log.isTraceEnabled()) {
+        log.trace("  Saving message key '" + messageKey(localeKey,key));
+      }
+      messages.put(messageKey(localeKey,key),props.getProperty(key));
+    }
+  }
+}

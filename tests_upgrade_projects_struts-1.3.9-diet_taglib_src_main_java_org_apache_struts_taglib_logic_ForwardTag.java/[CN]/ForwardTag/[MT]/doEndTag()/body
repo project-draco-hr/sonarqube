@@ -1,0 +1,21 @@
+{
+  ActionForward forward=null;
+  ModuleConfig config=TagUtils.getInstance().getModuleConfig(pageContext);
+  if (config != null) {
+    forward=(ActionForward)config.findForwardConfig(name);
+  }
+  if (forward == null) {
+    JspException e=new JspException(messages.getMessage("forward.lookup",name));
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw e;
+  }
+  String path=forward.getPath();
+  path=config.getPrefix() + path;
+  if (forward.getRedirect()) {
+    this.doRedirect(path);
+  }
+ else {
+    this.doForward(path);
+  }
+  return (SKIP_PAGE);
+}

@@ -1,0 +1,54 @@
+{
+  ActionConfig config=null;
+  try {
+    config=(ActionConfig)BeanUtils.cloneBean(orig);
+  }
+ catch (  Exception ex) {
+    log.warn("Unable to clone action config, recommend not using " + "wildcards",ex);
+    return null;
+  }
+  config.setName(convertParam(orig.getName(),vars));
+  if ((path.length() == 0) || (path.charAt(0) != '/')) {
+    path="/" + path;
+  }
+  config.setPath(path);
+  config.setType(convertParam(orig.getType(),vars));
+  config.setRoles(convertParam(orig.getRoles(),vars));
+  config.setParameter(convertParam(orig.getParameter(),vars));
+  config.setAttribute(convertParam(orig.getAttribute(),vars));
+  config.setForward(convertParam(orig.getForward(),vars));
+  config.setInclude(convertParam(orig.getInclude(),vars));
+  config.setInput(convertParam(orig.getInput(),vars));
+  config.setCatalog(convertParam(orig.getCatalog(),vars));
+  config.setCommand(convertParam(orig.getCommand(),vars));
+  config.setMultipartClass(convertParam(orig.getMultipartClass(),vars));
+  config.setPrefix(convertParam(orig.getPrefix(),vars));
+  config.setSuffix(convertParam(orig.getSuffix(),vars));
+  ForwardConfig[] fConfigs=orig.findForwardConfigs();
+  ForwardConfig cfg;
+  for (int x=0; x < fConfigs.length; x++) {
+    try {
+      cfg=(ActionForward)BeanUtils.cloneBean(fConfigs[x]);
+    }
+ catch (    Exception ex) {
+      log.warn("Unable to clone action config, recommend not using " + "wildcards",ex);
+      return null;
+    }
+    cfg.setName(fConfigs[x].getName());
+    cfg.setPath(convertParam(fConfigs[x].getPath(),vars));
+    cfg.setRedirect(fConfigs[x].getRedirect());
+    cfg.setCommand(convertParam(fConfigs[x].getCommand(),vars));
+    cfg.setCatalog(convertParam(fConfigs[x].getCatalog(),vars));
+    cfg.setModule(convertParam(fConfigs[x].getModule(),vars));
+    replaceProperties(fConfigs[x].getProperties(),cfg.getProperties(),vars);
+    config.removeForwardConfig(fConfigs[x]);
+    config.addForwardConfig(cfg);
+  }
+  replaceProperties(orig.getProperties(),config.getProperties(),vars);
+  ExceptionConfig[] exConfigs=orig.findExceptionConfigs();
+  for (int x=0; x < exConfigs.length; x++) {
+    config.addExceptionConfig(exConfigs[x]);
+  }
+  config.freeze();
+  return config;
+}

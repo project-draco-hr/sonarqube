@@ -1,0 +1,72 @@
+{
+  Object form=validator.getParameterValue(Validator.BEAN_PARAM);
+  String value=null;
+  boolean valid=false;
+  int index=-1;
+  if (field.isIndexed()) {
+    String key=field.getKey();
+    final int leftBracket=key.indexOf("[");
+    final int rightBracket=key.indexOf("]");
+    if ((leftBracket > -1) && (rightBracket > -1)) {
+      index=Integer.parseInt(key.substring(leftBracket + 1,rightBracket));
+    }
+  }
+  if (isString(bean)) {
+    value=(String)bean;
+  }
+ else {
+    value=ValidatorUtils.getValueAsString(bean,field.getProperty());
+  }
+  String test=null;
+  try {
+    test=Resources.getVarValue("test",field,validator,request,true);
+  }
+ catch (  IllegalArgumentException ex) {
+    String logErrorMsg=sysmsgs.getMessage("validation.failed","validwhen",field.getProperty(),ex.toString());
+    log.error(logErrorMsg);
+    String userErrorMsg=sysmsgs.getMessage("system.error");
+    errors.add(field.getKey(),new ActionMessage(userErrorMsg,false));
+    return false;
+  }
+  ValidWhenLexer lexer=null;
+  try {
+    lexer=new ValidWhenLexer(new StringReader(test));
+  }
+ catch (  Exception ex) {
+    String logErrorMsg="ValidWhenLexer Error for field ' " + field.getKey() + "' - "+ ex;
+    log.error(logErrorMsg);
+    String userErrorMsg=sysmsgs.getMessage("system.error");
+    errors.add(field.getKey(),new ActionMessage(userErrorMsg,false));
+    return false;
+  }
+  ValidWhenParser parser=null;
+  try {
+    parser=new ValidWhenParser(lexer);
+  }
+ catch (  Exception ex) {
+    String logErrorMsg="ValidWhenParser Error for field ' " + field.getKey() + "' - "+ ex;
+    log.error(logErrorMsg);
+    String userErrorMsg=sysmsgs.getMessage("system.error");
+    errors.add(field.getKey(),new ActionMessage(userErrorMsg,false));
+    return false;
+  }
+  parser.setForm(form);
+  parser.setIndex(index);
+  parser.setValue(value);
+  try {
+    parser.expression();
+    valid=parser.getResult();
+  }
+ catch (  Exception ex) {
+    String logErrorMsg="ValidWhen Error for field ' " + field.getKey() + "' - "+ ex;
+    log.error(logErrorMsg);
+    String userErrorMsg=sysmsgs.getMessage("system.error");
+    errors.add(field.getKey(),new ActionMessage(userErrorMsg,false));
+    return false;
+  }
+  if (!valid) {
+    errors.add(field.getKey(),Resources.getActionMessage(validator,request,va,field));
+    return false;
+  }
+  return true;
+}

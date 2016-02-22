@@ -1,0 +1,52 @@
+{
+  String baseType=getType();
+  boolean indexed=false;
+  if (baseType.endsWith("[]")) {
+    baseType=baseType.substring(0,baseType.length() - 2);
+    indexed=true;
+  }
+  Class baseClass=null;
+  if ("boolean".equals(baseType)) {
+    baseClass=Boolean.TYPE;
+  }
+ else   if ("byte".equals(baseType)) {
+    baseClass=Byte.TYPE;
+  }
+ else   if ("char".equals(baseType)) {
+    baseClass=Character.TYPE;
+  }
+ else   if ("double".equals(baseType)) {
+    baseClass=Double.TYPE;
+  }
+ else   if ("float".equals(baseType)) {
+    baseClass=Float.TYPE;
+  }
+ else   if ("int".equals(baseType)) {
+    baseClass=Integer.TYPE;
+  }
+ else   if ("long".equals(baseType)) {
+    baseClass=Long.TYPE;
+  }
+ else   if ("short".equals(baseType)) {
+    baseClass=Short.TYPE;
+  }
+ else {
+    ClassLoader classLoader=Thread.currentThread().getContextClassLoader();
+    if (classLoader == null) {
+      classLoader=this.getClass().getClassLoader();
+    }
+    try {
+      baseClass=classLoader.loadClass(baseType);
+    }
+ catch (    ClassNotFoundException ex) {
+      log.error("Class '" + baseType + "' not found for property '"+ name+ "'");
+      baseClass=null;
+    }
+  }
+  if (indexed) {
+    return (Array.newInstance(baseClass,0).getClass());
+  }
+ else {
+    return (baseClass);
+  }
+}

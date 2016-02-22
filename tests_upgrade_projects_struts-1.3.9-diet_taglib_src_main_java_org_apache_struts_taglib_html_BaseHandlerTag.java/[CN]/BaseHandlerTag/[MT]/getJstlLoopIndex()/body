@@ -1,0 +1,42 @@
+{
+  if (!triedJstlInit) {
+    triedJstlInit=true;
+    try {
+      loopTagClass=RequestUtils.applicationClass("javax.servlet.jsp.jstl.core.LoopTag");
+      loopTagGetStatus=loopTagClass.getDeclaredMethod("getLoopStatus",null);
+      loopTagStatusClass=RequestUtils.applicationClass("javax.servlet.jsp.jstl.core.LoopTagStatus");
+      loopTagStatusGetIndex=loopTagStatusClass.getDeclaredMethod("getIndex",null);
+      triedJstlSuccess=true;
+    }
+ catch (    ClassNotFoundException ex) {
+    }
+catch (    NoSuchMethodException ex) {
+    }
+  }
+  if (triedJstlSuccess) {
+    try {
+      Object loopTag=findAncestorWithClass(this,loopTagClass);
+      if (loopTag == null) {
+        return null;
+      }
+      Object status=loopTagGetStatus.invoke(loopTag,null);
+      return (Integer)loopTagStatusGetIndex.invoke(status,null);
+    }
+ catch (    IllegalAccessException ex) {
+      log.error(ex.getMessage(),ex);
+    }
+catch (    IllegalArgumentException ex) {
+      log.error(ex.getMessage(),ex);
+    }
+catch (    InvocationTargetException ex) {
+      log.error(ex.getMessage(),ex);
+    }
+catch (    NullPointerException ex) {
+      log.error(ex.getMessage(),ex);
+    }
+catch (    ExceptionInInitializerError ex) {
+      log.error(ex.getMessage(),ex);
+    }
+  }
+  return null;
+}

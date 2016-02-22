@@ -1,0 +1,54 @@
+{
+  request=processMultipart(request);
+  String path=processPath(request,response);
+  if (path == null) {
+    return;
+  }
+  if (log.isDebugEnabled()) {
+    log.debug("Processing a '" + request.getMethod() + "' for path '"+ path+ "'");
+  }
+  processLocale(request,response);
+  processContent(request,response);
+  processNoCache(request,response);
+  if (!processPreprocess(request,response)) {
+    return;
+  }
+  this.processCachedMessages(request,response);
+  ActionMapping mapping=processMapping(request,response,path);
+  if (mapping == null) {
+    return;
+  }
+  if (!processRoles(request,response,mapping)) {
+    return;
+  }
+  ActionForm form=processActionForm(request,response,mapping);
+  processPopulate(request,response,form,mapping);
+  try {
+    if (!processValidate(request,response,form,mapping)) {
+      return;
+    }
+  }
+ catch (  InvalidCancelException e) {
+    ActionForward forward=processException(request,response,e,form,mapping);
+    processForwardConfig(request,response,forward);
+    return;
+  }
+catch (  IOException e) {
+    throw e;
+  }
+catch (  ServletException e) {
+    throw e;
+  }
+  if (!processForward(request,response,mapping)) {
+    return;
+  }
+  if (!processInclude(request,response,mapping)) {
+    return;
+  }
+  Action action=processActionCreate(request,response,mapping);
+  if (action == null) {
+    return;
+  }
+  ActionForward forward=processActionPerform(request,response,action,form,mapping);
+  processForwardConfig(request,response,forward);
+}

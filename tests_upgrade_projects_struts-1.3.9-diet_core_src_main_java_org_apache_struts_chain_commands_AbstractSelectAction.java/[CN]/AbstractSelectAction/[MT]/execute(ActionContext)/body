@@ -1,0 +1,19 @@
+{
+  String path=getPath(actionCtx);
+  ModuleConfig moduleConfig=actionCtx.getModuleConfig();
+  ActionConfig actionConfig=moduleConfig.findActionConfig(path);
+  if (actionConfig == null) {
+    ActionConfig[] configs=moduleConfig.findActionConfigs();
+    for (int i=0; i < configs.length; i++) {
+      if (configs[i].getUnknown()) {
+        actionConfig=configs[i];
+        break;
+      }
+    }
+  }
+  if (actionConfig == null) {
+    throw new InvalidPathException("No action config found for the specified url.",path);
+  }
+  actionCtx.setActionConfig(actionConfig);
+  return (false);
+}

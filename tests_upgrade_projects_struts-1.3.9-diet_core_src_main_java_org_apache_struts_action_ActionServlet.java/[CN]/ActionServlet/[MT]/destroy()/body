@@ -1,0 +1,20 @@
+{
+  if (log.isDebugEnabled()) {
+    log.debug(internal.getMessage("finalizing"));
+  }
+  destroyModules();
+  destroyInternal();
+  getServletContext().removeAttribute(Globals.ACTION_SERVLET_KEY);
+  ClassLoader classLoader=Thread.currentThread().getContextClassLoader();
+  if (classLoader == null) {
+    classLoader=ActionServlet.class.getClassLoader();
+  }
+  try {
+    LogFactory.release(classLoader);
+  }
+ catch (  Throwable t) {
+    ;
+  }
+  CatalogFactory.clear();
+  PropertyUtils.clearDescriptors();
+}

@@ -1,0 +1,34 @@
+{
+  boolean present=false;
+  HttpServletRequest request=(HttpServletRequest)pageContext.getRequest();
+  if (cookie != null) {
+    present=this.isCookiePresent(request);
+  }
+ else   if (header != null) {
+    String value=request.getHeader(header);
+    present=(value != null);
+  }
+ else   if (name != null) {
+    present=this.isBeanPresent();
+  }
+ else   if (parameter != null) {
+    String value=request.getParameter(parameter);
+    present=(value != null);
+  }
+ else   if (role != null) {
+    StringTokenizer st=new StringTokenizer(role,ROLE_DELIMITER,false);
+    while (!present && st.hasMoreTokens()) {
+      present=request.isUserInRole(st.nextToken());
+    }
+  }
+ else   if (user != null) {
+    Principal principal=request.getUserPrincipal();
+    present=(principal != null) && user.equals(principal.getName());
+  }
+ else {
+    JspException e=new JspException(messages.getMessage("logic.selector"));
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw e;
+  }
+  return (present == desired);
+}

@@ -1,0 +1,32 @@
+{
+  Msg msg=field.getMessage(va.getName());
+  if ((msg != null) && !msg.isResource()) {
+    return new ActionMessage(msg.getKey(),false);
+  }
+  String msgKey=null;
+  String msgBundle=null;
+  if (msg == null) {
+    msgKey=va.getMsg();
+  }
+ else {
+    msgKey=msg.getKey();
+    msgBundle=msg.getBundle();
+  }
+  if ((msgKey == null) || (msgKey.length() == 0)) {
+    return new ActionMessage("??? " + va.getName() + "."+ field.getProperty()+ " ???",false);
+  }
+  ServletContext application=(ServletContext)validator.getParameterValue(SERVLET_CONTEXT_PARAM);
+  MessageResources messages=getMessageResources(application,request,msgBundle);
+  Locale locale=RequestUtils.getUserLocale(request,null);
+  Arg[] args=field.getArgs(va.getName());
+  String[] argValues=getArgValues(application,request,messages,locale,args);
+  ActionMessage actionMessage=null;
+  if (msgBundle == null) {
+    actionMessage=new ActionMessage(msgKey,argValues);
+  }
+ else {
+    String message=messages.getMessage(locale,msgKey,argValues);
+    actionMessage=new ActionMessage(message,false);
+  }
+  return actionMessage;
+}

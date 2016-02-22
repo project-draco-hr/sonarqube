@@ -1,0 +1,27 @@
+{
+  String value=null;
+  value=evaluateBean(bean,field);
+  if (value != null) {
+    try {
+      String maxVar=Resources.getVarValue("maxlength",field,validator,request,true);
+      int max=Integer.parseInt(maxVar);
+      boolean isValid=false;
+      String endLth=Resources.getVarValue("lineEndLength",field,validator,request,false);
+      if (GenericValidator.isBlankOrNull(endLth)) {
+        isValid=GenericValidator.maxLength(value,max);
+      }
+ else {
+        isValid=GenericValidator.maxLength(value,max,Integer.parseInt(endLth));
+      }
+      if (!isValid) {
+        errors.add(field.getKey(),Resources.getActionMessage(validator,request,va,field));
+        return false;
+      }
+    }
+ catch (    Exception e) {
+      processFailure(errors,field,"maxlength",e);
+      return false;
+    }
+  }
+  return true;
+}

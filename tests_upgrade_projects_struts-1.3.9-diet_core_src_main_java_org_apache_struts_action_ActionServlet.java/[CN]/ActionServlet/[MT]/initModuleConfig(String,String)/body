@@ -1,0 +1,17 @@
+{
+  if (log.isDebugEnabled()) {
+    log.debug("Initializing module path '" + prefix + "' configuration from '"+ paths+ "'");
+  }
+  ModuleConfigFactory factoryObject=ModuleConfigFactory.createFactory();
+  ModuleConfig config=factoryObject.createModuleConfig(prefix);
+  Digester digester=initConfigDigester();
+  List urls=splitAndResolvePaths(paths);
+  URL url;
+  for (Iterator i=urls.iterator(); i.hasNext(); ) {
+    url=(URL)i.next();
+    digester.push(config);
+    this.parseModuleConfigFile(digester,url);
+  }
+  getServletContext().setAttribute(Globals.MODULE_KEY + config.getPrefix(),config);
+  return config;
+}

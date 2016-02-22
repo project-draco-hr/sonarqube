@@ -1,0 +1,30 @@
+{
+  List actionMethods=new ArrayList();
+  Iterator iterator=form.getFields().iterator();
+  while (iterator.hasNext()) {
+    Field field=(Field)iterator.next();
+    for (Iterator x=field.getDependencyList().iterator(); x.hasNext(); ) {
+      Object o=x.next();
+      if ((o != null) && !actionMethods.contains(o)) {
+        actionMethods.add(o);
+      }
+    }
+  }
+  List actions=new ArrayList();
+  iterator=actionMethods.iterator();
+  while (iterator.hasNext()) {
+    String depends=(String)iterator.next();
+    ValidatorAction va=resources.getValidatorAction(depends);
+    if (va == null) {
+      throw new NullPointerException("Depends string \"" + depends + "\" was not found in validator-rules.xml.");
+    }
+    if ((va.getJavascript() != null) && (va.getJavascript().length() > 0)) {
+      actions.add(va);
+    }
+ else {
+      iterator.remove();
+    }
+  }
+  Collections.sort(actions,actionComparator);
+  return actions;
+}

@@ -1,0 +1,38 @@
+{
+  CatalogFactory catalogFactory=CatalogFactory.getInstance();
+  String catalogName=getCatalogName();
+  Catalog catalog;
+  if (catalogName == null) {
+    catalog=catalogFactory.getCatalog();
+    catalogName="{default}";
+  }
+ else {
+    catalog=catalogFactory.getCatalog(catalogName);
+  }
+  if (catalog == null) {
+    throw new IllegalArgumentException("Cannot find catalog '" + catalogName + "'");
+  }
+  Command command;
+  String name=getName();
+  if (name == null) {
+    name=(String)context.get(getNameKey());
+  }
+  if (name != null) {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Lookup command " + name + " in catalog "+ catalogName);
+    }
+    command=catalog.getCommand(name);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Found command " + command + ";"+ " optional: "+ isOptional());
+    }
+    if ((command == null) && !isOptional()) {
+      throw new IllegalArgumentException("Cannot find command " + "'" + name + "' in catalog '"+ catalogName+ "'");
+    }
+ else {
+      return command;
+    }
+  }
+ else {
+    throw new IllegalArgumentException("No command name");
+  }
+}

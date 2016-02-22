@@ -1,0 +1,47 @@
+{
+  Object bean=lookup(pageContext,name,scope);
+  if (bean == null) {
+    JspException e=null;
+    if (scope == null) {
+      e=new JspException(messages.getMessage("lookup.bean.any",name));
+    }
+ else {
+      e=new JspException(messages.getMessage("lookup.bean",name,scope));
+    }
+    saveException(pageContext,e);
+    throw e;
+  }
+  if (property == null) {
+    return bean;
+  }
+  try {
+    return PropertyUtils.getProperty(bean,property);
+  }
+ catch (  IllegalAccessException e) {
+    saveException(pageContext,e);
+    throw new JspException(messages.getMessage("lookup.access",property,name));
+  }
+catch (  IllegalArgumentException e) {
+    saveException(pageContext,e);
+    throw new JspException(messages.getMessage("lookup.argument",property,name));
+  }
+catch (  InvocationTargetException e) {
+    Throwable t=e.getTargetException();
+    if (t == null) {
+      t=e;
+    }
+    saveException(pageContext,t);
+    throw new JspException(messages.getMessage("lookup.target",property,name));
+  }
+catch (  NoSuchMethodException e) {
+    saveException(pageContext,e);
+    String beanName=name;
+    if (Constants.BEAN_KEY.equals(name)) {
+      Object obj=pageContext.findAttribute(Constants.BEAN_KEY);
+      if (obj != null) {
+        beanName=obj.getClass().getName();
+      }
+    }
+    throw new JspException(messages.getMessage("lookup.method",property,beanName));
+  }
+}

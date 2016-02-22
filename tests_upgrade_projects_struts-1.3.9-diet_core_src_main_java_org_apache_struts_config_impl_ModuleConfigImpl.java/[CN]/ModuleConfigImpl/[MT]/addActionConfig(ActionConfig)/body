@@ -1,0 +1,27 @@
+{
+  throwIfConfigured();
+  config.setModuleConfig(this);
+  String path=config.getPath();
+  if (actionConfigs.containsKey(path)) {
+    log.warn("Overriding ActionConfig of path " + path);
+  }
+  String actionId=config.getActionId();
+  if ((actionId != null) && !actionId.equals("")) {
+    if (actionConfigIds.containsKey(actionId)) {
+      if (log.isWarnEnabled()) {
+        ActionConfig otherConfig=(ActionConfig)actionConfigIds.get(actionId);
+        StringBuffer msg=new StringBuffer("Overriding actionId[");
+        msg.append(actionId);
+        msg.append("] for path[");
+        msg.append(otherConfig.getPath());
+        msg.append("] with path[");
+        msg.append(path);
+        msg.append("]");
+        log.warn(msg);
+      }
+    }
+    actionConfigIds.put(actionId,config);
+  }
+  actionConfigs.put(path,config);
+  actionConfigList.add(config);
+}

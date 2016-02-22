@@ -1,0 +1,31 @@
+{
+  ServletActionContext sacontext=(ServletActionContext)context;
+  String uri=forwardConfig.getPath();
+  if (uri == null) {
+    ActionServlet servlet=sacontext.getActionServlet();
+    MessageResources resources=servlet.getInternal();
+    throw new IllegalArgumentException(resources.getMessage("forwardPathNull"));
+  }
+  HttpServletRequest request=sacontext.getRequest();
+  ServletContext servletContext=sacontext.getContext();
+  HttpServletResponse response=sacontext.getResponse();
+  String actionIdPath=RequestUtils.actionIdURL(forwardConfig,sacontext.getRequest(),sacontext.getActionServlet());
+  if (actionIdPath != null) {
+    uri=actionIdPath;
+    ForwardConfig actionIdForwardConfig=new ForwardConfig(forwardConfig);
+    actionIdForwardConfig.setPath(actionIdPath);
+    forwardConfig=actionIdForwardConfig;
+  }
+  if (uri.startsWith("/")) {
+    uri=resolveModuleRelativePath(forwardConfig,servletContext,request);
+  }
+  if (response.isCommitted() && !forwardConfig.getRedirect()) {
+    handleAsInclude(uri,servletContext,request,response);
+  }
+ else   if (forwardConfig.getRedirect()) {
+    handleAsRedirect(uri,request,response);
+  }
+ else {
+    handleAsForward(uri,servletContext,request,response);
+  }
+}

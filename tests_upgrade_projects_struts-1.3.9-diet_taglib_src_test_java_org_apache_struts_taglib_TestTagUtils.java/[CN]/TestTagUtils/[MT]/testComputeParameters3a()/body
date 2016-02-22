@@ -1,0 +1,21 @@
+{
+  request.setAttribute("attr",new MockFormBean("bar3"));
+  request.getSession().setAttribute(Globals.TRANSACTION_TOKEN_KEY,"token");
+  Map map=null;
+  try {
+    map=tagutils.computeParameters(pageContext,"foo1","attr","stringProperty","request","attr","mapProperty","request",true);
+  }
+ catch (  JspException e) {
+    fail("JspException: " + e);
+  }
+  assertNotNull("Map is not null",map);
+  assertEquals("Three parameter in the returned map",3,map.size());
+  assertTrue("Parameter foo1 present",map.containsKey("foo1"));
+  assertTrue("Parameter foo1 value type",map.get("foo1") instanceof String[]);
+  String[] values=(String[])map.get("foo1");
+  assertEquals("Values count",2,values.length);
+  assertTrue("Parameter foo2 present",map.containsKey("foo2"));
+  assertEquals("Parameter foo2 value","bar2",(String)map.get("foo2"));
+  assertTrue("Transaction token parameter present",map.containsKey(Constants.TOKEN_KEY));
+  assertEquals("Transaction token parameter value","token",(String)map.get(Constants.TOKEN_KEY));
+}

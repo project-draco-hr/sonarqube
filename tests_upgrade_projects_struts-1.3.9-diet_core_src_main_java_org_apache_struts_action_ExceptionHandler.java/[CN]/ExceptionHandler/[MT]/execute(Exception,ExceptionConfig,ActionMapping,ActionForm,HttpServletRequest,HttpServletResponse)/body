@@ -1,0 +1,34 @@
+{
+  LOG.debug("ExceptionHandler executing for exception " + ex);
+  ActionForward forward;
+  ActionMessage error;
+  String property;
+  if (ae.getPath() != null) {
+    forward=new ActionForward(ae.getPath());
+  }
+ else {
+    forward=mapping.getInputForward();
+  }
+  if (ex instanceof ModuleException) {
+    error=((ModuleException)ex).getActionMessage();
+    property=((ModuleException)ex).getProperty();
+  }
+ else {
+    error=new ActionMessage(ae.getKey(),ex.getMessage());
+    property=error.getKey();
+  }
+  this.logException(ex);
+  request.setAttribute(Globals.EXCEPTION_KEY,ex);
+  this.storeException(request,property,error,forward,ae.getScope());
+  if (!response.isCommitted()) {
+    return forward;
+  }
+  LOG.debug("Response is already committed, so forwarding will not work." + " Attempt alternate handling.");
+  if (!silent(ae)) {
+    handleCommittedResponse(ex,ae,mapping,formInstance,request,response,forward);
+  }
+ else {
+    LOG.warn("ExceptionHandler configured with " + SILENT_IF_COMMITTED + " and response is committed.",ex);
+  }
+  return null;
+}

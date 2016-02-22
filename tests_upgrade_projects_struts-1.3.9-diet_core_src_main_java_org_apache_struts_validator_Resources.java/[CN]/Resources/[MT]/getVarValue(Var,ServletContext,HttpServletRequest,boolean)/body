@@ -1,0 +1,18 @@
+{
+  String varName=var.getName();
+  String varValue=var.getValue();
+  if (!var.isResource()) {
+    return varValue;
+  }
+  String bundle=var.getBundle();
+  MessageResources messages=getMessageResources(application,request,bundle);
+  Locale locale=RequestUtils.getUserLocale(request,null);
+  String value=messages.getMessage(locale,varValue,null);
+  if ((value == null) && required) {
+    throw new IllegalArgumentException(sysmsgs.getMessage("variable.resource.notfound",varName,varValue,bundle));
+  }
+  if (log.isDebugEnabled()) {
+    log.debug("Var=[" + varName + "], "+ "bundle=["+ bundle+ "], "+ "key=["+ varValue+ "], "+ "value=["+ value+ "]");
+  }
+  return value;
+}

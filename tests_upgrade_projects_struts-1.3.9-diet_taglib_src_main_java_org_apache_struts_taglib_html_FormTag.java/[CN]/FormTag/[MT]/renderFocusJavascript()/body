@@ -1,0 +1,48 @@
+{
+  StringBuffer results=new StringBuffer();
+  results.append(lineEnd);
+  results.append("<script type=\"text/javascript\"");
+  if (!this.isXhtml() && this.scriptLanguage) {
+    results.append(" language=\"JavaScript\"");
+  }
+  results.append(">");
+  results.append(lineEnd);
+  if (!this.isXhtml()) {
+    results.append("  <!--");
+    results.append(lineEnd);
+  }
+  StringBuffer focusControl=new StringBuffer("document.forms[\"");
+  focusControl.append(beanName);
+  focusControl.append("\"].elements[\"");
+  focusControl.append(this.focus);
+  focusControl.append("\"]");
+  results.append("  var focusControl = ");
+  results.append(focusControl.toString());
+  results.append(";");
+  results.append(lineEnd);
+  results.append(lineEnd);
+  results.append("  if (focusControl.type != \"hidden\" && ");
+  results.append("!focusControl.disabled && ");
+  results.append("focusControl.style.display != \"none\") {");
+  results.append(lineEnd);
+  String index="";
+  if (this.focusIndex != null) {
+    StringBuffer sb=new StringBuffer("[");
+    sb.append(this.focusIndex);
+    sb.append("]");
+    index=sb.toString();
+  }
+  results.append("     focusControl");
+  results.append(index);
+  results.append(".focus();");
+  results.append(lineEnd);
+  results.append("  }");
+  results.append(lineEnd);
+  if (!this.isXhtml()) {
+    results.append("  // -->");
+    results.append(lineEnd);
+  }
+  results.append("</script>");
+  results.append(lineEnd);
+  return results.toString();
+}

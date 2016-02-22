@@ -1,0 +1,38 @@
+{
+  if (log.isDebugEnabled()) {
+    log.debug("getMessage(" + locale + ","+ key+ ")");
+  }
+  String localeKey=localeKey(locale);
+  String originalKey=messageKey(localeKey,key);
+  String message=null;
+  message=findMessage(locale,key,originalKey);
+  if (message != null) {
+    return message;
+  }
+  if (mode == MODE_JSTL) {
+  }
+ else   if (mode == MODE_RESOURCE_BUNDLE) {
+    if (!defaultLocale.equals(locale)) {
+      message=findMessage(defaultLocale,key,originalKey);
+    }
+  }
+ else {
+    if (!defaultLocale.equals(locale)) {
+      localeKey=localeKey(defaultLocale);
+      message=findMessage(localeKey,key,originalKey);
+    }
+  }
+  if (message != null) {
+    return message;
+  }
+  message=findMessage("",key,originalKey);
+  if (message != null) {
+    return message;
+  }
+  if (returnNull) {
+    return (null);
+  }
+ else {
+    return ("???" + messageKey(locale,key) + "???");
+  }
+}

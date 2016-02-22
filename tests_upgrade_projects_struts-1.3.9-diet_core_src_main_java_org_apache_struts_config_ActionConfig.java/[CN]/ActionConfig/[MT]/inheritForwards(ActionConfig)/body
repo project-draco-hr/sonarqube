@@ -1,0 +1,19 @@
+{
+  if (configured) {
+    throw new IllegalStateException("Configuration is frozen");
+  }
+  ForwardConfig[] baseForwards=baseConfig.findForwardConfigs();
+  for (int i=0; i < baseForwards.length; i++) {
+    ForwardConfig baseForward=baseForwards[i];
+    ForwardConfig copy=this.findForwardConfig(baseForward.getName());
+    if (copy == null) {
+      copy=(ForwardConfig)RequestUtils.applicationInstance(baseForward.getClass().getName());
+      BeanUtils.copyProperties(copy,baseForward);
+      this.addForwardConfig(copy);
+      copy.setProperties(baseForward.copyProperties());
+    }
+ else {
+      copy.processExtends(getModuleConfig(),this);
+    }
+  }
+}

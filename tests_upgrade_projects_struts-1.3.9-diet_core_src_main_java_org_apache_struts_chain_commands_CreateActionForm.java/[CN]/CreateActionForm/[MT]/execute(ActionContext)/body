@@ -1,0 +1,30 @@
+{
+  ActionConfig actionConfig=actionCtx.getActionConfig();
+  String name=actionConfig.getName();
+  if (name == null) {
+    actionCtx.setActionForm(null);
+    return (false);
+  }
+  if (LOG.isTraceEnabled()) {
+    LOG.trace("Look up form-bean " + name);
+  }
+  FormBeanConfig formBeanConfig=actionConfig.getModuleConfig().findFormBeanConfig(name);
+  if (formBeanConfig == null) {
+    LOG.warn("No FormBeanConfig found in module " + actionConfig.getModuleConfig().getPrefix() + " under name "+ name);
+    actionCtx.setActionForm(null);
+    return (false);
+  }
+  Map scope=actionCtx.getScope(actionConfig.getScope());
+  ActionForm instance;
+  instance=(ActionForm)scope.get(actionConfig.getAttribute());
+  if (!formBeanConfig.canReuse(instance)) {
+    instance=formBeanConfig.createActionForm(actionCtx);
+  }
+  if (actionCtx instanceof ServletActionContext) {
+    ServletActionContext sac=(ServletActionContext)actionCtx;
+    instance.setServlet(sac.getActionServlet());
+  }
+  actionCtx.setActionForm(instance);
+  scope.put(actionConfig.getAttribute(),instance);
+  return (false);
+}

@@ -1,0 +1,19 @@
+{
+  CopyFormToContext command=new CopyFormToContext();
+  String formName="bar";
+  command.setFormName(formName);
+  command.setScope("session");
+  command.setToKey(POST_EXECUTION_CONTEXT_KEY);
+  assertNull(context.get(POST_EXECUTION_CONTEXT_KEY));
+  assertNull(context.getRequestScope().get(formName));
+  assertNull(context.getSessionScope().get(formName));
+  command.execute(context);
+  assertNotNull(context.get(POST_EXECUTION_CONTEXT_KEY));
+  assertNull(context.getRequestScope().get(formName));
+  assertNotNull(context.getSessionScope().get(formName));
+  assertSame(context.get(POST_EXECUTION_CONTEXT_KEY),context.getSessionScope().get(formName));
+  ActionForm theForm=(ActionForm)context.get(POST_EXECUTION_CONTEXT_KEY);
+  assertTrue(theForm instanceof DynaActionForm);
+  DynaActionForm dForm=(DynaActionForm)theForm;
+  assertEquals("test",dForm.get("property"));
+}

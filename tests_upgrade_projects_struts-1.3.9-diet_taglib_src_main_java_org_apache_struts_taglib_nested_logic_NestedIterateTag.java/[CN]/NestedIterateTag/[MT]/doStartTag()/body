@@ -1,0 +1,21 @@
+{
+  originalName=getName();
+  originalProperty=getProperty();
+  if ((id == null) || (id.trim().length() == 0)) {
+    id=property;
+  }
+  HttpServletRequest request=(HttpServletRequest)pageContext.getRequest();
+  originalNesting=NestedPropertyHelper.getCurrentProperty(request);
+  originalNestingName=NestedPropertyHelper.getCurrentName(request,this);
+  if (getName() == null) {
+    nesting=NestedPropertyHelper.getAdjustedProperty(request,getProperty());
+  }
+ else {
+    nesting=getProperty();
+  }
+  NestedPropertyHelper.setNestedProperties(request,this);
+  int temp=super.doStartTag();
+  NestedPropertyHelper.setName(request,getName());
+  NestedPropertyHelper.setProperty(request,deriveNestedProperty());
+  return temp;
+}

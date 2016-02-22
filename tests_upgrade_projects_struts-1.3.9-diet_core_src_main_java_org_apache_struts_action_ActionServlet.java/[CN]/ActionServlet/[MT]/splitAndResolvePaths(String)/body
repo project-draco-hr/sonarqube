@@ -1,0 +1,55 @@
+{
+  ClassLoader loader=Thread.currentThread().getContextClassLoader();
+  if (loader == null) {
+    loader=this.getClass().getClassLoader();
+  }
+  ArrayList resolvedUrls=new ArrayList();
+  URL resource;
+  String path=null;
+  try {
+    while (paths.length() > 0) {
+      resource=null;
+      int comma=paths.indexOf(',');
+      if (comma >= 0) {
+        path=paths.substring(0,comma).trim();
+        paths=paths.substring(comma + 1);
+      }
+ else {
+        path=paths.trim();
+        paths="";
+      }
+      if (path.length() < 1) {
+        break;
+      }
+      if (path.charAt(0) == '/') {
+        resource=getServletContext().getResource(path);
+      }
+      if (resource == null) {
+        if (log.isDebugEnabled()) {
+          log.debug("Unable to locate " + path + " in the servlet context, "+ "trying classloader.");
+        }
+        Enumeration e=loader.getResources(path);
+        if (!e.hasMoreElements()) {
+          String msg=internal.getMessage("configMissing",path);
+          log.error(msg);
+          throw new UnavailableException(msg);
+        }
+ else {
+          while (e.hasMoreElements()) {
+            resolvedUrls.add(e.nextElement());
+          }
+        }
+      }
+ else {
+        resolvedUrls.add(resource);
+      }
+    }
+  }
+ catch (  MalformedURLException e) {
+    handleConfigException(path,e);
+  }
+catch (  IOException e) {
+    handleConfigException(path,e);
+  }
+  return resolvedUrls;
+}

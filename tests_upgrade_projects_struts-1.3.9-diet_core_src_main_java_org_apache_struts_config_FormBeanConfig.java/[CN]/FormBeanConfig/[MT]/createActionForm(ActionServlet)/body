@@ -1,0 +1,32 @@
+{
+  Object obj=null;
+  if (getDynamic()) {
+    obj=getDynaActionFormClass().newInstance();
+  }
+ else {
+    obj=formBeanClass().newInstance();
+  }
+  ActionForm form=null;
+  if (obj instanceof ActionForm) {
+    form=(ActionForm)obj;
+  }
+ else {
+    form=new BeanValidatorForm(obj);
+  }
+  form.setServlet(servlet);
+  if (form instanceof DynaBean && ((DynaBean)form).getDynaClass() instanceof MutableDynaClass) {
+    DynaBean dynaBean=(DynaBean)form;
+    MutableDynaClass dynaClass=(MutableDynaClass)dynaBean.getDynaClass();
+    dynaClass.setRestricted(false);
+    FormPropertyConfig[] props=findFormPropertyConfigs();
+    for (int i=0; i < props.length; i++) {
+      dynaClass.add(props[i].getName(),props[i].getTypeClass());
+      dynaBean.set(props[i].getName(),props[i].initial());
+    }
+    dynaClass.setRestricted(isRestricted());
+  }
+  if (form instanceof BeanValidatorForm) {
+    ((BeanValidatorForm)form).initialize(this);
+  }
+  return form;
+}

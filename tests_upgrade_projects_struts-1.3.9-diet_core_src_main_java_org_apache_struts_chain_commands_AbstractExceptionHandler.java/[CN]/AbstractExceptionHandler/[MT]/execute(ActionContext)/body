@@ -1,0 +1,34 @@
+{
+  Exception exception=actionCtx.getException();
+  if (exception == null) {
+    LOG.warn("No Exception found in ActionContext");
+    return (true);
+  }
+  ExceptionConfig exceptionConfig=null;
+  ActionConfig actionConfig=actionCtx.getActionConfig();
+  ModuleConfig moduleConfig=actionCtx.getModuleConfig();
+  if (actionConfig != null) {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("See if actionConfig " + actionConfig + " has an exceptionConfig for "+ exception.getClass().getName());
+    }
+    exceptionConfig=actionConfig.findException(exception.getClass());
+  }
+ else   if (moduleConfig != null) {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("No action yet, see if moduleConfig " + moduleConfig + " has an exceptionConfig "+ exception.getClass().getName());
+    }
+    exceptionConfig=moduleConfig.findException(exception.getClass());
+  }
+  if (exceptionConfig == null) {
+    LOG.warn("Unhandled exception",exception);
+    throw exception;
+  }
+  ForwardConfig forwardConfig=handle(actionCtx,exception,exceptionConfig,actionConfig,moduleConfig);
+  if (forwardConfig != null) {
+    actionCtx.setForwardConfig(forwardConfig);
+    return (false);
+  }
+ else {
+    return (true);
+  }
+}

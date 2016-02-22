@@ -1,0 +1,23 @@
+{
+  String baseCount="10";
+  baseConfig.setProperty("count",baseCount);
+  String baseLabel="label a";
+  baseConfig.setProperty("label",baseLabel);
+  String path=baseConfig.getPath();
+  String module=baseConfig.getModule();
+  String inherit=subConfig.getExtends();
+  String name=subConfig.getName();
+  boolean redirect=subConfig.getRedirect();
+  String subLabel="label b";
+  subConfig.setProperty("label",subLabel);
+  moduleConfig.addForwardConfig(baseConfig);
+  moduleConfig.addForwardConfig(subConfig);
+  subConfig.processExtends(moduleConfig,null);
+  assertEquals("Path wasn't inherited",path,subConfig.getPath());
+  assertEquals("Module wasn't inherited",module,subConfig.getModule());
+  assertEquals("Name shouldn't have changed",name,subConfig.getName());
+  assertEquals("Extends shouldn't have changed",inherit,subConfig.getExtends());
+  assertEquals("Redirect shouldn't have changed",redirect,subConfig.getRedirect());
+  assertEquals("Arbitrary config property was not inherited",baseCount,subConfig.getProperty("count"));
+  assertEquals("Overridden config property was not retained",subLabel,subConfig.getProperty("label"));
+}

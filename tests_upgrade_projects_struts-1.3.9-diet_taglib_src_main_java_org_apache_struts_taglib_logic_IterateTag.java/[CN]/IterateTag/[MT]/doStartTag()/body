@@ -1,0 +1,105 @@
+{
+  Object collection=this.collection;
+  if (collection == null) {
+    collection=TagUtils.getInstance().lookup(pageContext,name,property,scope);
+  }
+  if (collection == null) {
+    JspException e=new JspException(messages.getMessage("iterate.collection"));
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw e;
+  }
+  if (collection.getClass().isArray()) {
+    try {
+      iterator=Arrays.asList((Object[])collection).iterator();
+    }
+ catch (    ClassCastException e) {
+      int length=Array.getLength(collection);
+      ArrayList c=new ArrayList(length);
+      for (int i=0; i < length; i++) {
+        c.add(Array.get(collection,i));
+      }
+      iterator=c.iterator();
+    }
+  }
+ else   if (collection instanceof Collection) {
+    iterator=((Collection)collection).iterator();
+  }
+ else   if (collection instanceof Iterator) {
+    iterator=(Iterator)collection;
+  }
+ else   if (collection instanceof Map) {
+    iterator=((Map)collection).entrySet().iterator();
+  }
+ else   if (collection instanceof Enumeration) {
+    iterator=new IteratorAdapter((Enumeration)collection);
+  }
+ else {
+    JspException e=new JspException(messages.getMessage("iterate.iterator"));
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw e;
+  }
+  if (offset == null) {
+    offsetValue=0;
+  }
+ else {
+    try {
+      offsetValue=Integer.parseInt(offset);
+    }
+ catch (    NumberFormatException e) {
+      Integer offsetObject=(Integer)TagUtils.getInstance().lookup(pageContext,offset,null);
+      if (offsetObject == null) {
+        offsetValue=0;
+      }
+ else {
+        offsetValue=offsetObject.intValue();
+      }
+    }
+  }
+  if (offsetValue < 0) {
+    offsetValue=0;
+  }
+  if (length == null) {
+    lengthValue=0;
+  }
+ else {
+    try {
+      lengthValue=Integer.parseInt(length);
+    }
+ catch (    NumberFormatException e) {
+      Integer lengthObject=(Integer)TagUtils.getInstance().lookup(pageContext,length,null);
+      if (lengthObject == null) {
+        lengthValue=0;
+      }
+ else {
+        lengthValue=lengthObject.intValue();
+      }
+    }
+  }
+  if (lengthValue < 0) {
+    lengthValue=0;
+  }
+  lengthCount=0;
+  for (int i=0; i < offsetValue; i++) {
+    if (iterator.hasNext()) {
+      iterator.next();
+    }
+  }
+  if (iterator.hasNext()) {
+    Object element=iterator.next();
+    if (element == null) {
+      pageContext.removeAttribute(id);
+    }
+ else {
+      pageContext.setAttribute(id,element);
+    }
+    lengthCount++;
+    started=true;
+    if (indexId != null) {
+      pageContext.setAttribute(indexId,new Integer(getIndex()));
+    }
+    return (EVAL_BODY_TAG);
+  }
+ else {
+    return (SKIP_BODY);
+  }
+}

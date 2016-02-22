@@ -1,0 +1,17 @@
+{
+  if (attributes.getIndex("key") == -1) {
+    super.begin(attributes);
+    return;
+  }
+  if (attributes.getIndex("property") != -1) {
+    throw new IllegalArgumentException("<set-property> accepts only one of 'key' or 'property' attributes.");
+  }
+  Object topOfStack=digester.peek();
+  if (topOfStack instanceof BaseConfig) {
+    BaseConfig config=(BaseConfig)topOfStack;
+    config.setProperty(attributes.getValue("key"),attributes.getValue("value"));
+  }
+ else {
+    throw new IllegalArgumentException("'key' attribute of <set-property> only applicable to subclasses of BaseConfig; " + "object on top of stack is " + topOfStack + " [key: "+ attributes.getValue("key")+ ", value: "+ attributes.getValue("value")+ "]");
+  }
+}

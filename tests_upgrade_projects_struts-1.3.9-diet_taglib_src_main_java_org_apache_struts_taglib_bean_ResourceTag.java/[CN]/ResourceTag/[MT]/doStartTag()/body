@@ -1,0 +1,32 @@
+{
+  InputStream stream=pageContext.getServletContext().getResourceAsStream(name);
+  if (stream == null) {
+    JspException e=new JspException(messages.getMessage("resource.get",name));
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw e;
+  }
+  if (input != null) {
+    pageContext.setAttribute(id,stream);
+    return (SKIP_BODY);
+  }
+  try {
+    StringBuffer sb=new StringBuffer();
+    InputStreamReader reader=new InputStreamReader(stream);
+    char[] buffer=new char[BUFFER_SIZE];
+    int n=0;
+    while (true) {
+      n=reader.read(buffer);
+      if (n < 1) {
+        break;
+      }
+      sb.append(buffer,0,n);
+    }
+    reader.close();
+    pageContext.setAttribute(id,sb.toString());
+  }
+ catch (  IOException e) {
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw new JspException(messages.getMessage("resource.get",name));
+  }
+  return (SKIP_BODY);
+}

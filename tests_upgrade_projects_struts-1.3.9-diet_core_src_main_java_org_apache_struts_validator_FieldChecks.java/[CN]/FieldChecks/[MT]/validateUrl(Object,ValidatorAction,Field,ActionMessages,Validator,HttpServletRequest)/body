@@ -1,0 +1,45 @@
+{
+  String value=null;
+  value=evaluateBean(bean,field);
+  if (GenericValidator.isBlankOrNull(value)) {
+    return true;
+  }
+  String allowallschemesVar=Resources.getVarValue("allowallschemes",field,validator,request,false);
+  boolean allowallschemes="true".equalsIgnoreCase(allowallschemesVar);
+  int options=allowallschemes ? UrlValidator.ALLOW_ALL_SCHEMES : 0;
+  String allow2slashesVar=Resources.getVarValue("allow2slashes",field,validator,request,false);
+  if ("true".equalsIgnoreCase(allow2slashesVar)) {
+    options+=UrlValidator.ALLOW_2_SLASHES;
+  }
+  String nofragmentsVar=Resources.getVarValue("nofragments",field,validator,request,false);
+  if ("true".equalsIgnoreCase(nofragmentsVar)) {
+    options+=UrlValidator.NO_FRAGMENTS;
+  }
+  String schemesVar=allowallschemes ? null : Resources.getVarValue("schemes",field,validator,request,false);
+  if ((options == 0) && (schemesVar == null)) {
+    if (GenericValidator.isUrl(value)) {
+      return true;
+    }
+ else {
+      errors.add(field.getKey(),Resources.getActionMessage(validator,request,va,field));
+      return false;
+    }
+  }
+  String[] schemes=null;
+  if (schemesVar != null) {
+    StringTokenizer st=new StringTokenizer(schemesVar,",");
+    schemes=new String[st.countTokens()];
+    int i=0;
+    while (st.hasMoreTokens()) {
+      schemes[i++]=st.nextToken().trim();
+    }
+  }
+  UrlValidator urlValidator=new UrlValidator(schemes,options);
+  if (urlValidator.isValid(value)) {
+    return true;
+  }
+ else {
+    errors.add(field.getKey(),Resources.getActionMessage(validator,request,va,field));
+    return false;
+  }
+}

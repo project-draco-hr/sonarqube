@@ -1,0 +1,25 @@
+{
+  if (!(parameterValue instanceof FormFile))   return parameterValue;
+  FormFile formFileValue=(FormFile)parameterValue;
+  try {
+    Class propertyType=PropertyUtils.getPropertyType(bean,name);
+    if (propertyType.isAssignableFrom(List.class)) {
+      ArrayList list=new ArrayList(1);
+      list.add(formFileValue);
+      return list;
+    }
+    if (propertyType.isArray() && propertyType.getComponentType().equals(FormFile.class)) {
+      return new FormFile[]{formFileValue};
+    }
+  }
+ catch (  IllegalAccessException e) {
+    throw new ServletException(e);
+  }
+catch (  InvocationTargetException e) {
+    throw new ServletException(e);
+  }
+catch (  NoSuchMethodException e) {
+    throw new ServletException(e);
+  }
+  return parameterValue;
+}

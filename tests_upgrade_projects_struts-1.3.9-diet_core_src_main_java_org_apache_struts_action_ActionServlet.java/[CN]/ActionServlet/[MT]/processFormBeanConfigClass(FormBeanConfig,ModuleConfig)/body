@@ -1,0 +1,31 @@
+{
+  String ancestor=beanConfig.getExtends();
+  if (ancestor == null) {
+    return beanConfig;
+  }
+  FormBeanConfig baseConfig=moduleConfig.findFormBeanConfig(ancestor);
+  if (baseConfig == null) {
+    throw new UnavailableException("Unable to find " + "form bean '" + ancestor + "' to extend.");
+  }
+  if (beanConfig.getClass().equals(FormBeanConfig.class)) {
+    if (!baseConfig.getClass().equals(beanConfig.getClass())) {
+      FormBeanConfig newBeanConfig=null;
+      String baseConfigClassName=baseConfig.getClass().getName();
+      try {
+        newBeanConfig=(FormBeanConfig)RequestUtils.applicationInstance(baseConfigClassName);
+        BeanUtils.copyProperties(newBeanConfig,beanConfig);
+        FormPropertyConfig[] fpc=beanConfig.findFormPropertyConfigs();
+        for (int i=0; i < fpc.length; i++) {
+          newBeanConfig.addFormPropertyConfig(fpc[i]);
+        }
+      }
+ catch (      Exception e) {
+        handleCreationException(baseConfigClassName,e);
+      }
+      moduleConfig.removeFormBeanConfig(beanConfig);
+      moduleConfig.addFormBeanConfig(newBeanConfig);
+      beanConfig=newBeanConfig;
+    }
+  }
+  return beanConfig;
+}

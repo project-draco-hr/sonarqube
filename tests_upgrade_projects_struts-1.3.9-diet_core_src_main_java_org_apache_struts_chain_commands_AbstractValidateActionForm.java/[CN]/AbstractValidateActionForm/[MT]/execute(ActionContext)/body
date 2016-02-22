@@ -1,0 +1,24 @@
+{
+  actionCtx.setFormValid(Boolean.TRUE);
+  ActionForm actionForm=actionCtx.getActionForm();
+  if (actionForm == null) {
+    return false;
+  }
+  ActionConfig actionConfig=actionCtx.getActionConfig();
+  if (!actionConfig.getValidate()) {
+    return false;
+  }
+  if (isCancelled(actionCtx,actionConfig)) {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(" Cancelled transaction, skipping validation");
+    }
+    return false;
+  }
+  ActionErrors errors=validate(actionCtx,actionConfig,actionForm);
+  if ((errors == null) || (errors.isEmpty())) {
+    return false;
+  }
+  actionCtx.saveErrors(errors);
+  actionCtx.setFormValid(Boolean.FALSE);
+  return false;
+}

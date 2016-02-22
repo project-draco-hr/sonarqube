@@ -1,0 +1,19 @@
+{
+  Map params=TagUtils.getInstance().computeParameters(pageContext,paramId,paramName,paramProperty,paramScope,name,property,scope,transaction);
+  if (!this.parameters.isEmpty()) {
+    if (params == null) {
+      params=new HashMap();
+    }
+    params.putAll(this.parameters);
+  }
+  String url=null;
+  try {
+    url=TagUtils.getInstance().computeURLWithCharEncoding(pageContext,forward,href,page,action,module,params,anchor,false,this.isXhtml(),useLocalEncoding);
+  }
+ catch (  MalformedURLException e) {
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw new JspException(messages.getMessage("rewrite.url",e.toString()));
+  }
+  TagUtils.getInstance().write(pageContext,url);
+  return (EVAL_PAGE);
+}

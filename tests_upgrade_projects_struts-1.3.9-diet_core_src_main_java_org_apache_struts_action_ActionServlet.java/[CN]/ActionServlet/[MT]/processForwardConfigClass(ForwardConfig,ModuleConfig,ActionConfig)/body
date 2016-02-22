@@ -1,0 +1,39 @@
+{
+  String ancestor=forwardConfig.getExtends();
+  if (ancestor == null) {
+    return forwardConfig;
+  }
+  ForwardConfig baseConfig=null;
+  if (actionConfig != null) {
+    baseConfig=actionConfig.findForwardConfig(ancestor);
+  }
+  if (baseConfig == null) {
+    baseConfig=moduleConfig.findForwardConfig(ancestor);
+  }
+  if (baseConfig == null) {
+    throw new UnavailableException("Unable to find " + "forward '" + ancestor + "' to extend.");
+  }
+  if (forwardConfig.getClass().equals(ActionForward.class)) {
+    if (!baseConfig.getClass().equals(forwardConfig.getClass())) {
+      ForwardConfig newForwardConfig=null;
+      String baseConfigClassName=baseConfig.getClass().getName();
+      try {
+        newForwardConfig=(ForwardConfig)RequestUtils.applicationInstance(baseConfigClassName);
+        BeanUtils.copyProperties(newForwardConfig,forwardConfig);
+      }
+ catch (      Exception e) {
+        handleCreationException(baseConfigClassName,e);
+      }
+      if (actionConfig != null) {
+        actionConfig.removeForwardConfig(forwardConfig);
+        actionConfig.addForwardConfig(newForwardConfig);
+      }
+ else {
+        moduleConfig.removeForwardConfig(forwardConfig);
+        moduleConfig.addForwardConfig(newForwardConfig);
+      }
+      forwardConfig=newForwardConfig;
+    }
+  }
+  return forwardConfig;
+}

@@ -1,0 +1,19 @@
+{
+  ActionMapping mapping=(ActionMapping)moduleConfig.findActionConfig(path);
+  if (mapping != null) {
+    request.setAttribute(Globals.MAPPING_KEY,mapping);
+    return (mapping);
+  }
+  ActionConfig[] configs=moduleConfig.findActionConfigs();
+  for (int i=0; i < configs.length; i++) {
+    if (configs[i].getUnknown()) {
+      mapping=(ActionMapping)configs[i];
+      request.setAttribute(Globals.MAPPING_KEY,mapping);
+      return (mapping);
+    }
+  }
+  String msg=getInternal().getMessage("processInvalid");
+  log.error(msg + " " + path);
+  response.sendError(HttpServletResponse.SC_NOT_FOUND,msg);
+  return null;
+}

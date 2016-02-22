@@ -1,0 +1,14 @@
+{
+  CustomForwardConfig customBase=new CustomForwardConfig("success","/success.jsp");
+  moduleConfig.addForwardConfig(customBase);
+  ActionForward customSub=new ActionForward();
+  customSub.setName("failure");
+  customSub.setExtends("success");
+  moduleConfig.addForwardConfig(customSub);
+  ForwardConfig result=actionServlet.processForwardConfigClass(customSub,moduleConfig,null);
+  assertTrue("Incorrect class of forward config",result instanceof CustomForwardConfig);
+  assertEquals("Incorrect name",customSub.getName(),result.getName());
+  assertEquals("Incorrect path",customSub.getPath(),result.getPath());
+  assertEquals("Incorrect extends",customSub.getExtends(),result.getExtends());
+  assertSame("Result was not registered in the module config",result,moduleConfig.findForwardConfig("failure"));
+}

@@ -1,0 +1,18 @@
+{
+  int scope=PageContext.SESSION_SCOPE;
+  if ("request".equalsIgnoreCase(beanScope)) {
+    scope=PageContext.REQUEST_SCOPE;
+  }
+  Object bean=pageContext.getAttribute(beanName,scope);
+  if (bean == null) {
+    bean=RequestUtils.createActionForm((HttpServletRequest)pageContext.getRequest(),mapping,moduleConfig,servlet);
+    if (bean instanceof ActionForm) {
+      ((ActionForm)bean).reset(mapping,(HttpServletRequest)pageContext.getRequest());
+    }
+    if (bean == null) {
+      throw new JspException(messages.getMessage("formTag.create",beanType));
+    }
+    pageContext.setAttribute(beanName,bean,scope);
+  }
+  pageContext.setAttribute(Constants.BEAN_KEY,bean,PageContext.REQUEST_SCOPE);
+}

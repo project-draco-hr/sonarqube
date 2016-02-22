@@ -1,0 +1,56 @@
+{
+  if (form == null) {
+    return (true);
+  }
+  if (!mapping.getValidate()) {
+    return (true);
+  }
+  if (request.getAttribute(Globals.CANCEL_KEY) != null) {
+    if (mapping.getCancellable()) {
+      if (log.isDebugEnabled()) {
+        log.debug(" Cancelled transaction, skipping validation");
+      }
+      return (true);
+    }
+ else {
+      request.removeAttribute(Globals.CANCEL_KEY);
+      throw new InvalidCancelException();
+    }
+  }
+  if (log.isDebugEnabled()) {
+    log.debug(" Validating input form properties");
+  }
+  ActionMessages errors=form.validate(mapping,request);
+  if ((errors == null) || errors.isEmpty()) {
+    if (log.isTraceEnabled()) {
+      log.trace("  No errors detected, accepting input");
+    }
+    return (true);
+  }
+  if (form.getMultipartRequestHandler() != null) {
+    if (log.isTraceEnabled()) {
+      log.trace("  Rolling back multipart request");
+    }
+    form.getMultipartRequestHandler().rollback();
+  }
+  String input=mapping.getInput();
+  if (input == null) {
+    if (log.isTraceEnabled()) {
+      log.trace("  Validation failed but no input form available");
+    }
+    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,getInternal().getMessage("noInput",mapping.getPath()));
+    return (false);
+  }
+  if (log.isDebugEnabled()) {
+    log.debug(" Validation failed, returning to '" + input + "'");
+  }
+  request.setAttribute(Globals.ERROR_KEY,errors);
+  if (moduleConfig.getControllerConfig().getInputForward()) {
+    ForwardConfig forward=mapping.findForward(input);
+    processForwardConfig(request,response,forward);
+  }
+ else {
+    internalModuleRelativeForward(input,request,response);
+  }
+  return (false);
+}

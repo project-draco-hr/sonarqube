@@ -1,0 +1,42 @@
+{
+  HttpServletRequest request=(HttpServletRequest)pageContext.getRequest();
+  String contextPath=request.getContextPath();
+  StringBuffer value=new StringBuffer();
+  if (contextPath.length() > 1) {
+    value.append(contextPath);
+  }
+  ModuleConfig moduleConfig=getModuleConfig(module,pageContext);
+  if ((moduleConfig != null) && (!contextRelative)) {
+    value.append(moduleConfig.getPrefix());
+  }
+  String servletMapping=(String)pageContext.getAttribute(Globals.SERVLET_KEY,PageContext.APPLICATION_SCOPE);
+  if (servletMapping != null) {
+    String queryString=null;
+    int question=action.indexOf("?");
+    if (question >= 0) {
+      queryString=action.substring(question);
+    }
+    String actionMapping=getActionMappingName(action);
+    if (servletMapping.startsWith("*.")) {
+      value.append(actionMapping);
+      value.append(servletMapping.substring(1));
+    }
+ else     if (servletMapping.endsWith("/*")) {
+      value.append(servletMapping.substring(0,servletMapping.length() - 2));
+      value.append(actionMapping);
+    }
+ else     if (servletMapping.equals("/")) {
+      value.append(actionMapping);
+    }
+    if (queryString != null) {
+      value.append(queryString);
+    }
+  }
+ else {
+    if (!action.startsWith("/")) {
+      value.append("/");
+    }
+    value.append(action);
+  }
+  return value.toString();
+}

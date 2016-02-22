@@ -1,0 +1,22 @@
+{
+  ExceptionConfig config=mapping.findException(exception.getClass());
+  if (config == null) {
+    log.warn(getInternal().getMessage("unhandledException",exception.getClass()));
+    if (exception instanceof IOException) {
+      throw (IOException)exception;
+    }
+ else     if (exception instanceof ServletException) {
+      throw (ServletException)exception;
+    }
+ else {
+      throw new ServletException(exception);
+    }
+  }
+  try {
+    ExceptionHandler handler=(ExceptionHandler)RequestUtils.applicationInstance(config.getHandler());
+    return (handler.execute(exception,config,mapping,form,request,response));
+  }
+ catch (  Exception e) {
+    throw new ServletException(e);
+  }
+}

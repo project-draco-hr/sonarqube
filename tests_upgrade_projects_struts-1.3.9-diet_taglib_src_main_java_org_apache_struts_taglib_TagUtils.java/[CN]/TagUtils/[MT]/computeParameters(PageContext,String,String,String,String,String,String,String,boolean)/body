@@ -1,0 +1,69 @@
+{
+  if ((paramId == null) && (name == null) && !transaction) {
+    return (null);
+  }
+  Map map=null;
+  try {
+    if (name != null) {
+      map=(Map)getInstance().lookup(pageContext,name,property,scope);
+    }
+  }
+ catch (  JspException e) {
+    saveException(pageContext,e);
+    throw e;
+  }
+  Map results=null;
+  if (map != null) {
+    results=new HashMap(map);
+  }
+ else {
+    results=new HashMap();
+  }
+  if ((paramId != null) && (paramName != null)) {
+    Object paramValue=null;
+    try {
+      paramValue=TagUtils.getInstance().lookup(pageContext,paramName,paramProperty,paramScope);
+    }
+ catch (    JspException e) {
+      saveException(pageContext,e);
+      throw e;
+    }
+    if (paramValue != null) {
+      String paramString=null;
+      if (paramValue instanceof String) {
+        paramString=(String)paramValue;
+      }
+ else {
+        paramString=paramValue.toString();
+      }
+      Object mapValue=results.get(paramId);
+      if (mapValue == null) {
+        results.put(paramId,paramString);
+      }
+ else       if (mapValue instanceof String[]) {
+        String[] oldValues=(String[])mapValue;
+        String[] newValues=new String[oldValues.length + 1];
+        System.arraycopy(oldValues,0,newValues,0,oldValues.length);
+        newValues[oldValues.length]=paramString;
+        results.put(paramId,newValues);
+      }
+ else {
+        String[] newValues=new String[2];
+        newValues[0]=mapValue.toString();
+        newValues[1]=paramString;
+        results.put(paramId,newValues);
+      }
+    }
+  }
+  if (transaction) {
+    HttpSession session=pageContext.getSession();
+    String token=null;
+    if (session != null) {
+      token=(String)session.getAttribute(Globals.TRANSACTION_TOKEN_KEY);
+    }
+    if (token != null) {
+      results.put(Constants.TOKEN_KEY,token);
+    }
+  }
+  return (results);
+}

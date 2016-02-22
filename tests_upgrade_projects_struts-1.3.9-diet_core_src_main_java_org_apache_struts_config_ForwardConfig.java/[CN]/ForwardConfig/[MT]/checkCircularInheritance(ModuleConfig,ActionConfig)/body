@@ -1,0 +1,44 @@
+{
+  String ancestorName=getExtends();
+  if (ancestorName == null) {
+    return false;
+  }
+  ForwardConfig ancestor=null;
+  if (actionConfig != null) {
+    ancestor=actionConfig.findForwardConfig(ancestorName);
+    if (ancestor == this) {
+      ancestor=null;
+    }
+  }
+  if (ancestor == null) {
+    ancestor=moduleConfig.findForwardConfig(ancestorName);
+    if (ancestor != null) {
+      actionConfig=null;
+    }
+  }
+  while (ancestor != null) {
+    if (ancestor == this) {
+      return true;
+    }
+    ancestorName=ancestor.getExtends();
+    if (ancestor.getName().equals(ancestorName)) {
+      if (actionConfig == null) {
+        return false;
+      }
+ else {
+        actionConfig=null;
+      }
+    }
+    ancestor=null;
+    if (actionConfig != null) {
+      ancestor=actionConfig.findForwardConfig(ancestorName);
+    }
+    if (ancestor == null) {
+      ancestor=moduleConfig.findForwardConfig(ancestorName);
+      if (ancestor != null) {
+        actionConfig=null;
+      }
+    }
+  }
+  return false;
+}

@@ -1,0 +1,23 @@
+{
+  if ((className != null) && (className.trim().length() > 0)) {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("setActionContextClassName: requested context class: " + className);
+    }
+    try {
+      Class actionContextClass=RequestUtils.applicationClass(className);
+      if (!ActionContext.class.isAssignableFrom(actionContextClass)) {
+        throw new UnavailableException("ActionContextClass " + "[" + className + "]"+ " must implement ActionContext interface.");
+      }
+      this.setActionContextClass(actionContextClass);
+    }
+ catch (    ClassNotFoundException e) {
+      throw new UnavailableException("ActionContextClass " + className + " not found.");
+    }
+  }
+ else {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("setActionContextClassName: no className specified");
+    }
+    this.setActionContextClass(null);
+  }
+}

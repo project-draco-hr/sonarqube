@@ -1,0 +1,23 @@
+{
+  String key=this.key;
+  if (key == null) {
+    Object value=TagUtils.getInstance().lookup(pageContext,name,property,scope);
+    if ((value != null) && !(value instanceof String)) {
+      JspException e=new JspException(messages.getMessage("message.property",key));
+      TagUtils.getInstance().saveException(pageContext,e);
+      throw e;
+    }
+    key=(String)value;
+  }
+  Object[] args=new Object[]{arg0,arg1,arg2,arg3,arg4};
+  String message=TagUtils.getInstance().message(pageContext,this.bundle,this.localeKey,key,args);
+  if (message == null) {
+    Locale locale=TagUtils.getInstance().getUserLocale(pageContext,this.localeKey);
+    String localeVal=(locale == null) ? "default locale" : locale.toString();
+    JspException e=new JspException(messages.getMessage("message.message","\"" + key + "\"","\"" + ((bundle == null) ? "(default bundle)" : bundle) + "\"",localeVal));
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw e;
+  }
+  TagUtils.getInstance().write(pageContext,message);
+  return (SKIP_BODY);
+}

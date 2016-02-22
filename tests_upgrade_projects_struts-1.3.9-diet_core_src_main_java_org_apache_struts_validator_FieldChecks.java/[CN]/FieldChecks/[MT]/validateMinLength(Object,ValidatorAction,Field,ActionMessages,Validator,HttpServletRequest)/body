@@ -1,0 +1,27 @@
+{
+  String value=null;
+  value=evaluateBean(bean,field);
+  if (!GenericValidator.isBlankOrNull(value)) {
+    try {
+      String minVar=Resources.getVarValue("minlength",field,validator,request,true);
+      int min=Integer.parseInt(minVar);
+      boolean isValid=false;
+      String endLth=Resources.getVarValue("lineEndLength",field,validator,request,false);
+      if (GenericValidator.isBlankOrNull(endLth)) {
+        isValid=GenericValidator.minLength(value,min);
+      }
+ else {
+        isValid=GenericValidator.minLength(value,min,Integer.parseInt(endLth));
+      }
+      if (!isValid) {
+        errors.add(field.getKey(),Resources.getActionMessage(validator,request,va,field));
+        return false;
+      }
+    }
+ catch (    Exception e) {
+      processFailure(errors,field,"minlength",e);
+      return false;
+    }
+  }
+  return true;
+}

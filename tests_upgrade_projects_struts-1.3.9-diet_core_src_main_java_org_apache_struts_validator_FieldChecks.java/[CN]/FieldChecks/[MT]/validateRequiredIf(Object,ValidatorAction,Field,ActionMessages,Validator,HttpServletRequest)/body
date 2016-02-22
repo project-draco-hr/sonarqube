@@ -1,0 +1,69 @@
+{
+  Object form=validator.getParameterValue(org.apache.commons.validator.Validator.BEAN_PARAM);
+  String value=null;
+  boolean required=false;
+  value=evaluateBean(bean,field);
+  int i=0;
+  String fieldJoin="AND";
+  if (!GenericValidator.isBlankOrNull(field.getVarValue("fieldJoin"))) {
+    fieldJoin=field.getVarValue("fieldJoin");
+  }
+  if (fieldJoin.equalsIgnoreCase("AND")) {
+    required=true;
+  }
+  while (!GenericValidator.isBlankOrNull(field.getVarValue("field[" + i + "]"))) {
+    String dependProp=field.getVarValue("field[" + i + "]");
+    String dependTest=field.getVarValue("fieldTest[" + i + "]");
+    String dependTestValue=field.getVarValue("fieldValue[" + i + "]");
+    String dependIndexed=field.getVarValue("fieldIndexed[" + i + "]");
+    if (dependIndexed == null) {
+      dependIndexed="false";
+    }
+    String dependVal=null;
+    boolean thisRequired=false;
+    if (field.isIndexed() && dependIndexed.equalsIgnoreCase("true")) {
+      String key=field.getKey();
+      if ((key.indexOf("[") > -1) && (key.indexOf("]") > -1)) {
+        String ind=key.substring(0,key.indexOf(".") + 1);
+        dependProp=ind + dependProp;
+      }
+    }
+    dependVal=ValidatorUtils.getValueAsString(form,dependProp);
+    if (dependTest.equals(FIELD_TEST_NULL)) {
+      if ((dependVal != null) && (dependVal.length() > 0)) {
+        thisRequired=false;
+      }
+ else {
+        thisRequired=true;
+      }
+    }
+    if (dependTest.equals(FIELD_TEST_NOTNULL)) {
+      if ((dependVal != null) && (dependVal.length() > 0)) {
+        thisRequired=true;
+      }
+ else {
+        thisRequired=false;
+      }
+    }
+    if (dependTest.equals(FIELD_TEST_EQUAL)) {
+      thisRequired=dependTestValue.equalsIgnoreCase(dependVal);
+    }
+    if (fieldJoin.equalsIgnoreCase("AND")) {
+      required=required && thisRequired;
+    }
+ else {
+      required=required || thisRequired;
+    }
+    i++;
+  }
+  if (required) {
+    if (GenericValidator.isBlankOrNull(value)) {
+      errors.add(field.getKey(),Resources.getActionMessage(validator,request,va,field));
+      return false;
+    }
+ else {
+      return true;
+    }
+  }
+  return true;
+}

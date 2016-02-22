@@ -1,0 +1,39 @@
+{
+  String ancestor=exceptionConfig.getExtends();
+  if (ancestor == null) {
+    return exceptionConfig;
+  }
+  ExceptionConfig baseConfig=null;
+  if (actionConfig != null) {
+    baseConfig=actionConfig.findExceptionConfig(ancestor);
+  }
+  if (baseConfig == null) {
+    baseConfig=moduleConfig.findExceptionConfig(ancestor);
+  }
+  if (baseConfig == null) {
+    throw new UnavailableException("Unable to find " + "exception config '" + ancestor + "' to extend.");
+  }
+  if (exceptionConfig.getClass().equals(ExceptionConfig.class)) {
+    if (!baseConfig.getClass().equals(exceptionConfig.getClass())) {
+      ExceptionConfig newExceptionConfig=null;
+      String baseConfigClassName=baseConfig.getClass().getName();
+      try {
+        newExceptionConfig=(ExceptionConfig)RequestUtils.applicationInstance(baseConfigClassName);
+        BeanUtils.copyProperties(newExceptionConfig,exceptionConfig);
+      }
+ catch (      Exception e) {
+        handleCreationException(baseConfigClassName,e);
+      }
+      if (actionConfig != null) {
+        actionConfig.removeExceptionConfig(exceptionConfig);
+        actionConfig.addExceptionConfig(newExceptionConfig);
+      }
+ else {
+        moduleConfig.removeExceptionConfig(exceptionConfig);
+        moduleConfig.addExceptionConfig(newExceptionConfig);
+      }
+      exceptionConfig=newExceptionConfig;
+    }
+  }
+  return exceptionConfig;
+}

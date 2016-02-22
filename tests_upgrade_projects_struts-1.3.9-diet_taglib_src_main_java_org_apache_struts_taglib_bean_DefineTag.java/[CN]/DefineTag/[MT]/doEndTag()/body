@@ -1,0 +1,40 @@
+{
+  int n=0;
+  if (this.body != null) {
+    n++;
+  }
+  if (this.name != null) {
+    n++;
+  }
+  if (this.value != null) {
+    n++;
+  }
+  if (n > 1) {
+    JspException e=new JspException(messages.getMessage("define.value",id));
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw e;
+  }
+  Object value=this.value;
+  if ((value == null) && (name != null)) {
+    value=TagUtils.getInstance().lookup(pageContext,name,property,scope);
+  }
+  if ((value == null) && (body != null)) {
+    value=body;
+  }
+  if (value == null) {
+    JspException e=new JspException(messages.getMessage("define.null",id));
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw e;
+  }
+  int inScope=PageContext.PAGE_SCOPE;
+  try {
+    if (toScope != null) {
+      inScope=TagUtils.getInstance().getScope(toScope);
+    }
+  }
+ catch (  JspException e) {
+    log.warn("toScope was invalid name so we default to PAGE_SCOPE",e);
+  }
+  pageContext.setAttribute(id,value,inScope);
+  return (EVAL_PAGE);
+}

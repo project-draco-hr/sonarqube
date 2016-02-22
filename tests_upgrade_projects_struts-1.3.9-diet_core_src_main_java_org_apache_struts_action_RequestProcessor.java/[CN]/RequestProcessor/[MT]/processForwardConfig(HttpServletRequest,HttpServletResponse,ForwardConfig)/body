@@ -1,0 +1,32 @@
+{
+  if (forward == null) {
+    return;
+  }
+  if (log.isDebugEnabled()) {
+    log.debug("processForwardConfig(" + forward + ")");
+  }
+  String forwardPath=forward.getPath();
+  String uri;
+  String actionIdPath=RequestUtils.actionIdURL(forward,request,servlet);
+  if (actionIdPath != null) {
+    forwardPath=actionIdPath;
+    ForwardConfig actionIdForward=new ForwardConfig(forward);
+    actionIdForward.setPath(actionIdPath);
+    forward=actionIdForward;
+  }
+  if (forwardPath.startsWith("/")) {
+    uri=RequestUtils.forwardURL(request,forward,null);
+  }
+ else {
+    uri=forwardPath;
+  }
+  if (forward.getRedirect()) {
+    if (uri.startsWith("/")) {
+      uri=request.getContextPath() + uri;
+    }
+    response.sendRedirect(response.encodeRedirectURL(uri));
+  }
+ else {
+    doForward(uri,request,response);
+  }
+}

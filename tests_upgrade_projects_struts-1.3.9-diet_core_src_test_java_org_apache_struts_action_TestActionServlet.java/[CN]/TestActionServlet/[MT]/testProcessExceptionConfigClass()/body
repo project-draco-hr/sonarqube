@@ -1,0 +1,16 @@
+{
+  CustomExceptionConfig customBase=new CustomExceptionConfig();
+  customBase.setType("java.lang.NullPointerException");
+  customBase.setKey("msg.exception.npe");
+  moduleConfig.addExceptionConfig(customBase);
+  ExceptionConfig customSub=new ExceptionConfig();
+  customSub.setType("java.lang.IllegalStateException");
+  customSub.setExtends("java.lang.NullPointerException");
+  moduleConfig.addExceptionConfig(customSub);
+  ExceptionConfig result=actionServlet.processExceptionConfigClass(customSub,moduleConfig,null);
+  assertTrue("Incorrect class of exception config",result instanceof CustomExceptionConfig);
+  assertEquals("Incorrect type",customSub.getType(),result.getType());
+  assertEquals("Incorrect key",customSub.getKey(),result.getKey());
+  assertEquals("Incorrect extends",customSub.getExtends(),result.getExtends());
+  assertSame("Result was not registered in the module config",result,moduleConfig.findExceptionConfig("java.lang.IllegalStateException"));
+}

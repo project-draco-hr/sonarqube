@@ -1,0 +1,20 @@
+{
+  if (configured) {
+    throw new IllegalStateException("Configuration is frozen");
+  }
+  String ancestor=getExtends();
+  if ((!extensionProcessed) && (ancestor != null)) {
+    FormBeanConfig baseConfig=moduleConfig.findFormBeanConfig(ancestor);
+    if (baseConfig == null) {
+      throw new NullPointerException("Unable to find " + "form bean '" + ancestor + "' to extend.");
+    }
+    if (checkCircularInheritance(moduleConfig)) {
+      throw new IllegalArgumentException("Circular inheritance detected for form bean " + getName());
+    }
+    if (!baseConfig.isExtensionProcessed()) {
+      baseConfig.processExtends(moduleConfig);
+    }
+    inheritFrom(baseConfig);
+  }
+  extensionProcessed=true;
+}

@@ -1,0 +1,19 @@
+{
+  if (configured) {
+    throw new IllegalStateException("Configuration is frozen");
+  }
+  ExceptionConfig[] baseHandlers=baseConfig.findExceptionConfigs();
+  for (int i=0; i < baseHandlers.length; i++) {
+    ExceptionConfig baseHandler=baseHandlers[i];
+    ExceptionConfig copy=this.findExceptionConfig(baseHandler.getType());
+    if (copy == null) {
+      copy=(ExceptionConfig)RequestUtils.applicationInstance(baseHandler.getClass().getName());
+      BeanUtils.copyProperties(copy,baseHandler);
+      this.addExceptionConfig(copy);
+      copy.setProperties(baseHandler.copyProperties());
+    }
+ else {
+      copy.processExtends(getModuleConfig(),this);
+    }
+  }
+}

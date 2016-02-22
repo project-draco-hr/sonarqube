@@ -1,0 +1,42 @@
+{
+  int[] expr=new int[data.length() + 2];
+  char[] buff=data.toCharArray();
+  int y=0;
+  boolean slash=false;
+  expr[y++]=MATCH_BEGIN;
+  if (buff.length > 0) {
+    if (buff[0] == '\\') {
+      slash=true;
+    }
+ else     if (buff[0] == '*') {
+      expr[y++]=MATCH_FILE;
+    }
+ else {
+      expr[y++]=buff[0];
+    }
+    for (int x=1; x < buff.length; x++) {
+      if (slash) {
+        expr[y++]=buff[x];
+        slash=false;
+      }
+ else {
+        if (buff[x] == '\\') {
+          slash=true;
+        }
+ else         if (buff[x] == '*') {
+          if (expr[y - 1] <= MATCH_FILE) {
+            expr[y - 1]=MATCH_PATH;
+          }
+ else {
+            expr[y++]=MATCH_FILE;
+          }
+        }
+ else {
+          expr[y++]=buff[x];
+        }
+      }
+    }
+  }
+  expr[y]=MATCH_THEEND;
+  return expr;
+}

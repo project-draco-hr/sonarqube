@@ -1,0 +1,19 @@
+{
+  MessageResourcesConfig[] mrcs=config.findMessageResourcesConfigs();
+  for (int i=0; i < mrcs.length; i++) {
+    if ((mrcs[i].getFactory() == null) || (mrcs[i].getParameter() == null)) {
+      continue;
+    }
+    if (log.isDebugEnabled()) {
+      log.debug("Initializing module path '" + config.getPrefix() + "' message resources from '"+ mrcs[i].getParameter()+ "'");
+    }
+    String factory=mrcs[i].getFactory();
+    MessageResourcesFactory.setFactoryClass(factory);
+    MessageResourcesFactory factoryObject=MessageResourcesFactory.createFactory();
+    factoryObject.setConfig(mrcs[i]);
+    MessageResources resources=factoryObject.createResources(mrcs[i].getParameter());
+    resources.setReturnNull(mrcs[i].getNull());
+    resources.setEscape(mrcs[i].isEscape());
+    getServletContext().setAttribute(mrcs[i].getKey() + config.getPrefix(),resources);
+  }
+}

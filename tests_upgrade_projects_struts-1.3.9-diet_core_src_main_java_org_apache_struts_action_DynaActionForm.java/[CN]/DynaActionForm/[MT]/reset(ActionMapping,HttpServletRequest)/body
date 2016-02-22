@@ -1,0 +1,31 @@
+{
+  String name=getDynaClass().getName();
+  if (name == null) {
+    return;
+  }
+  FormBeanConfig config=mapping.getModuleConfig().findFormBeanConfig(name);
+  if (config == null) {
+    return;
+  }
+  FormPropertyConfig[] props=config.findFormPropertyConfigs();
+  for (int i=0; i < props.length; i++) {
+    String resetValue=props[i].getReset();
+    if ((resetValue == null) || (resetValue.length() <= 0)) {
+      continue;
+    }
+    boolean reset=Boolean.valueOf(resetValue).booleanValue();
+    if (!reset) {
+      StringTokenizer st=new StringTokenizer(resetValue,", \t\n\r\f");
+      while (st.hasMoreTokens()) {
+        String token=st.nextToken();
+        if (token.equalsIgnoreCase(request.getMethod())) {
+          reset=true;
+          break;
+        }
+      }
+    }
+    if (reset) {
+      set(props[i].getName(),props[i].initial());
+    }
+  }
+}

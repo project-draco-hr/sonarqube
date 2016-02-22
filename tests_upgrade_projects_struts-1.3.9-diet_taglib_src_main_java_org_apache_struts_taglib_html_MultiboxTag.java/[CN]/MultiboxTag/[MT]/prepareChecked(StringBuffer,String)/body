@@ -1,0 +1,29 @@
+{
+  Object bean=TagUtils.getInstance().lookup(pageContext,name,null);
+  String[] values=null;
+  if (bean == null) {
+    throw new JspException(messages.getMessage("getter.bean",name));
+  }
+  try {
+    values=BeanUtils.getArrayProperty(bean,property);
+    if (values == null) {
+      values=new String[0];
+    }
+  }
+ catch (  IllegalAccessException e) {
+    throw new JspException(messages.getMessage("getter.access",property,name));
+  }
+catch (  InvocationTargetException e) {
+    Throwable t=e.getTargetException();
+    throw new JspException(messages.getMessage("getter.result",property,t.toString()));
+  }
+catch (  NoSuchMethodException e) {
+    throw new JspException(messages.getMessage("getter.method",property,name));
+  }
+  for (int i=0; i < values.length; i++) {
+    if (value.equals(values[i])) {
+      results.append(" checked=\"checked\"");
+      break;
+    }
+  }
+}

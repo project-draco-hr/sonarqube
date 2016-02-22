@@ -1,0 +1,39 @@
+{
+  if (form != null) {
+    if (this.getDynamic()) {
+      String className=((DynaBean)form).getDynaClass().getName();
+      if (className.equals(this.getName())) {
+        log.debug("Can reuse existing instance (dynamic)");
+        return (true);
+      }
+    }
+ else {
+      try {
+        Class formClass=form.getClass();
+        if (form instanceof BeanValidatorForm) {
+          BeanValidatorForm beanValidatorForm=(BeanValidatorForm)form;
+          if (beanValidatorForm.getInstance() instanceof DynaBean) {
+            String formName=beanValidatorForm.getStrutsConfigFormName();
+            if (getName().equals(formName)) {
+              log.debug("Can reuse existing instance (BeanValidatorForm)");
+              return true;
+            }
+ else {
+              return false;
+            }
+          }
+          formClass=beanValidatorForm.getInstance().getClass();
+        }
+        Class configClass=ClassUtils.getApplicationClass(this.getType());
+        if (configClass.isAssignableFrom(formClass)) {
+          log.debug("Can reuse existing instance (non-dynamic)");
+          return (true);
+        }
+      }
+ catch (      Exception e) {
+        log.debug("Error testing existing instance for reusability; just create a new instance",e);
+      }
+    }
+  }
+  return false;
+}

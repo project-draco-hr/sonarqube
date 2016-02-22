@@ -1,0 +1,54 @@
+{
+  Map params=TagUtils.getInstance().computeParameters(pageContext,null,null,null,null,null,null,null,transaction);
+  String urlString=null;
+  URL url=null;
+  try {
+    urlString=TagUtils.getInstance().computeURLWithCharEncoding(pageContext,forward,href,page,null,null,params,anchor,false,useLocalEncoding);
+    if (urlString.indexOf(':') < 0) {
+      HttpServletRequest request=(HttpServletRequest)pageContext.getRequest();
+      url=new URL(RequestUtils.requestURL(request),urlString);
+    }
+ else {
+      url=new URL(urlString);
+    }
+  }
+ catch (  MalformedURLException e) {
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw new JspException(messages.getMessage("include.url",e.toString()));
+  }
+  URLConnection conn=null;
+  try {
+    conn=url.openConnection();
+    conn.setAllowUserInteraction(false);
+    conn.setDoInput(true);
+    conn.setDoOutput(false);
+    HttpServletRequest request=(HttpServletRequest)pageContext.getRequest();
+    addCookie(conn,urlString,request);
+    conn.connect();
+  }
+ catch (  Exception e) {
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw new JspException(messages.getMessage("include.open",url.toString(),e.toString()));
+  }
+  StringBuffer sb=new StringBuffer();
+  try {
+    BufferedInputStream is=new BufferedInputStream(conn.getInputStream());
+    InputStreamReader in=new InputStreamReader(is);
+    char[] buffer=new char[BUFFER_SIZE];
+    int n=0;
+    while (true) {
+      n=in.read(buffer);
+      if (n < 1) {
+        break;
+      }
+      sb.append(buffer,0,n);
+    }
+    in.close();
+  }
+ catch (  Exception e) {
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw new JspException(messages.getMessage("include.read",url.toString(),e.toString()));
+  }
+  pageContext.setAttribute(id,sb.toString());
+  return (SKIP_BODY);
+}

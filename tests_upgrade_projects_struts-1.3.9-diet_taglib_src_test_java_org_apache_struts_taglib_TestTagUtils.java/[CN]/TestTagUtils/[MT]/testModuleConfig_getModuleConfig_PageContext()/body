@@ -1,0 +1,20 @@
+{
+  MockServletConfig mockServletConfig=new MockServletConfig();
+  ModuleConfig moduleConfig=new ModuleConfigImpl("");
+  MockServletContext mockServletContext=new MockServletContext();
+  MockHttpServletRequest mockHttpServletRequest=new MockHttpServletRequest();
+  MockHttpServletResponse mockHttpServletResponse=new MockHttpServletResponse();
+  mockServletConfig.setServletContext(mockServletContext);
+  MockPageContext mockPageContext=new MockPageContext(mockServletConfig,mockHttpServletRequest,mockHttpServletResponse);
+  ModuleConfig foundModuleConfig=null;
+  try {
+    foundModuleConfig=tagutils.getModuleConfig(mockPageContext);
+    fail("Expected ModuleConfig to not be found");
+  }
+ catch (  NullPointerException ignore) {
+  }
+  mockHttpServletRequest.setAttribute(Globals.MODULE_KEY,moduleConfig);
+  mockPageContext.getServletContext().setAttribute(Globals.MODULE_KEY,mockPageContext);
+  foundModuleConfig=tagutils.getModuleConfig(mockPageContext);
+  assertNotNull(foundModuleConfig);
+}

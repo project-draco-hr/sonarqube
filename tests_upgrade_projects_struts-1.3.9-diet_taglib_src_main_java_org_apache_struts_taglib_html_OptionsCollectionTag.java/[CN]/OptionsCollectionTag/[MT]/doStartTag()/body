@@ -1,0 +1,70 @@
+{
+  SelectTag selectTag=(SelectTag)pageContext.getAttribute(Constants.SELECT_KEY);
+  if (selectTag == null) {
+    JspException e=new JspException(messages.getMessage("optionsCollectionTag.select"));
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw e;
+  }
+  Object collection=TagUtils.getInstance().lookup(pageContext,name,property,null);
+  if (collection == null) {
+    JspException e=new JspException(messages.getMessage("optionsCollectionTag.collection"));
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw e;
+  }
+  Iterator iter=getIterator(collection);
+  StringBuffer sb=new StringBuffer();
+  while (iter.hasNext()) {
+    Object bean=iter.next();
+    Object beanLabel=null;
+    Object beanValue=null;
+    try {
+      beanLabel=PropertyUtils.getProperty(bean,label);
+      if (beanLabel == null) {
+        beanLabel="";
+      }
+    }
+ catch (    IllegalAccessException e) {
+      JspException jspe=new JspException(messages.getMessage("getter.access",label,bean));
+      TagUtils.getInstance().saveException(pageContext,jspe);
+      throw jspe;
+    }
+catch (    InvocationTargetException e) {
+      Throwable t=e.getTargetException();
+      JspException jspe=new JspException(messages.getMessage("getter.result",label,t.toString()));
+      TagUtils.getInstance().saveException(pageContext,jspe);
+      throw jspe;
+    }
+catch (    NoSuchMethodException e) {
+      JspException jspe=new JspException(messages.getMessage("getter.method",label,bean));
+      TagUtils.getInstance().saveException(pageContext,jspe);
+      throw jspe;
+    }
+    try {
+      beanValue=PropertyUtils.getProperty(bean,value);
+      if (beanValue == null) {
+        beanValue="";
+      }
+    }
+ catch (    IllegalAccessException e) {
+      JspException jspe=new JspException(messages.getMessage("getter.access",value,bean));
+      TagUtils.getInstance().saveException(pageContext,jspe);
+      throw jspe;
+    }
+catch (    InvocationTargetException e) {
+      Throwable t=e.getTargetException();
+      JspException jspe=new JspException(messages.getMessage("getter.result",value,t.toString()));
+      TagUtils.getInstance().saveException(pageContext,jspe);
+      throw jspe;
+    }
+catch (    NoSuchMethodException e) {
+      JspException jspe=new JspException(messages.getMessage("getter.method",value,bean));
+      TagUtils.getInstance().saveException(pageContext,jspe);
+      throw jspe;
+    }
+    String stringLabel=beanLabel.toString();
+    String stringValue=beanValue.toString();
+    addOption(sb,stringLabel,stringValue,selectTag.isMatched(stringValue));
+  }
+  TagUtils.getInstance().write(pageContext,sb.toString());
+  return SKIP_BODY;
+}

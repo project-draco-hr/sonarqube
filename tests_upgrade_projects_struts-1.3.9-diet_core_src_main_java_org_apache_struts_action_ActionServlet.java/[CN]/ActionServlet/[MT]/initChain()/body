@@ -1,0 +1,21 @@
+{
+  try {
+    String value;
+    value=getServletConfig().getInitParameter("chainConfig");
+    if (value != null) {
+      chainConfig=value;
+    }
+    ConfigParser parser=new ConfigParser();
+    List urls=splitAndResolvePaths(chainConfig);
+    URL resource;
+    for (Iterator i=urls.iterator(); i.hasNext(); ) {
+      resource=(URL)i.next();
+      log.info("Loading chain catalog from " + resource);
+      parser.parse(resource);
+    }
+  }
+ catch (  Exception e) {
+    log.error("Exception loading resources",e);
+    throw new ServletException(e);
+  }
+}

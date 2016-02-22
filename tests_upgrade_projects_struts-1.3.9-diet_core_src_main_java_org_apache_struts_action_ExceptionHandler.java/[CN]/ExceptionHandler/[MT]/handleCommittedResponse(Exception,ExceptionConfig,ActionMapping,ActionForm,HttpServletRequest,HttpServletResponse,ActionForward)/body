@@ -1,0 +1,33 @@
+{
+  String includePath=determineIncludePath(config,actionForward);
+  if (includePath != null) {
+    if (includePath.startsWith("/")) {
+      LOG.debug("response committed, " + "but attempt to include results " + "of actionForward path");
+      RequestDispatcher requestDispatcher=request.getRequestDispatcher(includePath);
+      try {
+        requestDispatcher.include(request,response);
+        return;
+      }
+ catch (      IOException e) {
+        LOG.error("IOException when trying to include " + "the error page path " + includePath,e);
+      }
+catch (      ServletException e) {
+        LOG.error("ServletException when trying to include " + "the error page path " + includePath,e);
+      }
+    }
+ else {
+      LOG.warn("Suspicious includePath doesn't seem likely to work, " + "so skipping it: " + includePath + "; expected path to start with '/'");
+    }
+  }
+  LOG.debug("Include not available or failed; " + "try writing to the response directly.");
+  try {
+    response.getWriter().println("Unexpected error: " + ex);
+    response.getWriter().println("<!-- ");
+    ex.printStackTrace(response.getWriter());
+    response.getWriter().println("-->");
+  }
+ catch (  IOException e) {
+    LOG.error("Error giving minimal information about exception",e);
+    LOG.error("Original exception: ",ex);
+  }
+}

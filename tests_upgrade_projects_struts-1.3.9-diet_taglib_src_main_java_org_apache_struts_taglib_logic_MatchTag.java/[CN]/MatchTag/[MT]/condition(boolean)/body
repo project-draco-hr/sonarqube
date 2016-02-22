@@ -1,0 +1,53 @@
+{
+  String variable=null;
+  if (cookie != null) {
+    Cookie[] cookies=((HttpServletRequest)pageContext.getRequest()).getCookies();
+    if (cookies == null) {
+      cookies=new Cookie[0];
+    }
+    for (int i=0; i < cookies.length; i++) {
+      if (cookie.equals(cookies[i].getName())) {
+        variable=cookies[i].getValue();
+        break;
+      }
+    }
+  }
+ else   if (header != null) {
+    variable=((HttpServletRequest)pageContext.getRequest()).getHeader(header);
+  }
+ else   if (name != null) {
+    Object value=TagUtils.getInstance().lookup(pageContext,name,property,scope);
+    if (value != null) {
+      variable=value.toString();
+    }
+  }
+ else   if (parameter != null) {
+    variable=pageContext.getRequest().getParameter(parameter);
+  }
+ else {
+    JspException e=new JspException(messages.getMessage("logic.selector"));
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw e;
+  }
+  if (variable == null) {
+    JspException e=new JspException(messages.getMessage("logic.variable",value));
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw e;
+  }
+  boolean matched=false;
+  if (location == null) {
+    matched=(variable.indexOf(value) >= 0);
+  }
+ else   if (location.equals("start")) {
+    matched=variable.startsWith(value);
+  }
+ else   if (location.equals("end")) {
+    matched=variable.endsWith(value);
+  }
+ else {
+    JspException e=new JspException(messages.getMessage("logic.location",location));
+    TagUtils.getInstance().saveException(pageContext,e);
+    throw e;
+  }
+  return (matched == desired);
+}
