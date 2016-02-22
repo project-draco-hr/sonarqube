@@ -3,7 +3,7 @@
   NewRule newRule=NewRule.createForCustomRule("CUSTOM_RULE",templateRule.getKey()).setName("My custom").setMarkdownDescription("Some description").setSeverity(Severity.MAJOR).setStatus(RuleStatus.READY).setParameters(ImmutableMap.of("regex","a.*"));
   RuleKey customRuleKey=creator.create(newRule);
   dbSession.clearCache();
-  RuleDto rule=db.deprecatedRuleDao().getNullableByKey(dbSession,customRuleKey);
+  RuleDto rule=db.ruleDao().selectOrFailByKey(dbSession,customRuleKey);
   assertThat(rule).isNotNull();
   assertThat(rule.getKey()).isEqualTo(RuleKey.of("java","CUSTOM_RULE"));
   assertThat(rule.getTemplateId()).isEqualTo(templateRule.getId());
@@ -19,11 +19,12 @@
   assertThat(rule.getEffortToFixDescription()).isEqualTo("desc");
   assertThat(rule.getTags()).containsOnly("usertag1","usertag2");
   assertThat(rule.getSystemTags()).containsOnly("tag1","tag4");
-  List<RuleParamDto> params=db.deprecatedRuleDao().selectRuleParamsByRuleKey(dbSession,customRuleKey);
+  List<RuleParamDto> params=db.ruleDao().selectRuleParamsByRuleKey(dbSession,customRuleKey);
   assertThat(params).hasSize(1);
   RuleParamDto param=params.get(0);
   assertThat(param.getName()).isEqualTo("regex");
   assertThat(param.getDescription()).isEqualTo("Reg ex");
   assertThat(param.getType()).isEqualTo("STRING");
   assertThat(param.getDefaultValue()).isEqualTo("a.*");
+  assertThat(ruleIndex.search(new RuleQuery(),new SearchOptions()).getIds()).containsOnly(customRuleKey,templateRule.getKey());
 }

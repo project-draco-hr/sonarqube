@@ -1,16 +1,16 @@
 {
   String key="MANUAL_RULE";
-  RuleDto rule=dao.insert(dbSession,RuleTesting.newManualRule(key).setStatus(RuleStatus.REMOVED).setName("Old name").setDescription("Old description").setSeverity(Severity.INFO));
+  RuleDto rule=RuleTesting.newManualRule(key).setStatus(RuleStatus.REMOVED).setName("Old name").setDescription("Old description").setSeverity(Severity.INFO);
+  dao.insert(dbSession,rule);
   dbSession.commit();
   dbSession.clearCache();
   NewRule newRule=NewRule.createForManualRule(key).setName("New name").setMarkdownDescription("New description");
   RuleKey ruleKey=creator.create(newRule);
   dbSession.clearCache();
-  Rule result=ruleIndex.getByKey(ruleKey);
-  assertThat(result.key()).isEqualTo(RuleKey.of("manual",key));
-  assertThat(result.status()).isEqualTo(RuleStatus.READY);
-  assertThat(result.name()).isEqualTo("Old name");
-  assertThat(result.markdownDescription()).isEqualTo("Old description");
-  assertThat(result.severity()).isEqualTo(Severity.INFO);
-  assertThat(db.deprecatedRuleDao().getByKey(dbSession,result.key()).getId()).isEqualTo(rule.getId());
+  RuleDto result=db.ruleDao().selectOrFailByKey(dbSession,ruleKey);
+  assertThat(result.getKey()).isEqualTo(RuleKey.of("manual",key));
+  assertThat(result.getStatus()).isEqualTo(RuleStatus.READY);
+  assertThat(result.getName()).isEqualTo("Old name");
+  assertThat(result.getDescription()).isEqualTo("Old description");
+  assertThat(result.getSeverityString()).isEqualTo(Severity.INFO);
 }
