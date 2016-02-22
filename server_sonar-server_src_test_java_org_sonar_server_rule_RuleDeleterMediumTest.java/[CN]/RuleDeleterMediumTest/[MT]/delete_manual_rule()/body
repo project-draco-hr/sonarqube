@@ -3,7 +3,8 @@
   dao.insert(dbSession,manualRule);
   dbSession.commit();
   deleter.delete(manualRule.getKey());
-  Rule result=index.getByKey(manualRule.getKey());
+  RuleDto result=dao.selectOrFailByKey(dbSession,manualRule.getKey());
   assertThat(result).isNotNull();
-  assertThat(result.status()).isEqualTo(RuleStatus.REMOVED);
+  assertThat(result.getStatus()).isEqualTo(RuleStatus.REMOVED);
+  assertThat(index.search(new RuleQuery(),new SearchOptions()).getIds()).isEmpty();
 }

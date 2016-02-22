@@ -9,9 +9,10 @@
   dbSession.clearCache();
   activate(new RuleActivation(customRule.getKey()).setSeverity(Severity.BLOCKER),QProfileTesting.XOO_P1_KEY);
   deleter.delete(customRule.getKey());
-  Rule customRuleReloaded=index.getByKey(customRule.getKey());
+  RuleDto customRuleReloaded=dao.selectOrFailByKey(dbSession,customRule.getKey());
   assertThat(customRuleReloaded).isNotNull();
-  assertThat(customRuleReloaded.status()).isEqualTo(RuleStatus.REMOVED);
+  assertThat(customRuleReloaded.getStatus()).isEqualTo(RuleStatus.REMOVED);
   List<ActiveRule> activeRules=Lists.newArrayList(tester.get(ActiveRuleIndex.class).findByProfile(profileDto.getKey()));
   assertThat(activeRules).isEmpty();
+  assertThat(index.search(new RuleQuery(),new SearchOptions()).getIds()).containsOnly(templateRule.getKey());
 }
