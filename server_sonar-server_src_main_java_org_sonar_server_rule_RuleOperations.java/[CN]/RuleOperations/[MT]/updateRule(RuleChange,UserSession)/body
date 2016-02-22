@@ -2,12 +2,10 @@
   checkPermission(userSession);
   DbSession session=dbClient.openSession(false);
   try {
-    RuleDto ruleDto=dbClient.deprecatedRuleDao().getNullableByKey(session,ruleChange.ruleKey());
-    if (ruleDto == null) {
-      throw new NotFoundException(String.format("Unknown rule '%s'",ruleChange.ruleKey()));
-    }
+    RuleDto ruleDto=dbClient.ruleDao().selectOrFailByKey(session,ruleChange.ruleKey());
     boolean needUpdate=updateRule(ruleDto,ruleChange.debtRemediationFunction(),ruleChange.debtRemediationCoefficient(),ruleChange.debtRemediationOffset(),session);
     if (needUpdate) {
+      ruleIndexer.index();
       session.commit();
     }
   }
