@@ -8,9 +8,8 @@
   ruleDao.insertRuleParam(dbSession,customRule,templateRuleParam);
   dbSession.commit();
   RuleUpdate update=RuleUpdate.createForCustomRule(customRule.getKey()).setName("New name").setMarkdownDescription("New description").setSeverity("MAJOR").setStatus(RuleStatus.READY);
-  updater.update(dbSession,update,userSessionRule);
+  underTest.update(update,userSessionRule);
   dbSession.clearCache();
-  Rule customRuleReloaded=ruleIndex.getByKey(customRule.getKey());
-  RuleParam param=customRuleReloaded.params().get(0);
-  assertThat(param.defaultValue()).isNull();
+  List<RuleParamDto> params=ruleDao.selectRuleParamsByRuleKey(dbSession,customRule.getKey());
+  assertThat(params.get(0).getDefaultValue()).isNull();
 }

@@ -2,9 +2,9 @@
   ruleDao.insert(dbSession,RuleTesting.newDto(RULE_KEY).setTags(Sets.newHashSet("security")).setSystemTags(Sets.newHashSet("java8","javadoc")));
   dbSession.commit();
   RuleUpdate update=RuleUpdate.createForPluginRule(RULE_KEY).setTags(null);
-  updater.update(dbSession,update,userSessionRule);
+  underTest.update(update,userSessionRule);
   dbSession.clearCache();
-  RuleDto rule=ruleDao.getNullableByKey(dbSession,RULE_KEY);
+  RuleDto rule=ruleDao.selectOrFailByKey(dbSession,RULE_KEY);
   assertThat(rule.getTags()).isEmpty();
   assertThat(rule.getSystemTags()).containsOnly("java8","javadoc");
   Set<String> tags=tester.get(RuleService.class).listTags();

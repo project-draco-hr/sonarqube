@@ -2,14 +2,13 @@
   ruleDao.insert(dbSession,RuleTesting.newDto(RULE_KEY).setDefaultRemediationFunction(DebtRemediationFunction.Type.LINEAR.name()).setDefaultRemediationCoefficient("1d").setDefaultRemediationOffset(null).setRemediationFunction(null).setRemediationCoefficient(null).setRemediationOffset(null));
   dbSession.commit();
   RuleUpdate update=RuleUpdate.createForPluginRule(RULE_KEY).setDebtRemediationFunction(new DefaultDebtRemediationFunction(DebtRemediationFunction.Type.LINEAR,"2d",null));
-  updater.update(dbSession,update,userSessionRule);
+  underTest.update(update,userSessionRule);
   dbSession.clearCache();
-  Rule indexedRule=tester.get(RuleIndex.class).getByKey(RULE_KEY);
-  assertThat(indexedRule.debtRemediationFunction().type()).isEqualTo(DebtRemediationFunction.Type.LINEAR);
-  assertThat(indexedRule.debtRemediationFunction().coefficient()).isEqualTo("2d");
-  assertThat(indexedRule.debtRemediationFunction().offset()).isNull();
-  assertThat(indexedRule.debtOverloaded()).isTrue();
-  assertThat(indexedRule.defaultDebtRemediationFunction().type()).isEqualTo(DebtRemediationFunction.Type.LINEAR);
-  assertThat(indexedRule.defaultDebtRemediationFunction().coefficient()).isEqualTo("1d");
-  assertThat(indexedRule.defaultDebtRemediationFunction().offset()).isNull();
+  RuleDto rule=ruleDao.selectOrFailByKey(dbSession,RULE_KEY);
+  assertThat(rule.getRemediationFunction()).isEqualTo(DebtRemediationFunction.Type.LINEAR.name());
+  assertThat(rule.getRemediationCoefficient()).isEqualTo("2d");
+  assertThat(rule.getRemediationOffset()).isNull();
+  assertThat(rule.getDefaultRemediationFunction()).isEqualTo(DebtRemediationFunction.Type.LINEAR.name());
+  assertThat(rule.getDefaultRemediationCoefficient()).isEqualTo("1d");
+  assertThat(rule.getDefaultRemediationOffset()).isNull();
 }

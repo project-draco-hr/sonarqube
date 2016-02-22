@@ -2,9 +2,9 @@
   ruleDao.insert(dbSession,RuleTesting.newDto(RULE_KEY).setNoteData("my *note*").setNoteUserLogin("me"));
   dbSession.commit();
   RuleUpdate update=RuleUpdate.createForPluginRule(RULE_KEY).setMarkdownNote(null);
-  updater.update(dbSession,update,userSessionRule);
+  underTest.update(update,userSessionRule);
   dbSession.clearCache();
-  RuleDto rule=ruleDao.getNullableByKey(dbSession,RULE_KEY);
+  RuleDto rule=ruleDao.selectOrFailByKey(dbSession,RULE_KEY);
   assertThat(rule.getNoteData()).isNull();
   assertThat(rule.getNoteUserLogin()).isNull();
   assertThat(rule.getNoteCreatedAt()).isNull();

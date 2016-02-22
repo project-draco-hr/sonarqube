@@ -4,9 +4,9 @@
   dbSession.commit();
   RuleUpdate update=RuleUpdate.createForPluginRule(RULE_KEY);
   update.setMarkdownNote("my *note*");
-  updater.update(dbSession,update,userSessionRule);
+  underTest.update(update,userSessionRule);
   dbSession.clearCache();
-  RuleDto rule=ruleDao.getNullableByKey(dbSession,RULE_KEY);
+  RuleDto rule=ruleDao.selectOrFailByKey(dbSession,RULE_KEY);
   assertThat(rule.getNoteData()).isEqualTo("my *note*");
   assertThat(rule.getNoteUserLogin()).isEqualTo("me");
   assertThat(rule.getNoteCreatedAt()).isNotNull();

@@ -3,11 +3,15 @@
   ruleDao.insert(dbSession,manualRule);
   dbSession.commit();
   RuleUpdate update=RuleUpdate.createForManualRule(manualRule.getKey()).setName("New name").setMarkdownDescription("New description").setSeverity(Severity.CRITICAL);
-  updater.update(dbSession,update,userSessionRule);
+  underTest.update(update,userSessionRule);
   dbSession.clearCache();
-  Rule manualRuleReloaded=ruleIndex.getByKey(manualRule.getKey());
+  RuleDto manualRuleReloaded=ruleDao.selectOrFailByKey(dbSession,manualRule.getKey());
   assertThat(manualRuleReloaded).isNotNull();
-  assertThat(manualRuleReloaded.name()).isEqualTo("New name");
-  assertThat(manualRuleReloaded.htmlDescription()).isEqualTo("New description");
-  assertThat(manualRuleReloaded.severity()).isEqualTo(Severity.CRITICAL);
+  assertThat(manualRuleReloaded.getName()).isEqualTo("New name");
+  assertThat(manualRuleReloaded.getDescription()).isEqualTo("New description");
+  assertThat(manualRuleReloaded.getSeverityString()).isEqualTo(Severity.CRITICAL);
+  assertThat(ruleIndex.search(new RuleQuery().setQueryText("New name"),new SearchOptions()).getIds()).containsOnly(manualRule.getKey());
+  assertThat(ruleIndex.search(new RuleQuery().setQueryText("New description"),new SearchOptions()).getIds()).containsOnly(manualRule.getKey());
+  assertThat(ruleIndex.search(new RuleQuery().setQueryText("Old name"),new SearchOptions()).getTotal()).isZero();
+  assertThat(ruleIndex.search(new RuleQuery().setQueryText("Old description"),new SearchOptions()).getTotal()).isZero();
 }

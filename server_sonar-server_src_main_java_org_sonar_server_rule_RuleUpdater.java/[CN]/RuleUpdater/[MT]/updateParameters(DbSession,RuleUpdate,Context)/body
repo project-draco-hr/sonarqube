@@ -1,8 +1,10 @@
 {
   if (update.isChangeParameters() && update.isCustomRule()) {
     RuleDto customRule=context.rule;
-    RuleDto templateRule=dbClient.deprecatedRuleDao().selectTemplate(customRule,dbSession);
-    if (templateRule == null) {
+    Integer templateId=customRule.getTemplateId();
+    Preconditions.checkNotNull(templateId,"Rule '%s' has no persisted template!",customRule);
+    Optional<RuleDto> templateRule=dbClient.ruleDao().selectById(templateId,dbSession);
+    if (!templateRule.isPresent()) {
       throw new IllegalStateException(String.format("Template %s of rule %s does not exist",customRule.getTemplateId(),customRule.getKey()));
     }
     List<String> paramKeys=newArrayList();
