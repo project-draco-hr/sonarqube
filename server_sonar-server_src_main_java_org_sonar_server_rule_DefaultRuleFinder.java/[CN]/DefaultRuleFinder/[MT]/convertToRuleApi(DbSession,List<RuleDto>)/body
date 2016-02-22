@@ -1,0 +1,10 @@
+{
+  List<org.sonar.api.rules.Rule> rules=new ArrayList<>();
+  List<RuleKey> ruleKeys=FluentIterable.from(ruleDtos).transform(RuleDtoToKey.INSTANCE).toList();
+  List<RuleParamDto> ruleParamDtos=ruleDao.selectRuleParamsByRuleKeys(dbSession,ruleKeys);
+  ImmutableListMultimap<Integer,RuleParamDto> ruleParamByRuleId=FluentIterable.from(ruleParamDtos).index(RuleParamDtoToRuleId.INSTANCE);
+  for (  RuleDto rule : ruleDtos) {
+    rules.add(toRule(rule,ruleParamByRuleId.get(rule.getId())));
+  }
+  return rules;
+}

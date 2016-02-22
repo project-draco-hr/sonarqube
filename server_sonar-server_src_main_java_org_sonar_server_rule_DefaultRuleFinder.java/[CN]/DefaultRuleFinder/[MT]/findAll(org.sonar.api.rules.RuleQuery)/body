@@ -1,7 +1,13 @@
 {
-  List<org.sonar.api.rules.Rule> rules=newArrayList();
-  for (  Rule rule : index.search(toQuery(query),new QueryContext(userSession)).getHits()) {
-    rules.add(toRule(rule));
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    List<RuleDto> rules=ruleDao.selectByQuery(dbSession,query);
+    if (rules.isEmpty()) {
+      return Collections.emptyList();
+    }
+    return convertToRuleApi(dbSession,rules);
   }
-  return rules;
+  finally {
+    dbClient.closeSession(dbSession);
+  }
 }

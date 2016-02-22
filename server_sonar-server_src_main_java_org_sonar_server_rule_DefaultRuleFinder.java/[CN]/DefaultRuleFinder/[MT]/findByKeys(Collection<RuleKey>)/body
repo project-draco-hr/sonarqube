@@ -3,8 +3,12 @@
   if (ruleKeys.isEmpty()) {
     return rules;
   }
-  for (  Rule rule : index.getByKeys(ruleKeys)) {
-    rules.add(toRule(rule));
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    List<RuleDto> ruleDtos=ruleDao.selectByKeys(dbSession,new ArrayList<>(ruleKeys));
+    return convertToRuleApi(dbSession,ruleDtos);
   }
-  return rules;
+  finally {
+    dbClient.closeSession(dbSession);
+  }
 }

@@ -1,0 +1,17 @@
+{
+  assertThat(underTest.findById(rule1.getId()).getId()).isEqualTo(rule1.getId());
+  assertThat(underTest.findById(rule3.getId()).getConfigKey()).isEqualTo("Checker/Treewalker/AnnotationUseStyleCheck");
+  assertThat(underTest.findById(rule2.getId())).isNull();
+  assertThat(underTest.findByIds(newArrayList(rule2.getId(),rule3.getId()))).hasSize(2);
+  Rule rule=underTest.findByKey("checkstyle","com.puppycrawl.tools.checkstyle.checks.header.HeaderCheck");
+  assertThat(rule).isNotNull();
+  assertThat(rule.getKey()).isEqualTo(("com.puppycrawl.tools.checkstyle.checks.header.HeaderCheck"));
+  assertThat(rule.isEnabled()).isTrue();
+  assertThat(underTest.findByKey("checkstyle","unknown")).isNull();
+  assertThat(underTest.find(RuleQuery.create().withRepositoryKey("checkstyle").withConfigKey("unknown"))).isNull();
+  assertThat(underTest.findAll(RuleQuery.create().withRepositoryKey("checkstyle"))).hasSize(2);
+  assertThat(underTest.findAll(RuleQuery.create())).extracting("id").containsOnly(rule1.getId(),rule3.getId(),rule4.getId(),manualRule.getId());
+  assertThat(underTest.findAll(RuleQuery.create())).hasSize(4);
+  assertThat(underTest.findByKey("checkstyle","DisabledCheck")).isNull();
+  assertThat(underTest.findAll(RuleQuery.create().withRepositoryKey("unknown_repository"))).isEmpty();
+}

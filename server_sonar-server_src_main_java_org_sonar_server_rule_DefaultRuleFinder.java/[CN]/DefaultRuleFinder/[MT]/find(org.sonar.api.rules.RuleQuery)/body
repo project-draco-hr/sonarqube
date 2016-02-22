@@ -1,9 +1,14 @@
 {
-  Result<Rule> result=index.search(toQuery(query),new QueryContext(userSession));
-  if (!result.getHits().isEmpty()) {
-    return toRule(result.getHits().get(0));
-  }
- else {
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    List<RuleDto> rules=ruleDao.selectByQuery(dbSession,query);
+    if (!rules.isEmpty()) {
+      RuleDto rule=rules.get(0);
+      return toRule(rule,ruleDao.selectRuleParamsByRuleKey(dbSession,rule.getKey()));
+    }
     return null;
+  }
+  finally {
+    dbClient.closeSession(dbSession);
   }
 }

@@ -1,7 +1,13 @@
 {
-  Rule rule=index.getById(ruleId);
-  if (rule != null && rule.status() != RuleStatus.REMOVED) {
-    return toRule(rule);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    Optional<RuleDto> rule=ruleDao.selectById(ruleId,dbSession);
+    if (rule.isPresent() && rule.get().getStatus() != RuleStatus.REMOVED) {
+      return toRule(rule.get(),ruleDao.selectRuleParamsByRuleKey(dbSession,rule.get().getKey()));
+    }
+    return null;
   }
-  return null;
+  finally {
+    dbClient.closeSession(dbSession);
+  }
 }
