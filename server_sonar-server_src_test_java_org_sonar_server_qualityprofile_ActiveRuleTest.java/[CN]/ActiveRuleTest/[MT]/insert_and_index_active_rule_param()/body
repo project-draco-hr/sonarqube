@@ -9,13 +9,13 @@
   RuleParamDto maxParam=new RuleParamDto().setName("max").setType("STRING");
   db.deprecatedRuleDao().insertRuleParam(dbSession,ruleDto,maxParam);
   ActiveRuleDto activeRule=ActiveRuleDto.createFor(profileDto,ruleDto).setInheritance(ActiveRule.Inheritance.INHERITED.name()).setSeverity(Severity.BLOCKER);
-  db.activeRuleDao().insert(dbSession,activeRule);
+  db.deprecatedActiveRuleDao().insert(dbSession,activeRule);
   ActiveRuleParamDto activeRuleMinParam=ActiveRuleParamDto.createFor(minParam).setValue("minimum");
-  db.activeRuleDao().insertParam(dbSession,activeRule,activeRuleMinParam);
+  db.deprecatedActiveRuleDao().insertParam(dbSession,activeRule,activeRuleMinParam);
   ActiveRuleParamDto activeRuleMaxParam=ActiveRuleParamDto.createFor(maxParam).setValue("maximum");
-  db.activeRuleDao().insertParam(dbSession,activeRule,activeRuleMaxParam);
+  db.deprecatedActiveRuleDao().insertParam(dbSession,activeRule,activeRuleMaxParam);
   dbSession.commit();
-  List<ActiveRuleParamDto> persistedDtos=db.activeRuleDao().selectParamsByActiveRuleKey(dbSession,activeRule.getKey());
+  List<ActiveRuleParamDto> persistedDtos=db.deprecatedActiveRuleDao().selectParamsByActiveRuleKey(dbSession,activeRule.getKey());
   assertThat(persistedDtos).hasSize(2);
   ActiveRule rule=index.get(ActiveRuleIndex.class).getByKey(activeRule.getKey());
   assertThat(rule).isNotNull();

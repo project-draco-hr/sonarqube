@@ -5,10 +5,10 @@
   RuleDto ruleDto=newRuleDto(ruleKey);
   db.deprecatedRuleDao().insert(dbSession,ruleDto);
   ActiveRuleDto activeRule=ActiveRuleDto.createFor(profileDto,ruleDto).setInheritance(ActiveRule.Inheritance.INHERITED.name()).setSeverity(Severity.BLOCKER);
-  db.activeRuleDao().insert(dbSession,activeRule);
+  db.deprecatedActiveRuleDao().insert(dbSession,activeRule);
   dbSession.commit();
-  assertThat(db.activeRuleDao().getByKey(dbSession,activeRule.getKey())).isNotNull();
-  List<ActiveRuleDto> persistedDtos=db.activeRuleDao().selectByRule(dbSession,ruleDto);
+  assertThat(db.deprecatedActiveRuleDao().getByKey(dbSession,activeRule.getKey())).isNotNull();
+  List<ActiveRuleDto> persistedDtos=db.deprecatedActiveRuleDao().selectByRule(dbSession,ruleDto);
   assertThat(persistedDtos).hasSize(1);
   ActiveRule hit=index.get(ActiveRuleIndex.class).getByKey(activeRule.getKey());
   assertThat(hit).isNotNull();

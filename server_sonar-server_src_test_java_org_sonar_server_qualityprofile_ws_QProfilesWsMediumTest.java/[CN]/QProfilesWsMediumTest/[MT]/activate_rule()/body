@@ -2,11 +2,11 @@
   QualityProfileDto profile=createProfile("java");
   RuleDto rule=createRule(profile.getLanguage(),"toto");
   session.commit();
-  assertThat(db.activeRuleDao().selectByProfileKey(session,profile.getKey())).isEmpty();
+  assertThat(db.deprecatedActiveRuleDao().selectByProfileKey(session,profile.getKey())).isEmpty();
   WsTester.TestRequest request=wsTester.newPostRequest(QProfilesWs.API_ENDPOINT,RuleActivationActions.ACTIVATE_ACTION);
   request.setParam(RuleActivationActions.PROFILE_KEY,profile.getKey().toString());
   request.setParam(RuleActivationActions.RULE_KEY,rule.getKey().toString());
   WsTester.Result result=request.execute();
   session.clearCache();
-  assertThat(db.activeRuleDao().selectByProfileKey(session,profile.getKey())).hasSize(1);
+  assertThat(db.deprecatedActiveRuleDao().selectByProfileKey(session,profile.getKey())).hasSize(1);
 }

@@ -4,12 +4,12 @@
   RuleDto rule=RuleDto.createFor(RuleTesting.XOO_X1).setSeverity(Severity.MAJOR);
   db.deprecatedRuleDao().insert(dbSession,rule);
   ActiveRuleDto activeRule=ActiveRuleDto.createFor(profile,rule).setSeverity("BLOCKER");
-  db.activeRuleDao().insert(dbSession,activeRule);
+  db.deprecatedActiveRuleDao().insert(dbSession,activeRule);
   dbSession.commit();
   executeSql(String.format("DELETE FROM rules WHERE id=%s",rule.getId()));
   dbSession.commit();
   tester.clearIndexes();
-  db.activeRuleDao().synchronizeAfter(dbSession,new Date(0L));
+  db.deprecatedActiveRuleDao().synchronizeAfter(dbSession,new Date(0L));
   dbSession.commit();
   assertThat(index.get(ActiveRuleIndex.class).getNullableByKey(activeRule.getKey())).isNull();
 }

@@ -6,11 +6,11 @@
   RuleDto rule2=createRule(php.getLanguage(),"hello");
   RuleDto rule3=createRule(php.getLanguage(),"world");
   session.commit();
-  assertThat(db.activeRuleDao().selectByProfileKey(session,php.getKey())).isEmpty();
+  assertThat(db.deprecatedActiveRuleDao().selectByProfileKey(session,php.getKey())).isEmpty();
   WsTester.TestRequest request=wsTester.newPostRequest(QProfilesWs.API_ENDPOINT,BulkRuleActivationActions.BULK_ACTIVATE_ACTION);
   request.setParam(RuleActivationActions.PROFILE_KEY,php.getKey().toString());
   request.setParam(SearchAction.PARAM_LANGUAGES,"php");
   WsTester.Result result=request.execute();
   session.clearCache();
-  assertThat(db.activeRuleDao().selectByProfileKey(session,php.getKey())).hasSize(2);
+  assertThat(db.deprecatedActiveRuleDao().selectByProfileKey(session,php.getKey())).hasSize(2);
 }
