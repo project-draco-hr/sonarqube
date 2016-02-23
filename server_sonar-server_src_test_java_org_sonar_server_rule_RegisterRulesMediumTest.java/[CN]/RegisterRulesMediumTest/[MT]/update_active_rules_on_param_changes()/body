@@ -23,9 +23,9 @@
     }
   }
 );
-  ActiveRule activeRule=activeRuleIndex.getByKey(ActiveRuleKey.of(QProfileTesting.XOO_P1_KEY,RuleTesting.XOO_X1));
-  Map<String,String> params=activeRule.params();
+  List<ActiveRuleParamDto> params=db.activeRuleDao().selectParamsByActiveRuleKey(dbSession,ActiveRuleKey.of(QProfileTesting.XOO_P1_KEY,RuleTesting.XOO_X1));
   assertThat(params).hasSize(2);
-  assertThat(params.get("min")).isEqualTo("5");
-  assertThat(params.get("max")).isEqualTo("10");
+  Map<String,ActiveRuleParamDto> parmsByKey=FluentIterable.from(params).uniqueIndex(ActiveRuleParamToKey.INSTANCE);
+  assertThat(parmsByKey.get("min").getValue()).isEqualTo("5");
+  assertThat(parmsByKey.get("max").getValue()).isEqualTo("10");
 }

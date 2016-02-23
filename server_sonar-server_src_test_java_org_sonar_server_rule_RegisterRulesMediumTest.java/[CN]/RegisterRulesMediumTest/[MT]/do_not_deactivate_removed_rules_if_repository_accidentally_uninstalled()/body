@@ -13,9 +13,11 @@
   RuleActivation activation=new RuleActivation(RuleTesting.XOO_X1);
   TESTER.get(QProfileService.class).activate(QProfileTesting.XOO_P1_KEY,activation);
   register(null);
+  dbSession.commit();
+  dbSession.clearCache();
   assertThat(ruleIndex.search(new RuleQuery().setKey(RuleTesting.XOO_X1.toString()),new SearchOptions()).getTotal()).isEqualTo(0);
-  assertThat(activeRuleIndex.findByProfile(QProfileTesting.XOO_P1_KEY)).isEmpty();
+  assertThat(db.activeRuleDao().selectByProfileKey(dbSession,QProfileTesting.XOO_P1_KEY)).hasSize(1);
   register(rules);
   assertThat(ruleIndex.search(new RuleQuery().setKey(RuleTesting.XOO_X1.toString()),new SearchOptions()).getTotal()).isEqualTo(1);
-  assertThat(activeRuleIndex.findByProfile(QProfileTesting.XOO_P1_KEY)).hasSize(1);
+  assertThat(db.activeRuleDao().selectByProfileKey(dbSession,QProfileTesting.XOO_P1_KEY)).hasSize(1);
 }

@@ -7,10 +7,10 @@
   QualityProfileDto profile=qualityProfileDao.selectByNameAndLanguage("Basic","xoo",dbSession);
   assertThat(profile).isNotNull();
   verifyDefaultProfile("xoo","Basic");
-  ActiveRuleDao activeRuleDao=dbClient().deprecatedActiveRuleDao();
+  ActiveRuleDao activeRuleDao=dbClient().activeRuleDao();
   assertThat(activeRuleDao.selectByProfileKey(dbSession,profile.getKey())).hasSize(2);
   RuleKey ruleKey=RuleKey.of("xoo","x1");
-  ActiveRuleDto activeRule=activeRuleDao.getNullableByKey(dbSession,ActiveRuleKey.of(profile.getKey(),ruleKey));
+  ActiveRuleDto activeRule=activeRuleDao.selectByKey(dbSession,ActiveRuleKey.of(profile.getKey(),ruleKey)).get();
   assertThat(activeRule.getKey().qProfile()).isEqualTo(profile.getKey());
   assertThat(activeRule.getKey().ruleKey()).isEqualTo(ruleKey);
   assertThat(activeRule.getSeverityString()).isEqualTo(Severity.CRITICAL);

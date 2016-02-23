@@ -1,16 +1,16 @@
 {
   ActiveRuleKey key=ActiveRuleKey.of(profileKey,ruleKey);
-  ActiveRuleDto activeRule=db.deprecatedActiveRuleDao().getNullableByKey(session,key);
+  Optional<ActiveRuleDto> activeRule=db.activeRuleDao().selectByKey(session,key);
   Collection<ActiveRuleParamDto> activeRuleParams=null;
-  if (activeRule != null) {
-    activeRuleParams=db.deprecatedActiveRuleDao().selectParamsByActiveRuleKey(session,key);
+  if (activeRule.isPresent()) {
+    activeRuleParams=db.activeRuleDao().selectParamsByActiveRuleKey(session,key);
   }
   if (parent) {
-    context.setParentActiveRule(activeRule);
+    context.setParentActiveRule(activeRule.orNull());
     context.setParentActiveRuleParams(activeRuleParams);
   }
  else {
-    context.setActiveRule(activeRule);
+    context.setActiveRule(activeRule.orNull());
     context.setActiveRuleParams(activeRuleParams);
   }
 }
