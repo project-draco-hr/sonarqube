@@ -1,0 +1,7 @@
+{
+  BulkIndexer bulk=new BulkIndexer(esClient,INDEX);
+  bulk.start();
+  SearchRequestBuilder search=esClient.prepareSearch(INDEX).setTypes(TYPE_ACTIVE_RULE).setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),FilterBuilders.boolFilter().must(FilterBuilders.termsFilter(RuleIndexDefinition.FIELD_ACTIVE_RULE_KEY,keys))));
+  bulk.addDeletion(search);
+  bulk.stop();
+}

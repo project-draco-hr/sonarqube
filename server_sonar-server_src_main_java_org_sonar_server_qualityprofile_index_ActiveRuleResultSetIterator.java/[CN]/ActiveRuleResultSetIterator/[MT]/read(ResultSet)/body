@@ -1,0 +1,23 @@
+{
+  RuleKey ruleKey=RuleKey.of(rs.getString(4),rs.getString(3));
+  ActiveRuleKey activeRuleKey=ActiveRuleKey.of(rs.getString(5),ruleKey);
+  ActiveRuleDoc doc=new ActiveRuleDoc(activeRuleKey);
+  doc.setSeverity(SeverityUtil.getSeverityFromOrdinal(rs.getInt(1)));
+  String inheritance=rs.getString(2);
+  if (inheritance != null) {
+    doc.setInheritance(inheritance);
+  }
+ else {
+    doc.setInheritance(ActiveRule.Inheritance.NONE.name());
+  }
+  String parentProfileKey=rs.getString(6);
+  if (parentProfileKey != null) {
+    doc.setParentKey(ActiveRuleKey.of(parentProfileKey,ruleKey).toString());
+  }
+ else {
+    doc.setParentKey(null);
+  }
+  doc.setCreatedAt(rs.getLong(7));
+  doc.setUpdatedAt(rs.getLong(8));
+  return doc;
+}

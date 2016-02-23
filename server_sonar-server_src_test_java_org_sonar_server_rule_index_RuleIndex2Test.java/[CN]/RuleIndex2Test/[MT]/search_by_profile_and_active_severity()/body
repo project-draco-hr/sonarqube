@@ -1,2 +1,11 @@
 {
+  indexRules(newDoc(RULE_KEY_1).setSeverity(MAJOR),newDoc(RULE_KEY_2).setSeverity(MINOR),newDoc(RULE_KEY_3).setSeverity(INFO));
+  indexActiveRules(ActiveRuleDocTesting.newDoc(ActiveRuleKey.of(QUALITY_PROFILE_KEY1,RULE_KEY_1)).setSeverity(BLOCKER),ActiveRuleDocTesting.newDoc(ActiveRuleKey.of(QUALITY_PROFILE_KEY2,RULE_KEY_1)).setSeverity(BLOCKER),ActiveRuleDocTesting.newDoc(ActiveRuleKey.of(QUALITY_PROFILE_KEY1,RULE_KEY_2)).setSeverity(CRITICAL));
+  assertThat(index.search(new RuleQuery().setActivation(true).setQProfileKey(QUALITY_PROFILE_KEY1),new SearchOptions()).getIds()).hasSize(2);
+  SearchIdResult<RuleKey> result=index.search(new RuleQuery().setActivation(true).setQProfileKey(QUALITY_PROFILE_KEY1).setActiveSeverities(singletonList(CRITICAL)),new SearchOptions().addFacets(singletonList(RuleIndex2.FACET_ACTIVE_SEVERITIES)));
+  assertThat(result.getIds()).containsOnly(RULE_KEY_2);
+  assertThat(result.getFacets().get(RuleIndex2.FACET_ACTIVE_SEVERITIES)).containsOnly(entry(BLOCKER,1L),entry(CRITICAL,1L));
+  result=index.search(new RuleQuery(),new SearchOptions().addFacets(singletonList(RuleIndex2.FACET_ACTIVE_SEVERITIES)));
+  assertThat(result.getIds()).hasSize(3);
+  assertThat(result.getFacets().get(RuleIndex2.FACET_ACTIVE_SEVERITIES)).containsOnly(entry(BLOCKER,2L),entry(CRITICAL,1L));
 }

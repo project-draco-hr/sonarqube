@@ -1,0 +1,15 @@
+{
+  indexRules(RuleDocTesting.newDoc(RULE_KEY_1),RuleDocTesting.newDoc(RULE_KEY_2));
+  indexActiveRules(ActiveRuleDocTesting.newDoc(ActiveRuleKey.of(QUALITY_PROFILE_KEY1,RULE_KEY_1)),ActiveRuleDocTesting.newDoc(ActiveRuleKey.of(QUALITY_PROFILE_KEY2,RULE_KEY_1)));
+  List<String> profileKeys=new ArrayList<>();
+  List<ActiveRuleDoc> docs=new ArrayList<>();
+  for (int i=0; i < 30; i++) {
+    String profileKey="profile-" + i;
+    profileKeys.add(profileKey);
+    docs.add(ActiveRuleDocTesting.newDoc(ActiveRuleKey.of(profileKey,RULE_KEY_1)).setSeverity(BLOCKER));
+    docs.add(ActiveRuleDocTesting.newDoc(ActiveRuleKey.of(profileKey,RULE_KEY_2)).setSeverity(MAJOR));
+  }
+  indexActiveRules(docs.toArray(new ActiveRuleDoc[]{}));
+  Map<String,Multimap<String,FacetValue>> stats=index.getStatsByProfileKeys(profileKeys);
+  assertThat(stats).hasSize(30);
+}

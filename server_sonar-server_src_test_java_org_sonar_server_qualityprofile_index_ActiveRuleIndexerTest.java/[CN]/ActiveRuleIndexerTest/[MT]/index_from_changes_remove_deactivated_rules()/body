@@ -1,0 +1,10 @@
+{
+  ActiveRuleKey activeRuleKey1=ActiveRuleKey.of(QUALITY_PROFILE_KEY1,RULE_KEY_1);
+  ActiveRuleKey activeRuleKey2=ActiveRuleKey.of(QUALITY_PROFILE_KEY1,RULE_KEY_2);
+  ActiveRuleKey activeRuleKey3=ActiveRuleKey.of(QUALITY_PROFILE_KEY2,RULE_KEY_2);
+  ActiveRuleKey activeRuleKey4=ActiveRuleKey.of(QUALITY_PROFILE_KEY2,RULE_KEY_3);
+  indexActiveRules(newDoc(activeRuleKey1),newDoc(activeRuleKey2),newDoc(activeRuleKey3),newDoc(activeRuleKey4));
+  assertThat(esTester.getIds(INDEX,TYPE_ACTIVE_RULE)).hasSize(4);
+  indexer.index(Arrays.asList(ActiveRuleChange.createFor(ACTIVATED,activeRuleKey1),ActiveRuleChange.createFor(DEACTIVATED,activeRuleKey2),ActiveRuleChange.createFor(DEACTIVATED,activeRuleKey3)));
+  assertThat(esTester.getIds(INDEX,TYPE_ACTIVE_RULE)).containsOnly(activeRuleKey1.toString(),activeRuleKey4.toString());
+}

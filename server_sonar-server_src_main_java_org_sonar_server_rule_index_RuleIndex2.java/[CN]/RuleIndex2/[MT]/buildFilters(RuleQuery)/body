@@ -42,9 +42,9 @@
     filters.put(RuleIndexDefinition.FIELD_RULE_TEMPLATE_KEY,FilterBuilders.termFilter(RuleIndexDefinition.FIELD_RULE_TEMPLATE_KEY,template));
   }
   BoolFilterBuilder childrenFilter=FilterBuilders.boolFilter();
-  this.addTermFilter(childrenFilter,ActiveRuleNormalizer.ActiveRuleField.PROFILE_KEY.field(),query.getQProfileKey());
-  this.addTermFilter(childrenFilter,ActiveRuleNormalizer.ActiveRuleField.INHERITANCE.field(),query.getInheritance());
-  this.addTermFilter(childrenFilter,ActiveRuleNormalizer.ActiveRuleField.SEVERITY.field(),query.getActiveSeverities());
+  addTermFilter(childrenFilter,RuleIndexDefinition.FIELD_ACTIVE_RULE_PROFILE_KEY,query.getQProfileKey());
+  addTermFilter(childrenFilter,RuleIndexDefinition.FIELD_ACTIVE_RULE_INHERITANCE,query.getInheritance());
+  addTermFilter(childrenFilter,RuleIndexDefinition.FIELD_ACTIVE_RULE_SEVERITY,query.getActiveSeverities());
   FilterBuilder childQuery;
   if (childrenFilter.hasClauses()) {
     childQuery=childrenFilter;
@@ -53,10 +53,10 @@
     childQuery=FilterBuilders.matchAllFilter();
   }
   if (Boolean.TRUE.equals(query.getActivation())) {
-    filters.put("activation",FilterBuilders.hasChildFilter(IndexDefinition.ACTIVE_RULE.getIndexType(),childQuery));
+    filters.put("activation",FilterBuilders.hasChildFilter(RuleIndexDefinition.TYPE_ACTIVE_RULE,childQuery));
   }
  else   if (Boolean.FALSE.equals(query.getActivation())) {
-    filters.put("activation",FilterBuilders.boolFilter().mustNot(FilterBuilders.hasChildFilter(IndexDefinition.ACTIVE_RULE.getIndexType(),childQuery)));
+    filters.put("activation",FilterBuilders.boolFilter().mustNot(FilterBuilders.hasChildFilter(RuleIndexDefinition.TYPE_ACTIVE_RULE,childQuery)));
   }
   return filters;
 }
