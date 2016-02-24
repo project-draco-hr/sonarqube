@@ -3,7 +3,7 @@
   defProfile.activateRule(org.sonar.api.rules.Rule.create("xoo","x1").setParams(newArrayList(new RuleParam().setKey("acceptWhitespace"))),RulePriority.CRITICAL).setParameter("acceptWhitespace","true");
   register(new Rules(){
     @Override public void init(    RulesDefinition.NewRepository repository){
-      RulesDefinition.NewRule x1=repository.createRule("x1").setName("x1 name").setHtmlDescription("x1 desc").setSeverity(Severity.MINOR);
+      RulesDefinition.NewRule x1=repository.createRule("x1").setName("x1 name").setHtmlDescription("x1 desc").setSeverity(MINOR);
       x1.createParam("acceptWhitespace").setDefaultValue("false").setType(RuleParamType.BOOLEAN).setDescription("Accept whitespaces on the line");
     }
   }
@@ -11,13 +11,20 @@
   RuleKey ruleKey=RuleKey.of("xoo","x1");
   QualityProfileDto profile=tester.get(QualityProfileDao.class).selectByNameAndLanguage("Basic",ServerTester.Xoo.KEY,dbSession);
   ActiveRuleKey activeRuleKey=ActiveRuleKey.of(profile.getKey(),ruleKey);
-  tester.get(RuleActivator.class).activate(dbSession,new RuleActivation(ruleKey).setSeverity(Severity.BLOCKER).setParameter("acceptWhitespace","false"),profile.getKey());
+  tester.get(RuleActivator.class).activate(dbSession,new RuleActivation(ruleKey).setSeverity(BLOCKER).setParameter("acceptWhitespace","false"),profile.getKey());
   dbSession.commit();
-  ActiveRule activeRule=tester.get(ActiveRuleIndex.class).getNullableByKey(activeRuleKey);
-  assertThat(activeRule.severity()).isEqualTo(Severity.BLOCKER);
-  assertThat(activeRule.params()).isEqualTo(ImmutableMap.of("acceptWhitespace","false"));
+  ActiveRuleDto activeRuleDto=tester.get(ActiveRuleDao.class).selectOrFailByKey(dbSession,activeRuleKey);
+  assertThat(activeRuleDto.getSeverityString()).isEqualTo(BLOCKER);
+  List<ActiveRuleParamDto> activeRuleParamDtos=tester.get(ActiveRuleDao.class).selectParamsByActiveRuleKey(dbSession,activeRuleKey);
+  assertThat(activeRuleParamDtos.get(0).getKey()).isEqualTo("acceptWhitespace");
+  assertThat(activeRuleParamDtos.get(0).getValue()).isEqualTo("false");
   reset.resetLanguage(ServerTester.Xoo.KEY);
-  activeRule=tester.get(ActiveRuleIndex.class).getNullableByKey(activeRuleKey);
-  assertThat(activeRule.severity()).isEqualTo(Severity.CRITICAL);
-  assertThat(activeRule.params()).isEqualTo(ImmutableMap.of("acceptWhitespace","true"));
+  dbSession.commit();
+  activeRuleDto=tester.get(ActiveRuleDao.class).selectOrFailByKey(dbSession,activeRuleKey);
+  assertThat(activeRuleDto.getSeverityString()).isEqualTo(CRITICAL);
+  ActiveRule activeRule=tester.get(ActiveRuleIndex2.class).getNullableByKey(activeRuleKey);
+  assertThat(activeRule.severity()).isEqualTo(CRITICAL);
+  activeRuleParamDtos=tester.get(ActiveRuleDao.class).selectParamsByActiveRuleKey(dbSession,activeRuleKey);
+  assertThat(activeRuleParamDtos.get(0).getKey()).isEqualTo("acceptWhitespace");
+  assertThat(activeRuleParamDtos.get(0).getValue()).isEqualTo("true");
 }

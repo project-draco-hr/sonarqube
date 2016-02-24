@@ -19,12 +19,16 @@
       result.getErrors().add(e.errors());
     }
   }
+  List<ActiveRuleChange> changes=new ArrayList<>();
+  changes.addAll(result.getChanges());
   for (  RuleKey ruleKey : ruleToBeDeactivated) {
     try {
-      activator.deactivate(dbSession,ActiveRuleKey.of(profile.getKee(),ruleKey));
+      changes.addAll(activator.deactivate(dbSession,ActiveRuleKey.of(profile.getKee(),ruleKey)));
     }
  catch (    BadRequestException e) {
     }
   }
+  dbSession.commit();
+  activeRuleIndexer.index(changes);
   return result;
 }
