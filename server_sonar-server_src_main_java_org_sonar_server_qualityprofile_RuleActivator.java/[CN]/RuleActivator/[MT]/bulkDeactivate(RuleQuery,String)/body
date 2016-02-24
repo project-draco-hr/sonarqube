@@ -1,14 +1,12 @@
 {
   DbSession dbSession=db.openSession(false);
   try {
-    RuleIndex ruleIndex=index.get(RuleIndex.class);
     BulkChangeResult result=new BulkChangeResult();
-    Result<Rule> ruleSearchResult=ruleIndex.search(ruleQuery,new QueryContext(userSession).setScroll(true).setFieldsToReturn(Arrays.asList(RuleNormalizer.RuleField.KEY.field())));
-    Iterator<Rule> rules=ruleSearchResult.scroll();
+    Iterator<RuleKey> rules=ruleIndex.searchAll(ruleQuery);
     while (rules.hasNext()) {
       try {
-        Rule rule=rules.next();
-        ActiveRuleKey key=ActiveRuleKey.of(profile,rule.key());
+        RuleKey ruleKey=rules.next();
+        ActiveRuleKey key=ActiveRuleKey.of(profile,ruleKey);
         List<ActiveRuleChange> changes=deactivate(dbSession,key);
         result.addChanges(changes);
         if (!changes.isEmpty()) {
