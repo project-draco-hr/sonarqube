@@ -1,15 +1,16 @@
 {
   int bulkSize=QueryContext.MAX_LIMIT + 10;
   for (int i=0; i < bulkSize; i++) {
-    db.deprecatedRuleDao().insert(dbSession,RuleTesting.newDto(RuleKey.of("bulk","r_" + i)).setLanguage("xoo"));
+    db.ruleDao().insert(dbSession,newDto(RuleKey.of("bulk","r_" + i)).setLanguage("xoo"));
   }
   dbSession.commit();
+  ruleIndexer.index();
   verifyZeroActiveRules(XOO_P1_KEY);
-  assertThat(tester.get(RuleIndex.class).search(new RuleQuery().setRepositories(Arrays.asList("bulk")),new QueryContext(userSessionRule)).getTotal()).isEqualTo(bulkSize);
+  assertThat(tester.get(RuleIndex2.class).search(new RuleQuery().setRepositories(Arrays.asList("bulk")),new SearchOptions()).getTotal()).isEqualTo(bulkSize);
   BulkChangeResult result=ruleActivator.bulkActivate(new RuleQuery().setRepositories(Arrays.asList("bulk")),XOO_P1_KEY,"MINOR");
   dbSession.clearCache();
-  assertThat(db.deprecatedActiveRuleDao().selectByProfileKey(dbSession,XOO_P1_KEY)).hasSize(bulkSize);
-  assertThat(index.findByProfile(XOO_P1_KEY)).hasSize(bulkSize);
+  assertThat(db.activeRuleDao().selectByProfileKey(dbSession,XOO_P1_KEY)).hasSize(bulkSize);
+  assertThat(activeRuleIndex.findByProfile(XOO_P1_KEY)).hasSize(bulkSize);
   assertThat(result.countSucceeded()).isEqualTo(bulkSize);
   assertThat(result.countFailed()).isEqualTo(0);
 }

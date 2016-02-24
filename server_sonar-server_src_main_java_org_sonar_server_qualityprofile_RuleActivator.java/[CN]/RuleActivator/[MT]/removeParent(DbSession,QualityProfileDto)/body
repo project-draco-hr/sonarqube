@@ -1,16 +1,20 @@
 {
   if (profileDto.getParentKee() != null) {
+    List<ActiveRuleChange> changes=new ArrayList<>();
     profileDto.setParentKee(null);
     db.qualityProfileDao().update(dbSession,profileDto);
     for (    ActiveRuleDto activeRule : db.activeRuleDao().selectByProfileKey(dbSession,profileDto.getKey())) {
       if (ActiveRuleDto.INHERITED.equals(activeRule.getInheritance())) {
-        deactivate(dbSession,activeRule.getKey(),true);
+        changes.addAll(deactivate(dbSession,activeRule.getKey(),true));
       }
  else       if (ActiveRuleDto.OVERRIDES.equals(activeRule.getInheritance())) {
         activeRule.setInheritance(null);
         activeRule.setUpdatedAtInMs(system2.now());
         db.activeRuleDao().update(dbSession,activeRule);
+        changes.add(ActiveRuleChange.createFor(ActiveRuleChange.Type.UPDATED,activeRule.getKey()).setInheritance(null));
       }
     }
+    return changes;
   }
+  return Collections.emptyList();
 }

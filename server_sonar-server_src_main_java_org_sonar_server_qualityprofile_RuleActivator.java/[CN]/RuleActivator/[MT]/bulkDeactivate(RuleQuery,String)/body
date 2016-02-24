@@ -1,7 +1,7 @@
 {
   DbSession dbSession=db.openSession(false);
+  BulkChangeResult result=new BulkChangeResult();
   try {
-    BulkChangeResult result=new BulkChangeResult();
     Iterator<RuleKey> rules=ruleIndex.searchAll(ruleQuery);
     while (rules.hasNext()) {
       try {
@@ -19,6 +19,7 @@
       }
     }
     dbSession.commit();
+    activeRuleIndexer.index(result.getChanges());
     return result;
   }
   finally {

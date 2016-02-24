@@ -1,16 +1,16 @@
 {
   createChildProfiles();
-  RuleActivation activation=new RuleActivation(RuleTesting.XOO_X1).setSeverity(Severity.INFO).setParameter("max","7");
+  RuleActivation activation=new RuleActivation(XOO_X1).setSeverity(INFO).setParameter("max","7");
   activate(activation,XOO_P1_KEY);
-  activation=new RuleActivation(RuleTesting.XOO_X2).setSeverity(Severity.INFO);
+  activation=new RuleActivation(XOO_X2).setSeverity(INFO);
   activate(activation,XOO_P1_KEY);
   RuleQuery query=new RuleQuery().setActivation(true).setQProfileKey(XOO_P1_KEY);
   BulkChangeResult result=ruleActivator.bulkActivate(query,XOO_P1_KEY,"BLOCKER");
   assertThat(result.countSucceeded()).isEqualTo(2);
-  verifyHasActiveRule(XOO_P1_KEY,RuleTesting.XOO_X1,Severity.BLOCKER,null,ImmutableMap.of("max","7"));
-  verifyHasActiveRule(XOO_P1_KEY,RuleTesting.XOO_X2,Severity.BLOCKER,null,Collections.<String,String>emptyMap());
-  verifyHasActiveRule(XOO_P2_KEY,RuleTesting.XOO_X1,Severity.BLOCKER,ActiveRuleDto.INHERITED,ImmutableMap.of("max","7"));
-  verifyHasActiveRule(XOO_P2_KEY,RuleTesting.XOO_X2,Severity.BLOCKER,ActiveRuleDto.INHERITED,Collections.<String,String>emptyMap());
-  verifyHasActiveRule(XOO_P3_KEY,RuleTesting.XOO_X1,Severity.BLOCKER,ActiveRuleDto.INHERITED,ImmutableMap.of("max","7"));
-  verifyHasActiveRule(XOO_P3_KEY,RuleTesting.XOO_X2,Severity.BLOCKER,ActiveRuleDto.INHERITED,Collections.<String,String>emptyMap());
+  verifyHasActiveRuleInDbAndIndex(ActiveRuleKey.of(XOO_P1_KEY,XOO_X1),BLOCKER,null,ImmutableMap.of("max","7"));
+  verifyHasActiveRuleInDbAndIndex(ActiveRuleKey.of(XOO_P1_KEY,XOO_X2),BLOCKER,null,Collections.<String,String>emptyMap());
+  verifyHasActiveRuleInDbAndIndex(ActiveRuleKey.of(XOO_P2_KEY,XOO_X1),BLOCKER,INHERITED,ImmutableMap.of("max","7"));
+  verifyHasActiveRuleInDbAndIndex(ActiveRuleKey.of(XOO_P2_KEY,XOO_X2),BLOCKER,INHERITED,Collections.<String,String>emptyMap());
+  verifyHasActiveRuleInDbAndIndex(ActiveRuleKey.of(XOO_P3_KEY,XOO_X1),BLOCKER,INHERITED,ImmutableMap.of("max","7"));
+  verifyHasActiveRuleInDbAndIndex(ActiveRuleKey.of(XOO_P3_KEY,XOO_X2),BLOCKER,INHERITED,Collections.<String,String>emptyMap());
 }
