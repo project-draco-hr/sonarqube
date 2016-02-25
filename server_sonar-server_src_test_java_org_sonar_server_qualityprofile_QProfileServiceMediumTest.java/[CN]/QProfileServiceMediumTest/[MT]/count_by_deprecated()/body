@@ -1,8 +1,9 @@
 {
   userSessionRule.login().setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN);
   RuleDto deprecatedXooRule=RuleTesting.newDto(RuleKey.of("xoo","deprecated1")).setSeverity("MINOR").setLanguage("xoo").setStatus(RuleStatus.DEPRECATED);
-  db.deprecatedRuleDao().insert(dbSession,deprecatedXooRule);
+  db.ruleDao().insert(dbSession,deprecatedXooRule);
   dbSession.commit();
+  ruleIndexer.index();
   service.activate(XOO_P1_KEY,new RuleActivation(deprecatedXooRule.getKey()).setSeverity("BLOCKER"));
   service.activate(XOO_P1_KEY,new RuleActivation(RuleTesting.XOO_X1).setSeverity("BLOCKER"));
   dbSession.commit();

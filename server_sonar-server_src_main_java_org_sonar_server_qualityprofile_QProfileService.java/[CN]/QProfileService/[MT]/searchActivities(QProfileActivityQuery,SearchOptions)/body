@@ -5,8 +5,8 @@
     Result<QProfileActivity> result=new Result<>(response);
     for (    SearchHit hit : response.getHits().getHits()) {
       QProfileActivity profileActivity=new QProfileActivity(hit.getSource());
-      RuleDto ruleDto=db.deprecatedRuleDao().getNullableByKey(session,profileActivity.ruleKey());
-      profileActivity.ruleName(ruleDto != null ? ruleDto.getName() : null);
+      Optional<RuleDto> ruleDto=db.ruleDao().selectByKey(session,profileActivity.ruleKey());
+      profileActivity.ruleName(ruleDto.isPresent() ? ruleDto.get().getName() : null);
       String login=profileActivity.getLogin();
       if (login != null) {
         UserDto user=db.userDao().selectActiveUserByLogin(session,login);
