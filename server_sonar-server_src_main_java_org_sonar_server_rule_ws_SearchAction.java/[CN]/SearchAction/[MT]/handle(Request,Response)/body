@@ -1,7 +1,13 @@
 {
-  QueryContext context=getQueryContext(request);
-  RuleQuery query=doQuery(request);
-  Result<Rule> result=doSearch(query,context);
-  SearchResponse responseBuilder=buildResponse(request,context,result);
-  writeProtobuf(responseBuilder,request,response);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    QueryContext context=getQueryContext(request);
+    RuleQuery query=doQuery(request);
+    SearchResult searchResult=doSearch(dbSession,query,context);
+    SearchResponse responseBuilder=buildResponse(dbSession,request,context,searchResult);
+    writeProtobuf(responseBuilder,request,response);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
 }

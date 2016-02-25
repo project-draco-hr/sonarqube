@@ -1,0 +1,20 @@
+{
+  if (shouldReturnField(fieldsToReturn,RuleNormalizer.RuleField.HTML_DESCRIPTION)) {
+    String description=ruleDto.getDescription();
+    if (description != null) {
+switch (ruleDto.getDescriptionFormat()) {
+case MARKDOWN:
+        ruleResponse.setHtmlDesc(macroInterpreter.interpret(Markdown.convertToHtml(description)));
+      break;
+case HTML:
+    ruleResponse.setHtmlDesc(macroInterpreter.interpret(description));
+  break;
+default :
+throw new IllegalStateException(format("Rule description format '%s' is unknown for key '%s'",ruleDto.getDescriptionFormat(),ruleDto.getKey().toString()));
+}
+}
+}
+if (shouldReturnField(fieldsToReturn,RuleNormalizer.RuleField.MARKDOWN_DESCRIPTION) && ruleDto.getDescription() != null) {
+ruleResponse.setMdDesc(ruleDto.getDescription());
+}
+}

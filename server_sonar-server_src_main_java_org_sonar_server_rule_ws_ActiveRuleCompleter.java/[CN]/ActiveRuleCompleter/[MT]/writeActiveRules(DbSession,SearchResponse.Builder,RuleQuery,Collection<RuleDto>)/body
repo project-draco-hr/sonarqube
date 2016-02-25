@@ -1,0 +1,37 @@
+{
+  Collection<String> qProfileKeys=newHashSet();
+  Rules.Actives.Builder activesBuilder=response.getActivesBuilder();
+  String profileKey=query.getQProfileKey();
+  if (profileKey != null) {
+    for (    RuleDto rule : rules) {
+      ActiveRule activeRule=loader.getActiveRule(ActiveRuleKey.of(profileKey,rule.getKey()));
+      if (activeRule != null) {
+        Optional<ActiveRuleDto> activeRuleDto=dbClient.activeRuleDao().selectByActiveRuleKey(dbSession,activeRule.key());
+        checkFoundWithOptional(activeRuleDto,"Active rule with key '%s' not found",activeRule.key().toString());
+        List<ActiveRuleParamDto> activeRuleParamDtos=dbClient.activeRuleDao().selectParamsByActiveRuleId(dbSession,activeRuleDto.get().getId());
+        ListMultimap<ActiveRuleKey,ActiveRuleParamDto> activeRuleParamByActiveRuleKey=ArrayListMultimap.create(1,activeRuleParamDtos.size());
+        activeRuleParamByActiveRuleKey.putAll(activeRule.key(),activeRuleParamDtos);
+        qProfileKeys=writeActiveRules(rule.getKey(),singletonList(activeRule),activeRuleParamByActiveRuleKey,activesBuilder);
+      }
+    }
+  }
+ else {
+    for (    RuleDto rule : rules) {
+      List<ActiveRule> activeRules=loader.findActiveRulesByRule(rule.getKey());
+      List<ActiveRuleDto> activeRuleDtos=dbClient.activeRuleDao().selectByActiveRuleKeys(dbSession,Lists.transform(activeRules,ActiveRuleToKey.INSTANCE));
+      Map<Integer,ActiveRuleKey> activeRuleIdsByKey=new HashMap<>();
+      for (      ActiveRuleDto activeRuleDto : activeRuleDtos) {
+        activeRuleIdsByKey.put(activeRuleDto.getId(),activeRuleDto.getKey());
+      }
+      List<ActiveRuleParamDto> activeRuleParamDtos=dbClient.activeRuleDao().selectParamsByActiveRuleIds(dbSession,Lists.transform(activeRuleDtos,ActiveRuleDtoToId.INSTANCE));
+      ListMultimap<ActiveRuleKey,ActiveRuleParamDto> activeRuleParamsByActiveRuleKey=ArrayListMultimap.create(activeRules.size(),10);
+      for (      ActiveRuleParamDto activeRuleParamDto : activeRuleParamDtos) {
+        ActiveRuleKey activeRuleKey=activeRuleIdsByKey.get(activeRuleParamDto.getId());
+        activeRuleParamsByActiveRuleKey.put(activeRuleKey,activeRuleParamDto);
+      }
+      qProfileKeys=writeActiveRules(rule.getKey(),activeRules,activeRuleParamsByActiveRuleKey,activesBuilder);
+    }
+  }
+  response.setActives(activesBuilder);
+  return qProfileKeys;
+}

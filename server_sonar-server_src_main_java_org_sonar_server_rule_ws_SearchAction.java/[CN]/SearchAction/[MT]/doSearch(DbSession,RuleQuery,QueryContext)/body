@@ -1,0 +1,22 @@
+{
+  Result<Rule> result=ruleIndex.search(query,context);
+  List<RuleKey> ruleKeys=from(result.getHits()).transform(RuleToRuleKey.INSTANCE).toList();
+  Map<RuleKey,RuleDto> rulesByRuleKey=Maps.uniqueIndex(dbClient.ruleDao().selectByKeys(dbSession,ruleKeys),new Function<RuleDto,RuleKey>(){
+    @Override public RuleKey apply(    @Nonnull RuleDto input){
+      return input.getKey();
+    }
+  }
+);
+  List<RuleDto> rules=new ArrayList<>();
+  for (  RuleKey ruleKey : ruleKeys) {
+    RuleDto rule=rulesByRuleKey.get(ruleKey);
+    if (rule != null) {
+      rules.add(rule);
+    }
+  }
+  List<Integer> ruleIds=from(rules).transform(RuleDtoToId.INSTANCE).toList();
+  List<Integer> templateRuleIds=from(rules).transform(RuleDtoToTemplateId.INSTANCE).filter(Predicates.<Integer>notNull()).toList();
+  List<RuleDto> templateRules=dbClient.ruleDao().selectByIds(dbSession,templateRuleIds);
+  List<RuleParamDto> ruleParamDtos=dbClient.ruleDao().selectRuleParamsByRuleIds(dbSession,ruleIds);
+  return new SearchResult(result).setRules(rules).setRuleParams(ruleParamDtos).setTemplateRules(templateRules);
+}
