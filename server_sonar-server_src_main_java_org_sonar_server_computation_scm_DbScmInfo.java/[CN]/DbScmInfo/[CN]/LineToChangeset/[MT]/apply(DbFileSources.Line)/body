@@ -1,6 +1,12 @@
 {
-  if (input.hasScmRevision() || input.hasScmAuthor() || input.hasScmDate()) {
-    return Changeset.newChangesetBuilder().setRevision(input.getScmRevision()).setAuthor(input.getScmAuthor()).setDate(input.getScmDate()).build();
+  if (input.hasScmRevision() && input.hasScmDate()) {
+    String revision=input.getScmRevision();
+    Changeset changeset=cache.get(revision);
+    if (changeset == null) {
+      changeset=builder.setRevision(revision).setAuthor(input.hasScmAuthor() ? input.getScmAuthor() : null).setDate(input.getScmDate()).build();
+      cache.put(revision,changeset);
+    }
+    return changeset;
   }
   this.encounteredLineWithoutScmInfo=true;
   return null;
