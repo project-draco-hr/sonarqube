@@ -31,10 +31,11 @@
   assertThat(paramsByKey.get("message").getDefaultValue()).isEqualTo("a message");
   assertThat(paramsByKey.get("format")).isNotNull();
   assertThat(paramsByKey.get("format").getDefaultValue()).isNull();
-  ActiveRule activeRule=tester.get(ActiveRuleIndex.class).getByKey(ActiveRuleKey.of(profileDto.getKey(),customRule.getKey()));
-  assertThat(activeRule.params()).hasSize(2);
-  assertThat(activeRule.params().get("regex")).isEqualTo("b.*");
-  assertThat(activeRule.params().get("message")).isEqualTo("a message");
-  assertThat(activeRule.params().get("format")).isNull();
-  assertThat(activeRule.severity()).isEqualTo(Severity.BLOCKER);
+  ActiveRuleDto activeRuleDto=db.activeRuleDao().selectOrFailByKey(dbSession,ActiveRuleKey.of(profileDto.getKey(),customRule.getKey()));
+  assertThat(activeRuleDto.getSeverityString()).isEqualTo(Severity.BLOCKER);
+  List<ActiveRuleParamDto> activeRuleParams=db.activeRuleDao().selectParamsByActiveRuleKey(dbSession,activeRuleDto.getKey());
+  Map<String,ActiveRuleParamDto> activeRuleParamsByKey=ActiveRuleParamDto.groupByKey(activeRuleParams);
+  assertThat(activeRuleParamsByKey.get("regex").getValue()).isEqualTo("b.*");
+  assertThat(activeRuleParamsByKey.get("message").getValue()).isEqualTo("a message");
+  assertThat(activeRuleParamsByKey.get("format")).isNull();
 }

@@ -2,13 +2,14 @@
   QualityProfileDto profile=createProfile("java");
   RuleDto rule=createRule(profile.getLanguage(),"toto");
   session.commit();
-  assertThat(db.deprecatedActiveRuleDao().selectByProfileKey(session,profile.getKey())).isEmpty();
+  ruIndexer.index();
+  assertThat(db.activeRuleDao().selectByProfileKey(session,profile.getKey())).isEmpty();
   WsTester.TestRequest request=wsTester.newPostRequest(QProfilesWs.API_ENDPOINT,RuleActivationActions.ACTIVATE_ACTION);
-  request.setParam(RuleActivationActions.PROFILE_KEY,profile.getKey().toString());
+  request.setParam(RuleActivationActions.PROFILE_KEY,profile.getKey());
   request.setParam(RuleActivationActions.RULE_KEY,rule.getKey().toString());
   request.setParam(RuleActivationActions.SEVERITY,"MINOR");
   WsTester.Result result=request.execute();
   session.clearCache();
   ActiveRuleKey activeRuleKey=ActiveRuleKey.of(profile.getKey(),rule.getKey());
-  assertThat(db.deprecatedActiveRuleDao().getNullableByKey(session,activeRuleKey).getSeverityString()).isEqualTo("MINOR");
+  assertThat(db.activeRuleDao().selectOrFailByKey(session,activeRuleKey).getSeverityString()).isEqualTo("MINOR");
 }

@@ -1,6 +1,7 @@
 {
   QualityProfileDto child=createProfile("xoo","Child");
   session.commit();
-  assertThat(db.deprecatedActiveRuleDao().selectByProfileKey(session,child.getKey())).isEmpty();
+  assertThat(db.activeRuleDao().selectByProfileKey(session,child.getKey())).isEmpty();
+  assertThat(ruleIndex.search(new RuleQuery().setActivation(true).setQProfileKey(child.getKey()),new SearchOptions()).getIds()).isEmpty();
   wsTester.newPostRequest(QProfilesWs.API_ENDPOINT,"change_parent").setParam(QProfileIdentificationParamUtils.PARAM_PROFILE_KEY,child.getKee()).setParam("parentName","polop").setParam("parentKey","palap").execute();
 }

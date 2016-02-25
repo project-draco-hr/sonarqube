@@ -7,11 +7,14 @@
   createActiveRule(rule1,parent1);
   createActiveRule(rule2,parent2);
   session.commit();
+  ruleIndexer.index();
+  activeRuleIndexer.index();
   tester.get(RuleActivator.class).setParent(child.getKey(),parent1.getKey());
   session.clearCache();
-  wsTester.newPostRequest(QProfilesWs.API_ENDPOINT,"change_parent").setParam(QProfileIdentificationParamUtils.PARAM_PROFILE_KEY,child.getKey()).setParam("parentKey",parent2.getKey().toString()).execute();
+  wsTester.newPostRequest(QProfilesWs.API_ENDPOINT,"change_parent").setParam(QProfileIdentificationParamUtils.PARAM_PROFILE_KEY,child.getKey()).setParam("parentKey",parent2.getKey()).execute();
   session.clearCache();
-  List<ActiveRuleDto> activeRules2=db.deprecatedActiveRuleDao().selectByProfileKey(session,child.getKey());
+  List<ActiveRuleDto> activeRules2=db.activeRuleDao().selectByProfileKey(session,child.getKey());
   assertThat(activeRules2).hasSize(1);
   assertThat(activeRules2.get(0).getKey().ruleKey().rule()).isEqualTo("rule2");
+  assertThat(ruleIndex.search(new RuleQuery().setActivation(true).setQProfileKey(child.getKey()),new SearchOptions()).getIds()).hasSize(1);
 }

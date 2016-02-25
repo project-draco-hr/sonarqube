@@ -5,11 +5,12 @@
   RuleDto rule2=createRule(profile.getLanguage(),"hello");
   RuleDto rule3=createRule(profile.getLanguage(),"world");
   session.commit();
-  assertThat(db.deprecatedActiveRuleDao().selectByProfileKey(session,profile.getKey())).isEmpty();
+  ruIndexer.index();
+  assertThat(db.activeRuleDao().selectByProfileKey(session,profile.getKey())).isEmpty();
   WsTester.TestRequest request=wsTester.newPostRequest(QProfilesWs.API_ENDPOINT,BulkRuleActivationActions.BULK_ACTIVATE_ACTION);
-  request.setParam(RuleActivationActions.PROFILE_KEY,profile.getKey().toString());
+  request.setParam(RuleActivationActions.PROFILE_KEY,profile.getKey());
   request.setParam(SearchAction.PARAM_LANGUAGES,"java");
   WsTester.Result result=request.execute();
   session.clearCache();
-  assertThat(db.deprecatedActiveRuleDao().selectByProfileKey(session,profile.getKey())).hasSize(4);
+  assertThat(db.activeRuleDao().selectByProfileKey(session,profile.getKey())).hasSize(4);
 }

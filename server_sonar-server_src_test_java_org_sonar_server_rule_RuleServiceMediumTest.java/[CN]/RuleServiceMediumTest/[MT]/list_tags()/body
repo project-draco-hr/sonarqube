@@ -1,12 +1,12 @@
 {
   RuleKey key1=RuleKey.of("javascript","S001");
   RuleKey key2=RuleKey.of("java","S001");
-  dao.insert(dbSession,RuleTesting.newDto(key1).setTags(Sets.newHashSet("tag1")).setSystemTags(Sets.newHashSet("sys1","sys2")),RuleTesting.newDto(key2).setTags(Sets.newHashSet("tag2")).setSystemTags(Collections.<String>emptySet()));
+  dao.insert(dbSession,RuleTesting.newDto(key1).setTags(Sets.newHashSet("tag1")).setSystemTags(Sets.newHashSet("sys1","sys2")));
+  dao.insert(dbSession,RuleTesting.newDto(key2).setTags(Sets.newHashSet("tag2")).setSystemTags(Collections.<String>emptySet()));
   dbSession.commit();
+  ruleIndexer.index();
   Set<String> tags=service.listTags();
   assertThat(tags).containsOnly("tag1","tag2","sys1","sys2");
-  tags=index.terms(RuleNormalizer.RuleField.TAGS.field());
-  assertThat(tags).containsOnly("tag1","tag2");
-  tags=index.terms(RuleNormalizer.RuleField.SYSTEM_TAGS.field());
-  assertThat(tags).containsOnly("sys1","sys2");
+  tags=index.terms(RuleIndexDefinition.FIELD_RULE_ALL_TAGS);
+  assertThat(tags).containsOnly("tag1","tag2","sys1","sys2");
 }

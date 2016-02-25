@@ -2,10 +2,11 @@
   QualityProfileDto profile=createProfile("java");
   RuleDto rule=createRule("php","toto");
   session.commit();
-  assertThat(db.deprecatedActiveRuleDao().selectByProfileKey(session,profile.getKey())).isEmpty();
+  ruIndexer.index();
+  assertThat(db.activeRuleDao().selectByProfileKey(session,profile.getKey())).isEmpty();
   try {
     WsTester.TestRequest request=wsTester.newPostRequest(QProfilesWs.API_ENDPOINT,RuleActivationActions.ACTIVATE_ACTION);
-    request.setParam(RuleActivationActions.PROFILE_KEY,profile.getKey().toString());
+    request.setParam(RuleActivationActions.PROFILE_KEY,profile.getKey());
     request.setParam(RuleActivationActions.RULE_KEY,rule.getKey().toString());
     request.execute();
     session.clearCache();

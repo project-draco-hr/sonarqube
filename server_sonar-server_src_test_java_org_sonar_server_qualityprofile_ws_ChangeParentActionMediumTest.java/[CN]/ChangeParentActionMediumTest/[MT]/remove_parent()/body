@@ -4,10 +4,13 @@
   RuleDto rule1=createRule("xoo","rule1");
   createActiveRule(rule1,parent);
   session.commit();
+  ruleIndexer.index();
+  activeRuleIndexer.index();
   tester.get(RuleActivator.class).setParent(child.getKey(),parent.getKey());
   session.clearCache();
   wsTester.newPostRequest(QProfilesWs.API_ENDPOINT,"change_parent").setParam(QProfileIdentificationParamUtils.PARAM_PROFILE_KEY,child.getKey()).execute();
   session.clearCache();
-  List<ActiveRuleDto> activeRules=db.deprecatedActiveRuleDao().selectByProfileKey(session,child.getKey());
+  List<ActiveRuleDto> activeRules=db.activeRuleDao().selectByProfileKey(session,child.getKey());
   assertThat(activeRules).isEmpty();
+  assertThat(ruleIndex.search(new RuleQuery().setActivation(true).setQProfileKey(child.getKey()),new SearchOptions()).getIds()).isEmpty();
 }

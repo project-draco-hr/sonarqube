@@ -5,11 +5,13 @@
   createActiveRule(rule0,profile);
   createActiveRule(rule1,profile);
   session.commit();
-  assertThat(db.deprecatedActiveRuleDao().selectByProfileKey(session,profile.getKey())).hasSize(2);
+  ruIndexer.index();
+  activeRuIndexer.index();
+  assertThat(db.activeRuleDao().selectByProfileKey(session,profile.getKey())).hasSize(2);
   WsTester.TestRequest request=wsTester.newPostRequest(QProfilesWs.API_ENDPOINT,BulkRuleActivationActions.BULK_DEACTIVATE_ACTION);
-  request.setParam(RuleActivationActions.PROFILE_KEY,profile.getKey().toString());
+  request.setParam(RuleActivationActions.PROFILE_KEY,profile.getKey());
   request.setParam(WebService.Param.TEXT_QUERY,"hello");
   WsTester.Result result=request.execute();
   session.clearCache();
-  assertThat(db.deprecatedActiveRuleDao().selectByProfileKey(session,profile.getKey())).hasSize(1);
+  assertThat(db.activeRuleDao().selectByProfileKey(session,profile.getKey())).hasSize(1);
 }

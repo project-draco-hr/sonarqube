@@ -1,12 +1,14 @@
 {
-  List<ActiveRule> activeRules=Lists.newArrayList(index.findByProfile(profileKey));
+  List<ActiveRuleDoc> activeRules=Lists.newArrayList(index.findByProfile(profileKey));
   assertThat(activeRules).hasSize(1);
-  ActiveRule activeRule=activeRules.get(0);
+  ActiveRuleDoc activeRule=activeRules.get(0);
   assertThat(activeRule.severity()).isEqualTo(expectedSeverity);
   assertThat(activeRule.inheritance()).isEqualTo(expectedInheritance == null ? ActiveRule.Inheritance.NONE : ActiveRule.Inheritance.valueOf(expectedInheritance));
-  assertThat(activeRule.params()).hasSize(expectedParams.size());
+  List<ActiveRuleParamDto> params=db.activeRuleDao().selectParamsByActiveRuleKey(dbSession,activeRule.key());
+  assertThat(params).hasSize(expectedParams.size());
+  Map<String,ActiveRuleParamDto> paramsByKey=ActiveRuleParamDto.groupByKey(params);
   for (  Map.Entry<String,String> entry : expectedParams.entrySet()) {
-    String value=activeRule.params().get(entry.getKey());
+    String value=paramsByKey.get(entry.getKey()).getValue();
     assertThat(value).isEqualTo(entry.getValue());
   }
 }

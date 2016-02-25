@@ -4,10 +4,13 @@
   RuleDto rule1=createRule("xoo","rule1");
   createActiveRule(rule1,parent1);
   session.commit();
-  assertThat(db.deprecatedActiveRuleDao().selectByProfileKey(session,child.getKey())).isEmpty();
-  wsTester.newPostRequest(QProfilesWs.API_ENDPOINT,"change_parent").setParam(QProfileIdentificationParamUtils.PARAM_PROFILE_KEY,child.getKey()).setParam("parentKey",parent1.getKey().toString()).execute();
+  ruleIndexer.index();
+  activeRuleIndexer.index();
+  assertThat(db.activeRuleDao().selectByProfileKey(session,child.getKey())).isEmpty();
+  wsTester.newPostRequest(QProfilesWs.API_ENDPOINT,"change_parent").setParam(QProfileIdentificationParamUtils.PARAM_PROFILE_KEY,child.getKey()).setParam("parentKey",parent1.getKey()).execute();
   session.clearCache();
-  List<ActiveRuleDto> activeRules1=db.deprecatedActiveRuleDao().selectByProfileKey(session,child.getKey());
+  List<ActiveRuleDto> activeRules1=db.activeRuleDao().selectByProfileKey(session,child.getKey());
   assertThat(activeRules1).hasSize(1);
   assertThat(activeRules1.get(0).getKey().ruleKey().rule()).isEqualTo("rule1");
+  assertThat(ruleIndex.search(new RuleQuery().setActivation(true).setQProfileKey(child.getKey()),new SearchOptions()).getIds()).hasSize(1);
 }
