@@ -1,0 +1,15 @@
+{
+  RuleKey key=leftRule.getKey().ruleKey();
+  Map<String,String> leftParams=paramDtoToMap(dbClient.activeRuleDao().selectParamsByActiveRuleKey(session,leftRule.getKey()));
+  Map<String,String> rightParams=paramDtoToMap(dbClient.activeRuleDao().selectParamsByActiveRuleKey(session,rightRule.getKey()));
+  if (leftParams.equals(rightParams) && leftRule.getSeverityString().equals(rightRule.getSeverityString())) {
+    result.same.put(key,leftRule);
+  }
+ else {
+    ActiveRuleDiff diff=new ActiveRuleDiff();
+    diff.leftSeverity=leftRule.getSeverityString();
+    diff.rightSeverity=rightRule.getSeverityString();
+    diff.paramDifference=Maps.difference(leftParams,rightParams);
+    result.modified.put(key,diff);
+  }
+}

@@ -3,8 +3,8 @@
   Preconditions.checkArgument(result.left != null,String.format("Could not find left profile '%s'",leftKey));
   result.right=dbClient.qualityProfileDao().selectByKey(session,rightKey);
   Preconditions.checkArgument(result.right != null,String.format("Could not find right profile '%s'",leftKey));
-  Map<RuleKey,ActiveRuleDoc> leftActiveRulesByRuleKey=loadActiveRules(leftKey);
-  Map<RuleKey,ActiveRuleDoc> rightActiveRulesByRuleKey=loadActiveRules(rightKey);
+  Map<RuleKey,ActiveRuleDto> leftActiveRulesByRuleKey=loadActiveRules(session,leftKey);
+  Map<RuleKey,ActiveRuleDto> rightActiveRulesByRuleKey=loadActiveRules(session,rightKey);
   Set<RuleKey> allRules=Sets.newHashSet();
   allRules.addAll(leftActiveRulesByRuleKey.keySet());
   allRules.addAll(rightActiveRulesByRuleKey.keySet());
@@ -16,7 +16,7 @@
       result.inLeft.put(ruleKey,leftActiveRulesByRuleKey.get(ruleKey));
     }
  else {
-      compareActivationParams(leftActiveRulesByRuleKey.get(ruleKey),rightActiveRulesByRuleKey.get(ruleKey),result);
+      compareActivationParams(session,leftActiveRulesByRuleKey.get(ruleKey),rightActiveRulesByRuleKey.get(ruleKey),result);
     }
   }
 }
