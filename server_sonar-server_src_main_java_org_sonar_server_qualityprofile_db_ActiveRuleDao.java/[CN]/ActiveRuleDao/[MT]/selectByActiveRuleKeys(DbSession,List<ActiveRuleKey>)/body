@@ -2,8 +2,12 @@
   if (keys.isEmpty()) {
     return emptyList();
   }
-  return DatabaseUtils.executeLargeInputs(keys,new Function<List<ActiveRuleKey>,List<ActiveRuleDto>>(){
-    @Override public List<ActiveRuleDto> apply(    @Nonnull List<ActiveRuleKey> input){
+  List<SqlActiveRuleKey> sqlKeys=new ArrayList<>();
+  for (  ActiveRuleKey key : keys) {
+    sqlKeys.add(new SqlActiveRuleKey(key));
+  }
+  return DatabaseUtils.executeLargeInputs(sqlKeys,new Function<List<SqlActiveRuleKey>,List<ActiveRuleDto>>(){
+    @Override public List<ActiveRuleDto> apply(    @Nonnull List<SqlActiveRuleKey> input){
       return mapper(dbSession).selectByKeys(input);
     }
   }

@@ -1,9 +1,22 @@
 {
   RuleKey key=RuleKey.parse(request.mandatoryParam(PARAM_KEY));
-  Rule rule=service.getByKey(key);
-  if (rule == null) {
-    throw new NotFoundException("Rule not found: " + key);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    Optional<RuleDto> optionalRule=dbClient.ruleDao().selectByKey(dbSession,key);
+    checkFoundWithOptional(optionalRule,"Rule not found: " + key);
+    RuleDto rule=optionalRule.get();
+    List<RuleDto> templateRules=new ArrayList<>();
+    if (rule.getTemplateId() != null) {
+      Optional<RuleDto> templateRule=dbClient.ruleDao().selectById(rule.getTemplateId(),dbSession);
+      if (templateRule.isPresent()) {
+        templateRules.add(templateRule.get());
+      }
+    }
+    List<RuleParamDto> ruleParameters=dbClient.ruleDao().selectRuleParamsByRuleIds(dbSession,singletonList(rule.getId()));
+    ShowResponse showResponse=buildResponse(dbSession,request,new SearchAction.SearchResult().setRules(singletonList(rule)).setTemplateRules(templateRules).setRuleParameters(ruleParameters).setTotal(1L));
+    writeProtobuf(showResponse,request,response);
   }
-  ShowResponse showResponse=buildResponse(request,rule);
-  writeProtobuf(showResponse,request,response);
+  finally {
+    dbClient.closeSession(dbSession);
+  }
 }

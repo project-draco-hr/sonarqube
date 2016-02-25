@@ -1,0 +1,17 @@
+{
+  List<ActiveRule> activeRules=loader.findActiveRulesByRule(rule.getKey());
+  List<ActiveRuleDto> activeRuleDtos=dbClient.activeRuleDao().selectByActiveRuleKeys(dbSession,Lists.transform(activeRules,ActiveRuleToKey.INSTANCE));
+  Map<Integer,ActiveRuleKey> activeRuleIdsByKey=new HashMap<>();
+  for (  ActiveRuleDto activeRuleDto : activeRuleDtos) {
+    activeRuleIdsByKey.put(activeRuleDto.getId(),activeRuleDto.getKey());
+  }
+  List<ActiveRuleParamDto> activeRuleParamDtos=dbClient.activeRuleDao().selectParamsByActiveRuleIds(dbSession,Lists.transform(activeRuleDtos,ActiveRuleDtoToId.INSTANCE));
+  ListMultimap<ActiveRuleKey,ActiveRuleParamDto> activeRuleParamsByActiveRuleKey=ArrayListMultimap.create(activeRules.size(),10);
+  for (  ActiveRuleParamDto activeRuleParamDto : activeRuleParamDtos) {
+    ActiveRuleKey activeRuleKey=activeRuleIdsByKey.get(activeRuleParamDto.getId());
+    activeRuleParamsByActiveRuleKey.put(activeRuleKey,activeRuleParamDto);
+  }
+  for (  ActiveRule activeRule : activeRules) {
+    response.addActives(buildActiveRuleResponse(activeRule,activeRuleParamsByActiveRuleKey.get(activeRule.key())));
+  }
+}
