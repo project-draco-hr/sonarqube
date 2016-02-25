@@ -1,19 +1,22 @@
 {
   initRules();
   db.qualityProfileDao().insert(dbSession,QProfileTesting.newXooP1(),QProfileTesting.newXooP2(),QProfileTesting.newXooP3());
-  tester.get(RuleActivator.class).setParent(dbSession,XOO_P2_KEY,XOO_P1_KEY);
-  tester.get(RuleActivator.class).setParent(dbSession,XOO_P3_KEY,XOO_P1_KEY);
-  tester.get(RuleActivator.class).activate(dbSession,new RuleActivation(RuleTesting.XOO_X1),XOO_P1_KEY);
+  List<ActiveRuleChange> changes=tester.get(RuleActivator.class).setParent(dbSession,XOO_P2_KEY,XOO_P1_KEY);
+  changes.addAll(tester.get(RuleActivator.class).setParent(dbSession,XOO_P3_KEY,XOO_P1_KEY));
+  changes.addAll(tester.get(RuleActivator.class).activate(dbSession,new RuleActivation(RuleTesting.XOO_X1),XOO_P1_KEY));
   dbSession.commit();
   dbSession.clearCache();
+  activeRuleIndexer.index(changes);
   assertThat(db.qualityProfileDao().selectAll(dbSession)).hasSize(3);
-  assertThat(db.deprecatedActiveRuleDao().selectAll(dbSession)).hasSize(3);
-  factory.delete(XOO_P1_KEY);
+  assertThat(db.activeRuleDao().selectAll(dbSession)).hasSize(3);
+  changes=factory.delete(dbSession,XOO_P1_KEY,false);
+  dbSession.commit();
+  activeRuleIndexer.index(changes);
   dbSession.clearCache();
   assertThat(db.qualityProfileDao().selectAll(dbSession)).isEmpty();
-  assertThat(db.deprecatedActiveRuleDao().selectAll(dbSession)).isEmpty();
-  assertThat(db.deprecatedActiveRuleDao().selectAllParams(dbSession)).isEmpty();
-  assertThat(index.get(ActiveRuleIndex.class).findByProfile(XOO_P1_KEY)).isEmpty();
-  assertThat(index.get(ActiveRuleIndex.class).findByProfile(XOO_P2_KEY)).isEmpty();
-  assertThat(index.get(ActiveRuleIndex.class).findByProfile(XOO_P3_KEY)).isEmpty();
+  assertThat(db.activeRuleDao().selectAll(dbSession)).isEmpty();
+  assertThat(db.activeRuleDao().selectAllParams(dbSession)).isEmpty();
+  assertThat(activeRuleIndex.findByProfile(XOO_P1_KEY)).isEmpty();
+  assertThat(activeRuleIndex.findByProfile(XOO_P2_KEY)).isEmpty();
+  assertThat(activeRuleIndex.findByProfile(XOO_P3_KEY)).isEmpty();
 }

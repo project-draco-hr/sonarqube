@@ -1,12 +1,15 @@
 {
   db.qualityProfileDao().insert(dbSession,QProfileTesting.newXooP1(),QProfileTesting.newXooP2(),QProfileTesting.newXooP3());
-  tester.get(RuleActivator.class).setParent(dbSession,XOO_P2_KEY,XOO_P1_KEY);
-  tester.get(RuleActivator.class).setParent(dbSession,XOO_P3_KEY,XOO_P1_KEY);
+  List<ActiveRuleChange> changes=tester.get(RuleActivator.class).setParent(dbSession,XOO_P2_KEY,XOO_P1_KEY);
+  changes.addAll(tester.get(RuleActivator.class).setParent(dbSession,XOO_P3_KEY,XOO_P1_KEY));
   factory.setDefault(dbSession,XOO_P3_KEY);
   dbSession.commit();
   dbSession.clearCache();
+  activeRuleIndexer.index(changes);
   try {
-    factory.delete(XOO_P1_KEY);
+    changes=factory.delete(dbSession,XOO_P1_KEY,false);
+    dbSession.commit();
+    activeRuleIndexer.index(changes);
     fail();
   }
  catch (  BadRequestException e) {

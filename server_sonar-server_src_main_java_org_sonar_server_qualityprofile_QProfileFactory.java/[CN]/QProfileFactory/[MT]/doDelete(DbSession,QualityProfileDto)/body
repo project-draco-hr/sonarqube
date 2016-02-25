@@ -1,5 +1,10 @@
 {
   db.qualityProfileDao().deleteAllProjectProfileAssociation(profile.getKey(),session);
-  db.activeRuleDao().deleteByProfileKey(session,profile.getKey());
+  List<ActiveRuleChange> changes=new ArrayList<>();
+  for (  ActiveRuleDto activeRule : db.activeRuleDao().selectByProfileKey(session,profile.getKey())) {
+    db.activeRuleDao().delete(session,activeRule.getKey());
+    changes.add(ActiveRuleChange.createFor(DEACTIVATED,activeRule.getKey()));
+  }
   db.qualityProfileDao().delete(session,profile);
+  return changes;
 }
