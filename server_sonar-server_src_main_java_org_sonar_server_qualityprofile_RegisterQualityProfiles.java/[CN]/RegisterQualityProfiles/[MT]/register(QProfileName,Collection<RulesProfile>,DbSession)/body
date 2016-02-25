@@ -2,9 +2,12 @@
   LOGGER.info("Register profile " + name);
   QualityProfileDto profileDto=dbClient.qualityProfileDao().selectByNameAndLanguage(name.getName(),name.getLanguage(),session);
   if (profileDto != null) {
-    profileFactory.delete(session,profileDto.getKey(),true);
+    List<ActiveRuleChange> deleteChanges=profileFactory.delete(session,profileDto.getKey(),true);
+    session.commit();
+    activeRuleIndexer.index(deleteChanges);
   }
   profileFactory.create(session,name);
+  List<ActiveRuleChange> changes=new ArrayList<>();
   for (  RulesProfile profile : profiles) {
     for (    org.sonar.api.rules.ActiveRule activeRule : profile.getActiveRules()) {
       RuleKey ruleKey=RuleKey.of(activeRule.getRepositoryKey(),activeRule.getRuleKey());
@@ -13,9 +16,11 @@
       for (      ActiveRuleParam param : activeRule.getActiveRuleParams()) {
         activation.setParameter(param.getKey(),param.getValue());
       }
-      ruleActivator.activate(session,activation,name);
+      changes.addAll(ruleActivator.activate(session,activation,name));
     }
   }
   LoadedTemplateDto template=new LoadedTemplateDto(templateKey(name),LoadedTemplateDto.QUALITY_PROFILE_TYPE);
   dbClient.loadedTemplateDao().insert(template,session);
+  session.commit();
+  activeRuleIndexer.index(changes);
 }

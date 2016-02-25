@@ -2,6 +2,7 @@
   Profiler profiler=Profiler.create(Loggers.get(getClass())).startInfo("Register quality profiles");
   DbSession session=dbClient.openSession(false);
   try {
+    activeRuleIndexer.setEnabled(true);
     ListMultimap<String,RulesProfile> profilesByLanguage=profilesByLanguage();
     for (    String language : profilesByLanguage.keySet()) {
       List<RulesProfile> defs=profilesByLanguage.get(language);
@@ -9,7 +10,7 @@
         registerProfilesForLanguage(session,language,defs);
       }
     }
-    activeRuleIndexer.setEnabled(true).index();
+    activeRuleIndexer.index();
     profiler.stopDebug();
   }
   finally {
