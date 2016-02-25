@@ -1,0 +1,22 @@
+{
+  final Splitter tagSplitter=Splitter.on(',');
+  final Joiner tagJoiner=Joiner.on(',').skipNulls();
+  MassUpdate update=context.prepareMassUpdate().rowPluralName("issues");
+  update.select("SELECT id, tags FROM issues WHERE issue_type IS NULL OR issue_type=0");
+  update.update("UPDATE issues SET issue_type=?, tags=?, updated_at=? WHERE id=?");
+  update.execute(new Handler(){
+    @Override public boolean handle(    Row row,    SqlStatement update) throws SQLException {
+      long id=row.getLong(1);
+      List<String> tags=newArrayList(tagSplitter.split(defaultString(row.getNullableString(2))));
+      IssueType type=tagsToType(tags);
+      tags.remove("bug");
+      tags.remove("security");
+      update.setInt(1,type.getDbConstant());
+      update.setString(2,tagJoiner.join(tags));
+      update.setLong(3,now);
+      update.setLong(4,id);
+      return true;
+    }
+  }
+);
+}

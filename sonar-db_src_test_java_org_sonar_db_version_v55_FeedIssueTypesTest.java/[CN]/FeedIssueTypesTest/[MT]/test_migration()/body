@@ -1,0 +1,14 @@
+{
+  try (DbSession dbSession=db.getSession()){
+    IssueDto codeSmell=new IssueDto().setKee("code_smell").setTags(Arrays.asList("clumsy","spring"));
+    IssueDto withoutTags=new IssueDto().setKee("without_tags");
+    IssueDto bug=new IssueDto().setKee("bug").setTags(Arrays.asList("clumsy","bug"));
+    db.getDbClient().issueDao().insert(dbSession,codeSmell,withoutTags,bug);
+    dbSession.commit();
+    MigrationStep underTest=new FeedIssueTypes(db.database(),mock(System2.class));
+    underTest.execute();
+    assertType("code_smell",IssueType.CODE_SMELL);
+    assertType("without_tags",IssueType.CODE_SMELL);
+    assertType("bug",IssueType.BUG);
+  }
+ }
