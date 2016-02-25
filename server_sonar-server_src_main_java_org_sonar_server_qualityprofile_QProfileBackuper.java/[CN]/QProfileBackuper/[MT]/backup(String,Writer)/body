@@ -3,11 +3,11 @@
   DbSession dbSession=db.openSession(false);
   try {
     profile=db.qualityProfileDao().selectOrFailByKey(dbSession,key);
+    List<ActiveRuleDto> activeRules=db.activeRuleDao().selectByProfileKey(dbSession,key);
+    Collections.sort(activeRules,BackupActiveRuleComparator.INSTANCE);
+    writeXml(dbSession,writer,profile,activeRules.iterator());
   }
   finally {
-    dbSession.close();
+    db.closeSession(dbSession);
   }
-  List<ActiveRuleDoc> activeRules=Lists.newArrayList(activeRuleIndex.findByProfile(profile.getKey()));
-  Collections.sort(activeRules,BackupActiveRuleComparator.INSTANCE);
-  writeXml(writer,profile,activeRules.iterator());
 }

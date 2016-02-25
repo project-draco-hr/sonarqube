@@ -4,7 +4,11 @@
   assertThat(profile).isNotNull();
   List<ActiveRuleDoc> activeRules=Lists.newArrayList(tester.get(QProfileLoader.class).findActiveRulesByProfile(profile.getKey()));
   assertThat(activeRules).hasSize(1);
-  assertThat(activeRules.get(0).severity()).isEqualTo("BLOCKER");
-  assertThat(activeRules.get(0).inheritance()).isEqualTo(ActiveRule.Inheritance.NONE);
-  assertThat(activeRules.get(0).params().get("max")).isEqualTo("7");
+  ActiveRuleDoc activeRuleDoc=activeRules.get(0);
+  assertThat(activeRuleDoc.severity()).isEqualTo("BLOCKER");
+  assertThat(activeRuleDoc.inheritance()).isEqualTo(ActiveRule.Inheritance.NONE);
+  List<ActiveRuleParamDto> params=tester.get(ActiveRuleDao.class).selectParamsByActiveRuleKey(dbSession,activeRuleDoc.key());
+  assertThat(params).hasSize(1);
+  assertThat(params.get(0).getKey()).isEqualTo("max");
+  assertThat(params.get(0).getValue()).isEqualTo("7");
 }

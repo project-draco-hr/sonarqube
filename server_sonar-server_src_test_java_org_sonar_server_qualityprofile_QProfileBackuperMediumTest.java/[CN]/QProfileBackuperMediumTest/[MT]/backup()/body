@@ -1,9 +1,10 @@
 {
   RuleKey blahRuleKey=RuleKey.of("blah","my-rule");
   RuleDto blahRule=RuleTesting.newDto(blahRuleKey).setSeverity("INFO").setLanguage("xoo");
-  db.deprecatedRuleDao().insert(dbSession,blahRule);
+  db.ruleDao().insert(dbSession,blahRule);
   dbSession.commit();
   dbSession.clearCache();
+  ruleIndexer.index();
   db.qualityProfileDao().insert(dbSession,QProfileTesting.newXooP1());
   RuleActivation activation1=new RuleActivation(RuleTesting.XOO_X2).setSeverity("MINOR");
   RuleActivation activation2=new RuleActivation(RuleTesting.XOO_X1);
@@ -15,6 +16,7 @@
   tester.get(RuleActivator.class).activate(dbSession,activation3,QProfileTesting.XOO_P1_NAME);
   dbSession.commit();
   dbSession.clearCache();
+  activeRuleIndexer.index();
   StringWriter output=new StringWriter();
   tester.get(QProfileBackuper.class).backup(QProfileTesting.XOO_P1_KEY,output);
   XMLUnit.setIgnoreWhitespace(true);

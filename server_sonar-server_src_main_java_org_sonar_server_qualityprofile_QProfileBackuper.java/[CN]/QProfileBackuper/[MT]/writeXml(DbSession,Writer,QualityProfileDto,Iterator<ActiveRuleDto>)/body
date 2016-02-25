@@ -5,13 +5,13 @@
   xml.prop("language",profile.getLanguage());
   xml.begin("rules");
   while (activeRules.hasNext()) {
-    ActiveRule activeRule=activeRules.next();
+    ActiveRuleDto activeRule=activeRules.next();
     xml.begin("rule");
-    xml.prop("repositoryKey",activeRule.key().ruleKey().repository());
-    xml.prop("key",activeRule.key().ruleKey().rule());
-    xml.prop("priority",activeRule.severity());
+    xml.prop("repositoryKey",activeRule.getKey().ruleKey().repository());
+    xml.prop("key",activeRule.getKey().ruleKey().rule());
+    xml.prop("priority",activeRule.getSeverityString());
     xml.begin("parameters");
-    for (    Map.Entry<String,String> param : activeRule.params().entrySet()) {
+    for (    ActiveRuleParamDto param : db.activeRuleDao().selectParamsByActiveRuleKey(dbSession,activeRule.getKey())) {
       xml.begin("parameter").prop("key",param.getKey()).prop("value",param.getValue()).end();
     }
     xml.end("parameters");
