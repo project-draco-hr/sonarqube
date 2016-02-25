@@ -2,12 +2,13 @@
   String leftKey=request.mandatoryParam(PARAM_LEFT_KEY);
   String rightKey=request.mandatoryParam(PARAM_RIGHT_KEY);
   QProfileComparisonResult result=comparator.compare(leftKey,rightKey);
-  List<Rule> referencedRules=ruleService.getByKeys(result.collectRuleKeys());
-  Map<RuleKey,Rule> rulesByKey=Maps.uniqueIndex(referencedRules,new NonNullInputFunction<Rule,RuleKey>(){
-    @Override protected RuleKey doApply(    Rule input){
-      return input.key();
-    }
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    List<RuleDto> referencedRules=dbClient.ruleDao().selectByKeys(dbSession,new ArrayList<>(result.collectRuleKeys()));
+    Map<RuleKey,RuleDto> rulesByKey=Maps.uniqueIndex(referencedRules,RuleDtoToRuleKey.INSTANCE);
+    writeResult(response.newJsonWriter(),result,rulesByKey);
   }
-);
-  writeResult(response.newJsonWriter(),result,rulesByKey);
+  finally {
+    dbClient.closeSession(dbSession);
+  }
 }
