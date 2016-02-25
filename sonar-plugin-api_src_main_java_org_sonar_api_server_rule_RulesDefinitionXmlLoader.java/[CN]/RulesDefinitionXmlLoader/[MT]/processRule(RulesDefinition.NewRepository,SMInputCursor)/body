@@ -5,6 +5,7 @@
   String descriptionFormat=DescriptionFormat.HTML.name();
   String internalKey=null;
   String severity=Severity.defaultSeverity();
+  String type=null;
   RuleStatus status=RuleStatus.defaultStatus();
   boolean template=false;
   String effortToFixDescription=null;
@@ -26,6 +27,9 @@
     String nodeName=cursor.getLocalName();
     if (equalsIgnoreCase("name",nodeName)) {
       name=nodeValue(cursor);
+    }
+ else     if (equalsIgnoreCase("type",nodeName)) {
+      type=nodeValue(cursor);
     }
  else     if (equalsIgnoreCase("description",nodeName)) {
       description=nodeValue(cursor);
@@ -78,6 +82,9 @@
   }
   try {
     RulesDefinition.NewRule rule=repo.createRule(key).setSeverity(severity).setName(name).setInternalKey(internalKey).setTags(tags.toArray(new String[tags.size()])).setTemplate(template).setStatus(status).setEffortToFixDescription(effortToFixDescription);
+    if (type != null) {
+      rule.setType(RulesDefinition.Type.valueOf(type));
+    }
     fillDescription(rule,descriptionFormat,description);
     fillRemediationFunction(rule,debtRemediationFunction,debtRemediationFunctionOffset,debtRemediationFunctionCoeff);
     fillParams(rule,params);
