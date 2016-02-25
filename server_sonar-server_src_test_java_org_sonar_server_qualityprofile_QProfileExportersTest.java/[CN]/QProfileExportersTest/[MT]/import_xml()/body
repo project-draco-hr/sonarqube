@@ -3,8 +3,9 @@
   db.qualityProfileDao().insert(dbSession,profileDto);
   dbSession.commit();
   assertThat(loader.findActiveRulesByProfile(profileDto.getKey())).isEmpty();
-  exporters.importXml(profileDto,"XooProfileImporter","<xml/>",dbSession);
+  QProfileResult result=exporters.importXml(profileDto,"XooProfileImporter","<xml/>",dbSession);
   dbSession.commit();
+  activeRuleIndexer.index(result.getChanges());
   List<ActiveRuleDoc> activeRules=Lists.newArrayList(loader.findActiveRulesByProfile(profileDto.getKey()));
   assertThat(activeRules).hasSize(1);
   ActiveRule activeRule=activeRules.get(0);
