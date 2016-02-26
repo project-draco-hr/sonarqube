@@ -6,7 +6,7 @@
     for (    RuleDto rule : rules) {
       ActiveRule activeRule=loader.getActiveRule(ActiveRuleKey.of(profileKey,rule.getKey()));
       if (activeRule != null) {
-        Optional<ActiveRuleDto> activeRuleDto=dbClient.activeRuleDao().selectByActiveRuleKey(dbSession,activeRule.key());
+        Optional<ActiveRuleDto> activeRuleDto=dbClient.activeRuleDao().selectByKey(dbSession,activeRule.key());
         checkFoundWithOptional(activeRuleDto,"Active rule with key '%s' not found",activeRule.key().toString());
         List<ActiveRuleParamDto> activeRuleParamDtos=dbClient.activeRuleDao().selectParamsByActiveRuleId(dbSession,activeRuleDto.get().getId());
         ListMultimap<ActiveRuleKey,ActiveRuleParamDto> activeRuleParamByActiveRuleKey=ArrayListMultimap.create(1,activeRuleParamDtos.size());
@@ -18,7 +18,7 @@
  else {
     for (    RuleDto rule : rules) {
       List<ActiveRule> activeRules=loader.findActiveRulesByRule(rule.getKey());
-      List<ActiveRuleDto> activeRuleDtos=dbClient.activeRuleDao().selectByActiveRuleKeys(dbSession,Lists.transform(activeRules,ActiveRuleToKey.INSTANCE));
+      List<ActiveRuleDto> activeRuleDtos=dbClient.activeRuleDao().selectByKeys(dbSession,Lists.transform(activeRules,ActiveRuleToKey.INSTANCE));
       Map<Integer,ActiveRuleKey> activeRuleIdsByKey=new HashMap<>();
       for (      ActiveRuleDto activeRuleDto : activeRuleDtos) {
         activeRuleIdsByKey.put(activeRuleDto.getId(),activeRuleDto.getKey());
