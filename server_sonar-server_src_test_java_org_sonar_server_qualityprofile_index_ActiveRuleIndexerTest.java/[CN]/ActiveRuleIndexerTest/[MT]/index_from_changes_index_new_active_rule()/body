@@ -5,14 +5,14 @@
   dbTester.getDbClient().ruleDao().insert(dbTester.getSession(),rule);
   QualityProfileDto profile=QualityProfileDto.createFor("qp").setLanguage("xoo").setName("profile");
   dbTester.getDbClient().qualityProfileDao().insert(dbTester.getSession(),profile);
-  ActiveRuleDto activeRule=ActiveRuleDto.createFor(profile,rule).setSeverity(Severity.BLOCKER).setCreatedAtInMs(yesterday).setUpdatedAtInMs(yesterday);
+  ActiveRuleDto activeRule=ActiveRuleDto.createFor(profile,rule).setSeverity(Severity.BLOCKER).setCreatedAt(yesterday).setUpdatedAt(yesterday);
   dbTester.getDbClient().activeRuleDao().insert(dbTester.getSession(),activeRule);
   dbTester.getSession().commit();
   indexer.index();
   assertThat(esTester.getIds(INDEX,TYPE_ACTIVE_RULE)).containsOnly(activeRule.getKey().toString());
   RuleDto rule2=RuleTesting.newDto(RULE_KEY_2);
   dbTester.getDbClient().ruleDao().insert(dbTester.getSession(),rule2);
-  ActiveRuleDto activeRule2=ActiveRuleDto.createFor(profile,rule2).setSeverity(Severity.CRITICAL).setCreatedAtInMs(now).setUpdatedAtInMs(now);
+  ActiveRuleDto activeRule2=ActiveRuleDto.createFor(profile,rule2).setSeverity(Severity.CRITICAL).setCreatedAt(now).setUpdatedAt(now);
   dbTester.getDbClient().activeRuleDao().insert(dbTester.getSession(),activeRule2);
   dbTester.getSession().commit();
   indexer.index(singletonList(ActiveRuleChange.createFor(ACTIVATED,activeRule2.getKey())));
