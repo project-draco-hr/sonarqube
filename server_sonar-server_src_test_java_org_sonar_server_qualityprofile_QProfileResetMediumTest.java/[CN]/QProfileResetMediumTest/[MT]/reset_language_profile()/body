@@ -15,7 +15,7 @@
   dbSession.commit();
   ActiveRuleDto activeRuleDto=tester.get(ActiveRuleDao.class).selectOrFailByKey(dbSession,activeRuleKey);
   assertThat(activeRuleDto.getSeverityString()).isEqualTo(BLOCKER);
-  List<ActiveRuleParamDto> activeRuleParamDtos=tester.get(ActiveRuleDao.class).selectParamsByActiveRuleKey(dbSession,activeRuleKey);
+  List<ActiveRuleParamDto> activeRuleParamDtos=tester.get(ActiveRuleDao.class).selectParamsByActiveRuleId(dbSession,activeRuleDto.getId());
   assertThat(activeRuleParamDtos.get(0).getKey()).isEqualTo("acceptWhitespace");
   assertThat(activeRuleParamDtos.get(0).getValue()).isEqualTo("false");
   reset.resetLanguage(ServerTester.Xoo.KEY);
@@ -24,7 +24,7 @@
   assertThat(activeRuleDto.getSeverityString()).isEqualTo(CRITICAL);
   ActiveRule activeRule=tester.get(ActiveRuleIndex.class).getNullableByKey(activeRuleKey);
   assertThat(activeRule.severity()).isEqualTo(CRITICAL);
-  activeRuleParamDtos=tester.get(ActiveRuleDao.class).selectParamsByActiveRuleKey(dbSession,activeRuleKey);
+  activeRuleParamDtos=tester.get(ActiveRuleDao.class).selectParamsByActiveRuleId(dbSession,activeRuleDto.getId());
   assertThat(activeRuleParamDtos.get(0).getKey()).isEqualTo("acceptWhitespace");
   assertThat(activeRuleParamDtos.get(0).getValue()).isEqualTo("true");
 }

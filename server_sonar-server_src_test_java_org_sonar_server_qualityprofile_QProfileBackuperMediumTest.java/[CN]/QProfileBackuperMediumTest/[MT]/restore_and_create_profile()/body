@@ -7,7 +7,8 @@
   ActiveRuleDoc activeRuleDoc=activeRules.get(0);
   assertThat(activeRuleDoc.severity()).isEqualTo("BLOCKER");
   assertThat(activeRuleDoc.inheritance()).isEqualTo(ActiveRule.Inheritance.NONE);
-  List<ActiveRuleParamDto> params=tester.get(ActiveRuleDao.class).selectParamsByActiveRuleKey(dbSession,activeRuleDoc.key());
+  ActiveRuleDto activeRuleDto=db.activeRuleDao().selectOrFailByKey(dbSession,activeRuleDoc.key());
+  List<ActiveRuleParamDto> params=tester.get(ActiveRuleDao.class).selectParamsByActiveRuleId(dbSession,activeRuleDto.getId());
   assertThat(params).hasSize(1);
   assertThat(params.get(0).getKey()).isEqualTo("max");
   assertThat(params.get(0).getValue()).isEqualTo("7");
