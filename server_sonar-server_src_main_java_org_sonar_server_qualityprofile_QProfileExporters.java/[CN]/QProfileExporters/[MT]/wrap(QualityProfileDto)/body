@@ -1,12 +1,18 @@
 {
+  DbSession dbSession=dbClient.openSession(false);
   RulesProfile target=new RulesProfile(profile.getName(),profile.getLanguage());
-  for (Iterator<ActiveRuleDoc> activeRuleIterator=loader.findActiveRulesByProfile(profile.getKey()); activeRuleIterator.hasNext(); ) {
-    ActiveRule activeRule=activeRuleIterator.next();
-    Rule rule=ruleFinder.findByKey(activeRule.key().ruleKey());
-    org.sonar.api.rules.ActiveRule wrappedActiveRule=target.activateRule(rule,RulePriority.valueOf(activeRule.severity()));
-    for (    Map.Entry<String,String> entry : activeRule.params().entrySet()) {
-      wrappedActiveRule.setParameter(entry.getKey(),entry.getValue());
+  try {
+    for (    ActiveRuleDto activeRule : dbClient.activeRuleDao().selectByProfileKey(dbSession,profile.getKey())) {
+      Rule rule=ruleFinder.findByKey(activeRule.getKey().ruleKey());
+      org.sonar.api.rules.ActiveRule wrappedActiveRule=target.activateRule(rule,RulePriority.valueOf(activeRule.getSeverityString()));
+      List<ActiveRuleParamDto> paramDtos=dbClient.activeRuleDao().selectParamsByActiveRuleId(dbSession,activeRule.getId());
+      for (      ActiveRuleParamDto activeRuleParamDto : paramDtos) {
+        wrappedActiveRule.setParameter(activeRuleParamDto.getKey(),activeRuleParamDto.getValue());
+      }
     }
+  }
+  finally {
+    dbClient.closeSession(dbSession);
   }
   return target;
 }
