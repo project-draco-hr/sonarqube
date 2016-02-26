@@ -7,11 +7,12 @@
   addMandatoryFacetValues(results,FACET_TAGS,request.paramAsStrings(PARAM_TAGS));
   Common.Facet.Builder facet=Common.Facet.newBuilder();
   Common.FacetValue.Builder value=Common.FacetValue.newBuilder();
-  for (  String facetName : context.facets()) {
+  for (  String facetName : context.getFacets()) {
     facet.clear().setProperty(facetName);
-    if (results.facets.getFacets().containsKey(facetName)) {
+    Map<String,Long> facets=results.facets.get(facetName);
+    if (facets != null) {
       Set<String> itemsFromFacets=Sets.newHashSet();
-      for (      FacetValue facetValue : results.facets.getFacets().get(facetName)) {
+      for (      Map.Entry<String,Long> facetValue : facets.entrySet()) {
         itemsFromFacets.add(facetValue.getKey());
         facet.addValues(value.clear().setVal(facetValue.getKey()).setCount(facetValue.getValue()));
       }

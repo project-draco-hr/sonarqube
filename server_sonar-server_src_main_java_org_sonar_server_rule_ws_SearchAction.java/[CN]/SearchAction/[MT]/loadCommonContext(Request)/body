@@ -1,12 +1,12 @@
 {
   int pageSize=request.mandatoryParamAsInt(Param.PAGE_SIZE);
-  QueryContext context=new QueryContext(userSession).addFieldsToReturn(request.paramAsStrings(Param.FIELDS));
+  org.sonar.server.es.SearchOptions context=new org.sonar.server.es.SearchOptions().addFields(request.paramAsStrings(Param.FIELDS));
   List<String> facets=request.paramAsStrings(Param.FACETS);
   if (facets != null) {
     context.addFacets(facets);
   }
   if (pageSize < 1) {
-    context.setPage(request.mandatoryParamAsInt(Param.PAGE),0).setMaxLimit();
+    context.setPage(request.mandatoryParamAsInt(Param.PAGE),0).setLimit(org.sonar.server.es.SearchOptions.MAX_LIMIT);
   }
  else {
     context.setPage(request.mandatoryParamAsInt(Param.PAGE),pageSize);

@@ -1,21 +1,19 @@
 {
-  ruleDao.insert(dbSession,RuleTesting.newXooX1());
-  ruleDao.insert(dbSession,RuleTesting.newXooX2());
+  Date since=new Date();
+  ruleDao.insert(dbSession,RuleTesting.newXooX1().setUpdatedAtInMs(since.getTime()).setCreatedAtInMs(since.getTime()));
+  ruleDao.insert(dbSession,RuleTesting.newXooX2().setUpdatedAtInMs(since.getTime()).setCreatedAtInMs(since.getTime()));
   dbSession.commit();
   dbSession.clearCache();
-  Date since=new Date();
+  ruleIndexer.index();
   WsTester.TestRequest request=tester.wsTester().newGetRequest(API_ENDPOINT,API_SEARCH_METHOD);
   request.setParam(WebService.Param.FIELDS,"");
   request.setParam(SearchAction.PARAM_AVAILABLE_SINCE,DateUtils.formatDate(since));
-  request.setParam(WebService.Param.SORT,RuleNormalizer.RuleField.KEY.field());
+  request.setParam(WebService.Param.SORT,RuleIndexDefinition.FIELD_RULE_KEY);
   WsTester.Result result=request.execute();
   result.assertJson("{\"total\":2,\"p\":1,\"ps\":100,\"rules\":[{\"key\":\"xoo:x1\"},{\"key\":\"xoo:x2\"}]}");
-  Calendar c=Calendar.getInstance();
-  c.setTime(since);
-  c.add(Calendar.DATE,1);
   request=tester.wsTester().newGetRequest(API_ENDPOINT,API_SEARCH_METHOD);
   request.setParam(WebService.Param.FIELDS,"");
-  request.setParam(SearchAction.PARAM_AVAILABLE_SINCE,DateUtils.formatDate(c.getTime()));
+  request.setParam(SearchAction.PARAM_AVAILABLE_SINCE,DateUtils.formatDate(DateUtils.addDays(since,1)));
   result=request.execute();
   result.assertJson("{\"total\":0,\"p\":1,\"ps\":100,\"rules\":[]}");
 }
