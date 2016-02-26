@@ -1,0 +1,13 @@
+{
+  RuleDto rule=dbClient.ruleDao().selectOrFailByKey(dbSession,ruleKey);
+  List<RuleDto> templateRules=new ArrayList<>();
+  if (rule.getTemplateId() != null) {
+    Optional<RuleDto> templateRule=dbClient.ruleDao().selectById(rule.getTemplateId(),dbSession);
+    if (templateRule.isPresent()) {
+      templateRules.add(templateRule.get());
+    }
+  }
+  List<RuleParamDto> ruleParameters=dbClient.ruleDao().selectRuleParamsByRuleIds(dbSession,singletonList(rule.getId()));
+  SearchAction.SearchResult searchResult=new SearchAction.SearchResult().setRules(singletonList(rule)).setRuleParameters(ruleParameters).setTemplateRules(templateRules).setTotal(1L);
+  return Rules.CreateResponse.newBuilder().setRule(ruleMapper.toWsRule(rule,searchResult,Collections.<String>emptySet())).build();
+}

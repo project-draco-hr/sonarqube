@@ -4,21 +4,27 @@
   if (isNullOrEmpty(customKey) && isNullOrEmpty(manualKey)) {
     throw new BadRequestException(String.format("Either '%s' or '%s' parameters should be set",PARAM_CUSTOM_KEY,PARAM_MANUAL_KEY));
   }
+  DbSession dbSession=dbClient.openSession(false);
   try {
-    if (!isNullOrEmpty(customKey)) {
-      NewRule newRule=NewRule.createForCustomRule(customKey,RuleKey.parse(request.mandatoryParam(PARAM_TEMPLATE_KEY))).setName(request.mandatoryParam(PARAM_NAME)).setMarkdownDescription(request.mandatoryParam(PARAM_DESCRIPTION)).setSeverity(request.mandatoryParam(PARAM_SEVERITY)).setStatus(RuleStatus.valueOf(request.mandatoryParam(PARAM_STATUS))).setPreventReactivation(request.mandatoryParamAsBoolean(PARAM_PREVENT_REACTIVATION));
-      String params=request.param(PARAMS);
-      if (!isNullOrEmpty(params)) {
-        newRule.setParameters(KeyValueFormat.parse(params));
+    try {
+      if (!isNullOrEmpty(customKey)) {
+        NewRule newRule=NewRule.createForCustomRule(customKey,RuleKey.parse(request.mandatoryParam(PARAM_TEMPLATE_KEY))).setName(request.mandatoryParam(PARAM_NAME)).setMarkdownDescription(request.mandatoryParam(PARAM_DESCRIPTION)).setSeverity(request.mandatoryParam(PARAM_SEVERITY)).setStatus(RuleStatus.valueOf(request.mandatoryParam(PARAM_STATUS))).setPreventReactivation(request.mandatoryParamAsBoolean(PARAM_PREVENT_REACTIVATION));
+        String params=request.param(PARAMS);
+        if (!isNullOrEmpty(params)) {
+          newRule.setParameters(KeyValueFormat.parse(params));
+        }
+        writeResponse(dbSession,request,response,ruleCreator.create(newRule));
       }
-      writeResponse(request,response,service.create(newRule));
+      if (!isNullOrEmpty(manualKey)) {
+        NewRule newRule=NewRule.createForManualRule(manualKey).setName(request.mandatoryParam(PARAM_NAME)).setMarkdownDescription(request.mandatoryParam(PARAM_DESCRIPTION)).setSeverity(request.param(PARAM_SEVERITY)).setPreventReactivation(request.mandatoryParamAsBoolean(PARAM_PREVENT_REACTIVATION));
+        writeResponse(dbSession,request,response,ruleCreator.create(newRule));
+      }
     }
-    if (!isNullOrEmpty(manualKey)) {
-      NewRule newRule=NewRule.createForManualRule(manualKey).setName(request.mandatoryParam(PARAM_NAME)).setMarkdownDescription(request.mandatoryParam(PARAM_DESCRIPTION)).setSeverity(request.param(PARAM_SEVERITY)).setPreventReactivation(request.mandatoryParamAsBoolean(PARAM_PREVENT_REACTIVATION));
-      writeResponse(request,response,service.create(newRule));
+ catch (    ReactivationException e) {
+      write409(dbSession,request,response,e.ruleKey());
     }
   }
- catch (  ReactivationException e) {
-    write409(request,response,e.ruleKey());
+  finally {
+    dbClient.closeSession(dbSession);
   }
 }
