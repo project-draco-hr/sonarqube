@@ -1,0 +1,17 @@
+{
+  Optional<RuleDto> optionalRule=dbClient.ruleDao().selectByKey(dbSession,key);
+  checkFoundWithOptional(optionalRule,"Rule not found: " + key);
+  RuleDto rule=optionalRule.get();
+  List<RuleDto> templateRules=new ArrayList<>();
+  if (rule.getTemplateId() != null) {
+    Optional<RuleDto> templateRule=dbClient.ruleDao().selectById(rule.getTemplateId(),dbSession);
+    if (templateRule.isPresent()) {
+      templateRules.add(templateRule.get());
+    }
+  }
+  List<RuleParamDto> ruleParameters=dbClient.ruleDao().selectRuleParamsByRuleIds(dbSession,singletonList(rule.getId()));
+  UpdateResponse.Builder responseBuilder=UpdateResponse.newBuilder();
+  SearchAction.SearchResult searchResult=new SearchAction.SearchResult().setRules(singletonList(rule)).setTemplateRules(templateRules).setRuleParameters(ruleParameters).setTotal(1L);
+  responseBuilder.setRule(mapper.toWsRule(rule,searchResult,Collections.<String>emptySet()));
+  return responseBuilder.build();
+}

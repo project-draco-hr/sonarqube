@@ -2,7 +2,7 @@
   ruleDao.insert(dbSession,RuleTesting.newDto(RULE_KEY).setDefaultRemediationFunction(DebtRemediationFunction.Type.LINEAR.name()).setDefaultRemediationCoefficient("1d").setDefaultRemediationOffset("5min").setRemediationFunction(DebtRemediationFunction.Type.CONSTANT_ISSUE.name()).setRemediationCoefficient(null).setRemediationOffset("1min"));
   dbSession.commit();
   RuleUpdate update=RuleUpdate.createForPluginRule(RULE_KEY).setDebtRemediationFunction(null);
-  updater.update(update,userSessionRule);
+  updater.update(dbSession,update,userSessionRule);
   dbSession.clearCache();
   Rule indexedRule=tester.get(RuleIndex.class).getByKey(RULE_KEY);
   assertThat(indexedRule.debtRemediationFunction().type()).isEqualTo(DebtRemediationFunction.Type.LINEAR);

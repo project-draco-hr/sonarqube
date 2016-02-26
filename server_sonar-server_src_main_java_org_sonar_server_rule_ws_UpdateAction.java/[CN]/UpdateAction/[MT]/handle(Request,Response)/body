@@ -1,6 +1,13 @@
 {
-  RuleUpdate update=readRequest(request);
-  service.update(update);
-  UpdateResponse updateResponse=buildResponse(update.getRuleKey());
-  writeProtobuf(updateResponse,request,response);
+  checkPermission();
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    RuleUpdate update=readRequest(dbSession,request);
+    ruleUpdater.update(dbSession,update,userSession);
+    UpdateResponse updateResponse=buildResponse(dbSession,update.getRuleKey());
+    writeProtobuf(updateResponse,request,response);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
 }

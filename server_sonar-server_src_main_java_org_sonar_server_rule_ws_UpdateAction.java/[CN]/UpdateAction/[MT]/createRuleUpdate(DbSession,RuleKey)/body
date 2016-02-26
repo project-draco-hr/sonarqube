@@ -1,0 +1,14 @@
+{
+  Optional<RuleDto> optionalRule=dbClient.ruleDao().selectByKey(dbSession,key);
+  checkFoundWithOptional(optionalRule,"This rule does not exists : " + key);
+  RuleDto rule=optionalRule.get();
+  if (rule.getTemplateId() != null) {
+    return RuleUpdate.createForCustomRule(key);
+  }
+ else   if (RuleKey.MANUAL_REPOSITORY_KEY.equals(rule.getRepositoryKey())) {
+    return RuleUpdate.createForManualRule(key);
+  }
+ else {
+    return RuleUpdate.createForPluginRule(key);
+  }
+}
