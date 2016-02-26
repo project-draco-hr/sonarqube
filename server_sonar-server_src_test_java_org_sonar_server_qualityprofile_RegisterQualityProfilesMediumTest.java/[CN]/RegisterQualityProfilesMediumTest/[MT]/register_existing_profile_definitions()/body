@@ -11,14 +11,14 @@
   RuleKey ruleKey=RuleKey.of("xoo","x1");
   ActiveRuleKey activeRuleKey=ActiveRuleKey.of(profile.getKey(),ruleKey);
   assertThat(activeRuleDao.selectByKey(dbSession,activeRuleKey)).isPresent();
-  assertThat(tester.get(RuleIndex2.class).search(new RuleQuery().setActivation(true),new SearchOptions()).getIds()).containsOnly(ruleKey,RuleKey.of("xoo","x2"));
+  assertThat(tester.get(RuleIndex.class).search(new RuleQuery().setActivation(true),new SearchOptions()).getIds()).containsOnly(ruleKey,RuleKey.of("xoo","x2"));
   tester.get(Platform.class).restart();
   assertThat(activeRuleDao.selectByKey(dbSession,activeRuleKey)).isPresent();
   ActiveRuleDto activeRule=activeRuleDao.selectByKey(dbSession,activeRuleKey).get();
   assertThat(activeRule.getKey().qProfile()).isEqualTo(profile.getKee());
   assertThat(activeRule.getKey().ruleKey()).isEqualTo(ruleKey);
   assertThat(activeRule.getSeverityString()).isEqualTo(Severity.CRITICAL);
-  assertThat(tester.get(RuleIndex2.class).search(new RuleQuery().setActivation(true),new SearchOptions()).getIds()).containsOnly(ruleKey,RuleKey.of("xoo","x2"));
+  assertThat(tester.get(RuleIndex.class).search(new RuleQuery().setActivation(true),new SearchOptions()).getIds()).containsOnly(ruleKey,RuleKey.of("xoo","x2"));
   Map<String,ActiveRuleParamDto> params=ActiveRuleParamDto.groupByKey(activeRuleDao.selectParamsByActiveRuleKey(dbSession,activeRule.getKey()));
   assertThat(params).hasSize(2);
   assertThat(params.get("acceptWhitespace").getValue()).isEqualTo("true");

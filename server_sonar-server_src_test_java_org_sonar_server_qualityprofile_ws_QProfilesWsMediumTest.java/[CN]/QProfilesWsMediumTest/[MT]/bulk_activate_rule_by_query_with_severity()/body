@@ -6,11 +6,11 @@
   ruIndexer.index();
   assertThat(db.activeRuleDao().selectByProfileKey(session,profile.getKey())).isEmpty();
   assertThat(db.activeRuleDao().selectByProfileKey(session,profile.getKey())).hasSize(0);
-  assertThat(tester.get(RuleIndex2.class).search(new RuleQuery().setSeverities(ImmutableSet.of("BLOCKER")),new SearchOptions()).getIds()).hasSize(2);
+  assertThat(tester.get(RuleIndex.class).search(new RuleQuery().setSeverities(ImmutableSet.of("BLOCKER")),new SearchOptions()).getIds()).hasSize(2);
   WsTester.TestRequest request=wsTester.newPostRequest(QProfilesWs.API_ENDPOINT,BulkRuleActivationActions.BULK_ACTIVATE_ACTION);
   request.setParam(BulkRuleActivationActions.PROFILE_KEY,profile.getKey());
   request.setParam(BulkRuleActivationActions.SEVERITY,"MINOR");
   request.execute();
   session.commit();
-  assertThat(tester.get(ActiveRuleIndex2.class).findByRule(rule0.getKey()).get(0).severity()).isEqualTo("MINOR");
+  assertThat(tester.get(ActiveRuleIndex.class).findByRule(rule0.getKey()).get(0).severity()).isEqualTo("MINOR");
 }

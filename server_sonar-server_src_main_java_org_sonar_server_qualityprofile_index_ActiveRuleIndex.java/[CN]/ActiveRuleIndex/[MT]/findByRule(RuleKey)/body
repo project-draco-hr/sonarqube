@@ -1,9 +1,9 @@
 {
-  SearchRequestBuilder request=getClient().prepareSearch(this.getIndexName()).setQuery(QueryBuilders.hasParentQuery(this.getParentType(),QueryBuilders.idsQuery(this.getParentType()).addIds(key.toString()))).setRouting(key.toString()).setSize(Integer.MAX_VALUE);
+  SearchRequestBuilder request=getClient().prepareSearch(RuleIndexDefinition.INDEX).setQuery(QueryBuilders.hasParentQuery(RuleIndexDefinition.TYPE_RULE,QueryBuilders.idsQuery(RuleIndexDefinition.TYPE_RULE).addIds(key.toString()))).setRouting(key.repository()).setSize(Integer.MAX_VALUE);
   SearchResponse response=request.get();
   List<ActiveRule> activeRules=new ArrayList<>();
   for (  SearchHit hit : response.getHits()) {
-    activeRules.add(toDoc(hit.getSource()));
+    activeRules.add(new ActiveRuleDoc(hit.getSource()));
   }
   return activeRules;
 }

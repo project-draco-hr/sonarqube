@@ -1,5 +1,0 @@
-{
-  SearchRequestBuilder request=getClient().prepareSearch(RuleIndexDefinition.INDEX).setTypes(RuleIndexDefinition.TYPE_ACTIVE_RULE).setSearchType(SearchType.SCAN).setScroll(TimeValue.timeValueMinutes(SCROLL_TIME_IN_MINUTES)).setSize(100).setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),FilterBuilders.boolFilter().must(FilterBuilders.termFilter(RuleIndexDefinition.FIELD_ACTIVE_RULE_PROFILE_KEY,key)).mustNot(FilterBuilders.hasParentFilter(RuleIndexDefinition.TYPE_RULE,FilterBuilders.termFilter(RuleIndexDefinition.FIELD_RULE_STATUS,RuleStatus.REMOVED.name())))));
-  SearchResponse response=request.get();
-  return scroll(getClient(),response.getScrollId(),ToDoc.INSTANCE);
-}
