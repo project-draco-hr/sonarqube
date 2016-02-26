@@ -7,12 +7,12 @@
   when(defLoader.load()).thenReturn(context);
   underTest.reset();
   verify(ruleDao).selectEnabledAndNonManual(session);
-  verify(deprecatedRuleDao).update(eq(session),ruleCaptor.capture());
+  verify(ruleDao).update(eq(session),ruleCaptor.capture());
   verifyNoMoreInteractions(ruleDao);
   verify(session).commit();
   RuleDto rule=ruleCaptor.getValue();
   assertThat(rule.getDefaultRemediationFunction()).isNull();
   assertThat(rule.getDefaultRemediationCoefficient()).isNull();
   assertThat(rule.getDefaultRemediationOffset()).isNull();
-  assertThat(rule.getUpdatedAt()).isEqualTo(now);
+  assertThat(rule.getUpdatedAtInMs()).isEqualTo(now.getTime());
 }

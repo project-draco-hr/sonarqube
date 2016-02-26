@@ -8,7 +8,7 @@
   when(defLoader.load()).thenReturn(context);
   underTest.reset();
   verify(ruleDao).selectEnabledAndNonManual(session);
-  verify(deprecatedRuleDao,times(2)).update(eq(session),ruleCaptor.capture());
+  verify(ruleDao,times(2)).update(eq(session),ruleCaptor.capture());
   verifyNoMoreInteractions(ruleDao);
   verify(session).commit();
   RuleDto rule=ruleCaptor.getAllValues().get(1);
@@ -16,9 +16,9 @@
   assertThat(rule.getDefaultRemediationFunction()).isEqualTo("LINEAR_OFFSET");
   assertThat(rule.getDefaultRemediationCoefficient()).isEqualTo("4h");
   assertThat(rule.getDefaultRemediationOffset()).isEqualTo("20min");
-  assertThat(rule.getUpdatedAt()).isEqualTo(now);
+  assertThat(rule.getUpdatedAtInMs()).isEqualTo(now.getTime());
   assertThat(rule.getRemediationFunction()).isNull();
   assertThat(rule.getRemediationCoefficient()).isNull();
   assertThat(rule.getRemediationOffset()).isNull();
-  assertThat(rule.getUpdatedAt()).isEqualTo(now);
+  assertThat(rule.getUpdatedAtInMs()).isEqualTo(now.getTime());
 }
