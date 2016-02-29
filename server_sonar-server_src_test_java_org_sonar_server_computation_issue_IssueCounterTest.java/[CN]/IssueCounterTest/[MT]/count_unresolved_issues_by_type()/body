@@ -1,0 +1,21 @@
+{
+  periodsHolder.setPeriods();
+  underTest.beforeComponent(FILE1);
+  underTest.onIssue(FILE1,createIssue(null,STATUS_OPEN,BLOCKER).setType(IssueType.CODE_SMELL));
+  underTest.onIssue(FILE1,createIssue(RESOLUTION_FIXED,STATUS_CLOSED,MAJOR).setType(IssueType.CODE_SMELL));
+  underTest.afterComponent(FILE1);
+  underTest.beforeComponent(FILE2);
+  underTest.onIssue(FILE2,createIssue(null,STATUS_CONFIRMED,BLOCKER).setType(IssueType.BUG));
+  underTest.afterComponent(FILE2);
+  underTest.beforeComponent(PROJECT);
+  underTest.afterComponent(PROJECT);
+  assertThat(measureRepository.getRawMeasure(FILE1,CODE_SMELLS_METRIC).get().getIntValue()).isEqualTo(1);
+  assertThat(measureRepository.getRawMeasure(FILE1,BUGS_METRIC).get().getIntValue()).isEqualTo(0);
+  assertThat(measureRepository.getRawMeasure(FILE1,VULNERABILITIES_METRIC).get().getIntValue()).isEqualTo(0);
+  assertThat(measureRepository.getRawMeasure(FILE2,CODE_SMELLS_METRIC).get().getIntValue()).isEqualTo(0);
+  assertThat(measureRepository.getRawMeasure(FILE2,BUGS_METRIC).get().getIntValue()).isEqualTo(1);
+  assertThat(measureRepository.getRawMeasure(FILE2,VULNERABILITIES_METRIC).get().getIntValue()).isEqualTo(0);
+  assertThat(measureRepository.getRawMeasure(PROJECT,CODE_SMELLS_METRIC).get().getIntValue()).isEqualTo(1);
+  assertThat(measureRepository.getRawMeasure(PROJECT,BUGS_METRIC).get().getIntValue()).isEqualTo(1);
+  assertThat(measureRepository.getRawMeasure(PROJECT,VULNERABILITIES_METRIC).get().getIntValue()).isEqualTo(0);
+}

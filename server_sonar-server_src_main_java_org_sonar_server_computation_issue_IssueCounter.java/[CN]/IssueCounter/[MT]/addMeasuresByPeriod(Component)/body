@@ -11,7 +11,18 @@
       Double[] variations=new Double[PeriodsHolder.MAX_NUMBER_OF_PERIODS];
       for (      Period period : periodsHolder.getPeriods()) {
         Multiset<String> bag=currentCounters.counterForPeriod(period.getIndex()).severityBag;
-        variations[period.getIndex() - 1]=new Double(bag.count(severity));
+        variations[period.getIndex() - 1]=(double)bag.count(severity);
+      }
+      Metric metric=metricRepository.getByKey(metricKey);
+      measureRepository.add(component,metric,Measure.newMeasureBuilder().setVariations(new MeasureVariations(variations)).createNoValue());
+    }
+    for (    Map.Entry<IssueType,String> entry : TYPE_TO_NEW_METRIC_KEY.entrySet()) {
+      IssueType type=entry.getKey();
+      String metricKey=entry.getValue();
+      Double[] variations=new Double[PeriodsHolder.MAX_NUMBER_OF_PERIODS];
+      for (      Period period : periodsHolder.getPeriods()) {
+        Multiset<IssueType> bag=currentCounters.counterForPeriod(period.getIndex()).typeBag;
+        variations[period.getIndex() - 1]=(double)bag.count(type);
       }
       Metric metric=metricRepository.getByKey(metricKey);
       measureRepository.add(component,metric,Measure.newMeasureBuilder().setVariations(new MeasureVariations(variations)).createNoValue());
