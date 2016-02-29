@@ -1,0 +1,11 @@
+{
+  ActiveRuleDto activeRule1=ActiveRuleDto.createFor(QPROFILE_1,RULE_1).setSeverity(Severity.BLOCKER);
+  ActiveRuleDto activeRule2=ActiveRuleDto.createFor(QPROFILE_1,RULE_2).setSeverity(Severity.BLOCKER);
+  ActiveRuleDto activeRule3=ActiveRuleDto.createFor(QPROFILE_2,RULE_1).setSeverity(Severity.BLOCKER);
+  underTest.insert(dbSession,activeRule1);
+  underTest.insert(dbSession,activeRule2);
+  underTest.insert(dbSession,activeRule3);
+  dbSession.commit();
+  assertThat(underTest.selectByRuleIds(dbSession,Collections.singletonList(RULE_1.getId()))).extracting("key").containsOnly(activeRule1.getKey(),activeRule3.getKey());
+  assertThat(underTest.selectByRuleIds(dbSession,newArrayList(RULE_1.getId(),RULE_2.getId()))).extracting("key").containsOnly(activeRule1.getKey(),activeRule2.getKey(),activeRule3.getKey());
+}

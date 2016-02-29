@@ -1,0 +1,13 @@
+{
+  Map<Integer,ActiveRuleKey> activeRuleIdsByKey=new HashMap<>();
+  for (  ActiveRuleDto activeRuleDto : activeRuleDtos) {
+    activeRuleIdsByKey.put(activeRuleDto.getId(),activeRuleDto.getKey());
+  }
+  List<ActiveRuleParamDto> activeRuleParamDtos=dbClient.activeRuleDao().selectParamsByActiveRuleIds(dbSession,Lists.transform(activeRuleDtos,ActiveRuleDtoToId.INSTANCE));
+  ListMultimap<ActiveRuleKey,ActiveRuleParamDto> activeRuleParamsByActiveRuleKey=ArrayListMultimap.create(activeRuleDtos.size(),10);
+  for (  ActiveRuleParamDto activeRuleParamDto : activeRuleParamDtos) {
+    ActiveRuleKey activeRuleKey=activeRuleIdsByKey.get(activeRuleParamDto.getActiveRuleId());
+    activeRuleParamsByActiveRuleKey.put(activeRuleKey,activeRuleParamDto);
+  }
+  return activeRuleParamsByActiveRuleKey;
+}

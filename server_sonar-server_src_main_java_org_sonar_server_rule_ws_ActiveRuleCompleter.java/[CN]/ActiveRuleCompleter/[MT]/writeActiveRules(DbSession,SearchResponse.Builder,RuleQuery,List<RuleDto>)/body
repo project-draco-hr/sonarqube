@@ -1,0 +1,25 @@
+{
+  Collection<String> qProfileKeys=newHashSet();
+  Rules.Actives.Builder activesBuilder=response.getActivesBuilder();
+  String profileKey=query.getQProfileKey();
+  if (profileKey != null) {
+    List<ActiveRuleDto> activeRuleDtos=dbClient.activeRuleDao().selectByProfileKey(dbSession,profileKey);
+    ListMultimap<ActiveRuleKey,ActiveRuleParamDto> activeRuleParamsByActiveRuleKey=activeRuleDtosToActiveRuleParamDtos(dbSession,activeRuleDtos);
+    for (    RuleDto rule : rules) {
+      ActiveRule activeRule=loader.getActiveRule(ActiveRuleKey.of(profileKey,rule.getKey()));
+      if (activeRule != null) {
+        qProfileKeys=writeActiveRules(rule.getKey(),singletonList(activeRule),activeRuleParamsByActiveRuleKey,activesBuilder);
+      }
+    }
+  }
+ else {
+    List<ActiveRuleDto> activeRuleDtos=dbClient.activeRuleDao().selectByRuleIds(dbSession,Lists.transform(rules,RuleDtoFunctions.toId()));
+    ListMultimap<ActiveRuleKey,ActiveRuleParamDto> activeRuleParamsByActiveRuleKey=activeRuleDtosToActiveRuleParamDtos(dbSession,activeRuleDtos);
+    for (    RuleDto rule : rules) {
+      List<ActiveRule> activeRules=loader.findActiveRulesByRule(rule.getKey());
+      qProfileKeys=writeActiveRules(rule.getKey(),activeRules,activeRuleParamsByActiveRuleKey,activesBuilder);
+    }
+  }
+  response.setActives(activesBuilder);
+  return qProfileKeys;
+}
