@@ -1,9 +1,9 @@
 {
   if (options.getFacets().contains(FACET_ACTIVE_SEVERITIES)) {
-    HasParentFilterBuilder ruleFilter=FilterBuilders.hasParentFilter(RuleIndexDefinition.TYPE_RULE,stickyFacetBuilder.getStickyFacetFilter("activation"));
+    HasParentFilterBuilder ruleFilter=FilterBuilders.hasParentFilter(TYPE_RULE,stickyFacetBuilder.getStickyFacetFilter("activation"));
     BoolFilterBuilder childrenFilter=FilterBuilders.boolFilter();
-    this.addTermFilter(childrenFilter,RuleIndexDefinition.FIELD_ACTIVE_RULE_PROFILE_KEY,query.getQProfileKey());
-    this.addTermFilter(childrenFilter,RuleIndexDefinition.FIELD_ACTIVE_RULE_INHERITANCE,query.getInheritance());
+    addTermFilter(childrenFilter,FIELD_ACTIVE_RULE_PROFILE_KEY,query.getQProfileKey());
+    RuleIndex.addTermFilter(childrenFilter,FIELD_ACTIVE_RULE_INHERITANCE,query.getInheritance());
     FilterBuilder activeRuleFilter;
     if (childrenFilter.hasClauses()) {
       activeRuleFilter=childrenFilter.must(ruleFilter);
@@ -11,7 +11,7 @@
  else {
       activeRuleFilter=ruleFilter;
     }
-    AggregationBuilder activeSeverities=AggregationBuilders.children(FACET_ACTIVE_SEVERITIES + "_children").childType(RuleIndexDefinition.TYPE_ACTIVE_RULE).subAggregation(AggregationBuilders.filter(FACET_ACTIVE_SEVERITIES + "_filter").filter(activeRuleFilter).subAggregation(AggregationBuilders.terms(FACET_ACTIVE_SEVERITIES).field(RuleIndexDefinition.FIELD_ACTIVE_RULE_SEVERITY).include(Joiner.on('|').join(Severity.ALL)).size(Severity.ALL.size())));
+    AggregationBuilder activeSeverities=AggregationBuilders.children(FACET_ACTIVE_SEVERITIES + "_children").childType(TYPE_ACTIVE_RULE).subAggregation(AggregationBuilders.filter(FACET_ACTIVE_SEVERITIES + "_filter").filter(activeRuleFilter).subAggregation(AggregationBuilders.terms(FACET_ACTIVE_SEVERITIES).field(FIELD_ACTIVE_RULE_SEVERITY).include(Joiner.on('|').join(Severity.ALL)).size(Severity.ALL.size())));
     aggregations.put(FACET_ACTIVE_SEVERITIES,AggregationBuilders.global(FACET_ACTIVE_SEVERITIES).subAggregation(activeSeverities));
   }
 }

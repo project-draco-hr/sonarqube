@@ -1,29 +1,29 @@
 {
   Map<String,FilterBuilder> filters=new HashMap<>();
-  filters.put(RuleIndexDefinition.FIELD_RULE_STATUS,FilterBuilders.boolFilter().mustNot(FilterBuilders.termFilter(RuleIndexDefinition.FIELD_RULE_STATUS,RuleStatus.REMOVED.toString())));
+  filters.put(FIELD_RULE_STATUS,FilterBuilders.boolFilter().mustNot(FilterBuilders.termFilter(FIELD_RULE_STATUS,RuleStatus.REMOVED.toString())));
   if (!StringUtils.isEmpty(query.getInternalKey())) {
-    filters.put(RuleIndexDefinition.FIELD_RULE_INTERNAL_KEY,FilterBuilders.termFilter(RuleIndexDefinition.FIELD_RULE_INTERNAL_KEY,query.getInternalKey()));
+    filters.put(FIELD_RULE_INTERNAL_KEY,FilterBuilders.termFilter(FIELD_RULE_INTERNAL_KEY,query.getInternalKey()));
   }
   if (!StringUtils.isEmpty(query.getRuleKey())) {
-    filters.put(RuleIndexDefinition.FIELD_RULE_RULE_KEY,FilterBuilders.termFilter(RuleIndexDefinition.FIELD_RULE_RULE_KEY,query.getRuleKey()));
+    filters.put(FIELD_RULE_RULE_KEY,FilterBuilders.termFilter(FIELD_RULE_RULE_KEY,query.getRuleKey()));
   }
   if (!CollectionUtils.isEmpty(query.getLanguages())) {
-    filters.put(RuleIndexDefinition.FIELD_RULE_LANGUAGE,FilterBuilders.termsFilter(RuleIndexDefinition.FIELD_RULE_LANGUAGE,query.getLanguages()));
+    filters.put(FIELD_RULE_LANGUAGE,FilterBuilders.termsFilter(FIELD_RULE_LANGUAGE,query.getLanguages()));
   }
   if (!CollectionUtils.isEmpty(query.getRepositories())) {
-    filters.put(RuleIndexDefinition.FIELD_RULE_REPOSITORY,FilterBuilders.termsFilter(RuleIndexDefinition.FIELD_RULE_REPOSITORY,query.getRepositories()));
+    filters.put(FIELD_RULE_REPOSITORY,FilterBuilders.termsFilter(FIELD_RULE_REPOSITORY,query.getRepositories()));
   }
   if (!CollectionUtils.isEmpty(query.getSeverities())) {
-    filters.put(RuleIndexDefinition.FIELD_RULE_SEVERITY,FilterBuilders.termsFilter(RuleIndexDefinition.FIELD_RULE_SEVERITY,query.getSeverities()));
+    filters.put(FIELD_RULE_SEVERITY,FilterBuilders.termsFilter(FIELD_RULE_SEVERITY,query.getSeverities()));
   }
   if (!StringUtils.isEmpty(query.getKey())) {
-    filters.put(RuleIndexDefinition.FIELD_RULE_KEY,FilterBuilders.termFilter(RuleIndexDefinition.FIELD_RULE_KEY,query.getKey()));
+    filters.put(FIELD_RULE_KEY,FilterBuilders.termFilter(FIELD_RULE_KEY,query.getKey()));
   }
   if (!CollectionUtils.isEmpty(query.getTags())) {
-    filters.put(RuleIndexDefinition.FIELD_RULE_ALL_TAGS,FilterBuilders.termsFilter(RuleIndexDefinition.FIELD_RULE_ALL_TAGS,query.getTags()));
+    filters.put(FIELD_RULE_ALL_TAGS,FilterBuilders.termsFilter(FIELD_RULE_ALL_TAGS,query.getTags()));
   }
   if (query.getAvailableSinceLong() != null) {
-    filters.put("availableSince",FilterBuilders.rangeFilter(RuleIndexDefinition.FIELD_RULE_CREATED_AT).gte(query.getAvailableSinceLong()));
+    filters.put("availableSince",FilterBuilders.rangeFilter(FIELD_RULE_CREATED_AT).gte(query.getAvailableSinceLong()));
   }
   Collection<RuleStatus> statusValues=query.getStatuses();
   if (statusValues != null && !statusValues.isEmpty()) {
@@ -31,20 +31,20 @@
     for (    RuleStatus status : statusValues) {
       stringStatus.add(status.name());
     }
-    filters.put(RuleIndexDefinition.FIELD_RULE_STATUS,FilterBuilders.termsFilter(RuleIndexDefinition.FIELD_RULE_STATUS,stringStatus));
+    filters.put(FIELD_RULE_STATUS,FilterBuilders.termsFilter(FIELD_RULE_STATUS,stringStatus));
   }
   Boolean isTemplate=query.isTemplate();
   if (isTemplate != null) {
-    filters.put(RuleIndexDefinition.FIELD_RULE_IS_TEMPLATE,FilterBuilders.termFilter(RuleIndexDefinition.FIELD_RULE_IS_TEMPLATE,Boolean.toString(isTemplate)));
+    filters.put(FIELD_RULE_IS_TEMPLATE,FilterBuilders.termFilter(FIELD_RULE_IS_TEMPLATE,Boolean.toString(isTemplate)));
   }
   String template=query.templateKey();
   if (template != null) {
-    filters.put(RuleIndexDefinition.FIELD_RULE_TEMPLATE_KEY,FilterBuilders.termFilter(RuleIndexDefinition.FIELD_RULE_TEMPLATE_KEY,template));
+    filters.put(FIELD_RULE_TEMPLATE_KEY,FilterBuilders.termFilter(FIELD_RULE_TEMPLATE_KEY,template));
   }
   BoolFilterBuilder childrenFilter=FilterBuilders.boolFilter();
-  addTermFilter(childrenFilter,RuleIndexDefinition.FIELD_ACTIVE_RULE_PROFILE_KEY,query.getQProfileKey());
-  addTermFilter(childrenFilter,RuleIndexDefinition.FIELD_ACTIVE_RULE_INHERITANCE,query.getInheritance());
-  addTermFilter(childrenFilter,RuleIndexDefinition.FIELD_ACTIVE_RULE_SEVERITY,query.getActiveSeverities());
+  addTermFilter(childrenFilter,FIELD_ACTIVE_RULE_PROFILE_KEY,query.getQProfileKey());
+  addTermFilter(childrenFilter,FIELD_ACTIVE_RULE_INHERITANCE,query.getInheritance());
+  addTermFilter(childrenFilter,FIELD_ACTIVE_RULE_SEVERITY,query.getActiveSeverities());
   FilterBuilder childQuery;
   if (childrenFilter.hasClauses()) {
     childQuery=childrenFilter;
@@ -53,10 +53,10 @@
     childQuery=FilterBuilders.matchAllFilter();
   }
   if (Boolean.TRUE.equals(query.getActivation())) {
-    filters.put("activation",FilterBuilders.hasChildFilter(RuleIndexDefinition.TYPE_ACTIVE_RULE,childQuery));
+    filters.put("activation",FilterBuilders.hasChildFilter(TYPE_ACTIVE_RULE,childQuery));
   }
  else   if (Boolean.FALSE.equals(query.getActivation())) {
-    filters.put("activation",FilterBuilders.boolFilter().mustNot(FilterBuilders.hasChildFilter(RuleIndexDefinition.TYPE_ACTIVE_RULE,childQuery)));
+    filters.put("activation",FilterBuilders.boolFilter().mustNot(FilterBuilders.hasChildFilter(TYPE_ACTIVE_RULE,childQuery)));
   }
   return filters;
 }
