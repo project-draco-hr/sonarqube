@@ -1,0 +1,30 @@
+{
+  RuleQuery query=new RuleQuery();
+  query.setQueryText(Strings.emptyToNull((String)params.get("searchQuery")));
+  query.setKey(Strings.emptyToNull((String)params.get("key")));
+  query.setLanguages(RubyUtils.toStrings(params.get("languages")));
+  query.setRepositories(RubyUtils.toStrings(params.get("repositories")));
+  query.setSeverities(RubyUtils.toStrings(params.get("severities")));
+  query.setStatuses(RubyUtils.toEnums(params.get("statuses"),RuleStatus.class));
+  query.setTags(RubyUtils.toStrings(params.get("tags")));
+  query.setSortField(RuleNormalizer.RuleField.NAME);
+  String profile=Strings.emptyToNull((String)params.get("profile"));
+  if (profile != null) {
+    query.setQProfileKey(profile);
+    query.setActivation(true);
+  }
+  QueryContext options=new QueryContext(userSession);
+  Integer pageSize=RubyUtils.toInteger(params.get("pageSize"));
+  int size=pageSize != null ? pageSize : 50;
+  if (size > -1) {
+    Integer page=RubyUtils.toInteger(params.get("p"));
+    int pageIndex=page != null ? page : 1;
+    options.setPage(pageIndex,size);
+    Result<Rule> result=service.search(query,options);
+    return new PagedResult<>(result.getHits(),PagingResult.create(options.getLimit(),pageIndex,result.getTotal()));
+  }
+ else {
+    List<Rule> rules=newArrayList(service.search(query,new QueryContext(userSession).setScroll(true)).scroll());
+    return new PagedResult<>(rules,PagingResult.create(Integer.MAX_VALUE,1,rules.size()));
+  }
+}
