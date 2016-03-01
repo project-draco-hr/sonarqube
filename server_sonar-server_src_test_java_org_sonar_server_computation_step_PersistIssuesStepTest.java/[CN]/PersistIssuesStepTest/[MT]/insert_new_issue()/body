@@ -1,6 +1,19 @@
 {
-  dbTester.prepareDbUnit(getClass(),"insert_new_issue.xml");
-  issueCache.newAppender().append(new DefaultIssue().setKey("ISSUE").setType(RuleType.CODE_SMELL).setRuleKey(RuleKey.of("xoo","S01")).setComponentUuid("COMPONENT").setProjectUuid("PROJECT").setSeverity(Severity.BLOCKER).setStatus(Issue.STATUS_OPEN).setNew(true)).close();
+  RuleDto rule=RuleTesting.newDto(RuleKey.of("xoo","S01"));
+  dbClient.ruleDao().insert(session,rule);
+  ComponentDto project=ComponentTesting.newProjectDto();
+  dbClient.componentDao().insert(session,project);
+  ComponentDto file=ComponentTesting.newFileDto(project);
+  dbClient.componentDao().insert(session,file);
+  session.commit();
+  issueCache.newAppender().append(new DefaultIssue().setKey("ISSUE").setType(RuleType.CODE_SMELL).setRuleKey(rule.getKey()).setComponentUuid(file.uuid()).setProjectUuid(project.uuid()).setSeverity(Severity.BLOCKER).setStatus(Issue.STATUS_OPEN).setNew(true).setType(RuleType.BUG)).close();
   step.execute();
-  dbTester.assertDbUnit(getClass(),"insert_new_issue-result.xml",new String[]{"id"},"issues");
+  IssueDto result=dbClient.issueDao().selectOrFailByKey(session,"ISSUE");
+  assertThat(result.getKey()).isEqualTo("ISSUE");
+  assertThat(result.getRuleKey()).isEqualTo(rule.getKey());
+  assertThat(result.getComponentUuid()).isEqualTo(file.uuid());
+  assertThat(result.getProjectUuid()).isEqualTo(project.uuid());
+  assertThat(result.getSeverity()).isEqualTo(Severity.BLOCKER);
+  assertThat(result.getStatus()).isEqualTo(Issue.STATUS_OPEN);
+  assertThat(result.getType()).isEqualTo(RuleType.BUG.getDbConstant());
 }

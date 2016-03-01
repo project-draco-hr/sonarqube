@@ -1,5 +1,5 @@
 {
-  RuleDto newRule=new RuleDto().setRuleKey("NewRuleKey").setRepositoryKey("plugin").setName("new name").setDescription("new description").setDescriptionFormat(RuleDto.Format.MARKDOWN).setStatus(RuleStatus.DEPRECATED).setConfigKey("NewConfigKey").setSeverity(Severity.INFO).setIsTemplate(true).setLanguage("dart").setTemplateId(3).setNoteData("My note").setNoteUserLogin("admin").setNoteCreatedAt(DateUtils.parseDate("2013-12-19")).setNoteUpdatedAt(DateUtils.parseDate("2013-12-20")).setRemediationFunction(DebtRemediationFunction.Type.LINEAR.toString()).setDefaultRemediationFunction(DebtRemediationFunction.Type.LINEAR_OFFSET.toString()).setRemediationCoefficient("1h").setDefaultRemediationCoefficient("5d").setRemediationOffset("5min").setDefaultRemediationOffset("10h").setEffortToFixDescription("squid.S115.effortToFix").setCreatedAt(1500000000000L).setUpdatedAt(2000000000000L);
+  RuleDto newRule=new RuleDto().setRuleKey("NewRuleKey").setRepositoryKey("plugin").setName("new name").setDescription("new description").setDescriptionFormat(RuleDto.Format.MARKDOWN).setStatus(RuleStatus.DEPRECATED).setConfigKey("NewConfigKey").setSeverity(Severity.INFO).setIsTemplate(true).setLanguage("dart").setTemplateId(3).setNoteData("My note").setNoteUserLogin("admin").setNoteCreatedAt(DateUtils.parseDate("2013-12-19")).setNoteUpdatedAt(DateUtils.parseDate("2013-12-20")).setRemediationFunction(DebtRemediationFunction.Type.LINEAR.toString()).setDefaultRemediationFunction(DebtRemediationFunction.Type.LINEAR_OFFSET.toString()).setRemediationCoefficient("1h").setDefaultRemediationCoefficient("5d").setRemediationOffset("5min").setDefaultRemediationOffset("10h").setEffortToFixDescription("squid.S115.effortToFix").setTags(newHashSet("tag1","tag2")).setSystemTags(newHashSet("systag1","systag2")).setType(RuleType.BUG).setCreatedAt(1500000000000L).setUpdatedAt(2000000000000L);
   underTest.insert(dbTester.getSession(),newRule);
   dbTester.getSession().commit();
   RuleDto ruleDto=underTest.selectOrFailByKey(dbTester.getSession(),RuleKey.of("plugin","NewRuleKey"));
@@ -26,6 +26,9 @@
   assertThat(ruleDto.getRemediationOffset()).isEqualTo("5min");
   assertThat(ruleDto.getDefaultRemediationOffset()).isEqualTo("10h");
   assertThat(ruleDto.getEffortToFixDescription()).isEqualTo("squid.S115.effortToFix");
+  assertThat(ruleDto.getTags()).containsOnly("tag1","tag2");
+  assertThat(ruleDto.getSystemTags()).containsOnly("systag1","systag2");
+  assertThat(ruleDto.getType()).isEqualTo(RuleType.BUG.getDbConstant());
   assertThat(ruleDto.getCreatedAt()).isEqualTo(1500000000000L);
   assertThat(ruleDto.getUpdatedAt()).isEqualTo(2000000000000L);
 }
