@@ -12,11 +12,11 @@
     if (!ruleKey.isManual()) {
       throw new IllegalArgumentException("Issues can be created only on rules marked as 'manual': " + ruleKey);
     }
-    Rule rule=getNullableRuleByKey(ruleKey);
-    if (rule == null) {
+    Optional<RuleDto> rule=getRuleByKey(dbSession,ruleKey);
+    if (!rule.isPresent()) {
       throw new IllegalArgumentException("Unknown rule: " + ruleKey);
     }
-    DefaultIssue issue=new DefaultIssueBuilder().componentKey(component.getKey()).projectKey(project.getKey()).line(line).message(!Strings.isNullOrEmpty(message) ? message : rule.getName()).severity(Objects.firstNonNull(severity,Severity.MAJOR)).ruleKey(ruleKey).reporter(userSession.getLogin()).assignee(findSourceLineUser(dbSession,component.uuid(),line)).build();
+    DefaultIssue issue=new DefaultIssueBuilder().componentKey(component.getKey()).type(RuleType.valueOf(rule.get().getType())).projectKey(project.getKey()).line(line).message(!Strings.isNullOrEmpty(message) ? message : rule.get().getName()).severity(Objects.firstNonNull(severity,Severity.MAJOR)).ruleKey(ruleKey).reporter(userSession.getLogin()).assignee(findSourceLineUser(dbSession,component.uuid(),line)).build();
     Date now=new Date();
     issue.setCreationDate(now);
     issue.setUpdateDate(now);
