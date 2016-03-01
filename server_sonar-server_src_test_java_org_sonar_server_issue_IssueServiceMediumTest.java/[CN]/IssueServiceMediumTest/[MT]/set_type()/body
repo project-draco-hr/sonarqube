@@ -1,0 +1,10 @@
+{
+  RuleDto rule=newRule();
+  ComponentDto project=newProject();
+  ComponentDto file=newFile(project);
+  userSessionRule.login("john").addProjectUuidPermissions(UserRole.ISSUE_ADMIN,project.uuid());
+  IssueDto issue=saveIssue(IssueTesting.newDto(rule,file,project).setType(RuleType.CODE_SMELL));
+  assertThat(IssueIndex.getByKey(issue.getKey()).type()).isEqualTo(RuleType.CODE_SMELL);
+  service.setType(issue.getKey(),RuleType.BUG);
+  assertThat(IssueIndex.getByKey(issue.getKey()).type()).isEqualTo(RuleType.BUG);
+}
