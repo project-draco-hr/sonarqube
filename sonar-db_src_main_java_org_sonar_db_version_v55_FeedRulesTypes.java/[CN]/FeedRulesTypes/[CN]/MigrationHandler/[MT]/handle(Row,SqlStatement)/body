@@ -1,0 +1,16 @@
+{
+  long id=row.getLong(1);
+  List<String> systemTags=newArrayList(TAG_SPLITTER.split(defaultString(row.getNullableString(2))));
+  List<String> userTags=newArrayList(TAG_SPLITTER.split(defaultString(row.getNullableString(3))));
+  RuleType type=tagsToType(systemTags);
+  systemTags.remove("bug");
+  systemTags.remove("security");
+  userTags.remove("bug");
+  userTags.remove("security");
+  update.setInt(1,type.getDbConstant());
+  update.setString(2,TAG_JOINER.join(systemTags));
+  update.setString(3,TAG_JOINER.join(userTags));
+  update.setLong(4,now);
+  update.setLong(5,id);
+  return true;
+}

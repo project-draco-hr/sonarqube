@@ -1,0 +1,15 @@
+{
+  insertRuleWithSystemTags("only_performance","performance");
+  insertRuleWithSystemTags("no_tag");
+  insertRuleWithSystemTags("only_bug","bug");
+  insertRuleWithSystemTags("security","security","test");
+  insertRuleWithSystemTags("bug_and_security","security","bug");
+  insertRuleWithType("type_already_exists",RuleType.BUG);
+  underTest.execute();
+  assertRule("only_performance",RuleType.CODE_SMELL,"performance",NOW);
+  assertRule("no_tag",RuleType.CODE_SMELL,"",NOW);
+  assertRule("only_bug",RuleType.BUG,"",NOW);
+  assertRule("security",RuleType.VULNERABILITY,"test",NOW);
+  assertRule("bug_and_security",RuleType.BUG,"",NOW);
+  assertRule("type_already_exists",RuleType.BUG,null,BEFORE);
+}
