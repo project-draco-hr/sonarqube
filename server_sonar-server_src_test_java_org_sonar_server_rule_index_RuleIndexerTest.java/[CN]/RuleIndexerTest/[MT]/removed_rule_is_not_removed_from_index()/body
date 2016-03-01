@@ -1,12 +1,10 @@
 {
   RuleIndexer indexer=createIndexer();
-  RuleDto ruleDto=RuleTesting.newDto(RuleKey.of("xoo","S001")).setStatus(RuleStatus.READY).setUpdatedAt(1000L);
-  dbTester.getDbClient().ruleDao().insert(dbTester.getSession(),ruleDto);
-  dbTester.getSession().commit();
+  dbClient.ruleDao().insert(dbSession,rule.setStatus(RuleStatus.READY));
+  dbSession.commit();
   indexer.index();
-  ruleDto.setStatus(RuleStatus.REMOVED);
-  ruleDto.setUpdatedAt(2000L);
-  dbTester.getDbClient().ruleDao().update(dbTester.getSession(),ruleDto);
+  assertThat(esTester.countDocuments(RuleIndexDefinition.INDEX,RuleIndexDefinition.TYPE_RULE)).isEqualTo(1);
+  dbTester.getDbClient().ruleDao().update(dbTester.getSession(),rule.setStatus(RuleStatus.READY).setUpdatedAt(2000000000000L));
   dbTester.getSession().commit();
   indexer.index();
   assertThat(esTester.countDocuments(RuleIndexDefinition.INDEX,RuleIndexDefinition.TYPE_RULE)).isEqualTo(1);

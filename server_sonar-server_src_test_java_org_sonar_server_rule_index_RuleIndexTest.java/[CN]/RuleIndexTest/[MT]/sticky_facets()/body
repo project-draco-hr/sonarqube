@@ -1,25 +1,27 @@
 {
-  indexRules(newDoc(RuleKey.of("xoo","S001")).setLanguage("java").setAllTags(Collections.<String>emptyList()),newDoc(RuleKey.of("xoo","S002")).setLanguage("java").setAllTags(Collections.<String>emptyList()),newDoc(RuleKey.of("xoo","S003")).setLanguage("java").setAllTags(asList("T1","T2")),newDoc(RuleKey.of("xoo","S011")).setLanguage("cobol").setAllTags(Collections.<String>emptyList()),newDoc(RuleKey.of("xoo","S012")).setLanguage("cobol").setAllTags(Collections.<String>emptyList()),newDoc(RuleKey.of("foo","S013")).setLanguage("cobol").setAllTags(asList("T3","T4")),newDoc(RuleKey.of("foo","S111")).setLanguage("cpp").setAllTags(Collections.<String>emptyList()),newDoc(RuleKey.of("foo","S112")).setLanguage("cpp").setAllTags(Collections.<String>emptyList()),newDoc(RuleKey.of("foo","S113")).setLanguage("cpp").setAllTags(asList("T2","T3")));
+  indexRules(newDoc(RuleKey.of("xoo","S001")).setLanguage("java").setAllTags(Collections.<String>emptyList()).setType(BUG),newDoc(RuleKey.of("xoo","S002")).setLanguage("java").setAllTags(Collections.<String>emptyList()).setType(CODE_SMELL),newDoc(RuleKey.of("xoo","S003")).setLanguage("java").setAllTags(asList("T1","T2")).setType(CODE_SMELL),newDoc(RuleKey.of("xoo","S011")).setLanguage("cobol").setAllTags(Collections.<String>emptyList()).setType(CODE_SMELL),newDoc(RuleKey.of("xoo","S012")).setLanguage("cobol").setAllTags(Collections.<String>emptyList()).setType(BUG),newDoc(RuleKey.of("foo","S013")).setLanguage("cobol").setAllTags(asList("T3","T4")).setType(VULNERABILITY),newDoc(RuleKey.of("foo","S111")).setLanguage("cpp").setAllTags(Collections.<String>emptyList()).setType(BUG),newDoc(RuleKey.of("foo","S112")).setLanguage("cpp").setAllTags(Collections.<String>emptyList()).setType(CODE_SMELL),newDoc(RuleKey.of("foo","S113")).setLanguage("cpp").setAllTags(asList("T2","T3")).setType(CODE_SMELL));
   assertThat(index.search(new RuleQuery(),new SearchOptions()).getIds()).hasSize(9);
-  SearchIdResult result=index.search(new RuleQuery(),new SearchOptions().addFacets(asList("languages","repositories","tags")));
-  assertThat(result.getFacets().getAll()).hasSize(3);
+  SearchIdResult result=index.search(new RuleQuery(),new SearchOptions().addFacets(asList(FACET_LANGUAGES,FACET_REPOSITORIES,FACET_TAGS,FACET_TYPES)));
+  assertThat(result.getFacets().getAll()).hasSize(4);
   assertThat(result.getFacets().getAll().get(FACET_LANGUAGES).keySet()).containsOnly("cpp","java","cobol");
   assertThat(result.getFacets().getAll().get(FACET_REPOSITORIES).keySet()).containsOnly("xoo","foo");
   assertThat(result.getFacets().getAll().get(FACET_TAGS).keySet()).containsOnly("T1","T2","T3","T4");
-  result=index.search(new RuleQuery().setLanguages(ImmutableList.of("cpp")),new SearchOptions().addFacets(asList("languages","repositories","tags")));
+  assertThat(result.getFacets().getAll().get(FACET_TYPES).keySet()).containsOnly("BUG","CODE_SMELL","VULNERABILITY");
+  result=index.search(new RuleQuery().setLanguages(ImmutableList.of("cpp")),new SearchOptions().addFacets(asList(FACET_LANGUAGES,FACET_REPOSITORIES,FACET_TAGS)));
   assertThat(result.getIds()).hasSize(3);
   assertThat(result.getFacets().getAll()).hasSize(3);
   assertThat(result.getFacets().get(FACET_LANGUAGES).keySet()).containsOnly("cpp","java","cobol");
-  result=index.search(new RuleQuery().setLanguages(ImmutableList.of("cpp")).setTags(ImmutableList.of("T2")),new SearchOptions().addFacets(asList("languages","repositories","tags")));
+  result=index.search(new RuleQuery().setLanguages(ImmutableList.of("cpp")).setTags(ImmutableList.of("T2")),new SearchOptions().addFacets(asList(FACET_LANGUAGES,FACET_REPOSITORIES,FACET_TAGS)));
   assertThat(result.getIds()).hasSize(1);
   assertThat(result.getFacets().getAll()).hasSize(3);
   assertThat(result.getFacets().get(FACET_LANGUAGES).keySet()).containsOnly("cpp","java");
   assertThat(result.getFacets().get(FACET_REPOSITORIES).keySet()).containsOnly("foo");
   assertThat(result.getFacets().get(FACET_TAGS).keySet()).containsOnly("T2","T3");
-  result=index.search(new RuleQuery().setLanguages(ImmutableList.of("cpp","java")).setTags(ImmutableList.of("T2")),new SearchOptions().addFacets(asList("languages","repositories","tags")));
+  result=index.search(new RuleQuery().setLanguages(ImmutableList.of("cpp","java")).setTags(ImmutableList.of("T2")).setTypes(asList(BUG,CODE_SMELL)),new SearchOptions().addFacets(asList(FACET_LANGUAGES,FACET_REPOSITORIES,FACET_TAGS,FACET_TYPES)));
   assertThat(result.getIds()).hasSize(2);
-  assertThat(result.getFacets().getAll()).hasSize(3);
+  assertThat(result.getFacets().getAll()).hasSize(4);
   assertThat(result.getFacets().get(FACET_LANGUAGES).keySet()).containsOnly("cpp","java");
   assertThat(result.getFacets().get(FACET_REPOSITORIES).keySet()).containsOnly("foo","xoo");
   assertThat(result.getFacets().get(FACET_TAGS).keySet()).containsOnly("T1","T2","T3");
+  assertThat(result.getFacets().get(FACET_TYPES).keySet()).containsOnly("CODE_SMELL");
 }

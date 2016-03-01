@@ -1,0 +1,15 @@
+{
+  indexRules(newDoc(RULE_KEY_1).setType(CODE_SMELL),newDoc(RULE_KEY_2).setType(VULNERABILITY),newDoc(RULE_KEY_3).setType(BUG),newDoc(RULE_KEY_4).setType(BUG));
+  RuleQuery query=new RuleQuery();
+  assertThat(index.search(query,new SearchOptions()).getIds()).hasSize(4);
+  query=new RuleQuery().setTypes(ImmutableSet.of(VULNERABILITY));
+  assertThat(index.search(query,new SearchOptions()).getIds()).containsOnly(RULE_KEY_2);
+  query=new RuleQuery().setTypes(ImmutableSet.of(BUG));
+  assertThat(index.search(query,new SearchOptions()).getIds()).containsOnly(RULE_KEY_3,RULE_KEY_4);
+  query=new RuleQuery().setQueryText("code smell bug vulnerability");
+  assertThat(index.search(query,new SearchOptions()).getIds()).isEmpty();
+  query=new RuleQuery().setTypes(Collections.<RuleType>emptySet());
+  assertThat(index.search(query,new SearchOptions()).getIds()).hasSize(4);
+  query=new RuleQuery().setTypes(null);
+  assertThat(index.search(query,new SearchOptions()).getIds()).hasSize(4);
+}
