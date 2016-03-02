@@ -3,14 +3,15 @@
   DbSession session=dbClient.openSession(false);
   try {
     activeRuleIndexer.setEnabled(true);
+    List<ActiveRuleChange> changes=new ArrayList<>();
     ListMultimap<String,RulesProfile> profilesByLanguage=profilesByLanguage();
     for (    String language : profilesByLanguage.keySet()) {
       List<RulesProfile> defs=profilesByLanguage.get(language);
       if (verifyLanguage(language,defs)) {
-        registerProfilesForLanguage(session,language,defs);
+        changes.addAll(registerProfilesForLanguage(session,language,defs));
       }
     }
-    activeRuleIndexer.index();
+    activeRuleIndexer.index(changes);
     profiler.stopDebug();
   }
   finally {
