@@ -1,14 +1,14 @@
 {
   DefaultIssue unresolved1=newCodeSmellIssue(10);
   DefaultIssue unresolved2=newCodeSmellIssue(30);
-  DefaultIssue unresolvedWithoutDebt=newCodeSmellIssueWithoutEffort();
+  DefaultIssue unresolvedWithoutEffort=newCodeSmellIssueWithoutEffort();
   DefaultIssue resolved=newCodeSmellIssue(50).setResolution(RESOLUTION_FIXED);
   underTest.beforeComponent(FILE);
   underTest.onIssue(FILE,unresolved1);
   underTest.onIssue(FILE,unresolved2);
-  underTest.onIssue(FILE,unresolvedWithoutDebt);
+  underTest.onIssue(FILE,unresolvedWithoutEffort);
   underTest.onIssue(FILE,resolved);
   underTest.afterComponent(FILE);
-  assertThat(maintainabilityEffortMeasure(FILE).get().getLongValue()).isEqualTo(10 + 30);
-  assertThat(debtRuleMeasure(FILE,RULE.getId()).get().getLongValue()).isEqualTo(10 + 30);
+  assertMeasure(FILE,TECHNICAL_DEBT_KEY,10L + 30L);
+  assertMaintainabilityRuleMeasure(FILE,RULE,10L + 30L);
 }

@@ -1,0 +1,28 @@
+{
+  periodsHolder.setPeriods(PERIOD);
+  DefaultIssue codeSmellIssue=newCodeSmellIssue(10);
+  when(calculator.calculate(same(codeSmellIssue),anyList(),same(PERIOD))).thenReturn(4L);
+  DefaultIssue bugIssue=newBugIssue(8);
+  when(calculator.calculate(same(bugIssue),anyList(),same(PERIOD))).thenReturn(3L);
+  DefaultIssue vulnerabilityIssue=newVulnerabilityIssue(12);
+  when(calculator.calculate(same(vulnerabilityIssue),anyList(),same(PERIOD))).thenReturn(6L);
+  DefaultIssue codeSmellProjectIssue=newCodeSmellIssue(30);
+  when(calculator.calculate(same(codeSmellProjectIssue),anyList(),same(PERIOD))).thenReturn(1L);
+  DefaultIssue bugProjectIssue=newBugIssue(28);
+  when(calculator.calculate(same(bugProjectIssue),anyList(),same(PERIOD))).thenReturn(2L);
+  DefaultIssue vulnerabilityProjectIssue=newVulnerabilityIssue(32);
+  when(calculator.calculate(same(vulnerabilityProjectIssue),anyList(),same(PERIOD))).thenReturn(4L);
+  underTest.beforeComponent(FILE);
+  underTest.onIssue(FILE,codeSmellIssue);
+  underTest.onIssue(FILE,bugIssue);
+  underTest.onIssue(FILE,vulnerabilityIssue);
+  underTest.afterComponent(FILE);
+  underTest.beforeComponent(PROJECT);
+  underTest.onIssue(PROJECT,codeSmellProjectIssue);
+  underTest.onIssue(PROJECT,bugProjectIssue);
+  underTest.onIssue(PROJECT,vulnerabilityProjectIssue);
+  underTest.afterComponent(PROJECT);
+  assertVariation(PROJECT,NEW_TECHNICAL_DEBT_KEY,4 + 1);
+  assertVariation(PROJECT,NEW_RELIABILITY_REMEDIATION_EFFORT_KEY,3 + 2);
+  assertVariation(PROJECT,NEW_SECURITY_REMEDIATION_EFFORT_KEY,6 + 4);
+}
