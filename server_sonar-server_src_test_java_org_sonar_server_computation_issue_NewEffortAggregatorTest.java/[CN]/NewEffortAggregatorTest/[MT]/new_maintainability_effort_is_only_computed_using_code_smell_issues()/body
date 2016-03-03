@@ -1,0 +1,16 @@
+{
+  periodsHolder.setPeriods(PERIOD);
+  DefaultIssue codeSmellIssue=newCodeSmellIssue(10);
+  DefaultIssue bugIssue=newBugIssue(15);
+  DefaultIssue vulnerabilityIssue=newVulnerabilityIssue(12);
+  when(calculator.calculate(same(codeSmellIssue),anyList(),same(PERIOD))).thenReturn(4L);
+  when(calculator.calculate(same(bugIssue),anyList(),same(PERIOD))).thenReturn(3L);
+  when(calculator.calculate(same(vulnerabilityIssue),anyList(),same(PERIOD))).thenReturn(5L);
+  underTest.beforeComponent(FILE);
+  underTest.onIssue(FILE,codeSmellIssue);
+  underTest.onIssue(FILE,bugIssue);
+  underTest.onIssue(FILE,vulnerabilityIssue);
+  underTest.afterComponent(FILE);
+  Measure newMeasure=newMaintainabilityEffortMeasure(FILE).get();
+  assertThat(newMeasure.getVariations().getVariation(PERIOD.getIndex())).isEqualTo(4);
+}

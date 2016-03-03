@@ -1,0 +1,14 @@
+{
+  maintainabilityEffortSum=new EffortSum();
+  sumsByComponentRef.put(component.getReportAttributes().getRef(),maintainabilityEffortSum);
+  List<IssueChangeDto> changes=dbClient.issueChangeDao().selectChangelogOfNonClosedIssuesByComponent(component.getUuid());
+  for (  IssueChangeDto change : changes) {
+    changesByIssueUuid.put(change.getIssueKey(),change);
+  }
+  for (  Component child : component.getChildren()) {
+    EffortSum childSum=sumsByComponentRef.remove(child.getReportAttributes().getRef());
+    if (childSum != null) {
+      maintainabilityEffortSum.add(childSum);
+    }
+  }
+}
