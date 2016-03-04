@@ -1,0 +1,8 @@
+{
+  RuleDto removedRule=RuleTesting.newDto(RuleKey.of("removed","rule")).setStatus(RuleStatus.REMOVED);
+  dbClient.ruleDao().insert(dbTester.getSession(),removedRule);
+  ActiveRuleDto activeRule=ActiveRuleDto.createFor(QPROFILE_1,removedRule).setSeverity(Severity.BLOCKER);
+  underTest.insert(dbTester.getSession(),activeRule);
+  dbSession.commit();
+  assertThat(underTest.selectByProfileKey(dbSession,QPROFILE_1.getKey())).isEmpty();
+}

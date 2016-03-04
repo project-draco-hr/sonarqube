@@ -13,9 +13,11 @@
       }
     }
     List<RuleDto> activeRules=processRemainingDbRules(allRules.values(),session);
-    removeActiveRulesOnStillExistingRepositories(session,activeRules,context);
+    List<ActiveRuleChange> changes=removeActiveRulesOnStillExistingRepositories(session,activeRules,context);
     session.commit();
     ruleIndexer.setEnabled(true).index();
+    activeRuleIndexer.setEnabled(true);
+    activeRuleIndexer.index(changes);
     profiler.stopDebug();
   }
   finally {
