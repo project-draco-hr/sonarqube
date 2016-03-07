@@ -1,24 +1,3 @@
 {
-  if (isOnTravisCI()) {
-    for (int i=0; i < MAX_TRY; i++) {
-      int port=nextPort.getAndIncrement();
-      try {
-        Process process=new ProcessBuilder("nc","-z","localhost",Integer.toString(port)).start();
-        if (process.waitFor() == 1) {
-          return port;
-        }
-      }
- catch (      Exception e) {
-        throw new IllegalStateException("Can't test that a network port is available",e);
-      }
-    }
-    throw new IllegalStateException("Can't find a free network port");
-  }
-  try (ServerSocket socket=new ServerSocket()){
-    socket.bind(new InetSocketAddress("localhost",0));
-    return socket.getLocalPort();
-  }
- catch (  IOException e) {
-    throw new IllegalStateException("Can't find a free network port",e);
-  }
+  return RANDOM_PORT_FINDER.getNextAvailablePort();
 }
