@@ -1,0 +1,23 @@
+{
+  treeRootHolder.setRoot(ROOT_PROJECT);
+  int file1Ncloc=10;
+  addRawMeasure(NCLOC_KEY,FILE_1_REF,file1Ncloc);
+  long file1MaintainabilityCost=100L;
+  addRawMeasure(TECHNICAL_DEBT_KEY,FILE_1_REF,file1MaintainabilityCost);
+  int file2Ncloc=5;
+  addRawMeasure(NCLOC_KEY,FILE_2_REF,file2Ncloc);
+  long file2MaintainabilityCost=1L;
+  addRawMeasure(TECHNICAL_DEBT_KEY,FILE_2_REF,file2MaintainabilityCost);
+  long directoryMaintainabilityCost=100L;
+  addRawMeasure(TECHNICAL_DEBT_KEY,DIRECTORY_REF,directoryMaintainabilityCost);
+  long moduleMaintainabilityCost=100L;
+  addRawMeasure(TECHNICAL_DEBT_KEY,MODULE_REF,moduleMaintainabilityCost);
+  long projectMaintainabilityCost=1000L;
+  addRawMeasure(TECHNICAL_DEBT_KEY,PROJECT_REF,projectMaintainabilityCost);
+  underTest.visit(ROOT_PROJECT);
+  verifyAddedRawMeasure(FILE_1_REF,SQALE_DEBT_RATIO_KEY,file1MaintainabilityCost * 1d / (file1Ncloc * DEV_COST_LANGUAGE_1) * 100);
+  verifyAddedRawMeasure(FILE_2_REF,SQALE_DEBT_RATIO_KEY,file2MaintainabilityCost * 1d / (file2Ncloc * DEV_COST_LANGUAGE_1) * 100);
+  verifyAddedRawMeasure(DIRECTORY_REF,SQALE_DEBT_RATIO_KEY,directoryMaintainabilityCost * 1d / ((file1Ncloc + file2Ncloc) * DEV_COST_LANGUAGE_1) * 100);
+  verifyAddedRawMeasure(MODULE_REF,SQALE_DEBT_RATIO_KEY,moduleMaintainabilityCost * 1d / ((file1Ncloc + file2Ncloc) * DEV_COST_LANGUAGE_1) * 100);
+  verifyAddedRawMeasure(PROJECT_REF,SQALE_DEBT_RATIO_KEY,projectMaintainabilityCost * 1d / ((file1Ncloc + file2Ncloc) * DEV_COST_LANGUAGE_1) * 100);
+}
