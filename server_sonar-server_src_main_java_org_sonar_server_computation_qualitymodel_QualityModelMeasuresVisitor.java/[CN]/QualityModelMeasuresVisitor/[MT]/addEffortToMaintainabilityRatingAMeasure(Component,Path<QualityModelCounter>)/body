@@ -1,0 +1,8 @@
+{
+  long developmentCostValue=path.current().devCosts;
+  Optional<Measure> effortMeasure=measureRepository.getRawMeasure(component,maintainabilityRemediationEffortMetric);
+  long effort=effortMeasure.isPresent() ? effortMeasure.get().getLongValue() : 0L;
+  long upperGradeCost=((Double)(ratingGrid.getGradeLowerBound(Rating.B) * developmentCostValue)).longValue();
+  long effortToRatingA=upperGradeCost < effort ? (effort - upperGradeCost) : 0L;
+  measureRepository.add(component,effortToMaintainabilityRatingAMetric,Measure.newMeasureBuilder().create(effortToRatingA));
+}

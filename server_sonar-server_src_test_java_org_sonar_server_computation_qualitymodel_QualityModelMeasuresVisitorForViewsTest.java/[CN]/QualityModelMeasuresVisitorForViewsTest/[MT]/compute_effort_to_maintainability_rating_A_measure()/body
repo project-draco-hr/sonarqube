@@ -1,0 +1,24 @@
+{
+  treeRootHolder.setRoot(treeRootHolder.getRoot());
+  long projectView1DevCosts=40L;
+  addRawMeasure(DEVELOPMENT_COST_KEY,PROJECT_VIEW_1_REF,Long.toString(projectView1DevCosts));
+  long projectView2DevCosts=70L;
+  addRawMeasure(DEVELOPMENT_COST_KEY,PROJECT_VIEW_2_REF,Long.toString(projectView2DevCosts));
+  long projectView3DevCosts=50L;
+  addRawMeasure(DEVELOPMENT_COST_KEY,PROJECT_VIEW_3_REF,Long.toString(projectView3DevCosts));
+  long projectView4DevCosts=100L;
+  addRawMeasure(DEVELOPMENT_COST_KEY,PROJECT_VIEW_4_REF,Long.toString(projectView4DevCosts));
+  long subSubView1Effort=10000L;
+  addRawMeasure(TECHNICAL_DEBT_KEY,SUB_SUBVIEW_1_REF,subSubView1Effort);
+  long subSubView2Effort=20000L;
+  addRawMeasure(TECHNICAL_DEBT_KEY,SUB_SUBVIEW_2_REF,subSubView2Effort);
+  long subViewEffort=30000L;
+  addRawMeasure(TECHNICAL_DEBT_KEY,SUBVIEW_REF,subViewEffort);
+  long viewEffort=35000L;
+  addRawMeasure(TECHNICAL_DEBT_KEY,ROOT_REF,viewEffort);
+  underTest.visit(treeRootHolder.getRoot());
+  verifyRawMeasure(SUB_SUBVIEW_1_REF,EFFORT_TO_REACH_MAINTAINABILITY_RATING_A_KEY,(long)(subSubView1Effort - RATING_GRID[0] * (projectView1DevCosts + projectView2DevCosts)));
+  verifyRawMeasure(SUB_SUBVIEW_2_REF,EFFORT_TO_REACH_MAINTAINABILITY_RATING_A_KEY,(long)(subSubView2Effort - RATING_GRID[0] * projectView3DevCosts));
+  verifyRawMeasure(SUBVIEW_REF,EFFORT_TO_REACH_MAINTAINABILITY_RATING_A_KEY,(long)(subViewEffort - RATING_GRID[0] * (projectView1DevCosts + projectView2DevCosts + projectView3DevCosts)));
+  verifyRawMeasure(ROOT_REF,EFFORT_TO_REACH_MAINTAINABILITY_RATING_A_KEY,(long)(viewEffort - RATING_GRID[0] * (projectView1DevCosts + projectView2DevCosts + projectView3DevCosts+ projectView4DevCosts)));
+}
