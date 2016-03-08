@@ -1,37 +1,36 @@
 {
   Map<String,FilterBuilder> filters=new HashMap<>();
   filters.put(FIELD_RULE_STATUS,FilterBuilders.boolFilter().mustNot(FilterBuilders.termFilter(FIELD_RULE_STATUS,RuleStatus.REMOVED.toString())));
-  if (!StringUtils.isEmpty(query.getInternalKey())) {
+  if (StringUtils.isNotEmpty(query.getInternalKey())) {
     filters.put(FIELD_RULE_INTERNAL_KEY,FilterBuilders.termFilter(FIELD_RULE_INTERNAL_KEY,query.getInternalKey()));
   }
-  if (!StringUtils.isEmpty(query.getRuleKey())) {
+  if (StringUtils.isNotEmpty(query.getRuleKey())) {
     filters.put(FIELD_RULE_RULE_KEY,FilterBuilders.termFilter(FIELD_RULE_RULE_KEY,query.getRuleKey()));
   }
-  if (!CollectionUtils.isEmpty(query.getLanguages())) {
+  if (isNotEmpty(query.getLanguages())) {
     filters.put(FIELD_RULE_LANGUAGE,FilterBuilders.termsFilter(FIELD_RULE_LANGUAGE,query.getLanguages()));
   }
-  if (!CollectionUtils.isEmpty(query.getRepositories())) {
+  if (isNotEmpty(query.getRepositories())) {
     filters.put(FIELD_RULE_REPOSITORY,FilterBuilders.termsFilter(FIELD_RULE_REPOSITORY,query.getRepositories()));
   }
-  if (!CollectionUtils.isEmpty(query.getSeverities())) {
+  if (isNotEmpty(query.getSeverities())) {
     filters.put(FIELD_RULE_SEVERITY,FilterBuilders.termsFilter(FIELD_RULE_SEVERITY,query.getSeverities()));
   }
-  if (!StringUtils.isEmpty(query.getKey())) {
+  if (StringUtils.isNotEmpty(query.getKey())) {
     filters.put(FIELD_RULE_KEY,FilterBuilders.termFilter(FIELD_RULE_KEY,query.getKey()));
   }
-  if (!CollectionUtils.isEmpty(query.getTags())) {
+  if (isNotEmpty(query.getTags())) {
     filters.put(FIELD_RULE_ALL_TAGS,FilterBuilders.termsFilter(FIELD_RULE_ALL_TAGS,query.getTags()));
   }
-  if (!CollectionUtils.isEmpty(query.getTypes())) {
+  if (isNotEmpty(query.getTypes())) {
     filters.put(FIELD_RULE_TYPE,FilterBuilders.termsFilter(FIELD_RULE_TYPE,query.getTypes()));
   }
   if (query.getAvailableSinceLong() != null) {
     filters.put("availableSince",FilterBuilders.rangeFilter(FIELD_RULE_CREATED_AT).gte(query.getAvailableSinceLong()));
   }
-  Collection<RuleStatus> statusValues=query.getStatuses();
-  if (statusValues != null && !statusValues.isEmpty()) {
+  if (isNotEmpty(query.getStatuses())) {
     Collection<String> stringStatus=new ArrayList<>();
-    for (    RuleStatus status : statusValues) {
+    for (    RuleStatus status : query.getStatuses()) {
       stringStatus.add(status.name());
     }
     filters.put(FIELD_RULE_STATUS,FilterBuilders.termsFilter(FIELD_RULE_STATUS,stringStatus));
