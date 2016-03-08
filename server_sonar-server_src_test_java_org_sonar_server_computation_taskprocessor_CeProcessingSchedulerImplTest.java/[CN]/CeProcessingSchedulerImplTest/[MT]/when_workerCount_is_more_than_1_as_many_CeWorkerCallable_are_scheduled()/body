@@ -1,0 +1,11 @@
+{
+  int workerCount=Math.abs(new Random().nextInt(10)) + 1;
+  ceConfiguration.setWorkerCount(workerCount);
+  ListenableScheduledFuture listenableScheduledFuture=mock(ListenableScheduledFuture.class);
+  CeProcessingSchedulerExecutorService processingExecutorService=mock(CeProcessingSchedulerExecutorService.class);
+  CeProcessingSchedulerImpl underTest=new CeProcessingSchedulerImpl(ceConfiguration,processingExecutorService,ceWorkerRunnable);
+  when(processingExecutorService.schedule(ceWorkerRunnable,ceConfiguration.getQueuePollingDelay(),MILLISECONDS)).thenReturn(listenableScheduledFuture);
+  underTest.startScheduling();
+  verify(processingExecutorService,times(workerCount)).schedule(ceWorkerRunnable,ceConfiguration.getQueuePollingDelay(),MILLISECONDS);
+  verify(listenableScheduledFuture,times(workerCount)).addListener(any(Runnable.class),eq(processingExecutorService));
+}
