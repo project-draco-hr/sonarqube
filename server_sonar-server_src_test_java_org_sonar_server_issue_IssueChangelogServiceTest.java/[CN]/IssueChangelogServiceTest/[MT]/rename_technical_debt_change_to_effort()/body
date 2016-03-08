@@ -1,0 +1,11 @@
+{
+  FieldDiffs userChange=new FieldDiffs().setUserLogin("arthur").setDiff("technicalDebt","10min","30min");
+  when(changeDao.selectChangelogByIssue("ABCDE")).thenReturn(Arrays.asList(userChange));
+  User arthur=new DefaultUser().setLogin("arthur").setName("Arthur");
+  when(userFinder.findByLogins(Arrays.asList("arthur"))).thenReturn(Arrays.asList(arthur));
+  when(issueService.getByKey("ABCDE")).thenReturn(new DefaultIssue().setKey("ABCDE"));
+  IssueChangelog changelog=service.changelog("ABCDE");
+  assertThat(changelog).isNotNull();
+  assertThat(changelog.changes()).hasSize(1);
+  assertThat(changelog.changes().get(0).diffs()).containsKeys("effort");
+}
