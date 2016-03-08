@@ -1,5 +1,5 @@
 {
-  ruleDao.insert(dbSession,RuleTesting.newDto(RULE_KEY).setDefaultRemediationFunction(DebtRemediationFunction.Type.LINEAR_OFFSET.name()).setDefaultRemediationCoefficient("1d").setDefaultRemediationOffset("5min").setRemediationFunction(null).setRemediationCoefficient(null).setRemediationOffset(null));
+  ruleDao.insert(dbSession,RuleTesting.newDto(RULE_KEY).setDefaultRemediationFunction(DebtRemediationFunction.Type.LINEAR_OFFSET.name()).setDefaultRemediationGapMultiplier("1d").setDefaultRemediationBaseEffort("5min").setRemediationFunction(null).setRemediationGapMultiplier(null).setRemediationBaseEffort(null));
   dbSession.commit();
   DefaultDebtRemediationFunction fn=new DefaultDebtRemediationFunction(DebtRemediationFunction.Type.CONSTANT_ISSUE,null,"1min");
   RuleUpdate update=RuleUpdate.createForPluginRule(RULE_KEY).setDebtRemediationFunction(fn);
@@ -7,9 +7,9 @@
   dbSession.clearCache();
   RuleDto rule=ruleDao.selectOrFailByKey(dbSession,RULE_KEY);
   assertThat(rule.getRemediationFunction()).isEqualTo(DebtRemediationFunction.Type.CONSTANT_ISSUE.name());
-  assertThat(rule.getRemediationCoefficient()).isNull();
-  assertThat(rule.getRemediationOffset()).isEqualTo("1min");
+  assertThat(rule.getRemediationGapMultiplier()).isNull();
+  assertThat(rule.getRemediationBaseEffort()).isEqualTo("1min");
   assertThat(rule.getDefaultRemediationFunction()).isEqualTo(DebtRemediationFunction.Type.LINEAR_OFFSET.name());
-  assertThat(rule.getDefaultRemediationCoefficient()).isEqualTo("1d");
-  assertThat(rule.getDefaultRemediationOffset()).isEqualTo("5min");
+  assertThat(rule.getDefaultRemediationGapMultiplier()).isEqualTo("1d");
+  assertThat(rule.getDefaultRemediationBaseEffort()).isEqualTo("5min");
 }

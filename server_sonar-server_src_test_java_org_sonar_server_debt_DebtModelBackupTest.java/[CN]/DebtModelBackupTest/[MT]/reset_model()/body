@@ -1,5 +1,5 @@
 {
-  when(ruleDao.selectEnabledAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setRepositoryKey("squid").setRuleKey("NPE").setDefaultRemediationFunction(DebtRemediationFunction.Type.LINEAR.toString()).setDefaultRemediationCoefficient("2h").setRemediationFunction(DebtRemediationFunction.Type.LINEAR_OFFSET.toString()).setRemediationCoefficient("2h").setRemediationOffset("15min")));
+  when(ruleDao.selectEnabledAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setRepositoryKey("squid").setRuleKey("NPE").setDefaultRemediationFunction(DebtRemediationFunction.Type.LINEAR.toString()).setDefaultRemediationGapMultiplier("2h").setRemediationFunction(DebtRemediationFunction.Type.LINEAR_OFFSET.toString()).setRemediationGapMultiplier("2h").setRemediationBaseEffort("15min")));
   RulesDefinition.Context context=new RulesDefinition.Context();
   RulesDefinition.NewRepository repo=context.createRepository("squid","java").setName("Squid");
   RulesDefinition.NewRule newRule=repo.createRule("NPE").setName("Detect NPE").setHtmlDescription("Detect <code>java.lang.NullPointerException</code>").setSeverity(Severity.BLOCKER).setStatus(RuleStatus.BETA);
@@ -14,11 +14,11 @@
   verify(ruleIndexer).index();
   RuleDto rule=ruleCaptor.getValue();
   assertThat(rule.getDefaultRemediationFunction()).isEqualTo("LINEAR_OFFSET");
-  assertThat(rule.getDefaultRemediationCoefficient()).isEqualTo("4h");
-  assertThat(rule.getDefaultRemediationOffset()).isEqualTo("20min");
+  assertThat(rule.getDefaultRemediationGapMultiplier()).isEqualTo("4h");
+  assertThat(rule.getDefaultRemediationBaseEffort()).isEqualTo("20min");
   assertThat(rule.getUpdatedAt()).isEqualTo(now.getTime());
   assertThat(rule.getRemediationFunction()).isNull();
-  assertThat(rule.getRemediationCoefficient()).isNull();
-  assertThat(rule.getRemediationOffset()).isNull();
+  assertThat(rule.getRemediationGapMultiplier()).isNull();
+  assertThat(rule.getRemediationBaseEffort()).isNull();
   assertThat(rule.getUpdatedAt()).isEqualTo(now.getTime());
 }

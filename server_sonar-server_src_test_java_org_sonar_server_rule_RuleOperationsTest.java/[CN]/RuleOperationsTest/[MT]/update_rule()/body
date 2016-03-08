@@ -1,5 +1,5 @@
 {
-  RuleDto dto=new RuleDto().setId(1).setRepositoryKey("squid").setRuleKey("UselessImportCheck").setRemediationFunction("CONSTANT_ISSUE").setRemediationOffset("10min");
+  RuleDto dto=new RuleDto().setId(1).setRepositoryKey("squid").setRuleKey("UselessImportCheck").setRemediationFunction("CONSTANT_ISSUE").setRemediationBaseEffort("10min");
   RuleKey ruleKey=RuleKey.of("squid","UselessImportCheck");
   when(ruleDao.selectOrFailByKey(session,ruleKey)).thenReturn(dto);
   operations.updateRule(new RuleChange().setRuleKey(ruleKey).setDebtRemediationFunction("LINEAR_OFFSET").setDebtRemediationCoefficient("2h").setDebtRemediationOffset("20min"),authorizedUserSession);
@@ -8,7 +8,7 @@
   RuleDto result=ruleCaptor.getValue();
   assertThat(result.getId()).isEqualTo(1);
   assertThat(result.getRemediationFunction()).isEqualTo("LINEAR_OFFSET");
-  assertThat(result.getRemediationCoefficient()).isEqualTo("2h");
-  assertThat(result.getRemediationOffset()).isEqualTo("20min");
+  assertThat(result.getRemediationGapMultiplier()).isEqualTo("2h");
+  assertThat(result.getRemediationBaseEffort()).isEqualTo("20min");
   verify(ruleIndexer).index();
 }
