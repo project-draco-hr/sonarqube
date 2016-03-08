@@ -1,0 +1,32 @@
+{
+  final EverRunningThread runningThread=new EverRunningThread();
+  final Thread safeJoiner=new Thread(){
+    @Override public void run(){
+      awaitTermination(runningThread);
+    }
+  }
+;
+  final Thread simpleJoiner=new Thread(){
+    @Override public void run(){
+      try {
+        runningThread.join();
+      }
+ catch (      InterruptedException e) {
+        System.err.println("runningThread interruption detected in SimpleJoiner");
+      }
+    }
+  }
+;
+  runningThread.start();
+  safeJoiner.start();
+  simpleJoiner.start();
+  safeJoiner.interrupt();
+  simpleJoiner.interrupt();
+  while (simpleJoiner.isAlive()) {
+  }
+  assertThat(safeJoiner.isAlive()).isTrue();
+  runningThread.stopIt();
+  while (runningThread.isAlive()) {
+  }
+  safeJoiner.join();
+}
