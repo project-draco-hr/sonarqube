@@ -1,0 +1,18 @@
+{
+  final CeServer ceServer=newCeServer();
+  Thread waitingThread=newWaitingThread(new Runnable(){
+    @Override public void run(){
+      ceServer.awaitStop();
+    }
+  }
+);
+  ceServer.start();
+  waitingThread.start();
+  for (int i=0; i < 5; i++) {
+    waitingThread.interrupt();
+    Thread.sleep(5);
+    assertThat(waitingThread.isAlive()).isTrue();
+  }
+  ceServer.stop();
+  waitingThread.join();
+}

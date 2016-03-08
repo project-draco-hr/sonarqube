@@ -1,0 +1,11 @@
+{
+  Throwable startupException=new Throwable("Faking failing ComputeEngine#startup()");
+  BlockingStartupComputeEngine computeEngine=new BlockingStartupComputeEngine(startupException);
+  CeServer ceServer=newCeServer(computeEngine);
+  ceServer.start();
+  assertThat(ceServer.isReady()).isFalse();
+  computeEngine.releaseStartup();
+  while (!ceServer.isReady()) {
+  }
+  assertThat(ceServer.isReady()).isTrue();
+}
