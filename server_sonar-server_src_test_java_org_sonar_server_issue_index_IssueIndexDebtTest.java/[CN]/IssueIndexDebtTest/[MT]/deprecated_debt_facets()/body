@@ -2,7 +2,7 @@
   ComponentDto project=ComponentTesting.newProjectDto("ABCD");
   ComponentDto project2=ComponentTesting.newProjectDto("EFGH");
   indexIssues(IssueTesting.newDoc("ISSUE1",ComponentTesting.newFileDto(project)).setEffort(10L),IssueTesting.newDoc("ISSUE2",ComponentTesting.newFileDto(project)).setEffort(10L),IssueTesting.newDoc("ISSUE3",ComponentTesting.newFileDto(project2)).setEffort(10L));
-  SearchResult<IssueDoc> result=index.search(newQueryBuilder().build(),new SearchOptions().addFacets(newArrayList("projectUuids")));
+  SearchResult<IssueDoc> result=index.search(IssueQuery.builder(userSessionRule).facetMode(DEPRECATED_FACET_MODE_DEBT).build(),new SearchOptions().addFacets(newArrayList("projectUuids")));
   assertThat(result.getFacets().getNames()).containsOnly("projectUuids",FACET_MODE_EFFORT);
   assertThat(result.getFacets().get("projectUuids")).containsOnly(entry("ABCD",20L),entry("EFGH",10L));
   assertThat(result.getFacets().get(FACET_MODE_EFFORT)).containsOnly(entry("total",30L));

@@ -2,9 +2,9 @@
   ComponentDto project=ComponentTesting.newProjectDto();
   ComponentDto file=ComponentTesting.newFileDto(project);
   RuleKey ruleKey=RuleKey.of("repo","X1");
-  indexIssues(IssueTesting.newDoc("ISSUE1",file).setRuleKey(ruleKey.toString()).setLanguage("xoo"));
+  indexIssues(IssueTesting.newDoc("ISSUE1",file).setRuleKey(ruleKey.toString()).setLanguage("xoo").setEffort(10L));
   SearchResult<IssueDoc> result=index.search(newQueryBuilder().build(),new SearchOptions().addFacets(newArrayList("languages")));
-  assertThat(result.getFacets().getNames()).containsOnly("languages","debt");
+  assertThat(result.getFacets().getNames()).containsOnly("languages",FACET_MODE_EFFORT);
   assertThat(result.getFacets().get("languages")).containsOnly(entry("xoo",10L));
-  assertThat(result.getFacets().get("debt")).containsOnly(entry("total",10L));
+  assertThat(result.getFacets().get(FACET_MODE_EFFORT)).containsOnly(entry("total",10L));
 }
