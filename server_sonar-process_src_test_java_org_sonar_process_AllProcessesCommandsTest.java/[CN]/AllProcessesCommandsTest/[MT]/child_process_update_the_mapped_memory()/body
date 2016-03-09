@@ -1,13 +1,13 @@
 {
   File dir=temp.newFolder();
   AllProcessesCommands commands=new AllProcessesCommands(dir);
-  assertThat(commands.isReady(PROCESS_NUMBER)).isFalse();
-  assertThat(commands.mappedByteBuffer.get(commands.offset(PROCESS_NUMBER))).isEqualTo(AllProcessesCommands.EMPTY);
+  assertThat(commands.isUp(PROCESS_NUMBER)).isFalse();
+  assertThat(commands.mappedByteBuffer.get(commands.offset(PROCESS_NUMBER))).isEqualTo(EMPTY);
   assertThat(commands.mappedByteBuffer.getLong(2 + commands.offset(PROCESS_NUMBER))).isEqualTo(0L);
-  commands.setReady(PROCESS_NUMBER);
-  assertThat(commands.isReady(PROCESS_NUMBER)).isTrue();
-  assertThat(commands.mappedByteBuffer.get(commands.offset(PROCESS_NUMBER))).isEqualTo(AllProcessesCommands.READY);
+  commands.setUp(PROCESS_NUMBER);
+  assertThat(commands.isUp(PROCESS_NUMBER)).isTrue();
+  assertThat(commands.mappedByteBuffer.get(commands.offset(PROCESS_NUMBER))).isEqualTo(UP);
   long currentTime=System.currentTimeMillis();
   commands.ping(PROCESS_NUMBER);
-  assertThat(commands.mappedByteBuffer.getLong(2 + commands.offset(PROCESS_NUMBER))).isGreaterThanOrEqualTo(currentTime);
+  assertThat(commands.mappedByteBuffer.getLong(3 + commands.offset(PROCESS_NUMBER))).isGreaterThanOrEqualTo(currentTime);
 }
