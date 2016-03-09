@@ -7,14 +7,7 @@
  else {
     userSession.checkPermission(UserRole.ADMIN);
     LOGGER.info("SonarQube restart requested by {}",userSession.getLogin());
-    File shareDir=nonNullValueAsFile(PROPERTY_SHARED_PATH);
-    int processNumber=nonNullAsInt(PROPERTY_PROCESS_INDEX);
-    try (ProcessCommands commands=new DefaultProcessCommands(shareDir,processNumber,false)){
-      commands.askForRestart();
-    }
- catch (    Exception e) {
-      LOGGER.warn("Failed to close ProcessCommands",e);
-    }
+    processCommandWrapper.requestSQRestart();
   }
   response.noContent();
 }
