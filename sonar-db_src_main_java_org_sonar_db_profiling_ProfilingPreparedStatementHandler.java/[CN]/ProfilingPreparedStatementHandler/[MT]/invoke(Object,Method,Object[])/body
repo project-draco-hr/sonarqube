@@ -6,13 +6,16 @@
       result=InvocationUtils.invokeQuietly(statement,method,args);
     }
   finally {
-      profiler.addContext("sql",StringUtils.remove(sql,'\n'));
+      profiler.addContext("sql",SqlLogFormatter.formatSql(sql));
+      if (sqlParams.length > 0) {
+        profiler.addContext("params",SqlLogFormatter.formatParams(sqlParams));
+      }
       profiler.stopTrace("");
     }
     return result;
   }
  else   if (method.getName().startsWith("set") && args.length > 1) {
-    arguments.set((Integer)args[0] - 1,args[1]);
+    sqlParams[(int)args[0] - 1]=args[1];
     return InvocationUtils.invokeQuietly(statement,method,args);
   }
  else {
