@@ -1,10 +1,8 @@
 {
-  checkStateAtStartup(this.status);
+  checkState(this.status == Status.INIT,"startup() can not be called multiple times");
   try {
     this.status=Status.STARTING;
-    if (props.value("sonar.ce.startupFailure") != null) {
-      throw new IllegalStateException("Startup failed!");
-    }
+    this.computeEngineContainer.configure(props).start();
   }
   finally {
     this.status=Status.STARTED;
