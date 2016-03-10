@@ -1,4 +1,11 @@
 {
+  boolean webServerOperational=webServerWatcher.waitForOperational();
+  if (!webServerOperational) {
+    LOG.debug("Interrupted while waiting for WebServer to be operational. Assuming it will never be. Stopping.");
+    this.started=true;
+    stopAwait();
+    return;
+  }
   boolean startupSuccessful=attemptStartup();
   this.started=true;
   if (startupSuccessful) {

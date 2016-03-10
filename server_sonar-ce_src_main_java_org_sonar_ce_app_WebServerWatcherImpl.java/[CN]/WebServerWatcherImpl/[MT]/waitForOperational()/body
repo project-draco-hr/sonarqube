@@ -1,0 +1,20 @@
+{
+  try (DefaultProcessCommands processCommands=DefaultProcessCommands.secondary(sharedDir,WEB_SERVER_PROCESS_NUMBER)){
+    if (processCommands.isOperational()) {
+      return true;
+    }
+    LOG.info("Waiting for Web Server to be operational...");
+    Logger logarithmicLogger=LogarithmicLogger.from(LOG).applyingCallRatio(CALL_RATIO).build();
+    while (!processCommands.isOperational()) {
+      logarithmicLogger.info("Still waiting for WebServer...");
+      try {
+        Thread.sleep(POLL_DELAY);
+      }
+ catch (      InterruptedException e) {
+        Thread.interrupted();
+        return false;
+      }
+    }
+    return true;
+  }
+ }

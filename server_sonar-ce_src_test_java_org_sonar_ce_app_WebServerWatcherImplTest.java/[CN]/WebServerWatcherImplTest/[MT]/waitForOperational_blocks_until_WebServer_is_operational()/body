@@ -1,0 +1,18 @@
+{
+  final CountDownLatch startedLatch=new CountDownLatch(1);
+  final CountDownLatch doneLatch=new CountDownLatch(1);
+  Thread waitingThread=new Thread(){
+    @Override public void run(){
+      startedLatch.countDown();
+      underTest.waitForOperational();
+      doneLatch.countDown();
+    }
+  }
+;
+  waitingThread.start();
+  assertThat(startedLatch.await(50,MILLISECONDS)).isTrue();
+  assertThat(doneLatch.await(50 + Math.abs(new Random().nextInt(300)),MILLISECONDS)).isFalse();
+  setWebServerOperational();
+  assertThat(doneLatch.await(400,MILLISECONDS)).isTrue();
+  assertThat(logTester.logs(LoggerLevel.INFO)).contains("Waiting for Web Server to be operational...");
+}
