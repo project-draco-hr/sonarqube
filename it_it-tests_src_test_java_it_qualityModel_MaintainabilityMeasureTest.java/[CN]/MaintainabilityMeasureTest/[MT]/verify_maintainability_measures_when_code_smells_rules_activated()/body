@@ -1,0 +1,25 @@
+{
+  orchestrator.getServer().restoreProfile(FileLocation.ofClasspath("/qualityModel/with-many-rules.xml"));
+  orchestrator.getServer().associateProjectToQualityProfile(PROJECT,"xoo","with-many-rules");
+  orchestrator.executeBuild(SonarScanner.create(projectDir("shared/xoo-multi-modules-sample")));
+  assertThat(getMeasure(PROJECT,CODE_SMELLS_METRIC).getValue()).isEqualTo(71);
+  assertThat(getMeasure(PROJECT,MAINTAINABILITY_REMEDIATION_EFFORT_METRIC).getValue()).isEqualTo(445);
+  assertThat(getMeasure(PROJECT,MAINTAINABILITY_RATING_METRIC).getData()).isEqualTo("C");
+  assertThat(getMeasure(PROJECT,EFFORT_TO_REACH_MAINTAINABILITY_RATING_A_METRIC).getValue()).isEqualTo(292);
+  assertThat(getMeasure(MODULE,CODE_SMELLS_METRIC).getValue()).isEqualTo(43);
+  assertThat(getMeasure(MODULE,MAINTAINABILITY_REMEDIATION_EFFORT_METRIC).getValue()).isEqualTo(231);
+  assertThat(getMeasure(MODULE,MAINTAINABILITY_RATING_METRIC).getData()).isEqualTo("C");
+  assertThat(getMeasure(MODULE,EFFORT_TO_REACH_MAINTAINABILITY_RATING_A_METRIC).getValue()).isEqualTo(150);
+  assertThat(getMeasure(SUB_MODULE,CODE_SMELLS_METRIC).getValue()).isEqualTo(19);
+  assertThat(getMeasure(SUB_MODULE,MAINTAINABILITY_REMEDIATION_EFFORT_METRIC).getValue()).isEqualTo(113);
+  assertThat(getMeasure(SUB_MODULE,MAINTAINABILITY_RATING_METRIC).getData()).isEqualTo("C");
+  assertThat(getMeasure(SUB_MODULE,EFFORT_TO_REACH_MAINTAINABILITY_RATING_A_METRIC).getValue()).isEqualTo(77);
+  assertThat(getMeasure(DIRECTORY,CODE_SMELLS_METRIC).getValue()).isEqualTo(18);
+  assertThat(getMeasure(DIRECTORY,MAINTAINABILITY_REMEDIATION_EFFORT_METRIC).getValue()).isEqualTo(28);
+  assertThat(getMeasure(DIRECTORY,MAINTAINABILITY_RATING_METRIC).getData()).isEqualTo("A");
+  assertThat(getMeasure(DIRECTORY,EFFORT_TO_REACH_MAINTAINABILITY_RATING_A_METRIC).getValue()).isEqualTo(0);
+  assertThat(getMeasure(FILE,CODE_SMELLS_METRIC).getValue()).isEqualTo(18);
+  assertThat(getMeasure(FILE,MAINTAINABILITY_REMEDIATION_EFFORT_METRIC).getValue()).isEqualTo(28);
+  assertThat(getMeasure(FILE,MAINTAINABILITY_RATING_METRIC).getData()).isEqualTo("A");
+  assertThat(getMeasure(FILE,EFFORT_TO_REACH_MAINTAINABILITY_RATING_A_METRIC)).isNull();
+}

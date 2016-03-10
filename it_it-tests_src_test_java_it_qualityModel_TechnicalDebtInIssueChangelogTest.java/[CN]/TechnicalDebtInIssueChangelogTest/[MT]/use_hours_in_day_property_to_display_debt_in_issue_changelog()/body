@@ -1,0 +1,18 @@
+{
+  orchestrator.getServer().restoreProfile(FileLocation.ofClasspath("/qualityModel/one-issue-per-file.xml"));
+  orchestrator.getServer().provisionProject("sample","sample");
+  orchestrator.getServer().associateProjectToQualityProfile("sample","xoo","one-issue-per-file");
+  orchestrator.executeBuild(SonarRunner.create(projectDir("shared/xoo-sample")));
+  debtConfiguration.updateHoursInDay(10);
+  orchestrator.executeBuild(SonarRunner.create(projectDir("shared/xoo-sample")).setProperties("sonar.oneIssuePerFile.effortToFix","72"));
+  IssueClient issueClient=orchestrator.getServer().wsClient().issueClient();
+  Issue issue=issueClient.find(IssueQuery.create()).list().get(0);
+  List<IssueChange> changes=issueClient.changes(issue.key());
+  assertThat(changes).hasSize(1);
+  IssueChange change=changes.get(0);
+  assertThat(change.diffs()).hasSize(1);
+  IssueChangeDiff changeDiff=change.diffs().get(0);
+  assertThat(changeDiff.key()).isEqualTo("effort");
+  assertThat(changeDiff.oldValue()).isEqualTo("10min");
+  assertThat(changeDiff.newValue()).isEqualTo("1d2h");
+}
