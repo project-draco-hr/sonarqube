@@ -1,9 +1,7 @@
 {
   logTester.setLevel(LoggerLevel.TRACE);
-  BasicDataSource originDataSource=mock(BasicDataSource.class);
   Connection connection=mock(Connection.class);
   when(originDataSource.getConnection()).thenReturn(connection);
-  String sql="select 'polop' from dual";
   String sqlWithParams="insert into polop (col1, col2, col3, col4) values (?, ?, ?, ?, ?)";
   int param1=42;
   String param2="plouf";
@@ -13,9 +11,6 @@
   PreparedStatement preparedStatement=mock(PreparedStatement.class);
   when(connection.prepareStatement(sqlWithParams)).thenReturn(preparedStatement);
   when(preparedStatement.execute()).thenReturn(true);
-  Statement statement=mock(Statement.class);
-  when(connection.createStatement()).thenReturn(statement);
-  when(statement.execute(sql)).thenReturn(true);
   ProfiledDataSource ds=new ProfiledDataSource(originDataSource,ProfiledConnectionInterceptor.INSTANCE);
   assertThat(ds.getUrl()).isNull();
   assertThat(ds.getConnection().getClientInfo()).isNull();
@@ -27,10 +22,6 @@
   preparedStatementProxy.setBlob(5,new ByteArrayInputStream(param5));
   assertThat(preparedStatementProxy.getConnection()).isNull();
   assertThat(preparedStatementProxy.execute()).isTrue();
-  final Statement statementProxy=ds.getConnection().createStatement();
-  assertThat(statementProxy.getConnection()).isNull();
-  assertThat(statementProxy.execute(sql)).isTrue();
-  assertThat(logTester.logs(LoggerLevel.TRACE)).hasSize(2);
+  assertThat(logTester.logs(LoggerLevel.TRACE)).hasSize(1);
   assertThat(logTester.logs(LoggerLevel.TRACE).get(0)).contains("sql=insert into polop (col1, col2, col3, col4) values (?, ?, ?, ?, ?)").contains("params=42, plouf");
-  assertThat(logTester.logs(LoggerLevel.TRACE).get(1)).contains("sql=select 'polop' from dual");
 }

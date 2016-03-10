@@ -1,0 +1,17 @@
+{
+  logTester.setLevel(LoggerLevel.TRACE);
+  Connection connection=mock(Connection.class);
+  when(originDataSource.getConnection()).thenReturn(connection);
+  String sql="select from dual";
+  Statement stmt=mock(Statement.class);
+  when(connection.createStatement()).thenReturn(stmt);
+  when(stmt.execute(sql)).thenReturn(true);
+  ProfiledDataSource underTest=new ProfiledDataSource(originDataSource,ProfiledConnectionInterceptor.INSTANCE);
+  assertThat(underTest.getUrl()).isNull();
+  assertThat(underTest.getConnection().getClientInfo()).isNull();
+  final Statement statementProxy=underTest.getConnection().createStatement();
+  assertThat(statementProxy.getConnection()).isNull();
+  assertThat(statementProxy.execute(sql)).isTrue();
+  assertThat(logTester.logs(LoggerLevel.TRACE)).hasSize(1);
+  assertThat(logTester.logs(LoggerLevel.TRACE).get(0)).contains("sql=select from dual");
+}
