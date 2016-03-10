@@ -1,0 +1,18 @@
+{
+  DefaultHttpDownloader.ProxySystem system=mock(DefaultHttpDownloader.ProxySystem.class);
+  Settings settings=new Settings();
+  settings.setProperty("https.proxyHost","1.2.3.4");
+  settings.setProperty("http.proxyUser","the_login");
+  settings.setProperty("http.proxyPassword","the_passwd");
+  new DefaultHttpDownloader.BaseHttpDownloader(system,settings,null);
+  verify(system).setDefaultAuthenticator(argThat(new TypeSafeMatcher<Authenticator>(){
+    @Override protected boolean matchesSafely(    Authenticator authenticator){
+      DefaultHttpDownloader.ProxyAuthenticator a=(DefaultHttpDownloader.ProxyAuthenticator)authenticator;
+      PasswordAuthentication authentication=a.getPasswordAuthentication();
+      return authentication.getUserName().equals("the_login") && new String(authentication.getPassword()).equals("the_passwd");
+    }
+    @Override public void describeTo(    Description description){
+    }
+  }
+));
+}
