@@ -7,7 +7,11 @@
     String effectiveKey=projectReactor.getRoot().getKeyWithBranch();
     metadata.put("projectKey",effectiveKey);
     metadata.put("serverUrl",publicUrl());
-    URL dashboardUrl=HttpUrl.parse(publicUrl()).newBuilder().addPathSegment("dashboard").addPathSegment("index").addPathSegment(effectiveKey).build().url();
+    HttpUrl publicUrl=HttpUrl.parse(publicUrl());
+    if (publicUrl == null) {
+      throw MessageException.of("Failed to parse public URL set in SonarQube server: " + publicUrl());
+    }
+    URL dashboardUrl=publicUrl.newBuilder().addPathSegment("dashboard").addPathSegment("index").addPathSegment(effectiveKey).build().url();
     metadata.put("dashboardUrl",dashboardUrl.toExternalForm());
     URL taskUrl=HttpUrl.parse(publicUrl()).newBuilder().addPathSegment("api").addPathSegment("ce").addPathSegment("task").addQueryParameter("id",taskId).build().url();
     metadata.put("ceTaskId",taskId);
