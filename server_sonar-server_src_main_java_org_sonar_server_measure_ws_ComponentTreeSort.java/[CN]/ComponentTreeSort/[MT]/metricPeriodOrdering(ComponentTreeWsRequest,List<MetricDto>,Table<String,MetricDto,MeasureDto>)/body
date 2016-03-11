@@ -1,0 +1,12 @@
+{
+  if (wsRequest.getMetricSort() == null || wsRequest.getMetricPeriodSort() == null) {
+    return componentNameOrdering(wsRequest.getAsc());
+  }
+  Map<String,MetricDto> metricsByKey=Maps.uniqueIndex(metrics,MetricDtoFunctions.toKey());
+  MetricDto metric=metricsByKey.get(wsRequest.getMetricSort());
+  ValueType metricValueType=ValueType.valueOf(metric.getValueType());
+  if (NUMERIC_VALUE_TYPES.contains(metricValueType)) {
+    return numericalMetricPeriodOrdering(wsRequest,metric,measuresByComponentUuidAndMetric);
+  }
+  throw new BadRequestException(format("Impossible to sort metric '%s' by measure period.",metric.getKey()));
+}

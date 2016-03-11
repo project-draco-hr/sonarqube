@@ -1,0 +1,16 @@
+{
+  if (wsRequest.getMetricSort() == null) {
+    return componentNameOrdering(wsRequest.getAsc());
+  }
+  Map<String,MetricDto> metricsByKey=Maps.uniqueIndex(metrics,MetricDtoFunctions.toKey());
+  MetricDto metric=metricsByKey.get(wsRequest.getMetricSort());
+  boolean isAscending=wsRequest.getAsc();
+  ValueType metricValueType=ValueType.valueOf(metric.getValueType());
+  if (NUMERIC_VALUE_TYPES.contains(metricValueType)) {
+    return numericalMetricOrdering(isAscending,metric,measuresByComponentUuidAndMetric);
+  }
+ else   if (TEXTUAL_VALUE_TYPES.contains(metricValueType)) {
+    return stringOrdering(isAscending,new ComponentDtoWithSnapshotIdToTextualMeasureValue(metric,measuresByComponentUuidAndMetric));
+  }
+  throw new IllegalStateException("Unrecognized metric value type: " + metric.getValueType());
+}
