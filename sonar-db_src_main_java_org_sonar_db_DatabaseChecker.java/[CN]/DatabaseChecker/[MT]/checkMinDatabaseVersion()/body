@@ -1,0 +1,13 @@
+{
+  Version minDbVersion=MINIMAL_SUPPORTED_DB_VERSIONS.get(db.getDialect().getId());
+  if (minDbVersion != null) {
+    try (Connection connection=db.getDataSource().getConnection()){
+      int dbMajorVersion=connection.getMetaData().getDatabaseMajorVersion();
+      int dbMinorVersion=connection.getMetaData().getDatabaseMinorVersion();
+      Version dbVersion=new Version(dbMajorVersion,dbMinorVersion);
+      if (!dbVersion.isGreaterThanOrEqual(minDbVersion)) {
+        throw MessageException.of(String.format("Unsupported %s version: %s. Minimal supported version is %s.",db.getDialect().getId(),dbVersion,minDbVersion));
+      }
+    }
+   }
+}

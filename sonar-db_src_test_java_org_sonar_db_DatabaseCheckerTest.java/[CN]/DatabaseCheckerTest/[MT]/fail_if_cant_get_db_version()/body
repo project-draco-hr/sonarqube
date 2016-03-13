@@ -1,0 +1,9 @@
+{
+  SQLException sqlException=new SQLException();
+  expectedException.expect(RuntimeException.class);
+  expectedException.expectCause(is(sqlException));
+  Database db=mock(Database.class,Mockito.RETURNS_DEEP_STUBS);
+  when(db.getDialect()).thenReturn(new MySql());
+  when(db.getDataSource().getConnection().getMetaData()).thenThrow(sqlException);
+  new DatabaseChecker(db).start();
+}
