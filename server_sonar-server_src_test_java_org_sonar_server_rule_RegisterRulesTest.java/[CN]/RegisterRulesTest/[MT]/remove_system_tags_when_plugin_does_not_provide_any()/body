@@ -1,0 +1,10 @@
+{
+  dbClient.ruleDao().insert(dbTester.getSession(),new RuleDto().setRuleKey("rule1").setRepositoryKey("findbugs").setName("Rule One").setDescription("Rule one description").setDescriptionFormat(RuleDto.Format.HTML).setSystemTags(newHashSet("tag1","tag2")));
+  dbTester.getSession().commit();
+  execute(new FindbugsRepository());
+  List<RuleDto> rules=dbClient.ruleDao().selectAll(dbTester.getSession());
+  assertThat(rules).hasSize(1);
+  RuleDto result=rules.get(0);
+  assertThat(result.getKey()).isEqualTo(RuleKey.of("findbugs","rule1"));
+  assertThat(result.getSystemTags()).isEmpty();
+}

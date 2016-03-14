@@ -1,0 +1,22 @@
+{
+  execute(new RulesDefinition(){
+    @Override public void define(    RulesDefinition.Context context){
+      RulesDefinition.NewRepository repo=context.createRepository("fake","java");
+      repo.createRule("rule1").setName("Rule One").setHtmlDescription("Description of Rule One").setTags("tag1");
+      repo.done();
+    }
+  }
+);
+  RuleDto rule=dbClient.ruleDao().selectOrFailByKey(dbTester.getSession(),RULE_KEY1);
+  assertThat(rule.getSystemTags()).containsOnly("tag1");
+  execute(new RulesDefinition(){
+    @Override public void define(    RulesDefinition.Context context){
+      RulesDefinition.NewRepository repo=context.createRepository("fake","java");
+      repo.createRule("rule1").setName("Rule One").setHtmlDescription("Description of Rule One").setTags("tag1","tag2");
+      repo.done();
+    }
+  }
+);
+  rule=dbClient.ruleDao().selectOrFailByKey(dbTester.getSession(),RULE_KEY1);
+  assertThat(rule.getSystemTags()).containsOnly("tag1","tag2");
+}
