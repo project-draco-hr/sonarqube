@@ -1,7 +1,17 @@
 {
-  Iterator<ResourceBlocks> it=index.iterator();
-  while (it.hasNext()) {
-    ResourceBlocks resourceBlocks=it.next();
-    runCpdAnalysis(resourceBlocks.resourceId(),resourceBlocks.blocks());
+  total=index.noResources();
+  progressReport.start(String.format("Calculating CPD for %d files",total));
+  try {
+    Iterator<ResourceBlocks> it=index.iterator();
+    while (it.hasNext()) {
+      ResourceBlocks resourceBlocks=it.next();
+      runCpdAnalysis(resourceBlocks.resourceId(),resourceBlocks.blocks());
+      count++;
+    }
+    progressReport.stop("CPD calculation finished");
+  }
+ catch (  Exception e) {
+    progressReport.stop("");
+    throw e;
   }
 }
