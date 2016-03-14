@@ -1,11 +1,9 @@
 {
   HttpServletRequest httpRequest=(HttpServletRequest)request;
-  String requestUri=httpRequest.getRequestURI();
-  final String keyProvider=requestUri.replace(INIT_CONTEXT + "/","");
+  String requestURI=httpRequest.getRequestURI();
+  String keyProvider="";
   try {
-    if (isNullOrEmpty(keyProvider)) {
-      throw new IllegalArgumentException("A valid identity provider key is required");
-    }
+    keyProvider=extractKeyProvider(requestURI,INIT_CONTEXT);
     IdentityProvider provider=identityProviderRepository.getEnabledByKey(keyProvider);
     if (provider instanceof BaseIdentityProvider) {
       BaseIdentityProvider baseIdentityProvider=(BaseIdentityProvider)provider;

@@ -1,8 +1,9 @@
 {
   HttpServletRequest httpRequest=(HttpServletRequest)request;
   String requestUri=httpRequest.getRequestURI();
-  String keyProvider=requestUri.replace(CALLBACK_PATH + "/","");
+  String keyProvider="";
   try {
+    keyProvider=extractKeyProvider(requestUri,CALLBACK_PATH);
     IdentityProvider provider=identityProviderRepository.getEnabledByKey(keyProvider);
     if (provider instanceof OAuth2IdentityProvider) {
       OAuth2IdentityProvider oauthProvider=(OAuth2IdentityProvider)provider;
@@ -16,6 +17,6 @@
     handleUnauthorizedError(e,(HttpServletResponse)response);
   }
 catch (  Exception e) {
-    handleError(e,(HttpServletResponse)response,format("Fail to callback authentication with %s",keyProvider));
+    handleError(e,(HttpServletResponse)response,keyProvider.isEmpty() ? "Fail to callback authentication" : format("Fail to callback authentication with '%s'",keyProvider));
   }
 }
