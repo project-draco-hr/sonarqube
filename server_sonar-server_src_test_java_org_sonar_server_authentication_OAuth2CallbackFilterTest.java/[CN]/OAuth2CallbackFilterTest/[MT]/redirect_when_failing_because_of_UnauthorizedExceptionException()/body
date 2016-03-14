@@ -1,0 +1,7 @@
+{
+  TestIdentityProvider identityProvider=new FailWithUnauthorizedExceptionIdProvider().setKey("failing").setEnabled(true);
+  when(request.getRequestURI()).thenReturn("/oauth2/callback/" + identityProvider.getKey());
+  identityProviderRepository.addIdentityProvider(identityProvider);
+  underTest.doFilter(request,response,chain);
+  verify(response).sendRedirect("/sessions/unauthorized?message=Email+john%40email.com+is+already+used");
+}

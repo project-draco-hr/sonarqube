@@ -2,6 +2,7 @@
   when(userDao.selectByLogin(dbSession,USER_IDENTITY.getLogin())).thenReturn(null);
   when(userDao.selectOrFailByLogin(dbSession,USER_IDENTITY.getLogin())).thenReturn(ACTIVE_USER);
   when(userDao.doesEmailExist(dbSession,USER_IDENTITY.getEmail())).thenReturn(true);
-  thrown.expect(EmailAlreadyExistsException.class);
+  thrown.expect(UnauthorizedException.class);
+  thrown.expectMessage("You can't sign up because email 'john@email.com' is already used by an existing user. This means that you probably already registered with another account.");
   underTest.authenticate(USER_IDENTITY,IDENTITY_PROVIDER,httpSession);
 }

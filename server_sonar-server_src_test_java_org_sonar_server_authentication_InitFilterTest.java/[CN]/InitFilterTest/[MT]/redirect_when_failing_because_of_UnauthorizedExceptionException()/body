@@ -1,0 +1,7 @@
+{
+  IdentityProvider identityProvider=new FailWithUnauthorizedExceptionIdProvider("failing");
+  when(request.getRequestURI()).thenReturn("/sessions/init/" + identityProvider.getKey());
+  identityProviderRepository.addIdentityProvider(identityProvider);
+  underTest.doFilter(request,response,chain);
+  verify(response).sendRedirect("/sessions/unauthorized?message=Email+john%40email.com+is+already+used");
+}

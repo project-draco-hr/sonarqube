@@ -8,11 +8,11 @@
       return userDto.getId();
     }
     if (!provider.allowsUsersToSignUp()) {
-      throw new NotAllowUserToSignUpException(provider);
+      throw new UnauthorizedException(format("'%s' users are not allowed to sign up",provider.getKey()));
     }
     String email=user.getEmail();
     if (email != null && dbClient.userDao().doesEmailExist(dbSession,email)) {
-      throw new EmailAlreadyExistsException(email);
+      throw new UnauthorizedException(format("You can't sign up because email '%s' is already used by an existing user. This means that you probably already registered with another account.",email));
     }
     userUpdater.create(dbSession,NewUser.create().setLogin(userLogin).setEmail(user.getEmail()).setName(user.getName()).setExternalIdentity(new ExternalIdentity(provider.getKey(),user.getProviderLogin())));
     return dbClient.userDao().selectOrFailByLogin(dbSession,userLogin).getId();
