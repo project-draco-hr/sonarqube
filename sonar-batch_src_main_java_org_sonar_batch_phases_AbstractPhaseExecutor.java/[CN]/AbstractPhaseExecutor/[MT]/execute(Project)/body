@@ -1,0 +1,15 @@
+{
+  pi.execute(module);
+  eventBus.fireEvent(new ProjectAnalysisEvent(module,true));
+  executeInitializersPhase();
+  indexFs();
+  profileVerifier.execute();
+  initIssueExclusions();
+  sensorsExecutor.execute(sensorContext);
+  if (module.isRoot()) {
+    executeOnRoot();
+    postJobsExecutor.execute(sensorContext);
+  }
+  cleanMemory();
+  eventBus.fireEvent(new ProjectAnalysisEvent(module,false));
+}

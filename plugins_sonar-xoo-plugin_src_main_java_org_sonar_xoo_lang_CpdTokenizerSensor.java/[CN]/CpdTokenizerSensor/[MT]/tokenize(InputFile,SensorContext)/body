@@ -1,0 +1,34 @@
+{
+  int lineIdx=1;
+  NewCpdTokens newCpdTokens=context.newCpdTokens().onFile(inputFile);
+  try {
+    StringBuilder sb=new StringBuilder();
+    for (    String line : FileUtils.readLines(inputFile.file(),context.fileSystem().encoding())) {
+      int startOffset=0;
+      int endOffset=0;
+      for (int i=0; i < line.length(); i++) {
+        char c=line.charAt(i);
+        if (Character.isWhitespace(c)) {
+          if (sb.length() > 0) {
+            newCpdTokens.addToken(inputFile.newRange(lineIdx,startOffset,lineIdx,endOffset),sb.toString());
+            sb.setLength(0);
+          }
+          startOffset=endOffset;
+        }
+ else {
+          sb.append(c);
+        }
+        endOffset++;
+      }
+      if (sb.length() > 0) {
+        newCpdTokens.addToken(inputFile.newRange(lineIdx,startOffset,lineIdx,endOffset),sb.toString());
+        sb.setLength(0);
+      }
+      lineIdx++;
+    }
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Unable to tokenize",e);
+  }
+  newCpdTokens.save();
+}
