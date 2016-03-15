@@ -10,15 +10,16 @@
     validateEmailFormat(email,messages);
     userDto.setEmail(email);
   }
-  String password=updateUser.password();
-  if (updateUser.isPasswordChanged()) {
-    validatePasswords(password,messages);
-    checkPasswordChangeAllowed(updateUser.login(),messages);
-    if (Strings.isNullOrEmpty(password)) {
-      userDto.setSalt(null);
-      userDto.setCryptedPassword(null);
-    }
+  if (isNewExternalIdentityNotEqualsToSonaQube(updateUser)) {
+    setExternalIdentity(userDto,updateUser.externalIdentity());
+    userDto.setSalt(null);
+    userDto.setCryptedPassword(null);
+  }
  else {
+    String password=updateUser.password();
+    if (updateUser.isPasswordChanged()) {
+      validatePasswords(password,messages);
+      checkPasswordChangeAllowed(userDto,messages);
       setEncryptedPassWord(password,userDto);
     }
   }
@@ -32,7 +33,9 @@
       userDto.setScmAccounts((String)null);
     }
   }
-  setExternalIdentity(userDto,updateUser.externalIdentity());
+  if (updateUser.isExternalIdentityChanged()) {
+    setExternalIdentity(userDto,updateUser.externalIdentity());
+  }
   if (!messages.isEmpty()) {
     throw new BadRequestException(messages);
   }

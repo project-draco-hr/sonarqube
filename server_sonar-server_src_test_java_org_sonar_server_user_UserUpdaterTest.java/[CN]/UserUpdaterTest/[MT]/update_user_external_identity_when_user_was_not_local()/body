@@ -1,0 +1,11 @@
+{
+  addUser(UserTesting.newExternalUser(DEFAULT_LOGIN,"Marius","marius@email.com").setCreatedAt(PAST).setUpdatedAt(PAST));
+  createDefaultGroup();
+  userUpdater.update(UpdateUser.create(DEFAULT_LOGIN).setName("Marius2").setEmail("marius2@email.com").setPassword(null).setExternalIdentity(new ExternalIdentity("github","john")));
+  session.commit();
+  session.clearCache();
+  UserDto dto=userDao.selectByLogin(session,DEFAULT_LOGIN);
+  assertThat(dto.getExternalIdentity()).isEqualTo("john");
+  assertThat(dto.getExternalIdentityProvider()).isEqualTo("github");
+  assertThat(dto.getUpdatedAt()).isEqualTo(NOW);
+}
