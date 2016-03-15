@@ -1,0 +1,16 @@
+{
+  json.name("user");
+  Set<String> groups=Sets.newHashSet();
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    UserDto user=dbClient.userDao().selectByLogin(dbSession,login);
+    if (user == null) {
+      throw new NotFoundException(format("User '%s' doesn't exist",login));
+    }
+    groups.addAll(dbClient.groupMembershipDao().selectGroupsByLogins(dbSession,singletonList(login)).get(login));
+    userWriter.write(json,user,groups,UserJsonWriter.FIELDS);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

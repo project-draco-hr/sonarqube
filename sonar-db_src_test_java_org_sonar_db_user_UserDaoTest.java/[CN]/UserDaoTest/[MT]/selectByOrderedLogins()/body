@@ -1,0 +1,10 @@
+{
+  underTest.insert(session,newUserDto().setLogin("U1").setActive(true));
+  underTest.insert(session,newUserDto().setLogin("U2").setActive(true));
+  session.commit();
+  Iterable<UserDto> users=underTest.selectByOrderedLogins(session,asList("U1","U2","U3"));
+  assertThat(users).extracting("login").containsExactly("U1","U2");
+  users=underTest.selectByOrderedLogins(session,asList("U2","U3","U1"));
+  assertThat(users).extracting("login").containsExactly("U2","U1");
+  assertThat(underTest.selectByOrderedLogins(session,Collections.<String>emptyList())).isEmpty();
+}

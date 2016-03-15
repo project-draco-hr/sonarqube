@@ -9,10 +9,10 @@
     MetricDto metric=dbClient.metricDao().selectOrFailById(dbSession,customMeasure.getMetricId());
     ComponentDto component=dbClient.componentDao().selectOrFailByUuid(dbSession,customMeasure.getComponentUuid());
     checkPermissions(userSession,component);
-    User user=userIndex.getByLogin(userSession.getLogin());
+    UserDto user=dbClient.userDao().selectOrFailByLogin(dbSession,userSession.getLogin());
     setValue(customMeasure,value,metric);
     setDescription(customMeasure,description);
-    customMeasure.setUserLogin(user.login());
+    customMeasure.setUserLogin(user.getLogin());
     customMeasure.setUpdatedAt(system.now());
     dbClient.customMeasureDao().update(dbSession,customMeasure);
     dbSession.commit();

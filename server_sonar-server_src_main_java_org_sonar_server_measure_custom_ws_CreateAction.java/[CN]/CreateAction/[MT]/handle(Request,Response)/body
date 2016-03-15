@@ -9,8 +9,8 @@
     checkPermissions(userSession,component);
     checkIsProjectOrModule(component);
     checkMeasureDoesNotExistAlready(dbSession,component,metric);
-    UserDoc user=userIndex.getByLogin(userSession.getLogin());
-    CustomMeasureDto measure=new CustomMeasureDto().setComponentUuid(component.uuid()).setMetricId(metric.getId()).setDescription(description).setUserLogin(user.login()).setCreatedAt(now).setUpdatedAt(now);
+    UserDto user=dbClient.userDao().selectOrFailByLogin(dbSession,userSession.getLogin());
+    CustomMeasureDto measure=new CustomMeasureDto().setComponentUuid(component.uuid()).setMetricId(metric.getId()).setDescription(description).setUserLogin(user.getLogin()).setCreatedAt(now).setUpdatedAt(now);
     validator.setMeasureValue(measure,valueAsString,metric);
     dbClient.customMeasureDao().insert(dbSession,measure);
     dbSession.commit();
@@ -19,6 +19,6 @@
     json.close();
   }
   finally {
-    MyBatis.closeQuietly(dbSession);
+    dbClient.closeSession(dbSession);
   }
 }
