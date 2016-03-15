@@ -1,8 +1,8 @@
 {
   ComponentDto project=insertComponent(ComponentTesting.newProjectDto("P1").setKey("PK1"));
   setDefaultProjectPermission(project);
-  ComponentDto module=insertComponent(ComponentTesting.newModuleDto("M1",project).setKey("MK1"));
-  ComponentDto file=insertComponent(ComponentTesting.newFileDto(module,"F1").setKey("FK1"));
+  ComponentDto module=insertComponent(newModuleDto("M1",project).setKey("MK1"));
+  ComponentDto file=insertComponent(newFileDto(module,"F1").setKey("FK1"));
   RuleDto newRule=newRule();
   IssueDto issueInModule=IssueTesting.newDto(newRule,file,project).setKee("ISSUE_IN_MODULE");
   IssueDto issueInRootModule=IssueTesting.newDto(newRule,project,project).setKee("ISSUE_IN_ROOT_MODULE");
@@ -11,7 +11,7 @@
   tester.get(IssueIndexer.class).indexAll();
   WsActionTester actionTester=new WsActionTester(tester.get(SearchAction.class));
   TestResponse response=actionTester.newRequest().setMediaType(MediaTypes.PROTOBUF).execute();
-  Issues.SearchWsResponse searchResponse=Issues.SearchWsResponse.parseFrom(response.getInputStream());
+  SearchWsResponse searchResponse=SearchWsResponse.parseFrom(response.getInputStream());
   assertThat(searchResponse.getIssuesCount()).isEqualTo(2);
   for (  Issues.Issue issue : searchResponse.getIssuesList()) {
     assertThat(issue.getProject()).isEqualTo("PK1");

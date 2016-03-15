@@ -1,0 +1,31 @@
+{
+  Date createdAfter=parseAsDateTime(request.getCreatedAfter());
+  String createdInLast=request.getCreatedInLast();
+  if (request.getSinceLeakPeriod() == null || !request.getSinceLeakPeriod()) {
+    return buildCreatedAfterFromDates(createdAfter,createdInLast);
+  }
+  checkRequest(createdAfter == null,"'%s' and '%s' cannot be set simultaneously",CREATED_AFTER,SINCE_LEAK_PERIOD);
+  Set<String> allComponentUuids=new HashSet<>(componentUuids);
+  if (!effectiveOnComponentOnly) {
+    if (request.getProjectKeys() != null) {
+      allComponentUuids.addAll(componentUuids(dbSession,request.getProjectKeys()));
+    }
+    if (request.getProjectUuids() != null) {
+      allComponentUuids.addAll(request.getProjectUuids());
+    }
+    if (request.getModuleUuids() != null) {
+      allComponentUuids.addAll(request.getModuleUuids());
+    }
+    if (request.getFileUuids() != null) {
+      allComponentUuids.addAll(request.getFileUuids());
+    }
+  }
+  checkArgument(allComponentUuids.size() == 1,"One and only one component must be provided when searching since leak period");
+  String uuid=allComponentUuids.iterator().next();
+  ComponentDto component=checkFoundWithOptional(componentService.getByUuid(uuid),"Component with id '%s' not found",uuid);
+  SnapshotDto snapshot=dbClient.snapshotDao().selectLastSnapshotByComponentId(dbSession,component.getId());
+  Long projectSnapshotId=snapshot == null ? null : snapshot.getRootId();
+  SnapshotDto projectSnapshot=projectSnapshotId == null ? snapshot : dbClient.snapshotDao().selectById(dbSession,projectSnapshotId);
+  Date createdAfterFromSnapshot=projectSnapshot == null ? null : longToDate(projectSnapshot.getPeriodDate(1));
+  return buildCreatedAfterFromDates(createdAfterFromSnapshot,createdInLast);
+}
