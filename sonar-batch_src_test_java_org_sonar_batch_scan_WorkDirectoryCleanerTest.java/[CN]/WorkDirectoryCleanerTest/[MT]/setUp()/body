@@ -1,0 +1,14 @@
+{
+  temp.newFile();
+  File newFolder=temp.newFolder();
+  File fileInFolder=new File(newFolder,"test");
+  fileInFolder.createNewFile();
+  File lock=new File(temp.getRoot(),DirectoryLock.LOCK_FILE_NAME);
+  lock.createNewFile();
+  ProjectReactor projectReactor=mock(ProjectReactor.class);
+  ProjectDefinition projectDefinition=mock(ProjectDefinition.class);
+  when(projectReactor.getRoot()).thenReturn(projectDefinition);
+  when(projectDefinition.getWorkDir()).thenReturn(temp.getRoot());
+  assertThat(temp.getRoot().list().length).isGreaterThan(1);
+  cleaner=new WorkDirectoryCleaner(projectReactor);
+}
