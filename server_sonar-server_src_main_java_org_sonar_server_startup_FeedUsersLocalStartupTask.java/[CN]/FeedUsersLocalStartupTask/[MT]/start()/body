@@ -1,0 +1,17 @@
+{
+  DbSession session=dbClient.openSession(false);
+  try {
+    if (hasAlreadyBeenExecuted(session)) {
+      return;
+    }
+    updateUsersLocal(session);
+    markAsExecuted(session);
+    session.commit();
+    if (settings.hasKey(LOCAL_USERS_PROPERTY)) {
+      LOG.info("NOTE : The property '{}' is now no more needed, you can safely remove it.",LOCAL_USERS_PROPERTY);
+    }
+  }
+  finally {
+    dbClient.closeSession(session);
+  }
+}
