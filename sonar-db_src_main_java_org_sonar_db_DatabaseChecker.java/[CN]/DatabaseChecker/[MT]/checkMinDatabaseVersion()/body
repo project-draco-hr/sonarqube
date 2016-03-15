@@ -4,8 +4,8 @@
     try (Connection connection=db.getDataSource().getConnection()){
       int dbMajorVersion=connection.getMetaData().getDatabaseMajorVersion();
       int dbMinorVersion=connection.getMetaData().getDatabaseMinorVersion();
-      Version dbVersion=new Version(dbMajorVersion,dbMinorVersion);
-      if (!dbVersion.isGreaterThanOrEqual(minDbVersion)) {
+      Version dbVersion=Version.create(dbMajorVersion,dbMinorVersion,0);
+      if (dbVersion.compareTo(minDbVersion) < 0) {
         throw MessageException.of(String.format("Unsupported %s version: %s. Minimal supported version is %s.",db.getDialect().getId(),dbVersion,minDbVersion));
       }
     }
