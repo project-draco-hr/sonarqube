@@ -1,0 +1,14 @@
+{
+  UserDto user=new UserDto().setLogin(USER_LOGIN).setActive(true).setName("John");
+  userDao.insert(dbSession,user);
+  GroupDto group1=addGroup("group1");
+  GroupDto group2=addGroup("group2");
+  dbClient.userGroupDao().insert(dbSession,new UserGroupDto().setUserId(user.getId()).setGroupId(group1.getId()));
+  dbClient.userGroupDao().insert(dbSession,new UserGroupDto().setUserId(user.getId()).setGroupId(group2.getId()));
+  dbSession.commit();
+  Set<String> userGroups=new HashSet<>(dbClient.groupMembershipDao().selectGroupsByLogins(dbSession,singletonList(USER_LOGIN)).get(USER_LOGIN));
+  assertThat(userGroups).containsOnly("group1","group2");
+  underTest.authenticate(UserIdentity.builder().setProviderLogin("johndoo").setLogin(USER_LOGIN).setName("John").setGroups(newHashSet("group1")).build(),IDENTITY_PROVIDER,httpSession);
+  dbSession.commit();
+  verifyUserGroups(USER_LOGIN,"group1");
+}

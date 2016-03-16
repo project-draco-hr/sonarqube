@@ -1,5 +1,7 @@
 {
-  when(userDao.selectByLogin(dbSession,USER_IDENTITY.getLogin())).thenReturn(ACTIVE_USER);
+  UserDto userDto=UserTesting.newUserDto().setLogin(USER_LOGIN);
+  userDao.insert(dbSession,userDto);
+  dbSession.commit();
   underTest.authenticate(USER_IDENTITY,IDENTITY_PROVIDER,httpSession);
-  verify(httpSession).setAttribute("user_id",ACTIVE_USER.getId());
+  verify(httpSession).setAttribute("user_id",userDto.getId());
 }

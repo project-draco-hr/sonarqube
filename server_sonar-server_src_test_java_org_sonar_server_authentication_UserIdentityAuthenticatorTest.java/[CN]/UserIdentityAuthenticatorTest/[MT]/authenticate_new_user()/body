@@ -1,13 +1,12 @@
 {
-  when(userDao.selectByLogin(dbSession,USER_IDENTITY.getLogin())).thenReturn(null);
-  when(userDao.selectOrFailByLogin(dbSession,USER_IDENTITY.getLogin())).thenReturn(ACTIVE_USER);
   underTest.authenticate(USER_IDENTITY,IDENTITY_PROVIDER,httpSession);
-  ArgumentCaptor<NewUser> newUserArgumentCaptor=ArgumentCaptor.forClass(NewUser.class);
-  verify(userUpdater).create(eq(dbSession),newUserArgumentCaptor.capture());
-  NewUser newUser=newUserArgumentCaptor.getValue();
-  assertThat(newUser.login()).isEqualTo(USER_LOGIN);
-  assertThat(newUser.name()).isEqualTo("John");
-  assertThat(newUser.email()).isEqualTo("john@email.com");
-  assertThat(newUser.externalIdentity().getProvider()).isEqualTo("github");
-  assertThat(newUser.externalIdentity().getId()).isEqualTo("johndoo");
+  dbSession.commit();
+  UserDto userDto=userDao.selectByLogin(dbSession,USER_LOGIN);
+  assertThat(userDto).isNotNull();
+  assertThat(userDto.isActive()).isTrue();
+  assertThat(userDto.getName()).isEqualTo("John");
+  assertThat(userDto.getEmail()).isEqualTo("john@email.com");
+  assertThat(userDto.getExternalIdentity()).isEqualTo("johndoo");
+  assertThat(userDto.getExternalIdentityProvider()).isEqualTo("github");
+  verifyUserGroups(USER_LOGIN,DEFAULT_GROUP);
 }

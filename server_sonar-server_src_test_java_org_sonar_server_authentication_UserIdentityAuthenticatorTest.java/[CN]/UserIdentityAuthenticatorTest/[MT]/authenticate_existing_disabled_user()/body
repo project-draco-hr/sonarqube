@@ -1,7 +1,13 @@
 {
-  when(userDao.selectByLogin(dbSession,USER_IDENTITY.getLogin())).thenReturn(UNACTIVE_USER);
-  when(userDao.selectOrFailByLogin(dbSession,USER_IDENTITY.getLogin())).thenReturn(UNACTIVE_USER);
+  userDao.insert(dbSession,new UserDto().setLogin(USER_LOGIN).setActive(false).setName("Old name").setEmail("Old email").setExternalIdentity("old identity").setExternalIdentityProvider("old provide"));
+  dbSession.commit();
   underTest.authenticate(USER_IDENTITY,IDENTITY_PROVIDER,httpSession);
-  ArgumentCaptor<NewUser> newUserArgumentCaptor=ArgumentCaptor.forClass(NewUser.class);
-  verify(userUpdater).create(eq(dbSession),newUserArgumentCaptor.capture());
+  dbSession.commit();
+  UserDto userDto=userDao.selectByLogin(dbSession,USER_LOGIN);
+  assertThat(userDto).isNotNull();
+  assertThat(userDto.isActive()).isTrue();
+  assertThat(userDto.getName()).isEqualTo("John");
+  assertThat(userDto.getEmail()).isEqualTo("john@email.com");
+  assertThat(userDto.getExternalIdentity()).isEqualTo("johndoo");
+  assertThat(userDto.getExternalIdentityProvider()).isEqualTo("github");
 }

@@ -1,0 +1,10 @@
+{
+  underTest.insert(dbSession,new GroupDto().setName("group1"));
+  underTest.insert(dbSession,new GroupDto().setName("group2"));
+  underTest.insert(dbSession,new GroupDto().setName("group3"));
+  dbSession.commit();
+  assertThat(underTest.selectByNames(dbSession,asList("group1","group2","group3"))).hasSize(3);
+  assertThat(underTest.selectByNames(dbSession,singletonList("group1"))).hasSize(1);
+  assertThat(underTest.selectByNames(dbSession,asList("group1","unknown"))).hasSize(1);
+  assertThat(underTest.selectByNames(dbSession,Collections.<String>emptyList())).isEmpty();
+}

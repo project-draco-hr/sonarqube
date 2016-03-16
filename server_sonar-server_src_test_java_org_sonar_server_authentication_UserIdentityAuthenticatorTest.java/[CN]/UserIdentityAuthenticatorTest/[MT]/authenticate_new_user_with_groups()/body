@@ -1,0 +1,9 @@
+{
+  addGroup("group1");
+  addGroup("group2");
+  underTest.authenticate(UserIdentity.builder().setProviderLogin("johndoo").setLogin(USER_LOGIN).setName("John").setGroups(newHashSet("group1","group2","group3")).build(),IDENTITY_PROVIDER,httpSession);
+  dbSession.commit();
+  UserDto userDto=userDao.selectByLogin(dbSession,USER_LOGIN);
+  assertThat(userDto).isNotNull();
+  verifyUserGroups(USER_LOGIN,"group1","group2");
+}
