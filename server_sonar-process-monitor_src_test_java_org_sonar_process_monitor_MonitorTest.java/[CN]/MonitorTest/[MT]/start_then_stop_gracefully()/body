@@ -1,10 +1,10 @@
 {
   underTest=newDefaultMonitor(tempDir);
-  HttpProcessClient client=new HttpProcessClient(tempDir,"test");
+  HttpProcessClient client=new HttpProcessClient(tempDir,ProcessId.ELASTICSEARCH);
   underTest.start(singletonList(client.newCommand()));
   assertThat(client).isUp().wasStartedBefore(System.currentTimeMillis());
   underTest.stop();
-  assertThat(client).isNotReady().wasGracefullyTerminated();
+  assertThat(client).isNotUp().wasGracefullyTerminated();
   assertThat(underTest.getState()).isEqualTo(State.STOPPED);
   verify(fileSystem).reset();
 }

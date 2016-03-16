@@ -1,16 +1,16 @@
 {
   Process process=null;
   try {
-    ProcessCommands commands=allProcessesCommands.createAfterClean(command.getProcessIndex());
+    ProcessCommands commands=allProcessesCommands.createAfterClean(command.getProcessId().getIpcIndex());
     ProcessBuilder processBuilder=create(command);
-    LoggerFactory.getLogger(getClass()).info("Launch process[{}]: {}",command.getKey(),StringUtils.join(processBuilder.command()," "));
+    LoggerFactory.getLogger(getClass()).info("Launch process[{}]: {}",command.getProcessId().getKey(),StringUtils.join(processBuilder.command()," "));
     process=processBuilder.start();
-    StreamGobbler inputGobbler=new StreamGobbler(process.getInputStream(),command.getKey());
+    StreamGobbler inputGobbler=new StreamGobbler(process.getInputStream(),command.getProcessId().getKey());
     inputGobbler.start();
-    return new ProcessRef(command.getKey(),commands,process,inputGobbler);
+    return new ProcessRef(command.getProcessId().getKey(),commands,process,inputGobbler);
   }
  catch (  Exception e) {
     ProcessUtils.sendKillSignal(process);
-    throw new IllegalStateException("Fail to launch " + command.getKey(),e);
+    throw new IllegalStateException("Fail to launch [" + command.getProcessId().getKey() + "]",e);
   }
 }

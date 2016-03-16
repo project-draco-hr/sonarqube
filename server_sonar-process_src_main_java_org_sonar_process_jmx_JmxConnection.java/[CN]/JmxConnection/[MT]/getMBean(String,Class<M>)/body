@@ -1,0 +1,12 @@
+{
+  try {
+    MBeanServerConnection connection=jmxConnector.getMBeanServerConnection();
+    if (mBeanName.startsWith("java.lang")) {
+      return ManagementFactory.newPlatformMXBeanProxy(connection,mBeanName,mBeanInterfaceClass);
+    }
+    return JMX.newMBeanProxy(connection,new ObjectName(mBeanName),mBeanInterfaceClass);
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Fail to connect to MBean " + mBeanName,e);
+  }
+}

@@ -1,6 +1,12 @@
 {
   LinkedHashMap<String,Object> attributes=new LinkedHashMap<>();
-  attributes.put("State",getStateAsEnum());
+  try (JmxConnection connection=jmxConnectionFactory.create(ProcessId.ELASTICSEARCH)){
+    EsSettingsMBean mbean=connection.getMBean(EsSettingsMBean.OBJECT_NAME,EsSettingsMBean.class);
+    attributes.put("Cluster Name",mbean.getClusterName());
+    attributes.put("Node Name",mbean.getNodeName());
+    attributes.put("HTTP Port",mbean.getHttpPort());
+  }
+   attributes.put("State",getStateAsEnum());
   attributes.put("Indices",indexAttributes());
   attributes.put("Number of Nodes",getNumberOfNodes());
   attributes.put("Nodes",nodeAttributes());
