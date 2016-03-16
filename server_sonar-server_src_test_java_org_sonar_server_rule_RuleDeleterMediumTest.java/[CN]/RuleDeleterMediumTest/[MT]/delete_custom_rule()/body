@@ -1,17 +1,20 @@
 {
-  RuleDto templateRule=RuleTesting.newTemplateRule(RuleKey.of("xoo","T1")).setLanguage("xoo");
+  RuleDto templateRule=RuleTesting.newTemplateRule(RuleKey.of("xoo","T1")).setLanguage("xoo").setCreatedAt(PAST).setUpdatedAt(PAST);
   dao.insert(dbSession,templateRule);
-  RuleDto customRule=RuleTesting.newCustomRule(templateRule).setLanguage("xoo");
+  RuleDto customRule=RuleTesting.newCustomRule(templateRule).setLanguage("xoo").setCreatedAt(PAST).setUpdatedAt(PAST);
   dao.insert(dbSession,customRule);
   QualityProfileDto profileDto=QProfileTesting.newXooP1();
   db.qualityProfileDao().insert(dbSession,profileDto);
   dbSession.commit();
   dbSession.clearCache();
+  ruleIndexer.index();
+  activeRuleIndexer.index();
   activate(new RuleActivation(customRule.getKey()).setSeverity(Severity.BLOCKER),QProfileTesting.XOO_P1_KEY);
   deleter.delete(customRule.getKey());
   RuleDto customRuleReloaded=dao.selectOrFailByKey(dbSession,customRule.getKey());
   assertThat(customRuleReloaded).isNotNull();
   assertThat(customRuleReloaded.getStatus()).isEqualTo(RuleStatus.REMOVED);
+  assertThat(customRuleReloaded.getUpdatedAt()).isNotEqualTo(PAST);
   List<ActiveRuleDoc> activeRules=Lists.newArrayList(tester.get(ActiveRuleIndex.class).findByProfile(profileDto.getKey()));
   assertThat(activeRules).isEmpty();
   assertThat(index.search(new RuleQuery(),new SearchOptions()).getIds()).containsOnly(templateRule.getKey());

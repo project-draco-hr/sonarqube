@@ -1,10 +1,12 @@
 {
-  RuleDto manualRule=RuleTesting.newManualRule("Manual_Rule");
+  RuleDto manualRule=RuleTesting.newManualRule("Manual_Rule").setCreatedAt(PAST).setUpdatedAt(PAST);
   dao.insert(dbSession,manualRule);
   dbSession.commit();
+  ruleIndexer.index();
   deleter.delete(manualRule.getKey());
   RuleDto result=dao.selectOrFailByKey(dbSession,manualRule.getKey());
   assertThat(result).isNotNull();
   assertThat(result.getStatus()).isEqualTo(RuleStatus.REMOVED);
+  assertThat(result.getUpdatedAt()).isNotEqualTo(PAST);
   assertThat(index.search(new RuleQuery(),new SearchOptions()).getIds()).isEmpty();
 }
