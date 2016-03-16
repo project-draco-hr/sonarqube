@@ -4,13 +4,13 @@
   }
   File analysisLog=writer.getFileStructure().analysisLog();
   try (BufferedWriter fileWriter=Files.newBufferedWriter(analysisLog.toPath(),StandardCharsets.UTF_8,StandardOpenOption.WRITE,StandardOpenOption.APPEND)){
+    Map<String,String> moduleSpecificProps=collectModuleSpecificProps(moduleDefinition);
     fileWriter.append(String.format("Settings for module: %s",moduleDefinition.getKey())).append('\n');
-    Map<String,String> moduleSettings=settings.getProperties();
-    for (    String prop : new TreeSet<>(moduleSettings.keySet())) {
+    for (    String prop : new TreeSet<>(moduleSpecificProps.keySet())) {
       if (isSystemProp(prop) || isEnvVariable(prop) || !isSqProp(prop)) {
         continue;
       }
-      fileWriter.append(String.format("  - %s=%s",prop,sensitive(prop) ? "******" : moduleSettings.get(prop))).append('\n');
+      fileWriter.append(String.format("  - %s=%s",prop,sensitive(prop) ? "******" : moduleSpecificProps.get(prop))).append('\n');
     }
   }
  catch (  IOException e) {

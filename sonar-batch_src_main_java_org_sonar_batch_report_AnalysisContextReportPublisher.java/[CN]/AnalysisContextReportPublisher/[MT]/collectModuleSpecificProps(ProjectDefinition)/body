@@ -1,0 +1,19 @@
+{
+  Map<String,String> moduleSpecificProps=new HashMap<>();
+  if (projectRepos.moduleExists(moduleDefinition.getKeyWithBranch())) {
+    moduleSpecificProps.putAll(projectRepos.settings(moduleDefinition.getKeyWithBranch()));
+  }
+  ProjectDefinition parent=moduleDefinition.getParent();
+  if (parent == null) {
+    moduleSpecificProps.putAll(moduleDefinition.properties());
+  }
+ else {
+    Map<String,String> parentProps=parent.properties();
+    for (    Map.Entry<String,String> entry : moduleDefinition.properties().entrySet()) {
+      if (!parentProps.containsKey(entry.getKey()) || !parentProps.get(entry.getKey()).equals(entry.getValue())) {
+        moduleSpecificProps.put(entry.getKey(),entry.getValue());
+      }
+    }
+  }
+  return moduleSpecificProps;
+}
