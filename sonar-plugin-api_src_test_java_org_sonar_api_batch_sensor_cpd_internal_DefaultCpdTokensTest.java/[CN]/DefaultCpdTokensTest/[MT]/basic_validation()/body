@@ -1,0 +1,32 @@
+{
+  SensorStorage sensorStorage=mock(SensorStorage.class);
+  DefaultCpdTokens tokens=new DefaultCpdTokens(sensorStorage);
+  try {
+    tokens.save();
+    fail("Expected exception");
+  }
+ catch (  Exception e) {
+    assertThat(e).hasMessage("Call onFile() first");
+  }
+  try {
+    tokens.addToken(INPUT_FILE.newRange(1,2,1,5),"foo");
+    fail("Expected exception");
+  }
+ catch (  Exception e) {
+    assertThat(e).hasMessage("Call onFile() first");
+  }
+  try {
+    tokens.addToken(null,"foo");
+    fail("Expected exception");
+  }
+ catch (  Exception e) {
+    assertThat(e).hasMessage("Range should not be null");
+  }
+  try {
+    tokens.addToken(INPUT_FILE.newRange(1,2,1,5),null);
+    fail("Expected exception");
+  }
+ catch (  Exception e) {
+    assertThat(e).hasMessage("Image should not be null");
+  }
+}

@@ -1,0 +1,11 @@
+{
+  SensorStorage sensorStorage=mock(SensorStorage.class);
+  DefaultCpdTokens tokens=new DefaultCpdTokens(sensorStorage).onFile(INPUT_FILE).addToken(INPUT_FILE.newRange(1,6,1,10),"bar");
+  try {
+    tokens.addToken(INPUT_FILE.newRange(1,2,1,5),"foo");
+    fail("Expected exception");
+  }
+ catch (  Exception e) {
+    assertThat(e).hasMessage("Tokens of file [moduleKey=foo, relative=src/Foo.java, basedir=null] should be provided in order.\n" + "Previous token: Range[from [line=1, lineOffset=6] to [line=1, lineOffset=10]]\n" + "Last token: Range[from [line=1, lineOffset=2] to [line=1, lineOffset=5]]");
+  }
+}
