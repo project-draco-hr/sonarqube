@@ -3,8 +3,10 @@
     doInstall(container,matcher,null,o);
   }
   for (  PluginInfo pluginInfo : pluginRepository.getPluginInfos()) {
-    SonarPlugin plugin=pluginRepository.getPluginInstance(pluginInfo.getKey());
-    for (    Object extension : plugin.getExtensions()) {
+    Plugin plugin=pluginRepository.getPluginInstance(pluginInfo.getKey());
+    Plugin.Context context=new Plugin.Context(sonarQubeVersion);
+    plugin.define(context);
+    for (    Object extension : context.getExtensions()) {
       doInstall(container,matcher,pluginInfo,extension);
     }
   }

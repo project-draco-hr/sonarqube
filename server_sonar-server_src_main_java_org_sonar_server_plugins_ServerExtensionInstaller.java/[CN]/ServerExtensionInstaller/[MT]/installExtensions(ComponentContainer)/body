@@ -3,9 +3,11 @@
   for (  PluginInfo pluginInfo : pluginRepository.getPluginInfos()) {
     try {
       String pluginKey=pluginInfo.getKey();
-      SonarPlugin plugin=pluginRepository.getPluginInstance(pluginKey);
+      Plugin plugin=pluginRepository.getPluginInstance(pluginKey);
       container.addExtension(pluginInfo,plugin);
-      for (      Object extension : plugin.getExtensions()) {
+      Plugin.Context context=new Plugin.Context(sonarQubeVersion);
+      plugin.define(context);
+      for (      Object extension : context.getExtensions()) {
         if (installExtension(container,pluginInfo,extension,true) != null) {
           installedExtensionsByPlugin.put(pluginInfo,extension);
         }
