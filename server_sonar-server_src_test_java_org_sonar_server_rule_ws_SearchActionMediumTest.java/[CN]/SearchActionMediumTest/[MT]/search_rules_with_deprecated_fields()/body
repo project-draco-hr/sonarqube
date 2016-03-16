@@ -1,0 +1,8 @@
+{
+  ruleDao.insert(dbSession,RuleTesting.newXooX1().setDefaultRemediationFunction(DebtRemediationFunction.Type.LINEAR_OFFSET.name()).setDefaultRemediationGapMultiplier("1h").setDefaultRemediationBaseEffort("15min").setRemediationFunction(DebtRemediationFunction.Type.LINEAR_OFFSET.name()).setRemediationGapMultiplier("2h").setRemediationBaseEffort("25min"));
+  dbSession.commit();
+  ruleIndexer.index();
+  WsTester.TestRequest request=tester.wsTester().newGetRequest(API_ENDPOINT,API_SEARCH_METHOD).setParam(WebService.Param.FIELDS,"name,defaultDebtRemFn,debtRemFn,effortToFixDescription,debtOverloaded");
+  WsTester.Result result=request.execute();
+  result.assertJson(getClass(),"search_rules_with_deprecated_fields.json");
+}
