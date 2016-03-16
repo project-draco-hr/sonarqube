@@ -1,0 +1,12 @@
+{
+  List<String[]> rows=select(connection,"SELECT table_name, column_name, character_set_name, collation_name " + "FROM INFORMATION_SCHEMA.columns " + "WHERE table_schema=database() and character_set_name is not null and collation_name is not null",4);
+  List<String> errors=new ArrayList<>();
+  for (  String[] row : rows) {
+    if (!containsIgnoreCase(row[2],UTF8) || endsWithIgnoreCase(row[3],"_ci")) {
+      errors.add(format("%s.%s",row[0],row[1]));
+    }
+  }
+  if (!errors.isEmpty()) {
+    throw MessageException.of(format("UTF8 charset and case-sensitive collation are required for database columns [%s]",Joiner.on(", ").join(errors)));
+  }
+}
