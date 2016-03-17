@@ -1,0 +1,14 @@
+{
+  ComponentDto project=componentDb.insertComponent(newProjectDto());
+  ComponentDto view=componentDb.insertComponent(newView());
+  ComponentDto developer=componentDb.insertComponent(newDeveloper("developer-name"));
+  addUserPermissionToProject(user1,developer,UserRole.ADMIN);
+  addUserPermissionToProject(user2,developer,UserRole.ADMIN);
+  addGroupPermissionToProject(group1,developer,UserRole.ADMIN);
+  addGroupPermissionToProject(group2,developer,UserRole.ADMIN);
+  db.commit();
+  call(ws.newRequest().setParam(PARAM_TEMPLATE_ID,template1.getUuid()));
+  assertTemplate1AppliedToProject(project);
+  assertTemplate1AppliedToProject(view);
+  assertTemplate1AppliedToProject(developer);
+}

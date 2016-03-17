@@ -1,0 +1,13 @@
+{
+  ComponentDto projectFoundByKey=newProjectDto().setKey("sonar");
+  componentDb.insertProjectAndSnapshot(projectFoundByKey);
+  ComponentDto projectFoundByName=newProjectDto().setName("name-sonar-name");
+  componentDb.insertProjectAndSnapshot(projectFoundByName);
+  ComponentDto projectUntouched=newProjectDto().setKey("new-sonar").setName("project-name");
+  componentDb.insertProjectAndSnapshot(projectUntouched);
+  componentDb.indexProjects();
+  call(ws.newRequest().setParam(PARAM_TEMPLATE_ID,template1.getUuid()).setParam(Param.TEXT_QUERY,"sonar"));
+  assertTemplate1AppliedToProject(projectFoundByKey);
+  assertTemplate1AppliedToProject(projectFoundByName);
+  assertNoPermissionOnProject(projectUntouched);
+}

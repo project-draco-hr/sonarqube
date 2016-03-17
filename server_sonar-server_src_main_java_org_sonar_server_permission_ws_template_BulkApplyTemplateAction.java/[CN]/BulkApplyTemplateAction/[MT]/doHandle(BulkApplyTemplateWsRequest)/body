@@ -1,0 +1,16 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    PermissionTemplateDto template=finder.getTemplate(dbSession,newTemplateRef(request.getTemplateId(),request.getTemplateName()));
+    ComponentQuery componentQuery=ComponentQuery.builder().setNameOrKeyQuery(request.getQuery()).setQualifiers(qualifiers(request.getQualifier())).build();
+    List<ComponentDto> rootComponents=dbClient.componentDao().selectByQuery(dbSession,componentQuery,0,Integer.MAX_VALUE);
+    if (rootComponents.isEmpty()) {
+      return;
+    }
+    ApplyPermissionTemplateQuery query=ApplyPermissionTemplateQuery.create(template.getUuid(),Lists.transform(rootComponents,ComponentDtoFunctions.toKey()));
+    permissionService.applyPermissionTemplate(dbSession,query);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

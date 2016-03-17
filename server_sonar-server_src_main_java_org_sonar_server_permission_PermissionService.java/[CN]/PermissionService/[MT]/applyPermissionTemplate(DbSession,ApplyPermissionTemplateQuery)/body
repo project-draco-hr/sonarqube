@@ -1,0 +1,14 @@
+{
+  if (query.getComponentKeys().size() == 1) {
+    checkProjectAdminUserByComponentKey(userSession,query.getComponentKeys().get(0));
+  }
+ else {
+    checkGlobalAdminUser(userSession);
+  }
+  for (  String componentKey : query.getComponentKeys()) {
+    ComponentDto component=componentFinder.getByKey(dbSession,componentKey);
+    permissionRepository.applyPermissionTemplate(dbSession,query.getTemplateUuid(),component.getId());
+  }
+  dbSession.commit();
+  indexProjectPermissions();
+}
