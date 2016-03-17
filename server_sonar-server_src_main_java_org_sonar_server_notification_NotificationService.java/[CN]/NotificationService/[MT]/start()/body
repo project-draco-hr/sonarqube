@@ -1,15 +1,17 @@
 {
-  executorService=Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat(THREAD_NAME_PREFIX + "%d").setPriority(Thread.MIN_PRIORITY).build());
-  executorService.scheduleWithFixedDelay(new Runnable(){
-    @Override public void run(){
-      try {
-        processQueue();
-      }
- catch (      Exception e) {
-        LOG.error("Error in NotificationService",e);
+  if (!disabled) {
+    executorService=Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat(THREAD_NAME_PREFIX + "%d").setPriority(Thread.MIN_PRIORITY).build());
+    executorService.scheduleWithFixedDelay(new Runnable(){
+      @Override public void run(){
+        try {
+          processQueue();
+        }
+ catch (        Exception e) {
+          LOG.error("Error in NotificationService",e);
+        }
       }
     }
-  }
 ,0,delayInSeconds,TimeUnit.SECONDS);
-  LOG.info("Notification service started (delay {} sec.)",delayInSeconds);
+    LOG.info("Notification service started (delay {} sec.)",delayInSeconds);
+  }
 }
