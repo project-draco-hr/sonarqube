@@ -1,8 +1,7 @@
 {
-  String query=request.getQuery();
   Optional<WsProjectRef> project=newOptionalWsProjectRef(request.getProjectId(),request.getProjectKey());
   if (project.isPresent()) {
     return singletonList(finder.getRootComponentOrModule(dbSession,project.get()));
   }
-  return dbClient.componentDao().selectComponents(dbSession,qualifiers(request.getQualifier()),paging.offset(),paging.pageSize(),query);
+  return dbClient.componentDao().selectByQuery(dbSession,toDbQuery(request),paging.offset(),paging.pageSize());
 }
