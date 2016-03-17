@@ -1,0 +1,14 @@
+{
+  LOG.info("Store analysis results in memory for later assertions in medium test");
+  for (  TrackedIssue issue : container.getComponentByType(IssueCache.class).all()) {
+    issues.add(issue);
+  }
+  ReportPublisher reportPublisher=container.getComponentByType(ReportPublisher.class);
+  reader=new ScannerReportReader(reportPublisher.getReportDir());
+  if (!container.getComponentByType(AnalysisMode.class).isIssues()) {
+    Metadata readMetadata=getReportReader().readMetadata();
+    int rootComponentRef=readMetadata.getRootComponentRef();
+    storeReportComponents(rootComponentRef,null,readMetadata.hasBranch() ? readMetadata.getBranch() : null);
+  }
+  storeFs(container);
+}

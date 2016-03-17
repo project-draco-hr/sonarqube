@@ -1,0 +1,20 @@
+{
+  File baseDir=createTestFiles();
+  File testDir=new File(baseDir,"test");
+  File xooTestExecutionFile=new File(testDir,"sampleTest.xoo.test");
+  FileUtils.write(xooTestExecutionFile,"some test:4:::OK:UNIT\n" + "another test:10:::OK:UNIT\n" + "test without coverage:10:::OK:UNIT\n");
+  File xooCoveragePerTestFile=new File(testDir,"sampleTest.xoo.testcoverage");
+  FileUtils.write(xooCoveragePerTestFile,"some test;src/sample.xoo,10,11;src/sample2.xoo,1,2\n" + "another test;src/sample.xoo,10,20\n");
+  TaskResult result=runTask(baseDir);
+  InputFile file=result.inputFile("test/sampleTest.xoo");
+  org.sonar.scanner.protocol.output.ScannerReport.CoverageDetail someTest=result.coveragePerTestFor(file,"some test");
+  assertThat(someTest.getCoveredFileList()).hasSize(2);
+  assertThat(someTest.getCoveredFile(0).getFileRef()).isGreaterThan(0);
+  assertThat(someTest.getCoveredFile(0).getCoveredLineList()).containsExactly(10,11);
+  assertThat(someTest.getCoveredFile(1).getFileRef()).isGreaterThan(0);
+  assertThat(someTest.getCoveredFile(1).getCoveredLineList()).containsExactly(1,2);
+  org.sonar.scanner.protocol.output.ScannerReport.CoverageDetail anotherTest=result.coveragePerTestFor(file,"another test");
+  assertThat(anotherTest.getCoveredFileList()).hasSize(1);
+  assertThat(anotherTest.getCoveredFile(0).getFileRef()).isGreaterThan(0);
+  assertThat(anotherTest.getCoveredFile(0).getCoveredLineList()).containsExactly(10,20);
+}

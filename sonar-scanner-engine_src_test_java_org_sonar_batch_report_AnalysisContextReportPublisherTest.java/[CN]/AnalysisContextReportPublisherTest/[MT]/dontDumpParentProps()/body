@@ -1,0 +1,10 @@
+{
+  logTester.setLevel(LoggerLevel.DEBUG);
+  ScannerReportWriter writer=new ScannerReportWriter(temp.newFolder());
+  publisher.init(writer);
+  ProjectDefinition module=ProjectDefinition.create().setProperty("sonar.projectKey","foo").setProperty(SONAR_SKIP,"true");
+  ProjectDefinition.create().setProperty("sonar.projectKey","parent").setProperty(SONAR_SKIP,"true").addSubProject(module);
+  publisher.dumpSettings(module);
+  String content=FileUtils.readFileToString(writer.getFileStructure().analysisLog());
+  assertThat(content).doesNotContain(SONAR_SKIP);
+}

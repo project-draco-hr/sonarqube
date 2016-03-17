@@ -1,0 +1,11 @@
+{
+  for (  ServerIssueFromWs unmatchedIssue : unmatchedIssues) {
+    org.sonar.scanner.protocol.input.ScannerInput.ServerIssue unmatchedPreviousIssue=unmatchedIssue.getDto();
+    TrackedIssue unmatched=IssueTransformer.toTrackedIssue(unmatchedPreviousIssue);
+    if (unmatchedIssue.getRuleKey().isManual() && !Issue.STATUS_CLOSED.equals(unmatchedPreviousIssue.getStatus())) {
+      relocateManualIssue(unmatched,unmatchedIssue,sourceHashHolder);
+    }
+    updateUnmatchedIssue(unmatched,false);
+    mergeTo.add(unmatched);
+  }
+}

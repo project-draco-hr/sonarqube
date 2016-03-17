@@ -1,0 +1,14 @@
+{
+  if (duplications.size() > MAX_CLONE_GROUP_PER_FILE) {
+    LOG.warn("Too many duplication groups on file " + component.inputComponent() + ". Keep only the first "+ MAX_CLONE_GROUP_PER_FILE+ " groups.");
+  }
+  Iterable<org.sonar.scanner.protocol.output.ScannerReport.Duplication> reportDuplications=from(duplications).limit(MAX_CLONE_GROUP_PER_FILE).transform(new Function<CloneGroup,ScannerReport.Duplication>(){
+    private final ScannerReport.Duplication.Builder dupBuilder=ScannerReport.Duplication.newBuilder();
+    private final ScannerReport.Duplicate.Builder blockBuilder=ScannerReport.Duplicate.newBuilder();
+    @Override public ScannerReport.Duplication apply(    CloneGroup input){
+      return toReportDuplication(component,dupBuilder,blockBuilder,input);
+    }
+  }
+);
+  publisher.getWriter().writeComponentDuplications(component.batchId(),reportDuplications);
+}

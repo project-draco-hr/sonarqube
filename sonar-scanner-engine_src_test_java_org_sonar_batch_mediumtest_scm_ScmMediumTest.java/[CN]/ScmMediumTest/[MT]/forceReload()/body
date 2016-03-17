@@ -1,0 +1,13 @@
+{
+  File baseDir=prepareProject();
+  File xooFileNoScm=new File(baseDir,SAME_CONTENT_SCM_ON_SERVER_XOO);
+  FileUtils.write(xooFileNoScm,SAMPLE_XOO_CONTENT);
+  File xooScmFile=new File(baseDir,SAME_CONTENT_SCM_ON_SERVER_XOO + ".scm");
+  FileUtils.write(xooScmFile,"1,foo,2013-01-04\n" + "1,bar,2013-01-04\n");
+  TaskBuilder taskBuilder=tester.newTask().properties(ImmutableMap.<String,String>builder().put("sonar.task","scan").put("sonar.projectBaseDir",baseDir.getAbsolutePath()).put("sonar.projectKey","com.foo.project").put("sonar.projectName","Foo Project").put("sonar.projectVersion","1.0-SNAPSHOT").put("sonar.projectDescription","Description of Foo Project").put("sonar.sources","src").put("sonar.scm.provider","xoo").put("sonar.scm.forceReloadAll","true").build());
+  taskBuilder.start();
+  ScannerReport.Changesets file1Scm=getChangesets(baseDir,"src/sample.xoo");
+  assertThat(file1Scm).isNotNull();
+  ScannerReport.Changesets file2Scm=getChangesets(baseDir,SAME_CONTENT_SCM_ON_SERVER_XOO);
+  assertThat(file2Scm).isNotNull();
+}

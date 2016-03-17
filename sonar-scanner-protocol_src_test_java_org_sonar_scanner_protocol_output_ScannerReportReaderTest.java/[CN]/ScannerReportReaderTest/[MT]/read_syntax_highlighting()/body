@@ -1,0 +1,13 @@
+{
+  ScannerReportWriter writer=new ScannerReportWriter(dir);
+  writer.writeMetadata(ScannerReport.Metadata.newBuilder().setRootComponentRef(1).build());
+  writer.writeComponent(ScannerReport.Component.newBuilder().setRef(1).build());
+  writer.writeComponentSyntaxHighlighting(1,asList(ScannerReport.SyntaxHighlighting.newBuilder().setRange(ScannerReport.TextRange.newBuilder().setStartLine(1).setEndLine(10).build()).setType(Constants.HighlightingType.ANNOTATION).build()));
+  try (CloseableIterator<ScannerReport.SyntaxHighlighting> it=underTest.readComponentSyntaxHighlighting(1)){
+    ScannerReport.SyntaxHighlighting syntaxHighlighting=it.next();
+    assertThat(syntaxHighlighting.getRange()).isNotNull();
+    assertThat(syntaxHighlighting.getRange().getStartLine()).isEqualTo(1);
+    assertThat(syntaxHighlighting.getRange().getEndLine()).isEqualTo(10);
+    assertThat(syntaxHighlighting.getType()).isEqualTo(Constants.HighlightingType.ANNOTATION);
+  }
+ }

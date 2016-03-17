@@ -1,0 +1,11 @@
+{
+  assertThat(underTest.hasComponentData(FileStructure.Domain.ISSUES,1)).isFalse();
+  ScannerReport.Issue issue=ScannerReport.Issue.newBuilder().setLine(50).setMsg("the message").build();
+  underTest.writeComponentIssues(1,asList(issue));
+  assertThat(underTest.hasComponentData(FileStructure.Domain.ISSUES,1)).isTrue();
+  File file=underTest.getFileStructure().fileFor(FileStructure.Domain.ISSUES,1);
+  assertThat(file).exists().isFile();
+  try (CloseableIterator<ScannerReport.Issue> read=Protobuf.readStream(file,ScannerReport.Issue.PARSER)){
+    assertThat(Iterators.size(read)).isEqualTo(1);
+  }
+ }

@@ -1,0 +1,39 @@
+{
+  Resource r=batchComponent.resource();
+  ScannerReport.Component.Builder builder=ScannerReport.Component.newBuilder();
+  builder.setRef(batchComponent.batchId());
+  builder.setType(getType(r));
+  if (batchComponent.isProjectOrModule()) {
+    ProjectDefinition def=reactor.getProjectDefinition(batchComponent.key());
+    builder.setKey(def.getKey());
+  }
+  if (batchComponent.isFile()) {
+    builder.setIsTest(ResourceUtils.isUnitTestFile(r));
+    builder.setLines(((InputFile)batchComponent.inputComponent()).lines());
+  }
+  String name=getName(r);
+  if (name != null) {
+    builder.setName(name);
+  }
+  String description=getDescription(r);
+  if (description != null) {
+    builder.setDescription(description);
+  }
+  String path=r.getPath();
+  if (path != null) {
+    builder.setPath(path);
+  }
+  String lang=getLanguageKey(r);
+  if (lang != null) {
+    builder.setLanguage(lang);
+  }
+  for (  BatchComponent child : batchComponent.children()) {
+    builder.addChildRef(child.batchId());
+  }
+  writeLinks(batchComponent,builder);
+  writeVersion(batchComponent,builder);
+  writer.writeComponent(builder.build());
+  for (  BatchComponent child : batchComponent.children()) {
+    recursiveWriteComponent(child,writer);
+  }
+}

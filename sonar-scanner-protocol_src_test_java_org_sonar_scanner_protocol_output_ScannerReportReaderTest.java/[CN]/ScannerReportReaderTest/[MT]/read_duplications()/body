@@ -1,0 +1,9 @@
+{
+  ScannerReportWriter writer=new ScannerReportWriter(dir);
+  writer.writeMetadata(ScannerReport.Metadata.newBuilder().setRootComponentRef(1).build());
+  writer.writeComponent(ScannerReport.Component.newBuilder().setRef(1).build());
+  ScannerReport.Duplication duplication=ScannerReport.Duplication.newBuilder().setOriginPosition(ScannerReport.TextRange.newBuilder().setStartLine(1).setEndLine(5).build()).addDuplicate(ScannerReport.Duplicate.newBuilder().setOtherFileRef(2).setRange(ScannerReport.TextRange.newBuilder().setStartLine(6).setEndLine(10).build()).build()).build();
+  writer.writeComponentDuplications(1,asList(duplication));
+  ScannerReportReader sut=new ScannerReportReader(dir);
+  assertThat(sut.readComponentDuplications(1)).hasSize(1);
+}

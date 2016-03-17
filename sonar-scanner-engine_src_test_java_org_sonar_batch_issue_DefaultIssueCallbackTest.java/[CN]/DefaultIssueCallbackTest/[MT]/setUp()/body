@@ -1,0 +1,16 @@
+{
+  MockitoAnnotations.initMocks(this);
+  RuleKey ruleKey=RuleKey.of("repo","key");
+  issue=new TrackedIssue();
+  issue.setKey("key");
+  issue.setAssignee("user");
+  issue.setRuleKey(ruleKey);
+  when(issueCache.all()).thenReturn(ImmutableList.of(issue));
+  ScannerInput.User.Builder userBuilder=ScannerInput.User.newBuilder();
+  userBuilder.setLogin("user");
+  userBuilder.setName("name");
+  when(userRepository.load("user")).thenReturn(userBuilder.build());
+  Rule r=mock(Rule.class);
+  when(r.name()).thenReturn("rule name");
+  when(rules.find(ruleKey)).thenReturn(r);
+}

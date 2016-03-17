@@ -1,0 +1,12 @@
+{
+  ruleBuilder.add(SQUID_RULE_KEY).setName(SQUID_RULE_NAME);
+  activeRulesBuilder.create(SQUID_RULE_KEY).setSeverity(Severity.INFO).setName(SQUID_RULE_NAME).activate();
+  initModuleIssues();
+  DefaultIssue issue=new DefaultIssue().at(new DefaultIssueLocation().on(file).at(file.selectLine(3)).message("")).forRule(SQUID_RULE_KEY);
+  when(filters.accept(anyString(),any(ScannerReport.Issue.class))).thenReturn(true);
+  boolean added=moduleIssues.initAndAddIssue(issue);
+  assertThat(added).isTrue();
+  ArgumentCaptor<ScannerReport.Issue> argument=ArgumentCaptor.forClass(ScannerReport.Issue.class);
+  verify(reportPublisher.getWriter()).appendComponentIssue(eq(1),argument.capture());
+  assertThat(argument.getValue().getMsg()).isEqualTo("Avoid Cycle");
+}

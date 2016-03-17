@@ -1,0 +1,16 @@
+{
+  int ref=reportComponents.get(((DefaultInputFile)testFile).key()).getRef();
+  try (InputStream inputStream=FileUtils.openInputStream(getReportReader().readCoverageDetails(ref))){
+    ScannerReport.CoverageDetail details=ScannerReport.CoverageDetail.PARSER.parseDelimitedFrom(inputStream);
+    while (details != null) {
+      if (details.getTestName().equals(testName)) {
+        return details;
+      }
+      details=ScannerReport.CoverageDetail.PARSER.parseDelimitedFrom(inputStream);
+    }
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException(e);
+  }
+  return null;
+}

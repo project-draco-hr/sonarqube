@@ -1,0 +1,17 @@
+{
+  ScannerReportWriter writer=new ScannerReportWriter(dir);
+  writer.writeMetadata(ScannerReport.Metadata.newBuilder().setRootComponentRef(1).build());
+  writer.writeComponent(ScannerReport.Component.newBuilder().setRef(1).build());
+  writer.writeComponentCoverage(1,asList(ScannerReport.Coverage.newBuilder().setLine(1).setConditions(1).setUtHits(true).setItHits(false).setUtCoveredConditions(1).setItCoveredConditions(1).setOverallCoveredConditions(1).build(),ScannerReport.Coverage.newBuilder().setLine(2).setConditions(5).setUtHits(false).setItHits(false).setUtCoveredConditions(4).setItCoveredConditions(5).setOverallCoveredConditions(5).build()));
+  underTest=new ScannerReportReader(dir);
+  try (CloseableIterator<ScannerReport.Coverage> it=new ScannerReportReader(dir).readComponentCoverage(1)){
+    ScannerReport.Coverage coverage=it.next();
+    assertThat(coverage.getLine()).isEqualTo(1);
+    assertThat(coverage.getConditions()).isEqualTo(1);
+    assertThat(coverage.getUtHits()).isTrue();
+    assertThat(coverage.getItHits()).isFalse();
+    assertThat(coverage.getUtCoveredConditions()).isEqualTo(1);
+    assertThat(coverage.getItCoveredConditions()).isEqualTo(1);
+    assertThat(coverage.getOverallCoveredConditions()).isEqualTo(1);
+  }
+ }

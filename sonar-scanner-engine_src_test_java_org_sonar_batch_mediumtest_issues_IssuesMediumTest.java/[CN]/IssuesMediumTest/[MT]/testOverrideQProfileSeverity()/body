@@ -1,0 +1,8 @@
+{
+  File projectDir=new File(IssuesMediumTest.class.getResource("/mediumtest/xoo/sample").toURI());
+  File tmpDir=temp.newFolder();
+  FileUtils.copyDirectory(projectDir,tmpDir);
+  TaskResult result=tester.newScanTask(new File(tmpDir,"sonar-project.properties")).property("sonar.oneIssuePerLine.forceSeverity","CRITICAL").start();
+  List<Issue> issues=result.issuesFor(result.inputFile("xources/hello/HelloJava.xoo"));
+  assertThat(issues.get(0).getSeverity()).isEqualTo(org.sonar.scanner.protocol.Constants.Severity.CRITICAL);
+}

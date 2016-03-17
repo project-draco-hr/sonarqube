@@ -1,0 +1,16 @@
+{
+  ByteArrayOutputStream bos=new ByteArrayOutputStream();
+  ServerIssue.newBuilder().setKey("ab1").build().writeDelimitedTo(bos);
+  ServerIssue.newBuilder().setKey("ab2").build().writeDelimitedTo(bos);
+  InputStream is=new ByteArrayInputStream(bos.toByteArray());
+  when(wsLoader.loadStream("/batch/issues.protobuf?key=foo")).thenReturn(new WSLoaderResult<>(is,true));
+  final List<ServerIssue> result=new ArrayList<>();
+  loader.load("foo",new Function<ScannerInput.ServerIssue,Void>(){
+    @Override public Void apply(    ServerIssue input){
+      result.add(input);
+      return null;
+    }
+  }
+);
+  assertThat(result).extracting("key").containsExactly("ab1","ab2");
+}

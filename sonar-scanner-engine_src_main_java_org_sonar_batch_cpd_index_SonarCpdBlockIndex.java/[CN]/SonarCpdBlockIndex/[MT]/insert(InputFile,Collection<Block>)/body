@@ -1,0 +1,22 @@
+{
+  if (isCrossProjectDuplicationEnabled(settings)) {
+    int id=batchComponentCache.get(inputFile).batchId();
+    final ScannerReport.CpdTextBlock.Builder builder=ScannerReport.CpdTextBlock.newBuilder();
+    publisher.getWriter().writeCpdTextBlocks(id,Iterables.transform(blocks,new Function<Block,ScannerReport.CpdTextBlock>(){
+      @Override public ScannerReport.CpdTextBlock apply(      Block input){
+        builder.clear();
+        builder.setStartLine(input.getStartLine());
+        builder.setEndLine(input.getEndLine());
+        builder.setStartTokenIndex(input.getStartUnit());
+        builder.setEndTokenIndex(input.getEndUnit());
+        builder.setHash(input.getBlockHash().toHexString());
+        return builder.build();
+      }
+    }
+));
+  }
+  for (  Block block : blocks) {
+    mem.insert(block);
+  }
+  indexedFiles.add(inputFile);
+}

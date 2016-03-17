@@ -1,0 +1,23 @@
+{
+  File baseDir=temp.getRoot();
+  File srcDir=new File(baseDir,"src");
+  srcDir.mkdir();
+  File testDir=new File(baseDir,"test");
+  testDir.mkdir();
+  File xooFile=new File(srcDir,"sample.xoo");
+  FileUtils.write(xooFile,"foo");
+  File xooTestFile=new File(testDir,"sampleTest.xoo");
+  FileUtils.write(xooTestFile,"failure\nerror\nok\nskipped");
+  File xooTestExecutionFile=new File(testDir,"sampleTest.xoo.test");
+  FileUtils.write(xooTestExecutionFile,"skipped::::SKIPPED:UNIT\n" + "failure:2:Failure::FAILURE:UNIT\n" + "error:2:Error:The stack:ERROR:UNIT\n"+ "success:4:::OK:INTEGRATION");
+  TaskResult result=tester.newTask().properties(ImmutableMap.<String,String>builder().put("sonar.task","scan").put("sonar.projectBaseDir",baseDir.getAbsolutePath()).put("sonar.projectKey","com.foo.project").put("sonar.projectName","Foo Project").put("sonar.projectVersion","1.0-SNAPSHOT").put("sonar.projectDescription","Description of Foo Project").put("sonar.sources","src").put("sonar.tests","test").build()).start();
+  InputFile file=result.inputFile("test/sampleTest.xoo");
+  org.sonar.scanner.protocol.output.ScannerReport.Test success=result.testExecutionFor(file,"success");
+  assertThat(success.getDurationInMs()).isEqualTo(4);
+  assertThat(success.getStatus()).isEqualTo(TestStatus.OK);
+  org.sonar.scanner.protocol.output.ScannerReport.Test error=result.testExecutionFor(file,"error");
+  assertThat(error.getDurationInMs()).isEqualTo(2);
+  assertThat(error.getStatus()).isEqualTo(TestStatus.ERROR);
+  assertThat(error.getMsg()).isEqualTo("Error");
+  assertThat(error.getStacktrace()).isEqualTo("The stack");
+}

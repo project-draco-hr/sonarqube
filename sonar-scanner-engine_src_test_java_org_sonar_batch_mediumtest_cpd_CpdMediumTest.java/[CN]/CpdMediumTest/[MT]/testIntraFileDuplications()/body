@@ -1,0 +1,17 @@
+{
+  File srcDir=new File(baseDir,"src");
+  srcDir.mkdir();
+  String content="Sample xoo\ncontent\nfoo\nbar\nSample xoo\ncontent\n";
+  File xooFile=new File(srcDir,"sample.xoo");
+  FileUtils.write(xooFile,content);
+  TaskResult result=tester.newTask().properties(builder.put("sonar.sources","src").put("sonar.cpd.xoo.minimumTokens","2").put("sonar.cpd.xoo.minimumLines","2").put("sonar.verbose","true").build()).start();
+  InputFile inputFile=result.inputFile("src/sample.xoo");
+  List<org.sonar.scanner.protocol.output.ScannerReport.Duplication> duplicationGroups=result.duplicationsFor(inputFile);
+  assertThat(duplicationGroups).hasSize(1);
+  org.sonar.scanner.protocol.output.ScannerReport.Duplication cloneGroup=duplicationGroups.get(0);
+  assertThat(cloneGroup.getOriginPosition().getStartLine()).isEqualTo(1);
+  assertThat(cloneGroup.getOriginPosition().getEndLine()).isEqualTo(2);
+  assertThat(cloneGroup.getDuplicateList()).hasSize(1);
+  assertThat(cloneGroup.getDuplicate(0).getRange().getStartLine()).isEqualTo(5);
+  assertThat(cloneGroup.getDuplicate(0).getRange().getEndLine()).isEqualTo(6);
+}

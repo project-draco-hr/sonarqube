@@ -1,0 +1,8 @@
+{
+  when(pluginRepo.getPluginInfos()).thenReturn(Arrays.asList(new PluginInfo("xoo").setName("Xoo").setVersion(Version.create("1.0"))));
+  ScannerReportWriter writer=new ScannerReportWriter(temp.newFolder());
+  publisher.init(writer);
+  assertThat(writer.getFileStructure().analysisLog()).exists();
+  assertThat(FileUtils.readFileToString(writer.getFileStructure().analysisLog())).contains("Xoo 1.0 (xoo)");
+  verifyZeroInteractions(system2);
+}

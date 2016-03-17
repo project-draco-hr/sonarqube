@@ -1,0 +1,8 @@
+{
+  final Set<String> allowedMetricKeys=newHashSet(transform(batchMetrics.getMetrics(),new MetricToKey()));
+  for (  final BatchComponent resource : resourceCache.all()) {
+    Iterable<Measure> batchMeasures=measureCache.byResource(resource.resource());
+    Iterable<org.sonar.scanner.protocol.output.ScannerReport.Measure> reportMeasures=transform(filter(batchMeasures,new IsMetricAllowed(allowedMetricKeys)),new MeasureToReportMeasure(resource));
+    writer.writeComponentMeasures(resource.batchId(),reportMeasures);
+  }
+}

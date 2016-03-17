@@ -1,0 +1,12 @@
+{
+  FileSystem fs=context.fileSystem();
+  for (  InputFile f : fs.inputFiles(fs.predicates().all())) {
+    ScannerReportReader reader=new ScannerReportReader(reportPublisher.getReportDir());
+    int batchId=resourceCache.get(f).batchId();
+    String language=f.language();
+    if (reader.hasSyntaxHighlighting(batchId) || language == null) {
+      continue;
+    }
+    codeColorizers.toSyntaxHighlighting(f.file(),fs.encoding(),language,context.newHighlighting().onFile(f));
+  }
+}

@@ -1,0 +1,16 @@
+{
+  logTester.setLevel(LoggerLevel.DEBUG);
+  ScannerReportWriter writer=new ScannerReportWriter(temp.newFolder());
+  Properties props=new Properties();
+  props.setProperty(COM_FOO,"bar");
+  props.setProperty(SONAR_SKIP,"true");
+  when(system2.properties()).thenReturn(props);
+  publisher.init(writer);
+  String content=FileUtils.readFileToString(writer.getFileStructure().analysisLog());
+  assertThat(content).containsOnlyOnce(COM_FOO);
+  assertThat(content).doesNotContain(SONAR_SKIP);
+  publisher.dumpSettings(ProjectDefinition.create().setProperty("sonar.projectKey","foo").setProperty(COM_FOO,"bar").setProperty(SONAR_SKIP,"true"));
+  content=FileUtils.readFileToString(writer.getFileStructure().analysisLog());
+  assertThat(content).containsOnlyOnce(COM_FOO);
+  assertThat(content).containsOnlyOnce(SONAR_SKIP);
+}
