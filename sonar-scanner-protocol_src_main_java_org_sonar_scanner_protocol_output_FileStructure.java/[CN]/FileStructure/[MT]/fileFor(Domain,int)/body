@@ -1,3 +1,10 @@
 {
-  return new File(dir,domain.filePrefix + componentRef + domain.fileSuffix);
+  Path parent=dir.toPath().resolve(getSubDirFor(componentRef));
+  try {
+    Files.createDirectories(parent);
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Unable to create subdirectory for component " + componentRef,e);
+  }
+  return parent.resolve(domain.filePrefix + componentRef + domain.fileSuffix).toFile();
 }
