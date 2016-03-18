@@ -1,10 +1,11 @@
 {
   DbSession dbSession=dbClient.openSession(false);
   try {
-    org.sonar.server.es.SearchOptions context=getQueryContext(request);
-    RuleQuery query=doQuery(request);
+    SearchWsRequest searchWsRequest=toSearchWsRequest(request);
+    org.sonar.server.es.SearchOptions context=getQueryContext(searchWsRequest);
+    RuleQuery query=doQuery(searchWsRequest);
     SearchResult searchResult=doSearch(dbSession,query,context);
-    SearchResponse responseBuilder=buildResponse(dbSession,request,context,searchResult);
+    SearchResponse responseBuilder=buildResponse(dbSession,searchWsRequest,context,searchResult);
     writeProtobuf(responseBuilder,request,response);
   }
   finally {

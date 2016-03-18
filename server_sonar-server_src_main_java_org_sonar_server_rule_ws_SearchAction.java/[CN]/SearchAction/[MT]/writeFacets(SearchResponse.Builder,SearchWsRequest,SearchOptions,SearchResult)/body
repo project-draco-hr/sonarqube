@@ -1,13 +1,21 @@
 {
-  addMandatoryFacetValues(results,FACET_LANGUAGES,request.paramAsStrings(PARAM_LANGUAGES));
-  addMandatoryFacetValues(results,FACET_REPOSITORIES,request.paramAsStrings(PARAM_REPOSITORIES));
+  addMandatoryFacetValues(results,FACET_LANGUAGES,request.getLanguages());
+  addMandatoryFacetValues(results,FACET_REPOSITORIES,request.getRepositories());
   addMandatoryFacetValues(results,FACET_STATUSES,ALL_STATUSES_EXCEPT_REMOVED);
   addMandatoryFacetValues(results,FACET_SEVERITIES,Severity.ALL);
   addMandatoryFacetValues(results,FACET_ACTIVE_SEVERITIES,Severity.ALL);
-  addMandatoryFacetValues(results,FACET_TAGS,request.paramAsStrings(PARAM_TAGS));
+  addMandatoryFacetValues(results,FACET_TAGS,request.getTags());
   addMandatoryFacetValues(results,FACET_TYPES,RuleType.ALL_NAMES);
   Common.Facet.Builder facet=Common.Facet.newBuilder();
   Common.FacetValue.Builder value=Common.FacetValue.newBuilder();
+  Map<String,List<String>> facetValuesByFacetKey=new HashMap<>();
+  facetValuesByFacetKey.put(FACET_LANGUAGES,request.getLanguages());
+  facetValuesByFacetKey.put(FACET_REPOSITORIES,request.getRepositories());
+  facetValuesByFacetKey.put(FACET_STATUSES,request.getStatuses());
+  facetValuesByFacetKey.put(FACET_SEVERITIES,request.getSeverities());
+  facetValuesByFacetKey.put(FACET_ACTIVE_SEVERITIES,request.getActiveSeverities());
+  facetValuesByFacetKey.put(FACET_TAGS,request.getTags());
+  facetValuesByFacetKey.put(FACET_TYPES,request.getTypes());
   for (  String facetName : context.getFacets()) {
     facet.clear().setProperty(facetName);
     Map<String,Long> facets=results.facets.get(facetName);
@@ -17,7 +25,7 @@
         itemsFromFacets.add(facetValue.getKey());
         facet.addValues(value.clear().setVal(facetValue.getKey()).setCount(facetValue.getValue()));
       }
-      addZeroFacetsForSelectedItems(facet,request,facetName,itemsFromFacets);
+      addZeroFacetsForSelectedItems(facet,facetValuesByFacetKey.get(facetName),itemsFromFacets);
     }
     response.getFacetsBuilder().addFacets(facet);
   }
