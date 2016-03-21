@@ -1,0 +1,17 @@
+{
+  RuleDto ruleDto=RuleTesting.newDto(RuleKey.of("java","S001")).setName("Rule S001").setDescription("Rule S001 <b>description</b>").setDescriptionFormat(Format.HTML).setSeverity(MINOR).setStatus(RuleStatus.BETA).setLanguage("xoo").setType(RuleType.BUG).setCreatedAt(new Date().getTime()).setUpdatedAt(new Date().getTime());
+  ruleDao.insert(session,ruleDto);
+  RuleParamDto regexParam=RuleParamDto.createFor(ruleDto).setName("regex").setType("STRING").setDescription("Reg *exp*").setDefaultValue(".*");
+  ruleDao.insertRuleParam(session,ruleDto,regexParam);
+  QualityProfileDto profile=QualityProfileDto.createFor("profile").setName("Profile").setLanguage("xoo");
+  tester.get(QualityProfileDao.class).insert(session,profile);
+  ActiveRuleDto activeRuleDto=new ActiveRuleDto().setProfileId(profile.getId()).setRuleId(ruleDto.getId()).setSeverity(MINOR).setCreatedAt(new Date().getTime()).setUpdatedAt(new Date().getTime());
+  tester.get(ActiveRuleDao.class).insert(session,activeRuleDto);
+  tester.get(ActiveRuleDao.class).insertParam(session,activeRuleDto,new ActiveRuleParamDto().setRulesParameterId(regexParam.getId()).setKey(regexParam.getName()).setValue(".*?"));
+  session.commit();
+  session.clearCache();
+  tester.get(RuleIndexer.class).setEnabled(true).index();
+  tester.get(ActiveRuleIndexer.class).setEnabled(true).index();
+  WsTester.TestRequest request=wsTester.newGetRequest("api/rules","show").setParam("key",ruleDto.getKey().toString()).setParam("actives","true");
+  request.execute().assertJson(getClass(),"show_rule_when_activated.json");
+}
