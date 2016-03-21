@@ -1,0 +1,9 @@
+{
+  logTester.setLevel(LoggerLevel.DEBUG);
+  ScannerReportWriter writer=new ScannerReportWriter(temp.newFolder());
+  when(globalRepositories.globalSettings()).thenReturn(ImmutableMap.of(COM_FOO,"bar",SONAR_SKIP,"true"));
+  publisher.init(writer);
+  String content=FileUtils.readFileToString(writer.getFileStructure().analysisLog());
+  assertThat(content).containsOnlyOnce(COM_FOO);
+  assertThat(content).containsOnlyOnce(SONAR_SKIP);
+}
