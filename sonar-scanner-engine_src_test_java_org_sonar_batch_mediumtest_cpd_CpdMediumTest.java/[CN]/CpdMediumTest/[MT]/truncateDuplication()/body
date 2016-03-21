@@ -10,7 +10,7 @@
   }
   TaskResult result=tester.newTask().properties(builder.put("sonar.sources","src").put("sonar.cpd.xoo.minimumTokens","1").put("sonar.cpd.xoo.minimumLines","1").build()).start();
   Map<String,List<Measure>> allMeasures=result.allMeasures();
-  assertThat(allMeasures.get("com.foo.project")).extracting("metricKey").containsOnly(CoreMetrics.QUALITY_PROFILES_KEY);
+  assertThat(allMeasures.get("com.foo.project")).extracting("metricKey").isEmpty();
   assertThat(allMeasures.get("com.foo.project:src/sample.xoo")).extracting("metricKey","intValue.value").containsOnly(tuple(CoreMetrics.LINES_KEY,blockCount * 2 + 1));
   List<org.sonar.scanner.protocol.output.ScannerReport.Duplication> duplicationGroups=result.duplicationsFor(result.inputFile("src/sample.xoo"));
   assertThat(duplicationGroups).hasSize(1);
