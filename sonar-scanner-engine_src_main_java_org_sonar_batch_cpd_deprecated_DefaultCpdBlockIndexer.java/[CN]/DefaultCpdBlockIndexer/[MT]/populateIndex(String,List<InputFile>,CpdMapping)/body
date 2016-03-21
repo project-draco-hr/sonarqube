@@ -1,0 +1,11 @@
+{
+  TokenizerBridge bridge=new TokenizerBridge(mapping.getTokenizer(),fs.encoding().name(),getBlockSize(languageKey));
+  for (  InputFile inputFile : sourceFiles) {
+    if (!index.isIndexed(inputFile)) {
+      LOG.debug("Populating index from {}",inputFile.absolutePath());
+      String resourceEffectiveKey=((DefaultInputFile)inputFile).key();
+      List<Block> blocks=bridge.chunk(resourceEffectiveKey,inputFile.file());
+      index.insert(inputFile,blocks);
+    }
+  }
+}
