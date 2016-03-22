@@ -2,10 +2,17 @@
   String defaultWebJavaOptions="-Xmx768m -XX:MaxPermSize=160m -XX:+HeapDumpOnOutOfMemoryError -Djava.awt.headless=true -Dfile.encoding=UTF-8 -Djruby.management.enabled=false";
   Orchestrator orchestrator=Orchestrator.builderEnv().setOrchestratorProperty("javaVersion","LATEST_RELEASE").addPlugin("java").setServerProperty("sonar.web.javaOpts",defaultWebJavaOptions + " -Djava.security.egd=file:/dev/./urandom").build();
   try {
-    long startupDuration=start(orchestrator);
-    assertDurationAround(startupDuration,41000);
-    long shutdownDuration=stop(orchestrator);
-    assertDurationLessThan(shutdownDuration,4000);
+    ServerLogs.clear(orchestrator);
+    orchestrator.start();
+    long firstLogDate=ServerLogs.extractFirstDate(readLogLines(orchestrator)).getTime();
+    long startedAtDate=extractStartedAtDate(orchestrator);
+    assertDurationAround(startedAtDate - firstLogDate,45000);
+    ServerLogs.clear(orchestrator);
+    orchestrator.stop();
+    List<String> lines=readLogLines(orchestrator);
+    long firstStopLogDate=ServerLogs.extractFirstDate(lines).getTime();
+    long stopDate=extractStopDate(lines);
+    assertDurationLessThan(stopDate - firstStopLogDate,10000);
   }
   finally {
     orchestrator.stop();
