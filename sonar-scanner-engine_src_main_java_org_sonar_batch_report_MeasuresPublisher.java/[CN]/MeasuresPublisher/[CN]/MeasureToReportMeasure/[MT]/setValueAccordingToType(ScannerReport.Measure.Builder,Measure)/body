@@ -1,22 +1,29 @@
 {
   Serializable value=measure.value();
-switch (builder.getValueType()) {
-case BOOLEAN:
-    builder.setBooleanValue((Boolean)value);
-  break;
-case DOUBLE:
-builder.setDoubleValue(((Number)value).doubleValue());
-break;
+  String data=measure.getData() != null ? measure.getData() : "";
+switch (measure.getMetric().getType()) {
 case INT:
-builder.setIntValue(((Number)value).intValue());
+case RATING:
+    builder.setIntValue(IntValue.newBuilder().setValue(((Number)value).intValue()).setData(data));
+  break;
+case FLOAT:
+case PERCENT:
+builder.setDoubleValue(DoubleValue.newBuilder().setValue(((Number)value).doubleValue()).setData(data));
 break;
-case LONG:
-builder.setLongValue(((Number)value).longValue());
+case BOOL:
+builder.setBooleanValue(BoolValue.newBuilder().setValue(((Boolean)value).booleanValue()).setData(data));
+break;
+case WORK_DUR:
+case MILLISEC:
+builder.setLongValue(LongValue.newBuilder().setValue(((Number)value).longValue()).setData(data));
 break;
 case STRING:
-builder.setStringValue((String)value);
+case DATA:
+case LEVEL:
+case DISTRIB:
+builder.setStringValue(StringValue.newBuilder().setValue((String)value));
 break;
 default :
-throw new IllegalStateException("Unknown value type: " + builder.getValueType());
+throw new IllegalStateException("Unknown metric type: " + measure.getMetric().getType());
 }
 }

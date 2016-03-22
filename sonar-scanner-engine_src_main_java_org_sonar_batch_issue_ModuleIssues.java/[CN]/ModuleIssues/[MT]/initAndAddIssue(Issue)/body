@@ -9,8 +9,9 @@
   String primaryMessage=Strings.isNullOrEmpty(issue.primaryLocation().message()) ? rule.name() : issue.primaryLocation().message();
   org.sonar.api.batch.rule.Severity overriddenSeverity=issue.overriddenSeverity();
   Severity severity=overriddenSeverity != null ? Severity.valueOf(overriddenSeverity.name()) : Severity.valueOf(activeRule.severity());
-  builder.clear();
-  locationBuilder.clear();
+  ScannerReport.Issue.Builder builder=ScannerReport.Issue.newBuilder();
+  ScannerReport.IssueLocation.Builder locationBuilder=IssueLocation.newBuilder();
+  ScannerReport.TextRange.Builder textRangeBuilder=ScannerReport.TextRange.newBuilder();
   builder.setSeverity(severity);
   builder.setRuleRepository(issue.ruleKey().repository());
   builder.setRuleKey(issue.ruleKey().rule());
@@ -19,14 +20,13 @@
   locationBuilder.setComponentRef(component.batchId());
   TextRange primaryTextRange=issue.primaryLocation().textRange();
   if (primaryTextRange != null) {
-    builder.setLine(primaryTextRange.start().line());
-    builder.setTextRange(toProtobufTextRange(primaryTextRange));
+    builder.setTextRange(toProtobufTextRange(textRangeBuilder,primaryTextRange));
   }
   Double gap=issue.gap();
   if (gap != null) {
     builder.setGap(gap);
   }
-  applyFlows(issue);
+  applyFlows(builder,locationBuilder,textRangeBuilder,issue);
   ScannerReport.Issue rawIssue=builder.build();
   if (filters.accept(inputComponent.key(),rawIssue)) {
     write(component,rawIssue);

@@ -2,20 +2,21 @@
   DefaultIssue issue=new DefaultIssue();
   init(issue);
   issue.setRuleKey(RuleKey.of(reportIssue.getRuleRepository(),reportIssue.getRuleKey()));
-  if (reportIssue.hasLine()) {
-    issue.setLine(reportIssue.getLine());
-    issue.setChecksum(lineHashSeq.getHashForLine(reportIssue.getLine()));
+  if (reportIssue.hasTextRange()) {
+    int startLine=reportIssue.getTextRange().getStartLine();
+    issue.setLine(startLine);
+    issue.setChecksum(lineHashSeq.getHashForLine(startLine));
   }
  else {
     issue.setChecksum("");
   }
-  if (reportIssue.hasMsg()) {
+  if (isNotEmpty(reportIssue.getMsg())) {
     issue.setMessage(reportIssue.getMsg());
   }
-  if (reportIssue.hasSeverity()) {
+  if (reportIssue.getSeverity() != Severity.UNSET_SEVERITY) {
     issue.setSeverity(reportIssue.getSeverity().name());
   }
-  if (reportIssue.hasGap()) {
+  if (reportIssue.getGap() != 0) {
     issue.setGap(reportIssue.getGap());
   }
   DbIssues.Locations.Builder dbLocationsBuilder=DbIssues.Locations.newBuilder();

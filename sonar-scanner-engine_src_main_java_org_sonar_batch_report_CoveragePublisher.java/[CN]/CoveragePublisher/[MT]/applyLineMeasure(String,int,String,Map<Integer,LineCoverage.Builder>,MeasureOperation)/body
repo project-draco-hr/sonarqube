@@ -1,0 +1,21 @@
+{
+  Measure measure=measureCache.byMetric(inputFileKey,metricKey);
+  if (measure != null) {
+    Map<Integer,String> lineMeasures=KeyValueFormat.parseIntString((String)measure.value());
+    for (    Map.Entry<Integer,String> lineMeasure : lineMeasures.entrySet()) {
+      int lineIdx=lineMeasure.getKey();
+      if (lineIdx <= lineCount) {
+        String value=lineMeasure.getValue();
+        if (StringUtils.isNotEmpty(value)) {
+          LineCoverage.Builder coverageBuilder=coveragePerLine.get(lineIdx);
+          if (coverageBuilder == null) {
+            coverageBuilder=LineCoverage.newBuilder();
+            coverageBuilder.setLine(lineIdx);
+            coveragePerLine.put(lineIdx,coverageBuilder);
+          }
+          op.apply(value,coverageBuilder);
+        }
+      }
+    }
+  }
+}
