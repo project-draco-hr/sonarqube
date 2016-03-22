@@ -8,7 +8,11 @@
     throw new UnauthorizedException("A functional error has happened");
   }
   String[] userInfos=userInfoProperty.split(",");
-  context.authenticate(UserIdentity.builder().setLogin(userInfos[0]).setProviderLogin(userInfos[1]).setName(userInfos[2]).setEmail(userInfos[3]).build());
+  UserIdentity.Builder builder=UserIdentity.builder().setLogin(userInfos[0]).setProviderLogin(userInfos[1]).setName(userInfos[2]).setEmail(userInfos[3]);
+  if (settings.getBoolean(ENABLED_GROUPS_SYNC)) {
+    builder.setGroups(newHashSet(settings.getStringArray(GROUPS)));
+  }
+  context.authenticate(builder.build());
   try {
     context.getResponse().sendRedirect("/");
   }
