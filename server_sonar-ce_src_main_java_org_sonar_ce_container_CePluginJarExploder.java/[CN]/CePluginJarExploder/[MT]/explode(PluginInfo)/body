@@ -1,0 +1,15 @@
+{
+  File tempDir=new File(fs.getTempDir(),TEMP_RELATIVE_PATH);
+  File toDir=new File(tempDir,pluginInfo.getKey());
+  try {
+    org.sonar.core.util.FileUtils.cleanDirectory(toDir);
+    File jarSource=pluginInfo.getNonNullJarFile();
+    File jarTarget=new File(toDir,jarSource.getName());
+    FileUtils.copyFile(jarSource,jarTarget);
+    ZipUtils.unzip(jarSource,toDir,newLibFilter());
+    return explodeFromUnzippedDir(pluginInfo.getKey(),jarTarget,toDir);
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException(String.format("Fail to unzip plugin [%s] %s to %s",pluginInfo.getKey(),pluginInfo.getNonNullJarFile().getAbsolutePath(),toDir.getAbsolutePath()),e);
+  }
+}
