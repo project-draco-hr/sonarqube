@@ -1,0 +1,9 @@
+{
+  ActiveRuleDto activeRule=createFor(profile1,rule1).setSeverity(BLOCKER);
+  underTest.insert(dbTester.getSession(),activeRule);
+  dbSession.commit();
+  assertThat(underTest.selectOrFailByKey(dbSession,activeRule.getKey())).isNotNull();
+  thrown.expect(RowNotFoundException.class);
+  thrown.expectMessage("Active rule with key 'qp2:xoo:x2' does not exist");
+  underTest.selectOrFailByKey(dbSession,ActiveRuleKey.of(profile2.getKey(),rule2.getKey()));
+}

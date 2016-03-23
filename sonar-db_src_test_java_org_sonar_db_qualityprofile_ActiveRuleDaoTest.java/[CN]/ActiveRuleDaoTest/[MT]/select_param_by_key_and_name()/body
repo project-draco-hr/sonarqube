@@ -1,0 +1,11 @@
+{
+  ActiveRuleDto activeRule=createFor(profile1,rule1).setSeverity(BLOCKER);
+  underTest.insert(dbTester.getSession(),activeRule);
+  ActiveRuleParamDto activeRuleParam1=ActiveRuleParamDto.createFor(rule1Param1).setValue("activeValue1");
+  underTest.insertParam(dbSession,activeRule,activeRuleParam1);
+  underTest.insertParam(dbSession,activeRule,ActiveRuleParamDto.createFor(rule1Param2));
+  dbSession.commit();
+  assertThat(underTest.selectParamByKeyAndName(activeRule.getKey(),activeRuleParam1.getKey(),dbSession)).isNotNull();
+  assertThat(underTest.selectParamByKeyAndName(activeRule.getKey(),"unknown",dbSession)).isNull();
+  assertThat(underTest.selectParamByKeyAndName(ActiveRuleKey.of(profile2.getKey(),rule1.getKey()),"unknown",dbSession)).isNull();
+}
