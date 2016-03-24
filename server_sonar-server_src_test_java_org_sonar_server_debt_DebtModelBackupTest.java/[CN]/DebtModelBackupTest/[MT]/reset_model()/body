@@ -1,5 +1,5 @@
 {
-  when(ruleDao.selectEnabledAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setRepositoryKey("squid").setRuleKey("NPE").setDefaultRemediationFunction(DebtRemediationFunction.Type.LINEAR.toString()).setDefaultRemediationGapMultiplier("2h").setRemediationFunction(DebtRemediationFunction.Type.LINEAR_OFFSET.toString()).setRemediationGapMultiplier("2h").setRemediationBaseEffort("15min")));
+  when(ruleDao.selectEnabled(session)).thenReturn(newArrayList(new RuleDto().setRepositoryKey("squid").setRuleKey("NPE").setDefaultRemediationFunction(DebtRemediationFunction.Type.LINEAR.toString()).setDefaultRemediationGapMultiplier("2h").setRemediationFunction(DebtRemediationFunction.Type.LINEAR_OFFSET.toString()).setRemediationGapMultiplier("2h").setRemediationBaseEffort("15min")));
   RulesDefinition.Context context=new RulesDefinition.Context();
   RulesDefinition.NewRepository repo=context.createRepository("squid","java").setName("Squid");
   RulesDefinition.NewRule newRule=repo.createRule("NPE").setName("Detect NPE").setHtmlDescription("Detect <code>java.lang.NullPointerException</code>").setSeverity(Severity.BLOCKER).setStatus(RuleStatus.BETA);
@@ -7,7 +7,7 @@
   repo.done();
   when(defLoader.load()).thenReturn(context);
   underTest.reset();
-  verify(ruleDao).selectEnabledAndNonManual(session);
+  verify(ruleDao).selectEnabled(session);
   verify(ruleDao).update(eq(session),ruleCaptor.capture());
   verifyNoMoreInteractions(ruleDao);
   verify(session).commit();

@@ -1,9 +1,9 @@
 {
   when(rulesXMLImporter.importXML(anyString(),any(ValidationMessages.class))).thenReturn(newArrayList(new RuleDebt().setRuleKey(RuleKey.of("squid","UselessImportCheck")).setFunction(DebtRemediationFunction.Type.LINEAR.name()).setCoefficient("2h")));
-  when(ruleDao.selectEnabledAndNonManual(session)).thenReturn(Collections.<RuleDto>emptyList());
+  when(ruleDao.selectEnabled(session)).thenReturn(Collections.<RuleDto>emptyList());
   assertThat(underTest.restoreFromXml("<xml/>").getWarnings()).hasSize(1);
   verifyZeroInteractions(ruleOperations);
-  verify(ruleDao).selectEnabledAndNonManual(session);
+  verify(ruleDao).selectEnabled(session);
   verify(session).commit();
   verify(ruleIndexer).index();
 }

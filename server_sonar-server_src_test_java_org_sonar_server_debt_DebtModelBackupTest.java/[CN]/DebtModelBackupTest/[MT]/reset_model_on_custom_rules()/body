@@ -1,5 +1,5 @@
 {
-  when(ruleDao.selectEnabledAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setId(5).setRepositoryKey("squid").setRuleKey("XPath").setRemediationFunction(DebtRemediationFunction.Type.LINEAR_OFFSET.toString()).setRemediationGapMultiplier("2h").setRemediationBaseEffort("15min"),new RuleDto().setId(6).setRepositoryKey("squid").setRuleKey("XPath_1369910135").setTemplateId(5).setRemediationFunction(DebtRemediationFunction.Type.LINEAR_OFFSET.toString()).setRemediationGapMultiplier("2h").setRemediationBaseEffort("15min")));
+  when(ruleDao.selectEnabled(session)).thenReturn(newArrayList(new RuleDto().setId(5).setRepositoryKey("squid").setRuleKey("XPath").setRemediationFunction(DebtRemediationFunction.Type.LINEAR_OFFSET.toString()).setRemediationGapMultiplier("2h").setRemediationBaseEffort("15min"),new RuleDto().setId(6).setRepositoryKey("squid").setRuleKey("XPath_1369910135").setTemplateId(5).setRemediationFunction(DebtRemediationFunction.Type.LINEAR_OFFSET.toString()).setRemediationGapMultiplier("2h").setRemediationBaseEffort("15min")));
   RulesDefinition.Context context=new RulesDefinition.Context();
   RulesDefinition.NewRepository repo=context.createRepository("squid","java").setName("XPath");
   RulesDefinition.NewRule newRule=repo.createRule("XPath").setName("XPath").setHtmlDescription("XPath").setSeverity(Severity.BLOCKER).setStatus(RuleStatus.BETA);
@@ -7,7 +7,7 @@
   repo.done();
   when(defLoader.load()).thenReturn(context);
   underTest.reset();
-  verify(ruleDao).selectEnabledAndNonManual(session);
+  verify(ruleDao).selectEnabled(session);
   verify(ruleDao,times(2)).update(eq(session),ruleCaptor.capture());
   verifyNoMoreInteractions(ruleDao);
   verify(session).commit();

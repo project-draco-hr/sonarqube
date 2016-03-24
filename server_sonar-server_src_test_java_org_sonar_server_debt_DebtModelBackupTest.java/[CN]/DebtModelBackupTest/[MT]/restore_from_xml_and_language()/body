@@ -1,9 +1,9 @@
 {
   when(rulesXMLImporter.importXML(anyString(),any(ValidationMessages.class))).thenReturn(newArrayList(new RuleDebt().setRuleKey(RuleKey.of("squid","UselessImportCheck")).setFunction(DebtRemediationFunction.Type.LINEAR.name()).setCoefficient("2h")));
-  when(ruleDao.selectEnabledAndNonManual(session)).thenReturn(newArrayList(new RuleDto().setId(1).setRepositoryKey("squid").setRuleKey("UselessImportCheck").setLanguage("java").setDefaultRemediationFunction(DebtRemediationFunction.Type.LINEAR.toString()).setDefaultRemediationGapMultiplier("2h"),new RuleDto().setId(2).setRepositoryKey("checkstyle").setLanguage("java2").setRemediationFunction(DebtRemediationFunction.Type.LINEAR.toString()).setRemediationGapMultiplier("2h")));
+  when(ruleDao.selectEnabled(session)).thenReturn(newArrayList(new RuleDto().setId(1).setRepositoryKey("squid").setRuleKey("UselessImportCheck").setLanguage("java").setDefaultRemediationFunction(DebtRemediationFunction.Type.LINEAR.toString()).setDefaultRemediationGapMultiplier("2h"),new RuleDto().setId(2).setRepositoryKey("checkstyle").setLanguage("java2").setRemediationFunction(DebtRemediationFunction.Type.LINEAR.toString()).setRemediationGapMultiplier("2h")));
   underTest.restoreFromXml("<xml/>","java");
   verify(ruleOperations).updateRule(ruleCaptor.capture(),eq("LINEAR"),eq("2h"),isNull(String.class),eq(session));
-  verify(ruleDao).selectEnabledAndNonManual(session);
+  verify(ruleDao).selectEnabled(session);
   verify(session).commit();
   verify(ruleIndexer).index();
 }
