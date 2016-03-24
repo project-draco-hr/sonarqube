@@ -1,20 +1,10 @@
 {
-  DefaultFileSystem fs=new DefaultFileSystem(temp.newFolder().toPath());
   DefaultInputFile inputFile=new DefaultInputFile("foo","src/Foo.xoo").setLanguage(Xoo.KEY).initMetadata(new FileMetadata().readMetadata(new StringReader("a\nb\nc\nd\ne\nf\ng\nh\ni\n")));
-  fs.add(inputFile);
-  SensorContext context=mock(SensorContext.class);
-  final SensorStorage sensorStorage=mock(SensorStorage.class);
-  when(context.settings()).thenReturn(new Settings());
-  when(context.fileSystem()).thenReturn(fs);
-  when(context.newIssue()).thenAnswer(new Answer<Issue>(){
-    @Override public Issue answer(    InvocationOnMock invocation) throws Throwable {
-      return new DefaultIssue(sensorStorage);
-    }
-  }
-);
+  SensorContextTester context=SensorContextTester.create(temp.newFolder());
+  context.fileSystem().add(inputFile);
   sensor.execute(context);
-  ArgumentCaptor<DefaultIssue> argCaptor=ArgumentCaptor.forClass(DefaultIssue.class);
-  verify(sensorStorage,times(10)).store(argCaptor.capture());
-  assertThat(argCaptor.getAllValues()).hasSize(10);
-  assertThat(argCaptor.getValue().overriddenSeverity()).isNull();
+  assertThat(context.allIssues()).hasSize(10);
+  for (  Issue issue : context.allIssues()) {
+    assertThat(issue.gap()).isNull();
+  }
 }
