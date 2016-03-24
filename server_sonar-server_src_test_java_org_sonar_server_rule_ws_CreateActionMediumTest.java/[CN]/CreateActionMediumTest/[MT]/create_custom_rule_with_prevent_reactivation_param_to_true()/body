@@ -1,0 +1,9 @@
+{
+  RuleDto templateRule=RuleTesting.newTemplateRule(RuleKey.of("java","S001"));
+  ruleDao.insert(session,templateRule);
+  RuleDto customRule=RuleTesting.newCustomRule(templateRule).setRuleKey("MY_CUSTOM").setStatus(RuleStatus.REMOVED).setName("My custom rule").setDescription("Description").setDescriptionFormat(RuleDto.Format.MARKDOWN).setSeverity(Severity.MAJOR);
+  tester.get(RuleDao.class).insert(session,customRule);
+  session.commit();
+  WsTester.TestRequest request=wsTester.newPostRequest("api/rules","create").setParam("custom_key","MY_CUSTOM").setParam("template_key",templateRule.getKey().toString()).setParam("name","My custom rule").setParam("markdown_description","Description").setParam("severity","MAJOR").setParam("prevent_reactivation","true");
+  request.execute().assertJson(getClass(),"create_rule_with_prevent_reactivation_param_to_true.json").assertStatus(409);
+}
