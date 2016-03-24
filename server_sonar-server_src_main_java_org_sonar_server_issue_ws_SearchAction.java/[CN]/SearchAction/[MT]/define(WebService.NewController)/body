@@ -1,10 +1,10 @@
 {
-  WebService.NewAction action=controller.createAction(SEARCH_ACTION).setHandler(this).setDescription("Search for issues. Requires Browse permission on project(s).<br/>" + "Since 5.5, response field 'debt' has been renamed to 'effort'").setSince("3.6").setResponseExample(Resources.getResource(this.getClass(),"example-search.json"));
+  WebService.NewAction action=controller.createAction(SEARCH_ACTION).setHandler(this).setDescription("Search for issues. Requires Browse permission on project(s).<br/>" + "Since 5.5, response field 'debt' has been renamed to 'effort'.<br/>" + "Since 5.5, response field 'actionPlan' has been removed").setSince("3.6").setResponseExample(Resources.getResource(this.getClass(),"example-search.json"));
   action.addPagingParams(100,MAX_LIMIT);
-  action.createParam(Param.FACETS).setDescription("Comma-separated list of the facets to be computed. No facet is computed by default.").setPossibleValues(IssueIndex.SUPPORTED_FACETS);
+  action.createParam(Param.FACETS).setDescription("Comma-separated list of the facets to be computed. No facet is computed by default.<br/>" + "Since 5.5, facet 'actionPlans' is deprecated.").setPossibleValues(IssueIndex.SUPPORTED_FACETS);
   action.createParam(FACET_MODE).setDefaultValue(FACET_MODE_COUNT).setDescription("Choose the returned value for facet items, either count of issues or sum of debt.<br/>" + "Since 5.5, 'debt' mode is deprecated and replaced by 'effort'").setPossibleValues(FACET_MODE_COUNT,FACET_MODE_EFFORT,DEPRECATED_FACET_MODE_DEBT);
   action.addSortParams(IssueQuery.SORTS,null,true);
-  action.createParam(ADDITIONAL_FIELDS).setSince("5.2").setDescription("Comma-separated list of the optional fields to be returned in response.").setPossibleValues(SearchAdditionalField.possibleValues());
+  action.createParam(ADDITIONAL_FIELDS).setSince("5.2").setDescription("Comma-separated list of the optional fields to be returned in response. Action plans are dropped in 5.5, it is not returned in the response.").setPossibleValues(SearchAdditionalField.possibleValues());
   addComponentRelatedParams(action);
   action.createParam(ISSUES).setDescription("Comma-separated list of issue keys").setExampleValue("5bccd6e8-f525-43a2-8d76-fcb13dde79ef");
   action.createParam(SEVERITIES).setDescription("Comma-separated list of severities").setExampleValue(Severity.BLOCKER + "," + Severity.CRITICAL).setPossibleValues(Severity.ALL);
@@ -14,8 +14,8 @@
   action.createParam(RULES).setDescription("Comma-separated list of coding rule keys. Format is <repository>:<rule>").setExampleValue("squid:AvoidCycles");
   action.createParam(TAGS).setDescription("Comma-separated list of tags.").setExampleValue("security,convention");
   action.createParam(TYPES).setDescription("Comma-separated list of types.").setSince("5.5").setPossibleValues(RuleType.values()).setExampleValue(format("%s,%s",RuleType.CODE_SMELL,RuleType.BUG));
-  action.createParam(ACTION_PLANS).setDescription("Comma-separated list of action plan keys (not names)").setExampleValue("3f19de90-1521-4482-a737-a311758ff513");
-  action.createParam(PLANNED).setDescription("To retrieve issues associated to an action plan or not").setBooleanPossibleValues();
+  action.createParam(DEPRECATED_ACTION_PLANS).setDescription("Action plans are dropped in 5.5. This parameter has no effect. Comma-separated list of action plan keys (not names)").setDeprecatedSince("5.5").setExampleValue("3f19de90-1521-4482-a737-a311758ff513");
+  action.createParam(PLANNED).setDescription("Since 5.5 this parameter is no more used, as action plan feature has been dropped").setDeprecatedSince("5.5").setBooleanPossibleValues();
   action.createParam(REPORTERS).setDescription("Comma-separated list of reporter logins").setExampleValue("admin");
   action.createParam(AUTHORS).setDescription("Comma-separated list of SCM accounts").setExampleValue("torvalds@linux-foundation.org");
   action.createParam(ASSIGNEES).setDescription("Comma-separated list of assignee logins. The value '__me__' can be used as a placeholder for user who performs the request").setExampleValue("admin,usera,__me__");
