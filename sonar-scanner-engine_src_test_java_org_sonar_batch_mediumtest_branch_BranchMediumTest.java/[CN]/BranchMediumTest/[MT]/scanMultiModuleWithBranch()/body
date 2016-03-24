@@ -1,0 +1,12 @@
+{
+  Path srcDir=baseDir.toPath().resolve("moduleA").resolve("src");
+  Files.createDirectories(srcDir);
+  File xooFile=new File(srcDir.toFile(),"sample.xoo");
+  FileUtils.write(xooFile,"Sample xoo\ncontent");
+  TaskResult result=tester.newTask().properties(ImmutableMap.<String,String>builder().putAll(commonProps).put("sonar.branch","branch").put("sonar.modules","moduleA").build()).start();
+  assertThat(result.inputFiles()).hasSize(1);
+  assertThat(result.inputFile("src/sample.xoo").key()).isEqualTo("com.foo.project:moduleA:branch:src/sample.xoo");
+  result=tester.newTask().properties(ImmutableMap.<String,String>builder().putAll(commonProps).put("sonar.branch","").put("sonar.modules","moduleA").build()).start();
+  assertThat(result.inputFiles()).hasSize(1);
+  assertThat(result.inputFile("src/sample.xoo").key()).isEqualTo("com.foo.project:moduleA:src/sample.xoo");
+}
