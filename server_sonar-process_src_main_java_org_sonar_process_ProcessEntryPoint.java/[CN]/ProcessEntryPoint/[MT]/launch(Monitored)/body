@@ -3,8 +3,9 @@
     throw new IllegalStateException("Already started");
   }
   monitored=mp;
+  Logger logger=LoggerFactory.getLogger(getClass());
   try {
-    LoggerFactory.getLogger(getClass()).info("Starting " + getKey());
+    logger.info("Starting " + getKey());
     Runtime.getRuntime().addShutdownHook(shutdownHook);
     stopWatcher.start();
     monitored.start();
@@ -13,14 +14,16 @@
       up=monitored.isUp();
       Thread.sleep(20L);
     }
-    commands.setJmxUrl(guessJmxUrl());
+    String jmxUrl=guessJmxUrl();
+    logger.debug("JMX URL is {}",jmxUrl);
+    commands.setJmxUrl(jmxUrl);
     commands.setUp();
     if (lifecycle.tryToMoveTo(Lifecycle.State.STARTED)) {
       monitored.awaitStop();
     }
   }
  catch (  Exception e) {
-    LoggerFactory.getLogger(getClass()).warn("Fail to start " + getKey(),e);
+    logger.warn("Fail to start " + getKey(),e);
   }
  finally {
     stop();
