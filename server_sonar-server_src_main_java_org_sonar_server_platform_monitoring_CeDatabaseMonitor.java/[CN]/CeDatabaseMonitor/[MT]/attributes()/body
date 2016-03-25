@@ -1,6 +1,9 @@
 {
   try (JmxConnection connection=jmxConnectionFactory.create(ProcessId.COMPUTE_ENGINE)){
-    LinkedHashMap<String,Object> result=new LinkedHashMap<>();
+    if (connection == null) {
+      return Optional.absent();
+    }
+    Map<String,Object> result=new LinkedHashMap<>(NUMBER_OF_ATTRIBUTES);
     CeDatabaseMBean mbean=connection.getMBean(CeDatabaseMBean.OBJECT_NAME,CeDatabaseMBean.class);
     result.put("Pool Initial Size",mbean.getPoolInitialSize());
     result.put("Pool Active Connections",mbean.getPoolActiveConnections());
@@ -11,6 +14,6 @@
     result.put("Pool Max Wait (ms)",mbean.getPoolMaxWaitMillis());
     result.put("Pool Remove Abandoned",mbean.getPoolRemoveAbandoned());
     result.put("Pool Remove Abandoned Timeout (sec)",mbean.getPoolRemoveAbandonedTimeoutSeconds());
-    return result;
+    return Optional.of(result);
   }
  }
