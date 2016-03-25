@@ -1,14 +1,13 @@
 {
   String profileName=request.getProfileName();
-  List<QProfile> profiles=new ArrayList<>();
-  DbSession dbSession=dbClient.openSession(false);
-  try {
-    for (    Language language : languages.all()) {
-      profiles.add(getDefaultProfile(dbSession,language.getKey(),profileName));
+  Set<String> languageKeys=getLanguageKeys();
+  try (DbSession dbSession=dbClient.openSession(false)){
+    Map<String,QProfile> qualityProfiles=new HashMap<>(languageKeys.size());
+    Set<String> missingLanguageKeys=lookupByProfileName(dbSession,qualityProfiles,languageKeys,profileName);
+    Set<String> noDefaultProfileLanguageKeys=lookupDefaults(dbSession,qualityProfiles,missingLanguageKeys);
+    if (!noDefaultProfileLanguageKeys.isEmpty()) {
+      throw new IllegalStateException(format("No quality profile can been found on language(s) '%s'",noDefaultProfileLanguageKeys));
     }
+    return qualityProfiles.values();
   }
-  finally {
-    dbClient.closeSession(dbSession);
-  }
-  return profiles;
-}
+ }

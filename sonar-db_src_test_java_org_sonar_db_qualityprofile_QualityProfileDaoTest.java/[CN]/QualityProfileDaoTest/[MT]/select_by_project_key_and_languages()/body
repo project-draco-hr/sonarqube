@@ -1,0 +1,8 @@
+{
+  dbTester.prepareDbUnit(getClass(),"projects.xml");
+  List<QualityProfileDto> dto=dao.selectByProjectAndLanguages(dbTester.getSession(),"org.codehaus.sonar:sonar",singletonList("java"));
+  assertThat(dto).extracting("id").containsOnly(1);
+  assertThat(dao.selectByProjectAndLanguages(dbTester.getSession(),"org.codehaus.sonar:sonar",singletonList("unkown"))).isEmpty();
+  assertThat(dao.selectByProjectAndLanguages(dbTester.getSession(),"org.codehaus.sonar:sonar",of("java","unkown"))).extracting("id").containsOnly(1);
+  assertThat(dao.selectByProjectAndLanguages(dbTester.getSession(),"unknown",singletonList("java"))).isEmpty();
+}

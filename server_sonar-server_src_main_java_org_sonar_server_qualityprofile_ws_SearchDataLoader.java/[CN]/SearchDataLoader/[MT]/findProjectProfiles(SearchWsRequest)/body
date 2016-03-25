@@ -1,17 +1,15 @@
 {
-  String moduleKey=request.getProjectKey();
+  String componentKey=request.getProjectKey();
   String profileName=request.getProfileName();
-  List<QProfile> profiles=new ArrayList<>();
-  DbSession dbSession=dbClient.openSession(false);
-  try {
-    for (    Language language : languages.all()) {
-      String languageKey=language.getKey();
-      ComponentDto project=getProject(moduleKey,dbSession);
-      profiles.add(getProfile(dbSession,languageKey,project.key(),profileName));
+  Set<String> languageKeys=getLanguageKeys();
+  try (DbSession dbSession=dbClient.openSession(false)){
+    Map<String,QProfile> qualityProfiles=new HashMap<>(languageKeys.size());
+    Set<String> unresolvedLanguages=lookupByProfileName(dbSession,qualityProfiles,languageKeys,profileName);
+    Set<String> stillUnresolvedLanguages=lookupByModuleKey(dbSession,qualityProfiles,unresolvedLanguages,componentKey);
+    Set<String> noDefaultProfileLanguages=lookupDefaults(dbSession,qualityProfiles,stillUnresolvedLanguages);
+    if (!noDefaultProfileLanguages.isEmpty()) {
+      throw new IllegalStateException(format("No quality profile can been found on language(s) '%s' for project '%s'",noDefaultProfileLanguages,componentKey));
     }
+    return qualityProfiles.values();
   }
-  finally {
-    dbClient.closeSession(dbSession);
-  }
-  return profiles;
-}
+ }
