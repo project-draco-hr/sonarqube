@@ -1,0 +1,16 @@
+{
+  Measure itsConditionsByLine=new Measure<>(CoreMetrics.IT_CONDITIONS_BY_LINE).setData("3=4");
+  when(measureCache.byMetric("foo:src/Foo.php",CoreMetrics.IT_CONDITIONS_BY_LINE_KEY)).thenReturn(itsConditionsByLine);
+  Measure itLineHits=new Measure<>(CoreMetrics.IT_COVERAGE_LINE_HITS_DATA).setData("2=0;3=0;5=1");
+  when(measureCache.byMetric("foo:src/Foo.php",CoreMetrics.IT_COVERAGE_LINE_HITS_DATA_KEY)).thenReturn(itLineHits);
+  Measure coveredConditionsByIts=new Measure<>(CoreMetrics.IT_COVERED_CONDITIONS_BY_LINE).setData("3=1");
+  when(measureCache.byMetric("foo:src/Foo.php",CoreMetrics.IT_COVERED_CONDITIONS_BY_LINE_KEY)).thenReturn(coveredConditionsByIts);
+  File outputDir=temp.newFolder();
+  ScannerReportWriter writer=new ScannerReportWriter(outputDir);
+  publisher.publish(writer);
+  try (CloseableIterator<LineCoverage> it=new ScannerReportReader(outputDir).readComponentCoverage(2)){
+    assertThat(it.next()).isEqualTo(LineCoverage.newBuilder().setLine(2).setItHits(false).build());
+    assertThat(it.next()).isEqualTo(LineCoverage.newBuilder().setLine(3).setItHits(false).setConditions(4).setItCoveredConditions(1).build());
+    assertThat(it.next()).isEqualTo(LineCoverage.newBuilder().setLine(5).setItHits(true).build());
+  }
+ }
