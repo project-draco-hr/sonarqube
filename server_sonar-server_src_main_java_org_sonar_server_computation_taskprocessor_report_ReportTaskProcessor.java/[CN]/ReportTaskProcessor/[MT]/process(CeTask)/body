@@ -1,16 +1,11 @@
 {
   ComputeEngineContainer ceContainer=containerFactory.create(serverContainer,task,componentProviders);
-  ThreadLocalSettings ceSettings=null;
   try {
-    ceSettings=ceContainer.getComponentByType(ThreadLocalSettings.class);
-    ceSettings.load();
     ceContainer.getComponentByType(ComputationStepExecutor.class).execute();
     return ceContainer.getComponentByType(TaskResultHolder.class).getResult();
   }
   finally {
-    if (ceSettings != null) {
-      ceSettings.remove();
-    }
+    ensureThreadLocalIsClean(ceContainer);
     ceContainer.cleanup();
   }
 }
