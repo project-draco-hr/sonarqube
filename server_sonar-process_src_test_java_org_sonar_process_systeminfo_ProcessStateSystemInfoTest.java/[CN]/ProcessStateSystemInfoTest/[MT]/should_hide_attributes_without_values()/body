@@ -1,0 +1,7 @@
+{
+  MemoryMXBean memoryBean=mock(MemoryMXBean.class,Mockito.RETURNS_DEEP_STUBS);
+  when(memoryBean.getHeapMemoryUsage().getCommitted()).thenReturn(-1L);
+  ProcessStateSystemInfo underTest=new ProcessStateSystemInfo(PROCESS_NAME);
+  ProtobufSystemInfo.Section section=underTest.toProtobuf(memoryBean);
+  assertThat(section.getAttributesList()).extracting("key").doesNotContain("Heap Committed (MB)");
+}

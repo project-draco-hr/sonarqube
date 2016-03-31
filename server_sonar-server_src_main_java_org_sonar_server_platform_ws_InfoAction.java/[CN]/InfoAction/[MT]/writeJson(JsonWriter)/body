@@ -1,15 +1,41 @@
 {
   json.beginObject();
   for (  Monitor monitor : monitors) {
-    Optional<Map<String,Object>> attributes=monitor.attributes();
-    if (attributes.isPresent()) {
-      json.name(monitor.name());
-      json.beginObject();
-      for (      Map.Entry<String,Object> attribute : attributes.get().entrySet()) {
-        json.name(attribute.getKey()).valueObject(attribute.getValue());
-      }
-      json.endObject();
+    Map<String,Object> attributes=monitor.attributes();
+    json.name(monitor.name());
+    json.beginObject();
+    for (    Map.Entry<String,Object> attribute : attributes.entrySet()) {
+      json.name(attribute.getKey()).valueObject(attribute.getValue());
     }
+    json.endObject();
   }
-  json.endObject();
+  Optional<ProtobufSystemInfo.SystemInfo> ceSysInfo=processSystemInfoClient.connect(ProcessId.COMPUTE_ENGINE);
+  if (ceSysInfo.isPresent()) {
+    for (    ProtobufSystemInfo.Section section : ceSysInfo.get().getSectionsList()) {
+      json.name(section.getName());
+      json.beginObject();
+      for (      ProtobufSystemInfo.Attribute attribute : section.getAttributesList()) {
+switch (attribute.getValueCase()) {
+case BOOLEAN_VALUE:
+          json.name(attribute.getKey()).valueObject(attribute.getBooleanValue());
+        break;
+case LONG_VALUE:
+      json.name(attribute.getKey()).valueObject(attribute.getLongValue());
+    break;
+case DOUBLE_VALUE:
+  json.name(attribute.getKey()).valueObject(attribute.getDoubleValue());
+break;
+case STRING_VALUE:
+json.name(attribute.getKey()).valueObject(attribute.getStringValue());
+break;
+case VALUE_NOT_SET:
+break;
+default :
+throw new IllegalArgumentException("Unsupported type: " + attribute.getValueCase());
+}
+}
+json.endObject();
+}
+}
+json.endObject();
 }
