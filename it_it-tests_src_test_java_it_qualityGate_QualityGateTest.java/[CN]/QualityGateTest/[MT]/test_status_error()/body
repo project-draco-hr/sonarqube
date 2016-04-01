@@ -3,8 +3,9 @@
   qgClient().setDefault(simple.id());
   qgClient().createCondition(NewCondition.create(simple.id()).metricKey("ncloc").operator("GT").errorThreshold("10"));
   try {
-    SonarRunner build=SonarRunner.create(projectDir("qualitygate/xoo-sample"));
-    orchestrator.executeBuild(build);
+    SonarScanner build=SonarScanner.create(projectDir("qualitygate/xoo-sample"));
+    BuildResult buildResult=orchestrator.executeBuild(build);
+    verifyQGStatusInPostTask(buildResult,TASK_STATUS_SUCCESS,QG_STATUS_ERROR);
     assertThat(fetchGateStatus().getData()).isEqualTo("ERROR");
   }
   finally {

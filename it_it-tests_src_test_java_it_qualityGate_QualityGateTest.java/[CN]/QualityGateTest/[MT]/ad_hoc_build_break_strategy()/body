@@ -4,8 +4,9 @@
   qgClient().createCondition(NewCondition.create(simple.id()).metricKey("ncloc").operator("GT").errorThreshold("7"));
   try {
     File projectDir=projectDir("qualitygate/xoo-sample");
-    SonarRunner build=SonarRunner.create(projectDir);
-    orchestrator.executeBuild(build);
+    SonarScanner build=SonarScanner.create(projectDir);
+    BuildResult buildResult=orchestrator.executeBuild(build);
+    verifyQGStatusInPostTask(buildResult,TASK_STATUS_SUCCESS,QG_STATUS_ERROR);
     String taskId=getTaskIdInLocalReport(projectDir);
     String analysisId=getAnalysisId(taskId);
     ProjectStatusWsResponse projectStatusWsResponse=wsClient.qualityGates().projectStatus(new ProjectStatusWsRequest().setAnalysisId(analysisId));
