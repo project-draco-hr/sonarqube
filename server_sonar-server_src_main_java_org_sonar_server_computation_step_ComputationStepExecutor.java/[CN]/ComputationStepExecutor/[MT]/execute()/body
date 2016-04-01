@@ -1,8 +1,13 @@
 {
   Profiler stepProfiler=Profiler.create(LOGGER);
-  for (  ComputationStep step : steps.instances()) {
-    stepProfiler.start();
-    step.execute();
-    stepProfiler.stopInfo(step.getDescription());
+  boolean allStepsExecuted=false;
+  try {
+    executeSteps(stepProfiler);
+    allStepsExecuted=true;
+  }
+  finally {
+    if (listener != null) {
+      listener.finished(allStepsExecuted);
+    }
   }
 }
