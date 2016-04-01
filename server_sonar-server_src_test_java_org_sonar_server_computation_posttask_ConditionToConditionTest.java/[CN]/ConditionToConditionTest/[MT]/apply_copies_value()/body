@@ -1,0 +1,9 @@
+{
+  Condition otherCondition=new Condition(newMetric(METRIC_KEY),Condition.Operator.NOT_EQUALS.getDbValue(),ERROR_THRESHOLD,WARN_THRESHOLD,null);
+  ConditionToCondition underTest=new ConditionToCondition(of(SOME_CONDITION,SOME_CONDITION_STATUS,otherCondition,ConditionStatus.NO_VALUE_STATUS));
+  assertThat(underTest.apply(SOME_CONDITION).getValue()).isEqualTo(SOME_VALUE);
+  QualityGate.Condition res=underTest.apply(otherCondition);
+  expectedException.expect(IllegalStateException.class);
+  expectedException.expectMessage("There is no value when status is NO_VALUE");
+  res.getValue();
+}

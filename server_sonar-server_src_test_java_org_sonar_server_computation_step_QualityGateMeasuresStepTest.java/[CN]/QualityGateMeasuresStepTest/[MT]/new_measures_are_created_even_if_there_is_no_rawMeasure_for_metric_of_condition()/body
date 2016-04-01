@@ -1,6 +1,6 @@
 {
   Condition equals2Condition=createEqualsCondition(INT_METRIC_1,"2",null);
-  qualityGateHolder.setQualityGate(new QualityGate("name",of(equals2Condition)));
+  qualityGateHolder.setQualityGate(new QualityGate(SOME_QG_ID,SOME_QG_NAME,of(equals2Condition)));
   when(measureRepository.getRawMeasure(PROJECT_COMPONENT,INT_METRIC_1)).thenReturn(Optional.<Measure>absent());
   underTest.execute();
   verify(measureRepository).getRawMeasure(PROJECT_COMPONENT,INT_METRIC_1);
@@ -9,4 +9,5 @@
   verifyNoMoreInteractions(measureRepository);
   assertThat(alertStatusMeasureCaptor.getValue()).hasQualityGateLevel(OK).hasQualityGateText("");
   assertThat(qgDetailsMeasureCaptor.getValue()).hasValue(new QualityGateDetailsData(OK,Collections.<EvaluatedCondition>emptyList()).toJson());
+  QualityGateStatusHolderAssertions.assertThat(qualityGateStatusHolder).hasStatus(QualityGateStatus.OK).hasConditionCount(1).hasCondition(equals2Condition,ConditionStatus.EvaluationStatus.NO_VALUE,null);
 }

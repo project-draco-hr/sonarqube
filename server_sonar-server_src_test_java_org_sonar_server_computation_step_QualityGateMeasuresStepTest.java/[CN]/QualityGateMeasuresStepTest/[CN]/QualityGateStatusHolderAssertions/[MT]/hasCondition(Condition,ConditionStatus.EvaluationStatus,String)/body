@@ -1,0 +1,17 @@
+{
+  for (  Map.Entry<Condition,ConditionStatus> entry : actual.getStatusPerConditions().entrySet()) {
+    if (entry.getKey() == condition) {
+      ConditionStatus.EvaluationStatus actualStatus=entry.getValue().getStatus();
+      if (actualStatus != evaluationStatus) {
+        failWithMessage("Expected Status of condition <%s> in QualityGateStatusHolder to be <%s> but it was <%s>",condition,evaluationStatus,actualStatus);
+      }
+      String actualValue=entry.getValue().getValue();
+      if (!Objects.equals(expectedValue,actualValue)) {
+        failWithMessage("Expected Value of condition <%s> in QualityGateStatusHolder to be <%s> but it was <%s>",condition,expectedValue,actualValue);
+      }
+      return this;
+    }
+  }
+  failWithMessage("Expected QualityGateStatusHolder to have an entry for <%s> but none was found",condition);
+  return this;
+}

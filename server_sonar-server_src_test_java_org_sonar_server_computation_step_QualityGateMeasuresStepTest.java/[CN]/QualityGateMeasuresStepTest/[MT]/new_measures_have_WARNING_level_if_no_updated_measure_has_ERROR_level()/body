@@ -3,7 +3,7 @@
   Condition equals2Condition=createEqualsCondition(INT_METRIC_1,"2",null);
   Condition equals1WarningCondition=createEqualsCondition(INT_METRIC_2,null,"1");
   Measure rawMeasure=Measure.newMeasureBuilder().create(rawValue,null);
-  qualityGateHolder.setQualityGate(new QualityGate("name",of(equals2Condition,equals1WarningCondition)));
+  qualityGateHolder.setQualityGate(new QualityGate(SOME_QG_ID,SOME_QG_NAME,of(equals2Condition,equals1WarningCondition)));
   when(measureRepository.getRawMeasure(PROJECT_COMPONENT,INT_METRIC_1)).thenReturn(Optional.of(rawMeasure));
   when(measureRepository.getRawMeasure(PROJECT_COMPONENT,INT_METRIC_2)).thenReturn(Optional.of(rawMeasure));
   underTest.execute();
@@ -20,4 +20,5 @@
   assertThat(equals1WarningConditionMeasureCaptor.getValue()).hasQualityGateLevel(WARN).hasQualityGateText(dumbResultTextAnswer(equals1WarningCondition,WARN,rawValue));
   assertThat(alertStatusMeasureCaptor.getValue()).hasQualityGateLevel(WARN).hasQualityGateText(dumbResultTextAnswer(equals2Condition,OK,rawValue) + ", " + dumbResultTextAnswer(equals1WarningCondition,WARN,rawValue));
   assertThat(qgDetailsMeasureCaptor.getValue()).hasValue(new QualityGateDetailsData(WARN,of(new EvaluatedCondition(equals2Condition,OK,rawValue),new EvaluatedCondition(equals1WarningCondition,WARN,rawValue))).toJson());
+  QualityGateStatusHolderAssertions.assertThat(qualityGateStatusHolder).hasStatus(QualityGateStatus.WARN).hasConditionCount(2).hasCondition(equals2Condition,ConditionStatus.EvaluationStatus.OK,String.valueOf(rawValue)).hasCondition(equals1WarningCondition,ConditionStatus.EvaluationStatus.WARN,String.valueOf(rawValue));
 }

@@ -1,0 +1,14 @@
+{
+  Map<Condition,EvaluatedCondition> evaluatedConditionPerCondition=from(evaluatedConditions).uniqueIndex(EvaluatedConditionToCondition.INSTANCE);
+  ImmutableMap.Builder<Condition,ConditionStatus> builder=ImmutableMap.builder();
+  for (  Condition condition : conditions) {
+    EvaluatedCondition evaluatedCondition=evaluatedConditionPerCondition.get(condition);
+    if (evaluatedCondition == null) {
+      builder.put(condition,NO_VALUE_STATUS);
+    }
+ else {
+      builder.put(condition,create(toEvaluationStatus(evaluatedCondition.getLevel()),evaluatedCondition.getActualValue()));
+    }
+  }
+  return builder.build();
+}
