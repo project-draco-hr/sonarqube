@@ -2,21 +2,12 @@
   Properties p=new Properties();
   p.setProperty("sonar.web.port","9000");
   p.setProperty("sonar.web.http.minThreads","2");
-  p.setProperty("sonar.web.https.port","9443");
-  p.setProperty("sonar.web.https.minThreads","5");
   Props props=new Props(p);
   TomcatConnectors.configure(tomcat,props);
   verify(tomcat.getService()).addConnector(argThat(new ArgumentMatcher<Connector>(){
     @Override public boolean matches(    Object o){
       Connector c=(Connector)o;
       return c.getPort() == 9000 && c.getProperty("minSpareThreads").equals(2);
-    }
-  }
-));
-  verify(tomcat.getService()).addConnector(argThat(new ArgumentMatcher<Connector>(){
-    @Override public boolean matches(    Object o){
-      Connector c=(Connector)o;
-      return c.getPort() == 9443 && c.getProperty("minSpareThreads").equals(5);
     }
   }
 ));
