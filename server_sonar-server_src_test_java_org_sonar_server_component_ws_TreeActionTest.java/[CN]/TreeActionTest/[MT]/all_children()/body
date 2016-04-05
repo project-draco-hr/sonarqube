@@ -11,8 +11,7 @@
   componentDb.insertComponentAndSnapshot(newFileDto(project,1),directorySnapshot);
   db.commit();
   componentDb.indexProjects();
-  InputStream responseStream=ws.newRequest().setMediaType(MediaTypes.PROTOBUF).setParam(PARAM_STRATEGY,"all").setParam(PARAM_BASE_COMPONENT_ID,"module-uuid-1").setParam(Param.PAGE,"2").setParam(Param.PAGE_SIZE,"3").setParam(Param.TEXT_QUERY,"file-name").setParam(Param.ASCENDING,"true").setParam(Param.SORT,"path").execute().getInputStream();
-  WsComponents.TreeWsResponse response=WsComponents.TreeWsResponse.parseFrom(responseStream);
+  TreeWsResponse response=call(ws.newRequest().setParam(PARAM_STRATEGY,"all").setParam(PARAM_BASE_COMPONENT_ID,"module-uuid-1").setParam(Param.PAGE,"2").setParam(Param.PAGE_SIZE,"3").setParam(Param.TEXT_QUERY,"file-name").setParam(Param.ASCENDING,"true").setParam(Param.SORT,"path"));
   assertThat(response.getComponentsCount()).isEqualTo(3);
   assertThat(response.getPaging().getTotal()).isEqualTo(9);
   assertThat(response.getComponentsList()).extracting("id").containsExactly("file-uuid-4","file-uuid-5","file-uuid-6");

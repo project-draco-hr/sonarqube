@@ -6,7 +6,6 @@
   componentDb.insertComponentAndSnapshot(newModuleDto("module-uuid-1",project),projectSnapshot);
   db.commit();
   componentDb.indexProjects();
-  InputStream responseStream=ws.newRequest().setMediaType(MediaTypes.PROTOBUF).setParam(PARAM_STRATEGY,"all").setParam(PARAM_QUALIFIERS,Qualifiers.FILE).setParam(PARAM_BASE_COMPONENT_ID,"project-uuid").execute().getInputStream();
-  WsComponents.TreeWsResponse response=WsComponents.TreeWsResponse.parseFrom(responseStream);
+  TreeWsResponse response=call(ws.newRequest().setParam(PARAM_STRATEGY,"all").setParam(PARAM_QUALIFIERS,Qualifiers.FILE).setParam(PARAM_BASE_COMPONENT_ID,"project-uuid"));
   assertThat(response.getComponentsList()).extracting("id").containsExactly("file-uuid-1","file-uuid-2");
 }
