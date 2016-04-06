@@ -1,0 +1,17 @@
+{
+  Response.Stream stream=response.stream();
+  if (stream instanceof ServletResponse.ServletStream) {
+    ((ServletResponse.ServletStream)stream).reset();
+  }
+  stream.setStatus(status);
+  stream.setMediaType(MediaTypes.JSON);
+  JsonWriter json=JsonWriter.of(new OutputStreamWriter(stream.output(),StandardCharsets.UTF_8));
+  try {
+    json.beginObject();
+    errors.writeJson(json,i18n,userSession.locale());
+    json.endObject();
+  }
+  finally {
+    json.close();
+  }
+}

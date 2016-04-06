@@ -1,0 +1,17 @@
+{
+  verify(connector).call(argThat(new TypeSafeMatcher<LocalConnector.LocalRequest>(){
+    @Override protected boolean matchesSafely(    LocalConnector.LocalRequest localRequest){
+      boolean ok=localRequest.getMethod().equals(expectedMethod) && localRequest.getPath().equals(expectedPath);
+      ok&=localRequest.getMediaType().equals(expectedMediaType);
+      for (      Map.Entry<String,String> expectedParam : expectedParams.entrySet()) {
+        String paramKey=expectedParam.getKey();
+        ok&=localRequest.hasParam(paramKey);
+        ok&=expectedParam.getValue().equals(localRequest.getParam(paramKey));
+      }
+      return ok;
+    }
+    @Override public void describeTo(    Description description){
+    }
+  }
+));
+}
