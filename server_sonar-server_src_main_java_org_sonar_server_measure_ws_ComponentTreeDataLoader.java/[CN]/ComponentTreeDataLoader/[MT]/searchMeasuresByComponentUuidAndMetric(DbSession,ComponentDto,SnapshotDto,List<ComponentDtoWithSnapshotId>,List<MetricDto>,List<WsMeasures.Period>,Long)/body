@@ -5,7 +5,7 @@
     componentsBySnapshotId.put(component.getSnapshotId(),component);
   }
   Map<Integer,MetricDto> metricsById=Maps.uniqueIndex(metrics,MetricDtoFunctions.toId());
-  List<MeasureDto> measureDtos=dbClient.measureDao().selectBySnapshotIdsAndMetricIds(dbSession,new ArrayList<>(componentsBySnapshotId.keySet()),new ArrayList<>(metricsById.keySet()));
+  List<MeasureDto> measureDtos=dbClient.measureDao().selectByDeveloperAndSnapshotIdsAndMetricIds(dbSession,developerId,new ArrayList<>(componentsBySnapshotId.keySet()),new ArrayList<>(metricsById.keySet()));
   Table<String,MetricDto,MeasureDto> measuresByComponentUuidAndMetric=HashBasedTable.create(components.size(),metrics.size());
   for (  MeasureDto measureDto : measureDtos) {
     measuresByComponentUuidAndMetric.put(componentsBySnapshotId.get(measureDto.getSnapshotId()).uuid(),metricsById.get(measureDto.getMetricId()),measureDto);
