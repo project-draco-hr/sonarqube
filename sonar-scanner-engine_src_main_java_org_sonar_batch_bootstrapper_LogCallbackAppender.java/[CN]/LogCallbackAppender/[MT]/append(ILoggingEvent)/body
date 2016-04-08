@@ -1,3 +1,11 @@
 {
-  target.log(event.getFormattedMessage(),translate(event.getLevel()));
+  if (event.getThrowableProxy() == null) {
+    target.log(event.getFormattedMessage(),translate(event.getLevel()));
+  }
+ else {
+    ExtendedThrowableProxyConverter throwableConverter=new ExtendedThrowableProxyConverter();
+    throwableConverter.start();
+    target.log(event.getFormattedMessage() + "\n" + throwableConverter.convert(event),translate(event.getLevel()));
+    throwableConverter.stop();
+  }
 }

@@ -1,0 +1,24 @@
+{
+  File srcDir=new File(baseDir,"src");
+  srcDir.mkdir();
+  File xooFile=new File(srcDir,"sample.xoo");
+  FileUtils.write(xooFile,"Sample xoo\ncontent");
+  File xooFileMeasure=new File(srcDir,"sample.xoo.measures");
+  FileUtils.write(xooFileMeasure,"foo:bar");
+  try {
+    tester.newTask().properties(builder.put("sonar.sources","src").build()).start();
+    fail("Expected exception");
+  }
+ catch (  Exception e) {
+    assertThat(e.getMessage()).contains("Error processing line 1");
+  }
+  tester.stop();
+  assertNoStdOutput();
+synchronized (logOutput) {
+    for (    LogEvent e : logOutput) {
+      if (e.level == Level.ERROR) {
+        assertThat(e.msg).contains("Error processing line 1 of file","src/sample.xoo.measures","java.lang.IllegalStateException: Unknow metric with key: foo","at org.sonar.xoo.lang.MeasureSensor.saveMeasure");
+      }
+    }
+  }
+}
