@@ -1,0 +1,32 @@
+{
+  String charset;
+  String dataType;
+  boolean isNullable;
+  int length;
+  PreparedStatement stmt=null;
+  ResultSet rs=null;
+  try {
+    stmt=connection.prepareStatement("SELECT character_set_name, data_type, is_nullable, character_maximum_length " + "FROM INFORMATION_SCHEMA.columns " + "WHERE table_schema=database() and table_name=? and column_name=?");
+    stmt.setString(1,table);
+    stmt.setString(2,column);
+    rs=stmt.executeQuery();
+    rs.next();
+    charset=rs.getString(1);
+    dataType=rs.getString(2);
+    isNullable=rs.getBoolean(3);
+    length=rs.getInt(4);
+  }
+  finally {
+    closeQuietly(stmt);
+    closeQuietly(rs);
+  }
+  try {
+    String nullability=isNullable ? "NULL" : "NOT NULL";
+    String alter=format("ALTER TABLE %s MODIFY %s %s(%d) CHARACTER SET '%s' COLLATE '%s' %s",table,column,dataType,length,charset,csCollation,nullability);
+    stmt=connection.prepareStatement(alter);
+    stmt.executeUpdate();
+  }
+  finally {
+    closeQuietly(stmt);
+  }
+}

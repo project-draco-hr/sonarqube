@@ -1,0 +1,14 @@
+{
+  DbSession session=dbTester.getSession();
+  dbTester.getDbClient().userDao().insert(session,new UserDto().setLogin("him").setName("Him"));
+  dbTester.getDbClient().userDao().insert(session,new UserDto().setLogin("her").setName("Her"));
+  session.commit();
+  try (Connection connection=dbTester.openConnection()){
+    List<String[]> rows=underTest.executeQuery(connection,"select login, name from users order by login",2);
+    assertThat(rows).hasSize(2);
+    assertThat(rows.get(0)[0]).isEqualTo("her");
+    assertThat(rows.get(0)[1]).isEqualTo("Her");
+    assertThat(rows.get(1)[0]).isEqualTo("him");
+    assertThat(rows.get(1)[1]).isEqualTo("Him");
+  }
+ }

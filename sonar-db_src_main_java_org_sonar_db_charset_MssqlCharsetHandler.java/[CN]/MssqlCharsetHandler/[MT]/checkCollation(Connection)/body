@@ -1,0 +1,12 @@
+{
+  List<String[]> rows=select(connection,"SELECT table_name, column_name, collation_name???" + "FROM [INFORMATION_SCHEMA].[COLUMNS] " + "WHERE collation_name is not null "+ "ORDER BY table_name,column_name",3);
+  List<String> errors=new ArrayList<>();
+  for (  String[] row : rows) {
+    if (!endsWithIgnoreCase(row[2],"_CS_AS")) {
+      errors.add(row[0] + "." + row[1]);
+    }
+  }
+  if (!errors.isEmpty()) {
+    throw MessageException.of(format("Case-sensitive and accent-sensitive collation (CS_AS) is required for database columns [%s]",Joiner.on(", ").join(errors)));
+  }
+}

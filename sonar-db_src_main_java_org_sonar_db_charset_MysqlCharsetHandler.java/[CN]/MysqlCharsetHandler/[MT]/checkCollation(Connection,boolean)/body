@@ -1,0 +1,19 @@
+{
+  List<String[]> rows=select(connection,"SELECT table_name, column_name, character_set_name, collation_name " + "FROM INFORMATION_SCHEMA.columns " + "WHERE table_schema=database() and character_set_name is not null and collation_name is not null",4);
+  List<String> utf8Errors=new ArrayList<>();
+  for (  String[] row : rows) {
+    String table=row[0];
+    String column=row[1];
+    String charset=row[2];
+    String collation=row[3];
+    if (enforceUtf8 && !containsIgnoreCase(charset,UTF8)) {
+      utf8Errors.add(format("%s.%s",table,column));
+    }
+ else     if (endsWithIgnoreCase(collation,"_ci")) {
+      repairCaseInsensitiveColumn(connection,table,column,collation);
+    }
+  }
+  if (!utf8Errors.isEmpty()) {
+    throw MessageException.of(format("UTF8 case-sensitive collation is required for database columns [%s]",Joiner.on(", ").join(utf8Errors)));
+  }
+}

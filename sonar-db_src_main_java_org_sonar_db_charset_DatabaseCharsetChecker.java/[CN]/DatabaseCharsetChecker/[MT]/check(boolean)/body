@@ -1,0 +1,27 @@
+{
+  try {
+    try (Connection connection=db.getDataSource().getConnection()){
+switch (db.getDialect().getId()) {
+case H2.ID:
+        break;
+case Oracle.ID:
+      new OracleCharsetHandler(selectExecutor).handle(connection,enforceUtf8);
+    break;
+case PostgreSql.ID:
+  new PostgresCharsetHandler(selectExecutor).handle(connection,enforceUtf8);
+break;
+case MySql.ID:
+new MysqlCharsetHandler(selectExecutor).handle(connection,enforceUtf8);
+break;
+case MsSql.ID:
+new MssqlCharsetHandler(selectExecutor).handle(connection,enforceUtf8);
+break;
+default :
+throw new IllegalArgumentException("Database not supported: " + db.getDialect().getId());
+}
+}
+ }
+ catch (SQLException e) {
+throw new IllegalStateException(e);
+}
+}
