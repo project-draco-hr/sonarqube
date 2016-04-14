@@ -1,0 +1,17 @@
+{
+  PreparedStatement stmt=null;
+  ResultSet rs=null;
+  try {
+    stmt=connection.prepareStatement(sql);
+    rs=stmt.executeQuery();
+    List<T> result=new ArrayList<>();
+    while (rs.next()) {
+      result.add(rowConverter.convert(rs));
+    }
+    return result;
+  }
+  finally {
+    DatabaseUtils.closeQuietly(rs);
+    DatabaseUtils.closeQuietly(stmt);
+  }
+}
