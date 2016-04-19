@@ -3,11 +3,11 @@
   try {
     Optional<CeQueueDto> queueDto=dbClient.ceQueueDao().selectByUuid(dbSession,taskUuid);
     if (queueDto.isPresent()) {
-      return LogFileRef.from(queueDto.get());
+      return new LogFileRefComponentUuidTuple(LogFileRef.from(queueDto.get()),queueDto.get().getComponentUuid());
     }
     Optional<CeActivityDto> activityDto=dbClient.ceActivityDao().selectByUuid(dbSession,taskUuid);
     if (activityDto.isPresent()) {
-      return LogFileRef.from(activityDto.get());
+      return new LogFileRefComponentUuidTuple(LogFileRef.from(activityDto.get()),activityDto.get().getComponentUuid());
     }
     throw new NotFoundException(format("Task %s not found",taskUuid));
   }
