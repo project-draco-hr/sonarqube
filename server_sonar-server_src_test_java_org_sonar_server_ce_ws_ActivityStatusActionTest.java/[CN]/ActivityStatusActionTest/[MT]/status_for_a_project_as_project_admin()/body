@@ -1,0 +1,20 @@
+{
+  String projectUuid="project-uuid";
+  String anotherProjectUuid="another-project-uuid";
+  userSession.login().addProjectUuidPermissions(UserRole.ADMIN,projectUuid);
+  componentDb.insertComponent(newProjectDto(projectUuid));
+  componentDb.insertComponent(newProjectDto(anotherProjectUuid));
+  insertInQueue(CeQueueDto.Status.PENDING,projectUuid);
+  insertInQueue(CeQueueDto.Status.PENDING,projectUuid);
+  insertInQueue(CeQueueDto.Status.IN_PROGRESS,projectUuid);
+  insertInQueue(CeQueueDto.Status.PENDING,anotherProjectUuid);
+  insertInQueue(CeQueueDto.Status.PENDING,null);
+  insertActivity(CeActivityDto.Status.SUCCESS,projectUuid);
+  insertActivity(CeActivityDto.Status.CANCELED,projectUuid);
+  insertActivity(CeActivityDto.Status.FAILED,projectUuid);
+  insertActivity(CeActivityDto.Status.FAILED,projectUuid);
+  insertActivity(CeActivityDto.Status.FAILED,anotherProjectUuid);
+  WsCe.ActivityStatusWsResponse result=call(projectUuid);
+  assertThat(result.getPending()).isEqualTo(2);
+  assertThat(result.getFailing()).isEqualTo(1);
+}

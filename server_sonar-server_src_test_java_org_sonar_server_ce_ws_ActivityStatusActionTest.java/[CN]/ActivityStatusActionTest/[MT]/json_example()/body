@@ -1,0 +1,10 @@
+{
+  dbClient.ceQueueDao().insert(dbSession,newCeQueueDto("ce-queue-uuid-1").setStatus(CeQueueDto.Status.PENDING));
+  dbClient.ceQueueDao().insert(dbSession,newCeQueueDto("ce-queue-uuid-2").setStatus(CeQueueDto.Status.PENDING));
+  for (int i=0; i < 5; i++) {
+    dbClient.ceActivityDao().insert(dbSession,new CeActivityDto(newCeQueueDto("ce-activity-uuid-" + i)).setStatus(CeActivityDto.Status.FAILED));
+  }
+  db.commit();
+  String result=ws.newRequest().execute().getInput();
+  assertJson(result).isSimilarTo(getClass().getResource("activity_status-example.json"));
+}
