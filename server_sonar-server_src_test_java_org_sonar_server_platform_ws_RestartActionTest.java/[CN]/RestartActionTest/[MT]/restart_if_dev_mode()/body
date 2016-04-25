@@ -3,5 +3,8 @@
   SystemWs ws=new SystemWs(sut);
   WsTester tester=new WsTester(ws);
   tester.newPostRequest("api/system","restart").execute();
-  verify(platform).restart();
+  InOrder inOrder=Mockito.inOrder(platform,restartFlagHolder);
+  inOrder.verify(restartFlagHolder).set();
+  inOrder.verify(platform).restart();
+  inOrder.verify(restartFlagHolder).unset();
 }
