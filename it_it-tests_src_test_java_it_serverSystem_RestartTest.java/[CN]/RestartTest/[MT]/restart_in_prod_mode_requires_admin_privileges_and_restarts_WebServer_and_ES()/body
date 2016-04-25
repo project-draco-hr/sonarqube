@@ -10,6 +10,8 @@
       assertThat(e.getMessage()).contains("403");
     }
     newAdminWsClient(orchestrator).system().restart();
+    WsResponse wsResponse=newAdminWsClient(orchestrator).wsConnector().call(new GetRequest("/api/system/status")).failIfNotSuccessful();
+    assertThat(wsResponse.content()).contains("RESTARTING");
     Thread.sleep(5000);
     assertThat(FileUtils.readFileToString(orchestrator.getServer().getLogs())).contains("SonarQube restart requested by admin");
   }
