@@ -1,12 +1,19 @@
 {
   if (settings.getBoolean("sonar.web.dev")) {
     LOGGER.info("Fast restarting WebServer...");
-    platform.restart();
-    LOGGER.info("WebServer restarted");
+    restartFlagHolder.set();
+    try {
+      platform.restart();
+      LOGGER.info("WebServer restarted");
+    }
+  finally {
+      restartFlagHolder.unset();
+    }
   }
  else {
     userSession.checkPermission(UserRole.ADMIN);
     LOGGER.info("SonarQube restart requested by {}",userSession.getLogin());
+    restartFlagHolder.set();
     processCommandWrapper.requestSQRestart();
   }
   response.noContent();

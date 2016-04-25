@@ -1,0 +1,18 @@
+{
+  settings.setProperty("sonar.web.dev",true);
+  RuntimeException toBeThrown=new RuntimeException("simulating platform.restart() failed");
+  doThrow(toBeThrown).when(platform).restart();
+  SystemWs ws=new SystemWs(sut);
+  WsTester tester=new WsTester(ws);
+  try {
+    tester.newPostRequest("api/system","restart").execute();
+  }
+ catch (  RuntimeException e) {
+    assertThat(e).isSameAs(toBeThrown);
+  }
+ finally {
+    inOrder.verify(restartFlagHolder).set();
+    inOrder.verify(platform).restart();
+    inOrder.verify(restartFlagHolder).unset();
+  }
+}
