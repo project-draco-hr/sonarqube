@@ -1,0 +1,13 @@
+{
+  dbTester.executeInsert(USERS_DB_TABLE,ImmutableMap.of(LOGIN_DB_COLUMN,"login1",NAME_DB_COLUMN,"name one"));
+  dbTester.executeInsert(USERS_DB_TABLE,ImmutableMap.of(LOGIN_DB_COLUMN,"login2",NAME_DB_COLUMN,"name two"));
+  dbTester.commit();
+  try (Connection connection=dbTester.openConnection()){
+    List<String[]> users=underTest.executeSelect(connection,"select " + LOGIN_DB_COLUMN + ", "+ NAME_DB_COLUMN+ " from users order by id",new SqlExecutor.StringsConverter(2));
+    assertThat(users).hasSize(2);
+    assertThat(users.get(0)[0]).isEqualTo("login1");
+    assertThat(users.get(0)[1]).isEqualTo("name one");
+    assertThat(users.get(1)[0]).isEqualTo("login2");
+    assertThat(users.get(1)[1]).isEqualTo("name two");
+  }
+ }

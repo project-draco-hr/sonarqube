@@ -1,0 +1,8 @@
+{
+  List<ColumnDef> columns=select(connection,ColumnDef.SELECT_COLUMNS + "FROM [INFORMATION_SCHEMA].[COLUMNS] " + "WHERE collation_name is not null "+ "ORDER BY table_name,column_name",ColumnDef.ColumnDefRowConverter.INSTANCE);
+  for (  ColumnDef column : columns) {
+    if (!endsWithIgnoreCase(column.getCollation(),"_CS_AS")) {
+      repairColumnCollation(connection,column);
+    }
+  }
+}
