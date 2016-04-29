@@ -1,0 +1,12 @@
+{
+  UserDto user=newActiveUser();
+  insertProperty("sonar.issues.defaultAssigneeLogin",user.getLogin(),10L);
+  insertProperty("sonar.issues.defaultAssigneeLogin",user.getLogin(),11L);
+  insertProperty("sonar.issues.defaultAssigneeLogin",user.getLogin(),12L);
+  UserDto otherUser=newActiveUser();
+  insertProperty("sonar.issues.defaultAssigneeLogin",otherUser.getLogin(),13L);
+  session.commit();
+  boolean deactivated=underTest.deactivateUserByLogin(session,user.getLogin());
+  assertThat(deactivated).isTrue();
+  assertThat(dbClient.propertiesDao().selectByQuery(PropertyQuery.builder().setKey("sonar.issues.defaultAssigneeLogin").build(),session)).hasSize(1);
+}
