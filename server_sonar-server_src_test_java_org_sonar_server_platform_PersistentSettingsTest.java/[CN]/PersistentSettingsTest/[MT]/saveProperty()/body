@@ -1,12 +1,6 @@
 {
-  PersistentSettings persistentSettings=new PersistentSettings(dao,settings);
+  PersistentSettings persistentSettings=new PersistentSettings(dbClient,settings);
   persistentSettings.saveProperty("foo","bar");
   assertThat(settings.getString("foo")).isEqualTo("bar");
-  verify(dao).insertProperty(argThat(new ArgumentMatcher<PropertyDto>(){
-    @Override public boolean matches(    Object o){
-      PropertyDto dto=(PropertyDto)o;
-      return dto.getKey().equals("foo");
-    }
-  }
-));
+  verifyGlobalPropertyExists("foo","bar");
 }

@@ -1,5 +1,11 @@
 {
-  serverSettings.setProperty(key,value);
-  propertiesDao.insertProperty(new PropertyDto().setKey(key).setValue(value));
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    saveProperty(dbSession,key,value);
+    dbSession.commit();
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
   return this;
 }

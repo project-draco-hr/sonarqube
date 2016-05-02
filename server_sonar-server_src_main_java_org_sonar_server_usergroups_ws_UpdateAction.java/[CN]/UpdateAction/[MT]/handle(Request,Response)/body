@@ -5,14 +5,16 @@
   String description=request.param(PARAM_DESCRIPTION);
   DbSession dbSession=dbClient.openSession(false);
   try {
-    groupUpdater.checkNameIsUnique(name,dbSession);
     GroupDto group=dbClient.groupDao().selectById(dbSession,groupId);
     if (group == null) {
       throw new NotFoundException(String.format("Could not find a user group with id '%s'.",groupId));
     }
+    String oldName=group.getName();
     if (name != null) {
+      groupUpdater.checkNameIsUnique(name,dbSession);
       groupUpdater.validateName(name);
       group.setName(name);
+      updateDefaultGroupIfNeeded(dbSession,oldName,name);
     }
     if (description != null) {
       groupUpdater.validateDescription(description);
@@ -21,7 +23,7 @@
     dbClient.groupDao().update(dbSession,group);
     dbSession.commit();
     JsonWriter json=response.newJsonWriter().beginObject();
-    groupUpdater.writeGroup(json,group,dbClient.groupMembershipDao().countUsersByGroups(dbSession,Arrays.asList(groupId)).get(group.getName()));
+    groupUpdater.writeGroup(json,group,dbClient.groupMembershipDao().countUsersByGroups(dbSession,singletonList(groupId)).get(group.getName()));
     json.endObject().close();
   }
   finally {

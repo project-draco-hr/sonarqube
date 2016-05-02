@@ -1,8 +1,10 @@
 {
+  newGlobalProperty("in_db1","foo");
+  newGlobalProperty("in_db2","bar");
   settings.setProperty("foo","bar");
   assertThat(settings.hasKey("foo")).isTrue();
-  PersistentSettings persistentSettings=new PersistentSettings(dao,settings);
+  PersistentSettings persistentSettings=new PersistentSettings(dbClient,settings);
   persistentSettings.deleteProperties();
   assertThat(settings.getProperties()).isEmpty();
-  verify(dao).deleteGlobalProperties();
+  assertThat(dao.selectGlobalProperties()).isEmpty();
 }
