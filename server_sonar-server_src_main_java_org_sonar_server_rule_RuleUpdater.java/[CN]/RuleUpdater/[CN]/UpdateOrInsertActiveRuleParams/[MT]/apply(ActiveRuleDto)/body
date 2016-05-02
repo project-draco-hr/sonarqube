@@ -1,0 +1,11 @@
+{
+  Map<String,ActiveRuleParamDto> activeRuleParamByKey=from(activeRuleParams.get(activeRuleDto)).uniqueIndex(ActiveRuleDtoParamToKey.INSTANCE);
+  ActiveRuleParamDto activeRuleParamDto=activeRuleParamByKey.get(ruleParamDto.getName());
+  if (activeRuleParamDto != null) {
+    dbClient.activeRuleDao().updateParam(dbSession,activeRuleDto,activeRuleParamDto.setValue(ruleParamDto.getDefaultValue()));
+  }
+ else {
+    dbClient.activeRuleDao().insertParam(dbSession,activeRuleDto,ActiveRuleParamDto.createFor(ruleParamDto).setValue(ruleParamDto.getDefaultValue()));
+  }
+  return true;
+}

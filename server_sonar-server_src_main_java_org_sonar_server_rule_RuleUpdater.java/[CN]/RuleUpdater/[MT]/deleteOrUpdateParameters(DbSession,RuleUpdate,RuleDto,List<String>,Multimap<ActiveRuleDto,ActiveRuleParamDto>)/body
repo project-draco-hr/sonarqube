@@ -1,0 +1,15 @@
+{
+  for (  RuleParamDto ruleParamDto : dbClient.ruleDao().selectRuleParamsByRuleKey(dbSession,update.getRuleKey())) {
+    String key=ruleParamDto.getName();
+    String value=Strings.emptyToNull(update.parameter(key));
+    ruleParamDto.setDefaultValue(value);
+    dbClient.ruleDao().updateRuleParam(dbSession,customRule,ruleParamDto);
+    if (value != null) {
+      updateOrInsertActiveRuleParams(dbSession,ruleParamDto,activeRuleParamsByActiveRule);
+    }
+ else {
+      deleteActiveRuleParams(dbSession,key,activeRuleParamsByActiveRule.values());
+    }
+    paramKeys.add(key);
+  }
+}

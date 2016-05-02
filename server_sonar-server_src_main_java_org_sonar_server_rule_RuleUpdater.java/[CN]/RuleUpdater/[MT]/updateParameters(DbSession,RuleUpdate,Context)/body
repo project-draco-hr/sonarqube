@@ -8,14 +8,7 @@
       throw new IllegalStateException(String.format("Template %s of rule %s does not exist",customRule.getTemplateId(),customRule.getKey()));
     }
     List<String> paramKeys=newArrayList();
-    Multimap<RuleDto,ActiveRuleDto> activeRules=ArrayListMultimap.create();
-    Multimap<ActiveRuleDto,ActiveRuleParamDto> activeRuleParams=ArrayListMultimap.create();
-    for (    ActiveRuleDto activeRuleDto : dbClient.activeRuleDao().selectByRule(dbSession,customRule)) {
-      activeRules.put(customRule,activeRuleDto);
-      for (      ActiveRuleParamDto activeRuleParamDto : dbClient.activeRuleDao().selectParamsByActiveRuleId(dbSession,activeRuleDto.getId())) {
-        activeRuleParams.put(activeRuleDto,activeRuleParamDto);
-      }
-    }
-    deleteOrUpdateParameters(dbSession,update,customRule,paramKeys,activeRules,activeRuleParams);
+    Multimap<ActiveRuleDto,ActiveRuleParamDto> activeRuleParamsByActiveRule=getActiveRuleParamsByActiveRule(dbSession,customRule);
+    deleteOrUpdateParameters(dbSession,update,customRule,paramKeys,activeRuleParamsByActiveRule);
   }
 }
