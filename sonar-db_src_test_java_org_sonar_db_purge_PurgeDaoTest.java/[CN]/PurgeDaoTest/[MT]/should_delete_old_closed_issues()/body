@@ -1,5 +1,7 @@
 {
+  PurgeListener purgeListener=mock(PurgeListener.class);
   dbTester.prepareDbUnit(getClass(),"should_delete_old_closed_issues.xml");
-  underTest.purge(newConfigurationWith30Days(),PurgeListener.EMPTY,new PurgeProfiler());
+  underTest.purge(newConfigurationWith30Days(),purgeListener,new PurgeProfiler());
   dbTester.assertDbUnit(getClass(),"should_delete_old_closed_issues-result.xml","issues","issue_changes");
+  verify(purgeListener).onIssuesRemoval(asList("ISSUE-1","ISSUE-2"));
 }

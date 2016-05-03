@@ -1,0 +1,15 @@
+{
+  int numberOfIssues=1010;
+  List<String> keys=new ArrayList<>(numberOfIssues);
+  List<IssueDoc> issueDocs=new ArrayList<>(numberOfIssues);
+  for (int i=0; i < numberOfIssues; i++) {
+    String key="Issue" + i;
+    issueDocs.add(newDoc().setKey(key));
+    keys.add(key);
+  }
+  esTester.putDocuments(IssueIndexDefinition.INDEX,IssueIndexDefinition.TYPE_ISSUE,issueDocs.toArray(new IssueDoc[]{}));
+  IssueIndexer indexer=createIndexer();
+  assertThat(esTester.countDocuments("issues","issue")).isEqualTo(numberOfIssues);
+  indexer.deleteByKeys(keys);
+  assertThat(esTester.countDocuments("issues","issue")).isZero();
+}

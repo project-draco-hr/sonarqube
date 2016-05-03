@@ -1,18 +1,18 @@
 {
   projectAnalysisRule.setServerProperty("sonar.dbcleaner.daysBeforeDeletingClosedIssues","5000");
   xooSampleAnalysis.withProperties("sonar.dynamicAnalysis","false","sonar.projectDate","2014-10-01").run();
-  List<Issue> issuesList=searchIssues();
-  for (  Issue issue : issuesList) {
+  List<Issue> issueList=searchIssues();
+  for (  Issue issue : issueList) {
     assertThat(issue.resolution()).isNull();
   }
   xooSampleAnalysis.withXooEmptyProfile().withProperties("sonar.dynamicAnalysis","false","sonar.projectDate","2014-10-15").run();
-  issuesList=searchIssues();
-  assertThat(issuesList).isNotEmpty();
-  for (  Issue issue : issuesList) {
+  issueList=searchIssues();
+  assertThat(issueList).isNotEmpty();
+  for (  Issue issue : issueList) {
     assertThat(issue.resolution()).isNotNull();
     assertThat(issue.status()).isEqualTo("CLOSED");
   }
-  projectAnalysisRule.setServerProperty("sonar.dbcleaner.daysBeforeDeletingClosedIssues","1");
+  projectAnalysisRule.setServerProperty("sonar.dbcleaner.daysBeforeDeletingClosedIssues","0");
   xooSampleAnalysis.withXooEmptyProfile().withProperties("sonar.dynamicAnalysis","false","sonar.projectDate","2014-10-20").run();
   Issues issues=issueClient().find(IssueQuery.create());
   assertThat(issues.list()).isEmpty();

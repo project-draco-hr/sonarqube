@@ -1,0 +1,18 @@
+{
+  if (issueKeys.isEmpty()) {
+    return;
+  }
+  int count=0;
+  BulkRequestBuilder builder=esClient.prepareBulk();
+  for (  String issueKey : issueKeys) {
+    builder.add(esClient.prepareDelete(INDEX,TYPE_ISSUE,issueKey));
+    count++;
+    if (count >= MAX_BATCH_SIZE) {
+      builder.get();
+      builder=esClient.prepareBulk();
+      count=0;
+    }
+  }
+  builder.get();
+  esClient.prepareRefresh(INDEX).get();
+}
