@@ -1,9 +1,8 @@
 {
   userSession.login("john").setGlobalPermissions(PROVISIONING);
-  ComponentDto project=newProjectDto("project-uuid");
-  dbClient.componentDao().insert(dbSession,project);
+  ComponentDto project=componentDb.insertComponent(newProjectDto("project-uuid"));
   SnapshotDto snapshot=dbClient.snapshotDao().insert(dbSession,newSnapshotForProject(project));
   dbSession.commit();
   expectedException.expect(ForbiddenException.class);
-  newRequest(snapshot.getId().toString());
+  call(snapshot.getId().toString());
 }
