@@ -1,6 +1,7 @@
 {
   String testId=request.mandatoryParam(TEST_ID);
-  userSession.checkComponentUuidPermission(UserRole.CODEVIEWER,index.searchByTestUuid(testId).fileUuid());
+  TestDoc testDoc=checkFoundWithOptional(index.getNullableByTestUuid(testId),"Test with id '%s' is not found",testId);
+  userSession.checkComponentUuidPermission(UserRole.CODEVIEWER,testDoc.fileUuid());
   List<CoveredFileDoc> coveredFiles=index.coveredFiles(testId);
   Map<String,ComponentDto> componentsByUuid=buildComponentsByUuid(coveredFiles);
   WsTests.CoveredFilesResponse.Builder responseBuilder=WsTests.CoveredFilesResponse.newBuilder();
@@ -17,5 +18,5 @@
       responseBuilder.addFiles(fileBuilder);
     }
   }
-  WsUtils.writeProtobuf(responseBuilder.build(),request,response);
+  writeProtobuf(responseBuilder.build(),request,response);
 }
