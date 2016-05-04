@@ -1,0 +1,9 @@
+{
+  indexRules(newDoc(RULE_KEY_1),newDoc(RULE_KEY_2),newDoc(RULE_KEY_3));
+  indexActiveRules(ActiveRuleDocTesting.newDoc(ActiveRuleKey.of(QUALITY_PROFILE_KEY1,RULE_KEY_1)),ActiveRuleDocTesting.newDoc(ActiveRuleKey.of(QUALITY_PROFILE_KEY2,RULE_KEY_1)),ActiveRuleDocTesting.newDoc(ActiveRuleKey.of(QUALITY_PROFILE_KEY1,RULE_KEY_2)));
+  assertThat(tester.countDocuments(INDEX,TYPE_ACTIVE_RULE)).isEqualTo(3);
+  assertThat(index.searchAll(new RuleQuery().setActivation(true))).containsOnly(RULE_KEY_1,RULE_KEY_2);
+  assertThat(index.searchAll(new RuleQuery().setActivation(false))).containsOnly(RULE_KEY_3);
+  assertThat(index.searchAll(new RuleQuery().setActivation(false).setQProfileKey(QUALITY_PROFILE_KEY2))).containsOnly(RULE_KEY_2,RULE_KEY_3);
+  assertThat(index.searchAll(new RuleQuery().setActivation(true).setQProfileKey(QUALITY_PROFILE_KEY2))).containsOnly(RULE_KEY_1);
+}
