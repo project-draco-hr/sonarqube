@@ -3,5 +3,8 @@
   dbTester.prepareDbUnit(getClass(),"should_delete_old_closed_issues.xml");
   underTest.purge(newConfigurationWith30Days(),purgeListener,new PurgeProfiler());
   dbTester.assertDbUnit(getClass(),"should_delete_old_closed_issues-result.xml","issues","issue_changes");
-  verify(purgeListener).onIssuesRemoval(asList("ISSUE-1","ISSUE-2"));
+  Class<ArrayList<String>> listClass=(Class<ArrayList<String>>)(Class)ArrayList.class;
+  ArgumentCaptor<ArrayList<String>> argument=ArgumentCaptor.forClass(listClass);
+  verify(purgeListener).onIssuesRemoval(argument.capture());
+  assertThat(argument.getValue()).containsOnly("ISSUE-1","ISSUE-2");
 }
