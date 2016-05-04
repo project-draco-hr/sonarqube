@@ -1,0 +1,11 @@
+{
+  PluginInfo installed=newPluginInfo("java");
+  PluginInfo removedPlugin=newPluginInfo("js");
+  PluginInfo newPlugin=newPluginInfo("php");
+  newUpdateCenter("scmgit");
+  when(serverPluginRepository.getPluginInfos()).thenReturn(of(installed));
+  when(serverPluginRepository.getUninstalledPlugins()).thenReturn(of(removedPlugin));
+  when(pluginDownloader.getDownloadedPlugins()).thenReturn(of(newPlugin,installed));
+  underTest.handle(request,response);
+  assertJson(response.outputAsString()).isSimilarTo("{" + "  \"installing\":" + "  ["+ "    {"+ "      \"key\": \"php\""+ "    }"+ "  ],"+ "  \"removing\":"+ "  ["+ "    {"+ "      \"key\": \"js\""+ "    }"+ "  ],"+ "  \"updating\": "+ "  ["+ "    {"+ "      \"key\": \"java\""+ "    }"+ "  ]"+ "}");
+}

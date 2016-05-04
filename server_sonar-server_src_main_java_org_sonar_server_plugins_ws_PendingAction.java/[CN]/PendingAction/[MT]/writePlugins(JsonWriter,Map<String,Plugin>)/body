@@ -1,0 +1,19 @@
+{
+  Collection<PluginInfo> uninstalledPlugins=installer.getUninstalledPlugins();
+  Collection<PluginInfo> downloadedPlugins=pluginDownloader.getDownloadedPlugins();
+  Collection<PluginInfo> installedPlugins=installer.getPluginInfos();
+  MatchPluginKeys matchPluginKeys=new MatchPluginKeys(from(installedPlugins).transform(PluginInfoToKey.INSTANCE).toSet());
+  Collection<PluginInfo> newPlugins=new ArrayList<>();
+  Collection<PluginInfo> updatedPlugins=new ArrayList<>();
+  for (  PluginInfo pluginInfo : downloadedPlugins) {
+    if (matchPluginKeys.apply(pluginInfo)) {
+      updatedPlugins.add(pluginInfo);
+    }
+ else {
+      newPlugins.add(pluginInfo);
+    }
+  }
+  pluginWSCommons.writePluginInfoList(json,newPlugins,compatiblePluginsByKey,ARRAY_INSTALLING);
+  pluginWSCommons.writePluginInfoList(json,updatedPlugins,compatiblePluginsByKey,ARRAY_UPDATING);
+  pluginWSCommons.writePluginInfoList(json,uninstalledPlugins,compatiblePluginsByKey,ARRAY_REMOVING);
+}
