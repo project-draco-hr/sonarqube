@@ -1,0 +1,12 @@
+{
+  FakeInput baseInput=FakeInput.createForSourceLines("public class Toto {","  private final Deque<Set<DataItem>> one = new ArrayDeque<Set<DataItem>>();","  private final Deque<Set<DataItem>> two = new ArrayDeque<Set<DataItem>>();","  private final Deque<Integer> three = new ArrayDeque<Integer>();","  private final Deque<Set<Set<DataItem>>> four = new ArrayDeque<Set<DataItem>>();");
+  Issue base1=baseInput.createIssueOnLine(2,RULE_USE_DIAMOND,"Use diamond");
+  baseInput.createIssueOnLine(3,RULE_USE_DIAMOND,"Use diamond");
+  baseInput.createIssueOnLine(4,RULE_USE_DIAMOND,"Use diamond");
+  baseInput.createIssueOnLine(5,RULE_USE_DIAMOND,"Use diamond");
+  FakeInput rawInput=FakeInput.createForSourceLines("public class Toto {","  // move all lines","  private final Deque<Set<DataItem>> one = new ArrayDeque<Set<DataItem>>();","  private final Deque<Set<DataItem>> two = new ArrayDeque<>();","  private final Deque<Integer> three = new ArrayDeque<>();","  private final Deque<Set<Set<DataItem>>> four = new ArrayDeque<>();");
+  Issue raw1=rawInput.createIssueOnLine(3,RULE_USE_DIAMOND,"Use diamond");
+  Tracking<Issue,Issue> tracking=tracker.track(rawInput,baseInput);
+  assertThat(tracking.getUnmatchedBases()).hasSize(3);
+  assertThat(tracking.baseFor(raw1)).isEqualTo(base1);
+}
