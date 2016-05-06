@@ -1,0 +1,12 @@
+{
+  ComponentDto developer=newDeveloper("Apache Developer").setUuid("D1");
+  ComponentDto apacheView=newView().setName("Apache View").setUuid("V1");
+  componentDb.insertDeveloperAndSnapshot(developer);
+  componentDb.insertViewAndSnapshot(apacheView);
+  componentDb.indexComponents(developer.getId(),apacheView.getId());
+  userSession.setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
+  insertActivity("T1","D1",CeActivityDto.Status.SUCCESS);
+  insertActivity("T2","V1",CeActivityDto.Status.SUCCESS);
+  ActivityResponse activityResponse=call(ws.newRequest().setParam(PARAM_COMPONENT_QUERY,"apac"));
+  assertThat(activityResponse.getTasksList()).extracting("id").containsOnly("T1","T2");
+}
