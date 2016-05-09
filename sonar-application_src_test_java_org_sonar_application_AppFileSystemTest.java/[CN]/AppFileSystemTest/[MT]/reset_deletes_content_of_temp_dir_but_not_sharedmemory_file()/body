@@ -1,0 +1,19 @@
+{
+  File tempDir=new File(homeDir,DEFAULT_TEMP_DIR_NAME);
+  assertThat(tempDir.mkdir()).isTrue();
+  File sharedmemory=new File(tempDir,"sharedmemory");
+  assertThat(sharedmemory.createNewFile()).isTrue();
+  FileUtils.write(sharedmemory,"toto");
+  Object fileKey=getFileKey(sharedmemory);
+  Object tempDirKey=getFileKey(tempDir);
+  File fileInTempDir=new File(tempDir,"someFile.txt");
+  assertThat(fileInTempDir.createNewFile()).isTrue();
+  AppFileSystem underTest=new AppFileSystem(new Props(properties));
+  underTest.verifyProps();
+  underTest.reset();
+  assertThat(tempDir).exists();
+  assertThat(fileInTempDir).doesNotExist();
+  assertThat(getFileKey(tempDir)).isEqualTo(tempDirKey);
+  assertThat(getFileKey(sharedmemory)).isEqualTo(fileKey);
+  assertThat(FileUtils.readFileToString(sharedmemory)).isEqualTo("toto");
+}
