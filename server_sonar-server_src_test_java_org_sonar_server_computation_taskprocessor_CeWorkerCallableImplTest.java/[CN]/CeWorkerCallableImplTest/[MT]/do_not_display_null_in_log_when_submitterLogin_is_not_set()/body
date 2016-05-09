@@ -1,0 +1,11 @@
+{
+  CeTask task=new CeTask.Builder().setUuid("TASK_1").setType(CeTaskTypes.REPORT).setComponentUuid("PROJECT_1").setSubmitterLogin(null).build();
+  when(queue.peek()).thenReturn(Optional.of(task));
+  taskProcessorRepository.setProcessorForTask(task.getType(),taskProcessor);
+  underTest.call();
+  List<String> logs=logTester.logs(LoggerLevel.INFO);
+  assertThat(logs).hasSize(4);
+  for (int i=0; i < 4; i++) {
+    assertThat(logs.get(i)).contains(" | submitter=''");
+  }
+}
