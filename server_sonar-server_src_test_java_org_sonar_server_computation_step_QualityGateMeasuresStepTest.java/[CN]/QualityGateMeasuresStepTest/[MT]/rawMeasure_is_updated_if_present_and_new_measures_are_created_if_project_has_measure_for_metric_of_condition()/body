@@ -1,18 +1,13 @@
 {
   int rawValue=1;
   Condition equals2Condition=createEqualsCondition(INT_METRIC_1,"2",null);
-  Measure rawMeasure=Measure.newMeasureBuilder().create(rawValue,null);
+  Measure rawMeasure=newMeasureBuilder().create(rawValue,null);
   qualityGateHolder.setQualityGate(new QualityGate(SOME_QG_ID,SOME_QG_NAME,of(equals2Condition)));
-  when(measureRepository.getRawMeasure(PROJECT_COMPONENT,INT_METRIC_1)).thenReturn(Optional.of(rawMeasure));
+  measureRepository.addRawMeasure(PROJECT_REF,INT_METRIC_1_KEY,rawMeasure);
   underTest.execute();
-  ArgumentCaptor<Measure> equals2ConditionMeasureCaptor=ArgumentCaptor.forClass(Measure.class);
-  verify(measureRepository).getRawMeasure(PROJECT_COMPONENT,INT_METRIC_1);
-  verify(measureRepository).update(same(PROJECT_COMPONENT),same(INT_METRIC_1),equals2ConditionMeasureCaptor.capture());
-  verify(measureRepository).add(same(PROJECT_COMPONENT),same(ALERT_STATUS_METRIC),alertStatusMeasureCaptor.capture());
-  verify(measureRepository).add(same(PROJECT_COMPONENT),same(QUALITY_GATE_DETAILS_METRIC),qgDetailsMeasureCaptor.capture());
-  verifyNoMoreInteractions(measureRepository);
-  assertThat(equals2ConditionMeasureCaptor.getValue()).hasQualityGateLevel(OK).hasQualityGateText(dumbResultTextAnswer(equals2Condition,OK,rawValue));
-  assertThat(alertStatusMeasureCaptor.getValue()).hasQualityGateLevel(OK).hasQualityGateText(dumbResultTextAnswer(equals2Condition,OK,rawValue));
-  assertThat(qgDetailsMeasureCaptor.getValue()).hasValue(new QualityGateDetailsData(OK,of(new EvaluatedCondition(equals2Condition,OK,rawValue))).toJson());
+  Optional<Measure> addedRawMeasure=measureRepository.getAddedRawMeasure(PROJECT_COMPONENT,INT_METRIC_1_KEY);
+  assertThat(addedRawMeasure).hasQualityGateLevel(OK).hasQualityGateText(dumbResultTextAnswer(equals2Condition,OK,rawValue));
+  assertThat(getAlertStatusMeasure()).hasQualityGateLevel(OK).hasQualityGateText(dumbResultTextAnswer(equals2Condition,OK,rawValue));
+  assertThat(getQGDetailsMeasure().get()).hasValue(new QualityGateDetailsData(OK,of(new EvaluatedCondition(equals2Condition,OK,rawValue))).toJson());
   QualityGateStatusHolderAssertions.assertThat(qualityGateStatusHolder).hasStatus(QualityGateStatus.OK).hasConditionCount(1).hasCondition(equals2Condition,ConditionStatus.EvaluationStatus.OK,String.valueOf(rawValue));
 }

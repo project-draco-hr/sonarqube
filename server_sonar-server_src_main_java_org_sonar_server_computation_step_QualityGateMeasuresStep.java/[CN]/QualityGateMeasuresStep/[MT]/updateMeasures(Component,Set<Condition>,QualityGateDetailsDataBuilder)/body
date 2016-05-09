@@ -1,14 +1,16 @@
 {
-  for (  Condition condition : conditions) {
-    Optional<Measure> measure=measureRepository.getRawMeasure(project,condition.getMetric());
+  Multimap<Metric,Condition> conditionsPerMetric=from(conditions).index(ConditionToMetric.INSTANCE);
+  for (  Map.Entry<Metric,Collection<Condition>> entry : conditionsPerMetric.asMap().entrySet()) {
+    Metric metric=entry.getKey();
+    Optional<Measure> measure=measureRepository.getRawMeasure(project,metric);
     if (!measure.isPresent()) {
       continue;
     }
-    EvaluationResult evaluationResult=new ConditionEvaluator().evaluate(condition,measure.get());
-    String text=evaluationResultTextConverter.asText(condition,evaluationResult);
+    MetricEvaluationResult metricEvaluationResult=evaluateQualityGate(measure.get(),entry.getValue());
+    String text=evaluationResultTextConverter.asText(metricEvaluationResult.condition,metricEvaluationResult.evaluationResult);
     builder.addLabel(text);
-    Measure updatedMeasure=Measure.updatedMeasureBuilder(measure.get()).setQualityGateStatus(new QualityGateStatus(evaluationResult.getLevel(),text)).create();
-    measureRepository.update(project,condition.getMetric(),updatedMeasure);
-    builder.addEvaluatedCondition(condition,evaluationResult);
+    Measure updatedMeasure=Measure.updatedMeasureBuilder(measure.get()).setQualityGateStatus(new QualityGateStatus(metricEvaluationResult.evaluationResult.getLevel(),text)).create();
+    measureRepository.update(project,metric,updatedMeasure);
+    builder.addEvaluatedCondition(metricEvaluationResult);
   }
 }

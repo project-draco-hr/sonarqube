@@ -1,0 +1,11 @@
+{
+  int rawValue=2;
+  Condition fixedCondition=createEqualsCondition(INT_METRIC_1,"1",null);
+  Condition periodCondition=createEqualsCondition(INT_METRIC_1,null,"2",1);
+  qualityGateHolder.setQualityGate(new QualityGate(SOME_QG_ID,SOME_QG_NAME,of(fixedCondition,periodCondition)));
+  Measure measure=newMeasureBuilder().setVariations(newMeasureVariationsBuilder().setVariation(new Period(1,"mode",null,1212,121),rawValue).build()).create(rawValue,null);
+  measureRepository.addRawMeasure(PROJECT_REF,INT_METRIC_1_KEY,measure);
+  underTest.execute();
+  Optional<Measure> rawMeasure1=measureRepository.getAddedRawMeasure(PROJECT_REF,INT_METRIC_1_KEY);
+  assertThat(rawMeasure1.get()).hasQualityGateLevel(WARN).hasQualityGateText(dumbResultTextAnswer(periodCondition,WARN,rawValue));
+}
