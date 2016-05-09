@@ -9,6 +9,6 @@
   dbClient.metricDao().insert(dbSession,ncloc);
   dbClient.measureDao().insert(dbSession,newMeasureDto(ncloc,fileSnapshot1.getId()).setValue(1.0d),newMeasureDto(ncloc,fileSnapshot2.getId()).setValue(2.0d),newMeasureDto(ncloc,fileSnapshot3.getId()).setValue(3.0d));
   db.commit();
-  ComponentTreeWsResponse response=call(ws.newRequest().setParam(PARAM_BASE_COMPONENT_ID,"project-uuid").setParam(Param.SORT,METRIC_SORT).setParam(PARAM_METRIC_SORT,"ncloc").setParam(PARAM_METRIC_KEYS,"ncloc"));
-  assertThat(response.getComponentsList()).extracting("id").containsExactly("file-uuid-1","file-uuid-2","file-uuid-3","file-uuid-4");
+  ComponentTreeWsResponse response=call(ws.newRequest().setParam(PARAM_BASE_COMPONENT_ID,"project-uuid").setParam(Param.SORT,METRIC_SORT).setParam(PARAM_METRIC_SORT,"ncloc").setParam(PARAM_METRIC_KEYS,"ncloc").setParam(PARAM_METRIC_SORT_FILTER,WITH_MEASURES_ONLY_METRIC_SORT_FILTER));
+  assertThat(response.getComponentsList()).extracting("id").containsExactly("file-uuid-1","file-uuid-2","file-uuid-3").doesNotContain("file-uuid-4");
 }

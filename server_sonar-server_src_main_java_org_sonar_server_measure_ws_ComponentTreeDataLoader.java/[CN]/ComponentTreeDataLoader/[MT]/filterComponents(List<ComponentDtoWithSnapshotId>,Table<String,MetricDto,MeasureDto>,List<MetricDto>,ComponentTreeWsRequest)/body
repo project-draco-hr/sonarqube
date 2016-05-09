@@ -1,0 +1,9 @@
+{
+  if (!WITH_MEASURES_ONLY_METRIC_SORT_FILTER.equals(wsRequest.getMetricSortFilter())) {
+    return components;
+  }
+  final String metricKeyToSort=wsRequest.getMetricSort();
+  Optional<MetricDto> metricToSort=from(metrics).firstMatch(new MatchMetricKey(metricKeyToSort));
+  checkState(metricToSort.isPresent(),"Metric '%s' not found",metricKeyToSort,wsRequest.getMetricKeys());
+  return from(components).filter(new HasMeasure(measuresByComponentUuidAndMetric,metricToSort.get())).toList();
+}
