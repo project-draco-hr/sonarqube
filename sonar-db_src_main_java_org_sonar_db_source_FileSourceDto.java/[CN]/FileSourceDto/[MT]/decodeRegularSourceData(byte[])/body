@@ -1,0 +1,11 @@
+{
+  try (LZ4BlockInputStream lz4Input=new LZ4BlockInputStream(new ByteArrayInputStream(binaryData))){
+    return DbFileSources.Data.parseFrom(lz4Input);
+  }
+ catch (  InvalidProtocolBufferException e) {
+    if (SIZE_LIMIT_EXCEEDED_EXCEPTION_MESSAGE.equals(e.getMessage())) {
+      return decodeHugeSourceData(binaryData);
+    }
+    throw e;
+  }
+}
