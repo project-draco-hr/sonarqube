@@ -1,0 +1,12 @@
+{
+  Map<Integer,LineData> result=new HashMap<>();
+  String json=orchestrator.getServer().adminWsClient().get("api/sources/scm","key",fileKey);
+  JSONObject obj=(JSONObject)JSONValue.parse(json);
+  JSONArray array=(JSONArray)obj.get("scm");
+  for (  Object anArray : array) {
+    JSONArray item=(JSONArray)anArray;
+    String datetime=(String)item.get(2);
+    result.put(((Long)item.get(0)).intValue(),new LineData((String)item.get(3),datetime,(String)item.get(1)));
+  }
+  return result;
+}
