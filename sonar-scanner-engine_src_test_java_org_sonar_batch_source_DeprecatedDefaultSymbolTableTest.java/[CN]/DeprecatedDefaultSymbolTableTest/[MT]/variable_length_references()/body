@@ -1,0 +1,10 @@
+{
+  Symbolizable.SymbolTableBuilder symbolTableBuilder=new DeprecatedDefaultSymbolTable.Builder(new DefaultSymbolTable(null).onFile(inputFile));
+  Symbol firstSymbol=symbolTableBuilder.newSymbol(10,20);
+  symbolTableBuilder.newReference(firstSymbol,32);
+  symbolTableBuilder.newReference(firstSymbol,44,47);
+  DeprecatedDefaultSymbolTable symbolTable=(DeprecatedDefaultSymbolTable)symbolTableBuilder.build();
+  assertThat(symbolTable.getWrapped().getReferencesBySymbol().keySet()).containsExactly(range(10,20));
+  Set<TextRange> references=symbolTable.getWrapped().getReferencesBySymbol().get(range(10,20));
+  assertThat(references).containsExactly(range(32,42),range(44,47));
+}

@@ -1,0 +1,18 @@
+{
+  ScannerReportWriter writer=reportPublisher.getWriter();
+  writer.writeComponentSymbols(componentCache.get(symbolTable.inputFile()).batchId(),Iterables.transform(symbolTable.getReferencesBySymbol().entrySet(),new Function<Map.Entry<TextRange,Set<TextRange>>,ScannerReport.Symbol>(){
+    private ScannerReport.Symbol.Builder builder=ScannerReport.Symbol.newBuilder();
+    private ScannerReport.TextRange.Builder rangeBuilder=ScannerReport.TextRange.newBuilder();
+    @Override public ScannerReport.Symbol apply(    Map.Entry<TextRange,Set<TextRange>> input){
+      builder.clear();
+      rangeBuilder.clear();
+      TextRange declaration=input.getKey();
+      builder.setDeclaration(rangeBuilder.setStartLine(declaration.start().line()).setStartOffset(declaration.start().lineOffset()).setEndLine(declaration.end().line()).setEndOffset(declaration.end().lineOffset()).build());
+      for (      TextRange reference : input.getValue()) {
+        builder.addReference(rangeBuilder.setStartLine(reference.start().line()).setStartOffset(reference.start().lineOffset()).setEndLine(reference.end().line()).setEndOffset(reference.end().lineOffset()).build());
+      }
+      return builder.build();
+    }
+  }
+));
+}
