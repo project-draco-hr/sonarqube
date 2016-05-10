@@ -20,7 +20,13 @@
         BlameLine blameLine=new BlameLine().revision(revision).author(author);
         String dateStr=StringUtils.trimToNull(fields[2]);
         if (dateStr != null) {
-          blameLine.date(DateUtils.parseDate(dateStr));
+          Date dateTime=DateUtils.parseDateTimeQuietly(dateStr);
+          if (dateTime != null) {
+            blameLine.date(dateTime);
+          }
+ else {
+            blameLine.date(DateUtils.parseDate(dateStr));
+          }
         }
         blame.add(blameLine);
       }
