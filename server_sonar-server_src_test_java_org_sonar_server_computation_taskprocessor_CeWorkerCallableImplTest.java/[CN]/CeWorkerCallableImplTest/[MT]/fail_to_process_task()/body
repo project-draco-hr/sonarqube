@@ -1,8 +1,8 @@
 {
-  CeTask task=new CeTask.Builder().setUuid("TASK_1").setType(CeTaskTypes.REPORT).setComponentUuid("PROJECT_1").setSubmitterLogin(null).build();
+  CeTask task=createCeTask(null);
   when(queue.peek()).thenReturn(Optional.of(task));
   taskProcessorRepository.setProcessorForTask(task.getType(),taskProcessor);
-  doThrow(new IllegalStateException("simulate exception thrown by TaskProcessor#process")).when(taskProcessor).process(task);
+  makeTaskProcessorFail(task);
   assertThat(underTest.call()).isTrue();
   inOrder.verify(ceLogging).initForTask(task);
   inOrder.verify(taskProcessor).process(task);
