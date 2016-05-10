@@ -3,12 +3,12 @@
   ORCHESTRATOR.getServer().restoreProfile(FileLocation.ofClasspath("/issue/with-many-rules.xml"));
   ORCHESTRATOR.getServer().associateProjectToQualityProfile(MULTI_MODULE_SAMPLE_PROJECT_KEY,"xoo","with-many-rules");
   runProjectAnalysis(ORCHESTRATOR,"shared/xoo-multi-modules-sample");
-  assertThat(searchIssuesByProject(MULTI_MODULE_SAMPLE_PROJECT_KEY)).hasSize(71);
+  assertThat(search(IssueQuery.create().componentRoots(MULTI_MODULE_SAMPLE_PROJECT_KEY)).paging().total()).isEqualTo(136);
   Resource project=ORCHESTRATOR.getServer().getWsClient().find(ResourceQuery.createForMetrics(MULTI_MODULE_SAMPLE_PROJECT_KEY,"violations","info_violations","minor_violations","major_violations","blocker_violations","critical_violations"));
-  assertThat(project.getMeasureIntValue("violations")).isEqualTo(71);
+  assertThat(project.getMeasureIntValue("violations")).isEqualTo(136);
   assertThat(project.getMeasureIntValue("info_violations")).isEqualTo(2);
   assertThat(project.getMeasureIntValue("minor_violations")).isEqualTo(61);
-  assertThat(project.getMeasureIntValue("major_violations")).isEqualTo(4);
-  assertThat(project.getMeasureIntValue("blocker_violations")).isEqualTo(0);
+  assertThat(project.getMeasureIntValue("major_violations")).isEqualTo(65);
+  assertThat(project.getMeasureIntValue("blocker_violations")).isEqualTo(4);
   assertThat(project.getMeasureIntValue("critical_violations")).isEqualTo(4);
 }
