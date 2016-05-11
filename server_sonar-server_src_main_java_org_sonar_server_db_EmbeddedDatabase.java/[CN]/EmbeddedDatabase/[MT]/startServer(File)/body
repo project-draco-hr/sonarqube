@@ -1,0 +1,21 @@
+{
+  String url=getRequiredSetting(PROP_URL);
+  String port=getRequiredSetting(PROP_EMBEDDED_PORT);
+  String user=getSetting(PROP_USER,PROP_USER_DEFAULT_VALUE);
+  String password=getSetting(PROP_PASSWORD,PROP_PASSWORD_DEFAULT_VALUE);
+  try {
+    if (url.contains("/mem:")) {
+      server=Server.createTcpServer("-tcpPort",port,"-tcpAllowOthers","-baseDir",dbHome.getAbsolutePath());
+    }
+ else {
+      createDatabase(dbHome,user,password);
+      server=Server.createTcpServer("-tcpPort",port,"-tcpAllowOthers","-ifExists","-baseDir",dbHome.getAbsolutePath());
+    }
+    LOG.info("Starting embedded database on port " + server.getPort() + " with url "+ url);
+    server.start();
+    LOG.info("Embedded database started. Data stored in: " + dbHome.getAbsolutePath());
+  }
+ catch (  Exception e) {
+    throw new SonarException("Unable to start database",e);
+  }
+}
