@@ -1,0 +1,9 @@
+{
+  userSession.login(userDto.getLogin()).setUserId(userDto.getId().intValue());
+  ComponentDto project1=componentDbTester.insertComponent(newProjectDto());
+  componentDbTester.insertComponent(newProjectDto());
+  dbClient.roleDao().insertUserRole(dbSession,new UserRoleDto().setUserId(userDto.getId()).setResourceId(project1.getId()).setRole(UserRole.USER));
+  dbTester.commit();
+  Association result=underTest.find(builder().gateId(Long.toString(qGate.getId())).build());
+  verifyProjects(result,project1.getId());
+}

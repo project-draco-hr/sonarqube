@@ -1,14 +1,13 @@
 {
-  Long gateId=validateId(query.gateId());
-  int pageSize=query.pageSize();
-  int pageIndex=query.pageIndex();
-  int offset=(pageIndex - 1) * pageSize;
-  int limit=pageSize + 1;
-  List<ProjectQgateAssociationDto> dtos=associationDao.selectProjects(query,gateId,offset,limit);
-  boolean hasMoreResults=false;
-  if (dtos.size() == limit) {
-    hasMoreResults=true;
-    dtos.remove(dtos.size() - 1);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    getQualityGateId(dbSession,query.gateId());
+    List<ProjectQgateAssociationDto> projects=associationDao.selectProjects(dbSession,query);
+    List<ProjectQgateAssociationDto> authorizedProjects=keepAuthorizedProjects(dbSession,projects);
+    Paging paging=forPageIndex(query.pageIndex()).withPageSize(query.pageSize()).andTotal(authorizedProjects.size());
+    return new Association(toProjectAssociations(getPaginatedProjects(authorizedProjects,paging)),paging.hasNextPage());
   }
-  return new Association(toProjectAssociations(dtos),hasMoreResults);
+  finally {
+    dbClient.closeSession(dbSession);
+  }
 }

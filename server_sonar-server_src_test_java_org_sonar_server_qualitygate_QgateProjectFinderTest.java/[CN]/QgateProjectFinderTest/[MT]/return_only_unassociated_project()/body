@@ -1,0 +1,9 @@
+{
+  ComponentDto associatedProject=insertProjectAuthorizedToAnyone(newProjectDto());
+  ComponentDto unassociatedProject=insertProjectAuthorizedToAnyone(newProjectDto());
+  associateProjectToQualitGate(associatedProject.getId());
+  Association result=underTest.find(builder().membership(OUT).gateId(Long.toString(qGate.getId())).build());
+  Map<Long,ProjectQgateAssociation> projectsById=projectsById(result.projects());
+  assertThat(projectsById).hasSize(1);
+  verifyProject(projectsById.get(unassociatedProject.getId()),false,unassociatedProject.name());
+}

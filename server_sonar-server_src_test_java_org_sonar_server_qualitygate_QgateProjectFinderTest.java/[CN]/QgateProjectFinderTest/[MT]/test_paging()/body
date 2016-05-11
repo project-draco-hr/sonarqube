@@ -1,0 +1,11 @@
+{
+  ComponentDto project1=insertProjectAuthorizedToAnyone(newProjectDto().setName("Project 1"));
+  ComponentDto project2=insertProjectAuthorizedToAnyone(newProjectDto().setName("Project 2"));
+  ComponentDto project3=insertProjectAuthorizedToAnyone(newProjectDto().setName("Project 3"));
+  associateProjectToQualitGate(project1.getId());
+  verifyPaging(underTest.find(builder().gateId(Long.toString(qGate.getId())).pageIndex(1).pageSize(1).build()),true,project1.getId());
+  verifyPaging(underTest.find(builder().gateId(Long.toString(qGate.getId())).pageIndex(2).pageSize(1).build()),true,project2.getId());
+  verifyPaging(underTest.find(builder().gateId(Long.toString(qGate.getId())).pageIndex(1).pageSize(2).build()),true,project1.getId(),project2.getId());
+  verifyPaging(underTest.find(builder().gateId(Long.toString(qGate.getId())).pageIndex(1).pageSize(3).build()),false,project1.getId(),project2.getId(),project3.getId());
+  verifyPaging(underTest.find(builder().gateId(Long.toString(qGate.getId())).pageIndex(3).pageSize(3).build()),false);
+}
