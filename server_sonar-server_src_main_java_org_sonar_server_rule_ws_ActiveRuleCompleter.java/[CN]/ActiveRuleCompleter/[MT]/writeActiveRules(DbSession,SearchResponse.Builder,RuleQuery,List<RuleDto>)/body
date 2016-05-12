@@ -4,9 +4,10 @@
   String profileKey=query.getQProfileKey();
   if (profileKey != null) {
     List<ActiveRuleDto> activeRuleDtos=dbClient.activeRuleDao().selectByProfileKey(dbSession,profileKey);
+    Map<RuleKey,ActiveRuleDto> activeRuleByRuleKey=from(activeRuleDtos).uniqueIndex(ActiveRuleToRuleKey.INSTANCE);
     ListMultimap<ActiveRuleKey,ActiveRuleParamDto> activeRuleParamsByActiveRuleKey=activeRuleDtosToActiveRuleParamDtos(dbSession,activeRuleDtos);
     for (    RuleDto rule : rules) {
-      ActiveRule activeRule=loader.getActiveRule(ActiveRuleKey.of(profileKey,rule.getKey()));
+      ActiveRuleDto activeRule=activeRuleByRuleKey.get(rule.getKey());
       if (activeRule != null) {
         qProfileKeys=writeActiveRules(rule.getKey(),singletonList(activeRule),activeRuleParamsByActiveRuleKey,activesBuilder);
       }
@@ -14,10 +15,10 @@
   }
  else {
     List<ActiveRuleDto> activeRuleDtos=dbClient.activeRuleDao().selectByRuleIds(dbSession,Lists.transform(rules,RuleDtoFunctions.toId()));
+    Multimap<RuleKey,ActiveRuleDto> activeRulesByRuleKey=from(activeRuleDtos).index(ActiveRuleToRuleKey.INSTANCE);
     ListMultimap<ActiveRuleKey,ActiveRuleParamDto> activeRuleParamsByActiveRuleKey=activeRuleDtosToActiveRuleParamDtos(dbSession,activeRuleDtos);
     for (    RuleDto rule : rules) {
-      List<ActiveRule> activeRules=loader.findActiveRulesByRule(rule.getKey());
-      qProfileKeys=writeActiveRules(rule.getKey(),activeRules,activeRuleParamsByActiveRuleKey,activesBuilder);
+      qProfileKeys=writeActiveRules(rule.getKey(),activeRulesByRuleKey.get(rule.getKey()),activeRuleParamsByActiveRuleKey,activesBuilder);
     }
   }
   response.setActives(activesBuilder);
