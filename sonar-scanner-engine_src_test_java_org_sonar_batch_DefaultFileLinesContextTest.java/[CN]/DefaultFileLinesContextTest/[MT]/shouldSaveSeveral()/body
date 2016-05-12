@@ -1,11 +1,13 @@
 {
-  fileLineMeasures.setIntValue("hits",1,2);
-  fileLineMeasures.setIntValue("hits",3,4);
-  fileLineMeasures.setStringValue("author",1,"simon");
-  fileLineMeasures.setStringValue("author",3,"evgeny");
+  fileLineMeasures.setIntValue(HITS_METRIC_KEY,1,2);
+  fileLineMeasures.setIntValue(HITS_METRIC_KEY,3,4);
+  fileLineMeasures.setStringValue(AUTHOR_METRIC_KEY,1,"simon");
+  fileLineMeasures.setStringValue(AUTHOR_METRIC_KEY,3,"evgeny");
   fileLineMeasures.save();
-  fileLineMeasures.setIntValue("branches",1,2);
-  fileLineMeasures.setIntValue("branches",3,4);
+  fileLineMeasures.setIntValue(BRANCHES_METRIC_KEY,1,2);
+  fileLineMeasures.setIntValue(BRANCHES_METRIC_KEY,3,4);
   fileLineMeasures.save();
-  verify(index,times(3)).addMeasure(Matchers.eq(resource),Matchers.any(Measure.class));
+  assertThat(sensorContextTester.measure("foo:src/foo.php",HITS_METRIC_KEY).value()).isEqualTo("1=2;3=4");
+  assertThat(sensorContextTester.measure("foo:src/foo.php",AUTHOR_METRIC_KEY).value()).isEqualTo("1=simon;3=evgeny");
+  assertThat(sensorContextTester.measure("foo:src/foo.php",BRANCHES_METRIC_KEY).value()).isEqualTo("1=2;3=4");
 }

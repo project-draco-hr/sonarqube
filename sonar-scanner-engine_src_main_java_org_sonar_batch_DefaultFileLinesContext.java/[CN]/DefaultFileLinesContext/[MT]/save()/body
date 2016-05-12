@@ -3,9 +3,8 @@
     String metricKey=entry.getKey();
     Map<Integer,Object> lines=entry.getValue();
     if (shouldSave(lines)) {
-      String data=KeyValueFormat.format(lines);
-      Measure measure=new Measure(metricKey).setPersistenceMode(PersistenceMode.DATABASE).setData(data);
-      index.addMeasure(resource,measure);
+      String data=KeyValueFormat.format(optimizeStorage(metricKey,lines));
+      context.newMeasure().on(inputFile).forMetric(metricFinder.findByKey(metricKey)).withValue(data).save();
       entry.setValue(ImmutableMap.copyOf(lines));
     }
   }

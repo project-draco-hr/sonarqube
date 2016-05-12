@@ -1,12 +1,7 @@
 {
-  fileLineMeasures.setIntValue("hits",1,2);
-  fileLineMeasures.setIntValue("hits",3,4);
+  fileLineMeasures.setIntValue(HITS_METRIC_KEY,1,2);
+  fileLineMeasures.setIntValue(HITS_METRIC_KEY,3,0);
   fileLineMeasures.save();
-  assertThat(fileLineMeasures.toString()).isEqualTo("DefaultFileLinesContext{map={hits={1=2, 3=4}}}");
-  ArgumentCaptor<Measure> measureCaptor=ArgumentCaptor.forClass(Measure.class);
-  verify(index).addMeasure(Matchers.eq(resource),measureCaptor.capture());
-  Measure measure=measureCaptor.getValue();
-  assertThat(measure.getMetricKey(),is("hits"));
-  assertThat(measure.getPersistenceMode(),is(PersistenceMode.DATABASE));
-  assertThat(measure.getData(),is("1=2;3=4"));
+  assertThat(fileLineMeasures.toString()).isEqualTo("DefaultFileLinesContext{map={hits={1=2, 3=0}}}");
+  assertThat(sensorContextTester.measure("foo:src/foo.php",HITS_METRIC_KEY).value()).isEqualTo("1=2;3=0");
 }

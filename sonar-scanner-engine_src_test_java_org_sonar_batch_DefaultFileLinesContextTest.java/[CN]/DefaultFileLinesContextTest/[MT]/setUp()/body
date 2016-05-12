@@ -1,6 +1,21 @@
 {
-  index=mock(SonarIndex.class);
-  resource=mock(Resource.class);
-  when(resource.getScope()).thenReturn(Scopes.FILE);
-  fileLineMeasures=new DefaultFileLinesContext(index,resource);
+  sensorContextTester=SensorContextTester.create(temp.newFolder());
+  MetricFinder metricFinder=mock(MetricFinder.class);
+  org.sonar.api.batch.measure.Metric<String> hitsMetric=mock(org.sonar.api.batch.measure.Metric.class);
+  when(hitsMetric.valueType()).thenReturn(String.class);
+  when(hitsMetric.key()).thenReturn(HITS_METRIC_KEY);
+  when(metricFinder.<String>findByKey(HITS_METRIC_KEY)).thenReturn(hitsMetric);
+  org.sonar.api.batch.measure.Metric<String> authorMetric=mock(org.sonar.api.batch.measure.Metric.class);
+  when(authorMetric.valueType()).thenReturn(String.class);
+  when(authorMetric.key()).thenReturn(AUTHOR_METRIC_KEY);
+  when(metricFinder.<String>findByKey(AUTHOR_METRIC_KEY)).thenReturn(authorMetric);
+  org.sonar.api.batch.measure.Metric<String> branchesMetric=mock(org.sonar.api.batch.measure.Metric.class);
+  when(branchesMetric.valueType()).thenReturn(String.class);
+  when(branchesMetric.key()).thenReturn(BRANCHES_METRIC_KEY);
+  when(metricFinder.<String>findByKey(BRANCHES_METRIC_KEY)).thenReturn(branchesMetric);
+  when(metricFinder.<String>findByKey(CoreMetrics.NCLOC_DATA_KEY)).thenReturn(CoreMetrics.NCLOC_DATA);
+  when(metricFinder.<String>findByKey(CoreMetrics.EXECUTABLE_LINES_DATA_KEY)).thenReturn(CoreMetrics.EXECUTABLE_LINES_DATA);
+  when(metricFinder.<String>findByKey(CoreMetrics.COMMENT_LINES_DATA_KEY)).thenReturn(CoreMetrics.COMMENT_LINES_DATA);
+  measureCache=mock(MeasureCache.class);
+  fileLineMeasures=new DefaultFileLinesContext(sensorContextTester,new DefaultInputFile("foo","src/foo.php").initMetadata("Foo\nbar\nbiz"),metricFinder,measureCache);
 }
