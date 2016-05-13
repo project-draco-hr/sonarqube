@@ -1,0 +1,10 @@
+{
+  List<ScannerReport.SyntaxHighlightingRule> syntaxHighlightingList=new ArrayList<>();
+  addHighlighting(syntaxHighlightingList,1,0,1,7,KEYWORD);
+  addHighlighting(syntaxHighlightingList,2,0,4,6,CPP_DOC);
+  addHighlighting(syntaxHighlightingList,5,0,5,6,KEYWORD);
+  addHighlighting(syntaxHighlightingList,5,7,5,12,KEYWORD);
+  HighlightingLineReader highlightingLineReader=new HighlightingLineReader(FILE,syntaxHighlightingList.iterator(),new RangeOffsetConverter());
+  DbFileSources.Line.Builder[] builders=new DbFileSources.Line.Builder[]{addSourceLine(highlightingLineReader,1,"package example;"),addSourceLine(highlightingLineReader,2,"/*"),addSourceLine(highlightingLineReader,3,""),addSourceLine(highlightingLineReader,4," foo*/"),addSourceLine(highlightingLineReader,5,"public class One {"),addSourceLine(highlightingLineReader,6,"}")};
+  assertThat(builders).extracting("highlighting").containsExactly("0,7,k","0,2,cppd","","0,6,cppd","0,6,k;7,12,k","");
+}
