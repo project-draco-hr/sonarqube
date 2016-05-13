@@ -1,6 +1,6 @@
 {
   Map<String,String> userMap=ImmutableMap.of("fmallet","Freddy Mallet","sbrandhof","Simon");
-  WSLoaderResult<InputStream> res=new WSLoaderResult<>(createUsersMock(userMap),true);
-  when(wsLoader.loadStream("/batch/users?logins=fmallet,sbrandhof")).thenReturn(res);
+  InputStream is=createUsersMock(userMap);
+  WsTestUtil.mockStream(wsClient,"/batch/users?logins=fmallet,sbrandhof",is);
   assertThat(userRepo.load(Arrays.asList("fmallet","sbrandhof"))).extracting("login","name").containsOnly(tuple("fmallet","Freddy Mallet"),tuple("sbrandhof","Simon"));
 }

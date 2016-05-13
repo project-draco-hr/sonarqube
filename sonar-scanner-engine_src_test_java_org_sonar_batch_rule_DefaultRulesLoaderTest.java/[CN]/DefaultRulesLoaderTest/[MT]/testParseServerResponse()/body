@@ -1,8 +1,8 @@
 {
-  WSLoader wsLoader=mock(WSLoader.class);
+  BatchWsClient wsClient=mock(BatchWsClient.class);
   InputStream is=Resources.asByteSource(this.getClass().getResource("DefaultRulesLoader/response.protobuf")).openBufferedStream();
-  when(wsLoader.loadStream(anyString())).thenReturn(new WSLoaderResult<>(is,true));
-  DefaultRulesLoader loader=new DefaultRulesLoader(wsLoader);
-  List<Rule> ruleList=loader.load(null);
+  WsTestUtil.mockStream(wsClient,is);
+  DefaultRulesLoader loader=new DefaultRulesLoader(wsClient);
+  List<Rule> ruleList=loader.load();
   assertThat(ruleList).hasSize(318);
 }

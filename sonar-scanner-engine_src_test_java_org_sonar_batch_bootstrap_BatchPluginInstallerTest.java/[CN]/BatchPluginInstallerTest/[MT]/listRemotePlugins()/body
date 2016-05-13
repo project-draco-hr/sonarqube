@@ -1,7 +1,6 @@
 {
-  WSLoader wsLoader=mock(WSLoader.class);
-  when(wsLoader.loadString("/deploy/plugins/index.txt")).thenReturn(new WSLoaderResult<>("checkstyle\nsqale",true));
-  BatchPluginInstaller underTest=new BatchPluginInstaller(wsLoader,wsClient,fileCache,pluginPredicate);
+  WsTestUtil.mockReader(wsClient,"/deploy/plugins/index.txt",new StringReader("checkstyle\nsqale"));
+  BatchPluginInstaller underTest=new BatchPluginInstaller(wsClient,fileCache,pluginPredicate);
   List<RemotePlugin> remotePlugins=underTest.listRemotePlugins();
   assertThat(remotePlugins).extracting("key").containsOnly("checkstyle","sqale");
 }

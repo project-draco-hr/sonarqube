@@ -1,9 +1,9 @@
 {
-  WSLoader wsLoader=mock(WSLoader.class);
+  BatchWsClient wsClient=mock(BatchWsClient.class);
   InputStream is=ByteSource.wrap(new String("trash").getBytes()).openBufferedStream();
-  when(wsLoader.loadStream(anyString())).thenReturn(new WSLoaderResult<>(is,true));
-  DefaultRulesLoader loader=new DefaultRulesLoader(wsLoader);
+  WsTestUtil.mockStream(wsClient,is);
+  DefaultRulesLoader loader=new DefaultRulesLoader(wsClient);
   exception.expect(IllegalStateException.class);
   exception.expectMessage("Unable to get rules");
-  loader.load(null);
+  loader.load();
 }

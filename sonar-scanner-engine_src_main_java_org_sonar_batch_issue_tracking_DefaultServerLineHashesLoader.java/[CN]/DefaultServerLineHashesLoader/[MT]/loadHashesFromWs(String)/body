@@ -1,0 +1,14 @@
+{
+  Profiler profiler=Profiler.createIfDebug(Loggers.get(getClass())).addContext("file",fileKey).startDebug("Load line hashes");
+  GetRequest getRequest=new GetRequest("/api/sources/hash?key=" + BatchUtils.encodeForUrl(fileKey));
+  Reader reader=wsClient.call(getRequest).contentReader();
+  try {
+    return IOUtils.toString(reader);
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException(e);
+  }
+ finally {
+    profiler.stopDebug();
+  }
+}

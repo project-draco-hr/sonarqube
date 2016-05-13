@@ -1,6 +1,13 @@
 {
   Profiler profiler=Profiler.create(LOG).startInfo("Load plugins index");
-  WSLoaderResult<String> wsResult=wsLoader.loadString(PLUGINS_INDEX_URL);
-  profiler.stopInfo(wsResult.isFromCache());
-  return wsResult.get();
+  GetRequest getRequest=new GetRequest(PLUGINS_INDEX_URL);
+  String str;
+  try (Reader reader=wsClient.call(getRequest).contentReader()){
+    str=IOUtils.toString(reader);
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException(e);
+  }
+  profiler.stopInfo();
+  return str;
 }

@@ -1,8 +1,7 @@
 {
   InputStream is=mock(InputStream.class);
   Mockito.doThrow(IOException.class).when(is).read();
-  WSLoaderResult<InputStream> res=new WSLoaderResult<>(is,true);
-  when(wsLoader.loadStream("/batch/users?logins=fmallet,sbrandhof")).thenReturn(res);
+  WsTestUtil.mockStream(wsClient,"/batch/users?logins=fmallet,sbrandhof",is);
   exception.expect(IllegalStateException.class);
   exception.expectMessage("Unable to get user details from server");
   userRepo.load(Arrays.asList("fmallet","sbrandhof"));

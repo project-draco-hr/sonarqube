@@ -1,0 +1,14 @@
+{
+  try {
+    GetRequest request=new GetRequest(getUrl(projectKey,issuesMode));
+    InputStream is=wsClient.call(request).contentStream();
+    return processStream(is,projectKey);
+  }
+ catch (  RuntimeException e) {
+    if (shouldThrow(e)) {
+      throw e;
+    }
+    LOG.debug("Project repository not available - continuing without it",e);
+    return new ProjectRepositories();
+  }
+}

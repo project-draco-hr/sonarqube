@@ -1,8 +1,8 @@
 {
   InputStream is=getTestResource("quality_profile_search_default");
-  when(ws.loadStream(anyString())).thenReturn(new WSLoaderResult<>(is,false));
-  List<QualityProfile> loaded=qpLoader.loadDefault(null,null);
-  verify(ws).loadStream("/api/qualityprofiles/search.protobuf?defaults=true");
-  verifyNoMoreInteractions(ws);
+  WsTestUtil.mockStream(wsClient,"/api/qualityprofiles/search.protobuf?defaults=true",is);
+  List<QualityProfile> loaded=qpLoader.loadDefault(null);
+  WsTestUtil.verifyCall(wsClient,"/api/qualityprofiles/search.protobuf?defaults=true");
+  verifyNoMoreInteractions(wsClient);
   assertThat(loaded).hasSize(1);
 }
