@@ -1,12 +1,10 @@
 {
-  long condId=43;
   String metricKey="new_coverage";
   String operator="LT";
   String errorThreshold="80";
   addMetric(metricKey,"New Coverage");
-  QualityGateConditionDto condition=new QualityGateConditionDto().setId(condId).setQualityGateId(QUALITY_GATE_ID).setMetricId(METRIC_ID).setMetricKey(metricKey).setOperator("GT").setWarningThreshold("123").setPeriod(1);
-  when(conditionDao.selectById(condId)).thenReturn(condition);
+  QualityGateConditionDto condition=insertQualityGateConditionDto(newCondition(metricKey,METRIC_ID));
   when(conditionDao.selectForQualityGate(QUALITY_GATE_ID)).thenReturn(singletonList(condition));
-  assertThat(underTest.updateCondition(condId,metricKey,operator,null,errorThreshold,1)).isEqualTo(condition);
+  assertThat(underTest.updateCondition(condition.getId(),metricKey,operator,null,errorThreshold,1)).isEqualTo(condition);
   verify(conditionDao).update(condition);
 }
