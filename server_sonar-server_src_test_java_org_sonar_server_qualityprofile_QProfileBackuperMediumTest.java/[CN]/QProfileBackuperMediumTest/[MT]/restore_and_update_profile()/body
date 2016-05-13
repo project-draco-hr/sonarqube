@@ -1,24 +1,25 @@
 {
-  db.qualityProfileDao().insert(dbSession,QProfileTesting.newXooP1());
-  RuleActivation activation=new RuleActivation(RuleTesting.XOO_X1);
+  db.qualityProfileDao().insert(dbSession,newXooP1());
+  RuleActivation activation=new RuleActivation(XOO_X1);
   activation.setSeverity(Severity.INFO);
   activation.setParameter("max","10");
-  tester.get(RuleActivator.class).activate(dbSession,activation,QProfileTesting.XOO_P1_NAME);
-  activation=new RuleActivation(RuleTesting.XOO_X2);
+  tester.get(RuleActivator.class).activate(dbSession,activation,XOO_P1_NAME);
+  activation=new RuleActivation(XOO_X2);
   activation.setSeverity(Severity.INFO);
-  tester.get(RuleActivator.class).activate(dbSession,activation,QProfileTesting.XOO_P1_NAME);
+  tester.get(RuleActivator.class).activate(dbSession,activation,XOO_P1_NAME);
   dbSession.commit();
   dbSession.clearCache();
   activeRuleIndexer.index();
   tester.get(QProfileBackuper.class).restore(new StringReader(Resources.toString(getClass().getResource("QProfileBackuperMediumTest/restore.xml"),StandardCharsets.UTF_8)),null);
-  List<ActiveRuleDoc> activeRules=Lists.newArrayList(tester.get(QProfileLoader.class).findActiveRulesByProfile(QProfileTesting.XOO_P1_KEY));
+  List<ActiveRuleDto> activeRules=db.activeRuleDao().selectByProfileKey(dbSession,XOO_P1_KEY);
   assertThat(activeRules).hasSize(1);
-  ActiveRuleDoc activeRuleDoc=activeRules.get(0);
-  assertThat(activeRuleDoc.severity()).isEqualTo("BLOCKER");
-  assertThat(activeRuleDoc.inheritance()).isEqualTo(ActiveRule.Inheritance.NONE);
-  ActiveRuleDto activeRuleDto=db.activeRuleDao().selectOrFailByKey(dbSession,activeRuleDoc.key());
+  ActiveRuleDto activeRuleDoc=activeRules.get(0);
+  assertThat(activeRuleDoc.getSeverityString()).isEqualTo("BLOCKER");
+  assertThat(activeRuleDoc.getInheritance()).isNull();
+  ActiveRuleDto activeRuleDto=db.activeRuleDao().selectOrFailByKey(dbSession,activeRuleDoc.getKey());
   List<ActiveRuleParamDto> params=tester.get(ActiveRuleDao.class).selectParamsByActiveRuleId(dbSession,activeRuleDto.getId());
   assertThat(params).hasSize(1);
   assertThat(params.get(0).getKey()).isEqualTo("max");
   assertThat(params.get(0).getValue()).isEqualTo("7");
+  assertThat(tester.get(RuleIndex.class).searchAll(new RuleQuery().setQProfileKey(XOO_P1_KEY).setActivation(true))).containsOnly(XOO_X1);
 }

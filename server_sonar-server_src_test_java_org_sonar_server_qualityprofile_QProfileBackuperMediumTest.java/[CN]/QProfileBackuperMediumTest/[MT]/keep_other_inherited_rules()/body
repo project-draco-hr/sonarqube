@@ -1,14 +1,13 @@
 {
-  db.qualityProfileDao().insert(dbSession,QProfileTesting.newXooP1(),QProfileTesting.newXooP2().setParentKee(QProfileTesting.XOO_P1_KEY));
+  db.qualityProfileDao().insert(dbSession,newXooP1(),newXooP2().setParentKee(XOO_P1_KEY));
   dbSession.commit();
-  RuleActivation activation=new RuleActivation(RuleTesting.XOO_X1);
+  RuleActivation activation=new RuleActivation(XOO_X1);
   activation.setSeverity(Severity.INFO);
   activation.setParameter("max","10");
-  tester.get(RuleActivator.class).activate(dbSession,activation,QProfileTesting.XOO_P1_KEY);
+  tester.get(RuleActivator.class).activate(dbSession,activation,XOO_P1_KEY);
   dbSession.commit();
   dbSession.clearCache();
   activeRuleIndexer.index();
-  tester.get(QProfileBackuper.class).restore(new StringReader(Resources.toString(getClass().getResource("QProfileBackuperMediumTest/keep_other_inherited_rules.xml"),StandardCharsets.UTF_8)),QProfileTesting.XOO_P2_NAME);
-  List<ActiveRuleDoc> activeRules=Lists.newArrayList(tester.get(QProfileLoader.class).findActiveRulesByProfile(QProfileTesting.XOO_P2_KEY));
-  assertThat(activeRules).hasSize(2);
+  tester.get(QProfileBackuper.class).restore(new StringReader(Resources.toString(getClass().getResource("QProfileBackuperMediumTest/keep_other_inherited_rules.xml"),StandardCharsets.UTF_8)),XOO_P2_NAME);
+  assertThat(db.activeRuleDao().selectByProfileKey(dbSession,XOO_P2_KEY)).hasSize(2);
 }

@@ -1,10 +1,10 @@
 {
-  List<ActiveRuleDoc> activeRules=Lists.newArrayList(index.findByProfile(profileKey));
+  List<ActiveRuleDto> activeRules=db.activeRuleDao().selectByProfileKey(dbSession,profileKey);
   assertThat(activeRules).hasSize(1);
-  ActiveRuleDoc activeRule=activeRules.get(0);
-  assertThat(activeRule.severity()).isEqualTo(expectedSeverity);
-  assertThat(activeRule.inheritance()).isEqualTo(expectedInheritance == null ? ActiveRule.Inheritance.NONE : ActiveRule.Inheritance.valueOf(expectedInheritance));
-  ActiveRuleDto activeRuleDto=db.activeRuleDao().selectOrFailByKey(dbSession,activeRule.key());
+  ActiveRuleDto activeRule=activeRules.get(0);
+  assertThat(activeRule.getSeverityString()).isEqualTo(expectedSeverity);
+  assertThat(activeRule.getInheritance()).isEqualTo(expectedInheritance);
+  ActiveRuleDto activeRuleDto=db.activeRuleDao().selectOrFailByKey(dbSession,activeRule.getKey());
   List<ActiveRuleParamDto> params=db.activeRuleDao().selectParamsByActiveRuleId(dbSession,activeRuleDto.getId());
   assertThat(params).hasSize(expectedParams.size());
   Map<String,ActiveRuleParamDto> paramsByKey=ActiveRuleParamDto.groupByKey(params);
@@ -12,4 +12,5 @@
     String value=paramsByKey.get(entry.getKey()).getValue();
     assertThat(value).isEqualTo(entry.getValue());
   }
+  assertThat(tester.get(RuleIndex.class).searchAll(new RuleQuery().setQProfileKey(profileKey).setActivation(true))).hasSize(1);
 }

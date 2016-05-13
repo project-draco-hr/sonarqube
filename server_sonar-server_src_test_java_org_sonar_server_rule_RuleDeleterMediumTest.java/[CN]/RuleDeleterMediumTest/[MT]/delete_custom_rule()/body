@@ -15,7 +15,6 @@
   assertThat(customRuleReloaded).isNotNull();
   assertThat(customRuleReloaded.getStatus()).isEqualTo(RuleStatus.REMOVED);
   assertThat(customRuleReloaded.getUpdatedAt()).isNotEqualTo(PAST);
-  List<ActiveRuleDoc> activeRules=Lists.newArrayList(tester.get(ActiveRuleIndex.class).findByProfile(profileDto.getKey()));
-  assertThat(activeRules).isEmpty();
-  assertThat(index.search(new RuleQuery(),new SearchOptions()).getIds()).containsOnly(templateRule.getKey());
+  assertThat(index.searchAll(new RuleQuery().setQProfileKey(profileDto.getKey()).setActivation(true))).isEmpty();
+  assertThat(index.searchAll(new RuleQuery())).containsOnly(templateRule.getKey());
 }

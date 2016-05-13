@@ -1,14 +1,4 @@
 {
-  List<ActiveRuleDoc> activeRules=Lists.newArrayList(activeRuleIndex.findByProfile(activeRuleKey.qProfile()));
-  boolean found=false;
-  for (  ActiveRuleDoc activeRule : activeRules) {
-    if (activeRule.key().equals(activeRuleKey)) {
-      found=true;
-      assertThat(activeRule.severity()).isEqualTo(expectedSeverity);
-      assertThat(activeRule.inheritance()).isEqualTo(expectedInheritance == null ? ActiveRule.Inheritance.NONE : ActiveRule.Inheritance.valueOf(expectedInheritance));
-      assertThat(activeRule.createdAt()).isNotNull();
-      assertThat(activeRule.updatedAt()).isNotNull();
-    }
-  }
-  assertThat(found).as("Rule is not activated in index").isTrue();
+  List<RuleKey> ruleKeys=newArrayList(tester.get(RuleIndex.class).searchAll(new RuleQuery().setKey(activeRuleKey.ruleKey().toString()).setQProfileKey(activeRuleKey.qProfile()).setActivation(true).setInheritance(singleton(expectedInheritance == null ? ActiveRule.Inheritance.NONE.name() : ActiveRule.Inheritance.valueOf(expectedInheritance).name())).setActiveSeverities(singleton(expectedSeverity))));
+  assertThat(ruleKeys).as("Rule is not activated in index").hasSize(1);
 }

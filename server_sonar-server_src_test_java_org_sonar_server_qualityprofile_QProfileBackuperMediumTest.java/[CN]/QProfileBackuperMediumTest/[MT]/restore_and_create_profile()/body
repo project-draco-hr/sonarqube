@@ -2,14 +2,15 @@
   tester.get(QProfileBackuper.class).restore(new StringReader(Resources.toString(getClass().getResource("QProfileBackuperMediumTest/restore.xml"),StandardCharsets.UTF_8)),null);
   QualityProfileDto profile=db.qualityProfileDao().selectByNameAndLanguage("P1","xoo",dbSession);
   assertThat(profile).isNotNull();
-  List<ActiveRuleDoc> activeRules=Lists.newArrayList(tester.get(QProfileLoader.class).findActiveRulesByProfile(profile.getKey()));
+  List<ActiveRuleDto> activeRules=db.activeRuleDao().selectByProfileKey(dbSession,profile.getKey());
   assertThat(activeRules).hasSize(1);
-  ActiveRuleDoc activeRuleDoc=activeRules.get(0);
-  assertThat(activeRuleDoc.severity()).isEqualTo("BLOCKER");
-  assertThat(activeRuleDoc.inheritance()).isEqualTo(ActiveRule.Inheritance.NONE);
-  ActiveRuleDto activeRuleDto=db.activeRuleDao().selectOrFailByKey(dbSession,activeRuleDoc.key());
+  ActiveRuleDto activeRuleDoc=activeRules.get(0);
+  assertThat(activeRuleDoc.getSeverityString()).isEqualTo("BLOCKER");
+  assertThat(activeRuleDoc.getInheritance()).isNull();
+  ActiveRuleDto activeRuleDto=db.activeRuleDao().selectOrFailByKey(dbSession,activeRuleDoc.getKey());
   List<ActiveRuleParamDto> params=tester.get(ActiveRuleDao.class).selectParamsByActiveRuleId(dbSession,activeRuleDto.getId());
   assertThat(params).hasSize(1);
   assertThat(params.get(0).getKey()).isEqualTo("max");
   assertThat(params.get(0).getValue()).isEqualTo("7");
+  assertThat(tester.get(RuleIndex.class).searchAll(new RuleQuery().setQProfileKey(profile.getKey()).setActivation(true))).containsOnly(XOO_X1);
 }
