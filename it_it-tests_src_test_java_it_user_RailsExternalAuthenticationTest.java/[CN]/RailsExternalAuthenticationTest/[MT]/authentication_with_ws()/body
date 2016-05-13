@@ -1,0 +1,18 @@
+{
+  String login=USER_LOGIN;
+  String password="1234567";
+  Map<String,String> users=Maps.newHashMap();
+  users.put(login + ".password",password);
+  updateUsersInExtAuth(users);
+  assertThat(checkAuthenticationWithWebService(login,password).code()).isEqualTo(HTTP_OK);
+  assertThat(checkAuthenticationWithWebService("wrong",password).code()).isEqualTo(HTTP_UNAUTHORIZED);
+  assertThat(checkAuthenticationWithWebService(login,"wrong").code()).isEqualTo(HTTP_UNAUTHORIZED);
+  assertThat(checkAuthenticationWithWebService(login,null).code()).isEqualTo(HTTP_UNAUTHORIZED);
+  assertThat(checkAuthenticationWithWebService(null,null).code()).isEqualTo(HTTP_OK);
+  setServerProperty(orchestrator,"sonar.forceAuthentication","true");
+  assertThat(checkAuthenticationWithWebService(login,password).code()).isEqualTo(HTTP_OK);
+  assertThat(checkAuthenticationWithWebService("wrong",password).code()).isEqualTo(HTTP_UNAUTHORIZED);
+  assertThat(checkAuthenticationWithWebService(login,"wrong").code()).isEqualTo(HTTP_UNAUTHORIZED);
+  assertThat(checkAuthenticationWithWebService(login,null).code()).isEqualTo(HTTP_UNAUTHORIZED);
+  assertThat(checkAuthenticationWithWebService(null,null).code()).isEqualTo(HTTP_UNAUTHORIZED);
+}
