@@ -1,0 +1,13 @@
+{
+  List<IssuePattern> patterns=new ArrayList<>();
+  String patternConf=defaultIfBlank(settings.getString(propertyKey),"");
+  for (  String id : Splitter.on(",").omitEmptyStrings().split(patternConf)) {
+    String propPrefix=propertyKey + "." + id+ ".";
+    String componentPathPattern=settings.getString(propPrefix + RESOURCE_KEY);
+    checkArgument(!isNullOrEmpty(componentPathPattern),format("File path pattern cannot be empty. Please check '%s' settings",propertyKey));
+    String ruleKeyPattern=settings.getString(propPrefix + RULE_KEY);
+    checkArgument(!isNullOrEmpty(ruleKeyPattern),format("Rule key pattern cannot be empty. Please check '%s' settings",propertyKey));
+    patterns.add(new IssuePattern(componentPathPattern,ruleKeyPattern));
+  }
+  return patterns;
+}
