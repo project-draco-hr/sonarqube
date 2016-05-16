@@ -1,0 +1,10 @@
+{
+  GroupDto lastGroup=groupDb.insertGroup(newGroupDto().setName("last-group"));
+  roleDao.insertGroupRole(dbSession,new GroupRoleDto().setGroupId(lastGroup.getId()).setRole(GlobalPermissions.SYSTEM_ADMIN));
+  UserDto bigBoss=userDb.insertUser(newUserDto("big.boss","Big Boss","big@boss.com"));
+  roleDao.insertUserRole(dbSession,new UserPermissionDto().setUserId(bigBoss.getId()).setPermission(GlobalPermissions.SYSTEM_ADMIN));
+  dbSession.commit();
+  loginAsAdmin();
+  newRequest().setParam(PARAM_GROUP_NAME,lastGroup.getName()).execute();
+  assertThat(groupDao.selectById(dbSession,lastGroup.getId())).isNull();
+}
