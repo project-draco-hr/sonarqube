@@ -3,7 +3,12 @@
   FileUtils.write(symbol,"1:4:k\n12:15:cppd\n\n#comment");
   DefaultInputFile inputFile=new DefaultInputFile("foo","src/foo.xoo").setLanguage("xoo").initMetadata(" xoo\nazertyazer\nfoo");
   context.fileSystem().add(inputFile);
+  Highlightable highlightable=mock(Highlightable.class);
+  when(perspectives.as(Highlightable.class,inputFile)).thenReturn(highlightable);
+  HighlightingBuilder builder=mock(Highlightable.HighlightingBuilder.class);
+  when(highlightable.newHighlighting()).thenReturn(builder);
   sensor.execute(context);
-  assertThat(context.highlightingTypeAt("foo:src/foo.xoo",1,2)).containsOnly(TypeOfText.KEYWORD);
-  assertThat(context.highlightingTypeAt("foo:src/foo.xoo",2,8)).containsOnly(TypeOfText.CPP_DOC);
+  verify(builder).highlight(1,4,"k");
+  verify(builder).highlight(12,15,"cppd");
+  verify(builder).done();
 }

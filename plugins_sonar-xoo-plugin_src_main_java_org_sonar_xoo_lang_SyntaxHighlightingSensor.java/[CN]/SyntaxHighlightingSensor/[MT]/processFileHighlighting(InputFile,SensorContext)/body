@@ -6,15 +6,18 @@
     try {
       List<String> lines=FileUtils.readLines(highlightingFile,context.fileSystem().encoding().name());
       int lineNumber=0;
-      NewHighlighting highlightingBuilder=context.newHighlighting().onFile(inputFile);
-      for (      String line : lines) {
-        lineNumber++;
-        if (StringUtils.isBlank(line) || line.startsWith("#")) {
-          continue;
+      Highlightable highlightable=perspectives.as(Highlightable.class,inputFile);
+      if (highlightable != null) {
+        HighlightingBuilder highlightingBuilder=highlightable.newHighlighting();
+        for (        String line : lines) {
+          lineNumber++;
+          if (StringUtils.isBlank(line) || line.startsWith("#")) {
+            continue;
+          }
+          processLine(highlightingFile,lineNumber,highlightingBuilder,line);
         }
-        processLine(highlightingFile,lineNumber,highlightingBuilder,line);
+        highlightingBuilder.done();
       }
-      highlightingBuilder.save();
     }
  catch (    IOException e) {
       throw new IllegalStateException(e);
