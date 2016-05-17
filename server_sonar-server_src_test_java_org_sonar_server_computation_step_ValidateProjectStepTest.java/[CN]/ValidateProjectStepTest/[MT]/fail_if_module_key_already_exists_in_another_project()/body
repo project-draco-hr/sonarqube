@@ -1,7 +1,5 @@
 {
   String anotherProjectKey="ANOTHER_PROJECT_KEY";
-  thrown.expect(MessageException.class);
-  thrown.expectMessage("Validation of project failed:\n" + "  o Module \"" + MODULE_KEY + "\" is already part of project \""+ anotherProjectKey+ "\"");
   reportReader.putComponent(ScannerReport.Component.newBuilder().setRef(1).setType(ComponentType.PROJECT).setKey(PROJECT_KEY).addChildRef(2).build());
   reportReader.putComponent(ScannerReport.Component.newBuilder().setRef(2).setType(ComponentType.MODULE).setKey(MODULE_KEY).build());
   ComponentDto project=ComponentTesting.newProjectDto("ABCD").setKey(PROJECT_KEY);
@@ -11,5 +9,7 @@
   dbClient.componentDao().insert(dbTester.getSession(),module);
   dbTester.getSession().commit();
   treeRootHolder.setRoot(ReportComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).addChildren(ReportComponent.builder(Component.Type.MODULE,2).setUuid("BCDE").setKey(MODULE_KEY).build()).build());
+  thrown.expect(MessageException.class);
+  thrown.expectMessage("Validation of project failed:\n" + "  o Module \"" + MODULE_KEY + "\" is already part of project \""+ anotherProjectKey+ "\"");
   underTest.execute();
 }

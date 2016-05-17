@@ -1,8 +1,4 @@
 {
-  thrown.expect(MessageException.class);
-  thrown.expectMessage("Validation of project failed:");
-  thrown.expectMessage("Date of analysis cannot be older than the date of the last known analysis on this project. Value: ");
-  thrown.expectMessage("Latest analysis: ");
   analysisMetadataHolder.setAnalysisDate(DateUtils.parseDate("2015-01-01"));
   reportReader.putComponent(ScannerReport.Component.newBuilder().setRef(1).setType(ComponentType.PROJECT).setKey(PROJECT_KEY).addChildRef(2).build());
   ComponentDto project=ComponentTesting.newProjectDto("ABCD").setKey(PROJECT_KEY);
@@ -10,5 +6,9 @@
   dbClient.snapshotDao().insert(dbTester.getSession(),SnapshotTesting.newSnapshotForProject(project).setCreatedAt(1433131200000L));
   dbTester.getSession().commit();
   treeRootHolder.setRoot(ReportComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).build());
+  thrown.expect(MessageException.class);
+  thrown.expectMessage("Validation of project failed:");
+  thrown.expectMessage("Date of analysis cannot be older than the date of the last known analysis on this project. Value: ");
+  thrown.expectMessage("Latest analysis: ");
   underTest.execute();
 }

@@ -1,0 +1,10 @@
+{
+  reportReader.putComponent(ScannerReport.Component.newBuilder().setRef(1).setType(ComponentType.PROJECT).setKey(PROJECT_KEY).build());
+  treeRootHolder.setRoot(ReportComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).build());
+  ComponentDto project=ComponentTesting.newView("ABCD").setKey(PROJECT_KEY);
+  dbClient.componentDao().insert(dbTester.getSession(),project);
+  dbTester.getSession().commit();
+  thrown.expect(MessageException.class);
+  thrown.expectMessage("Validation of project failed:\n" + "  o Component (uuid=ABCD, key=PROJECT_KEY) is not a project");
+  underTest.execute();
+}

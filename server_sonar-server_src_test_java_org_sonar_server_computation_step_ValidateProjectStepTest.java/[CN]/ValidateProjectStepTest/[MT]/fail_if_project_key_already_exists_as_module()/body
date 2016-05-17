@@ -1,7 +1,5 @@
 {
   String anotherProjectKey="ANOTHER_PROJECT_KEY";
-  thrown.expect(MessageException.class);
-  thrown.expectMessage("Validation of project failed:\n" + "  o The project \"" + PROJECT_KEY + "\" is already defined in SonarQube but as a module of project \""+ anotherProjectKey+ "\". "+ "If you really want to stop directly analysing project \""+ anotherProjectKey+ "\", please first delete it from SonarQube and then relaunch the analysis of project \""+ PROJECT_KEY+ "\".");
   reportReader.putComponent(ScannerReport.Component.newBuilder().setRef(1).setType(ComponentType.PROJECT).setKey(PROJECT_KEY).addChildRef(2).build());
   reportReader.putComponent(ScannerReport.Component.newBuilder().setRef(2).setType(ComponentType.MODULE).setKey(MODULE_KEY).build());
   ComponentDto anotherProject=ComponentTesting.newProjectDto().setKey(anotherProjectKey);
@@ -10,5 +8,7 @@
   dbClient.componentDao().insert(dbTester.getSession(),module);
   dbTester.getSession().commit();
   treeRootHolder.setRoot(ReportComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).addChildren(ReportComponent.builder(Component.Type.MODULE,2).setUuid("BCDE").setKey(MODULE_KEY).build()).build());
+  thrown.expect(MessageException.class);
+  thrown.expectMessage("Validation of project failed:\n" + "  o Component (uuid=ABCD, key=PROJECT_KEY) is not a project\n" + "  o The project \"" + PROJECT_KEY + "\" is already defined in SonarQube but as a module of project \""+ anotherProjectKey+ "\". "+ "If you really want to stop directly analysing project \""+ anotherProjectKey+ "\", please first delete it from SonarQube and then relaunch the analysis of project \""+ PROJECT_KEY+ "\".");
   underTest.execute();
 }
