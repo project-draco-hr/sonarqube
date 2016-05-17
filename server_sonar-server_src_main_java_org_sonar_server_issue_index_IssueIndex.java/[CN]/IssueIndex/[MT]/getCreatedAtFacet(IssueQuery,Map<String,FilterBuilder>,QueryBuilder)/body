@@ -1,6 +1,7 @@
 {
   long now=system.now();
   String timeZoneString=system.getDefaultTimeZone().getID();
+  String gmtTimeZoneString=TimeZone.getTimeZone("GMT").getID();
   DateHistogram.Interval bucketSize=DateHistogram.Interval.YEAR;
   Date createdAfter=query.createdAfter();
   long startTime=createdAfter == null ? getMinCreatedAt(filters,esQuery) : createdAfter.getTime();
@@ -16,7 +17,7 @@
  else   if (timeSpan.isShorterThan(TWENTY_MONTHS)) {
     bucketSize=DateHistogram.Interval.MONTH;
   }
-  AggregationBuilder dateHistogram=AggregationBuilders.dateHistogram(CREATED_AT).field(IssueIndexDefinition.FIELD_ISSUE_FUNC_CREATED_AT).interval(bucketSize).minDocCount(0L).format(DateUtils.DATETIME_FORMAT).timeZone(timeZoneString).postZone(timeZoneString).extendedBounds(startTime,endTime);
+  AggregationBuilder dateHistogram=AggregationBuilders.dateHistogram(CREATED_AT).field(IssueIndexDefinition.FIELD_ISSUE_FUNC_CREATED_AT).interval(bucketSize).minDocCount(0L).format(DateUtils.DATETIME_FORMAT).timeZone(gmtTimeZoneString).postZone(timeZoneString).extendedBounds(startTime,endTime);
   dateHistogram=addEffortAggregationIfNeeded(query,dateHistogram);
   return dateHistogram;
 }
