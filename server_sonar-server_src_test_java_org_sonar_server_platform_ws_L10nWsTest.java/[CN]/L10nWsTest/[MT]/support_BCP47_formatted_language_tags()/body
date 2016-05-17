@@ -1,0 +1,12 @@
+{
+  Locale locale=Locale.PRC;
+  userSessionRule.setLocale(locale);
+  Locale override=Locale.UK;
+  String key1="key1";
+  when(i18n.getPropertyKeys()).thenReturn(ImmutableSet.of(key1));
+  when(i18n.message(override,key1,key1)).thenReturn(key1);
+  Result result=new WsTester(new L10nWs(i18n,server,userSessionRule)).newGetRequest("api/l10n","index").setParam("locale","en-GB").execute();
+  verify(i18n).getPropertyKeys();
+  verify(i18n).message(override,key1,key1);
+  result.assertJson("{\"key1\":\"key1\"}");
+}

@@ -7,7 +7,8 @@
     Locale locale=userSession.locale();
     String localeParam=request.param("locale");
     if (localeParam != null) {
-      locale=LocaleUtils.toLocale(localeParam);
+      locale=Locale.forLanguageTag(localeParam);
+      checkArgument(!locale.getISO3Language().isEmpty(),"'%s' cannot be parsed as a BCP47 language tag",localeParam);
     }
     JsonWriter json=response.newJsonWriter().beginObject();
     for (    String messageKey : i18n.getPropertyKeys()) {
