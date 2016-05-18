@@ -1,0 +1,17 @@
+{
+  String[][] allScopesAndQualifierButProjectAndModule={{Scopes.PROJECT,Qualifiers.VIEW},{Scopes.PROJECT,Qualifiers.SUBVIEW},{Scopes.FILE,Qualifiers.PROJECT},{Scopes.DIRECTORY,Qualifiers.DIRECTORY},{Scopes.FILE,Qualifiers.UNIT_TEST_FILE},{Scopes.PROJECT,"DEV"},{Scopes.PROJECT,"DEV_PRJ"}};
+  for (  String[] scopeAndQualifier : allScopesAndQualifierButProjectAndModule) {
+    String scope=scopeAndQualifier[0];
+    String qualifier=scopeAndQualifier[1];
+    String key="theKey_" + scope + "_"+ qualifier;
+    dbClient.componentDao().insert(dbSession,new ComponentDto().setScope(scope).setQualifier(qualifier).setKey(key));
+    dbSession.commit();
+    try {
+      underTest.load(ProjectDataQuery.create().setModuleKey(key));
+      fail(format("A NotFoundException should have been raised because scope (%s) or qualifier (%s) is not project",scope,qualifier));
+    }
+ catch (    BadRequestException e) {
+      Assertions.assertThat(e).hasMessage("Key '" + key + "' belongs to a component which is not a Project");
+    }
+  }
+}

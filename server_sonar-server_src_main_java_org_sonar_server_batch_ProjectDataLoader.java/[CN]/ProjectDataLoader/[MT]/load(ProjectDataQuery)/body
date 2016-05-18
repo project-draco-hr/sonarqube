@@ -3,6 +3,9 @@
   try {
     ProjectRepositories data=new ProjectRepositories();
     ComponentDto module=checkFoundWithOptional(dbClient.componentDao().selectByKey(session,query.getModuleKey()),"Project or module with key '%s' is not found",query.getModuleKey());
+    if (!isProjectOrModule(module)) {
+      throw new BadRequestException(format("Key '%s' belongs to a component which is not a Project",query.getModuleKey()));
+    }
     boolean hasScanPerm=userSession.hasComponentUuidPermission(SCAN_EXECUTION,module.projectUuid());
     boolean hasBrowsePerm=userSession.hasComponentUuidPermission(USER,module.projectUuid());
     checkPermission(query.isIssuesMode(),hasScanPerm,hasBrowsePerm);
