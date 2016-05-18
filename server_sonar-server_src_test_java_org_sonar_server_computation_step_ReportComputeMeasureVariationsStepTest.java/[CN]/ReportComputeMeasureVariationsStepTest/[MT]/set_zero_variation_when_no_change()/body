@@ -1,0 +1,20 @@
+{
+  SnapshotDto period1ProjectSnapshot=newSnapshotForProject(PROJECT_DTO);
+  dbClient.snapshotDao().insert(session,period1ProjectSnapshot);
+  dbClient.measureDao().insert(session,newMeasureDto(ISSUES_METRIC.getId(),PROJECT_DTO.getId(),period1ProjectSnapshot.getId(),60d));
+  ComponentDto directoryDto=ComponentTesting.newDirectory(PROJECT_DTO,"dir");
+  dbClient.componentDao().insert(session,directoryDto);
+  SnapshotDto period1DirectorySnapshot=createForComponent(directoryDto,period1ProjectSnapshot);
+  dbClient.snapshotDao().insert(session,period1DirectorySnapshot);
+  dbClient.measureDao().insert(session,newMeasureDto(ISSUES_METRIC.getId(),directoryDto.getId(),period1DirectorySnapshot.getId(),10d));
+  session.commit();
+  periodsHolder.setPeriods(newPeriod(1,period1ProjectSnapshot));
+  Component directory=ReportComponent.builder(Component.Type.DIRECTORY,2).setUuid(directoryDto.uuid()).build();
+  Component project=ReportComponent.builder(Component.Type.PROJECT,1).setUuid(PROJECT_DTO.uuid()).addChildren(directory).build();
+  treeRootHolder.setRoot(project);
+  addRawMeasure(project,ISSUES_METRIC,newMeasureBuilder().create(60,null));
+  addRawMeasure(directory,ISSUES_METRIC,newMeasureBuilder().create(10,null));
+  underTest.execute();
+  assertThat(measureRepository.getRawMeasure(project,ISSUES_METRIC).get().getVariations().getVariation1()).isEqualTo(0d);
+  assertThat(measureRepository.getRawMeasure(directory,ISSUES_METRIC).get().getVariations().getVariation1()).isEqualTo(0d);
+}
