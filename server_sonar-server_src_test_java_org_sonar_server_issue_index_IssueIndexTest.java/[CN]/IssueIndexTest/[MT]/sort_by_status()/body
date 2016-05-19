@@ -3,12 +3,12 @@
   ComponentDto file=ComponentTesting.newFileDto(project);
   indexIssues(IssueTesting.newDoc("ISSUE1",file).setStatus(Issue.STATUS_OPEN),IssueTesting.newDoc("ISSUE2",file).setStatus(Issue.STATUS_CLOSED),IssueTesting.newDoc("ISSUE3",file).setStatus(Issue.STATUS_REOPENED));
   IssueQuery.Builder query=IssueQuery.builder(userSessionRule).sort(IssueQuery.SORT_BY_STATUS).asc(true);
-  SearchResult<IssueDoc> result=index.search(query.build(),new SearchOptions());
+  SearchResult<IssueDoc> result=underTest.search(query.build(),new SearchOptions());
   assertThat(result.getDocs().get(0).status()).isEqualTo(Issue.STATUS_CLOSED);
   assertThat(result.getDocs().get(1).status()).isEqualTo(Issue.STATUS_OPEN);
   assertThat(result.getDocs().get(2).status()).isEqualTo(Issue.STATUS_REOPENED);
   query=IssueQuery.builder(userSessionRule).sort(IssueQuery.SORT_BY_STATUS).asc(false);
-  result=index.search(query.build(),new SearchOptions());
+  result=underTest.search(query.build(),new SearchOptions());
   assertThat(result.getDocs().get(0).status()).isEqualTo(Issue.STATUS_REOPENED);
   assertThat(result.getDocs().get(1).status()).isEqualTo(Issue.STATUS_OPEN);
   assertThat(result.getDocs().get(2).status()).isEqualTo(Issue.STATUS_CLOSED);
