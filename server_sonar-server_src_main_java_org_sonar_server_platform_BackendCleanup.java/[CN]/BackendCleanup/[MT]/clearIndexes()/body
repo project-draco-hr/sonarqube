@@ -2,9 +2,9 @@
   Loggers.get(getClass()).info("Truncate Elasticsearch indices");
   try {
     esClient.prepareClearCache().get();
-    esClient.prepareDeleteByQuery(esClient.prepareState().get().getState().getMetaData().concreteAllIndices()).setQuery(QueryBuilders.matchAllQuery()).get();
-    esClient.prepareRefresh(esClient.prepareState().get().getState().getMetaData().concreteAllIndices()).get();
-    esClient.prepareFlush(esClient.prepareState().get().getState().getMetaData().concreteAllIndices()).get();
+    for (    String index : esClient.prepareState().get().getState().getMetaData().concreteAllIndices()) {
+      clearIndex(index);
+    }
   }
  catch (  Exception e) {
     throw new IllegalStateException("Unable to clear indexes",e);

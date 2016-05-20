@@ -1,5 +1,6 @@
 {
-  client.prepareDeleteByQuery(client.prepareState().get().getState().getMetaData().concreteAllIndices()).setQuery(QueryBuilders.matchAllQuery()).get();
-  client.prepareRefresh(client.prepareState().get().getState().getMetaData().concreteAllIndices()).setForce(true).get();
-  client.prepareFlush(client.prepareState().get().getState().getMetaData().concreteAllIndices()).get();
+  String[] indices=client.prepareState().get().getState().getMetaData().concreteAllIndices();
+  for (  String index : indices) {
+    BulkIndexer.delete(client,index,client().prepareSearch(index).setQuery(matchAllQuery()));
+  }
 }
