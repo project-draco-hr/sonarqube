@@ -1,13 +1,13 @@
 {
   setServerProperty(orchestrator,"sonar.dbcleaner.weeksBeforeKeepingOnlyOneSnapshotByWeek","4");
+  String elevenDaysAgo=formatDate(addDays(new Date(),-11));
+  runProjectAnalysis(orchestrator,PROJECT_SAMPLE_PATH,"sonar.projectDate",elevenDaysAgo);
   String tenDaysAgo=formatDate(addDays(new Date(),-10));
   runProjectAnalysis(orchestrator,PROJECT_SAMPLE_PATH,"sonar.projectDate",tenDaysAgo);
-  String eightDaysAgo=formatDate(addDays(new Date(),-8));
-  runProjectAnalysis(orchestrator,PROJECT_SAMPLE_PATH,"sonar.projectDate",eightDaysAgo);
   setServerProperty(orchestrator,"sonar.dbcleaner.weeksBeforeKeepingOnlyOneSnapshotByWeek","0");
   runProjectAnalysis(orchestrator,PROJECT_SAMPLE_PATH);
   WsResponse response=newAdminWsClient(orchestrator).wsConnector().call(new GetRequest("/api/timemachine/index").setParam("resource",PROJECT_KEY).setParam("metrics","ncloc")).failIfNotSuccessful();
   String content=response.content();
-  assertThat(content).contains(eightDaysAgo);
-  assertThat(content).doesNotContain(tenDaysAgo);
+  assertThat(content).contains(tenDaysAgo);
+  assertThat(content).doesNotContain(elevenDaysAgo);
 }
