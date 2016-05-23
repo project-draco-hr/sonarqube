@@ -1,14 +1,16 @@
 {
-  esTester.putDocuments(UserIndexDefinition.INDEX,UserIndexDefinition.TYPE_USER,this.getClass(),"user1.json","user2.json");
-  UserDoc userDoc=index.getNullableByLogin("user1");
+  UserDoc user1=newUser(USER1_LOGIN,asList("scmA","scmB"));
+  esTester.index(INDEX,TYPE_USER,USER1_LOGIN,user1.getFields());
+  esTester.index(INDEX,TYPE_USER,USER2_LOGIN,newUser(USER2_LOGIN,Collections.<String>emptyList()).getFields());
+  UserDoc userDoc=index.getNullableByLogin(USER1_LOGIN);
   assertThat(userDoc).isNotNull();
-  assertThat(userDoc.login()).isEqualTo("user1");
-  assertThat(userDoc.name()).isEqualTo("User1");
-  assertThat(userDoc.email()).isEqualTo("user1@mail.com");
+  assertThat(userDoc.login()).isEqualTo(user1.login());
+  assertThat(userDoc.name()).isEqualTo(user1.name());
+  assertThat(userDoc.email()).isEqualTo(user1.email());
   assertThat(userDoc.active()).isTrue();
-  assertThat(userDoc.scmAccounts()).containsOnly("user_1","u1");
-  assertThat(userDoc.createdAt()).isEqualTo(1500000000000L);
-  assertThat(userDoc.updatedAt()).isEqualTo(1500000000000L);
+  assertThat(userDoc.scmAccounts()).isEqualTo(user1.scmAccounts());
+  assertThat(userDoc.createdAt()).isEqualTo(user1.createdAt());
+  assertThat(userDoc.updatedAt()).isEqualTo(user1.updatedAt());
   assertThat(index.getNullableByLogin("")).isNull();
   assertThat(index.getNullableByLogin("unknown")).isNull();
 }

@@ -1,4 +1,12 @@
 {
-  esTester.putDocuments(UserIndexDefinition.INDEX,UserIndexDefinition.TYPE_USER,this.getClass(),"user1.json","user2-with-same-email-as-user1.json","user3-with-same-email-as-user1.json","user4-with-same-email-as-user1.json");
-  assertThat(index.getAtMostThreeActiveUsersForScmAccount("user1@mail.com")).hasSize(3);
+  String email="user@mail.com";
+  UserDoc user1=newUser("user1",Collections.<String>emptyList()).setEmail(email);
+  UserDoc user2=newUser("user2",Collections.<String>emptyList()).setEmail(email);
+  UserDoc user3=newUser("user3",Collections.<String>emptyList()).setEmail(email);
+  UserDoc user4=newUser("user4",Collections.<String>emptyList()).setEmail(email);
+  esTester.index(INDEX,TYPE_USER,user1.login(),user1.getFields());
+  esTester.index(INDEX,TYPE_USER,user2.login(),user2.getFields());
+  esTester.index(INDEX,TYPE_USER,user3.login(),user3.getFields());
+  esTester.index(INDEX,TYPE_USER,user4.login(),user4.getFields());
+  assertThat(index.getAtMostThreeActiveUsersForScmAccount(email)).hasSize(3);
 }

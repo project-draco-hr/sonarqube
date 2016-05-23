@@ -1,7 +1,8 @@
 {
-  esTester.putDocuments("users","user",getClass(),"charlie.json");
+  UserDoc user=new UserDoc().setLogin("charlie").setName("Charlie").setEmail("charlie@hebdo.com").setActive(true).setScmAccounts(asList("charlie","jesuis@charlie.com"));
+  esTester.index(UserIndexDefinition.INDEX,UserIndexDefinition.TYPE_USER,"charlie",user.getFields());
   UserIndex index=new UserIndex(esTester.client());
-  ScmAccountToUserLoader loader=new ScmAccountToUserLoader(index);
-  assertThat(loader.load("missing")).isNull();
-  assertThat(loader.load("jesuis@charlie.com")).isEqualTo("charlie");
+  ScmAccountToUserLoader underTest=new ScmAccountToUserLoader(index);
+  assertThat(underTest.load("missing")).isNull();
+  assertThat(underTest.load("jesuis@charlie.com")).isEqualTo("charlie");
 }

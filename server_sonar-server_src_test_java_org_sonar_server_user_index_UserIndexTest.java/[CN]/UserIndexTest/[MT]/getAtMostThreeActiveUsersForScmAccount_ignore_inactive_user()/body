@@ -1,5 +1,7 @@
 {
-  esTester.putDocuments(UserIndexDefinition.INDEX,UserIndexDefinition.TYPE_USER,this.getClass(),"inactive-user.json");
-  assertThat(index.getAtMostThreeActiveUsersForScmAccount("inactiveUser")).isEmpty();
-  assertThat(index.getAtMostThreeActiveUsersForScmAccount("user_1")).isEmpty();
+  String scmAccount="scmA";
+  UserDoc user=newUser(USER1_LOGIN,asList(scmAccount)).setActive(false);
+  esTester.index(INDEX,TYPE_USER,user.login(),user.getFields());
+  assertThat(index.getAtMostThreeActiveUsersForScmAccount(user.login())).isEmpty();
+  assertThat(index.getAtMostThreeActiveUsersForScmAccount(scmAccount)).isEmpty();
 }
