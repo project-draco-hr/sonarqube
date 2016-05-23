@@ -3,8 +3,8 @@
   ComponentDto project=ComponentTesting.newProjectDto("project-uuid-" + suffix).setKey("project-key-" + suffix);
   dbClient.componentDao().insert(dbSession,project);
   dbSession.commit();
-  es.putDocuments(IssueIndexDefinition.INDEX,IssueIndexDefinition.TYPE_ISSUE,IssueTesting.newDoc("issue-key-" + suffix,project));
-  es.putDocuments(IssueIndexDefinition.INDEX,IssueIndexDefinition.TYPE_AUTHORIZATION,ImmutableMap.<String,Object>of(IssueIndexDefinition.FIELD_AUTHORIZATION_PROJECT_UUID,project.uuid()));
+  es.putDocuments(IssueIndexDefinition.INDEX,TYPE_ISSUE,IssueTesting.newDoc("issue-key-" + suffix,project));
+  es.index(IssueIndexDefinition.INDEX,TYPE_AUTHORIZATION,project.uuid(),ImmutableMap.<String,Object>of(FIELD_AUTHORIZATION_PROJECT_UUID,project.uuid()));
   TestDoc testDoc=new TestDoc().setUuid("test-uuid-" + suffix).setProjectUuid(project.uuid()).setFileUuid(project.uuid());
   es.putDocuments(TestIndexDefinition.INDEX,TestIndexDefinition.TYPE,testDoc);
 }
