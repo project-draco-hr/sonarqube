@@ -1,5 +1,8 @@
 {
-  esTester.putDocuments(ViewIndexDefinition.INDEX,ViewIndexDefinition.TYPE_VIEW,this.getClass(),"view1.json","view2.json");
+  ViewDoc view1=new ViewDoc().setUuid("UUID1").setProjects(asList("P1"));
+  ViewDoc view2=new ViewDoc().setUuid("UUID2").setProjects(asList("P2"));
+  esTester.index(INDEX,TYPE_VIEW,view1.uuid(),view1.getFields());
+  esTester.index(INDEX,TYPE_VIEW,view2.uuid(),view2.getFields());
   List<String> result=newArrayList(index.findAllViewUuids());
-  assertThat(result).containsOnly("fed0a543-9d9c-4af5-a4ec-450a8fe78ce7","8d0bc2a5-bfba-464b-92de-bb170e9d978e");
+  assertThat(result).containsOnly(view1.uuid(),view2.uuid());
 }
