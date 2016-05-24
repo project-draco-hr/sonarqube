@@ -1,13 +1,20 @@
 {
   setServerProperty(orchestrator,"sonar.dbcleaner.weeksBeforeKeepingOnlyOneSnapshotByWeek","4");
-  String elevenDaysAgo=formatDate(addDays(new Date(),-11));
-  runProjectAnalysis(orchestrator,PROJECT_SAMPLE_PATH,"sonar.projectDate",elevenDaysAgo);
-  String tenDaysAgo=formatDate(addDays(new Date(),-10));
-  runProjectAnalysis(orchestrator,PROJECT_SAMPLE_PATH,"sonar.projectDate",tenDaysAgo);
+  Date oneWeekAgo=addDays(new Date(),-7);
+  Calendar lastWednesday=Calendar.getInstance();
+  lastWednesday.setTime(oneWeekAgo);
+  lastWednesday.set(Calendar.DAY_OF_WEEK,Calendar.WEDNESDAY);
+  String lastWednesdayFormatted=formatDate(lastWednesday.getTime());
+  runProjectAnalysis(orchestrator,PROJECT_SAMPLE_PATH,"sonar.projectDate",lastWednesdayFormatted);
+  Calendar lastThursday=Calendar.getInstance();
+  lastThursday.setTime(oneWeekAgo);
+  lastThursday.set(Calendar.DAY_OF_WEEK,Calendar.THURSDAY);
+  String lastThursdayFormatted=formatDate(lastThursday.getTime());
+  runProjectAnalysis(orchestrator,PROJECT_SAMPLE_PATH,"sonar.projectDate",lastThursdayFormatted);
   setServerProperty(orchestrator,"sonar.dbcleaner.weeksBeforeKeepingOnlyOneSnapshotByWeek","0");
   runProjectAnalysis(orchestrator,PROJECT_SAMPLE_PATH);
   WsResponse response=newAdminWsClient(orchestrator).wsConnector().call(new GetRequest("/api/timemachine/index").setParam("resource",PROJECT_KEY).setParam("metrics","ncloc")).failIfNotSuccessful();
   String content=response.content();
-  assertThat(content).contains(tenDaysAgo);
-  assertThat(content).doesNotContain(elevenDaysAgo);
+  assertThat(content).contains(lastThursdayFormatted);
+  assertThat(content).doesNotContain(lastWednesdayFormatted);
 }
