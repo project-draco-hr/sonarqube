@@ -1,0 +1,13 @@
+{
+  String fieldName=IssueIndexDefinition.FIELD_ISSUE_RESOLUTION;
+  String facetName=RESOLUTIONS;
+  Map<String,QueryBuilder> resolutionFilters=Maps.newHashMap(filters);
+  resolutionFilters.remove("__isResolved");
+  resolutionFilters.remove(fieldName);
+  StickyFacetBuilder assigneeFacetBuilder=newStickyFacetBuilder(query,resolutionFilters,esQuery);
+  BoolQueryBuilder facetFilter=assigneeFacetBuilder.getStickyFacetFilter(fieldName);
+  FilterAggregationBuilder facetTopAggregation=assigneeFacetBuilder.buildTopFacetAggregation(fieldName,facetName,facetFilter,DEFAULT_FACET_SIZE);
+  facetTopAggregation=assigneeFacetBuilder.addSelectedItemsToFacet(fieldName,facetName,facetTopAggregation);
+  facetTopAggregation.subAggregation(addEffortAggregationIfNeeded(query,AggregationBuilders.missing(facetName + FACET_SUFFIX_MISSING).field(fieldName)));
+  return AggregationBuilders.global(facetName).subAggregation(facetTopAggregation);
+}

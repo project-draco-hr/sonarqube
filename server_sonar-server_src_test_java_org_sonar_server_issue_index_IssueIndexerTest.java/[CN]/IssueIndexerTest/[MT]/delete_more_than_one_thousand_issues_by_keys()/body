@@ -1,15 +1,15 @@
 {
   int numberOfIssues=1010;
   List<String> keys=new ArrayList<>(numberOfIssues);
-  List<IssueDoc> issueDocs=new ArrayList<>(numberOfIssues);
+  IssueDoc[] issueDocs=new IssueDoc[numberOfIssues];
   for (int i=0; i < numberOfIssues; i++) {
     String key="Issue" + i;
-    issueDocs.add(newDoc().setKey(key));
+    issueDocs[i]=newDoc().setKey(key).setProjectUuid(A_PROJECT_UUID);
     keys.add(key);
   }
-  esTester.putDocuments(IssueIndexDefinition.INDEX,IssueIndexDefinition.TYPE_ISSUE,issueDocs.toArray(new IssueDoc[]{}));
+  esTester.putDocuments(IssueIndexDefinition.INDEX,IssueIndexDefinition.TYPE_ISSUE,issueDocs);
   IssueIndexer indexer=createIndexer();
   assertThat(esTester.countDocuments("issues","issue")).isEqualTo(numberOfIssues);
-  indexer.deleteByKeys(keys);
+  indexer.deleteByKeys(A_PROJECT_UUID,keys);
   assertThat(esTester.countDocuments("issues","issue")).isZero();
 }

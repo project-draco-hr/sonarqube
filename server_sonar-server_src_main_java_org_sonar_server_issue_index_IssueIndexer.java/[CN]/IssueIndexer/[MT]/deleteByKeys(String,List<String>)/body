@@ -1,0 +1,18 @@
+{
+  if (issueKeys.isEmpty()) {
+    return;
+  }
+  int count=0;
+  BulkRequestBuilder builder=esClient.prepareBulk();
+  for (  String issueKey : issueKeys) {
+    builder.add(esClient.prepareDelete(INDEX,TYPE_ISSUE,issueKey).setRefresh(false).setRouting(projectUuid));
+    count++;
+    if (count >= MAX_BATCH_SIZE) {
+      EsUtils.executeBulkRequest(builder,DELETE_ERROR_MESSAGE,projectUuid);
+      builder=esClient.prepareBulk();
+      count=0;
+    }
+  }
+  EsUtils.executeBulkRequest(builder,DELETE_ERROR_MESSAGE,projectUuid);
+  esClient.prepareRefresh(INDEX).get();
+}

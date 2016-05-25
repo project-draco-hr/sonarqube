@@ -1,7 +1,7 @@
 {
   SearchRequestBuilder esSearch=getClient().prepareSearch(INDEX).setTypes(TYPE_RULE);
   QueryBuilder qb=buildQuery(query);
-  Map<String,FilterBuilder> filters=buildFilters(query);
+  Map<String,QueryBuilder> filters=buildFilters(query);
   if (!options.getFacets().isEmpty()) {
     for (    AggregationBuilder aggregation : getFacets(query,options,qb,filters).values()) {
       esSearch.addAggregation(aggregation);
@@ -9,10 +9,10 @@
   }
   setSorting(query,esSearch);
   setPagination(options,esSearch);
-  BoolFilterBuilder fb=FilterBuilders.boolFilter();
-  for (  FilterBuilder filterBuilder : filters.values()) {
+  BoolQueryBuilder fb=boolQuery();
+  for (  QueryBuilder filterBuilder : filters.values()) {
     fb.must(filterBuilder);
   }
-  esSearch.setQuery(QueryBuilders.filteredQuery(qb,fb));
+  esSearch.setQuery(boolQuery().must(qb).filter(fb));
   return new SearchIdResult<>(esSearch.get(),ToRuleKey.INSTANCE);
 }

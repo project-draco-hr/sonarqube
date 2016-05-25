@@ -2,16 +2,16 @@
   SearchRequestBuilder requestBuilder=getClient().prepareSearch(IssueIndexDefinition.INDEX).setTypes(IssueIndexDefinition.TYPE_ISSUE);
   configureSorting(query,requestBuilder);
   configurePagination(options,requestBuilder);
-  QueryBuilder esQuery=QueryBuilders.matchAllQuery();
-  BoolFilterBuilder esFilter=FilterBuilders.boolFilter();
-  Map<String,FilterBuilder> filters=createFilters(query);
-  for (  FilterBuilder filter : filters.values()) {
+  QueryBuilder esQuery=matchAllQuery();
+  BoolQueryBuilder esFilter=boolQuery();
+  Map<String,QueryBuilder> filters=createFilters(query);
+  for (  QueryBuilder filter : filters.values()) {
     if (filter != null) {
       esFilter.must(filter);
     }
   }
   if (esFilter.hasClauses()) {
-    requestBuilder.setQuery(QueryBuilders.filteredQuery(esQuery,esFilter));
+    requestBuilder.setQuery(boolQuery().must(esQuery).filter(esFilter));
   }
  else {
     requestBuilder.setQuery(esQuery);

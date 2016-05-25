@@ -1,0 +1,25 @@
+{
+  QueryBuilder viewFilter=createViewFilter(query.viewUuids());
+  QueryBuilder componentFilter=createTermsFilter(IssueIndexDefinition.FIELD_ISSUE_COMPONENT_UUID,query.componentUuids());
+  QueryBuilder projectFilter=createTermsFilter(IssueIndexDefinition.FIELD_ISSUE_PROJECT_UUID,query.projectUuids());
+  QueryBuilder moduleRootFilter=createTermsFilter(IssueIndexDefinition.FIELD_ISSUE_MODULE_PATH,query.moduleRootUuids());
+  QueryBuilder moduleFilter=createTermsFilter(IssueIndexDefinition.FIELD_ISSUE_MODULE_UUID,query.moduleUuids());
+  QueryBuilder directoryFilter=createTermsFilter(IssueIndexDefinition.FIELD_ISSUE_DIRECTORY_PATH,query.directories());
+  QueryBuilder fileFilter=createTermsFilter(IssueIndexDefinition.FIELD_ISSUE_COMPONENT_UUID,query.fileUuids());
+  if (BooleanUtils.isTrue(query.onComponentOnly())) {
+    filters.put(IssueIndexDefinition.FIELD_ISSUE_COMPONENT_UUID,componentFilter);
+  }
+ else {
+    filters.put("__view",viewFilter);
+    filters.put(IssueIndexDefinition.FIELD_ISSUE_PROJECT_UUID,projectFilter);
+    filters.put("__module",moduleRootFilter);
+    filters.put(IssueIndexDefinition.FIELD_ISSUE_MODULE_UUID,moduleFilter);
+    filters.put(IssueIndexDefinition.FIELD_ISSUE_DIRECTORY_PATH,directoryFilter);
+    if (fileFilter != null) {
+      filters.put(IssueIndexDefinition.FIELD_ISSUE_COMPONENT_UUID,fileFilter);
+    }
+ else {
+      filters.put(IssueIndexDefinition.FIELD_ISSUE_COMPONENT_UUID,componentFilter);
+    }
+  }
+}

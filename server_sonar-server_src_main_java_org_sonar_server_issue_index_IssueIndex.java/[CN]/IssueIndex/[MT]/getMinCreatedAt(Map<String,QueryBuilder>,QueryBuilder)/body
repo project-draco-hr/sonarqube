@@ -1,0 +1,25 @@
+{
+  String facetNameAndField=IssueIndexDefinition.FIELD_ISSUE_FUNC_CREATED_AT;
+  SearchRequestBuilder esRequest=getClient().prepareSearch(IssueIndexDefinition.INDEX).setTypes(IssueIndexDefinition.TYPE_ISSUE).setSize(0);
+  BoolQueryBuilder esFilter=boolQuery();
+  for (  QueryBuilder filter : filters.values()) {
+    if (filter != null) {
+      esFilter.must(filter);
+    }
+  }
+  if (esFilter.hasClauses()) {
+    esRequest.setQuery(QueryBuilders.filteredQuery(esQuery,esFilter));
+  }
+ else {
+    esRequest.setQuery(esQuery);
+  }
+  esRequest.addAggregation(AggregationBuilders.min(facetNameAndField).field(facetNameAndField));
+  Min minValue=esRequest.get().getAggregations().get(facetNameAndField);
+  Double actualValue=minValue.getValue();
+  if (actualValue.isInfinite()) {
+    return Long.MIN_VALUE;
+  }
+ else {
+    return actualValue.longValue();
+  }
+}

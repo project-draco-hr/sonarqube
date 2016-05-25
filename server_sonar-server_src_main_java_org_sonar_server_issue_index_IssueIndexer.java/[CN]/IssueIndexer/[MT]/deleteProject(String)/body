@@ -2,7 +2,7 @@
   BulkIndexer bulk=new BulkIndexer(esClient,INDEX);
   bulk.setDisableRefresh(false);
   bulk.start();
-  SearchRequestBuilder search=esClient.prepareSearch(INDEX).setRouting(uuid).setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),FilterBuilders.boolFilter().must(FilterBuilders.termsFilter(FIELD_ISSUE_PROJECT_UUID,uuid))));
+  SearchRequestBuilder search=esClient.prepareSearch(INDEX).setTypes(TYPE_ISSUE,TYPE_AUTHORIZATION).setRouting(uuid).setQuery(boolQuery().must(termQuery(FIELD_ISSUE_PROJECT_UUID,uuid)));
   bulk.addDeletion(search);
   bulk.stop();
 }

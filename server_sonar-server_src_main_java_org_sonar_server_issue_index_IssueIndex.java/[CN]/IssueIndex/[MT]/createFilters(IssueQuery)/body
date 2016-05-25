@@ -1,18 +1,18 @@
 {
-  Map<String,FilterBuilder> filters=new HashMap<>();
+  Map<String,QueryBuilder> filters=new HashMap<>();
   filters.put("__authorization",createAuthorizationFilter(query.checkAuthorization(),query.userLogin(),query.userGroups()));
   if (BooleanUtils.isTrue(query.assigned())) {
-    filters.put(IS_ASSIGNED_FILTER,FilterBuilders.existsFilter(IssueIndexDefinition.FIELD_ISSUE_ASSIGNEE));
+    filters.put(IS_ASSIGNED_FILTER,existsQuery(IssueIndexDefinition.FIELD_ISSUE_ASSIGNEE));
   }
  else   if (BooleanUtils.isFalse(query.assigned())) {
-    filters.put(IS_ASSIGNED_FILTER,FilterBuilders.missingFilter(IssueIndexDefinition.FIELD_ISSUE_ASSIGNEE));
+    filters.put(IS_ASSIGNED_FILTER,boolQuery().mustNot(existsQuery(IssueIndexDefinition.FIELD_ISSUE_ASSIGNEE)));
   }
   String isResolved="__isResolved";
   if (BooleanUtils.isTrue(query.resolved())) {
-    filters.put(isResolved,FilterBuilders.existsFilter(IssueIndexDefinition.FIELD_ISSUE_RESOLUTION));
+    filters.put(isResolved,existsQuery(IssueIndexDefinition.FIELD_ISSUE_RESOLUTION));
   }
  else   if (BooleanUtils.isFalse(query.resolved())) {
-    filters.put(isResolved,FilterBuilders.missingFilter(IssueIndexDefinition.FIELD_ISSUE_RESOLUTION));
+    filters.put(isResolved,boolQuery().mustNot(existsQuery(IssueIndexDefinition.FIELD_ISSUE_RESOLUTION)));
   }
   filters.put(IssueIndexDefinition.FIELD_ISSUE_KEY,createTermsFilter(IssueIndexDefinition.FIELD_ISSUE_KEY,query.issueKeys()));
   filters.put(IssueIndexDefinition.FIELD_ISSUE_ASSIGNEE,createTermsFilter(IssueIndexDefinition.FIELD_ISSUE_ASSIGNEE,query.assignees()));

@@ -1,10 +1,10 @@
 {
-  SearchRequestBuilder request=getClient().prepareSearch(INDEX).setQuery(QueryBuilders.filteredQuery(QueryBuilders.termsQuery(FIELD_ACTIVE_RULE_PROFILE_KEY,keys),FilterBuilders.boolFilter().mustNot(FilterBuilders.hasParentFilter(TYPE_RULE,FilterBuilders.termFilter(FIELD_RULE_STATUS,RuleStatus.REMOVED.name()))))).addAggregation(AggregationBuilders.terms(FIELD_ACTIVE_RULE_PROFILE_KEY).field(RuleIndexDefinition.FIELD_ACTIVE_RULE_PROFILE_KEY).size(0).subAggregation(AggregationBuilders.terms(FIELD_ACTIVE_RULE_INHERITANCE).field(RuleIndexDefinition.FIELD_ACTIVE_RULE_INHERITANCE)).subAggregation(AggregationBuilders.terms(FIELD_ACTIVE_RULE_SEVERITY).field(RuleIndexDefinition.FIELD_ACTIVE_RULE_SEVERITY)).subAggregation(AggregationBuilders.count(COUNT_ACTIVE_RULES))).setSize(0).setTypes(TYPE_ACTIVE_RULE);
+  SearchRequestBuilder request=getClient().prepareSearch(INDEX).setQuery(QueryBuilders.boolQuery().must(QueryBuilders.termsQuery(FIELD_ACTIVE_RULE_PROFILE_KEY,keys)).filter(QueryBuilders.boolQuery().mustNot(QueryBuilders.hasParentQuery(TYPE_RULE,QueryBuilders.termQuery(FIELD_RULE_STATUS,RuleStatus.REMOVED.name()))))).addAggregation(AggregationBuilders.terms(FIELD_ACTIVE_RULE_PROFILE_KEY).field(RuleIndexDefinition.FIELD_ACTIVE_RULE_PROFILE_KEY).size(0).subAggregation(AggregationBuilders.terms(FIELD_ACTIVE_RULE_INHERITANCE).field(RuleIndexDefinition.FIELD_ACTIVE_RULE_INHERITANCE)).subAggregation(AggregationBuilders.terms(FIELD_ACTIVE_RULE_SEVERITY).field(RuleIndexDefinition.FIELD_ACTIVE_RULE_SEVERITY)).subAggregation(AggregationBuilders.count(COUNT_ACTIVE_RULES))).setSize(0).setTypes(TYPE_ACTIVE_RULE);
   SearchResponse response=request.get();
   Map<String,Multimap<String,FacetValue>> stats=new HashMap<>();
   Aggregation aggregation=response.getAggregations().get(FIELD_ACTIVE_RULE_PROFILE_KEY);
   for (  Terms.Bucket value : ((Terms)aggregation).getBuckets()) {
-    stats.put(value.getKey(),processAggregations(value.getAggregations()));
+    stats.put(value.getKeyAsString(),processAggregations(value.getAggregations()));
   }
   return stats;
 }

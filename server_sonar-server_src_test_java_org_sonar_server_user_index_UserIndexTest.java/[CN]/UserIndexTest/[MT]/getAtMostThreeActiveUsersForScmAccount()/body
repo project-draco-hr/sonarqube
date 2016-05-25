@@ -2,9 +2,9 @@
   UserDoc user1=newUser("user1",asList("user_1","u1"));
   UserDoc user2=newUser("user_with_same_email_as_user1",asList("user_2")).setEmail(user1.email());
   UserDoc user3=newUser("inactive_user_with_same_scm_as_user1",user1.scmAccounts()).setActive(false);
-  esTester.index(INDEX,TYPE_USER,user1.login(),user1.getFields());
-  esTester.index(INDEX,TYPE_USER,user2.login(),user2.getFields());
-  esTester.index(INDEX,TYPE_USER,user3.login(),user3.getFields());
+  esTester.putDocuments(INDEX,TYPE_USER,user1);
+  esTester.putDocuments(INDEX,TYPE_USER,user2);
+  esTester.putDocuments(INDEX,TYPE_USER,user3);
   assertThat(index.getAtMostThreeActiveUsersForScmAccount(user1.scmAccounts().get(0))).extractingResultOf("login").containsOnly(user1.login());
   assertThat(index.getAtMostThreeActiveUsersForScmAccount(user1.login())).extractingResultOf("login").containsOnly(user1.login());
   assertThat(index.getAtMostThreeActiveUsersForScmAccount(user1.email())).extractingResultOf("login").containsOnly(user1.login(),user2.login());

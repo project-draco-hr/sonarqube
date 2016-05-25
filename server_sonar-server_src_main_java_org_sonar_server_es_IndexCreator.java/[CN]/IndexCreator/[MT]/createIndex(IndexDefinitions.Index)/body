@@ -1,6 +1,6 @@
 {
   LOGGER.info(String.format("Create index %s",index.getName()));
-  ImmutableSettings.Builder settings=ImmutableSettings.builder();
+  Settings.Builder settings=Settings.builder();
   settings.put(index.getSettings());
   settings.put(SETTING_HASH,new IndexDefinitionHash().of(index));
   CreateIndexResponse indexResponse=client.prepareCreate(index.getName()).setSettings(settings).get();
@@ -10,7 +10,7 @@
   client.waitForStatus(ClusterHealthStatus.YELLOW);
   for (  Map.Entry<String,IndexDefinitions.IndexType> entry : index.getTypes().entrySet()) {
     LOGGER.info(String.format("Create type %s/%s",index.getName(),entry.getKey()));
-    PutMappingResponse mappingResponse=client.preparePutMapping(index.getName()).setType(entry.getKey()).setIgnoreConflicts(false).setSource(entry.getValue().getAttributes()).get();
+    PutMappingResponse mappingResponse=client.preparePutMapping(index.getName()).setType(entry.getKey()).setSource(entry.getValue().getAttributes()).get();
     if (!mappingResponse.isAcknowledged()) {
       throw new IllegalStateException("Failed to create type " + entry.getKey());
     }

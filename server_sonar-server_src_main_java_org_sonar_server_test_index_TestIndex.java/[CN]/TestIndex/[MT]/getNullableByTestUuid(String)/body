@@ -1,5 +1,5 @@
 {
-  for (  SearchHit hit : getClient().prepareSearch(TestIndexDefinition.INDEX).setTypes(TestIndexDefinition.TYPE).setSize(1).setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),FilterBuilders.termFilter(FIELD_TEST_UUID,testUuid))).get().getHits().getHits()) {
+  for (  SearchHit hit : getClient().prepareSearch(TestIndexDefinition.INDEX).setTypes(TestIndexDefinition.TYPE).setSize(1).setQuery(boolQuery().must(matchAllQuery()).filter(termQuery(FIELD_TEST_UUID,testUuid))).get().getHits().getHits()) {
     return Optional.of(new TestDoc(hit.sourceAsMap()));
   }
   return Optional.absent();

@@ -1,6 +1,6 @@
 {
   SearchRequestBuilder requestBuilder=getClient().prepareSearch(IssueIndexDefinition.INDEX).setSize(0).setTypes(IssueIndexDefinition.TYPE_ISSUE);
-  requestBuilder.setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),createBoolFilter(query)));
+  requestBuilder.setQuery(boolQuery().must(QueryBuilders.matchAllQuery()).filter(createBoolFilter(query)));
   TermsBuilder aggreg=AggregationBuilders.terms("_ref").field(fieldName).size(maxNumberOfTags).order(termsOrder).minDocCount(1L);
   if (textQuery != null) {
     aggreg.include(String.format(SUBSTRING_MATCH_REGEXP,textQuery));

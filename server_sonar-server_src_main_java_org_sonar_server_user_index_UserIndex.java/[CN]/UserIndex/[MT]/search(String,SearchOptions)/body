@@ -1,13 +1,13 @@
 {
   SearchRequestBuilder request=esClient.prepareSearch(UserIndexDefinition.INDEX).setTypes(UserIndexDefinition.TYPE_USER).setSize(options.getLimit()).setFrom(options.getOffset()).addSort(UserIndexDefinition.FIELD_NAME,SortOrder.ASC);
-  BoolFilterBuilder userFilter=FilterBuilders.boolFilter().must(FilterBuilders.termFilter(UserIndexDefinition.FIELD_ACTIVE,true));
+  BoolQueryBuilder userQuery=boolQuery().must(termQuery(UserIndexDefinition.FIELD_ACTIVE,true));
   QueryBuilder query;
   if (StringUtils.isEmpty(searchText)) {
-    query=QueryBuilders.matchAllQuery();
+    query=matchAllQuery();
   }
  else {
     query=QueryBuilders.multiMatchQuery(searchText,UserIndexDefinition.FIELD_LOGIN,UserIndexDefinition.FIELD_LOGIN + "." + UserIndexDefinition.SEARCH_SUB_SUFFIX,UserIndexDefinition.FIELD_NAME,UserIndexDefinition.FIELD_NAME + "." + UserIndexDefinition.SEARCH_SUB_SUFFIX).operator(MatchQueryBuilder.Operator.AND);
   }
-  request.setQuery(QueryBuilders.filteredQuery(query,userFilter));
+  request.setQuery(QueryBuilders.filteredQuery(query,userQuery));
   return new SearchResult<>(request.get(),DOC_CONVERTER);
 }

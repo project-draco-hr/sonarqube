@@ -1,15 +1,13 @@
 {
   if (checkAuthorization) {
-    OrFilterBuilder groupsAndUser=FilterBuilders.orFilter();
+    BoolQueryBuilder groupsAndUser=boolQuery();
     if (userLogin != null) {
-      groupsAndUser.add(FilterBuilders.termFilter(IssueIndexDefinition.FIELD_AUTHORIZATION_USERS,userLogin));
+      groupsAndUser.should(termQuery(IssueIndexDefinition.FIELD_AUTHORIZATION_USERS,userLogin));
     }
     for (    String group : userGroups) {
-      groupsAndUser.add(FilterBuilders.termFilter(IssueIndexDefinition.FIELD_AUTHORIZATION_GROUPS,group));
+      groupsAndUser.should(termQuery(IssueIndexDefinition.FIELD_AUTHORIZATION_GROUPS,group));
     }
-    return FilterBuilders.hasParentFilter(IssueIndexDefinition.TYPE_AUTHORIZATION,QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),FilterBuilders.boolFilter().must(groupsAndUser).cache(true)));
+    return QueryBuilders.hasParentQuery(IssueIndexDefinition.TYPE_AUTHORIZATION,QueryBuilders.boolQuery().must(matchAllQuery()).filter(groupsAndUser));
   }
- else {
-    return FilterBuilders.matchAllFilter();
-  }
+  return matchAllQuery();
 }

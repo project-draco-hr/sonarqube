@@ -1,13 +1,20 @@
 {
-  searchRequest.setScroll(TimeValue.timeValueMinutes(5)).setSearchType(SearchType.SCAN).setSize(100).setFetchSource(false);
+  searchRequest.addSort("_doc",SortOrder.ASC).setScroll(TimeValue.timeValueMinutes(5)).setSize(100).setFetchSource(false);
   SearchResponse searchResponse=searchRequest.get();
   while (true) {
-    searchResponse=client.prepareSearchScroll(searchResponse.getScrollId()).setScroll(TimeValue.timeValueMinutes(5)).get();
     SearchHit[] hits=searchResponse.getHits().getHits();
     for (    SearchHit hit : hits) {
-      add(client.prepareDelete(hit.index(),hit.type(),hit.getId()).request());
+      DeleteRequestBuilder deleteRequestBuilder=client.prepareDelete(hit.index(),hit.type(),hit.getId());
+      SearchHitField routing=hit.field("_routing");
+      if (routing != null) {
+        deleteRequestBuilder.setRouting((String)routing.getValue());
+      }
+      add(deleteRequestBuilder.request());
     }
+    String scrollId=searchResponse.getScrollId();
+    searchResponse=client.prepareSearchScroll(scrollId).setScroll(TimeValue.timeValueMinutes(5)).get();
     if (hits.length == 0) {
+      client.nativeClient().prepareClearScroll().addScrollId(scrollId).get();
       break;
     }
   }

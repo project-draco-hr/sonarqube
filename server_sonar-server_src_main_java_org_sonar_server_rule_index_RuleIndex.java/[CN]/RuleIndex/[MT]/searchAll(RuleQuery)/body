@@ -1,13 +1,13 @@
 {
   SearchRequestBuilder esSearch=getClient().prepareSearch(INDEX).setTypes(TYPE_RULE).setSearchType(SearchType.SCAN).setScroll(TimeValue.timeValueMinutes(SCROLL_TIME_IN_MINUTES));
   QueryBuilder qb=buildQuery(query);
-  Map<String,FilterBuilder> filters=buildFilters(query);
+  Map<String,QueryBuilder> filters=buildFilters(query);
   setSorting(query,esSearch);
-  BoolFilterBuilder fb=FilterBuilders.boolFilter();
-  for (  FilterBuilder filterBuilder : filters.values()) {
+  BoolQueryBuilder fb=boolQuery();
+  for (  QueryBuilder filterBuilder : filters.values()) {
     fb.must(filterBuilder);
   }
-  esSearch.setQuery(QueryBuilders.filteredQuery(qb,fb));
+  esSearch.setQuery(boolQuery().must(qb).filter(fb));
   SearchResponse response=esSearch.get();
   return scrollIds(getClient(),response.getScrollId(),ToRuleKey.INSTANCE);
 }

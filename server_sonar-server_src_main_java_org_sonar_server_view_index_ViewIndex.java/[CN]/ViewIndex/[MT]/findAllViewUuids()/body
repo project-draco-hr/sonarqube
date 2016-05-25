@@ -1,14 +1,16 @@
 {
-  SearchRequestBuilder esSearch=esClient.prepareSearch(ViewIndexDefinition.INDEX).setTypes(ViewIndexDefinition.TYPE_VIEW).setSearchType(SearchType.SCAN).setScroll(TimeValue.timeValueMinutes(SCROLL_TIME_IN_MINUTES)).setFetchSource(ViewIndexDefinition.FIELD_UUID,null).setSize(100).setQuery(matchAllQuery());
+  SearchRequestBuilder esSearch=esClient.prepareSearch(ViewIndexDefinition.INDEX).setTypes(ViewIndexDefinition.TYPE_VIEW).addSort("_doc",SortOrder.ASC).setScroll(TimeValue.timeValueMinutes(SCROLL_TIME_IN_MINUTES)).setFetchSource(false).setSize(100).setQuery(matchAllQuery());
   SearchResponse response=esSearch.get();
   List<String> result=newArrayList();
   while (true) {
     List<SearchHit> hits=newArrayList(response.getHits());
     for (    SearchHit hit : hits) {
-      result.add((String)hit.getSource().get(ViewIndexDefinition.FIELD_UUID));
+      result.add(hit.getId());
     }
-    response=esClient.prepareSearchScroll(response.getScrollId()).setScroll(TimeValue.timeValueMinutes(SCROLL_TIME_IN_MINUTES)).get();
+    String scrollId=response.getScrollId();
+    response=esClient.prepareSearchScroll(scrollId).setScroll(TimeValue.timeValueMinutes(SCROLL_TIME_IN_MINUTES)).get();
     if (response.getHits().getHits().length == 0) {
+      esClient.nativeClient().prepareClearScroll().addScrollId(scrollId).get();
       break;
     }
   }

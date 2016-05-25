@@ -1,6 +1,6 @@
 {
   List<CoveredFileDoc> coveredFiles=new ArrayList<>();
-  for (  SearchHit hit : getClient().prepareSearch(TestIndexDefinition.INDEX).setTypes(TestIndexDefinition.TYPE).setSize(1).setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),FilterBuilders.termFilter(FIELD_TEST_UUID,testUuid))).get().getHits().getHits()) {
+  for (  SearchHit hit : getClient().prepareSearch(TestIndexDefinition.INDEX).setTypes(TestIndexDefinition.TYPE).setSize(1).setQuery(boolQuery().must(matchAllQuery()).filter(termQuery(FIELD_TEST_UUID,testUuid))).get().getHits().getHits()) {
     coveredFiles.addAll(new TestDoc(hit.sourceAsMap()).coveredFiles());
   }
   return coveredFiles;
