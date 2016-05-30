@@ -1,0 +1,8 @@
+{
+  DefaultIssue issue=mockIssue("other component uuid");
+  when(issue.toString()).thenReturn("[bad issue, bad!]");
+  when(movedFilesRepository.getOriginalFile(FILE)).thenReturn(Optional.of(new MovedFilesRepository.OriginalFile(6451,"original uuid","original key")));
+  expectedException.expect(IllegalStateException.class);
+  expectedException.expectMessage("Issue [bad issue, bad!] doesn't belong to file original uuid registered as original " + "file of current file ReportComponent{ref=1, key='key_1', type=FILE}");
+  underTest.onIssue(FILE,issue);
+}

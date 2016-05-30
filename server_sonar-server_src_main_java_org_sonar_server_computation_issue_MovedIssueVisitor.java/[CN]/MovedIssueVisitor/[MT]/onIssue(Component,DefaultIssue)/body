@@ -1,0 +1,14 @@
+{
+  if (component.getType() != Component.Type.FILE || component.getUuid().equals(issue.componentUuid())) {
+    return;
+  }
+  Optional<OriginalFile> originalFileOptional=movedFilesRepository.getOriginalFile(component);
+  checkState(originalFileOptional.isPresent(),"Issue %s for component %s has a different component key but no original file exist in MovedFilesRepository",issue,component);
+  OriginalFile originalFile=originalFileOptional.get();
+  checkState(originalFile.getUuid().equals(issue.componentUuid()),"Issue %s doesn't belong to file %s registered as original file of current file %s",issue,originalFile.getUuid(),component);
+  issue.setComponentUuid(component.getUuid());
+  issue.setComponentKey(component.getKey());
+  issue.setModuleUuid(null);
+  issue.setModuleUuidPath(null);
+  issue.setChanged(true);
+}
