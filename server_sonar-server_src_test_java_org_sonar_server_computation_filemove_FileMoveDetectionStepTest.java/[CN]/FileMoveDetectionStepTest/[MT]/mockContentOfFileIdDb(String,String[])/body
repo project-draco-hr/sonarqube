@@ -1,0 +1,11 @@
+{
+  SourceLinesHashesComputer linesHashesComputer=new SourceLinesHashesComputer();
+  SourceHashComputer sourceHashComputer=new SourceHashComputer();
+  Iterator<String> lineIterator=Arrays.asList(content).iterator();
+  while (lineIterator.hasNext()) {
+    String line=lineIterator.next();
+    linesHashesComputer.addLine(line);
+    sourceHashComputer.addLine(line,lineIterator.hasNext());
+  }
+  when(fileSourceDao.selectSourceByFileUuid(dbSession,componentUuidOf(key))).thenReturn(new FileSourceDto().setLineHashes(on('\n').join(linesHashesComputer.getLineHashes())).setSrcHash(sourceHashComputer.getHash()));
+}

@@ -1,0 +1,17 @@
+{
+  ImmutableMap.Builder<String,FileSimilarity.File> builder=ImmutableMap.builder();
+  for (  String fileKey : addedFileKeys) {
+    Component component=reportFilesByKey.get(fileKey);
+    SourceLinesHashesComputer linesHashesComputer=new SourceLinesHashesComputer();
+    SourceHashComputer sourceHashComputer=new SourceHashComputer();
+    try (CloseableIterator<String> lineIterator=sourceLinesRepository.readLines(component)){
+      while (lineIterator.hasNext()) {
+        String line=lineIterator.next();
+        linesHashesComputer.addLine(line);
+        sourceHashComputer.addLine(line,lineIterator.hasNext());
+      }
+    }
+     builder.put(fileKey,new FileSimilarity.File(component.getReportAttributes().getPath(),sourceHashComputer.getHash(),linesHashesComputer.getLineHashes()));
+  }
+  return builder.build();
+}

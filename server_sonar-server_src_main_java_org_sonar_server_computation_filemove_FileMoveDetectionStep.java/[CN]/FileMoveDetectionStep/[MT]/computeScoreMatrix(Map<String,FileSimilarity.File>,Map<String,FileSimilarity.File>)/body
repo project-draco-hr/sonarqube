@@ -1,0 +1,20 @@
+{
+  int[][] scoreMatrix=new int[dbFileSourcesByKey.size()][reportFileSourcesByKey.size()];
+  int maxScore=0;
+  int dbFileIndex=0;
+  for (  Map.Entry<String,FileSimilarity.File> dbFileSourceAndKey : dbFileSourcesByKey.entrySet()) {
+    FileSimilarity.File fileInDb=dbFileSourceAndKey.getValue();
+    int reportFileIndex=0;
+    for (    Map.Entry<String,FileSimilarity.File> reportFileSourceAndKey : reportFileSourcesByKey.entrySet()) {
+      FileSimilarity.File unmatchedFile=reportFileSourceAndKey.getValue();
+      int score=fileSimilarity.score(fileInDb,unmatchedFile);
+      scoreMatrix[dbFileIndex][reportFileIndex]=score;
+      if (score > maxScore) {
+        maxScore=score;
+      }
+      reportFileIndex++;
+    }
+    dbFileIndex++;
+  }
+  return new ScoreMatrix(dbFileSourcesByKey,reportFileSourcesByKey,scoreMatrix,maxScore);
+}

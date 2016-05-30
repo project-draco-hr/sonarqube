@@ -1,0 +1,35 @@
+{
+  Snapshot baseProjectSnapshot=analysisMetadataHolder.getBaseProjectSnapshot();
+  if (baseProjectSnapshot == null) {
+    LOG.trace("First analysis. Do nothing.");
+    return;
+  }
+  Map<String,ComponentDtoWithSnapshotId> dbFilesByKey=getDbFilesByKey(baseProjectSnapshot);
+  if (dbFilesByKey.isEmpty()) {
+    LOG.trace("Previous snapshot has no file. Do nothing.");
+    return;
+  }
+  Map<String,Component> reportFilesByKey=getReportFilesByKey(this.rootHolder.getRoot());
+  if (reportFilesByKey.isEmpty()) {
+    LOG.trace("No File in report. Do nothing.");
+    return;
+  }
+  Set<String> addedFileKeys=ImmutableSet.copyOf(Sets.difference(reportFilesByKey.keySet(),dbFilesByKey.keySet()));
+  Set<String> removedFileKeys=ImmutableSet.copyOf(Sets.difference(dbFilesByKey.keySet(),reportFilesByKey.keySet()));
+  if (addedFileKeys.isEmpty() || removedFileKeys.isEmpty()) {
+    LOG.trace("No file added nor removed. Do nothing.");
+    return;
+  }
+  Map<String,FileSimilarity.File> dbFileSourcesByKey=getDbFileSourcesByKey(dbFilesByKey,removedFileKeys);
+  Map<String,FileSimilarity.File> reportFileSourcesByKey=getReportFileSourcesByKey(reportFilesByKey,addedFileKeys);
+  ScoreMatrix scoreMatrix=computeScoreMatrix(dbFileSourcesByKey,reportFileSourcesByKey);
+  if (scoreMatrix.isEmpty()) {
+    return;
+  }
+  MatchesByScore matchesByScore=MatchesByScore.create(scoreMatrix);
+  ElectedMatches electedMatches=electMatches(dbFileSourcesByKey,reportFileSourcesByKey,matchesByScore);
+  for (  Match validatedMatch : electedMatches) {
+    movedFilesRepository.setOriginalFile(reportFilesByKey.get(validatedMatch.getReportKey()),toOriginalFile(dbFilesByKey.get(validatedMatch.getDbKey())));
+    LOG.info("match found: " + validatedMatch);
+  }
+}
