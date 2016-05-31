@@ -1,0 +1,17 @@
+{
+  String oldComponentUuid="a";
+  String newComponentUuid="b";
+  issue.setComponentUuid(oldComponentUuid);
+  updater.setIssueMoved(issue,newComponentUuid,context);
+  assertThat(issue.changes()).hasSize(1);
+  FieldDiffs fieldDiffs=issue.changes().get(0);
+  assertThat(fieldDiffs.creationDate()).isEqualTo(context.date());
+  assertThat(fieldDiffs.diffs()).hasSize(1);
+  Map.Entry<String,FieldDiffs.Diff> entry=fieldDiffs.diffs().entrySet().iterator().next();
+  assertThat(entry.getKey()).isEqualTo("file");
+  assertThat(entry.getValue().oldValue()).isEqualTo(oldComponentUuid);
+  assertThat(entry.getValue().newValue()).isEqualTo(newComponentUuid);
+  assertThat(issue.componentUuid()).isEqualTo(newComponentUuid);
+  assertThat(issue.isChanged()).isTrue();
+  assertThat(issue.updateDate()).isEqualTo(DateUtils.truncate(context.date(),Calendar.SECOND));
+}
