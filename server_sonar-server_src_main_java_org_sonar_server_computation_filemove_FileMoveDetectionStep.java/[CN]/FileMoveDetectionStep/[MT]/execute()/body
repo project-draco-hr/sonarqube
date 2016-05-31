@@ -1,35 +1,37 @@
 {
   Snapshot baseProjectSnapshot=analysisMetadataHolder.getBaseProjectSnapshot();
   if (baseProjectSnapshot == null) {
-    LOG.trace("First analysis. Do nothing.");
+    LOG.debug("First analysis. Do nothing.");
     return;
   }
   Map<String,ComponentDtoWithSnapshotId> dbFilesByKey=getDbFilesByKey(baseProjectSnapshot);
   if (dbFilesByKey.isEmpty()) {
-    LOG.trace("Previous snapshot has no file. Do nothing.");
+    LOG.debug("Previous snapshot has no file. Do nothing.");
     return;
   }
   Map<String,Component> reportFilesByKey=getReportFilesByKey(this.rootHolder.getRoot());
   if (reportFilesByKey.isEmpty()) {
-    LOG.trace("No File in report. Do nothing.");
+    LOG.debug("No files in report. Do nothing.");
     return;
   }
   Set<String> addedFileKeys=ImmutableSet.copyOf(Sets.difference(reportFilesByKey.keySet(),dbFilesByKey.keySet()));
   Set<String> removedFileKeys=ImmutableSet.copyOf(Sets.difference(dbFilesByKey.keySet(),reportFilesByKey.keySet()));
   if (addedFileKeys.isEmpty() || removedFileKeys.isEmpty()) {
-    LOG.trace("No file added nor removed. Do nothing.");
+    LOG.debug("Either no files added or no files removed. Do nothing.");
     return;
   }
-  Map<String,FileSimilarity.File> dbFileSourcesByKey=getDbFileSourcesByKey(dbFilesByKey,removedFileKeys);
-  Map<String,FileSimilarity.File> reportFileSourcesByKey=getReportFileSourcesByKey(reportFilesByKey,addedFileKeys);
+  Map<String,File> dbFileSourcesByKey=getDbFileSourcesByKey(dbFilesByKey,removedFileKeys);
+  Map<String,File> reportFileSourcesByKey=getReportFileSourcesByKey(reportFilesByKey,addedFileKeys);
   ScoreMatrix scoreMatrix=computeScoreMatrix(dbFileSourcesByKey,reportFileSourcesByKey);
-  if (scoreMatrix.isEmpty()) {
+  printIfDebug(scoreMatrix);
+  if (scoreMatrix.maxScore < MIN_REQUIRED_SCORE) {
+    LOG.debug("max score in matrix is less than min required score (%s). Do nothing.",MIN_REQUIRED_SCORE);
     return;
   }
   MatchesByScore matchesByScore=MatchesByScore.create(scoreMatrix);
   ElectedMatches electedMatches=electMatches(dbFileSourcesByKey,reportFileSourcesByKey,matchesByScore);
   for (  Match validatedMatch : electedMatches) {
     movedFilesRepository.setOriginalFile(reportFilesByKey.get(validatedMatch.getReportKey()),toOriginalFile(dbFilesByKey.get(validatedMatch.getDbKey())));
-    LOG.info("match found: " + validatedMatch);
+    LOG.info("File move found: " + validatedMatch);
   }
 }

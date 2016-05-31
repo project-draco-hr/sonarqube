@@ -1,11 +1,11 @@
 {
   try (DbSession dbSession=dbClient.openSession(false)){
-    ImmutableMap.Builder<String,FileSimilarity.File> builder=ImmutableMap.builder();
+    ImmutableMap.Builder<String,File> builder=ImmutableMap.builder();
     for (    String fileKey : removedFileKeys) {
       ComponentDtoWithSnapshotId componentDto=dbFilesByKey.get(fileKey);
       FileSourceDto fileSourceDto=dbClient.fileSourceDao().selectSourceByFileUuid(dbSession,componentDto.uuid());
       if (fileSourceDto != null) {
-        builder.put(fileKey,new FileSimilarity.File(componentDto.path(),fileSourceDto.getSrcHash(),on('\n').splitToList(fileSourceDto.getLineHashes())));
+        builder.put(fileKey,new File(componentDto.path(),fileSourceDto.getSrcHash(),on('\n').splitToList(fileSourceDto.getLineHashes())));
       }
     }
     return builder.build();
