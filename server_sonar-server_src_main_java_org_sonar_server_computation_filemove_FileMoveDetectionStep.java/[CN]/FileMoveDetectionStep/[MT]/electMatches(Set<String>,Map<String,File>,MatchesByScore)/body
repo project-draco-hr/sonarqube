@@ -1,0 +1,32 @@
+{
+  ElectedMatches electedMatches=new ElectedMatches(matchesByScore,dbFileKeys,reportFileSourcesByKey);
+  Multimap<String,Match> matchesPerFileForScore=ArrayListMultimap.create();
+  for (  List<Match> matches : matchesByScore) {
+    if (matches == null) {
+      continue;
+    }
+    List<Match> matchesToValidate=electedMatches.filter(matches);
+    if (matches.isEmpty()) {
+      continue;
+    }
+    if (matches.size() == 1) {
+      Match match=matches.get(0);
+      electedMatches.add(match);
+    }
+ else {
+      matchesPerFileForScore.clear();
+      for (      Match match : matches) {
+        matchesPerFileForScore.put(match.getDbKey(),match);
+        matchesPerFileForScore.put(match.getReportKey(),match);
+      }
+      for (      Match match : matchesToValidate) {
+        int dbFileMatchesCount=matchesPerFileForScore.get(match.getDbKey()).size();
+        int reportFileMatchesCount=matchesPerFileForScore.get(match.getReportKey()).size();
+        if (dbFileMatchesCount == 1 && reportFileMatchesCount == 1) {
+          electedMatches.add(match);
+        }
+      }
+    }
+  }
+  return electedMatches;
+}

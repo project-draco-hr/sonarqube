@@ -1,0 +1,19 @@
+{
+  StringBuilder res=new StringBuilder();
+  res.append(separator);
+  for (  Map.Entry<String,FileSimilarity.File> reportEntry : reportFileSourcesByKey.entrySet()) {
+    res.append(reportEntry.getKey()).append(separator);
+  }
+  accept(new ScoreMatrixVisitor(){
+    private String previousDbFileKey=null;
+    @Override public void visit(    String dbFileKey,    String reportFileKey,    int score){
+      if (!Objects.equals(previousDbFileKey,dbFileKey)) {
+        res.append('\n').append(dbFileKey).append(separator);
+        previousDbFileKey=dbFileKey;
+      }
+      res.append(score).append(separator);
+    }
+  }
+);
+  return res.toString();
+}

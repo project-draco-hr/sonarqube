@@ -4,7 +4,7 @@
     LOG.debug("First analysis. Do nothing.");
     return;
   }
-  Map<String,ComponentDtoWithSnapshotId> dbFilesByKey=getDbFilesByKey(baseProjectSnapshot);
+  Map<String,DbComponent> dbFilesByKey=getDbFilesByKey(baseProjectSnapshot);
   if (dbFilesByKey.isEmpty()) {
     LOG.debug("Previous snapshot has no file. Do nothing.");
     return;
@@ -20,18 +20,14 @@
     LOG.debug("Either no files added or no files removed. Do nothing.");
     return;
   }
-  Map<String,File> dbFileSourcesByKey=getDbFileSourcesByKey(dbFilesByKey,removedFileKeys);
   Map<String,File> reportFileSourcesByKey=getReportFileSourcesByKey(reportFilesByKey,addedFileKeys);
-  ScoreMatrix scoreMatrix=computeScoreMatrix(dbFileSourcesByKey,reportFileSourcesByKey);
+  ScoreMatrix scoreMatrix=computeScoreMatrix(dbFilesByKey,removedFileKeys,reportFileSourcesByKey);
   printIfDebug(scoreMatrix);
-  if (scoreMatrix.maxScore < MIN_REQUIRED_SCORE) {
+  if (scoreMatrix.getMaxScore() < MIN_REQUIRED_SCORE) {
     LOG.debug("max score in matrix is less than min required score (%s). Do nothing.",MIN_REQUIRED_SCORE);
     return;
   }
   MatchesByScore matchesByScore=MatchesByScore.create(scoreMatrix);
-  ElectedMatches electedMatches=electMatches(dbFileSourcesByKey,reportFileSourcesByKey,matchesByScore);
-  for (  Match validatedMatch : electedMatches) {
-    movedFilesRepository.setOriginalFile(reportFilesByKey.get(validatedMatch.getReportKey()),toOriginalFile(dbFilesByKey.get(validatedMatch.getDbKey())));
-    LOG.info("File move found: " + validatedMatch);
-  }
+  ElectedMatches electedMatches=electMatches(removedFileKeys,reportFileSourcesByKey,matchesByScore);
+  registerMatches(dbFilesByKey,reportFilesByKey,electedMatches);
 }
