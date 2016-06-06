@@ -1,0 +1,18 @@
+{
+  try (Connection connection=db.getDatabase().getDataSource().getConnection();PreparedStatement stmt=connection.prepareStatement("select * from " + table);ResultSet res=stmt.executeQuery()){
+    Integer columnIndex=getColumnIndex(res,column);
+    if (columnIndex == null) {
+      fail("The column '" + column + "' does not exist");
+    }
+    assertThat(res.getMetaData().getColumnType(columnIndex)).isEqualTo(expectedType);
+    if (expectedSize != null) {
+      assertThat(res.getMetaData().getColumnDisplaySize(columnIndex)).isEqualTo(expectedSize);
+    }
+    if (isNullable != null) {
+      assertThat(res.getMetaData().isNullable(columnIndex)).isEqualTo(isNullable ? columnNullable : columnNoNulls);
+    }
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException("Fail to check column");
+  }
+}
