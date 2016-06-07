@@ -1,5 +1,16 @@
 {
-  StringBuilder sql=new StringBuilder("ALTER TABLE " + tableName + " ");
-  addColumns(sql,"ALTER COLUMN ","TYPE ",true);
+  StringBuilder sql=new StringBuilder(ALTER_TABLE + tableName + " ");
+  for (Iterator<ColumnDef> columnDefIterator=columnDefs.iterator(); columnDefIterator.hasNext(); ) {
+    ColumnDef columnDef=columnDefIterator.next();
+    sql.append(ALTER_COLUMN);
+    addColumn(sql,columnDef,"TYPE ",false);
+    sql.append(", ");
+    sql.append(ALTER_COLUMN);
+    sql.append(columnDef.getName());
+    sql.append(' ').append(columnDef.isNullable() ? "DROP" : "SET").append(" NOT NULL");
+    if (columnDefIterator.hasNext()) {
+      sql.append(", ");
+    }
+  }
   return Collections.singletonList(sql.toString());
 }
