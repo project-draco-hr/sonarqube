@@ -1,0 +1,24 @@
+{
+  try {
+    UpsertImpl.create(writeConnection,sql).execute().commit();
+  }
+ catch (  SQLException e) {
+    if (errorCount < ERROR_HANDLING_THRESHOLD) {
+      String message=e.getMessage();
+      if (message.contains("ORA-01451")) {
+        String newSql=nullPattern.matcher(sql).replaceFirst("");
+        execute(original,newSql,errorCount + 1);
+        return;
+      }
+ else       if (message.contains("ORA-01442")) {
+        String newSql=notNullPattern.matcher(sql).replaceFirst("");
+        execute(original,newSql,errorCount + 1);
+        return;
+      }
+    }
+    throw new IllegalStateException(messageForIseOf(original,sql,errorCount),e);
+  }
+catch (  Exception e) {
+    throw new IllegalStateException(messageForIseOf(original,sql,errorCount),e);
+  }
+}
