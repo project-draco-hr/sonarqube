@@ -1,0 +1,14 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    PermissionTemplateDto template=dependenciesFinder.getTemplate(dbSession,WsTemplateRef.newTemplateRef(request.getTemplateId(),request.getTemplateName()));
+    PermissionTemplateCharacteristicDao dao=dbClient.permissionTemplateCharacteristicDao();
+    Optional<PermissionTemplateCharacteristicDto> templatePermission=dao.selectByPermissionAndTemplateId(dbSession,request.getPermission(),template.getId());
+    if (templatePermission.isPresent()) {
+      updateTemplateCharacteristic(dbSession,templatePermission.get());
+    }
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}
