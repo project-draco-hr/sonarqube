@@ -1,21 +1,19 @@
 {
   ComponentDto viewDto=save(newView("ABCD").setKey(valueOf(PROJECT_KEY)).setName("Project"));
   ComponentDto subViewDto=save(newSubView(viewDto,"CDEF","key").setKey("2"));
-  SnapshotDto viewSnapshotDto=save(newSnapshotForProject(viewDto).setCreatedAt(DateUtils.parseDateQuietly("2015-01-01").getTime()));
-  SnapshotDto subViewSnapshotDto=save(newSnapshotForProject(subViewDto).setCreatedAt(DateUtils.parseDateQuietly("2015-01-01").getTime()));
   dbTester.getSession().commit();
   Component subView=ViewsComponent.builder(SUBVIEW,2).setUuid("ABCD").build();
-  Component view=ViewsComponent.builder(VIEW,PROJECT_KEY).setUuid("ABCD").addChildren(subView).build();
+  Component view=ViewsComponent.builder(VIEW,PROJECT_KEY).setUuid("CDEF").addChildren(subView).build();
   treeRootHolder.setRoot(view);
   dbIdsRepository.setComponentId(view,viewDto.getId());
   dbIdsRepository.setComponentId(subView,subViewDto.getId());
   periodsHolder.setPeriods(new Period(1,TIMEMACHINE_MODE_DATE,"2015-01-01",analysisDate,123L));
   underTest.execute();
-  SnapshotDto viewSnapshot=getUnprocessedSnapshot(viewDto.getId());
+  SnapshotDto viewSnapshot=getUnprocessedSnapshot(viewDto.uuid());
   assertThat(viewSnapshot.getPeriodMode(1)).isEqualTo(TIMEMACHINE_MODE_DATE);
   assertThat(viewSnapshot.getPeriodDate(1)).isEqualTo(analysisDate);
   assertThat(viewSnapshot.getPeriodModeParameter(1)).isNotNull();
-  SnapshotDto subViewSnapshot=getUnprocessedSnapshot(subViewDto.getId());
+  SnapshotDto subViewSnapshot=getUnprocessedSnapshot(subViewDto.uuid());
   assertThat(subViewSnapshot.getPeriodMode(1)).isEqualTo(TIMEMACHINE_MODE_DATE);
   assertThat(subViewSnapshot.getPeriodDate(1)).isEqualTo(analysisDate);
   assertThat(subViewSnapshot.getPeriodModeParameter(1)).isNotNull();
