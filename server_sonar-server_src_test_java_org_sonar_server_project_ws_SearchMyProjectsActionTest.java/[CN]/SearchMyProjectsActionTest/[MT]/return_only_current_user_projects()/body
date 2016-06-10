@@ -1,0 +1,10 @@
+{
+  ComponentDto jdk7=insertJdk7();
+  ComponentDto cLang=insertClang();
+  UserDto anotherUser=userDb.insertUser(newUserDto());
+  insertUserPermission(UserRole.ADMIN,user.getId(),jdk7.getId());
+  insertUserPermission(UserRole.ADMIN,anotherUser.getId(),cLang.getId());
+  SearchMyProjectsWsResponse result=call_ws();
+  assertThat(result.getProjectsCount()).isEqualTo(1);
+  assertThat(result.getProjects(0).getId()).isEqualTo(jdk7.uuid());
+}

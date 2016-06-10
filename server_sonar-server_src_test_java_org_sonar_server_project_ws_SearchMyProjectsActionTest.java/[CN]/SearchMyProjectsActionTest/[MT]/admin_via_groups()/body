@@ -1,0 +1,11 @@
+{
+  ComponentDto jdk7=insertJdk7();
+  ComponentDto cLang=insertClang();
+  GroupDto group=groupDb.insertGroup(newGroupDto());
+  groupDb.addUserToGroup(user.getId(),group.getId());
+  insertGroupPermission(UserRole.ADMIN,user.getId(),group.getId(),jdk7.getId());
+  insertGroupPermission(UserRole.USER,user.getId(),group.getId(),cLang.getId());
+  SearchMyProjectsWsResponse result=call_ws();
+  assertThat(result.getProjectsCount()).isEqualTo(1);
+  assertThat(result.getProjects(0).getId()).isEqualTo(jdk7.uuid());
+}

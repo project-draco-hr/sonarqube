@@ -1,0 +1,10 @@
+{
+  underTest.insertUserRole(dbSession,new UserRoleDto().setRole(UserRole.ADMIN).setUserId(1L).setResourceId(2L));
+  underTest.insertUserRole(dbSession,new UserRoleDto().setRole(UserRole.ADMIN).setUserId(1L).setResourceId(3L));
+  underTest.insertUserRole(dbSession,new UserRoleDto().setRole(UserRole.ADMIN).setUserId(1L).setResourceId(null));
+  underTest.insertUserRole(dbSession,new UserRoleDto().setRole(UserRole.ADMIN).setUserId(42L).setResourceId(2L));
+  underTest.insertUserRole(dbSession,new UserRoleDto().setRole(GlobalPermissions.SCAN_EXECUTION).setUserId(1L).setResourceId(2L));
+  db.commit();
+  List<Long> result=underTest.selectComponentIdsByPermissionAndUserId(dbSession,UserRole.ADMIN,1L);
+  assertThat(result).hasSize(2).containsExactly(2L,3L);
+}
