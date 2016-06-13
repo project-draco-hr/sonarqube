@@ -2,16 +2,16 @@
   long otherDeveloperId=666l;
   ComponentDto projectDto=insertProject("aa");
   SnapshotDto nonLastSnapshotDto=insertSnapshot(projectDto,false);
-  insertMeasure(nonLastSnapshotDto,DEVELOPER_ID,NCLOC_METRIC_ID,12d);
+  insertMeasure(projectDto,nonLastSnapshotDto,DEVELOPER_ID,NCLOC_METRIC_ID,12d);
   SnapshotDto lastSnapshotDto=insertSnapshot(projectDto,true);
-  insertMeasure(lastSnapshotDto,otherDeveloperId,NCLOC_METRIC_ID,15d);
+  insertMeasure(projectDto,lastSnapshotDto,otherDeveloperId,NCLOC_METRIC_ID,15d);
   assertThat(underTest.selectProjectMeasuresByDeveloperForMetrics(dbSession,DEVELOPER_ID,ImmutableList.of(NCLOC_METRIC_ID))).hasSize(0);
   List<MeasureDto> measureDtos=underTest.selectProjectMeasuresByDeveloperForMetrics(dbSession,otherDeveloperId,ImmutableList.of(NCLOC_METRIC_ID));
   assertThat(measureDtos).hasSize(1);
   MeasureDto measureDto=measureDtos.iterator().next();
   assertThat(measureDto.getMetricId()).isEqualTo(NCLOC_METRIC_ID);
   assertThat(measureDto.getSnapshotId()).isEqualTo(lastSnapshotDto.getId());
-  assertThat(measureDto.getComponentId()).isEqualTo(projectDto.getId());
+  assertThat(measureDto.getComponentUuid()).isEqualTo(projectDto.uuid());
   assertThat(measureDto.getDeveloperId()).isEqualTo(otherDeveloperId);
   assertThat(measureDto.getValue()).isEqualTo(15d);
 }
