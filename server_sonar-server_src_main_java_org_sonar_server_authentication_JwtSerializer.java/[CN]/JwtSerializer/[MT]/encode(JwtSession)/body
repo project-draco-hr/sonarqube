@@ -1,0 +1,9 @@
+{
+  checkIsStarted();
+  long now=system2.now();
+  JwtBuilder jwtBuilder=Jwts.builder().setId(uuidFactory.create()).setSubject(jwtSession.getUserLogin()).setIssuedAt(new Date(now)).setExpiration(new Date(now + jwtSession.getExpirationTimeInSeconds() * 1000)).signWith(SIGNATURE_ALGORITHM,secretKey);
+  for (  Map.Entry<String,Object> entry : jwtSession.getProperties().entrySet()) {
+    jwtBuilder.claim(entry.getKey(),entry.getValue());
+  }
+  return jwtBuilder.compact();
+}

@@ -1,0 +1,12 @@
+{
+  setDefaultSecretKey();
+  underTest.start();
+  Date now=new Date();
+  String token=underTest.encode(new JwtSession(USER_LOGIN,20 * 60));
+  Claims claims=underTest.decode(token).get();
+  assertThat(claims.getId()).isNotEmpty();
+  assertThat(claims.getSubject()).isEqualTo(USER_LOGIN);
+  assertThat(claims.getExpiration()).isNotNull();
+  assertThat(claims.getIssuedAt()).isNotNull();
+  assertThat(claims.getExpiration()).isAfterOrEqualsTo(new Date(now.getTime() + 19 * 60 * 1000));
+}

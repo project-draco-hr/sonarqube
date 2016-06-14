@@ -1,0 +1,9 @@
+{
+  addJwtCookie();
+  addUser(false);
+  Claims claims=createToken(NOW);
+  when(jwtSerializer.decode(JWT_TOKEN)).thenReturn(Optional.of(claims));
+  underTest.validateToken(request,response);
+  verify(httpSession).removeAttribute("user_id");
+  verifyCookie(findCookie("JWT-SESSION").get(),null,0);
+}

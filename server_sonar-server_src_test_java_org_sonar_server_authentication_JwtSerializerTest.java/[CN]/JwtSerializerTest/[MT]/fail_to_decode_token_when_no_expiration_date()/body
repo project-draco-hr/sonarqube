@@ -1,0 +1,8 @@
+{
+  setDefaultSecretKey();
+  underTest.start();
+  String token=Jwts.builder().setId("123").setIssuer("sonarqube").setSubject(USER_LOGIN).setIssuedAt(new Date(system2.now())).signWith(SignatureAlgorithm.HS256,decodeSecretKey(SECRET_KEY)).compact();
+  expectedException.expect(UnauthorizedException.class);
+  expectedException.expectMessage("Token expiration date hasn't been found");
+  underTest.decode(token);
+}

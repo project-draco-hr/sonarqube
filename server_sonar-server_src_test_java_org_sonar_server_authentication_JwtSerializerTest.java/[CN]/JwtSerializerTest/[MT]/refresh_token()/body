@@ -1,0 +1,17 @@
+{
+  setDefaultSecretKey();
+  underTest.start();
+  Date now=new Date();
+  Date createdAt=DateUtils.parseDate("2016-01-01");
+  Date expiredAt=new Date(now.getTime() + 10 * 60 * 1000);
+  Claims token=new DefaultClaims().setId("id").setSubject("subject").setIssuer("sonarqube").setIssuedAt(createdAt).setExpiration(expiredAt);
+  token.put("key","value");
+  String encodedToken=underTest.refresh(token,20 * 60);
+  Claims result=underTest.decode(encodedToken).get();
+  assertThat(result.getId()).isEqualTo("id");
+  assertThat(result.getSubject()).isEqualTo("subject");
+  assertThat(result.getIssuer()).isEqualTo("sonarqube");
+  assertThat(result.getIssuedAt()).isEqualTo(createdAt);
+  assertThat(result.get("key")).isEqualTo("value");
+  assertThat(result.getExpiration()).isNotEqualTo(expiredAt).isAfterOrEqualsTo(new Date(now.getTime() + 19 * 1000));
+}
