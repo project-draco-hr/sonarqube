@@ -16,7 +16,7 @@
   assertThat(projectDto.projectUuid()).isEqualTo(projectDto.uuid());
   assertThat(projectDto.qualifier()).isEqualTo("TRK");
   assertThat(projectDto.scope()).isEqualTo("PRJ");
-  assertThat(projectDto.parentProjectId()).isNull();
+  assertThat(projectDto.getRootUuid()).isEqualTo("ABCD");
   assertThat(projectDto.getCreatedAt()).isEqualTo(now);
   ComponentDto moduleDto=dbClient.componentDao().selectByKey(dbTester.getSession(),"MODULE_KEY").get();
   assertThat(moduleDto.name()).isEqualTo("Module");
@@ -28,7 +28,7 @@
   assertThat(moduleDto.projectUuid()).isEqualTo(projectDto.uuid());
   assertThat(moduleDto.qualifier()).isEqualTo("BRC");
   assertThat(moduleDto.scope()).isEqualTo("PRJ");
-  assertThat(moduleDto.parentProjectId()).isEqualTo(projectDto.getId());
+  assertThat(moduleDto.getRootUuid()).isEqualTo(projectDto.uuid());
   assertThat(moduleDto.getCreatedAt()).isEqualTo(now);
   ComponentDto directoryDto=dbClient.componentDao().selectByKey(dbTester.getSession(),"MODULE_KEY:src/main/java/dir").get();
   assertThat(directoryDto.name()).isEqualTo("src/main/java/dir");
@@ -40,7 +40,7 @@
   assertThat(directoryDto.projectUuid()).isEqualTo(projectDto.uuid());
   assertThat(directoryDto.qualifier()).isEqualTo("DIR");
   assertThat(directoryDto.scope()).isEqualTo("DIR");
-  assertThat(directoryDto.parentProjectId()).isEqualTo(moduleDto.getId());
+  assertThat(directoryDto.getRootUuid()).isEqualTo(moduleDto.uuid());
   assertThat(directoryDto.getCreatedAt()).isEqualTo(now);
   ComponentDto fileDto=dbClient.componentDao().selectByKey(dbTester.getSession(),"MODULE_KEY:src/main/java/dir/Foo.java").get();
   assertThat(fileDto.name()).isEqualTo("Foo.java");
@@ -53,7 +53,7 @@
   assertThat(fileDto.projectUuid()).isEqualTo(projectDto.uuid());
   assertThat(fileDto.qualifier()).isEqualTo("FIL");
   assertThat(fileDto.scope()).isEqualTo("FIL");
-  assertThat(fileDto.parentProjectId()).isEqualTo(moduleDto.getId());
+  assertThat(fileDto.getRootUuid()).isEqualTo(moduleDto.uuid());
   assertThat(fileDto.getCreatedAt()).isEqualTo(now);
   assertThat(dbIdsRepository.getComponentId(project)).isEqualTo(projectDto.getId());
   assertThat(dbIdsRepository.getComponentId(module)).isEqualTo(moduleDto.getId());

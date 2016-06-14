@@ -1,0 +1,18 @@
+{
+  DbSession session=mybatis.openSession(true);
+  ResourceKeyUpdaterMapper mapper=session.getMapper(ResourceKeyUpdaterMapper.class);
+  try {
+    if (mapper.countResourceByKey(newKey) > 0) {
+      throw new IllegalStateException("Impossible to update key: a resource with \"" + newKey + "\" key already exists.");
+    }
+    ResourceDto project=mapper.selectProject(projectUuid);
+    String projectOldKey=project.getKey();
+    List<ResourceDto> resources=mapper.selectProjectResources(projectUuid);
+    resources.add(project);
+    runBatchUpdateForAllResources(resources,projectOldKey,newKey,mapper);
+    session.commit();
+  }
+  finally {
+    MyBatis.closeQuietly(session);
+  }
+}

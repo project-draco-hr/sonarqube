@@ -7,9 +7,9 @@
   json.prop("name",component.name());
   json.prop("longName",component.longName());
   json.prop("q",component.qualifier());
-  ComponentDto parentProject=nullableComponentById(component.parentProjectId(),session);
+  ComponentDto parentProject=retrieveRootIfNotCurrentComponent(component,session);
   ComponentDto project=dbClient.componentDao().selectOrFailByUuid(session,component.projectUuid());
-  boolean displayParentProject=parentProject != null && !parentProject.getId().equals(project.getId());
+  boolean displayParentProject=parentProject != null && !parentProject.uuid().equals(project.uuid());
   json.prop("subProject",displayParentProject ? parentProject.key() : null);
   json.prop("subProjectName",displayParentProject ? parentProject.longName() : null);
   json.prop("project",project.key());

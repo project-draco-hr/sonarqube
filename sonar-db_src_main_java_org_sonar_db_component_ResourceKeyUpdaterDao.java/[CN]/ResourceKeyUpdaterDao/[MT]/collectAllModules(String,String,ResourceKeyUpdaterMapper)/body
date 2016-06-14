@@ -1,0 +1,11 @@
+{
+  ResourceDto project=mapper.selectProject(projectUuid);
+  Set<ResourceDto> modules=Sets.newHashSet();
+  if (project.getKey().contains(stringToReplace)) {
+    modules.add(project);
+  }
+  for (  ResourceDto submodule : mapper.selectDescendantProjects(projectUuid)) {
+    modules.addAll(collectAllModules(submodule.getUuid(),stringToReplace,mapper));
+  }
+  return modules;
+}

@@ -5,17 +5,17 @@
   ComponentDto project=dbClient.componentDao().selectByKey(dbTester.getSession(),PROJECT_KEY).get();
   assertThat(project.moduleUuid()).isNull();
   assertThat(project.moduleUuidPath()).isEqualTo("." + project.uuid() + ".");
-  assertThat(project.parentProjectId()).isNull();
+  assertThat(project.getRootUuid()).isEqualTo("ABCD");
   ComponentDto moduleA=dbClient.componentDao().selectByKey(dbTester.getSession(),"MODULE_A").get();
   assertThat(moduleA.moduleUuid()).isEqualTo(project.uuid());
   assertThat(moduleA.moduleUuidPath()).isEqualTo(project.moduleUuidPath() + moduleA.uuid() + ".");
-  assertThat(moduleA.parentProjectId()).isEqualTo(project.getId());
+  assertThat(moduleA.getRootUuid()).isEqualTo(project.uuid());
   ComponentDto subModuleA=dbClient.componentDao().selectByKey(dbTester.getSession(),"SUB_MODULE_A").get();
   assertThat(subModuleA.moduleUuid()).isEqualTo(moduleA.uuid());
   assertThat(subModuleA.moduleUuidPath()).isEqualTo(moduleA.moduleUuidPath() + subModuleA.uuid() + ".");
-  assertThat(subModuleA.parentProjectId()).isEqualTo(project.getId());
+  assertThat(subModuleA.getRootUuid()).isEqualTo(project.uuid());
   ComponentDto moduleB=dbClient.componentDao().selectByKey(dbTester.getSession(),"MODULE_B").get();
   assertThat(moduleB.moduleUuid()).isEqualTo(project.uuid());
   assertThat(moduleB.moduleUuidPath()).isEqualTo(project.moduleUuidPath() + moduleB.uuid() + ".");
-  assertThat(moduleB.parentProjectId()).isEqualTo(project.getId());
+  assertThat(moduleB.getRootUuid()).isEqualTo(project.uuid());
 }
