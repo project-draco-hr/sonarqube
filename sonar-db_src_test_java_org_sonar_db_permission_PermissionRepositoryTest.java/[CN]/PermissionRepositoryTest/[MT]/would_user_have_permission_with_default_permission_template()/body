@@ -1,0 +1,21 @@
+{
+  UserDto user=userDb.insertUser();
+  GroupDto group=groupDb.insertGroup();
+  groupDb.addUserToGroup(user.getId(),group.getId());
+  PermissionTemplateDto template=templateDb.insertTemplate();
+  setDefaultTemplateUuid(template.getUuid());
+  templateDb.addProjectCreatorToTemplate(template.getId(),SCAN_EXECUTION);
+  templateDb.addUserToTemplate(template.getId(),user.getId(),UserRole.USER);
+  templateDb.addGroupToTemplate(template.getId(),group.getId(),UserRole.CODEVIEWER);
+  templateDb.addGroupToTemplate(template.getId(),null,UserRole.ISSUE_ADMIN);
+  checkWouldUserHavePermission(user.getId(),UserRole.ADMIN,false);
+  checkWouldUserHavePermission(user.getId(),SCAN_EXECUTION,true);
+  checkWouldUserHavePermission(user.getId(),UserRole.USER,true);
+  checkWouldUserHavePermission(user.getId(),UserRole.CODEVIEWER,true);
+  checkWouldUserHavePermission(user.getId(),UserRole.ISSUE_ADMIN,true);
+  checkWouldUserHavePermission(null,UserRole.ADMIN,false);
+  checkWouldUserHavePermission(null,SCAN_EXECUTION,false);
+  checkWouldUserHavePermission(null,UserRole.USER,false);
+  checkWouldUserHavePermission(null,UserRole.CODEVIEWER,false);
+  checkWouldUserHavePermission(null,UserRole.ISSUE_ADMIN,true);
+}

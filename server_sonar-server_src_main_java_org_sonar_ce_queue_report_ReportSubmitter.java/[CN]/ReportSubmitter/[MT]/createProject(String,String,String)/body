@@ -1,0 +1,18 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    boolean wouldCurrentUserHaveScanPermission=permissionService.wouldCurrentUserHavePermissionWithDefaultTemplate(dbSession,SCAN_EXECUTION,projectBranch,projectKey,Qualifiers.PROJECT);
+    if (!wouldCurrentUserHaveScanPermission) {
+      throw insufficientPrivilegesException();
+    }
+    NewComponent newProject=new NewComponent(projectKey,StringUtils.defaultIfBlank(projectName,projectKey));
+    newProject.setBranch(projectBranch);
+    newProject.setQualifier(Qualifiers.PROJECT);
+    ComponentDto project=componentService.create(dbSession,newProject);
+    permissionService.applyDefaultPermissionTemplate(dbSession,project.getKey());
+    return project;
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

@@ -1,18 +1,12 @@
 {
-  PermissionTemplateDto template;
   PermissionTemplateMapper mapper=mapper(session);
-  template=mapper.selectByUuid(templateUuid);
+  PermissionTemplateDto template=mapper.selectByUuid(templateUuid);
   if (template == null) {
     return null;
   }
-  PermissionTemplateDto templateWithUserPermissions=mapper.selectTemplateUsersPermissions(templateUuid);
-  List<PermissionTemplateUserDto> userPermissions=templateWithUserPermissions == null ? emptyList() : templateWithUserPermissions.getUsersPermissions();
-  template.setUsersPermissions(userPermissions);
-  PermissionTemplateDto templateWithGroupPermissions=mapper.selectTemplateGroupsPermissions(templateUuid);
-  List<PermissionTemplateGroupDto> groupPermissions=templateWithGroupPermissions == null ? emptyList() : templateWithGroupPermissions.getGroupsPermissions();
-  template.setGroupsByPermission(groupPermissions);
-  PermissionTemplateDto templateWithCharacteristics=mapper.selectTemplateCharacteristics(templateUuid);
-  List<PermissionTemplateCharacteristicDto> characteristics=templateWithCharacteristics == null ? emptyList() : templateWithCharacteristics.getCharacteristics();
-  template.setCharacteristics(characteristics);
-  return template;
+  List<PermissionTemplateUserDto> userPermissions=mapper.selectUserPermissionsByTemplateId(template.getId());
+  List<PermissionTemplateGroupDto> groupPermissions=mapper.selectGroupPermissionsByTemplateId(template.getId());
+  PermissionTemplateCharacteristicMapper characteristicMapper=session.getMapper(PermissionTemplateCharacteristicMapper.class);
+  List<PermissionTemplateCharacteristicDto> characteristics=characteristicMapper.selectByTemplateId(template.getId());
+  return new PermissionTemplate(template,userPermissions,groupPermissions,characteristics);
 }

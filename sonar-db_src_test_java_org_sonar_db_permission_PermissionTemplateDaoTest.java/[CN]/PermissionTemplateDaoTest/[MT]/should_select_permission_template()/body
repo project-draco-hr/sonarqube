@@ -1,17 +1,20 @@
 {
   db.prepareDbUnit(getClass(),"selectPermissionTemplate.xml");
-  PermissionTemplateDto permissionTemplate=underTest.selectByUuidWithUserAndGroupPermissions("my_template_20130102_030405");
-  assertThat(permissionTemplate).isNotNull();
-  assertThat(permissionTemplate.getName()).isEqualTo("my template");
-  assertThat(permissionTemplate.getUuid()).isEqualTo("my_template_20130102_030405");
-  assertThat(permissionTemplate.getDescription()).isEqualTo("my description");
-  assertThat(permissionTemplate.getUsersPermissions()).hasSize(3);
-  assertThat(permissionTemplate.getUsersPermissions()).extracting("userId").containsOnly(1L,2L,1L);
-  assertThat(permissionTemplate.getUsersPermissions()).extracting("userLogin").containsOnly("login1","login2","login2");
-  assertThat(permissionTemplate.getUsersPermissions()).extracting("userName").containsOnly("user1","user2","user2");
-  assertThat(permissionTemplate.getUsersPermissions()).extracting("permission").containsOnly("user_permission1","user_permission1","user_permission2");
-  assertThat(permissionTemplate.getGroupsPermissions()).hasSize(3);
-  assertThat(permissionTemplate.getGroupsPermissions()).extracting("groupId").containsOnly(1L,2L,null);
-  assertThat(permissionTemplate.getGroupsPermissions()).extracting("groupName").containsOnly("group1","group2",null);
-  assertThat(permissionTemplate.getGroupsPermissions()).extracting("permission").containsOnly("group_permission1","group_permission1","group_permission2");
+  PermissionTemplate result=underTest.selectByUuidWithUserAndGroupPermissions("my_template_20130102_030405");
+  assertThat(result).isNotNull();
+  PermissionTemplateDto template=result.getTemplate();
+  assertThat(template.getName()).isEqualTo("my template");
+  assertThat(template.getUuid()).isEqualTo("my_template_20130102_030405");
+  assertThat(template.getDescription()).isEqualTo("my description");
+  List<PermissionTemplateUserDto> usersPermissions=result.getUserPermissions();
+  assertThat(usersPermissions).hasSize(3);
+  assertThat(usersPermissions).extracting("userId").containsOnly(1L,2L,1L);
+  assertThat(usersPermissions).extracting("userLogin").containsOnly("login1","login2","login2");
+  assertThat(usersPermissions).extracting("userName").containsOnly("user1","user2","user2");
+  assertThat(usersPermissions).extracting("permission").containsOnly("user_permission1","user_permission1","user_permission2");
+  List<PermissionTemplateGroupDto> groupsPermissions=result.getGroupPermissions();
+  assertThat(groupsPermissions).hasSize(3);
+  assertThat(groupsPermissions).extracting("groupId").containsOnly(1L,2L,null);
+  assertThat(groupsPermissions).extracting("groupName").containsOnly("group1","group2",null);
+  assertThat(groupsPermissions).extracting("permission").containsOnly("group_permission1","group_permission1","group_permission2");
 }

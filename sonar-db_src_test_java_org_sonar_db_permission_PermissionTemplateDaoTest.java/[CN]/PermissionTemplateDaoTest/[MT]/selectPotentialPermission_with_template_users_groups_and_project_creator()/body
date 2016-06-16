@@ -1,0 +1,17 @@
+{
+  UserDto user=userDb.insertUser();
+  GroupDto group=groupDb.insertGroup();
+  groupDb.addUserToGroup(user.getId(),group.getId());
+  PermissionTemplateDto template=templateDb.insertTemplate();
+  templateDb.addProjectCreatorToTemplate(template.getId(),SCAN_EXECUTION);
+  templateDb.addProjectCreatorToTemplate(template.getId(),UserRole.ADMIN);
+  templateDb.addUserToTemplate(template.getId(),user.getId(),UserRole.USER);
+  templateDb.addUserToTemplate(template.getId(),user.getId(),UserRole.ADMIN);
+  templateDb.addGroupToTemplate(template.getId(),group.getId(),UserRole.CODEVIEWER);
+  templateDb.addGroupToTemplate(template.getId(),group.getId(),UserRole.ADMIN);
+  templateDb.addGroupToTemplate(template.getId(),null,UserRole.ISSUE_ADMIN);
+  List<String> resultWithUser=underTest.selectPotentialPermissionsByUserIdAndTemplateId(dbSession,user.getId(),template.getId());
+  List<String> resultWithoutUser=underTest.selectPotentialPermissionsByUserIdAndTemplateId(dbSession,null,template.getId());
+  assertThat(resultWithUser).containsOnlyOnce(SCAN_EXECUTION,UserRole.ADMIN,UserRole.USER,UserRole.CODEVIEWER,UserRole.ISSUE_ADMIN);
+  assertThat(resultWithoutUser).containsOnly(UserRole.ISSUE_ADMIN);
+}

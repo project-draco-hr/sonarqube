@@ -2,20 +2,8 @@
   String effectiveProjectKey=ComponentKeys.createKey(projectKey,projectBranch);
   ComponentDto project=componentService.getNullableByKey(effectiveProjectKey);
   if (project == null) {
-    userSession.checkPermission(SCAN_EXECUTION);
-    NewComponent newProject=new NewComponent(projectKey,StringUtils.defaultIfBlank(projectName,projectKey));
-    newProject.setBranch(projectBranch);
-    newProject.setQualifier(Qualifiers.PROJECT);
-    project=componentService.create(newProject);
-    permissionService.applyDefaultPermissionTemplate(project.getKey());
+    project=createProject(projectKey,projectBranch,projectName);
   }
- else {
-    userSession.checkComponentPermission(SCAN_EXECUTION,projectKey);
-  }
-  CeTaskSubmit.Builder submit=queue.prepareSubmit();
-  reportFiles.save(submit.getUuid(),reportInput);
-  submit.setType(CeTaskTypes.REPORT);
-  submit.setComponentUuid(project.uuid());
-  submit.setSubmitterLogin(userSession.getLogin());
-  return queue.submit(submit.build());
+  userSession.checkComponentPermission(SCAN_EXECUTION,projectKey);
+  return submitReport(reportInput,project);
 }
