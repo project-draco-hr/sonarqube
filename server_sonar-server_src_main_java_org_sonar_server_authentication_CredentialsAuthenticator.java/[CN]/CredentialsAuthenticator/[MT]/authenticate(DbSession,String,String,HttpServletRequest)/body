@@ -1,0 +1,11 @@
+{
+  UserDto user=dbClient.userDao().selectActiveUserByLogin(dbSession,userLogin);
+  if (user != null && user.isLocal()) {
+    return authenticateFromDb(user,userPassword);
+  }
+  Optional<UserDto> userDto=externalAuthenticator.authenticate(userLogin,userPassword,request);
+  if (userDto.isPresent()) {
+    return userDto.get();
+  }
+  throw new UnauthorizedException();
+}

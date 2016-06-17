@@ -1,6 +1,8 @@
 {
-  UserSession session=newServerUserSession().setLogin(LOGIN).setUserId(1);
-  when(resourceDao.getRootProjectByComponentKey(FILE_KEY)).thenReturn(new ResourceDto().setKey("com.foo:Bar2"));
-  when(authorizationDao.selectAuthorizedRootProjectsKeys(1,UserRole.USER)).thenReturn(newArrayList(PROJECT_KEY));
-  session.checkComponentPermission(UserRole.USER,FILE_KEY);
+  ComponentDto project2=componentDbTester.insertComponent(ComponentTesting.newProjectDto());
+  ComponentDto file2=componentDbTester.insertComponent(ComponentTesting.newFileDto(project2));
+  addProjectPermissions(project,UserRole.USER);
+  UserSession session=newUserSession(userDto);
+  expectedException.expect(ForbiddenException.class);
+  session.checkComponentPermission(UserRole.USER,file2.getKey());
 }

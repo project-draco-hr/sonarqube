@@ -1,7 +1,9 @@
 {
+  boolean isValid=true;
   for (  String scmAccount : scmAccounts) {
     if (scmAccount.equals(login) || scmAccount.equals(email)) {
       messages.add(Message.of("user.login_or_email_used_as_scm_account"));
+      isValid=false;
     }
  else {
       List<UserDto> matchingUsers=dbClient.userDao().selectByScmAccountOrLoginOrEmail(dbSession,scmAccount);
@@ -13,7 +15,9 @@
       }
       if (!matchingUsersWithoutExistingUser.isEmpty()) {
         messages.add(Message.of("user.scm_account_already_used",scmAccount,Joiner.on(", ").join(matchingUsersWithoutExistingUser)));
+        isValid=false;
       }
     }
   }
+  return isValid;
 }

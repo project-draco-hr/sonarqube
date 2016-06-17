@@ -1,0 +1,10 @@
+{
+  addJwtCookie();
+  Claims claims=createToken(USER_LOGIN,NOW - (4L * 30 * 24* 60* 60* 1000));
+  claims.setExpiration(new Date(NOW + 5 * 60 * 1000));
+  claims.put("lastRefreshTime",FOUR_MINUTES_AGO);
+  when(jwtSerializer.decode(JWT_TOKEN)).thenReturn(Optional.of(claims));
+  underTest.validateToken(request,response);
+  verifyCookie(findCookie("JWT-SESSION").get(),null,0);
+  assertThat(threadLocalUserSession.get().isLoggedIn()).isFalse();
+}

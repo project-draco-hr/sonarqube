@@ -1,40 +1,35 @@
 {
   List<Message> messages=newArrayList();
   String name=updateUser.name();
-  if (updateUser.isNameChanged()) {
-    validateNameFormat(name,messages);
+  if (updateUser.isNameChanged() && validateNameFormat(name,messages)) {
     userDto.setName(name);
   }
   String email=updateUser.email();
-  if (updateUser.isEmailChanged()) {
-    validateEmailFormat(email,messages);
+  if (updateUser.isEmailChanged() && validateEmailFormat(email,messages)) {
     userDto.setEmail(email);
   }
-  if (isNewExternalIdentityNotEqualsToSonaQube(updateUser)) {
+  if (updateUser.isExternalIdentityChanged()) {
     setExternalIdentity(userDto,updateUser.externalIdentity());
     userDto.setSalt(null);
     userDto.setCryptedPassword(null);
   }
  else {
     String password=updateUser.password();
-    if (updateUser.isPasswordChanged()) {
-      validatePasswords(password,messages);
-      checkPasswordChangeAllowed(userDto,messages);
+    if (updateUser.isPasswordChanged() && validatePasswords(password,messages) && checkPasswordChangeAllowed(userDto,messages)) {
       setEncryptedPassWord(password,userDto);
     }
   }
   if (updateUser.isScmAccountsChanged()) {
     List<String> scmAccounts=sanitizeScmAccounts(updateUser.scmAccounts());
     if (scmAccounts != null && !scmAccounts.isEmpty()) {
-      validateScmAccounts(dbSession,scmAccounts,userDto.getLogin(),email != null ? email : userDto.getEmail(),userDto,messages);
-      userDto.setScmAccounts(scmAccounts);
+      String newOrOldEmail=email != null ? email : userDto.getEmail();
+      if (validateScmAccounts(dbSession,scmAccounts,userDto.getLogin(),newOrOldEmail,userDto,messages)) {
+        userDto.setScmAccounts(scmAccounts);
+      }
     }
  else {
       userDto.setScmAccounts((String)null);
     }
-  }
-  if (updateUser.isExternalIdentityChanged()) {
-    setExternalIdentity(userDto,updateUser.externalIdentity());
   }
   if (!messages.isEmpty()) {
     throw new BadRequestException(messages);

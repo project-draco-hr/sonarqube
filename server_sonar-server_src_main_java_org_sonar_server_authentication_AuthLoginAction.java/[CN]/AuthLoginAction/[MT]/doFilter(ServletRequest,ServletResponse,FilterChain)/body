@@ -1,0 +1,15 @@
+{
+  HttpServletRequest request=(HttpServletRequest)servletRequest;
+  HttpServletResponse response=(HttpServletResponse)servletResponse;
+  if (!request.getMethod().equals(POST)) {
+    response.setStatus(HTTP_BAD_REQUEST);
+    return;
+  }
+  try {
+    UserDto userDto=authenticate(request);
+    jwtHttpHandler.generateToken(userDto,response);
+  }
+ catch (  UnauthorizedException e) {
+    response.setStatus(e.httpCode());
+  }
+}

@@ -1,0 +1,19 @@
+{
+  try {
+    ExternalUsersProvider.Context externalUsersProviderContext=new ExternalUsersProvider.Context(userLogin,request);
+    UserDetails details=externalUsersProvider.doGetUserDetails(externalUsersProviderContext);
+    if (details == null) {
+      throw new UnauthorizedException("No user details");
+    }
+    Authenticator.Context authenticatorContext=new Authenticator.Context(userLogin,userPassword,request);
+    boolean status=authenticator.doAuthenticate(authenticatorContext);
+    if (!status) {
+      throw new UnauthorizedException("Fail to authenticate from external provider");
+    }
+    return synchronize(userLogin,details,request);
+  }
+ catch (  Exception e) {
+    LOG.error("Error during authentication",e);
+    throw new UnauthorizedException();
+  }
+}

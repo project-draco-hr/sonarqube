@@ -1,0 +1,11 @@
+{
+  executeStartWithoutGroupSync();
+  when(authenticator.doAuthenticate(any(Authenticator.Context.class))).thenReturn(true);
+  UserDetails userDetails=new UserDetails();
+  userDetails.setName(null);
+  when(externalUsersProvider.doGetUserDetails(any(ExternalUsersProvider.Context.class))).thenReturn(userDetails);
+  when(userIdentityAuthenticator.authenticate(any(UserIdentity.class),any(IdentityProvider.class))).thenReturn(USER);
+  underTest.authenticate(LOGIN,PASSWORD,request);
+  verify(userIdentityAuthenticator).authenticate(userIdentityArgumentCaptor.capture(),identityProviderArgumentCaptor.capture());
+  assertThat(userIdentityArgumentCaptor.getValue().getName()).isEqualTo(LOGIN);
+}

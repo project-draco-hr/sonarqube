@@ -1,0 +1,10 @@
+{
+  when(externalGroupsProvider.doGetGroups(any(ExternalGroupsProvider.Context.class))).thenReturn(asList("group1","group2"));
+  when(userIdentityAuthenticator.authenticate(any(UserIdentity.class),any(IdentityProvider.class))).thenReturn(USER);
+  executeStartWithGroupSync();
+  executeAuthenticate();
+  verify(userIdentityAuthenticator).authenticate(userIdentityArgumentCaptor.capture(),identityProviderArgumentCaptor.capture());
+  UserIdentity userIdentity=userIdentityArgumentCaptor.getValue();
+  assertThat(userIdentity.shouldSyncGroups()).isTrue();
+  assertThat(userIdentity.getGroups()).containsOnly("group1","group2");
+}

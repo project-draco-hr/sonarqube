@@ -1,0 +1,10 @@
+{
+  settings.setProperty("sonar.authenticator.downcase",true);
+  when(userIdentityAuthenticator.authenticate(any(UserIdentity.class),any(IdentityProvider.class))).thenReturn(USER);
+  executeStartWithoutGroupSync();
+  executeAuthenticate("LOGIN");
+  verify(userIdentityAuthenticator).authenticate(userIdentityArgumentCaptor.capture(),identityProviderArgumentCaptor.capture());
+  UserIdentity userIdentity=userIdentityArgumentCaptor.getValue();
+  assertThat(userIdentity.getLogin()).isEqualTo("login");
+  assertThat(userIdentity.getProviderLogin()).isEqualTo("login");
+}

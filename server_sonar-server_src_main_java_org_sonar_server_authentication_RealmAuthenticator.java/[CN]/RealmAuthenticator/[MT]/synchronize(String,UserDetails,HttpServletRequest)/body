@@ -1,0 +1,10 @@
+{
+  String name=details.getName();
+  UserIdentity.Builder userIdentityBuilder=UserIdentity.builder().setLogin(userLogin).setName(isNullOrEmpty(name) ? userLogin : name).setEmail(trimToNull(details.getEmail())).setProviderLogin(userLogin);
+  if (externalGroupsProvider != null) {
+    ExternalGroupsProvider.Context context=new ExternalGroupsProvider.Context(userLogin,request);
+    Collection<String> groups=externalGroupsProvider.doGetGroups(context);
+    userIdentityBuilder.setGroups(new HashSet<>(groups));
+  }
+  return userIdentityAuthenticator.authenticate(userIdentityBuilder.build(),new ExternalIdentityProvider());
+}

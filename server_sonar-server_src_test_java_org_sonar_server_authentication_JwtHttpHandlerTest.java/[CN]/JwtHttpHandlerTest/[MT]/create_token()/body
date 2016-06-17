@@ -1,0 +1,9 @@
+{
+  underTest.generateToken(userDto,response);
+  Optional<Cookie> jwtCookie=findCookie("JWT-SESSION");
+  assertThat(jwtCookie).isPresent();
+  verifyCookie(jwtCookie.get(),JWT_TOKEN,3 * 24 * 60* 60);
+  verify(jwtSerializer).encode(jwtArgumentCaptor.capture());
+  verifyToken(jwtArgumentCaptor.getValue(),3 * 24 * 60* 60,NOW);
+  assertThat(threadLocalUserSession.get().isLoggedIn()).isTrue();
+}

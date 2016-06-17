@@ -2,9 +2,12 @@
   if (existingUser.isActive()) {
     throw new IllegalArgumentException(String.format("An active user with login '%s' already exists",login));
   }
-  UpdateUser updateUser=UpdateUser.create(login).setName(newUser.name()).setEmail(newUser.email()).setScmAccounts(newUser.scmAccounts()).setExternalIdentity(newUser.externalIdentity());
+  UpdateUser updateUser=UpdateUser.create(login).setName(newUser.name()).setEmail(newUser.email()).setScmAccounts(newUser.scmAccounts());
   if (newUser.password() != null) {
     updateUser.setPassword(newUser.password());
+  }
+  if (newUser.externalIdentity() != null) {
+    updateUser.setExternalIdentity(newUser.externalIdentity());
   }
   existingUser.setLocal(true);
   updateUserDto(dbSession,updateUser,existingUser);

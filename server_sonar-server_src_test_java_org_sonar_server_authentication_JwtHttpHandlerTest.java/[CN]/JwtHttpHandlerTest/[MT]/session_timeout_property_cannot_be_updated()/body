@@ -1,10 +1,10 @@
 {
   int firstSessionTimeoutInHours=10;
   settings.setProperty("sonar.auth.sessionTimeoutInHours",firstSessionTimeoutInHours);
-  underTest=new JwtHttpHandler(system2,dbClient,server,settings,jwtSerializer,jwtCsrfVerifier);
-  underTest.generateToken(USER_LOGIN,response);
+  underTest=new JwtHttpHandler(system2,dbClient,server,settings,jwtSerializer,jwtCsrfVerifier,threadLocalUserSession);
+  underTest.generateToken(userDto,response);
   settings.setProperty("sonar.auth.sessionTimeoutInHours",15);
-  underTest.generateToken(USER_LOGIN,response);
+  underTest.generateToken(userDto,response);
   verify(jwtSerializer,times(2)).encode(jwtArgumentCaptor.capture());
   verifyToken(jwtArgumentCaptor.getAllValues().get(0),firstSessionTimeoutInHours * 60 * 60,NOW);
   verifyToken(jwtArgumentCaptor.getAllValues().get(1),firstSessionTimeoutInHours * 60 * 60,NOW);

@@ -1,23 +1,23 @@
 {
   Optional<Claims> claims=jwtSerializer.decode(tokenEncoded);
   if (!claims.isPresent()) {
-    removeSession(request,response);
+    removeToken(response);
     return;
   }
   Date now=new Date(system2.now());
   Claims token=claims.get();
   if (now.after(DateUtils.addSeconds(token.getIssuedAt(),SESSION_DISCONNECT_IN_SECONDS))) {
-    removeSession(request,response);
-    return;
-  }
-  Optional<UserDto> user=selectUserFromDb(token.getSubject());
-  if (!user.isPresent()) {
-    removeSession(request,response);
+    removeToken(response);
     return;
   }
   jwtCsrfVerifier.verifyState(request,(String)token.get(CSRF_JWT_PARAM));
-  request.getSession().setAttribute(RAILS_USER_ID_SESSION,user.get().getId());
   if (now.after(DateUtils.addSeconds(getLastRefreshDate(token),SESSION_REFRESH_IN_SECONDS))) {
     refreshToken(token,response);
   }
+  Optional<UserDto> user=selectUserFromDb(token.getSubject());
+  if (!user.isPresent()) {
+    removeToken(response);
+    throw new UnauthorizedException("User does not exist");
+  }
+  threadLocalUserSession.set(createForUser(dbClient,user.get()));
 }
