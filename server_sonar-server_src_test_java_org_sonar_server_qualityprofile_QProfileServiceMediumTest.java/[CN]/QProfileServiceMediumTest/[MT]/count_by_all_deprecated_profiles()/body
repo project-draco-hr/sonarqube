@@ -1,0 +1,17 @@
+{
+  userSessionRule.login().setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN);
+  RuleDto xooRule2=newXooX2().setStatus(RuleStatus.DEPRECATED);
+  RuleDto xooRule3=newXooX3().setStatus(RuleStatus.DEPRECATED);
+  dbClient.ruleDao().insert(dbSession,xooRule2);
+  dbClient.ruleDao().insert(dbSession,xooRule3);
+  dbSession.commit();
+  ruleIndexer.index();
+  service.activate(XOO_P1_KEY,new RuleActivation(xooRule1.getKey()));
+  service.activate(XOO_P1_KEY,new RuleActivation(xooRule2.getKey()));
+  service.activate(XOO_P1_KEY,new RuleActivation(xooRule3.getKey()));
+  service.activate(XOO_P2_KEY,new RuleActivation(xooRule1.getKey()));
+  service.activate(XOO_P2_KEY,new RuleActivation(xooRule3.getKey()));
+  dbSession.commit();
+  Map<String,Long> counts=activeRuleIndex.countAllDeprecatedByQualityProfileKey();
+  assertThat(counts).hasSize(2).containsEntry(XOO_P1_KEY,2L).containsEntry(XOO_P2_KEY,1L);
+}

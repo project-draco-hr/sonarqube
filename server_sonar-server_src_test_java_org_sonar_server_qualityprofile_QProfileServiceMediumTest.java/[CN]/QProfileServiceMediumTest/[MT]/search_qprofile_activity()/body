@@ -1,9 +1,9 @@
 {
   userSessionRule.login("david").setGlobalPermissions(GlobalPermissions.QUALITY_PROFILE_ADMIN);
   UserDto user=new UserDto().setLogin("david").setName("David").setEmail("dav@id.com").setCreatedAt(System.currentTimeMillis()).setUpdatedAt(System.currentTimeMillis());
-  db.userDao().insert(dbSession,user);
+  dbClient.userDao().insert(dbSession,user);
   dbSession.commit();
-  RuleDto rule=db.ruleDao().selectOrFailByKey(dbSession,RuleTesting.XOO_X1);
+  RuleDto rule=dbClient.ruleDao().selectOrFailByKey(dbSession,RuleTesting.XOO_X1);
   tester.get(ActivityService.class).save(ActiveRuleChange.createFor(ActiveRuleChange.Type.ACTIVATED,ActiveRuleKey.of(XOO_P1_KEY,RuleTesting.XOO_X1)).setSeverity(Severity.MAJOR).setParameter("max","10").toActivity());
   Result<QProfileActivity> activities=service.searchActivities(new QProfileActivityQuery(),new SearchOptions());
   assertThat(activities.getHits()).hasSize(1);
