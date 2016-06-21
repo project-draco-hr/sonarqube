@@ -1,11 +1,11 @@
 {
+  if (!crossProjectDuplicationStatusHolder.isEnabled()) {
+    return;
+  }
   DbSession session=dbClient.openSession(true);
   try {
-    if (crossProjectDuplicationStatusHolder.isEnabled()) {
-      Component project=treeRootHolder.getRoot();
-      long projectSnapshotId=dbIdsRepository.getSnapshotId(project);
-      new DepthTraversalTypeAwareCrawler(new DuplicationVisitor(session,projectSnapshotId)).visit(project);
-    }
+    Component project=treeRootHolder.getRoot();
+    new DepthTraversalTypeAwareCrawler(new DuplicationVisitor(session,analysisMetadataHolder.getUuid())).visit(project);
     session.commit();
   }
   finally {
