@@ -1,0 +1,17 @@
+{
+  Optional<String> authenticatedLogin=userTokenAuthenticator.authenticate(token);
+  if (!authenticatedLogin.isPresent()) {
+    throw new UnauthorizedException("Token doesn't exist");
+  }
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    UserDto userDto=dbClient.userDao().selectActiveUserByLogin(dbSession,authenticatedLogin.get());
+    if (userDto == null) {
+      throw new UnauthorizedException("User doesn't exist");
+    }
+    return userDto;
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

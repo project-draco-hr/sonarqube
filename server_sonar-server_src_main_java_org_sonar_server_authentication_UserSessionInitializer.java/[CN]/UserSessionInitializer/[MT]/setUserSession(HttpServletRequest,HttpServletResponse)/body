@@ -1,0 +1,12 @@
+{
+  Optional<UserDto> user=authenticate(request,response);
+  if (user.isPresent()) {
+    userSession.set(createForUser(dbClient,user.get()));
+  }
+ else {
+    if (settings.getBoolean(CORE_FORCE_AUTHENTICATION_PROPERTY)) {
+      throw new UnauthorizedException("User must be authenticated");
+    }
+    userSession.set(createForAnonymous(dbClient));
+  }
+}

@@ -3,7 +3,6 @@
   Claims claims=createToken(USER_LOGIN,TEN_DAYS_AGO);
   claims.put("lastRefreshTime",FOUR_MINUTES_AGO);
   when(jwtSerializer.decode(JWT_TOKEN)).thenReturn(Optional.of(claims));
-  underTest.validateToken(request,response);
+  assertThat(underTest.validateToken(request,response).isPresent()).isTrue();
   verify(jwtSerializer,never()).refresh(any(Claims.class),anyInt());
-  assertThat(threadLocalUserSession.get().isLoggedIn()).isTrue();
 }

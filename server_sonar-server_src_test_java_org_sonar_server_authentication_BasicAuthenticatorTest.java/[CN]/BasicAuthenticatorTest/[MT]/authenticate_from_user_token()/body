@@ -1,0 +1,8 @@
+{
+  insertUser(UserTesting.newUserDto().setLogin(LOGIN));
+  when(userTokenAuthenticator.authenticate("token")).thenReturn(Optional.of(LOGIN));
+  when(request.getHeader("Authorization")).thenReturn("Basic " + toBase64("token:"));
+  Optional<UserDto> userDto=underTest.authenticate(request);
+  assertThat(userDto.isPresent()).isTrue();
+  assertThat(userDto.get().getLogin()).isEqualTo(LOGIN);
+}

@@ -2,7 +2,6 @@
   addJwtCookie();
   Claims claims=createToken(USER_LOGIN,NOW);
   when(jwtSerializer.decode(JWT_TOKEN)).thenReturn(Optional.of(claims));
-  underTest.validateToken(request,response);
+  assertThat(underTest.validateToken(request,response).isPresent()).isTrue();
   verify(jwtSerializer,never()).encode(any(JwtSerializer.JwtSession.class));
-  assertThat(threadLocalUserSession.get().isLoggedIn()).isTrue();
 }

@@ -1,0 +1,8 @@
+{
+  when(userSession.isLoggedIn()).thenReturn(false);
+  when(basicAuthenticator.authenticate(request)).thenReturn(Optional.empty());
+  when(jwtHttpHandler.validateToken(request,response)).thenReturn(Optional.empty());
+  settings.setProperty("sonar.forceAuthentication",true);
+  assertThat(underTest.initUserSession(request,response)).isTrue();
+  verify(response).setStatus(401);
+}

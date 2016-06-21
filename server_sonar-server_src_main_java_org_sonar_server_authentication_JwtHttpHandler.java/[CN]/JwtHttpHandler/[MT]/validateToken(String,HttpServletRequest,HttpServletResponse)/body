@@ -1,14 +1,12 @@
 {
   Optional<Claims> claims=jwtSerializer.decode(tokenEncoded);
   if (!claims.isPresent()) {
-    removeToken(response);
-    return;
+    return Optional.empty();
   }
   Date now=new Date(system2.now());
   Claims token=claims.get();
   if (now.after(DateUtils.addSeconds(token.getIssuedAt(),SESSION_DISCONNECT_IN_SECONDS))) {
-    removeToken(response);
-    return;
+    return Optional.empty();
   }
   jwtCsrfVerifier.verifyState(request,(String)token.get(CSRF_JWT_PARAM));
   if (now.after(DateUtils.addSeconds(getLastRefreshDate(token),SESSION_REFRESH_IN_SECONDS))) {
@@ -16,8 +14,7 @@
   }
   Optional<UserDto> user=selectUserFromDb(token.getSubject());
   if (!user.isPresent()) {
-    removeToken(response);
-    throw new UnauthorizedException("User does not exist");
+    return Optional.empty();
   }
-  threadLocalUserSession.set(createForUser(dbClient,user.get()));
+  return Optional.of(user.get());
 }

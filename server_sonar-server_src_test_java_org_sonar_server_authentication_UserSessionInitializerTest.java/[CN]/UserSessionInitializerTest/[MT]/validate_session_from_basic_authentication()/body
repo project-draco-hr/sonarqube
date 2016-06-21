@@ -1,0 +1,10 @@
+{
+  when(userSession.isLoggedIn()).thenReturn(false).thenReturn(true);
+  when(basicAuthenticator.authenticate(request)).thenReturn(Optional.of(user));
+  when(jwtHttpHandler.validateToken(request,response)).thenReturn(Optional.empty());
+  assertThat(underTest.initUserSession(request,response)).isTrue();
+  verify(jwtHttpHandler).validateToken(request,response);
+  verify(basicAuthenticator).authenticate(request);
+  verify(userSession).set(any(ServerUserSession.class));
+  verify(response,never()).setStatus(anyInt());
+}

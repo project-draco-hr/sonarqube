@@ -1,0 +1,18 @@
+{
+  String path=request.getRequestURI().replaceFirst(request.getContextPath(),"");
+  try {
+    if (!URL_PATTERN.matches(path)) {
+      return true;
+    }
+    setUserSession(request,response);
+    return true;
+  }
+ catch (  UnauthorizedException e) {
+    jwtHttpHandler.removeToken(response);
+    response.setStatus(HTTP_UNAUTHORIZED);
+    if (isWsUrl(path)) {
+      return false;
+    }
+    return true;
+  }
+}

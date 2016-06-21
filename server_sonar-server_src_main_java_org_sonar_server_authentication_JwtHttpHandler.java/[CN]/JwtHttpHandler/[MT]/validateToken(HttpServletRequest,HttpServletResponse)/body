@@ -1,6 +1,8 @@
 {
-  validate(request,response);
-  if (!threadLocalUserSession.isLoggedIn()) {
-    threadLocalUserSession.set(ServerUserSession.createForAnonymous(dbClient));
+  Optional<UserDto> userDto=validate(request,response);
+  if (userDto.isPresent()) {
+    return userDto;
   }
+  removeToken(response);
+  return Optional.empty();
 }

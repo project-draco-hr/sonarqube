@@ -1,0 +1,11 @@
+{
+  String basicAuthEncoded=authorizationHeader.substring(6);
+  String basicAuthDecoded=new String(BASE64_DECODER.decode(basicAuthEncoded.getBytes(Charsets.UTF_8)),Charsets.UTF_8);
+  int semiColonPos=basicAuthDecoded.indexOf(':');
+  if (semiColonPos <= 0) {
+    throw new UnauthorizedException("Invalid credentials : " + basicAuthDecoded);
+  }
+  String login=basicAuthDecoded.substring(0,semiColonPos);
+  String password=basicAuthDecoded.substring(semiColonPos + 1);
+  return new String[]{login,password};
+}
