@@ -1,14 +1,9 @@
 {
   dbTester.prepareDbUnit(getClass(),"empty.xml");
-  ReportComponent module=ReportComponent.builder(Component.Type.MODULE,2).setUuid("BCDE").build();
-  ReportComponent root=ReportComponent.builder(Component.Type.PROJECT,1).setUuid("ABCD").addChildren(module).build();
-  treeRootHolder.setRoot(root);
-  dbIdsRepository.setSnapshotId(root,1000L);
-  dbIdsRepository.setSnapshotId(module,1001L);
-  Component child=root.getChildren().get(0);
-  when(eventRepository.getEvents(root)).thenReturn(ImmutableList.of(Event.createAlert("Red (was Orange)",null,"Open issues > 0")));
-  when(eventRepository.getEvents(child)).thenReturn(ImmutableList.of(Event.createAlert("Red (was Orange)",null,"Open issues > 0")));
-  treeRootHolder.setRoot(root);
+  treeRootHolder.setRoot(ROOT);
+  dbIdsRepository.setSnapshotId(ROOT,1000L);
+  when(eventRepository.getEvents(ROOT)).thenReturn(ImmutableList.of(Event.createAlert("Red (was Orange)",null,"Open issues > 0")));
+  treeRootHolder.setRoot(ROOT);
   step.execute();
   dbTester.assertDbUnit(getClass(),"persist_report_events_with_component_children-result.xml","events");
 }
