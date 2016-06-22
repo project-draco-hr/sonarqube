@@ -1,0 +1,24 @@
+{
+  List<Interval> intervals=Lists.newArrayList();
+  GregorianCalendar calendar=new GregorianCalendar();
+  int lastYear=-1;
+  int lastFieldValue=-1;
+  Interval currentInterval=null;
+  for (  PurgeableAnalysisDto snapshot : snapshots) {
+    if (!DateUtils.isSameDay(start,snapshot.getDate()) && snapshot.getDate().after(start) && (snapshot.getDate().before(end) || DateUtils.isSameDay(end,snapshot.getDate()))) {
+      calendar.setTime(snapshot.getDate());
+      int currentFieldValue=calendar.get(calendarField);
+      int currentYear=calendar.get(Calendar.YEAR);
+      if (lastYear != currentYear || lastFieldValue != currentFieldValue) {
+        currentInterval=new Interval();
+        intervals.add(currentInterval);
+      }
+      lastFieldValue=currentFieldValue;
+      lastYear=currentYear;
+      if (currentInterval != null) {
+        currentInterval.add(snapshot);
+      }
+    }
+  }
+  return intervals;
+}
