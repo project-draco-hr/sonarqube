@@ -8,7 +8,7 @@
   SnapshotDto fileSnapshot=componentDb.insertComponentAndSnapshot(newFileDto(directoryDto,"file-uuid").setName("file-1"),directorySnapshot);
   MetricDto ncloc=insertNclocMetric();
   MetricDto coverage=insertCoverageMetric();
-  dbClient.measureDao().insert(dbSession,newMeasureDto(ncloc,fileSnapshot.getId()).setValue(5.0d).setVariation(1,4.0d),newMeasureDto(coverage,fileSnapshot.getId()).setValue(15.5d).setVariation(3,2.0d),newMeasureDto(coverage,directorySnapshot.getId()).setValue(15.0d));
+  dbClient.measureDao().insert(dbSession,newMeasureDto(ncloc,fileSnapshot).setValue(5.0d).setVariation(1,4.0d),newMeasureDto(coverage,fileSnapshot).setValue(15.5d).setVariation(3,2.0d),newMeasureDto(coverage,directorySnapshot).setValue(15.0d));
   db.commit();
   ComponentTreeWsResponse response=call(ws.newRequest().setParam(PARAM_BASE_COMPONENT_ID,"project-uuid").setParam(PARAM_METRIC_KEYS,"ncloc,coverage").setParam(PARAM_ADDITIONAL_FIELDS,ADDITIONAL_PERIODS));
   assertThat(response.getComponentsList().get(0).getMeasuresList()).extracting("metric").containsOnly("coverage");

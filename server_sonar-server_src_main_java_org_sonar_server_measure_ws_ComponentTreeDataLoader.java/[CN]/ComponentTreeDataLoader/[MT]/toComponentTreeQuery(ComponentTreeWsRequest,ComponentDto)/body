@@ -1,0 +1,17 @@
+{
+  List<String> childrenQualifiers=childrenQualifiers(wsRequest,baseComponent.qualifier());
+  List<String> sortsWithoutMetricSort=newArrayList(Iterables.filter(wsRequest.getSort(),IsNotMetricSort.INSTANCE));
+  sortsWithoutMetricSort=sortsWithoutMetricSort.isEmpty() ? singletonList(NAME_SORT) : sortsWithoutMetricSort;
+  ComponentTreeQuery.Builder dbQuery=ComponentTreeQuery.builder().setBaseUuid(baseComponent.uuid()).setPage(wsRequest.getPage()).setPageSize(wsRequest.getPageSize()).setSortFields(sortsWithoutMetricSort).setAsc(wsRequest.getAsc());
+  if (wsRequest.getQuery() != null) {
+    dbQuery.setNameOrKeyQuery(wsRequest.getQuery());
+  }
+  if (childrenQualifiers != null) {
+    dbQuery.setQualifiers(childrenQualifiers);
+  }
+  if (isSortByMetric(wsRequest)) {
+    dbQuery.setPage(1);
+    dbQuery.setPageSize(Integer.MAX_VALUE);
+  }
+  return dbQuery.build();
+}

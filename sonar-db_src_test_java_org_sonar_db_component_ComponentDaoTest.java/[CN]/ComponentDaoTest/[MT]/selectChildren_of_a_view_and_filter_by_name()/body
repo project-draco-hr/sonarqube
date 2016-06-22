@@ -1,0 +1,13 @@
+{
+  ComponentDto view=newView(A_VIEW_UUID);
+  SnapshotDto viewSnapshot=componentDb.insertViewAndSnapshot(view);
+  ComponentDto subView=newSubView(view,"subview-uuid","subview-key").setName("subview name");
+  componentDb.insertComponentAndSnapshot(subView,viewSnapshot);
+  ComponentDto project=newProjectDto(PROJECT_UUID).setName("project name");
+  componentDb.insertProjectAndSnapshot(project);
+  componentDb.insertComponentAndSnapshot(newProjectCopy("project-copy-uuid",project,view),viewSnapshot);
+  componentDb.indexAllComponents();
+  ComponentTreeQuery dbQuery=newTreeQuery(A_VIEW_UUID).setNameOrKeyQuery("name").build();
+  List<ComponentDto> components=underTest.selectChildren(dbSession,dbQuery);
+  assertThat(components).extracting("uuid").containsOnly("project-copy-uuid","subview-uuid");
+}

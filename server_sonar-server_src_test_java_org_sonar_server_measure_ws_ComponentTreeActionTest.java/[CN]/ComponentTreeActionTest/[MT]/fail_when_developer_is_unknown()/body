@@ -1,13 +1,13 @@
 {
   expectedException.expect(NotFoundException.class);
-  ComponentDto developer=newDeveloper("developer").setUuid("developer-uuid");
+  ComponentDto developer=newDeveloper("developer","developer-uuid");
   ComponentDto project=newProjectDto("project-uuid").setKey("project-key");
   SnapshotDto developerSnapshot=componentDb.insertDeveloperAndSnapshot(developer);
   SnapshotDto projectSnapshot=componentDb.insertProjectAndSnapshot(project);
   SnapshotDto file1Snapshot=componentDb.insertComponentAndSnapshot(newFileDto(project,"file1-uuid"),projectSnapshot);
   componentDb.insertComponentAndSnapshot(newDevProjectCopy("project-uuid-copy",project,developer),developerSnapshot);
   MetricDto ncloc=insertNclocMetric();
-  dbClient.measureDao().insert(dbSession,newMeasureDto(ncloc,file1Snapshot.getId()).setValue(3d).setDeveloperId(developer.getId()));
+  dbClient.measureDao().insert(dbSession,newMeasureDto(ncloc,file1Snapshot).setValue(3d).setDeveloperId(developer.getId()));
   db.commit();
   call(ws.newRequest().setParam(PARAM_BASE_COMPONENT_ID,"project-uuid").setParam(PARAM_DEVELOPER_KEY,"unknown-developer-key").setParam(PARAM_METRIC_KEYS,"ncloc"));
 }

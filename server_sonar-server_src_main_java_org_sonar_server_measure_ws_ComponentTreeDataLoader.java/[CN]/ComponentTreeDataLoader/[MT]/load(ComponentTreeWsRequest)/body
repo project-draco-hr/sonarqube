@@ -3,17 +3,17 @@
   try {
     ComponentDto baseComponent=componentFinder.getByUuidOrKey(dbSession,wsRequest.getBaseComponentId(),wsRequest.getBaseComponentKey(),BASE_COMPONENT_ID_AND_KEY);
     checkPermissions(baseComponent);
-    SnapshotDto baseSnapshot=dbClient.snapshotDao().selectLastSnapshotByComponentUuid(dbSession,baseComponent.uuid());
+    SnapshotDto baseSnapshot=dbClient.snapshotDao().selectLastSnapshotByComponentUuid(dbSession,baseComponent.projectUuid());
     if (baseSnapshot == null) {
       return ComponentTreeData.builder().setBaseComponent(baseComponent).build();
     }
     Long developerId=searchDeveloperId(dbSession,wsRequest);
-    ComponentTreeQuery dbQuery=toComponentTreeQuery(wsRequest,baseSnapshot);
+    ComponentTreeQuery dbQuery=toComponentTreeQuery(wsRequest,baseComponent);
     ComponentDtosAndTotal componentDtosAndTotal=searchComponents(dbSession,dbQuery,wsRequest);
-    List<ComponentDtoWithSnapshotId> components=componentDtosAndTotal.componentDtos;
+    List<ComponentDto> components=componentDtosAndTotal.componentDtos;
     List<MetricDto> metrics=searchMetrics(dbSession,wsRequest);
     List<WsMeasures.Period> periods=snapshotToWsPeriods(baseSnapshot);
-    Table<String,MetricDto,MeasureDto> measuresByComponentUuidAndMetric=searchMeasuresByComponentUuidAndMetric(dbSession,baseComponent,baseSnapshot,components,metrics,periods,developerId);
+    Table<String,MetricDto,MeasureDto> measuresByComponentUuidAndMetric=searchMeasuresByComponentUuidAndMetric(dbSession,baseComponent,components,metrics,periods,developerId);
     components=filterComponents(components,measuresByComponentUuidAndMetric,metrics,wsRequest);
     components=sortComponents(components,wsRequest,metrics,measuresByComponentUuidAndMetric);
     int componentCount=computeComponentCount(componentDtosAndTotal.total,components,componentWithMeasuresOnly(wsRequest));

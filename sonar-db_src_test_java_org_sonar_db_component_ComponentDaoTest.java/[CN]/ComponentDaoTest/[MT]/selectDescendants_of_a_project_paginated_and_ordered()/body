@@ -1,0 +1,17 @@
+{
+  ComponentDto project=newProjectDto(PROJECT_UUID).setKey("project-key");
+  SnapshotDto projectSnapshot=componentDb.insertProjectAndSnapshot(project);
+  SnapshotDto moduleSnapshot=componentDb.insertComponentAndSnapshot(newModuleDto("module-1-uuid",project),projectSnapshot);
+  componentDb.insertComponentAndSnapshot(newFileDto(project,"file-uuid-1").setName("file-name-1"),projectSnapshot);
+  componentDb.insertComponentAndSnapshot(newFileDto(project,"another-uuid"),projectSnapshot);
+  for (int i=2; i <= 9; i++) {
+    componentDb.insertComponentAndSnapshot(newFileDto(project,"file-uuid-" + i).setName("file-name-" + i),moduleSnapshot);
+  }
+  db.commit();
+  componentDb.indexAllComponents();
+  ComponentTreeQuery query=newTreeQuery(PROJECT_UUID).setQualifiers(newArrayList(Qualifiers.FILE)).setPage(2).setPageSize(3).setNameOrKeyQuery("file-name").setSortFields(singletonList("name")).setAsc(false).build();
+  List<ComponentDto> result=underTest.selectDescendants(dbSession,query);
+  int count=underTest.countDescendants(dbSession,query);
+  assertThat(count).isEqualTo(9);
+  assertThat(result).extracting("uuid").containsExactly("file-uuid-6","file-uuid-5","file-uuid-4");
+}

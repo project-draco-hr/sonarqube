@@ -1,0 +1,19 @@
+{
+  ComponentDto project=newProjectDto("project-uuid");
+  SnapshotDto projectSnapshot=componentDb.insertProjectAndSnapshot(project);
+  ComponentDto module=newModuleDto("module-uuid-1",project);
+  SnapshotDto moduleSnapshot=componentDb.insertComponentAndSnapshot(module,projectSnapshot);
+  componentDb.insertComponentAndSnapshot(newFileDto(project,1),projectSnapshot);
+  for (int i=2; i <= 9; i++) {
+    componentDb.insertComponentAndSnapshot(newFileDto(module,i),moduleSnapshot);
+  }
+  ComponentDto directory=newDirectory(module,"directory-path-1");
+  SnapshotDto directorySnapshot=componentDb.insertComponentAndSnapshot(directory,moduleSnapshot);
+  componentDb.insertComponentAndSnapshot(newFileDto(directory,10),directorySnapshot);
+  db.commit();
+  componentDb.indexAllComponents();
+  TreeWsResponse response=call(ws.newRequest().setParam(PARAM_STRATEGY,"children").setParam(PARAM_BASE_COMPONENT_ID,"module-uuid-1").setParam(Param.PAGE,"2").setParam(Param.PAGE_SIZE,"3").setParam(Param.TEXT_QUERY,"file-name").setParam(Param.ASCENDING,"false").setParam(Param.SORT,"name"));
+  assertThat(response.getComponentsCount()).isEqualTo(3);
+  assertThat(response.getPaging().getTotal()).isEqualTo(8);
+  assertThat(response.getComponentsList()).extracting("id").containsExactly("file-uuid-6","file-uuid-5","file-uuid-4");
+}

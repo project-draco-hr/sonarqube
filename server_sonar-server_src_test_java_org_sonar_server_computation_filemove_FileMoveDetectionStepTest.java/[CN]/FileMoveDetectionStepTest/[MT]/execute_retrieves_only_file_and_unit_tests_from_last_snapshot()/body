@@ -1,11 +1,10 @@
 {
   analysisMetadataHolder.setBaseProjectSnapshot(SNAPSHOT);
   ArgumentCaptor<ComponentTreeQuery> captor=ArgumentCaptor.forClass(ComponentTreeQuery.class);
-  when(componentDao.selectAllChildren(eq(dbSession),captor.capture())).thenReturn(Collections.<ComponentDtoWithSnapshotId>emptyList());
+  when(componentDao.selectDescendants(eq(dbSession),captor.capture())).thenReturn(Collections.emptyList());
   underTest.execute();
   ComponentTreeQuery query=captor.getValue();
-  assertThat(query.getBaseSnapshot().getId()).isEqualTo(SNAPSHOT_ID);
-  assertThat(query.getBaseSnapshot().getRootId()).isEqualTo(SNAPSHOT_ID);
+  assertThat(query.getBaseUuid()).isEqualTo(PROJECT.getUuid());
   assertThat(query.getPage()).isEqualTo(1);
   assertThat(query.getPageSize()).isEqualTo(Integer.MAX_VALUE);
   assertThat(query.getSqlSort()).isEqualTo("LOWER(p.name) ASC, p.name ASC");

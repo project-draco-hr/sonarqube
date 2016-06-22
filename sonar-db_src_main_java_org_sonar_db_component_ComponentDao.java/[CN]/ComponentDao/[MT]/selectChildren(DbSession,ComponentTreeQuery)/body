@@ -1,0 +1,9 @@
+{
+  Optional<ComponentDto> componentOpt=selectByUuid(dbSession,query.getBaseUuid());
+  if (!componentOpt.isPresent()) {
+    return emptyList();
+  }
+  ComponentDto component=componentOpt.get();
+  RowBounds rowBounds=new RowBounds(offset(query.getPage(),query.getPageSize()),query.getPageSize());
+  return mapper(dbSession).selectChildren(query,uuidPathForChildrenQuery(component),rowBounds);
+}

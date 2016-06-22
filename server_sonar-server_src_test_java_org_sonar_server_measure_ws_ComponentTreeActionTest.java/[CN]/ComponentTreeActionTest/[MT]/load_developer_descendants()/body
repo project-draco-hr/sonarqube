@@ -1,11 +1,12 @@
 {
-  ComponentDto developer=newDeveloper("developer").setUuid("developer-uuid");
   ComponentDto project=newProjectDto("project-uuid").setKey("project-key");
-  SnapshotDto developerSnapshot=componentDb.insertDeveloperAndSnapshot(developer);
   componentDb.insertProjectAndSnapshot(project);
+  ComponentDto developer=newDeveloper("developer","developer-uuid");
+  SnapshotDto developerSnapshot=componentDb.insertDeveloperAndSnapshot(developer);
   componentDb.insertComponentAndSnapshot(newDevProjectCopy("project-uuid-copy",project,developer),developerSnapshot);
   insertNclocMetric();
-  ComponentTreeWsResponse response=call(ws.newRequest().setParam(PARAM_BASE_COMPONENT_ID,"developer-uuid").setParam(PARAM_METRIC_KEYS,"ncloc"));
+  db.commit();
+  ComponentTreeWsResponse response=call(ws.newRequest().setParam(PARAM_BASE_COMPONENT_ID,developer.uuid()).setParam(PARAM_METRIC_KEYS,"ncloc"));
   assertThat(response.getComponentsCount()).isEqualTo(1);
   WsMeasures.Component projectCopy=response.getComponents(0);
   assertThat(projectCopy.getId()).isEqualTo("project-uuid-copy");

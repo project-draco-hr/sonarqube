@@ -1,14 +1,14 @@
 {
   if (dbQuery.getQualifiers() != null && dbQuery.getQualifiers().isEmpty()) {
-    return new ComponentDtosAndTotal(Collections.<ComponentDtoWithSnapshotId>emptyList(),0);
+    return new ComponentDtosAndTotal(Collections.emptyList(),0);
   }
   String strategy=requireNonNull(wsRequest.getStrategy());
 switch (strategy) {
 case CHILDREN_STRATEGY:
-    return new ComponentDtosAndTotal(dbClient.componentDao().selectDirectChildren(dbSession,dbQuery),dbClient.componentDao().countDirectChildren(dbSession,dbQuery));
+    return new ComponentDtosAndTotal(dbClient.componentDao().selectChildren(dbSession,dbQuery),dbClient.componentDao().countChildren(dbSession,dbQuery));
 case LEAVES_STRATEGY:
 case ALL_STRATEGY:
-  return new ComponentDtosAndTotal(dbClient.componentDao().selectAllChildren(dbSession,dbQuery),dbClient.componentDao().countAllChildren(dbSession,dbQuery));
+  return new ComponentDtosAndTotal(dbClient.componentDao().selectDescendants(dbSession,dbQuery),dbClient.componentDao().countDescendants(dbSession,dbQuery));
 default :
 throw new IllegalStateException("Unknown component tree strategy");
 }

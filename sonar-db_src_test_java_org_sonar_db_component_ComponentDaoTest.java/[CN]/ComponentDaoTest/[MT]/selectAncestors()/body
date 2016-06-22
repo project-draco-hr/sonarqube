@@ -1,0 +1,15 @@
+{
+  ComponentDto project=newProjectDto(PROJECT_UUID);
+  SnapshotDto projectSnapshot=componentDb.insertProjectAndSnapshot(project);
+  ComponentDto module=newModuleDto(MODULE_UUID,project);
+  SnapshotDto moduleSnapshot=componentDb.insertComponentAndSnapshot(module,projectSnapshot);
+  ComponentDto file=newFileDto(module,FILE_1_UUID);
+  componentDb.insertComponentAndSnapshot(file,moduleSnapshot);
+  db.commit();
+  List<ComponentDto> ancestors=underTest.selectAncestors(dbSession,project);
+  assertThat(ancestors).isEmpty();
+  ancestors=underTest.selectAncestors(dbSession,module);
+  assertThat(ancestors).extracting("uuid").containsExactly(PROJECT_UUID);
+  ancestors=underTest.selectAncestors(dbSession,file);
+  assertThat(ancestors).extracting("uuid").containsExactly(PROJECT_UUID,MODULE_UUID);
+}

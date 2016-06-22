@@ -3,27 +3,23 @@
   try {
     ComponentDto baseComponent=componentFinder.getByUuidOrKey(dbSession,treeWsRequest.getBaseComponentId(),treeWsRequest.getBaseComponentKey(),BASE_COMPONENT_ID_AND_KEY);
     checkPermissions(baseComponent);
-    SnapshotDto baseSnapshot=dbClient.snapshotDao().selectLastSnapshotByComponentUuid(dbSession,baseComponent.uuid());
-    if (baseSnapshot == null) {
-      return emptyResponse(baseComponent,treeWsRequest);
-    }
-    ComponentTreeQuery query=toComponentTreeQuery(treeWsRequest,baseSnapshot);
-    List<ComponentDtoWithSnapshotId> components;
+    ComponentTreeQuery query=toComponentTreeQuery(treeWsRequest,baseComponent);
+    List<ComponentDto> components;
     int total;
 switch (treeWsRequest.getStrategy()) {
 case CHILDREN_STRATEGY:
-      components=dbClient.componentDao().selectDirectChildren(dbSession,query);
-    total=dbClient.componentDao().countDirectChildren(dbSession,query);
+      components=dbClient.componentDao().selectChildren(dbSession,query);
+    total=dbClient.componentDao().countChildren(dbSession,query);
   break;
 case LEAVES_STRATEGY:
 case ALL_STRATEGY:
-components=dbClient.componentDao().selectAllChildren(dbSession,query);
-total=dbClient.componentDao().countAllChildren(dbSession,query);
+components=dbClient.componentDao().selectDescendants(dbSession,query);
+total=dbClient.componentDao().countDescendants(dbSession,query);
 break;
 default :
 throw new IllegalStateException("Unknown component tree strategy");
 }
-Map<String,ComponentDto> referenceComponentsByUuid=searchreferenceComponentsByUuid(dbSession,components);
+Map<String,ComponentDto> referenceComponentsByUuid=searchReferenceComponentsByUuid(dbSession,components);
 return buildResponse(baseComponent,components,referenceComponentsByUuid,Paging.forPageIndex(query.getPage()).withPageSize(query.getPageSize()).andTotal(total));
 }
   finally {
