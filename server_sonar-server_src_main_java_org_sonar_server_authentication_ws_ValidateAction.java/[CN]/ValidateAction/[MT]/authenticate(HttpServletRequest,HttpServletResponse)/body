@@ -1,0 +1,16 @@
+{
+  try {
+    Optional<UserDto> user=jwtHttpHandler.validateToken(request,response);
+    if (user.isPresent()) {
+      return true;
+    }
+    user=basicAuthenticator.authenticate(request);
+    if (user.isPresent()) {
+      return true;
+    }
+    return !settings.getBoolean(CORE_FORCE_AUTHENTICATION_PROPERTY);
+  }
+ catch (  UnauthorizedException e) {
+    return false;
+  }
+}

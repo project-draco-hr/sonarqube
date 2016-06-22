@@ -1,0 +1,7 @@
+{
+  when(jwtHttpHandler.validateToken(request,response)).thenReturn(Optional.empty());
+  doThrow(UnauthorizedException.class).when(basicAuthenticator).authenticate(request);
+  underTest.doFilter(request,response,chain);
+  verify(response).setContentType(MediaTypes.JSON);
+  JsonAssert.assertJson(stringWriter.toString()).isSimilarTo("{\"valid\":false}");
+}
