@@ -1,5 +1,12 @@
 {
-  ActivityDto dto=new ActivityDto().setKey(Uuids.create()).setAuthor(userSession.getLogin()).setAction(activity.getAction()).setMessage(activity.getMessage()).setData(KeyValueFormat.format(activity.getData())).setType(activity.getType().name());
-  dbClient.activityDao().insert(dto);
-  indexer.index();
+  ActivityDto dto=new ActivityDto().setKey(Uuids.create()).setAuthor(userSession.getLogin()).setAction(activity.getAction()).setMessage(activity.getMessage()).setData(KeyValueFormat.format(activity.getData())).setProfileKey(activity.getProfileKey()).setType(activity.getType().name());
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    dbClient.activityDao().insert(dbSession,dto);
+    dbSession.commit();
+    indexer.index();
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
 }
