@@ -1,0 +1,14 @@
+{
+  HttpServletRequest request=(HttpServletRequest)servletRequest;
+  HttpServletResponse response=(HttpServletResponse)servletResponse;
+  String path=request.getRequestURI().replaceFirst(request.getContextPath(),"");
+  String[] pathWithExtension=getPathWithExtension(path);
+  WsUrl url=wsUrls.get(pathWithExtension[0]);
+  if (url == null) {
+    throw new IllegalStateException(format("Unknown path : %s",path));
+  }
+  ServletRequest wsRequest=new ServletRequest(request);
+  ServletResponse wsResponse=new ServletResponse();
+  webServiceEngine.execute(wsRequest,wsResponse,url.getController(),url.getAction(),pathWithExtension[1]);
+  writeResponse(wsResponse,response);
+}

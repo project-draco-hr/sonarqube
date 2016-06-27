@@ -1,0 +1,17 @@
+{
+  HttpServletRequest request=(HttpServletRequest)servletRequest;
+  HttpServletResponse response=(HttpServletResponse)servletResponse;
+  String path=request.getRequestURI().replaceFirst(request.getContextPath(),EMPTY);
+  if (path.startsWith(BATCH_WS + "/") && path.endsWith(".jar")) {
+    response.sendRedirect(format("%s%s/file?name=%s",request.getContextPath(),BATCH_WS,path.replace(BATCH_WS + "/",EMPTY)));
+  }
+ else   if ("/batch_bootstrap/index".equals(path)) {
+    response.sendRedirect(format("%s%s/index",request.getContextPath(),BATCH_WS));
+  }
+ else   if (API_SOURCES_WS.equals(path)) {
+    response.sendRedirect(format("%s%s/index?%s",request.getContextPath(),API_SOURCES_WS,request.getQueryString()));
+  }
+ else {
+    chain.doFilter(request,response);
+  }
+}

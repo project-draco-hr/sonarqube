@@ -1,7 +1,9 @@
 {
-  RubyFile file=mock(RubyFile.class);
-  ServletRequest request=new ServletRequest(source,ImmutableMap.<String,Object>of("param1",file,"param2","value"));
-  request.readInputStreamParam("param1");
-  verify(file).getInStream();
+  InputStream file=mock(InputStream.class);
+  Part part=mock(Part.class);
+  when(part.getInputStream()).thenReturn(file);
+  when(source.getPart("param1")).thenReturn(part);
+  ServletRequest request=new ServletRequest(source);
+  assertThat(request.readInputStreamParam("param1")).isEqualTo(file);
   assertThat(request.readInputStreamParam("param2")).isNull();
 }
