@@ -3,13 +3,13 @@
   activation.setSeverity(BLOCKER);
   activation.setParameter("max","7");
   activation.setParameter("min","3");
-  userSessionRule.login().setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
-  List<ActiveRuleChange> changes=ruleActivator.activate(dbSession,activation,profileDto);
+  List<ActiveRuleChange> changes=ruleActivator.activate(dbSession,activation,XOO_P1_KEY);
   dbSession.commit();
   dbSession.clearCache();
+  userSessionRule.anonymous();
   assertThat(countActiveRules(XOO_P1_KEY)).isEqualTo(1);
   verifyHasActiveRuleInDb(ActiveRuleKey.of(XOO_P1_KEY,XOO_X1),BLOCKER,null,ImmutableMap.of("max","7","min","3"));
   assertThat(changes).hasSize(1);
   assertThat(changes.get(0).getType()).isEqualTo(ActiveRuleChange.Type.ACTIVATED);
-  assertProfileHasBeenUpdatedManually(profileDto.getKey());
+  assertProfileHasBeenUpdatedAutomatically(XOO_P1_KEY);
 }
