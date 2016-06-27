@@ -1,0 +1,12 @@
+{
+  OkHttpClient.Builder okHttpClientBuilder=new OkHttpClient.Builder();
+  if (builder.proxy != null) {
+    okHttpClientBuilder.proxy(builder.proxy);
+  }
+  okHttpClientBuilder.connectTimeout(builder.connectTimeoutMs,TimeUnit.MILLISECONDS);
+  okHttpClientBuilder.readTimeout(builder.readTimeoutMs,TimeUnit.MILLISECONDS);
+  ConnectionSpec tls=new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS).allEnabledTlsVersions().allEnabledCipherSuites().supportsTlsExtensions(true).build();
+  okHttpClientBuilder.connectionSpecs(asList(tls,ConnectionSpec.CLEARTEXT));
+  okHttpClientBuilder.sslSocketFactory(createSslSocketFactory(javaVersion));
+  return okHttpClientBuilder.build();
+}

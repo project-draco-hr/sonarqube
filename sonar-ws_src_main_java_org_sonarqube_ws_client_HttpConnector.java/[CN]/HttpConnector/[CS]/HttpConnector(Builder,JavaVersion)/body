@@ -8,18 +8,11 @@
  else {
     this.credentials=Credentials.basic(builder.login,nullToEmpty(builder.password));
   }
-  if (builder.proxy != null) {
-    this.okHttpClient.setProxy(builder.proxy);
-  }
   if (isNullOrEmpty(builder.proxyLogin)) {
     this.proxyCredentials=null;
   }
  else {
     this.proxyCredentials=Credentials.basic(builder.proxyLogin,nullToEmpty(builder.proxyPassword));
   }
-  this.okHttpClient.setConnectTimeout(builder.connectTimeoutMs,TimeUnit.MILLISECONDS);
-  this.okHttpClient.setReadTimeout(builder.readTimeoutMs,TimeUnit.MILLISECONDS);
-  ConnectionSpec tls=new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS).allEnabledTlsVersions().allEnabledCipherSuites().supportsTlsExtensions(true).build();
-  this.okHttpClient.setConnectionSpecs(asList(tls,ConnectionSpec.CLEARTEXT));
-  this.okHttpClient.setSslSocketFactory(createSslSocketFactory(javaVersion));
+  this.okHttpClient=buildClient(builder,javaVersion);
 }
