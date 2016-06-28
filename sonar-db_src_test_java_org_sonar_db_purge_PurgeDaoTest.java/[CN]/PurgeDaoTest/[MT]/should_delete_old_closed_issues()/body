@@ -1,7 +1,8 @@
 {
   PurgeListener purgeListener=mock(PurgeListener.class);
   dbTester.prepareDbUnit(getClass(),"should_delete_old_closed_issues.xml");
-  underTest.purge(newConfigurationWith30Days(),purgeListener,new PurgeProfiler());
+  underTest.purge(dbSession,newConfigurationWith30Days(),purgeListener,new PurgeProfiler());
+  dbSession.commit();
   dbTester.assertDbUnit(getClass(),"should_delete_old_closed_issues-result.xml","issues","issue_changes");
   Class<ArrayList<String>> listClass=(Class<ArrayList<String>>)(Class)ArrayList.class;
   ArgumentCaptor<ArrayList<String>> issueKeys=ArgumentCaptor.forClass(listClass);

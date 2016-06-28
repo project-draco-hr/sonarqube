@@ -1,6 +1,7 @@
 {
   dbTester.prepareDbUnit(getClass(),"disable_resources_without_last_snapshot.xml");
   when(system2.now()).thenReturn(1450000000000L);
-  underTest.purge(newConfigurationWith30Days(system2),PurgeListener.EMPTY,new PurgeProfiler());
+  underTest.purge(dbSession,newConfigurationWith30Days(system2),PurgeListener.EMPTY,new PurgeProfiler());
+  dbSession.commit();
   dbTester.assertDbUnit(getClass(),"disable_resources_without_last_snapshot-result.xml",new String[]{"issue_close_date","issue_update_date"},"projects","snapshots","issues");
 }
