@@ -1,0 +1,26 @@
+{
+  List<List<Long>> snapshotIdsPartition=Lists.partition(IdUuidPairs.ids(analysisIdUuids),MAX_SNAPSHOTS_PER_QUERY);
+  List<List<String>> snapshotUuidsPartition=Lists.partition(IdUuidPairs.uuids(analysisIdUuids),MAX_SNAPSHOTS_PER_QUERY);
+  deleteSnapshotDuplications(snapshotUuidsPartition);
+  profiler.start("deleteAnalyses (events)");
+  for (  List<String> partSnapshotUuids : snapshotUuidsPartition) {
+    purgeMapper.deleteSnapshotEvents(partSnapshotUuids);
+  }
+  session.commit();
+  profiler.stop();
+  profiler.start("deleteAnalyses (project_measures)");
+  for (  List<Long> partSnapshotIds : snapshotIdsPartition) {
+    purgeMapper.deleteSnapshotMeasures(partSnapshotIds);
+  }
+  session.commit();
+  profiler.stop();
+  profiler.start("deleteAnalyses (snapshots)");
+  for (  List<String> partSnapshotUuids : snapshotUuidsPartition) {
+    purgeMapper.deleteAnalyses(partSnapshotUuids);
+  }
+  for (  List<Long> snapshotIdPartition : snapshotIdsPartition) {
+    purgeMapper.deleteDescendantSnapshots(snapshotIdPartition);
+  }
+  session.commit();
+  profiler.stop();
+}
