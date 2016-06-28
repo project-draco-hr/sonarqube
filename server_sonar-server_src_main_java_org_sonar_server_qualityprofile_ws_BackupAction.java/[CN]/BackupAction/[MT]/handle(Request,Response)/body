@@ -1,12 +1,12 @@
 {
   Stream stream=response.stream();
   stream.setMediaType(MediaTypes.XML);
-  OutputStreamWriter writer=new OutputStreamWriter(stream.output(),StandardCharsets.UTF_8);
   DbSession dbSession=dbClient.openSession(false);
+  OutputStreamWriter writer=new OutputStreamWriter(stream.output(),StandardCharsets.UTF_8);
   try {
     String profileKey=QProfileIdentificationParamUtils.getProfileKeyFromParameters(request,profileFactory,dbSession);
-    backuper.backup(profileKey,writer);
     response.setHeader("Content-Disposition",String.format("attachment; filename=%s.xml",profileKey));
+    backuper.backup(profileKey,writer);
   }
   finally {
     dbSession.close();

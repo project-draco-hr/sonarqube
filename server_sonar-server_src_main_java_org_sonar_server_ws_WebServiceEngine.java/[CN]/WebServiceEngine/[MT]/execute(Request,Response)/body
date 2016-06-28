@@ -1,0 +1,26 @@
+{
+  try {
+    ActionExtractor actionExtractor=new ActionExtractor(request.getPath());
+    WebService.Action action=getAction(actionExtractor.getController(),actionExtractor.getAction());
+    if (request instanceof ValidatingRequest) {
+      ((ValidatingRequest)request).setAction(action);
+      ((ValidatingRequest)request).setLocalConnector(this);
+    }
+    checkActionExtension(actionExtractor.getExtension());
+    verifyRequest(action,request);
+    action.handler().handle(request,response);
+  }
+ catch (  IllegalArgumentException e) {
+    sendErrors(response,400,new Errors().add(Message.of(e.getMessage())));
+  }
+catch (  BadRequestException e) {
+    sendErrors(response,400,e.errors());
+  }
+catch (  ServerException e) {
+    sendErrors(response,e.httpCode(),new Errors().add(Message.of(e.getMessage())));
+  }
+catch (  Exception e) {
+    Loggers.get(getClass()).error("Fail to process request " + request,e);
+    sendErrors(response,500,new Errors().add(Message.of(e.getMessage())));
+  }
+}

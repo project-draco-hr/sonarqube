@@ -1,8 +1,8 @@
 {
-  ValidatingRequest request=new SimpleRequest("GET").setParam("count","3");
-  ServletResponse response=new ServletResponse();
-  underTest.execute(request,response,"api/system","fail_with_multiple_messages",null);
+  ValidatingRequest request=new SimpleRequest("GET","api/system/fail_with_multiple_messages").setParam("count","3");
+  DumbResponse response=new DumbResponse();
+  underTest.execute(request,response);
   assertThat(response.stream().outputAsString()).isEqualTo("{\"errors\":[" + "{\"msg\":\"Bad request reason #0\"}," + "{\"msg\":\"Bad request reason #1\"},"+ "{\"msg\":\"Bad request reason #2\"}"+ "]}");
-  assertThat(response.stream().httpStatus()).isEqualTo(400);
+  assertThat(response.stream().status()).isEqualTo(400);
   assertThat(response.stream().mediaType()).isEqualTo(MediaTypes.JSON);
 }
