@@ -3,7 +3,7 @@
   Set<String> errors=new LinkedHashSet<>();
   List<ColumnDef> columns=select(connection,ColumnDef.SELECT_COLUMNS + "FROM [INFORMATION_SCHEMA].[COLUMNS] " + "WHERE collation_name is not null "+ "ORDER BY table_name,column_name",ColumnDef.ColumnDefRowConverter.INSTANCE);
   for (  ColumnDef column : from(columns).filter(ColumnDef.IsInSonarQubeTablePredicate.INSTANCE)) {
-    if (!endsWithIgnoreCase(column.getCollation(),"_CS_AS")) {
+    if (!isCollationCorrect(column)) {
       if (flags.contains(AUTO_REPAIR_COLLATION)) {
         repairColumnCollation(connection,column);
       }
