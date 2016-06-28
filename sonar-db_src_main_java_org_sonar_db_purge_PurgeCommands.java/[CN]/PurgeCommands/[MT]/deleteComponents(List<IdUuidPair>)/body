@@ -2,17 +2,17 @@
   List<List<Long>> componentIdPartitions=Lists.partition(IdUuidPairs.ids(componentIdUuids),MAX_RESOURCES_PER_QUERY);
   List<List<String>> componentUuidsPartitions=Lists.partition(IdUuidPairs.uuids(componentIdUuids),MAX_RESOURCES_PER_QUERY);
   for (  List<String> componentUuidPartition : componentUuidsPartitions) {
-    deleteSnapshots(purgeMapper.selectSnapshotIdAndUuidsByResource(componentUuidPartition));
+    deleteSnapshots(purgeMapper.selectSnapshotIdAndUuidsByComponent(componentUuidPartition));
   }
   profiler.start("deleteResourceLinks (project_links)");
   for (  List<String> componentUuidPartition : componentUuidsPartitions) {
-    purgeMapper.deleteResourceLinks(componentUuidPartition);
+    purgeMapper.deleteComponentLinks(componentUuidPartition);
   }
   session.commit();
   profiler.stop();
   profiler.start("deleteResourceProperties (properties)");
   for (  List<Long> partResourceIds : componentIdPartitions) {
-    purgeMapper.deleteResourceProperties(partResourceIds);
+    purgeMapper.deleteComponentProperties(partResourceIds);
   }
   session.commit();
   profiler.stop();
@@ -24,19 +24,19 @@
   profiler.stop();
   profiler.start("deleteResourceGroupRoles (group_roles)");
   for (  List<Long> partResourceIds : componentIdPartitions) {
-    purgeMapper.deleteResourceGroupRoles(partResourceIds);
+    purgeMapper.deleteComponentGroupRoles(partResourceIds);
   }
   session.commit();
   profiler.stop();
   profiler.start("deleteResourceUserRoles (user_roles)");
   for (  List<Long> partResourceIds : componentIdPartitions) {
-    purgeMapper.deleteResourceUserRoles(partResourceIds);
+    purgeMapper.deleteComponentUserRoles(partResourceIds);
   }
   session.commit();
   profiler.stop();
   profiler.start("deleteResourceManualMeasures (manual_measures)");
   for (  List<String> componentUuidPartition : componentUuidsPartitions) {
-    purgeMapper.deleteResourceManualMeasures(componentUuidPartition);
+    purgeMapper.deleteComponentManualMeasures(componentUuidPartition);
   }
   session.commit();
   profiler.stop();
@@ -59,8 +59,8 @@
   session.commit();
   profiler.stop();
   profiler.start("deleteResource (projects)");
-  for (  List<Long> partResourceIds : componentIdPartitions) {
-    purgeMapper.deleteResource(partResourceIds);
+  for (  List<String> componentUuidPartition : componentUuidsPartitions) {
+    purgeMapper.deleteComponents(componentUuidPartition);
   }
   session.commit();
   profiler.stop();
