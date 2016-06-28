@@ -1,11 +1,11 @@
 {
-  List<Long> projectSnapshotIds=purgeCommands.selectSnapshotIds(PurgeSnapshotQuery.create().setComponentUuid(project.getUuid()).setIslast(false).setNotPurged(true));
-  for (  Long projectSnapshotId : projectSnapshotIds) {
-    LOG.debug("<- Clean snapshot " + projectSnapshotId);
+  List<String> projectSnapshotIds=purgeCommands.selectSnapshotUuids(PurgeSnapshotQuery.create().setComponentUuid(project.getUuid()).setIslast(false).setNotPurged(true));
+  for (  String analysisUuid : projectSnapshotIds) {
+    LOG.debug("<- Clean analysis " + analysisUuid);
     if (!ArrayUtils.isEmpty(scopesWithoutHistoricalData)) {
-      PurgeSnapshotQuery query=PurgeSnapshotQuery.create().setIslast(false).setScopes(scopesWithoutHistoricalData).setRootSnapshotId(projectSnapshotId);
+      PurgeSnapshotQuery query=PurgeSnapshotQuery.create().setIslast(false).setScopes(scopesWithoutHistoricalData).setAnalysisUuid(analysisUuid);
       purgeCommands.deleteSnapshots(query);
     }
-    purgeCommands.purgeSnapshots(PurgeSnapshotQuery.create().setRootSnapshotId(projectSnapshotId).setNotPurged(true),PurgeSnapshotQuery.create().setId(projectSnapshotId).setNotPurged(true));
+    purgeCommands.purgeSnapshots(PurgeSnapshotQuery.create().setAnalysisUuid(analysisUuid).setNotPurged(true),PurgeSnapshotQuery.create().setSnapshotUuid(analysisUuid).setNotPurged(true));
   }
 }
