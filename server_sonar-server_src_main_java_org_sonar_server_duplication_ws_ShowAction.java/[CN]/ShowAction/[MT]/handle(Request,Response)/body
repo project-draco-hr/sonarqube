@@ -2,10 +2,9 @@
   DbSession dbSession=dbClient.openSession(false);
   try {
     ComponentDto component=componentFinder.getByUuidOrKey(dbSession,request.param("uuid"),request.param("key"),UUID_AND_KEY);
-    String componentKey=component.key();
-    userSession.checkComponentPermission(UserRole.CODEVIEWER,componentKey);
+    userSession.checkComponentPermission(UserRole.CODEVIEWER,component.key());
     JsonWriter json=response.newJsonWriter().beginObject();
-    String duplications=findDataFromComponent(componentKey,CoreMetrics.DUPLICATIONS_DATA_KEY,dbSession);
+    String duplications=findDataFromComponent(dbSession,component);
     List<DuplicationsParser.Block> blocks=parser.parse(component,duplications,dbSession);
     duplicationsJsonWriter.write(blocks,json,dbSession);
     json.endObject().close();

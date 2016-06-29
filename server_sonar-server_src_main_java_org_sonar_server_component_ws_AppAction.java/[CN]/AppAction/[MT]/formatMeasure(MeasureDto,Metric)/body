@@ -1,0 +1,24 @@
+{
+  if (measure == null) {
+    return null;
+  }
+  Metric.ValueType metricType=metric.getType();
+  Double value=getDoubleValue(measure,metric);
+  String data=measure.getData();
+  if (value != null) {
+switch (metricType) {
+case FLOAT:
+      return i18n.formatDouble(userSession.locale(),value);
+case INT:
+    return i18n.formatInteger(userSession.locale(),value.intValue());
+case PERCENT:
+  return i18n.formatDouble(userSession.locale(),value) + "%";
+case WORK_DUR:
+return durations.format(userSession.locale(),durations.create(value.longValue()),Durations.DurationFormat.SHORT);
+}
+}
+if ((metricType.equals(Metric.ValueType.STRING) || metricType.equals(Metric.ValueType.RATING)) && data != null) {
+return data;
+}
+return null;
+}

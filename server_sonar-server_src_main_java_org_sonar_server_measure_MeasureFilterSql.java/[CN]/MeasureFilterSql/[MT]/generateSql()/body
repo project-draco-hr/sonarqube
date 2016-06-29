@@ -1,29 +1,33 @@
 {
   StringBuilder sb=new StringBuilder(1000);
-  sb.append("SELECT s.id, p.id, root.uuid, ");
+  sb.append("select c.uuid, c.project_uuid, ");
   sb.append(filter.sort().column());
-  sb.append(" FROM snapshots s");
-  sb.append(" INNER JOIN projects p ON s.component_uuid=p.uuid ");
-  sb.append(" INNER JOIN projects root ON s.root_component_uuid=root.uuid ");
+  sb.append(" from projects c");
+  sb.append(" inner join snapshots s on s.component_uuid=c.project_uuid ");
+  if (context.getBaseComponent() != null) {
+    sb.append(" inner join projects base on base.project_uuid = c.project_uuid ");
+  }
   for (int index=0; index < filter.getMeasureConditions().size(); index++) {
     MeasureFilterCondition condition=filter.getMeasureConditions().get(index);
-    sb.append(" INNER JOIN project_measures pmcond").append(index);
-    sb.append(" ON s.id=pmcond").append(index).append(".snapshot_id AND ");
+    sb.append(" inner join project_measures pmcond").append(index);
+    sb.append(" on pmcond").append(index).append(".analysis_uuid = s.uuid and ");
+    sb.append(" pmcond").append(index).append(".component_uuid = c.uuid and ");
     condition.appendSqlCondition(sb,index);
   }
   if (filter.isOnFavourites()) {
-    sb.append(" INNER JOIN properties props ON props.resource_id=p.id ");
+    sb.append(" inner join properties props on props.resource_id=c.id ");
   }
   if (filter.sort().isOnMeasure()) {
-    sb.append(" LEFT OUTER JOIN project_measures pmsort ON s.id=pmsort.snapshot_id AND pmsort.metric_id=");
+    sb.append(" left outer join project_measures pmsort ON s.uuid = pmsort.analysis_uuid and pmsort.component_uuid = c.uuid and pmsort.metric_id=");
     sb.append(filter.sort().metric().getId());
-    sb.append(" AND pmsort.person_id IS NULL ");
+    sb.append(" and pmsort.person_id is null ");
   }
-  sb.append(" WHERE ");
-  appendResourceConditions(sb);
+  sb.append(" where ");
+  sb.append(" s.islast=").append(database.getDialect().getTrueSqlValue());
+  appendComponentConditions(sb);
   for (int index=0; index < filter.getMeasureConditions().size(); index++) {
     MeasureFilterCondition condition=filter.getMeasureConditions().get(index);
-    sb.append(" AND ");
+    sb.append(" and ");
     condition.appendSqlCondition(sb,index);
   }
   return sb.toString();

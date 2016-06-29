@@ -1,0 +1,19 @@
+{
+  insertAnalysis("A1",false);
+  insertAnalysis("A2",true);
+  insertMeasure("M1","A1","C1",NCLOC_METRIC_ID);
+  insertMeasure("M2","A2","C1",NCLOC_METRIC_ID);
+  insertMeasure("M3","A2","C1",COVERAGE_METRIC_ID);
+  insertMeasureOnPerson("M4","A2","C1",NCLOC_METRIC_ID,A_PERSON_ID);
+  insertMeasure("M5","A2","C2",NCLOC_METRIC_ID);
+  db.commit();
+  verifyZeroMeasures(MeasureQuery.builder().setComponentUuids(emptyList()));
+  verifyZeroMeasures(MeasureQuery.builder().setComponentUuid("MISSING_COMPONENT"));
+  verifyMeasures(MeasureQuery.builder().setComponentUuid("C1"),"M2","M3");
+  verifyMeasures(MeasureQuery.builder().setComponentUuid("C1").setMetricId(NCLOC_METRIC_ID),"M2");
+  verifyMeasures(MeasureQuery.builder().setComponentUuid("C1").setMetricIds(asList(NCLOC_METRIC_ID,COVERAGE_METRIC_ID)),"M2","M3");
+  verifyZeroMeasures(MeasureQuery.builder().setComponentUuid("C1").setMetricId(COMPLEXITY_METRIC_ID));
+  verifyMeasures(MeasureQuery.builder().setComponentUuids(asList("C1","C2","C3")),"M2","M3","M5");
+  verifyZeroMeasures(MeasureQuery.builder().setComponentUuid("C1").setPersonId(123L));
+  verifyMeasures(MeasureQuery.builder().setComponentUuid("C1").setPersonId(A_PERSON_ID),"M4");
+}

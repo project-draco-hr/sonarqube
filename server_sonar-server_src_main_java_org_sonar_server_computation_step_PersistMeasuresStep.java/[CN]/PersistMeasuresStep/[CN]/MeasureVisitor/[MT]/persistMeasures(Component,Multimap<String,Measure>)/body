@@ -6,9 +6,10 @@
     }
     Metric metric=metricRepository.getByKey(metricKey);
     Predicate<Measure> notBestValueOptimized=Predicates.not(BestValueOptimization.from(metric,component));
+    MeasureDao measureDao=dbClient.measureDao();
     for (    Measure measure : from(measures.getValue()).filter(NonEmptyMeasure.INSTANCE).filter(notBestValueOptimized)) {
       MeasureDto measureDto=measureToMeasureDto.toMeasureDto(measure,metric,component);
-      dbClient.measureDao().insert(session,measureDto);
+      measureDao.insert(session,measureDto);
     }
   }
 }

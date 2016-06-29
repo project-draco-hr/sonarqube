@@ -1,14 +1,12 @@
 {
-  SnapshotDto period1ProjectSnapshot=newSnapshotForProject(PROJECT_DTO);
-  dbClient.snapshotDao().insert(session,period1ProjectSnapshot);
-  dbClient.measureDao().insert(session,newMeasureDto(ISSUES_METRIC.getId(),PROJECT_DTO.uuid(),period1ProjectSnapshot.getId(),60d));
+  SnapshotDto period1Snapshot=newSnapshotForProject(PROJECT_DTO);
+  dbClient.snapshotDao().insert(session,period1Snapshot);
+  dbClient.measureDao().insert(session,newMeasureDto(ISSUES_METRIC.getId(),PROJECT_DTO.uuid(),period1Snapshot.getUuid(),60d));
   ComponentDto directoryDto=ComponentTesting.newDirectory(PROJECT_DTO,"dir");
   dbClient.componentDao().insert(session,directoryDto);
-  SnapshotDto period1DirectorySnapshot=createForComponent(directoryDto,period1ProjectSnapshot);
-  dbClient.snapshotDao().insert(session,period1DirectorySnapshot);
-  dbClient.measureDao().insert(session,newMeasureDto(ISSUES_METRIC.getId(),directoryDto.uuid(),period1DirectorySnapshot.getId(),10d));
+  dbClient.measureDao().insert(session,newMeasureDto(ISSUES_METRIC.getId(),directoryDto.uuid(),period1Snapshot.getUuid(),10d));
   session.commit();
-  periodsHolder.setPeriods(newPeriod(1,period1ProjectSnapshot));
+  periodsHolder.setPeriods(newPeriod(1,period1Snapshot));
   Component directory=ReportComponent.builder(Component.Type.DIRECTORY,2).setUuid(directoryDto.uuid()).build();
   Component project=ReportComponent.builder(Component.Type.PROJECT,1).setUuid(PROJECT_DTO.uuid()).addChildren(directory).build();
   treeRootHolder.setRoot(project);

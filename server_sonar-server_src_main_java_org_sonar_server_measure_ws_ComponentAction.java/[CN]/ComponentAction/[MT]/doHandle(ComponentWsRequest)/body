@@ -5,10 +5,10 @@
     Long developerId=searchDeveloperId(dbSession,request);
     Optional<ComponentDto> refComponent=getReferenceComponent(dbSession,component);
     checkPermissions(component);
-    SnapshotDto lastSnapshot=dbClient.snapshotDao().selectLastSnapshotByComponentUuid(dbSession,component.uuid());
+    SnapshotDto analysis=dbClient.snapshotDao().selectLastSnapshotByComponentUuid(dbSession,component.uuid());
     List<MetricDto> metrics=searchMetrics(dbSession,request);
-    List<WsMeasures.Period> periods=snapshotToWsPeriods(lastSnapshot);
-    List<MeasureDto> measures=searchMeasures(dbSession,component,lastSnapshot,metrics,periods,developerId);
+    List<WsMeasures.Period> periods=snapshotToWsPeriods(analysis);
+    List<MeasureDto> measures=searchMeasures(dbSession,component,analysis,metrics,periods,developerId);
     return buildResponse(request,component,refComponent,measures,metrics,periods);
   }
   finally {

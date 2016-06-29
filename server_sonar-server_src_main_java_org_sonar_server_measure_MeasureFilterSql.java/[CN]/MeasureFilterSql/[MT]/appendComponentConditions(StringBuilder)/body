@@ -1,0 +1,30 @@
+{
+  sb.append(" and c.enabled=").append(database.getDialect().getTrueSqlValue());
+  ComponentDto base=context.getBaseComponent();
+  if (base == null) {
+    sb.append(" and c.copy_component_uuid is null ");
+  }
+ else {
+    sb.append(" and base.uuid = '").append(base.uuid()).append("' ");
+    if (filter.isOnBaseResourceChildren()) {
+      String path=base.getUuidPath() + base.uuid() + UUID_PATH_SEPARATOR;
+      sb.append(" and c.uuid_path = '").append(path).append("' ");
+    }
+ else {
+      String like=DatabaseUtils.buildLikeValue(base.getUuidPath() + base.uuid() + UUID_PATH_SEPARATOR,WildcardPosition.AFTER);
+      sb.append(" and c.uuid_path like '").append(like).append("' escape '/' ");
+    }
+  }
+  if (!filter.getResourceQualifiers().isEmpty()) {
+    sb.append(" and c.qualifier in ");
+    appendInStatement(filter.getResourceQualifiers(),sb);
+  }
+  if (!filter.getResourceScopes().isEmpty()) {
+    sb.append(" and c.scope in ");
+    appendInStatement(filter.getResourceScopes(),sb);
+  }
+  appendDateConditions(sb);
+  appendFavouritesCondition(sb);
+  appendResourceNameCondition(sb);
+  appendResourceKeyCondition(sb);
+}

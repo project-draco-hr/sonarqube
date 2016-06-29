@@ -1,0 +1,12 @@
+{
+  insertAnalysis("A1",true);
+  insertMeasure("M1","A1","C1",NCLOC_METRIC_ID);
+  insertMeasure("M2","A1","C1",COMPLEXITY_METRIC_ID);
+  db.commit();
+  assertThat(selectSingle(MeasureQuery.builder().setComponentUuids(emptyList()))).isNotPresent();
+  assertThat(selectSingle(MeasureQuery.builder().setComponentUuid("MISSING_COMPONENT"))).isNotPresent();
+  assertThat(selectSingle(MeasureQuery.builder().setComponentUuid("C1").setMetricId(NCLOC_METRIC_ID))).isPresent();
+  expectedException.expect(IllegalArgumentException.class);
+  expectedException.expectMessage("expected one element");
+  selectSingle(MeasureQuery.builder().setComponentUuid("C1"));
+}
