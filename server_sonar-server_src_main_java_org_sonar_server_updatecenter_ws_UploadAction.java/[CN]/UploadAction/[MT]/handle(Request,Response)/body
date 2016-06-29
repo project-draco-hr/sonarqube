@@ -1,0 +1,15 @@
+{
+  userSession.checkPermission(GlobalPermissions.SYSTEM_ADMIN);
+  Part part=request.mandatoryParamAsPart(PARAM_FILE);
+  String fileName=part.getFileName();
+  checkArgument(fileName.endsWith(".jar"),"Only jar file is allowed");
+  InputStream inputStream=part.getInputStream();
+  try {
+    File destPlugin=new File(downloadDir,fileName);
+    Files.copy(inputStream,destPlugin.toPath(),REPLACE_EXISTING);
+    response.noContent();
+  }
+  finally {
+    closeQuietly(inputStream);
+  }
+}
