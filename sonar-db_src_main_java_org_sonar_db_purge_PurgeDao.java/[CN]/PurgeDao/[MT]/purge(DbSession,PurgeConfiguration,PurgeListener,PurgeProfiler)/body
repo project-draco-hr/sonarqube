@@ -1,10 +1,10 @@
 {
   PurgeMapper mapper=session.getMapper(PurgeMapper.class);
   PurgeCommands commands=new PurgeCommands(session,mapper,profiler);
+  deleteAbortedAnalyses(conf.rootProjectIdUuid().getUuid(),commands);
   List<ResourceDto> projects=getProjects(conf.rootProjectIdUuid().getId(),session);
   for (  ResourceDto project : projects) {
     LOG.debug("-> Clean " + project.getLongName() + " [id="+ project.getId()+ "]");
-    deleteAbortedBuilds(project,commands);
     purge(project,conf.scopesWithoutHistoricalData(),commands);
   }
   for (  ResourceDto project : projects) {
