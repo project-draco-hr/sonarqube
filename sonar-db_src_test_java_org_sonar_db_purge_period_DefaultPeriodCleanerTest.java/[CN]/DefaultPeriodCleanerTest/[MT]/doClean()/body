@@ -1,12 +1,16 @@
 {
   PurgeDao dao=mock(PurgeDao.class);
   DbSession session=mock(DbSession.class);
-  when(dao.selectPurgeableAnalyses("uuid_123",session)).thenReturn(Arrays.asList(new PurgeableAnalysisDto().setAnalysisUuid("u999").setDate(System2.INSTANCE.now())));
-  Filter filter1=newLazyFilter();
-  Filter filter2=newLazyFilter();
-  DefaultPeriodCleaner cleaner=new DefaultPeriodCleaner(dao,new PurgeProfiler());
+  when(dao.selectPurgeableAnalyses("uuid_123",session)).thenReturn(Arrays.asList(new PurgeableAnalysisDto().setAnalysisId(999).setAnalysisUuid("u999").setDate(System2.INSTANCE.now()),new PurgeableAnalysisDto().setAnalysisId(456).setAnalysisUuid("u456").setDate(System2.INSTANCE.now())));
+  Filter filter1=newFirstSnapshotInListFilter();
+  Filter filter2=newFirstSnapshotInListFilter();
+  PurgeProfiler profiler=new PurgeProfiler();
+  DefaultPeriodCleaner cleaner=new DefaultPeriodCleaner(dao,profiler);
   cleaner.doClean("uuid_123",Arrays.asList(filter1,filter2),session);
-  verify(filter1).log();
-  verify(filter2).log();
-  verify(dao,times(2)).deleteSnapshots(eq(session),any(PurgeProfiler.class),argThat(newRootSnapshotQuery()),argThat(newSnapshotIdQuery()));
+  InOrder inOrder=Mockito.inOrder(dao,filter1,filter2);
+  inOrder.verify(filter1).log();
+  inOrder.verify(dao,times(1)).deleteAnalyses(eq(session),eq(profiler),eq(ImmutableList.of(new IdUuidPair(999,"u999"))));
+  inOrder.verify(filter2).log();
+  inOrder.verify(dao,times(1)).deleteAnalyses(eq(session),eq(profiler),eq(ImmutableList.of(new IdUuidPair(456,"u456"))));
+  inOrder.verifyNoMoreInteractions();
 }
