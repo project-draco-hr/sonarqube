@@ -1,0 +1,15 @@
+{
+  if (analysisUuids.isEmpty() || componentUuids.isEmpty()) {
+    return;
+  }
+  List<List<String>> analysisUuidsPartitions=Lists.partition(analysisUuids,MAX_SNAPSHOTS_PER_QUERY);
+  List<List<String>> componentUuidsPartitions=Lists.partition(componentUuids,MAX_RESOURCES_PER_QUERY);
+  profiler.start("deleteComponentMeasures");
+  for (  List<String> analysisUuidsPartition : analysisUuidsPartitions) {
+    for (    List<String> componentUuidsPartition : componentUuidsPartitions) {
+      purgeMapper.deleteComponentMeasures(analysisUuidsPartition,componentUuidsPartition);
+    }
+  }
+  session.commit();
+  profiler.stop();
+}
