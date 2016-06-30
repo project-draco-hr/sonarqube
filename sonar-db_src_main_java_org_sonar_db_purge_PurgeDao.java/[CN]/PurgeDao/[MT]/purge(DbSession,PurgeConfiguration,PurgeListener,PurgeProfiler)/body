@@ -1,13 +1,12 @@
 {
   PurgeMapper mapper=session.getMapper(PurgeMapper.class);
   PurgeCommands commands=new PurgeCommands(session,mapper,profiler);
-  deleteAbortedAnalyses(conf.rootProjectIdUuid().getUuid(),commands);
+  String rootUuid=conf.rootProjectIdUuid().getUuid();
+  deleteAbortedAnalyses(rootUuid,commands);
   deleteDataOfComponentsWithoutHistoricalData(session,conf.rootProjectIdUuid().getUuid(),conf.scopesWithoutHistoricalData(),commands);
+  List<IdUuidPair> analysisUuids=commands.selectSnapshotIdUuids(PurgeSnapshotQuery.create().setComponentUuid(rootUuid).setIslast(false).setNotPurged(true));
+  commands.purgeAnalyses(analysisUuids);
   List<ResourceDto> projects=getProjects(conf.rootProjectIdUuid().getId(),session);
-  for (  ResourceDto project : projects) {
-    LOG.debug("-> Clean " + project.getLongName() + " [id="+ project.getId()+ "]");
-    purge(project.getUuid(),commands);
-  }
   for (  ResourceDto project : projects) {
     disableOrphanResources(project,session,mapper,listener);
   }
