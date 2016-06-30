@@ -3,12 +3,8 @@
   PurgeCommands commands=new PurgeCommands(session,mapper,profiler);
   String rootUuid=conf.rootProjectIdUuid().getUuid();
   deleteAbortedAnalyses(rootUuid,commands);
-  deleteDataOfComponentsWithoutHistoricalData(session,conf.rootProjectIdUuid().getUuid(),conf.scopesWithoutHistoricalData(),commands);
-  List<IdUuidPair> analysisUuids=commands.selectSnapshotIdUuids(PurgeSnapshotQuery.create().setComponentUuid(rootUuid).setIslast(false).setNotPurged(true));
-  commands.purgeAnalyses(analysisUuids);
-  List<ResourceDto> projects=getProjects(conf.rootProjectIdUuid().getId(),session);
-  for (  ResourceDto project : projects) {
-    disableOrphanResources(project,session,mapper,listener);
-  }
+  deleteDataOfComponentsWithoutHistoricalData(session,rootUuid,conf.scopesWithoutHistoricalData(),commands);
+  purgeAnalyses(commands,rootUuid);
+  disableOrphanResources(rootUuid,session,mapper,listener);
   deleteOldClosedIssues(conf,mapper,listener);
 }
