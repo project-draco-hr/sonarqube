@@ -3,7 +3,7 @@
   long startTime=System.currentTimeMillis();
   ProjectDefinition projectDefinition=projectReactor.getRoot();
   PostRequest.Part filePart=new PostRequest.Part(MediaTypes.ZIP,report);
-  PostRequest post=new PostRequest("api/ce/submit").setMediaType(MediaTypes.PROTOBUF).setParam("projectKey",projectDefinition.getKey()).setParam("projectName",projectDefinition.getName()).setParam("projectBranch",projectDefinition.getBranch()).setPart("report",filePart);
+  PostRequest post=new PostRequest("api/ce/submit").setMediaType(MediaTypes.PROTOBUF).setParam("projectKey",projectDefinition.getKey()).setParam("projectName",projectDefinition.getOriginalName()).setParam("projectBranch",projectDefinition.getBranch()).setPart("report",filePart);
   WsResponse response=wsClient.call(post).failIfNotSuccessful();
   try (InputStream protobuf=response.contentStream()){
     return WsCe.SubmitResponse.parser().parseFrom(protobuf).getTaskId();
