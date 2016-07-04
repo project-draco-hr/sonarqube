@@ -1,0 +1,17 @@
+{
+  Optional<WsProjectRef> wsProjectRef=newOptionalWsProjectRef(request.getProjectId(),request.getProjectKey());
+  validatePermission(request.getPermission(),wsProjectRef);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    Optional<ComponentDto> project=dependenciesFinder.searchProject(dbSession,wsProjectRef);
+    checkProjectAdminUserByComponentDto(userSession,project);
+    PermissionQuery permissionQuery=buildPermissionQuery(request,project);
+    Long projectIdIfPresent=project.isPresent() ? project.get().getId() : null;
+    int total=dbClient.permissionDao().countUsers(dbSession,permissionQuery,projectIdIfPresent);
+    List<UserWithPermissionDto> usersWithPermission=permissionFinder.findUsersWithPermission(dbSession,permissionQuery);
+    return buildResponse(usersWithPermission,forPageIndex(request.getPage()).withPageSize(request.getPageSize()).andTotal(total));
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}
