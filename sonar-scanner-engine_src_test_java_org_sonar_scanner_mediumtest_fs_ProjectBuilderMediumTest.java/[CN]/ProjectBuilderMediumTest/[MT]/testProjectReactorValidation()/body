@@ -1,0 +1,19 @@
+{
+  File baseDir=prepareProject();
+  doThrow(new IllegalStateException("My error message")).when(projectBuilder).build(any(ProjectBuilder.Context.class));
+  exception.expectMessage("Failed to execute project builder");
+  exception.expect(MessageException.class);
+  exception.expectCause(new BaseMatcher<Throwable>(){
+    @Override public boolean matches(    Object item){
+      if (!(item instanceof IllegalStateException)) {
+        return false;
+      }
+      IllegalStateException e=(IllegalStateException)item;
+      return "My error message".equals(e.getMessage());
+    }
+    @Override public void describeTo(    Description description){
+    }
+  }
+);
+  tester.newTask().properties(ImmutableMap.<String,String>builder().put("sonar.task","scan").put("sonar.projectBaseDir",baseDir.getAbsolutePath()).put("sonar.projectKey","com.foo.project").put("sonar.projectName","Foo Project").put("sonar.projectVersion","1.0-SNAPSHOT").put("sonar.projectDescription","Description of Foo Project").put("sonar.sources",".").put("sonar.xoo.enableProjectBuilder","true").build()).start();
+}

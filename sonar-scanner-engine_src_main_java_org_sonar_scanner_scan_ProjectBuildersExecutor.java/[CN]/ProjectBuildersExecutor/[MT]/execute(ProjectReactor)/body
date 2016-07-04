@@ -3,7 +3,12 @@
     Profiler profiler=Profiler.create(LOG).startInfo("Execute project builders");
     ProjectBuilderContext context=new ProjectBuilderContext(reactor);
     for (    ProjectBuilder projectBuilder : projectBuilders) {
-      projectBuilder.build(context);
+      try {
+        projectBuilder.build(context);
+      }
+ catch (      Exception e) {
+        throw MessageException.of("Failed to execute project builder: " + projectBuilder,e);
+      }
     }
     profiler.stopInfo();
   }
