@@ -2,7 +2,7 @@
   restoreProfile("one-issue-per-line.xml");
   orchestrator.getServer().provisionProject("sample","xoo-sample");
   orchestrator.getServer().associateProjectToQualityProfile("sample","xoo","one-issue-per-line");
-  SonarRunner runner=configureRunner("shared/xoo-sample","sonar.verbose","true");
+  SonarScanner runner=configureRunner("shared/xoo-sample","sonar.verbose","true");
   BuildResult result=orchestrator.executeBuild(runner);
   restoreProfile("with-many-rules.xml");
   orchestrator.getServer().associateProjectToQualityProfile("sample","xoo","with-many-rules");
@@ -10,7 +10,7 @@
   FileUtils.copyDirectory(ItUtils.projectDir("shared/xoo-sample"),tmpProjectDir);
   File srcFile=new File(tmpProjectDir,"src/main/xoo/sample/Sample.xoo");
   FileUtils.write(srcFile,"\n",StandardCharsets.UTF_8,true);
-  runner=SonarRunner.create(tmpProjectDir,"sonar.working.directory",temp.newFolder().getAbsolutePath(),"sonar.analysis.mode","issues","sonar.report.export.path","sonar-report.json","sonar.userHome",temp.newFolder().getAbsolutePath(),"sonar.verbose","true","sonar.scanChangedFilesOnly","true");
+  runner=SonarScanner.create(tmpProjectDir,"sonar.working.directory",temp.newFolder().getAbsolutePath(),"sonar.analysis.mode","issues","sonar.report.export.path","sonar-report.json","sonar.userHome",temp.newFolder().getAbsolutePath(),"sonar.verbose","true","sonar.scanChangedFilesOnly","true");
   result=orchestrator.executeBuild(runner);
   assertThat(result.getLogs()).contains("Scanning only changed files");
   assertThat(result.getLogs()).doesNotContain("'One Issue Per Line' skipped because there is no related file in current project");

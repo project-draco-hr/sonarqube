@@ -2,12 +2,12 @@
   orchestrator.getServer().restoreProfile(FileLocation.ofClasspath("/qualityModel/one-issue-per-line.xml"));
   orchestrator.getServer().provisionProject("sample","sample");
   orchestrator.getServer().associateProjectToQualityProfile("sample","xoo","one-issue-per-line");
-  orchestrator.executeBuild(SonarRunner.create(projectDir("shared/xoo-sample")));
+  orchestrator.executeBuild(SonarScanner.create(projectDir("shared/xoo-sample")));
   Measure rating=getMeasure("sample","sqale_rating");
   assertThat(rating.getIntValue()).isEqualTo(1);
   assertThat(rating.getData()).isEqualTo("A");
   debtConfiguration.updateRatingGrid(0.001d,0.005d,0.01d,0.015d);
-  orchestrator.executeBuild(SonarRunner.create(projectDir("shared/xoo-sample")));
+  orchestrator.executeBuild(SonarScanner.create(projectDir("shared/xoo-sample")));
   rating=getMeasure("sample","sqale_rating");
   assertThat(rating.getIntValue()).isEqualTo(5);
   assertThat(rating.getData()).isEqualTo("E");

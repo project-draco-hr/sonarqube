@@ -1,16 +1,16 @@
 {
   ORCHESTRATOR.getServer().provisionProject("sample","Sample");
   ORCHESTRATOR.getServer().associateProjectToQualityProfile("sample","xoo","empty");
-  ORCHESTRATOR.executeBuild(SonarRunner.create(projectDir("shared/xoo-sample")).setProperty("sonar.projectDate","2013-01-01"));
+  ORCHESTRATOR.executeBuild(SonarScanner.create(projectDir("shared/xoo-sample")).setProperty("sonar.projectDate","2013-01-01"));
   ORCHESTRATOR.getServer().restoreProfile(FileLocation.ofClasspath("/issue/one-issue-per-line-profile.xml"));
   ORCHESTRATOR.getServer().associateProjectToQualityProfile("sample","xoo","one-issue-per-line-profile");
-  ORCHESTRATOR.executeBuild(SonarRunner.create(projectDir("shared/xoo-sample")));
+  ORCHESTRATOR.executeBuild(SonarScanner.create(projectDir("shared/xoo-sample")));
   assertThat(ORCHESTRATOR.getServer().wsClient().issueClient().find(IssueQuery.create()).list()).isNotEmpty();
   Resource newIssues=ORCHESTRATOR.getServer().getWsClient().find(ResourceQuery.createForMetrics("sample:src/main/xoo/sample/Sample.xoo","new_violations").setIncludeTrends(true));
   List<Measure> measures=newIssues.getMeasures();
   assertThat(measures.get(0).getVariation1().intValue()).isEqualTo(17);
   assertThat(measures.get(0).getVariation2().intValue()).isEqualTo(17);
-  ORCHESTRATOR.executeBuild(SonarRunner.create(projectDir("shared/xoo-sample")));
+  ORCHESTRATOR.executeBuild(SonarScanner.create(projectDir("shared/xoo-sample")));
   assertThat(ORCHESTRATOR.getServer().wsClient().issueClient().find(IssueQuery.create()).list()).isNotEmpty();
   newIssues=ORCHESTRATOR.getServer().getWsClient().find(ResourceQuery.createForMetrics("sample:src/main/xoo/sample/Sample.xoo","new_violations").setIncludeTrends(true));
   assertThat(newIssues).isNull();
