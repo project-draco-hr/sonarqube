@@ -1,23 +1,2 @@
 {
-  UserDto user1=insertUser(newUserDto());
-  UserDto user2=insertUser(newUserDto());
-  UserDto user3=insertUser(newUserDto());
-  insertUserRole(ISSUE_ADMIN,user1.getId(),42L);
-  insertUserRole(ADMIN,user1.getId(),123L);
-  insertUserRole(ADMIN,user2.getId(),123L);
-  insertUserRole(ADMIN,user3.getId(),123L);
-  insertUserRole(USER,user1.getId(),123L);
-  insertUserRole(USER,user1.getId(),456L);
-  commit();
-  final List<CountByProjectAndPermissionDto> result=new ArrayList<>();
-  underTest.usersCountByComponentIdAndPermission(dbTester.getSession(),Arrays.asList(123L,456L,789L),new ResultHandler(){
-    @Override public void handleResult(    ResultContext context){
-      result.add((CountByProjectAndPermissionDto)context.getResultObject());
-    }
-  }
-);
-  assertThat(result).hasSize(3);
-  assertThat(result).extracting("permission").containsOnly(ADMIN,USER);
-  assertThat(result).extracting("componentId").containsOnly(123L,456L);
-  assertThat(result).extracting("count").containsOnly(3,1);
 }
