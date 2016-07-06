@@ -5,11 +5,12 @@
   try {
     Optional<ComponentDto> project=dependenciesFinder.searchProject(dbSession,wsProjectRef);
     checkProjectAdminUserByComponentDto(userSession,project);
-    OldPermissionQuery permissionQuery=buildPermissionQuery(request,project);
-    Long projectIdIfPresent=project.isPresent() ? project.get().getId() : null;
-    int total=dbClient.permissionDao().countUsers(dbSession,permissionQuery,projectIdIfPresent);
-    List<UserWithPermissionDto> usersWithPermission=permissionFinder.findUsersWithPermission(dbSession,permissionQuery);
-    return buildResponse(usersWithPermission,forPageIndex(request.getPage()).withPageSize(request.getPageSize()).andTotal(total));
+    PermissionQuery dbQuery=buildPermissionQuery(request,project);
+    List<UserDto> users=findUsers(dbSession,dbQuery);
+    int total=dbClient.permissionDao().countUsersByQuery(dbSession,dbQuery);
+    List<UserPermissionDto> userPermissions=findUserPermissions(dbSession,users);
+    Paging paging=Paging.forPageIndex(request.getPage()).withPageSize(request.getPageSize()).andTotal(total);
+    return buildResponse(users,userPermissions,paging);
   }
   finally {
     dbClient.closeSession(dbSession);

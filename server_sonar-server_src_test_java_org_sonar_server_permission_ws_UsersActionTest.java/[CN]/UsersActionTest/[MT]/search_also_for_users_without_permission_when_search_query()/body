@@ -1,0 +1,11 @@
+{
+  userSession.login().setGlobalPermissions(SYSTEM_ADMIN);
+  ComponentDto project=componentDbTester.insertComponent(newProjectDto());
+  UserDto user=userDb.insertUser(newUserDto("with-permission","with-permission",null));
+  insertUserRole(new UserPermissionDto().setPermission(ISSUE_ADMIN).setUserId(user.getId()).setComponentId(project.getId()));
+  UserDto withoutPermission=userDb.insertUser(newUserDto("without-permission","without-permission",null));
+  UserDto anotherUser=userDb.insertUser(newUserDto("another-user","another-user",null));
+  dbSession.commit();
+  String result=ws.newRequest().setParam(PARAM_PROJECT_ID,project.uuid()).setParam(TEXT_QUERY,"with").execute().getInput();
+  assertThat(result).contains(user.getLogin()).contains(withoutPermission.getLogin()).doesNotContain(anotherUser.getLogin());
+}
