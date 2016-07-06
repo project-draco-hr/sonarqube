@@ -1,6 +1,10 @@
 {
   ScannerReportWriter writer=reportPublisher.getWriter();
-  writer.writeComponentSymbols(componentCache.get(symbolTable.inputFile()).batchId(),Iterables.transform(symbolTable.getReferencesBySymbol().entrySet(),new Function<Map.Entry<TextRange,Set<TextRange>>,ScannerReport.Symbol>(){
+  int componentRef=componentCache.get(symbolTable.inputFile()).batchId();
+  if (writer.hasComponentData(FileStructure.Domain.SYMBOLS,componentRef)) {
+    throw new UnsupportedOperationException("Trying to save symbol table twice for the same file is not supported: " + symbolTable.inputFile().absolutePath());
+  }
+  writer.writeComponentSymbols(componentRef,Iterables.transform(symbolTable.getReferencesBySymbol().entrySet(),new Function<Map.Entry<TextRange,Set<TextRange>>,ScannerReport.Symbol>(){
     private ScannerReport.Symbol.Builder builder=ScannerReport.Symbol.newBuilder();
     private ScannerReport.TextRange.Builder rangeBuilder=ScannerReport.TextRange.newBuilder();
     @Override public ScannerReport.Symbol apply(    Map.Entry<TextRange,Set<TextRange>> input){

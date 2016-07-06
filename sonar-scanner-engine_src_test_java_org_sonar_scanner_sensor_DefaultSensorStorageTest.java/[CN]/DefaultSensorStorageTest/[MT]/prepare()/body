@@ -9,5 +9,7 @@
   CoverageExclusions coverageExclusions=mock(CoverageExclusions.class);
   when(coverageExclusions.accept(any(Resource.class),any(Measure.class))).thenReturn(true);
   resourceCache=new BatchComponentCache();
-  underTest=new DefaultSensorStorage(metricFinder,moduleIssues,settings,coverageExclusions,resourceCache,mock(ReportPublisher.class),measureCache,mock(SonarCpdBlockIndex.class));
+  ReportPublisher reportPublisher=mock(ReportPublisher.class);
+  when(reportPublisher.getWriter()).thenReturn(new ScannerReportWriter(temp.newFolder()));
+  underTest=new DefaultSensorStorage(metricFinder,moduleIssues,settings,coverageExclusions,resourceCache,reportPublisher,measureCache,mock(SonarCpdBlockIndex.class));
 }

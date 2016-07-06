@@ -1,6 +1,9 @@
 {
   if (isCrossProjectDuplicationEnabled(settings)) {
     int id=batchComponentCache.get(inputFile).batchId();
+    if (publisher.getWriter().hasComponentData(FileStructure.Domain.CPD_TEXT_BLOCKS,id)) {
+      throw new UnsupportedOperationException("Trying to save CPD tokens twice for the same file is not supported: " + inputFile.absolutePath());
+    }
     final ScannerReport.CpdTextBlock.Builder builder=ScannerReport.CpdTextBlock.newBuilder();
     publisher.getWriter().writeCpdTextBlocks(id,Iterables.transform(blocks,new Function<Block,ScannerReport.CpdTextBlock>(){
       @Override public ScannerReport.CpdTextBlock apply(      Block input){
