@@ -1,0 +1,10 @@
+{
+  ComponentDto project=ComponentTesting.newProjectDto(REPORT_PROJECT.getUuid());
+  db.getDbClient().componentDao().insert(db.getSession(),project);
+  insertAnalysis(project,CURRENT_ANALYSIS_UUID,SnapshotDto.STATUS_UNPROCESSED,false);
+  db.commit();
+  treeRootHolder.setRoot(REPORT_PROJECT);
+  analysisMetadataHolder.setUuid(CURRENT_ANALYSIS_UUID);
+  underTest.execute();
+  verifyAnalysis(CURRENT_ANALYSIS_UUID,SnapshotDto.STATUS_PROCESSED,true);
+}
