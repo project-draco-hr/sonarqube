@@ -1,7 +1,8 @@
 {
   ComponentDto component=checkFoundWithOptional(componentService.getByUuid(uuid),"Component with id '%s' not found",uuid);
-  SnapshotDto snapshot=dbClient.snapshotDao().selectLastSnapshotByComponentUuid(dbSession,component.uuid());
-  Long projectSnapshotId=snapshot == null ? null : snapshot.getRootId();
-  SnapshotDto projectSnapshot=projectSnapshotId == null ? snapshot : dbClient.snapshotDao().selectById(dbSession,projectSnapshotId);
-  return projectSnapshot == null ? null : longToDate(projectSnapshot.getPeriodDate(1));
+  Optional<SnapshotDto> snapshot=dbClient.snapshotDao().selectLastSnapshotByComponentUuid(dbSession,component.uuid());
+  if (snapshot.isPresent()) {
+    return longToDate(snapshot.get().getPeriodDate(1));
+  }
+  return null;
 }

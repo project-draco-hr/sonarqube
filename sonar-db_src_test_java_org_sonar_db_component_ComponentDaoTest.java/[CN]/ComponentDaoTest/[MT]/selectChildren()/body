@@ -1,21 +1,21 @@
 {
   ComponentDto project=newProjectDto(PROJECT_UUID);
-  SnapshotDto projectSnapshot=componentDb.insertProjectAndSnapshot(project);
+  componentDb.insertProjectAndSnapshot(project);
   ComponentDto module=newModuleDto(MODULE_UUID,project);
-  SnapshotDto moduleSnapshot=componentDb.insertComponentAndSnapshot(module,projectSnapshot);
+  componentDb.insertComponent(module);
   ComponentDto file1=newFileDto(project,FILE_1_UUID).setKey("file-key-1").setName("File One");
-  componentDb.insertComponentAndSnapshot(file1,projectSnapshot);
+  componentDb.insertComponent(file1);
   ComponentDto file2=newFileDto(module,FILE_2_UUID).setKey("file-key-2").setName("File Two");
-  componentDb.insertComponentAndSnapshot(file2,moduleSnapshot);
+  componentDb.insertComponent(file2);
   ComponentDto file3=newFileDto(module,FILE_3_UUID).setKey("file-key-3").setName("File Three");
-  componentDb.insertComponentAndSnapshot(file3,moduleSnapshot);
+  componentDb.insertComponent(file3);
   db.commit();
   componentDb.indexAllComponents();
   ComponentTreeQuery query=newTreeQuery(PROJECT_UUID).build();
   List<ComponentDto> children=underTest.selectChildren(dbSession,query);
   assertThat(children).extracting("uuid").containsExactly(FILE_1_UUID,MODULE_UUID);
   assertThat(underTest.countChildren(dbSession,query)).isEqualTo(2);
-  query=newTreeQuery(PROJECT_UUID).setQualifiers(Arrays.asList(Qualifiers.MODULE)).build();
+  query=newTreeQuery(PROJECT_UUID).setQualifiers(asList(Qualifiers.MODULE)).build();
   children=underTest.selectChildren(dbSession,query);
   assertThat(children).extracting("uuid").containsExactly(MODULE_UUID);
   assertThat(underTest.countChildren(dbSession,query)).isEqualTo(1);

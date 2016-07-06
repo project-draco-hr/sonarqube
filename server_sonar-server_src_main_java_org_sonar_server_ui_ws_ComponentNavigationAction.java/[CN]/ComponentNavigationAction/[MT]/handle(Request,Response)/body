@@ -4,14 +4,14 @@
   try {
     ComponentDto component=componentFinder.getByKey(session,componentKey);
     userSession.checkComponentUuidPermission(UserRole.USER,component.projectUuid());
-    SnapshotDto analysis=dbClient.snapshotDao().selectLastSnapshotByComponentUuid(session,component.uuid());
+    Optional<SnapshotDto> analysis=dbClient.snapshotDao().selectLastSnapshotByRootComponentUuid(session,component.projectUuid());
     JsonWriter json=response.newJsonWriter();
     json.beginObject();
-    writeComponent(json,session,component,analysis,userSession);
+    writeComponent(json,session,component,analysis.orElse(null),userSession);
     if (userSession.hasComponentUuidPermission(UserRole.ADMIN,component.projectUuid()) || userSession.hasPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN)) {
       writeConfiguration(json,component,userSession);
     }
-    writeBreadCrumbs(json,session,component,analysis);
+    writeBreadCrumbs(json,session,component);
     json.endObject().close();
   }
   finally {

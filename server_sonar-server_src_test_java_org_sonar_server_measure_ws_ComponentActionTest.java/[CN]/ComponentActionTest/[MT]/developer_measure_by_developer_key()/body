@@ -4,9 +4,9 @@
   ComponentDto project=newProjectDto(PROJECT_UUID);
   SnapshotDto projectSnapshot=componentDb.insertProjectAndSnapshot(project);
   ComponentDto file=newFileDto(project,"file-uuid");
-  SnapshotDto fileSnapshot=componentDb.insertComponentAndSnapshot(file,projectSnapshot);
+  componentDb.insertComponent(file);
   MetricDto ncloc=insertNclocMetric();
-  dbClient.measureDao().insert(dbSession,newMeasureDto(ncloc,fileSnapshot).setValue(42.0d).setDeveloperId(null),newMeasureDto(ncloc,fileSnapshot).setValue(1984.0d).setDeveloperId(developer.getId()));
+  dbClient.measureDao().insert(dbSession,newMeasureDto(ncloc,file,projectSnapshot).setValue(42.0d).setDeveloperId(null),newMeasureDto(ncloc,file,projectSnapshot).setValue(1984.0d).setDeveloperId(developer.getId()));
   db.commit();
   ComponentWsResponse result=call(ws.newRequest().setParam(PARAM_COMPONENT_ID,"file-uuid").setParam(PARAM_DEVELOPER_KEY,developer.key()).setParam(PARAM_METRIC_KEYS,"ncloc"));
   assertThat(result.getComponent().getMeasuresCount()).isEqualTo(1);

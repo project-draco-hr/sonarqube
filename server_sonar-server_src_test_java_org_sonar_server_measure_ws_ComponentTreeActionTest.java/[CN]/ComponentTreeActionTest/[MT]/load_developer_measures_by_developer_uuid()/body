@@ -1,13 +1,13 @@
 {
   ComponentDto developer=newDeveloper("developer","developer-uuid");
   ComponentDto project=newProjectDto("project-uuid").setKey("project-key");
-  SnapshotDto developerSnapshot=componentDb.insertDeveloperAndSnapshot(developer);
+  componentDb.insertDeveloperAndSnapshot(developer);
   SnapshotDto projectSnapshot=componentDb.insertProjectAndSnapshot(project);
-  SnapshotDto file1Snapshot=componentDb.insertComponentAndSnapshot(newFileDto(project,"file1-uuid"),projectSnapshot);
-  SnapshotDto file2Snapshot=componentDb.insertComponentAndSnapshot(newFileDto(project,"file2-uuid"),projectSnapshot);
-  componentDb.insertComponentAndSnapshot(newDevProjectCopy("project-uuid-copy",project,developer),developerSnapshot);
+  ComponentDto file1=componentDb.insertComponent(newFileDto(project,"file1-uuid"));
+  ComponentDto file2=componentDb.insertComponent(newFileDto(project,"file2-uuid"));
+  componentDb.insertComponent(newDevProjectCopy("project-uuid-copy",project,developer));
   MetricDto ncloc=insertNclocMetric();
-  dbClient.measureDao().insert(dbSession,newMeasureDto(ncloc,projectSnapshot).setDeveloperId(developer.getId()),newMeasureDto(ncloc,file1Snapshot).setValue(3d).setDeveloperId(developer.getId()),newMeasureDto(ncloc,file1Snapshot).setDeveloperId(null),newMeasureDto(ncloc,file2Snapshot).setDeveloperId(null));
+  dbClient.measureDao().insert(dbSession,newMeasureDto(ncloc,project,projectSnapshot).setDeveloperId(developer.getId()),newMeasureDto(ncloc,file1,projectSnapshot).setValue(3d).setDeveloperId(developer.getId()),newMeasureDto(ncloc,file1,projectSnapshot).setDeveloperId(null),newMeasureDto(ncloc,file2,projectSnapshot).setDeveloperId(null));
   db.commit();
   ComponentTreeWsResponse response=call(ws.newRequest().setParam(PARAM_BASE_COMPONENT_ID,"project-uuid").setParam(PARAM_DEVELOPER_ID,"developer-uuid").setParam(PARAM_STRATEGY,CHILDREN_STRATEGY).setParam(PARAM_METRIC_KEYS,"ncloc"));
   assertThat(response.getComponentsCount()).isEqualTo(2);

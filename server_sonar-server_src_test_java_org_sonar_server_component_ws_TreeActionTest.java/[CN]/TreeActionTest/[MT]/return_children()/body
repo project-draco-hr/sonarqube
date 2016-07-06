@@ -1,15 +1,15 @@
 {
   ComponentDto project=newProjectDto("project-uuid");
-  SnapshotDto projectSnapshot=componentDb.insertProjectAndSnapshot(project);
+  componentDb.insertProjectAndSnapshot(project);
   ComponentDto module=newModuleDto("module-uuid-1",project);
-  SnapshotDto moduleSnapshot=componentDb.insertComponentAndSnapshot(module,projectSnapshot);
-  componentDb.insertComponentAndSnapshot(newFileDto(project,1),projectSnapshot);
+  componentDb.insertComponent(module);
+  componentDb.insertComponent(newFileDto(project,1));
   for (int i=2; i <= 9; i++) {
-    componentDb.insertComponentAndSnapshot(newFileDto(module,i),moduleSnapshot);
+    componentDb.insertComponent(newFileDto(module,i));
   }
   ComponentDto directory=newDirectory(module,"directory-path-1");
-  SnapshotDto directorySnapshot=componentDb.insertComponentAndSnapshot(directory,moduleSnapshot);
-  componentDb.insertComponentAndSnapshot(newFileDto(directory,10),directorySnapshot);
+  componentDb.insertComponent(directory);
+  componentDb.insertComponent(newFileDto(directory,10));
   db.commit();
   componentDb.indexAllComponents();
   TreeWsResponse response=call(ws.newRequest().setParam(PARAM_STRATEGY,"children").setParam(PARAM_BASE_COMPONENT_ID,"module-uuid-1").setParam(Param.PAGE,"2").setParam(Param.PAGE_SIZE,"3").setParam(Param.TEXT_QUERY,"file-name").setParam(Param.ASCENDING,"false").setParam(Param.SORT,"name"));

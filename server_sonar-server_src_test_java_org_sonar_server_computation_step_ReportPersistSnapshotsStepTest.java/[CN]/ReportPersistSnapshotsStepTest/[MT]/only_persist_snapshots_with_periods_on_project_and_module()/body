@@ -6,16 +6,10 @@
   dbClient.snapshotDao().insert(dbTester.getSession(),projectSnapshot);
   ComponentDto moduleDto=ComponentTesting.newModuleDto("BCDE",projectDto).setKey("MODULE_KEY").setName("Module");
   dbClient.componentDao().insert(dbTester.getSession(),moduleDto);
-  SnapshotDto moduleSnapshot=SnapshotTesting.createForComponent(moduleDto,projectSnapshot);
-  dbClient.snapshotDao().insert(dbTester.getSession(),moduleSnapshot);
   ComponentDto directoryDto=ComponentTesting.newDirectory(moduleDto,"CDEF","MODULE_KEY:src/main/java/dir").setKey("MODULE_KEY:src/main/java/dir");
   dbClient.componentDao().insert(dbTester.getSession(),directoryDto);
-  SnapshotDto directorySnapshot=SnapshotTesting.createForComponent(directoryDto,moduleSnapshot);
-  dbClient.snapshotDao().insert(dbTester.getSession(),directorySnapshot);
   ComponentDto fileDto=ComponentTesting.newFileDto(moduleDto,"DEFG").setKey("MODULE_KEY:src/main/java/dir/Foo.java");
   dbClient.componentDao().insert(dbTester.getSession(),fileDto);
-  SnapshotDto fileSnapshot=SnapshotTesting.createForComponent(fileDto,directorySnapshot);
-  dbClient.snapshotDao().insert(dbTester.getSession(),fileSnapshot);
   dbTester.getSession().commit();
   Component file=ReportComponent.builder(Component.Type.FILE,4).setUuid("DEFG").setKey("MODULE_KEY:src/main/java/dir/Foo.java").build();
   Component directory=ReportComponent.builder(Component.Type.DIRECTORY,3).setUuid("CDEF").setKey("MODULE_KEY:src/main/java/dir").addChildren(file).build();
@@ -29,10 +23,4 @@
   underTest.execute();
   SnapshotDto newProjectSnapshot=getUnprocessedSnapshot(projectDto.uuid());
   assertThat(newProjectSnapshot.getPeriodMode(1)).isEqualTo(TIMEMACHINE_MODE_PREVIOUS_ANALYSIS);
-  SnapshotDto newModuleSnapshot=getUnprocessedSnapshot(moduleDto.uuid());
-  assertThat(newModuleSnapshot.getPeriodMode(1)).isEqualTo(TIMEMACHINE_MODE_PREVIOUS_ANALYSIS);
-  SnapshotDto newDirectorySnapshot=getUnprocessedSnapshot(directoryDto.uuid());
-  assertThat(newDirectorySnapshot.getPeriodMode(1)).isNull();
-  SnapshotDto newFileSnapshot=getUnprocessedSnapshot(fileDto.uuid());
-  assertThat(newFileSnapshot.getPeriodMode(1)).isNull();
 }

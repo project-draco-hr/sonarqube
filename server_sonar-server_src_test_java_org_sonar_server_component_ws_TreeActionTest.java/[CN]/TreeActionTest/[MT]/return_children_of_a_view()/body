@@ -1,10 +1,10 @@
 {
   ComponentDto view=newView("view-uuid");
-  SnapshotDto viewSnapshot=componentDb.insertViewAndSnapshot(view);
+  componentDb.insertViewAndSnapshot(view);
   ComponentDto project=newProjectDto("project-uuid-1").setName("project-name").setKey("project-key-1");
   componentDb.insertProjectAndSnapshot(project);
-  componentDb.insertComponentAndSnapshot(newProjectCopy("project-uuid-1-copy",project,view),viewSnapshot);
-  componentDb.insertComponentAndSnapshot(newSubView(view,"sub-view-uuid","sub-view-key").setName("sub-view-name"),viewSnapshot);
+  componentDb.insertComponent(newProjectCopy("project-uuid-1-copy",project,view));
+  componentDb.insertComponent(newSubView(view,"sub-view-uuid","sub-view-key").setName("sub-view-name"));
   db.commit();
   componentDb.indexAllComponents();
   TreeWsResponse response=call(ws.newRequest().setParam(PARAM_STRATEGY,"children").setParam(PARAM_BASE_COMPONENT_ID,"view-uuid").setParam(Param.TEXT_QUERY,"name"));

@@ -3,13 +3,12 @@
   analysisMetadataHolder.setBaseProjectSnapshot(baseProjectSnapshot);
   ComponentDto otherProject=createProject("OTHER_PROJECT_KEY");
   SnapshotDto otherProjectSnapshot=createProjectSnapshot(otherProject);
-  ComponentDto otherFIle=createFile("OTHER_FILE_KEY",otherProject);
-  SnapshotDto otherFileSnapshot=createFileSnapshot(otherFIle,otherProjectSnapshot);
+  ComponentDto otherFile=createFile("OTHER_FILE_KEY",otherProject);
   ScannerReport.CpdTextBlock originBlock1=ScannerReport.CpdTextBlock.newBuilder().setHash("a8998353e96320ec").setStartLine(30).setEndLine(45).setStartTokenIndex(0).setEndTokenIndex(10).build();
   ScannerReport.CpdTextBlock originBlock2=ScannerReport.CpdTextBlock.newBuilder().setHash("b1234353e96320ff").setStartLine(10).setEndLine(25).setStartTokenIndex(5).setEndTokenIndex(15).build();
   batchReportReader.putDuplicationBlocks(FILE_REF,asList(originBlock1,originBlock2));
-  DuplicationUnitDto duplicate1=new DuplicationUnitDto().setHash(originBlock1.getHash()).setStartLine(40).setEndLine(55).setIndexInFile(0).setAnalysisUuid(otherProjectSnapshot.getUuid()).setComponentUuid(otherFileSnapshot.getComponentUuid());
-  DuplicationUnitDto duplicate2=new DuplicationUnitDto().setHash(originBlock2.getHash()).setStartLine(20).setEndLine(35).setIndexInFile(1).setAnalysisUuid(otherProjectSnapshot.getUuid()).setComponentUuid(otherFileSnapshot.getComponentUuid());
+  DuplicationUnitDto duplicate1=new DuplicationUnitDto().setHash(originBlock1.getHash()).setStartLine(40).setEndLine(55).setIndexInFile(0).setAnalysisUuid(otherProjectSnapshot.getUuid()).setComponentUuid(otherFile.uuid());
+  DuplicationUnitDto duplicate2=new DuplicationUnitDto().setHash(originBlock2.getHash()).setStartLine(20).setEndLine(35).setIndexInFile(1).setAnalysisUuid(otherProjectSnapshot.getUuid()).setComponentUuid(otherFile.uuid());
   dbClient.duplicationDao().insert(dbSession,duplicate1);
   dbClient.duplicationDao().insert(dbSession,duplicate2);
   dbSession.commit();
@@ -22,6 +21,6 @@
   assertThat(originBlocksByIndex.get(0)).isEqualTo(new Block.Builder().setResourceId(CURRENT_FILE_KEY).setBlockHash(new ByteArray(originBlock1.getHash())).setIndexInFile(0).setLines(originBlock1.getStartLine(),originBlock1.getEndLine()).setUnit(originBlock1.getStartTokenIndex(),originBlock1.getEndTokenIndex()).build());
   assertThat(originBlocksByIndex.get(1)).isEqualTo(new Block.Builder().setResourceId(CURRENT_FILE_KEY).setBlockHash(new ByteArray(originBlock2.getHash())).setIndexInFile(1).setLines(originBlock2.getStartLine(),originBlock2.getEndLine()).setUnit(originBlock2.getStartTokenIndex(),originBlock2.getEndTokenIndex()).build());
   Map<Integer,Block> duplicationBlocksByIndex=blocksByIndexInFile(duplicationBlocks.getValue());
-  assertThat(duplicationBlocksByIndex.get(0)).isEqualTo(new Block.Builder().setResourceId(otherFIle.getKey()).setBlockHash(new ByteArray(originBlock1.getHash())).setIndexInFile(duplicate1.getIndexInFile()).setLines(duplicate1.getStartLine(),duplicate1.getEndLine()).build());
-  assertThat(duplicationBlocksByIndex.get(1)).isEqualTo(new Block.Builder().setResourceId(otherFIle.getKey()).setBlockHash(new ByteArray(originBlock2.getHash())).setIndexInFile(duplicate2.getIndexInFile()).setLines(duplicate2.getStartLine(),duplicate2.getEndLine()).build());
+  assertThat(duplicationBlocksByIndex.get(0)).isEqualTo(new Block.Builder().setResourceId(otherFile.getKey()).setBlockHash(new ByteArray(originBlock1.getHash())).setIndexInFile(duplicate1.getIndexInFile()).setLines(duplicate1.getStartLine(),duplicate1.getEndLine()).build());
+  assertThat(duplicationBlocksByIndex.get(1)).isEqualTo(new Block.Builder().setResourceId(otherFile.getKey()).setBlockHash(new ByteArray(originBlock2.getHash())).setIndexInFile(duplicate2.getIndexInFile()).setLines(duplicate2.getStartLine(),duplicate2.getEndLine()).build());
 }

@@ -1,10 +1,10 @@
 {
   ComponentDto project=newProjectDto(PROJECT_UUID);
-  SnapshotDto projectSnapshot=componentDb.insertProjectAndSnapshot(project);
+  componentDb.insertProjectAndSnapshot(project);
   ComponentDto module=newModuleDto(MODULE_UUID,project);
-  SnapshotDto moduleSnapshot=componentDb.insertComponentAndSnapshot(module,projectSnapshot);
+  componentDb.insertComponent(module);
   ComponentDto file=newFileDto(module,FILE_1_UUID);
-  componentDb.insertComponentAndSnapshot(file,moduleSnapshot);
+  componentDb.insertComponent(file);
   db.commit();
   assertThat(underTest.selectParent(dbSession,project)).isAbsent();
   assertThat(underTest.selectParent(dbSession,module).get().uuid()).isEqualTo(PROJECT_UUID);

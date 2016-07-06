@@ -1,0 +1,20 @@
+{
+  ComponentDto viewDto=save(newView("UUID_VIEW").setKey("KEY_VIEW"));
+  ComponentDto subViewDto=save(newSubView(viewDto,"UUID_SUBVIEW","KEY_SUBVIEW"));
+  ComponentDto projectDto=save(newProjectDto("proj"));
+  ComponentDto projectViewDto=save(newProjectCopy("UUID_PROJECT_COPY",projectDto,subViewDto).setKey("KEY_PROJECT_COPY"));
+  dbTester.getSession().commit();
+  Component projectView=ViewsComponent.builder(PROJECT_VIEW,"KEY_PROJECT_COPY").setUuid("UUID_PROJECT_COPY").build();
+  Component subView=ViewsComponent.builder(SUBVIEW,"KEY_SUBVIEW").setUuid("UUID_SUBVIEW").addChildren(projectView).build();
+  Component view=ViewsComponent.builder(VIEW,"KEY_VIEW").setUuid("UUID_VIEW").addChildren(subView).build();
+  treeRootHolder.setRoot(view);
+  underTest.execute();
+  assertThat(dbTester.countRowsOfTable("snapshots")).isEqualTo(1);
+  SnapshotDto viewSnapshot=getUnprocessedSnapshot(viewDto.uuid());
+  assertThat(viewSnapshot.getComponentUuid()).isEqualTo(view.getUuid());
+  assertThat(viewSnapshot.getVersion()).isNull();
+  assertThat(viewSnapshot.getLast()).isFalse();
+  assertThat(viewSnapshot.getStatus()).isEqualTo("U");
+  assertThat(viewSnapshot.getCreatedAt()).isEqualTo(analysisDate);
+  assertThat(viewSnapshot.getBuildDate()).isEqualTo(now);
+}

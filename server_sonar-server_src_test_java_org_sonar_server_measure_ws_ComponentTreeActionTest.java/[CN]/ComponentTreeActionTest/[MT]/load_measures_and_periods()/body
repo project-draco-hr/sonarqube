@@ -4,11 +4,12 @@
   SnapshotDto projectSnapshot=dbClient.snapshotDao().insert(dbSession,newSnapshotForProject(projectDto).setPeriodDate(1,System.currentTimeMillis()).setPeriodMode(1,"last_version").setPeriodDate(3,System.currentTimeMillis()).setPeriodMode(3,"last_analysis"));
   userSession.anonymous().addProjectUuidPermissions(UserRole.ADMIN,"project-uuid");
   ComponentDto directoryDto=newDirectory(projectDto,"directory-uuid","path/to/directory").setName("directory-1");
-  SnapshotDto directorySnapshot=componentDb.insertComponentAndSnapshot(directoryDto,projectSnapshot);
-  SnapshotDto fileSnapshot=componentDb.insertComponentAndSnapshot(newFileDto(directoryDto,"file-uuid").setName("file-1"),directorySnapshot);
+  componentDb.insertComponent(directoryDto);
+  ComponentDto file=newFileDto(directoryDto,"file-uuid").setName("file-1");
+  componentDb.insertComponent(file);
   MetricDto ncloc=insertNclocMetric();
   MetricDto coverage=insertCoverageMetric();
-  dbClient.measureDao().insert(dbSession,newMeasureDto(ncloc,fileSnapshot).setValue(5.0d).setVariation(1,4.0d),newMeasureDto(coverage,fileSnapshot).setValue(15.5d).setVariation(3,2.0d),newMeasureDto(coverage,directorySnapshot).setValue(15.0d));
+  dbClient.measureDao().insert(dbSession,newMeasureDto(ncloc,file,projectSnapshot).setValue(5.0d).setVariation(1,4.0d),newMeasureDto(coverage,file,projectSnapshot).setValue(15.5d).setVariation(3,2.0d),newMeasureDto(coverage,directoryDto,projectSnapshot).setValue(15.0d));
   db.commit();
   ComponentTreeWsResponse response=call(ws.newRequest().setParam(PARAM_BASE_COMPONENT_ID,"project-uuid").setParam(PARAM_METRIC_KEYS,"ncloc,coverage").setParam(PARAM_ADDITIONAL_FIELDS,ADDITIONAL_PERIODS));
   assertThat(response.getComponentsList().get(0).getMeasuresList()).extracting("metric").containsOnly("coverage");
