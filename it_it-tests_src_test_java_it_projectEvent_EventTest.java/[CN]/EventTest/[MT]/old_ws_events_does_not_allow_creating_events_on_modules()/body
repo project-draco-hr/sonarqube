@@ -1,0 +1,8 @@
+{
+  SonarScanner sampleProject=SonarScanner.create(projectDir("shared/xoo-multi-modules-sample"));
+  orchestrator.executeBuild(sampleProject);
+  WsConnector wsConnector=ItUtils.newAdminWsClient(orchestrator).wsConnector();
+  WsResponse response=wsConnector.call(newCreateEventRequest("com.sonarsource.it.samples:multi-modules-sample","bar"));
+  assertThat(response.code()).isEqualTo(200);
+  assertThat(wsConnector.call(newCreateEventRequest("com.sonarsource.it.samples:multi-modules-sample:module_a","bar")).code()).isEqualTo(400);
+}
