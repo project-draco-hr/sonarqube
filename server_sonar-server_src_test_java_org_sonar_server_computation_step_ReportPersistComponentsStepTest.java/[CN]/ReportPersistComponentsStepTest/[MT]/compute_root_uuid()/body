@@ -1,11 +1,11 @@
 {
-  treeRootHolder.setRoot(builder(PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).setName("Project").addChildren(builder(Component.Type.MODULE,2).setUuid("BCDE").setKey("MODULE_KEY").setName("Module").addChildren(builder(Component.Type.MODULE,3).setUuid("CDEF").setKey("SUB_MODULE_1_KEY").setName("Sub Module 1").addChildren(builder(Component.Type.MODULE,4).setUuid("DEFG").setKey("SUB_MODULE_2_KEY").setName("Sub Module 2").addChildren(builder(DIRECTORY,5).setUuid("EFGH").setKey("SUB_MODULE_2_KEY:src/main/java/dir").setPath("src/main/java/dir").build()).build()).build()).build()).build());
+  treeRootHolder.setRoot(builder(PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).setName("Project").addChildren(builder(Component.Type.MODULE,2).setUuid("BCDE").setKey(MODULE_KEY).setName("Module").addChildren(builder(Component.Type.MODULE,3).setUuid("CDEF").setKey("SUB_MODULE_1_KEY").setName("Sub Module 1").addChildren(builder(Component.Type.MODULE,4).setUuid("DEFG").setKey("SUB_MODULE_2_KEY").setName("Sub Module 2").addChildren(builder(DIRECTORY,5).setUuid("EFGH").setKey("SUB_MODULE_2_KEY:src/main/java/dir").setPath("src/main/java/dir").build()).build()).build()).build()).build());
   underTest.execute();
   assertThat(dbTester.countRowsOfTable("projects")).isEqualTo(5);
   Optional<ComponentDto> project=dbClient.componentDao().selectByKey(dbTester.getSession(),PROJECT_KEY);
   assertThat(project).isPresent();
   assertThat(project.get().getRootUuid()).isEqualTo("ABCD");
-  Optional<ComponentDto> module=dbClient.componentDao().selectByKey(dbTester.getSession(),"MODULE_KEY");
+  Optional<ComponentDto> module=dbClient.componentDao().selectByKey(dbTester.getSession(),MODULE_KEY);
   assertThat(module).isPresent();
   assertThat(module.get().getRootUuid()).isEqualTo(project.get().uuid());
   Optional<ComponentDto> subModule1=dbClient.componentDao().selectByKey(dbTester.getSession(),"SUB_MODULE_1_KEY");

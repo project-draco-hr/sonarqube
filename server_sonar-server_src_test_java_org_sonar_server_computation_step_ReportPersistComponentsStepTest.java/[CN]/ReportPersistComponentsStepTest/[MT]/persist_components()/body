@@ -1,7 +1,7 @@
 {
   Component file=builder(FILE,4).setUuid("DEFG").setKey("MODULE_KEY:src/main/java/dir/Foo.java").setPath("src/main/java/dir/Foo.java").setFileAttributes(new FileAttributes(false,"java")).build();
   Component directory=builder(DIRECTORY,3).setUuid("CDEF").setKey("MODULE_KEY:src/main/java/dir").setPath("src/main/java/dir").addChildren(file).build();
-  Component module=builder(Component.Type.MODULE,2).setUuid("BCDE").setKey("MODULE_KEY").setPath("module").setName("Module").setDescription("Module description").addChildren(directory).build();
+  Component module=builder(Component.Type.MODULE,2).setUuid("BCDE").setKey(MODULE_KEY).setPath("module").setName("Module").setDescription("Module description").addChildren(directory).build();
   Component project=builder(PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).setName("Project").setDescription("Project description").addChildren(module).build();
   treeRootHolder.setRoot(project);
   underTest.execute();
@@ -18,7 +18,7 @@
   assertThat(projectDto.scope()).isEqualTo("PRJ");
   assertThat(projectDto.getRootUuid()).isEqualTo("ABCD");
   assertThat(projectDto.getCreatedAt()).isEqualTo(now);
-  ComponentDto moduleDto=dbClient.componentDao().selectByKey(dbTester.getSession(),"MODULE_KEY").get();
+  ComponentDto moduleDto=dbClient.componentDao().selectByKey(dbTester.getSession(),MODULE_KEY).get();
   assertThat(moduleDto.name()).isEqualTo("Module");
   assertThat(moduleDto.description()).isEqualTo("Module description");
   assertThat(moduleDto.path()).isEqualTo("module");

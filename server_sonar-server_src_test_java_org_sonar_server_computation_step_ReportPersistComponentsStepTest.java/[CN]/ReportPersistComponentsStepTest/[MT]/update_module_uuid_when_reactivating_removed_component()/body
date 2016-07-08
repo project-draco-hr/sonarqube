@@ -1,0 +1,26 @@
+{
+  ComponentDto project=ComponentTesting.newProjectDto("ABCD").setKey(PROJECT_KEY).setName("Project");
+  dbClient.componentDao().insert(dbTester.getSession(),project);
+  ComponentDto module=ComponentTesting.newModuleDto("BCDE",project).setKey(MODULE_KEY).setName("Module");
+  ComponentDto removedModule=ComponentTesting.newModuleDto("EDCD",project).setKey("REMOVED_MODULE_KEY").setName("Removed Module").setEnabled(false);
+  dbClient.componentDao().insert(dbTester.getSession(),module,removedModule);
+  ComponentDto directory=ComponentTesting.newDirectory(module,"src/main/java/dir").setUuid("CDEF").setKey("MODULE_KEY:src/main/java/dir");
+  ComponentDto removedFile=ComponentTesting.newFileDto(removedModule,"DEFG").setPath("src/main/java/dir/Foo.java").setName("Foo.java").setKey("MODULE_KEY:src/main/java/dir/Foo.java").setEnabled(false);
+  dbClient.componentDao().insert(dbTester.getSession(),directory,removedFile);
+  dbTester.getSession().commit();
+  treeRootHolder.setRoot(builder(PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).setName("Project").addChildren(builder(Component.Type.MODULE,2).setUuid("BCDE").setKey(MODULE_KEY).setName("Module").addChildren(builder(DIRECTORY,3).setUuid("CDEF").setKey("MODULE_KEY:src/main/java/dir").setPath("src/main/java/dir").addChildren(builder(FILE,4).setUuid("DEFG").setKey("MODULE_KEY:src/main/java/dir/Foo.java").setPath("src/main/java/dir/Foo.java").build()).build()).build()).build());
+  underTest.execute();
+  dbClient.componentDao().applyBChangesForRootComponentUuid(dbTester.getSession(),project.uuid());
+  dbTester.commit();
+  assertThat(dbTester.countRowsOfTable("projects")).isEqualTo(5);
+  ComponentDto moduleReloaded=dbClient.componentDao().selectByKey(dbTester.getSession(),MODULE_KEY).get();
+  ComponentDto fileReloaded=dbClient.componentDao().selectByKey(dbTester.getSession(),"MODULE_KEY:src/main/java/dir/Foo.java").get();
+  assertThat(fileReloaded.getId()).isEqualTo(removedFile.getId());
+  assertThat(fileReloaded.uuid()).isEqualTo(removedFile.uuid());
+  assertThat(fileReloaded.moduleUuid()).isEqualTo(moduleReloaded.uuid());
+  assertThat(fileReloaded.moduleUuidPath()).isEqualTo(moduleReloaded.moduleUuidPath());
+  assertThat(fileReloaded.projectUuid()).isEqualTo(moduleReloaded.projectUuid());
+  assertThat(fileReloaded.name()).isEqualTo(removedFile.name());
+  assertThat(fileReloaded.path()).isEqualTo(removedFile.path());
+  assertThat(fileReloaded.isEnabled()).isTrue();
+}

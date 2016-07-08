@@ -1,11 +1,12 @@
 {
   ComponentDto project=ComponentTesting.newProjectDto("ABCD").setKey(PROJECT_KEY).setName("Project");
   dbClient.componentDao().insert(dbTester.getSession(),project);
-  ComponentDto module=ComponentTesting.newModuleDto("BCDE",project).setKey("MODULE_KEY").setName("Module").setPath("path");
+  ComponentDto module=ComponentTesting.newModuleDto("BCDE",project).setKey(MODULE_KEY).setName("Module").setPath("path");
   dbClient.componentDao().insert(dbTester.getSession(),module);
   dbTester.getSession().commit();
-  treeRootHolder.setRoot(builder(PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).setName("Project").addChildren(builder(Component.Type.MODULE,2).setUuid("BCDE").setKey("MODULE_KEY").setName("Module").setPath("New path").build()).build());
+  treeRootHolder.setRoot(builder(PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).setName("Project").addChildren(builder(Component.Type.MODULE,2).setUuid("BCDE").setKey(MODULE_KEY).setName("Module").setPath("New path").build()).build());
   underTest.execute();
-  ComponentDto moduleReloaded=dbClient.componentDao().selectByKey(dbTester.getSession(),"MODULE_KEY").get();
-  assertThat(moduleReloaded.path()).isEqualTo("New path");
+  assertThat(dbClient.componentDao().selectByKey(dbTester.getSession(),MODULE_KEY).get().path()).isEqualTo("path");
+  dbClient.componentDao().applyBChangesForRootComponentUuid(dbTester.getSession(),project.uuid());
+  assertThat(dbClient.componentDao().selectByKey(dbTester.getSession(),MODULE_KEY).get().path()).isEqualTo("New path");
 }

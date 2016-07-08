@@ -1,19 +1,21 @@
 {
   ComponentDto project=ComponentTesting.newProjectDto("ABCD").setKey(PROJECT_KEY).setName("Project");
   dbClient.componentDao().insert(dbTester.getSession(),project);
-  ComponentDto removedModule=ComponentTesting.newModuleDto("BCDE",project).setKey("MODULE_KEY").setName("Module").setEnabled(false);
+  ComponentDto removedModule=ComponentTesting.newModuleDto("BCDE",project).setKey(MODULE_KEY).setName("Module").setEnabled(false);
   dbClient.componentDao().insert(dbTester.getSession(),removedModule);
   ComponentDto removedDirectory=ComponentTesting.newDirectory(removedModule,"src/main/java/dir").setUuid("CDEF").setKey("MODULE_KEY:src/main/java/dir").setEnabled(false);
   ComponentDto removedFile=ComponentTesting.newFileDto(removedModule,"DEFG").setPath("src/main/java/dir/Foo.java").setName("Foo.java").setKey("MODULE_KEY:src/main/java/dir/Foo.java").setEnabled(false);
   dbClient.componentDao().insert(dbTester.getSession(),removedDirectory,removedFile);
   dbTester.getSession().commit();
-  treeRootHolder.setRoot(builder(PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).setName("Project").addChildren(builder(Component.Type.MODULE,2).setUuid("BCDE").setKey("MODULE_KEY").setName("Module").addChildren(builder(DIRECTORY,3).setUuid("CDEF").setKey("MODULE_KEY:src/main/java/dir").setPath("src/main/java/dir").addChildren(builder(FILE,4).setUuid("DEFG").setKey("MODULE_KEY:src/main/java/dir/Foo.java").setPath("src/main/java/dir/Foo.java").build()).build()).build()).build());
+  treeRootHolder.setRoot(builder(PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).setName("Project").addChildren(builder(Component.Type.MODULE,2).setUuid("BCDE").setKey(MODULE_KEY).setName("Module").addChildren(builder(DIRECTORY,3).setUuid("CDEF").setKey("MODULE_KEY:src/main/java/dir").setPath("src/main/java/dir").addChildren(builder(FILE,4).setUuid("DEFG").setKey("MODULE_KEY:src/main/java/dir/Foo.java").setPath("src/main/java/dir/Foo.java").build()).build()).build()).build());
   underTest.execute();
   assertThat(dbTester.countRowsOfTable("projects")).isEqualTo(4);
   assertThat(dbClient.componentDao().selectByKey(dbTester.getSession(),PROJECT_KEY).get().getId()).isEqualTo(project.getId());
-  assertThat(dbClient.componentDao().selectByKey(dbTester.getSession(),"MODULE_KEY").get().getId()).isEqualTo(removedModule.getId());
+  assertThat(dbClient.componentDao().selectByKey(dbTester.getSession(),MODULE_KEY).get().getId()).isEqualTo(removedModule.getId());
   assertThat(dbClient.componentDao().selectByKey(dbTester.getSession(),"MODULE_KEY:src/main/java/dir").get().getId()).isEqualTo(removedDirectory.getId());
   assertThat(dbClient.componentDao().selectByKey(dbTester.getSession(),"MODULE_KEY:src/main/java/dir/Foo.java").get().getId()).isEqualTo(removedFile.getId());
+  assertExistButDisabled(removedModule.key(),removedDirectory.getKey(),removedFile.getKey());
+  dbClient.componentDao().applyBChangesForRootComponentUuid(dbTester.getSession(),project.uuid());
   ComponentDto projectReloaded=dbClient.componentDao().selectByKey(dbTester.getSession(),PROJECT_KEY).get();
   assertThat(projectReloaded.getId()).isEqualTo(project.getId());
   assertThat(projectReloaded.uuid()).isEqualTo(project.uuid());
@@ -22,7 +24,7 @@
   assertThat(projectReloaded.projectUuid()).isEqualTo(project.projectUuid());
   assertThat(projectReloaded.getRootUuid()).isEqualTo(project.getRootUuid());
   assertThat(projectReloaded.isEnabled()).isTrue();
-  ComponentDto moduleReloaded=dbClient.componentDao().selectByKey(dbTester.getSession(),"MODULE_KEY").get();
+  ComponentDto moduleReloaded=dbClient.componentDao().selectByKey(dbTester.getSession(),MODULE_KEY).get();
   assertThat(moduleReloaded.getId()).isEqualTo(removedModule.getId());
   assertThat(moduleReloaded.uuid()).isEqualTo(removedModule.uuid());
   assertThat(moduleReloaded.moduleUuid()).isEqualTo(removedModule.moduleUuid());

@@ -10,6 +10,8 @@
   dbTester.getSession().commit();
   treeRootHolder.setRoot(builder(PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).setName("Project").addChildren(builder(Component.Type.MODULE,2).setUuid("EDCB").setKey("MODULE_A").setName("Module A").addChildren(builder(Component.Type.MODULE,3).setUuid("BCDE").setKey("MODULE_B").setName("Module B").addChildren(builder(DIRECTORY,4).setUuid("CDEF").setKey("MODULE_B:src/main/java/dir").setPath("src/main/java/dir").addChildren(builder(FILE,5).setUuid("DEFG").setKey("MODULE_B:src/main/java/dir/Foo.java").setPath("src/main/java/dir/Foo.java").build()).build()).build()).build()).build());
   underTest.execute();
+  dbClient.componentDao().applyBChangesForRootComponentUuid(dbTester.getSession(),project.uuid());
+  dbTester.commit();
   assertThat(dbTester.countRowsOfTable("projects")).isEqualTo(5);
   ComponentDto moduleAreloaded=dbClient.componentDao().selectByKey(dbTester.getSession(),"MODULE_A").get();
   ComponentDto moduleBReloaded=dbClient.componentDao().selectByKey(dbTester.getSession(),"MODULE_B").get();

@@ -2,12 +2,11 @@
   Date oldDate=DateUtils.parseDate("2015-01-01");
   ComponentDto project=ComponentTesting.newProjectDto("ABCD").setKey(PROJECT_KEY).setName("Project").setCreatedAt(oldDate);
   dbClient.componentDao().insert(dbTester.getSession(),project);
-  ComponentDto module=ComponentTesting.newModuleDto("BCDE",project).setKey("MODULE_KEY").setName("Module").setPath("path").setCreatedAt(oldDate);
+  ComponentDto module=ComponentTesting.newModuleDto("BCDE",project).setKey(MODULE_KEY).setName("Module").setPath("path").setCreatedAt(oldDate);
   dbClient.componentDao().insert(dbTester.getSession(),module);
   dbTester.getSession().commit();
-  treeRootHolder.setRoot(builder(PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).setName("New project name").build());
+  treeRootHolder.setRoot(builder(PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).build());
   underTest.execute();
   Optional<ComponentDto> projectReloaded=dbClient.componentDao().selectByKey(dbTester.getSession(),PROJECT_KEY);
-  assertThat(projectReloaded.get().name()).isEqualTo("New project name");
   assertThat(projectReloaded.get().getCreatedAt()).isNotEqualTo(now);
 }

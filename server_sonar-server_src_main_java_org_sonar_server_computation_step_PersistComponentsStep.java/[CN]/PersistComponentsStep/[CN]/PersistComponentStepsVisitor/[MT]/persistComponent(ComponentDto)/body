@@ -1,13 +1,23 @@
 {
-  ComponentDto existingComponent=existingComponentDtosByKey.get(componentDto.getKey());
+  ComponentDto existingComponent=existingComponentDtosByKey.remove(componentDto.getKey());
   if (existingComponent == null) {
     dbClient.componentDao().insert(dbSession,componentDto);
     return componentDto;
   }
- else {
-    if (updateExisting(existingComponent,componentDto)) {
-      dbClient.componentDao().update(dbSession,existingComponent);
-    }
-    return existingComponent;
+  Optional<ComponentUpdateDto> update=compareForUpdate(existingComponent,componentDto);
+  if (update.isPresent()) {
+    ComponentUpdateDto updateDto=update.get();
+    dbClient.componentDao().update(dbSession,updateDto);
+    existingComponent.setCopyComponentUuid(updateDto.getBCopyComponentUuid());
+    existingComponent.setDescription(updateDto.getBDescription());
+    existingComponent.setEnabled(updateDto.isBEnabled());
+    existingComponent.setLanguage(updateDto.getBLanguage());
+    existingComponent.setLongName(updateDto.getBLongName());
+    existingComponent.setModuleUuid(updateDto.getBModuleUuid());
+    existingComponent.setModuleUuidPath(updateDto.getBModuleUuidPath());
+    existingComponent.setName(updateDto.getBName());
+    existingComponent.setPath(updateDto.getBPath());
+    existingComponent.setQualifier(updateDto.getBQualifier());
   }
+  return existingComponent;
 }

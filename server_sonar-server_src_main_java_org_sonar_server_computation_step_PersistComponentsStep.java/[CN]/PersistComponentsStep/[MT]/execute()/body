@@ -1,11 +1,14 @@
 {
-  DbSession session=dbClient.openSession(false);
+  DbSession dbSession=dbClient.openSession(false);
   try {
-    Map<String,ComponentDto> existingComponentDtosByKey=indexExistingDtosByKey(session);
-    new PathAwareCrawler<>(new PersistComponentStepsVisitor(existingComponentDtosByKey,session)).visit(treeRootHolder.getRoot());
-    session.commit();
+    String projectUuid=treeRootHolder.getRoot().getUuid();
+    dbClient.componentDao().resetBChangedForRootComponentUuid(dbSession,projectUuid);
+    Map<String,ComponentDto> existingDtosByKeys=indexExistingDtosByKey(dbSession);
+    new PathAwareCrawler<>(new PersistComponentStepsVisitor(existingDtosByKeys,dbSession)).visit(treeRootHolder.getRoot());
+    disableRemainingComponents(dbSession,existingDtosByKeys.values());
+    dbSession.commit();
   }
   finally {
-    dbClient.closeSession(session);
+    dbClient.closeSession(dbSession);
   }
 }
