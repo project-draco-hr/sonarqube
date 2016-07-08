@@ -1,0 +1,10 @@
+{
+  GroupDto group=groupDb.insertGroup(newGroupDto().setName("group-anyone"));
+  groupDb.insertGroup(newGroupDto().setName("unknown"));
+  permissionDb.addGlobalPermissionToGroup(SCAN_EXECUTION,group.getId());
+  PermissionQuery.Builder dbQuery=PermissionQuery.builder().setSearchQuery("any");
+  List<String> groupNames=selectGroupNames(dbQuery);
+  int countNames=countGroupNames(dbQuery);
+  assertThat(groupNames).containsOnlyOnce(DefaultGroups.ANYONE,"group-anyone");
+  assertThat(countNames).isEqualTo(2);
+}
