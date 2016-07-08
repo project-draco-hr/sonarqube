@@ -1,0 +1,19 @@
+{
+  Path ioFile=inputFile.file().toPath();
+  Path errorFile=ioFile.resolveSibling(ioFile.getFileName() + ERROR_EXTENSION).toAbsolutePath();
+  if (Files.exists(errorFile) && Files.isRegularFile(errorFile)) {
+    LOG.debug("Processing " + errorFile.toString());
+    try {
+      List<String> lines=Files.readAllLines(errorFile,context.fileSystem().encoding());
+      for (      String line : lines) {
+        if (StringUtils.isBlank(line) || line.startsWith("#")) {
+          continue;
+        }
+        processLine(line,inputFile,context);
+      }
+    }
+ catch (    IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  Path baseDir=temp.newFolder().toPath().toAbsolutePath();
+  createErrorFile(baseDir);
+  DefaultInputFile inputFile=new DefaultInputFile("foo","src/foo.xoo").setLanguage("xoo");
+  context=SensorContextTester.create(baseDir);
+  context.fileSystem().add(inputFile);
+  sensor.execute(context);
+  assertThat(context.allAnalysisErrors()).hasSize(1);
+  AnalysisError error=context.allAnalysisErrors().iterator().next();
+  assertThat(error.inputFile()).isEqualTo(inputFile);
+  assertThat(error.location()).isEqualTo(new DefaultTextPointer(1,4));
+  assertThat(error.message()).isEqualTo("my error");
+}

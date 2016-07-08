@@ -1,0 +1,11 @@
+{
+  assertThat(tester.allAnalysisErrors()).isEmpty();
+  NewAnalysisError newAnalysisError=tester.newAnalysisError();
+  InputFile file=new DefaultInputFile("foo","src/Foo.java");
+  newAnalysisError.onFile(file).message("error").at(new DefaultTextPointer(5,2)).save();
+  assertThat(tester.allAnalysisErrors()).hasSize(1);
+  AnalysisError analysisError=tester.allAnalysisErrors().iterator().next();
+  assertThat(analysisError.inputFile()).isEqualTo(file);
+  assertThat(analysisError.message()).isEqualTo("error");
+  assertThat(analysisError.location()).isEqualTo(new DefaultTextPointer(5,2));
+}
