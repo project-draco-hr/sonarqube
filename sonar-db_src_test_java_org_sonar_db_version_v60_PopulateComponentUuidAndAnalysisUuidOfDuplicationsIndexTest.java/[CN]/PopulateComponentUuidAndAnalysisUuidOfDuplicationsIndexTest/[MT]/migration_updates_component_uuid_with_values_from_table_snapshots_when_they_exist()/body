@@ -1,0 +1,20 @@
+{
+  insertSnapshot(40,"cpt1");
+  String rootUuid1=insertSnapshot(50,"cpt2");
+  insertSnapshot(60,"cpt3");
+  String rootUuid2=insertSnapshot(70,"cpt4");
+  insertDuplicationIndex(1,40,50);
+  insertDuplicationIndex(2,40,50);
+  insertDuplicationIndex(3,40,70);
+  insertDuplicationIndex(4,60,110);
+  insertDuplicationIndex(5,90,120);
+  insertDuplicationIndex(6,100,70);
+  db.commit();
+  underTest.execute();
+  verifyDuplicationsIndex(1,40,"cpt1",rootUuid1);
+  verifyDuplicationsIndex(2,40,"cpt1",rootUuid1);
+  verifyDuplicationsIndex(3,40,"cpt1",rootUuid2);
+  verifyDuplicationsIndex(4,60,"cpt3",null);
+  verifyDuplicationsIndex(5,90,null,null);
+  verifyDuplicationsIndex(6,100,null,rootUuid2);
+}
