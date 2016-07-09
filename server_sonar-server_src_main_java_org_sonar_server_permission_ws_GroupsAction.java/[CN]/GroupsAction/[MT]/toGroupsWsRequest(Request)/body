@@ -1,12 +1,6 @@
 {
-  String permission=request.mandatoryParam(PARAM_PERMISSION);
-  String projectUuid=request.param(PARAM_PROJECT_ID);
-  String projectKey=request.param(PARAM_PROJECT_KEY);
-  if (newOptionalWsProjectRef(projectUuid,projectKey).isPresent()) {
-    validateProjectPermission(permission);
-  }
- else {
-    validateGlobalPermission(permission);
-  }
-  return new GroupsWsRequest().setPermission(permission).setProjectId(projectUuid).setProjectKey(projectKey).setPage(request.mandatoryParamAsInt(Param.PAGE)).setPageSize(request.mandatoryParamAsInt(Param.PAGE_SIZE)).setQuery(request.param(Param.TEXT_QUERY)).setSelected(request.mandatoryParam(Param.SELECTED));
+  GroupsWsRequest groupsRequest=new GroupsWsRequest().setPermission(request.param(PARAM_PERMISSION)).setProjectId(request.param(PARAM_PROJECT_ID)).setProjectKey(request.param(PARAM_PROJECT_KEY)).setPage(request.mandatoryParamAsInt(Param.PAGE)).setPageSize(request.mandatoryParamAsInt(Param.PAGE_SIZE)).setQuery(request.param(Param.TEXT_QUERY));
+  Optional<WsProjectRef> wsProjectRef=newOptionalWsProjectRef(groupsRequest.getProjectId(),groupsRequest.getProjectKey());
+  validatePermission(groupsRequest.getPermission(),wsProjectRef);
+  return groupsRequest;
 }

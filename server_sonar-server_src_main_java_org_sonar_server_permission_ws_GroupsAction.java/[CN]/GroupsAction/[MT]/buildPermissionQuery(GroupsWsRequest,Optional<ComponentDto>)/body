@@ -1,7 +1,10 @@
 {
-  OldPermissionQuery.Builder permissionQuery=OldPermissionQuery.builder().permission(request.getPermission()).pageIndex(request.getPage()).pageSize(request.getPageSize()).membership(fromSelectionModeToMembership(firstNonNull(request.getSelected(),SelectionMode.SELECTED.value()))).search(request.getQuery());
+  PermissionQuery.Builder permissionQuery=PermissionQuery.builder().setPermission(request.getPermission()).setPageIndex(request.getPage()).setPageSize(request.getPageSize()).setSearchQuery(request.getQuery());
   if (project.isPresent()) {
-    permissionQuery.component(project.get().getKey());
+    permissionQuery.setComponentUuid(project.get().uuid());
   }
-  return permissionQuery.build();
+  if (request.getQuery() == null) {
+    permissionQuery.withPermissionOnly();
+  }
+  return permissionQuery;
 }
