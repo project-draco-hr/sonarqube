@@ -3,10 +3,10 @@
   try {
     Optional<ComponentDto> project=dependenciesFinder.searchProject(dbSession,newOptionalWsProjectRef(request.getProjectId(),request.getProjectKey()));
     checkProjectAdminUserByComponentDto(userSession,project);
-    PermissionQuery.Builder dbQuery=buildPermissionQuery(request,project);
-    List<GroupDto> groups=permissionFinder.findGroups(dbSession,dbQuery);
-    int total=dbClient.permissionDao().countGroupsByPermissionQuery(dbSession,dbQuery.build());
-    List<GroupRoleDto> groupsWithPermission=permissionFinder.findGroupPermissions(dbSession,dbQuery,groups);
+    PermissionQuery dbQuery=buildPermissionQuery(request,project);
+    List<GroupDto> groups=findGroups(dbSession,dbQuery);
+    int total=dbClient.permissionDao().countGroupsByPermissionQuery(dbSession,dbQuery);
+    List<GroupRoleDto> groupsWithPermission=findGroupPermissions(dbSession,groups,project);
     return buildResponse(groups,groupsWithPermission,Paging.forPageIndex(request.getPage()).withPageSize(request.getPageSize()).andTotal(total));
   }
   finally {

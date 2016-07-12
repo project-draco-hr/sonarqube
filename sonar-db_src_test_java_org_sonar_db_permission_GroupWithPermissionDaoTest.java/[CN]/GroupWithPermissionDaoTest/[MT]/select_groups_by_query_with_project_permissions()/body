@@ -1,2 +1,18 @@
 {
+  GroupDto group1=groupDb.insertGroup();
+  GroupDto group2=groupDb.insertGroup();
+  GroupDto group3=groupDb.insertGroup();
+  ComponentDto project=componentDb.insertComponent(newProjectDto());
+  ComponentDto anotherProject=componentDb.insertComponent(newProjectDto());
+  permissionDb.addProjectPermissionToGroup(SCAN_EXECUTION,group1.getId(),project.getId());
+  permissionDb.addProjectPermissionToGroup(PROVISIONING,group1.getId(),project.getId());
+  permissionDb.addProjectPermissionToGroup(USER,null,project.getId());
+  permissionDb.addProjectPermissionToGroup(SYSTEM_ADMIN,group1.getId(),anotherProject.getId());
+  permissionDb.addProjectPermissionToGroup(SYSTEM_ADMIN,null,anotherProject.getId());
+  permissionDb.addProjectPermissionToGroup(SCAN_EXECUTION,group3.getId(),anotherProject.getId());
+  permissionDb.addGlobalPermissionToGroup(SCAN_EXECUTION,group2.getId());
+  PermissionQuery.Builder builderOnComponent=PermissionQuery.builder().setComponentUuid(project.uuid());
+  assertThat(underTest.selectGroupNamesByPermissionQuery(dbSession,builderOnComponent.withPermissionOnly().build())).containsOnlyOnce(group1.getName());
+  assertThat(underTest.selectGroupNamesByPermissionQuery(dbSession,builderOnComponent.setPermission(SCAN_EXECUTION).build())).containsOnlyOnce(group1.getName());
+  assertThat(underTest.selectGroupNamesByPermissionQuery(dbSession,builderOnComponent.setPermission(USER).build())).containsOnlyOnce(ANYONE);
 }

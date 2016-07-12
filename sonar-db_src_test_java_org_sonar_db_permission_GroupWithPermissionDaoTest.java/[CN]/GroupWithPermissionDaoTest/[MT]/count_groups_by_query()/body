@@ -1,0 +1,12 @@
+{
+  GroupDto group1=groupDb.insertGroup(newGroupDto().setName("Group-1"));
+  GroupDto group2=groupDb.insertGroup(newGroupDto().setName("Group-2"));
+  GroupDto group3=groupDb.insertGroup(newGroupDto().setName("Group-3"));
+  permissionDb.addGlobalPermissionToGroup(SCAN_EXECUTION,null);
+  permissionDb.addGlobalPermissionToGroup(PROVISIONING,group1.getId());
+  assertThat(underTest.countGroupsByPermissionQuery(dbSession,PermissionQuery.builder().build())).isEqualTo(4);
+  assertThat(underTest.countGroupsByPermissionQuery(dbSession,PermissionQuery.builder().setPermission(PROVISIONING).build())).isEqualTo(1);
+  assertThat(underTest.countGroupsByPermissionQuery(dbSession,PermissionQuery.builder().withPermissionOnly().build())).isEqualTo(2);
+  assertThat(underTest.countGroupsByPermissionQuery(dbSession,PermissionQuery.builder().setSearchQuery("Group-").build())).isEqualTo(3);
+  assertThat(underTest.countGroupsByPermissionQuery(dbSession,PermissionQuery.builder().setSearchQuery("Any").build())).isEqualTo(1);
+}

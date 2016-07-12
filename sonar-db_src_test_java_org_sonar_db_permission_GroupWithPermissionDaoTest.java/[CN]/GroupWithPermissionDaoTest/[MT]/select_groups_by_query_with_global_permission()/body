@@ -1,2 +1,14 @@
 {
+  GroupDto group1=groupDb.insertGroup(newGroupDto().setName("Group-1"));
+  GroupDto group2=groupDb.insertGroup(newGroupDto().setName("Group-2"));
+  GroupDto group3=groupDb.insertGroup(newGroupDto().setName("Group-3"));
+  ComponentDto project=componentDb.insertComponent(newProjectDto());
+  permissionDb.addGlobalPermissionToGroup(SCAN_EXECUTION,null);
+  permissionDb.addGlobalPermissionToGroup(PROVISIONING,null);
+  permissionDb.addGlobalPermissionToGroup(SCAN_EXECUTION,group1.getId());
+  permissionDb.addGlobalPermissionToGroup(SYSTEM_ADMIN,group3.getId());
+  permissionDb.addProjectPermissionToGroup(UserRole.ADMIN,group2.getId(),project.getId());
+  assertThat(underTest.selectGroupNamesByPermissionQuery(dbSession,PermissionQuery.builder().setPermission(SCAN_EXECUTION).build())).containsExactly(ANYONE,"Group-1");
+  assertThat(underTest.selectGroupNamesByPermissionQuery(dbSession,PermissionQuery.builder().setPermission(SYSTEM_ADMIN).build())).containsExactly("Group-3");
+  assertThat(underTest.selectGroupNamesByPermissionQuery(dbSession,PermissionQuery.builder().setPermission(PROVISIONING).build())).containsExactly(ANYONE);
 }
