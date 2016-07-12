@@ -1,0 +1,11 @@
+{
+  setSysAdminUser();
+  UserDto user=insertUser(new UserDto().setLogin("login-1").setName("name-1").setEmail("email-1"));
+  PermissionTemplateDto template=dbClient.permissionTemplateDao().insert(dbSession,newPermissionTemplateDto().setUuid("template-uuid-1"));
+  PermissionTemplateDto anotherTemplate=dbClient.permissionTemplateDao().insert(dbSession,newPermissionTemplateDto().setUuid("template-uuid-2"));
+  addUserToTemplate(newPermissionTemplateUser(USER,anotherTemplate.getId(),user.getId()));
+  commit();
+  InputStream responseStream=newRequest(null,null).setParam(PARAM_TEMPLATE_NAME,template.getName()).setMediaType(PROTOBUF).execute().getInputStream();
+  WsPermissions.UsersWsResponse response=WsPermissions.UsersWsResponse.parseFrom(responseStream);
+  assertThat(response.getUsersList()).isEmpty();
+}

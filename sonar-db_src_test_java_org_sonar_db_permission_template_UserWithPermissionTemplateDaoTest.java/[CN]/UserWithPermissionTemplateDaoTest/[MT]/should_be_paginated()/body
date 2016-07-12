@@ -1,14 +1,6 @@
 {
   dbTester.prepareDbUnit(getClass(),"users_with_permissions.xml");
-  List<UserWithPermissionDto> result=dao.selectUsers(dbSession,OldPermissionQuery.builder().permission("user").build(),TEMPLATE_ID,0,2);
-  assertThat(result).hasSize(2);
-  assertThat(result.get(0).getName()).isEqualTo("User1");
-  assertThat(result.get(1).getName()).isEqualTo("User2");
-  result=dao.selectUsers(dbSession,OldPermissionQuery.builder().permission("user").build(),TEMPLATE_ID,1,2);
-  assertThat(result).hasSize(2);
-  assertThat(result.get(0).getName()).isEqualTo("User2");
-  assertThat(result.get(1).getName()).isEqualTo("User3");
-  result=dao.selectUsers(dbSession,OldPermissionQuery.builder().permission("user").build(),TEMPLATE_ID,2,1);
-  assertThat(result).hasSize(1);
-  assertThat(result.get(0).getName()).isEqualTo("User3");
+  assertThat(dao.selectUserLoginsByQueryAndTemplate(dbSession,builder().setPageIndex(1).setPageSize(2).build(),TEMPLATE_ID)).containsOnly("user1","user2");
+  assertThat(dao.selectUserLoginsByQueryAndTemplate(dbSession,builder().setPageIndex(2).setPageSize(2).build(),TEMPLATE_ID)).containsOnly("user3");
+  assertThat(dao.selectUserLoginsByQueryAndTemplate(dbSession,builder().setPageIndex(3).setPageSize(1).build(),TEMPLATE_ID)).containsOnly("user3");
 }

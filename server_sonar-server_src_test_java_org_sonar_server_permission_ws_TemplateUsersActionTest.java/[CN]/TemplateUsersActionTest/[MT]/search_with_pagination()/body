@@ -1,5 +1,17 @@
 {
-  InputStream responseStream=newRequest(UserRole.USER,null).setParam(org.sonarqube.ws.client.permission.PermissionsWsParameters.PARAM_TEMPLATE_NAME,template1.getName()).setParam(WebService.Param.SELECTED,"all").setParam(WebService.Param.PAGE,"2").setParam(WebService.Param.PAGE_SIZE,"1").setMediaType(PROTOBUF).execute().getInputStream();
-  OldUsersWsResponse response=parseFrom(responseStream);
+  setSysAdminUser();
+  UserDto user1=insertUser(new UserDto().setLogin("login-1").setName("name-1").setEmail("email-1"));
+  UserDto user2=insertUser(new UserDto().setLogin("login-2").setName("name-2").setEmail("email-2"));
+  UserDto user3=insertUser(new UserDto().setLogin("login-3").setName("name-3").setEmail("email-3"));
+  PermissionTemplateDto template=dbClient.permissionTemplateDao().insert(dbSession,newPermissionTemplateDto().setUuid("template-uuid-1"));
+  addUserToTemplate(newPermissionTemplateUser(USER,template.getId(),user1.getId()));
+  addUserToTemplate(newPermissionTemplateUser(USER,template.getId(),user2.getId()));
+  addUserToTemplate(newPermissionTemplateUser(ISSUE_ADMIN,template.getId(),user1.getId()));
+  addUserToTemplate(newPermissionTemplateUser(ISSUE_ADMIN,template.getId(),user3.getId()));
+  PermissionTemplateDto anotherTemplate=dbClient.permissionTemplateDao().insert(dbSession,newPermissionTemplateDto().setUuid("template-uuid-2"));
+  addUserToTemplate(newPermissionTemplateUser(USER,anotherTemplate.getId(),user1.getId()));
+  commit();
+  InputStream responseStream=newRequest(USER,null).setParam(PARAM_TEMPLATE_NAME,template.getName()).setParam(WebService.Param.SELECTED,"all").setParam(WebService.Param.PAGE,"2").setParam(WebService.Param.PAGE_SIZE,"1").setMediaType(PROTOBUF).execute().getInputStream();
+  WsPermissions.UsersWsResponse response=WsPermissions.UsersWsResponse.parseFrom(responseStream);
   assertThat(response.getUsersList()).extracting("login").containsOnly("login-2");
 }

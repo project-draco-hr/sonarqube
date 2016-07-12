@@ -1,4 +1,9 @@
 {
-  String permission=validateProjectPermission(wsRequest.mandatoryParam(PARAM_PERMISSION));
-  return OldPermissionQuery.builder().template(template.getUuid()).permission(permission).membership(fromSelectionModeToMembership(wsRequest.mandatoryParam(Param.SELECTED))).pageIndex(wsRequest.mandatoryParamAsInt(Param.PAGE)).pageSize(wsRequest.mandatoryParamAsInt(Param.PAGE_SIZE)).search(wsRequest.param(Param.TEXT_QUERY)).build();
+  String textQuery=wsRequest.param(TEXT_QUERY);
+  String permission=wsRequest.param(PARAM_PERMISSION);
+  PermissionQuery.Builder query=PermissionQuery.builder().setTemplate(template.getUuid()).setPermission(permission != null ? validateProjectPermission(permission) : null).setPageIndex(wsRequest.mandatoryParamAsInt(PAGE)).setPageSize(wsRequest.mandatoryParamAsInt(PAGE_SIZE)).setSearchQuery(textQuery);
+  if (textQuery == null) {
+    query.withPermissionOnly();
+  }
+  return query.build();
 }

@@ -1,8 +1,7 @@
 {
   dbTester.prepareDbUnit(getClass(),"users_with_permissions.xml");
-  List<UserWithPermissionDto> result=dao.selectUsers(dbSession,OldPermissionQuery.builder().permission("user").search("SEr1").build(),TEMPLATE_ID,0,10);
-  assertThat(result).hasSize(1);
-  assertThat(result.get(0).getName()).isEqualTo("User1");
-  result=dao.selectUsers(dbSession,OldPermissionQuery.builder().permission("user").search("user").build(),TEMPLATE_ID,0,10);
-  assertThat(result).hasSize(3);
+  List<String> result=dao.selectUserLoginsByQueryAndTemplate(dbSession,builder().withPermissionOnly().setPermission("user").setSearchQuery("SEr1").build(),TEMPLATE_ID);
+  assertThat(result).containsOnly("user1");
+  result=dao.selectUserLoginsByQueryAndTemplate(dbSession,builder().withPermissionOnly().setPermission("user").setSearchQuery("user").build(),TEMPLATE_ID);
+  assertThat(result).hasSize(2);
 }

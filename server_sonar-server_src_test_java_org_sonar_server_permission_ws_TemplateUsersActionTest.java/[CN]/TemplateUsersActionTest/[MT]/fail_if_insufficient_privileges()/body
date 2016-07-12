@@ -1,5 +1,7 @@
 {
-  expectedException.expect(ForbiddenException.class);
   userSession.login("login");
-  newRequest(UserRole.USER,template1.getUuid()).execute();
+  PermissionTemplateDto template=dbClient.permissionTemplateDao().insert(dbSession,newPermissionTemplateDto().setUuid("template-uuid-1"));
+  commit();
+  expectedException.expect(ForbiddenException.class);
+  newRequest(null,template.getUuid()).execute();
 }
