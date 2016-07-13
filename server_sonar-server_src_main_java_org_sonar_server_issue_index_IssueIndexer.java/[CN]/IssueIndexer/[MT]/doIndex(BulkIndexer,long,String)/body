@@ -1,13 +1,8 @@
 {
-  DbSession dbSession=dbClient.openSession(false);
-  long maxDate;
-  try {
+  try (DbSession dbSession=dbClient.openSession(false)){
     IssueResultSetIterator rowIt=IssueResultSetIterator.create(dbClient,dbSession,lastUpdatedAt,projectUuid);
-    maxDate=doIndex(bulk,rowIt);
+    long maxDate=doIndex(bulk,rowIt);
     rowIt.close();
     return maxDate;
   }
-  finally {
-    dbSession.close();
-  }
-}
+ }

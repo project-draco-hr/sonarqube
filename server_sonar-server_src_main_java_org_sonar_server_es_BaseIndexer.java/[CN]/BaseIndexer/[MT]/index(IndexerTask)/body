@@ -1,23 +1,2 @@
 {
-  if (enabled) {
-    final long requestedAt=System.currentTimeMillis();
-    Future submit=executor.submit(new Runnable(){
-      @Override public void run(){
-        if (lastUpdatedAt == -1L) {
-          lastUpdatedAt=esClient.getMaxFieldValue(indexName,typeName,dateFieldName);
-        }
-        if (requestedAt > lastUpdatedAt) {
-          long l=task.index(lastUpdatedAt);
-          lastUpdatedAt=Math.max(l,lastUpdatedAt);
-        }
-      }
-    }
-);
-    try {
-      Uninterruptibles.getUninterruptibly(submit);
-    }
- catch (    ExecutionException e) {
-      Throwables.propagate(e);
-    }
-  }
 }
