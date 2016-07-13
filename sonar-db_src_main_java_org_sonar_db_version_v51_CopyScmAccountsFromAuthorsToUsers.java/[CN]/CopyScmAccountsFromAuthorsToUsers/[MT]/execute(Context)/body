@@ -9,18 +9,19 @@
     for (    Long personId : authorsByPersonId.keySet()) {
       List<String> authors=newArrayList(authorsByPersonId.get(personId));
       List<User> users=selectUsersFromLoginOrEmail(context,authors);
-      if (users.size() == 1) {
-        User user=users.get(0);
-        if (authors.contains(user.login)) {
-          authors.remove(user.login);
-        }
-        if (authors.contains(user.email)) {
-          authors.remove(user.email);
-        }
-        if (!authors.isEmpty()) {
-          update.setString(1,encodeScmAccounts(authors)).setLong(2,now).setLong(3,user.id).addBatch();
-          counter.getAndIncrement();
-        }
+      if (users.size() != 1) {
+        continue;
+      }
+      User user=users.get(0);
+      if (authors.contains(user.login)) {
+        authors.remove(user.login);
+      }
+      if (authors.contains(user.email)) {
+        authors.remove(user.email);
+      }
+      if (!authors.isEmpty()) {
+        update.setString(1,encodeScmAccounts(authors)).setLong(2,now).setLong(3,user.id).addBatch();
+        counter.getAndIncrement();
       }
     }
     if (((UpsertImpl)update).getBatchCount() > 0L) {

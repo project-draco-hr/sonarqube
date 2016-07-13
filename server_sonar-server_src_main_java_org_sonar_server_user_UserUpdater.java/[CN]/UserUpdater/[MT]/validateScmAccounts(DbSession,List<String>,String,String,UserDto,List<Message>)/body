@@ -9,9 +9,10 @@
       List<UserDto> matchingUsers=dbClient.userDao().selectByScmAccountOrLoginOrEmail(dbSession,scmAccount);
       List<String> matchingUsersWithoutExistingUser=newArrayList();
       for (      UserDto matchingUser : matchingUsers) {
-        if (existingUser == null || !matchingUser.getId().equals(existingUser.getId())) {
-          matchingUsersWithoutExistingUser.add(matchingUser.getName() + " (" + matchingUser.getLogin()+ ")");
+        if (existingUser != null && matchingUser.getId().equals(existingUser.getId())) {
+          continue;
         }
+        matchingUsersWithoutExistingUser.add(matchingUser.getName() + " (" + matchingUser.getLogin()+ ")");
       }
       if (!matchingUsersWithoutExistingUser.isEmpty()) {
         messages.add(Message.of("user.scm_account_already_used",scmAccount,Joiner.on(", ").join(matchingUsersWithoutExistingUser)));
