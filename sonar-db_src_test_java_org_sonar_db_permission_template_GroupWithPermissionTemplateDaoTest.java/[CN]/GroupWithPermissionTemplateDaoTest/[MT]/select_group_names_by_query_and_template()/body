@@ -1,0 +1,21 @@
+{
+  GroupDto group1=groupDb.insertGroup(newGroupDto().setName("Group-1"));
+  GroupDto group2=groupDb.insertGroup(newGroupDto().setName("Group-2"));
+  GroupDto group3=groupDb.insertGroup(newGroupDto().setName("Group-3"));
+  PermissionTemplateDto template=permissionTemplateDbTester.insertTemplate();
+  permissionTemplateDbTester.addGroupToTemplate(template.getId(),group1.getId(),USER);
+  permissionTemplateDbTester.addGroupToTemplate(template.getId(),group1.getId(),ADMIN);
+  permissionTemplateDbTester.addGroupToTemplate(template.getId(),group2.getId(),PROVISIONING);
+  PermissionTemplateDto anotherTemplate=permissionTemplateDbTester.insertTemplate();
+  permissionTemplateDbTester.addGroupToTemplate(anotherTemplate.getId(),null,USER);
+  permissionTemplateDbTester.addGroupToTemplate(anotherTemplate.getId(),group1.getId(),PROVISIONING);
+  assertThat(selectGroupNamesByQueryAndTemplate(builder().build(),template.getId())).containsOnly("Group-1","Group-2","Group-3","Anyone");
+  assertThat(selectGroupNamesByQueryAndTemplate(builder().withPermissionOnly().build(),template.getId())).containsOnly("Group-1","Group-2");
+  assertThat(selectGroupNamesByQueryAndTemplate(builder().setPermission(USER).build(),template.getId())).containsOnly("Group-1");
+  assertThat(selectGroupNamesByQueryAndTemplate(builder().setPermission(USER).build(),anotherTemplate.getId())).containsOnly("Anyone");
+  assertThat(selectGroupNamesByQueryAndTemplate(builder().setSearchQuery("groU").build(),template.getId())).containsOnly("Group-1","Group-2","Group-3");
+  assertThat(selectGroupNamesByQueryAndTemplate(builder().setSearchQuery("nYo").build(),template.getId())).containsOnly("Anyone");
+  assertThat(selectGroupNamesByQueryAndTemplate(builder().setSearchQuery("p-2").build(),template.getId())).containsOnly("Group-2");
+  assertThat(selectGroupNamesByQueryAndTemplate(builder().withPermissionOnly().build(),123L)).isEmpty();
+  assertThat(selectGroupNamesByQueryAndTemplate(builder().setSearchQuery("unknown").build(),template.getId())).isEmpty();
+}

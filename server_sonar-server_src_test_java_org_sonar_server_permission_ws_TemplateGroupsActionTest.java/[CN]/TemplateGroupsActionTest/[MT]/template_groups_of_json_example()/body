@@ -1,10 +1,13 @@
 {
+  logAsSysAdminUser();
   GroupDto adminGroup=insertGroup(newGroupDto().setName("sonar-administrators").setDescription("System administrators"));
   GroupDto userGroup=insertGroup(newGroupDto().setName("sonar-users").setDescription("Any new users created will automatically join this group"));
-  addGroupToTemplate(newPermissionTemplateGroup(UserRole.ISSUE_ADMIN,template1.getId(),adminGroup.getId()));
-  addGroupToTemplate(newPermissionTemplateGroup(UserRole.ISSUE_ADMIN,template1.getId(),userGroup.getId()));
-  addGroupToTemplate(newPermissionTemplateGroup(UserRole.ISSUE_ADMIN,template1.getId(),null));
+  PermissionTemplateDto template=dbClient.permissionTemplateDao().insert(dbSession,newPermissionTemplateDto().setUuid("template-uuid-1"));
+  addGroupToTemplate(newPermissionTemplateGroup(ISSUE_ADMIN,template.getId(),adminGroup.getId()));
+  addGroupToTemplate(newPermissionTemplateGroup(ISSUE_ADMIN,template.getId(),userGroup.getId()));
+  addGroupToTemplate(newPermissionTemplateGroup(USER,template.getId(),null));
+  addGroupToTemplate(newPermissionTemplateGroup(ISSUE_ADMIN,template.getId(),null));
   commit();
-  String response=ws.newRequest().setParam(PARAM_PERMISSION,UserRole.ISSUE_ADMIN).setParam(PARAM_TEMPLATE_ID,template1.getUuid()).execute().getInput();
+  String response=ws.newRequest().setParam(PARAM_PERMISSION,ISSUE_ADMIN).setParam(PARAM_TEMPLATE_ID,template.getUuid()).execute().getInput();
   assertJson(response).ignoreFields("id").withStrictArrayOrder().isSimilarTo(getClass().getResource("template_groups-example.json"));
 }

@@ -1,5 +1,12 @@
 {
-  InputStream responseStream=ws.newRequest().setMediaType(MediaTypes.PROTOBUF).setParam(PARAM_PERMISSION,UserRole.USER).setParam(PARAM_TEMPLATE_NAME,template1.getName()).setParam(TEXT_QUERY,"-name").execute().getInputStream();
+  logAsSysAdminUser();
+  PermissionTemplateDto template=dbClient.permissionTemplateDao().insert(dbSession,newPermissionTemplateDto().setUuid("template-uuid-1"));
+  GroupDto group1=insertGroup(new GroupDto().setName("group-1-name"));
+  addGroupToTemplate(newPermissionTemplateGroup(USER,template.getId(),group1.getId()));
+  GroupDto group2=insertGroup(new GroupDto().setName("group-2-name"));
+  GroupDto group3=insertGroup(new GroupDto().setName("group-3"));
+  commit();
+  InputStream responseStream=ws.newRequest().setMediaType(PROTOBUF).setParam(PARAM_TEMPLATE_NAME,template.getName()).setParam(TEXT_QUERY,"-nam").execute().getInputStream();
   WsGroupsResponse response=WsGroupsResponse.parseFrom(responseStream);
   assertThat(response.getGroupsList()).extracting("name").containsExactly("group-1-name","group-2-name");
 }

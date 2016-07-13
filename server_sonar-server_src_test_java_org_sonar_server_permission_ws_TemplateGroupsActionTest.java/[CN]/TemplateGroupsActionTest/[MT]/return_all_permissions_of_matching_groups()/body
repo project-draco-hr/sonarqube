@@ -1,0 +1,22 @@
+{
+  logAsSysAdminUser();
+  PermissionTemplateDto template=dbClient.permissionTemplateDao().insert(dbSession,newPermissionTemplateDto().setUuid("template-uuid-1"));
+  GroupDto group1=insertGroup(new GroupDto().setName("group-1-name"));
+  addGroupToTemplate(newPermissionTemplateGroup(CODEVIEWER,template.getId(),group1.getId()));
+  addGroupToTemplate(newPermissionTemplateGroup(ADMIN,template.getId(),group1.getId()));
+  GroupDto group2=insertGroup(new GroupDto().setName("group-2-name"));
+  addGroupToTemplate(newPermissionTemplateGroup(USER,template.getId(),group2.getId()));
+  addGroupToTemplate(newPermissionTemplateGroup(ADMIN,template.getId(),group2.getId()));
+  GroupDto group3=insertGroup(new GroupDto().setName("group-3-name"));
+  addGroupToTemplate(newPermissionTemplateGroup(USER,template.getId(),null));
+  addGroupToTemplate(newPermissionTemplateGroup(ISSUE_ADMIN,template.getId(),null));
+  PermissionTemplateDto anotherTemplate=dbClient.permissionTemplateDao().insert(dbSession,newPermissionTemplateDto().setUuid("template-uuid-2"));
+  addGroupToTemplate(newPermissionTemplateGroup(ADMIN,anotherTemplate.getId(),group3.getId()));
+  commit();
+  InputStream responseStream=ws.newRequest().setMediaType(PROTOBUF).setParam(PARAM_TEMPLATE_ID,template.getUuid()).execute().getInputStream();
+  WsGroupsResponse response=WsGroupsResponse.parseFrom(responseStream);
+  assertThat(response.getGroupsList()).extracting("name").containsExactly("Anyone","group-1-name","group-2-name");
+  assertThat(response.getGroups(0).getPermissionsList()).containsOnly("user","issueadmin");
+  assertThat(response.getGroups(1).getPermissionsList()).containsOnly("codeviewer","admin");
+  assertThat(response.getGroups(2).getPermissionsList()).containsOnly("user","admin");
+}

@@ -4,8 +4,12 @@
   try {
     WsTemplateRef templateRef=WsTemplateRef.fromRequest(wsRequest);
     PermissionTemplateDto template=dependenciesFinder.getTemplate(dbSession,templateRef);
-    OldPermissionQuery query=buildQuery(wsRequest,template);
-    WsTemplateGroupsResponse groupsResponse=buildResponse(dbSession,query,template);
+    PermissionQuery query=buildPermissionQuery(wsRequest);
+    int total=dbClient.permissionTemplateDao().countGroupNamesByQueryAndTemplate(dbSession,query,template.getId());
+    Paging paging=Paging.forPageIndex(wsRequest.mandatoryParamAsInt(PAGE)).withPageSize(wsRequest.mandatoryParamAsInt(PAGE_SIZE)).andTotal(total);
+    List<GroupDto> groups=findGroups(dbSession,query,template);
+    List<PermissionTemplateGroupDto> groupPermissions=findGroupPermissions(dbSession,groups,template);
+    WsPermissions.WsGroupsResponse groupsResponse=buildResponse(groups,groupPermissions,paging);
     writeProtobuf(groupsResponse,wsRequest,wsResponse);
   }
   finally {
