@@ -1,0 +1,14 @@
+{
+  ComponentDto project1=componentDbTester.insertComponent(newProjectDto().setName("Project1 name"));
+  ComponentDto project2=componentDbTester.insertComponent(newProjectDto().setName("Project2 name"));
+  ComponentDto project3=componentDbTester.insertComponent(newProjectDto().setName("Project3 name"));
+  QualityProfileDto profile1=newQualityProfileDto();
+  qualityProfileDb.insertQualityProfiles(profile1);
+  qualityProfileDb.associateProjectWithQualityProfile(project1,profile1);
+  QualityProfileDto profile2=newQualityProfileDto();
+  qualityProfileDb.insertQualityProfiles(profile2);
+  qualityProfileDb.associateProjectWithQualityProfile(project2,profile2);
+  assertThat(underTest.selectDeselectedProjects(profile1.getKey(),null,dbSession)).extracting("projectId","projectUuid","projectKey","projectName","profileKey").containsOnly(tuple(project2.getId(),project2.uuid(),project2.key(),project2.name(),null),tuple(project3.getId(),project3.uuid(),project3.key(),project3.name(),null));
+  assertThat(underTest.selectDeselectedProjects(profile1.getKey(),"ect2",dbSession)).hasSize(1);
+  assertThat(underTest.selectDeselectedProjects("unknown",null,dbSession)).hasSize(3);
+}
