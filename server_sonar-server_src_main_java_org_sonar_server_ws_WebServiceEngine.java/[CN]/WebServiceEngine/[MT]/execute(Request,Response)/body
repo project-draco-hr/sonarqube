@@ -20,7 +20,12 @@ catch (  ServerException e) {
     sendErrors(response,e.httpCode(),new Errors().add(Message.of(e.getMessage())));
   }
 catch (  Exception e) {
-    Loggers.get(getClass()).error("Fail to process request " + request,e);
+    Throwable cause=e.getCause();
+    if (cause != null && cause instanceof ClientAbortException) {
+      LOGGER.warn("Request {} has been aborted by client, error is '{}'",request,e.getMessage());
+      return;
+    }
+    LOGGER.error("Fail to process request " + request,e);
     sendErrors(response,500,new Errors().add(Message.of(e.getMessage())));
   }
 }
