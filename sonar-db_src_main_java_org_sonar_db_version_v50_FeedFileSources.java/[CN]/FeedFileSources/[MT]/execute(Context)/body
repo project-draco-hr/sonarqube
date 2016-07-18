@@ -1,27 +1,2 @@
 {
-  RowReader<Long> simpleLongReader=new RowReader<Long>(){
-    @Override public Long read(    Row row) throws SQLException {
-      Long longValue=row.getNullableLong(1);
-      return longValue == null ? Long.valueOf(0L) : longValue;
-    }
-  }
-;
-  Long revisionMetricId=context.prepareSelect("SELECT id FROM metrics WHERE name = 'revisions_by_line'").get(simpleLongReader);
-  Long authorMetricId=context.prepareSelect("SELECT id FROM metrics WHERE name = 'authors_by_line'").get(simpleLongReader);
-  Long datesMetricId=context.prepareSelect("SELECT id FROM metrics WHERE name = 'last_commit_datetimes_by_line'").get(simpleLongReader);
-  Long utCoverageHitsByLineMetricId=context.prepareSelect("SELECT id FROM metrics WHERE name = 'coverage_line_hits_data'").get(simpleLongReader);
-  Long utConditionsByLineMetricId=context.prepareSelect("SELECT id FROM metrics WHERE name = 'conditions_by_line'").get(simpleLongReader);
-  Long utCoveredConditionsByLineMetricId=context.prepareSelect("SELECT id FROM metrics WHERE name = 'covered_conditions_by_line'").get(simpleLongReader);
-  Long itCoverageHitsByLineMetricId=context.prepareSelect("SELECT id FROM metrics WHERE name = 'it_coverage_line_hits_data'").get(simpleLongReader);
-  Long itConditionsByLineMetricId=context.prepareSelect("SELECT id FROM metrics WHERE name = 'it_conditions_by_line'").get(simpleLongReader);
-  Long itCoveredConditionsByLineMetricId=context.prepareSelect("SELECT id FROM metrics WHERE name = 'it_covered_conditions_by_line'").get(simpleLongReader);
-  Long overallCoverageHitsByLineMetricId=context.prepareSelect("SELECT id FROM metrics WHERE name = 'overall_coverage_line_hits_data'").get(simpleLongReader);
-  Long overallConditionsByLineMetricId=context.prepareSelect("SELECT id FROM metrics WHERE name = 'overall_conditions_by_line'").get(simpleLongReader);
-  Long overallCoveredConditionsByLineMetricId=context.prepareSelect("SELECT id FROM metrics WHERE name = 'overall_covered_conditions_by_line'").get(simpleLongReader);
-  Long duplicationDataMetricId=context.prepareSelect("SELECT id FROM metrics WHERE name = 'duplications_data'").get(simpleLongReader);
-  MassUpdate massUpdate=context.prepareMassUpdate();
-  massUpdate.select(SELECT_FILES_AND_MEASURES_SQL).setBoolean(1,true).setLong(2,zeroIfNull(revisionMetricId)).setLong(3,zeroIfNull(authorMetricId)).setLong(4,zeroIfNull(datesMetricId)).setLong(5,zeroIfNull(utCoverageHitsByLineMetricId)).setLong(6,zeroIfNull(utConditionsByLineMetricId)).setLong(7,zeroIfNull(utCoveredConditionsByLineMetricId)).setLong(8,zeroIfNull(itCoverageHitsByLineMetricId)).setLong(9,zeroIfNull(itConditionsByLineMetricId)).setLong(10,zeroIfNull(itCoveredConditionsByLineMetricId)).setLong(11,zeroIfNull(overallCoverageHitsByLineMetricId)).setLong(12,zeroIfNull(overallConditionsByLineMetricId)).setLong(13,zeroIfNull(overallCoveredConditionsByLineMetricId)).setLong(14,zeroIfNull(duplicationDataMetricId)).setBoolean(15,true);
-  massUpdate.update("INSERT INTO file_sources" + "(project_uuid, file_uuid, created_at, updated_at, data, line_hashes, data_hash)" + "VALUES "+ "(?, ?, ?, ?, ?, ?, ?)");
-  massUpdate.rowPluralName("files");
-  massUpdate.execute(new FileSourceBuilder(system));
 }
