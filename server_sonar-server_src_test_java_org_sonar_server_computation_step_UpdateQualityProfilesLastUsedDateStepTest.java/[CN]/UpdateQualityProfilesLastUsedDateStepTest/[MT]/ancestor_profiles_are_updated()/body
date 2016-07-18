@@ -1,0 +1,13 @@
+{
+  QualityProfileDto rootProfile=newQualityProfileDto().setKey("root");
+  QualityProfileDto parentProfile=newQualityProfileDto().setKey("parent").setParentKee(rootProfile.getKey());
+  QualityProfileDto currentProfile=newQualityProfileDto().setKey("current").setParentKee(parentProfile.getKey());
+  QualityProfileDto childProfile=newQualityProfileDto().setKey("child").setParentKee(currentProfile.getKey());
+  qualityProfileDb.insertQualityProfiles(rootProfile,parentProfile,currentProfile,childProfile);
+  measureRepository.addRawMeasure(1,QUALITY_PROFILES_KEY,Measure.newMeasureBuilder().create(toJson(currentProfile.getKey())));
+  underTest.execute();
+  assertQualityProfileIsUpdated(rootProfile);
+  assertQualityProfileIsUpdated(parentProfile);
+  assertQualityProfileIsUpdated(currentProfile);
+  assertQualityProfileIsTheSame(childProfile);
+}
