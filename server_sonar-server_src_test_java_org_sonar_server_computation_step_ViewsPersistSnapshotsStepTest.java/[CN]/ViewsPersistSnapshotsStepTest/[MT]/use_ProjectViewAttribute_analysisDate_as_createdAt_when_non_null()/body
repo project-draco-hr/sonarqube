@@ -1,0 +1,14 @@
+{
+  ComponentDto projectDto=save(newProjectDto("proj"));
+  ComponentDto viewDto=save(newView("ABCD").setKey(valueOf(PROJECT_KEY)).setName("Project"));
+  ComponentDto projectViewDto=save(newProjectCopy("DEFG",projectDto,viewDto).setKey("3"));
+  long projectAnalysisDate=946543544L;
+  Component projectView=ViewsComponent.builder(PROJECT_VIEW,3).setProjectViewAttributes(new ProjectViewAttributes(6845L,projectAnalysisDate)).setUuid("DEFG").build();
+  Component view=ViewsComponent.builder(VIEW,1).setUuid("ABCD").addChildren(projectView).build();
+  treeRootHolder.setRoot(view);
+  dbIdsRepository.setComponentId(view,viewDto.getId());
+  dbIdsRepository.setComponentId(projectView,projectViewDto.getId());
+  underTest.execute();
+  SnapshotDto projectViewSnapshot=getUnprocessedSnapshot(projectViewDto.getId());
+  assertThat(projectViewSnapshot.getCreatedAt()).isEqualTo(projectAnalysisDate);
+}
