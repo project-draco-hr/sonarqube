@@ -1,7 +1,6 @@
 {
   List<UserDto> userDtos=Lists.newArrayList();
   long createdAt=System.currentTimeMillis();
-  UserDoc[] users=new UserDoc[numberOfUsers];
   for (int index=0; index < numberOfUsers; index++) {
     String email=String.format("user-%d@mail.com",index);
     String login=String.format("user-%d",index);
@@ -9,12 +8,11 @@
     List<String> scmAccounts=singletonList(String.format("user-%d",index));
     UserDto userDto=dbClient.userDao().insert(dbSession,new UserDto().setActive(true).setCreatedAt(createdAt).setEmail(email).setLogin(login).setName(name).setScmAccounts(scmAccounts).setLocal(true).setExternalIdentity(login).setExternalIdentityProvider("sonarqube").setUpdatedAt(createdAt));
     userDtos.add(userDto);
-    users[index]=toUserDoc(userDto);
     for (int tokenIndex=0; tokenIndex < index; tokenIndex++) {
       dbClient.userTokenDao().insert(dbSession,newUserToken().setLogin(login).setName(String.format("%s-%d",login,tokenIndex)));
     }
   }
   dbSession.commit();
-  esTester.putDocuments(UserIndexDefinition.INDEX,UserIndexDefinition.TYPE_USER,users);
+  userIndexer.index();
   return userDtos;
 }

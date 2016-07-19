@@ -1,10 +1,11 @@
 {
+  boolean realmConfExists=settings.getString(CORE_AUTHENTICATOR_REALM) != null;
+  checkConfigurationIfRealmExists(realmConfExists);
   long now=system2.now();
   Set<String> localUsers=new HashSet<>(asList(settings.getStringArray(LOCAL_USERS_PROPERTY)));
-  boolean isRealmExist=settings.getString(CORE_AUTHENTICATOR_REALM) != null;
   for (  UserDto user : dbClient.userDao().selectUsers(dbSession,UserQuery.ALL_ACTIVES)) {
     if (user.getExternalIdentityProvider().equals(UserUpdater.SQ_AUTHORITY)) {
-      user.setLocal(!isRealmExist || localUsers.contains(user.getLogin()));
+      user.setLocal(!realmConfExists || localUsers.contains(user.getLogin()));
     }
  else {
       user.setLocal(false);
