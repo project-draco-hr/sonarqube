@@ -1,0 +1,8 @@
+{
+  WsResponse batchIndex=wsClient.wsConnector().call(new GetRequest("/batch/index")).failIfNotSuccessful();
+  String batchIndexContent=batchIndex.content();
+  assertThat(batchIndexContent).isNotEmpty();
+  String jar=batchIndexContent.split("\\|")[0];
+  assertThat(wsClient.wsConnector().call(new GetRequest("/batch/file").setParam("name",jar)).failIfNotSuccessful().contentStream()).isNotNull();
+  assertThat(wsClient.wsConnector().call(new GetRequest("/batch/" + jar)).failIfNotSuccessful().contentStream()).isNotNull();
+}
