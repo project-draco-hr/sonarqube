@@ -1,0 +1,15 @@
+{
+  underTest=new ProjectAnalysisTaskContainerPopulator(task,null);
+  AddedObjectsRecorderTaskContainer container=new AddedObjectsRecorderTaskContainer();
+  underTest.populateContainer(container);
+  Set<String> computationStepClassNames=from(container.added).transform(new Function<Object,Class<?>>(){
+    @Nullable @Override public Class<?> apply(    Object input){
+      if (input instanceof Class) {
+        return (Class<?>)input;
+      }
+      return null;
+    }
+  }
+).filter(notNull()).filter(IsComputationStep.INSTANCE).transform(StepsExplorer.toCanonicalName()).toSet();
+  assertThat(difference(StepsExplorer.retrieveStepPackageStepsCanonicalNames(PROJECTANALYSIS_STEP_PACKAGE),computationStepClassNames)).containsOnly(PersistDevelopersStep.class.getCanonicalName());
+}

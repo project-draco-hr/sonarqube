@@ -1,0 +1,11 @@
+{
+  Object object=new Object();
+  Class<MyClass> clazz=MyClass.class;
+  ReportAnalysisComponentProvider componentProvider=mock(ReportAnalysisComponentProvider.class);
+  when(componentProvider.getComponents()).thenReturn(ImmutableList.of(object,clazz));
+  underTest=new ProjectAnalysisTaskContainerPopulator(task,new ReportAnalysisComponentProvider[]{componentProvider});
+  AddedObjectsRecorderTaskContainer container=new AddedObjectsRecorderTaskContainer();
+  container.add(componentProvider);
+  underTest.populateContainer(container);
+  assertThat(container.added).contains(object,clazz);
+}

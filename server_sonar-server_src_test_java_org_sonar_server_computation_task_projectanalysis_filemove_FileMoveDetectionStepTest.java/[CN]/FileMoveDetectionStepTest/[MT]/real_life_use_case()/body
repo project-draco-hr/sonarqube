@@ -1,0 +1,24 @@
+{
+  analysisMetadataHolder.setBaseProjectSnapshot(ANALYSIS);
+  List<String> componentDtoKey=new ArrayList<>();
+  for (  File f : FileUtils.listFiles(new File("src/test/resources/org/sonar/server/computation/task/projectanalysis/filemove/FileMoveDetectionStepTest/v1"),null,false)) {
+    componentDtoKey.add(f.getName());
+    mockContentOfFileInDb(f.getName(),readLines(f));
+  }
+  mockComponents(componentDtoKey.toArray(new String[0]));
+  Map<String,Component> comps=new HashMap<>();
+  int i=1;
+  for (  File f : FileUtils.listFiles(new File("src/test/resources/org/sonar/server/computation/task/projectanalysis/filemove/FileMoveDetectionStepTest/v2"),null,false)) {
+    comps.put(f.getName(),builder(Component.Type.FILE,i).setKey(f.getName()).setPath(f.getName()).build());
+    setFileContentInReport(i++,readLines(f));
+  }
+  setFilesInReport(comps.values().toArray(new Component[0]));
+  underTest.execute();
+  Component makeComponentUuidAndAnalysisUuidNotNullOnDuplicationsIndex=comps.get("MakeComponentUuidAndAnalysisUuidNotNullOnDuplicationsIndex.java");
+  Component migrationRb1238=comps.get("1238_make_component_uuid_and_analysis_uuid_not_null_on_duplications_index.rb");
+  Component addComponentUuidAndAnalysisUuidColumnToDuplicationsIndex=comps.get("AddComponentUuidAndAnalysisUuidColumnToDuplicationsIndex.java");
+  assertThat(movedFilesRepository.getComponentsWithOriginal()).containsOnly(makeComponentUuidAndAnalysisUuidNotNullOnDuplicationsIndex,migrationRb1238,addComponentUuidAndAnalysisUuidColumnToDuplicationsIndex);
+  assertThat(movedFilesRepository.getOriginalFile(makeComponentUuidAndAnalysisUuidNotNullOnDuplicationsIndex).get().getKey()).isEqualTo("MakeComponentUuidNotNullOnDuplicationsIndex.java");
+  assertThat(movedFilesRepository.getOriginalFile(migrationRb1238).get().getKey()).isEqualTo("1242_make_analysis_uuid_not_null_on_duplications_index.rb");
+  assertThat(movedFilesRepository.getOriginalFile(addComponentUuidAndAnalysisUuidColumnToDuplicationsIndex).get().getKey()).isEqualTo("AddComponentUuidColumnToDuplicationsIndex.java");
+}
