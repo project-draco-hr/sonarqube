@@ -1,0 +1,34 @@
+{
+  ComponentDto dto1=ComponentTesting.newProjectDto("U1");
+  ComponentDto dto2=ComponentTesting.newProjectDto("U2");
+  ComponentDto dto3=ComponentTesting.newProjectDto("U3");
+  underTest.insert(dbSession,dto1,dto2,dto3);
+  underTest.updateBEnabledToFalse(dbSession,asList("U1","U2"));
+  dbSession.commit();
+  Map<String,Object> row1=selectBColumnsForUuid("U1");
+  assertThat(row1.get("bChanged")).isIn(true,1L,1);
+  assertThat(row1.get("bCopyComponentUuid")).isEqualTo(dto1.getCopyResourceUuid());
+  assertThat(row1.get("bDescription")).isEqualTo(dto1.description());
+  assertThat(row1.get("bEnabled")).isIn(false,0L,0);
+  assertThat(row1.get("bLanguage")).isEqualTo(dto1.language());
+  assertThat(row1.get("bLongName")).isEqualTo(dto1.longName());
+  assertThat(row1.get("bModuleUuid")).isEqualTo(dto1.moduleUuid());
+  assertThat(row1.get("bModuleUuidPath")).isEqualTo(dto1.moduleUuidPath());
+  assertThat(row1.get("bName")).isEqualTo(dto1.name());
+  assertThat(row1.get("bPath")).isEqualTo(dto1.path());
+  assertThat(row1.get("bQualifier")).isEqualTo(dto1.qualifier());
+  Map<String,Object> row2=selectBColumnsForUuid("U2");
+  assertThat(row2.get("bChanged")).isIn(true,1L,1);
+  assertThat(row2.get("bCopyComponentUuid")).isEqualTo(dto2.getCopyResourceUuid());
+  assertThat(row2.get("bDescription")).isEqualTo(dto2.description());
+  assertThat(row2.get("bEnabled")).isIn(false,0L,0);
+  assertThat(row2.get("bLanguage")).isEqualTo(dto2.language());
+  assertThat(row2.get("bLongName")).isEqualTo(dto2.longName());
+  assertThat(row2.get("bModuleUuid")).isEqualTo(dto2.moduleUuid());
+  assertThat(row2.get("bModuleUuidPath")).isEqualTo(dto2.moduleUuidPath());
+  assertThat(row2.get("bName")).isEqualTo(dto2.name());
+  assertThat(row2.get("bPath")).isEqualTo(dto2.path());
+  assertThat(row2.get("bQualifier")).isEqualTo(dto2.qualifier());
+  Map<String,Object> row3=selectBColumnsForUuid("U3");
+  assertThat(row3.get("bChanged")).isIn(false,0L,0);
+}
