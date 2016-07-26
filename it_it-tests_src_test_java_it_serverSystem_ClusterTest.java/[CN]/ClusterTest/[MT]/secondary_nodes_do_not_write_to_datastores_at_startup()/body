@@ -1,0 +1,13 @@
+{
+  Orchestrator orchestrator=Orchestrator.builderEnv().setServerProperty("sonar.cluster.enabled","true").setServerProperty("sonar.cluster.startupLeader","true").setServerProperty("sonar.log.level","TRACE").addPlugin(ItUtils.xooPlugin()).build();
+  orchestrator.start();
+  expectLog(orchestrator,"Cluster enabled (startup leader)");
+  expectWriteOperations(orchestrator,true);
+  assertThat(newWsClient(orchestrator).rules().search(new SearchWsRequest()).getTotal()).isGreaterThan(0);
+  FileUtils.write(orchestrator.getServer().getLogs(),"",false);
+  updateSonarPropertiesFile(orchestrator,ImmutableMap.of("sonar.cluster.startupLeader","false"));
+  orchestrator.restartServer();
+  expectLog(orchestrator,"Cluster enabled (startup follower)");
+  expectWriteOperations(orchestrator,false);
+  orchestrator.stop();
+}

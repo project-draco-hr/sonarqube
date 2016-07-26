@@ -3,7 +3,6 @@
   File homeDir=tempFolder.newFolder();
   File dataDir=new File(homeDir,"data");
   File tmpDir=new File(homeDir,"tmp");
-  properties.setProperty(STARTED_AT,valueOf(new Date().getTime()));
   properties.setProperty(PATH_HOME,homeDir.getAbsolutePath());
   properties.setProperty(PATH_DATA,dataDir.getAbsolutePath());
   properties.setProperty(PATH_TEMP,tmpDir.getAbsolutePath());
@@ -13,12 +12,14 @@
   properties.setProperty(DatabaseProperties.PROP_URL,url);
   properties.setProperty(DatabaseProperties.PROP_USER,"sonar");
   properties.setProperty(DatabaseProperties.PROP_PASSWORD,"sonar");
+  insertProperty(CoreProperties.SERVER_ID,"a_startup_id");
+  insertProperty("sonar.core.startedAt","123456789");
   underTest.start(new Props(properties));
   MutablePicoContainer picoContainer=underTest.getComponentContainer().getPicoContainer();
   assertThat(picoContainer.getComponentAdapters()).hasSize(CONTAINER_ITSELF + 75 + 7+ 7+ 4+ 4);
-  assertThat(picoContainer.getParent().getComponentAdapters()).hasSize(CONTAINER_ITSELF + 2);
+  assertThat(picoContainer.getParent().getComponentAdapters()).hasSize(CONTAINER_ITSELF + 4);
   assertThat(picoContainer.getParent().getParent().getComponentAdapters()).hasSize(CONTAINER_ITSELF + 11);
-  assertThat(picoContainer.getParent().getParent().getParent().getComponentAdapters()).hasSize(COMPONENTS_IN_LEVEL_1_AT_CONSTRUCTION + 23 + 46+ 1+ 55+ 1);
+  assertThat(picoContainer.getParent().getParent().getParent().getComponentAdapters()).hasSize(COMPONENTS_IN_LEVEL_1_AT_CONSTRUCTION + 26 + 46+ 1+ 55+ 1);
   assertThat(picoContainer.getParent().getParent().getParent().getParent()).isNull();
   underTest.stop();
   assertThat(picoContainer.getLifecycleState().isStarted()).isFalse();
