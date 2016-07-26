@@ -1,0 +1,16 @@
+{
+  String name=createWsRequest.getName();
+  String url=createWsRequest.getUrl();
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    ComponentDto component=getComponentByUuidOrKey(dbSession,createWsRequest);
+    userSession.checkComponentUuidPermission(UserRole.ADMIN,component.uuid());
+    ComponentLinkDto link=new ComponentLinkDto().setComponentUuid(component.uuid()).setName(name).setHref(url).setType(nameToType(name));
+    dbClient.componentLinkDao().insert(dbSession,link);
+    dbSession.commit();
+    return buildResponse(link);
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}

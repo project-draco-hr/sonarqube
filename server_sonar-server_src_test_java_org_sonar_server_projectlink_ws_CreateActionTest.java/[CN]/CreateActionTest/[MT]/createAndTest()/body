@@ -1,0 +1,9 @@
+{
+  InputStream responseStream=ws.newRequest().setMethod("POST").setParam(PARAM_PROJECT_KEY,PROJECT_KEY).setParam(PARAM_NAME,"Custom").setParam(PARAM_URL,"http://example.org").setMediaType(PROTOBUF).execute().getInputStream();
+  WsProjectLinks.CreateWsResponse response=WsProjectLinks.CreateWsResponse.parseFrom(responseStream);
+  String newId=response.getLink().getId();
+  ComponentLinkDto link=dbClient.componentLinkDao().selectById(dbSession,newId);
+  assertThat(link.getName()).isEqualTo("Custom");
+  assertThat(link.getHref()).isEqualTo("http://example.org");
+  assertThat(link.getType()).isEqualTo("custom");
+}
