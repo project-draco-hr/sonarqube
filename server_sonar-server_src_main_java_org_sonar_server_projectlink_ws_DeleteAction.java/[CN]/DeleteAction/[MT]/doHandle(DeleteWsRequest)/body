@@ -1,0 +1,15 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    long id=request.getId();
+    ComponentLinkDto link=dbClient.componentLinkDao().selectById(dbSession,id);
+    link=WsUtils.checkFound(link,"Link with id '%s' not found",id);
+    checkPermissions(link.getComponentUuid());
+    checkNotProvided(link);
+    dbClient.componentLinkDao().delete(dbSession,link.getId());
+    dbSession.commit();
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}
