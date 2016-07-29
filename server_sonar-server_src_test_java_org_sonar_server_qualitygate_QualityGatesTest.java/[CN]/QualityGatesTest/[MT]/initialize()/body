@@ -1,7 +1,11 @@
 {
   settings.clear();
-  when(componentDao.selectOrFailById(eq(session),anyLong())).thenReturn(new ComponentDto().setId(1L).setKey(PROJECT_KEY));
-  when(myBatis.openSession(false)).thenReturn(session);
-  underTest=new QualityGates(dao,conditionDao,metricFinder,propertiesDao,componentDao,myBatis,userSessionRule,settings);
+  when(dbClient.openSession(false)).thenReturn(dbSession);
+  when(dbClient.qualityGateDao()).thenReturn(dao);
+  when(dbClient.gateConditionDao()).thenReturn(conditionDao);
+  when(dbClient.propertiesDao()).thenReturn(propertiesDao);
+  when(dbClient.componentDao()).thenReturn(componentDao);
+  when(componentDao.selectOrFailById(eq(dbSession),anyLong())).thenReturn(new ComponentDto().setId(1L).setKey(PROJECT_KEY));
+  underTest=new QualityGates(dbClient,metricFinder,userSessionRule,settings);
   userSessionRule.set(authorizedProfileAdminUserSession);
 }

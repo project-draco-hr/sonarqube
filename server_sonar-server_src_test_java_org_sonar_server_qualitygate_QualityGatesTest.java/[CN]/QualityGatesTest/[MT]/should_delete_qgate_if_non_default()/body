@@ -4,10 +4,9 @@
   QualityGateDto toDelete=new QualityGateDto().setId(idToDelete).setName(name);
   when(dao.selectById(idToDelete)).thenReturn(toDelete);
   when(propertiesDao.selectGlobalProperty("sonar.qualitygate")).thenReturn(new PropertyDto().setValue("666"));
-  DbSession session=mock(DbSession.class);
-  when(myBatis.openSession(false)).thenReturn(session);
+  when(dbClient.openSession(false)).thenReturn(dbSession);
   underTest.delete(idToDelete);
   verify(dao).selectById(idToDelete);
-  verify(propertiesDao).deleteProjectProperties("sonar.qualitygate","42",session);
-  verify(dao).delete(toDelete,session);
+  verify(propertiesDao).deleteProjectProperties("sonar.qualitygate","42",dbSession);
+  verify(dao).delete(toDelete,dbSession);
 }

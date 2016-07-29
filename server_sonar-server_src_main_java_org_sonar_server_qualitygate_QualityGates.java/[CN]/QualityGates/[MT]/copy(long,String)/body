@@ -3,16 +3,16 @@
   getNonNullQgate(sourceId);
   validateQualityGate(null,destinationName);
   QualityGateDto destinationGate=new QualityGateDto().setName(destinationName);
-  SqlSession session=myBatis.openSession(false);
+  DbSession dbSession=dbClient.openSession(false);
   try {
-    dao.insert(destinationGate,session);
-    for (    QualityGateConditionDto sourceCondition : conditionDao.selectForQualityGate(sourceId,session)) {
-      conditionDao.insert(new QualityGateConditionDto().setQualityGateId(destinationGate.getId()).setMetricId(sourceCondition.getMetricId()).setOperator(sourceCondition.getOperator()).setWarningThreshold(sourceCondition.getWarningThreshold()).setErrorThreshold(sourceCondition.getErrorThreshold()).setPeriod(sourceCondition.getPeriod()),session);
+    dao.insert(dbSession,destinationGate);
+    for (    QualityGateConditionDto sourceCondition : conditionDao.selectForQualityGate(sourceId,dbSession)) {
+      conditionDao.insert(new QualityGateConditionDto().setQualityGateId(destinationGate.getId()).setMetricId(sourceCondition.getMetricId()).setOperator(sourceCondition.getOperator()).setWarningThreshold(sourceCondition.getWarningThreshold()).setErrorThreshold(sourceCondition.getErrorThreshold()).setPeriod(sourceCondition.getPeriod()),dbSession);
     }
-    session.commit();
+    dbSession.commit();
   }
   finally {
-    MyBatis.closeQuietly(session);
+    MyBatis.closeQuietly(dbSession);
   }
   return destinationGate;
 }

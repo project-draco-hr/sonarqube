@@ -1,0 +1,10 @@
+{
+  ComponentDto project=componentDb.insertComponent(newProjectDto());
+  QualityGateDto dbQualityGate=insertQualityGate("Sonar way");
+  setDefaultQualityGate(dbQualityGate.getId());
+  GetByProjectWsResponse result=callByUuid(project.uuid());
+  WsQualityGates.QualityGate qualityGate=result.getQualityGate();
+  assertThat(Long.valueOf(qualityGate.getId())).isEqualTo(dbQualityGate.getId());
+  assertThat(qualityGate.getName()).isEqualTo(dbQualityGate.getName());
+  assertThat(qualityGate.getDefault()).isTrue();
+}

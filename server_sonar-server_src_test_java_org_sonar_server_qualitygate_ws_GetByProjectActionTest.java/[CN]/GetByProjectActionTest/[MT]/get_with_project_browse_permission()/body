@@ -1,0 +1,8 @@
+{
+  ComponentDto project=componentDb.insertComponent(newProjectDto());
+  userSession.anonymous().addProjectUuidPermissions(UserRole.ADMIN,project.uuid());
+  QualityGateDto dbQualityGate=insertQualityGate("Sonar way");
+  setDefaultQualityGate(dbQualityGate.getId());
+  GetByProjectWsResponse result=callByUuid(project.uuid());
+  assertThat(result.getQualityGate().getName()).isEqualTo(dbQualityGate.getName());
+}
