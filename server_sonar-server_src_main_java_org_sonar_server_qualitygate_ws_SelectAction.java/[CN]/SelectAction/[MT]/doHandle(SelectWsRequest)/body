@@ -1,0 +1,12 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    checkQualityGate(dbClient,request.getGateId());
+    ComponentDto project=getProject(dbSession,request.getProjectId(),request.getProjectKey());
+    dbClient.propertiesDao().insertProperty(dbSession,new PropertyDto().setKey(SONAR_QUALITYGATE_PROPERTY).setResourceId(project.getId()).setValue(String.valueOf(request.getGateId())));
+    dbSession.commit();
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}
