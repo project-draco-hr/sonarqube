@@ -1,0 +1,12 @@
+{
+  settings.setProperty(ProcessProperties.CLUSTER_ENABLED,false);
+  settings.setProperty(ProcessProperties.SEARCH_HOST,localhost);
+  settings.setProperty(ProcessProperties.SEARCH_PORT,8080);
+  EsClient client=underTest.provide(settings);
+  TransportClient transportClient=(TransportClient)client.nativeClient();
+  assertThat(transportClient.transportAddresses()).hasSize(1);
+  TransportAddress address=transportClient.transportAddresses().get(0);
+  assertThat(address.getAddress()).isEqualTo(localhost);
+  assertThat(address.getPort()).isEqualTo(8080);
+  assertThat(underTest.provide(settings)).isSameAs(client);
+}

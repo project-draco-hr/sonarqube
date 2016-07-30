@@ -1,25 +1,18 @@
 {
   int replicationFactor=0;
-  if (inCluster()) {
+  if (clusterEnabled) {
     replicationFactor=1;
-    if (isMaster()) {
-      LOGGER.info("Elasticsearch cluster enabled. Master node.");
-      builder.put("node.master",true);
-    }
- else     if (!masterHosts.isEmpty()) {
-      LOGGER.info("Elasticsearch cluster enabled. Node connecting to master: {}",masterHosts);
-      builder.put("discovery.zen.ping.unicast.hosts",StringUtils.join(masterHosts,","));
-      builder.put("node.master",false);
-      builder.put("discovery.zen.minimum_master_nodes",1);
-    }
- else {
-      throw new MessageException(String.format("Not an Elasticsearch master nor slave. Please check properties %s and %s",ProcessProperties.CLUSTER_MASTER,ProcessProperties.CLUSTER_MASTER_HOST));
-    }
+    String hosts=props.value(ProcessProperties.CLUSTER_SEARCH_HOSTS,"");
+    LOGGER.info("Elasticsearch cluster enabled. Connect to hosts [{}]",hosts);
+    builder.put("discovery.zen.ping.unicast.hosts",hosts);
   }
+  builder.put("discovery.zen.minimum_master_nodes",1);
   builder.put(IndexMetaData.SETTING_NUMBER_OF_REPLICAS,replicationFactor);
   builder.put("cluster.name",getClusterName());
   builder.put("cluster.routing.allocation.awareness.attributes","rack_id");
   String nodeName=getNodeName();
   builder.put("node.rack_id",nodeName);
   builder.put("node.name",nodeName);
+  builder.put("node.data",true);
+  builder.put("node.master",true);
 }

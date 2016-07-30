@@ -1,0 +1,10 @@
+{
+  Monitor monitor=mock(Monitor.class);
+  App app=new App(monitor);
+  Props props=initDefaultProps();
+  app.start(props);
+  ArgumentCaptor<List<JavaCommand>> argument=newJavaCommandArgumentCaptor();
+  verify(monitor).start(argument.capture());
+  assertThat(argument.getValue()).extracting("processId").containsExactly(ProcessId.ELASTICSEARCH,ProcessId.WEB_SERVER,ProcessId.COMPUTE_ENGINE);
+  app.stopAsync();
+}

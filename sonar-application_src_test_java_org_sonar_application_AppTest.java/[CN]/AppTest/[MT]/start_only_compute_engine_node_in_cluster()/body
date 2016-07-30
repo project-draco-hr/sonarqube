@@ -1,0 +1,12 @@
+{
+  Monitor monitor=mock(Monitor.class);
+  App app=new App(monitor);
+  Props props=initDefaultProps();
+  props.set(ProcessProperties.CLUSTER_ENABLED,"true");
+  props.set(ProcessProperties.CLUSTER_WEB_DISABLED,"true");
+  props.set(ProcessProperties.CLUSTER_SEARCH_DISABLED,"true");
+  app.start(props);
+  ArgumentCaptor<List<JavaCommand>> argument=newJavaCommandArgumentCaptor();
+  verify(monitor).start(argument.capture());
+  assertThat(argument.getValue()).extracting("processId").containsOnly(ProcessId.COMPUTE_ENGINE);
+}
