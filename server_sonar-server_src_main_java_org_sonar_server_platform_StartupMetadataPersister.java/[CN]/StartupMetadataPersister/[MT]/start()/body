@@ -1,9 +1,4 @@
 {
-  try (DbSession dbSession=dbClient.openSession(false)){
-    String startedAt=DateUtils.formatDateTime(new Date(metadata.getStartedAt()));
-    PropertiesDao dao=dbClient.propertiesDao();
-    dao.insertProperty(dbSession,new PropertyDto().setKey(CoreProperties.SERVER_ID).setValue(metadata.getStartupId()));
-    dao.insertProperty(dbSession,new PropertyDto().setKey(CoreProperties.SERVER_STARTTIME).setValue(startedAt));
-    dbSession.commit();
-  }
- }
+  String startedAt=DateUtils.formatDateTime(new Date(metadata.getStartedAt()));
+  persistentSettings.saveProperties(ImmutableMap.of(CoreProperties.SERVER_ID,metadata.getStartupId(),CoreProperties.SERVER_STARTTIME,startedAt));
+}
