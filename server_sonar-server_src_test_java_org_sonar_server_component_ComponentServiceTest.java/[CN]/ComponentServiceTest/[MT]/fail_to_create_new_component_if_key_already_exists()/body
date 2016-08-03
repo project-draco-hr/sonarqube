@@ -1,13 +1,9 @@
 {
-  userSessionRule.login("john").setGlobalPermissions(PROVISIONING);
+  expectedException.expect(BadRequestException.class);
+  expectedException.expectMessage("Could not create Project, key already exists: struts");
+  userSession.login("john").setGlobalPermissions(PROVISIONING);
   ComponentDto project=ComponentTesting.newProjectDto().setKey("struts");
-  dbClient.componentDao().insert(session,project);
-  session.commit();
-  try {
-    service.create(NewComponent.create("struts","Struts project"));
-    fail();
-  }
- catch (  Exception e) {
-    assertThat(e).isInstanceOf(BadRequestException.class).hasMessage("Could not create Project, key already exists: struts");
-  }
+  dbClient.componentDao().insert(dbSession,project);
+  dbSession.commit();
+  underTest.create(NewComponent.create("struts","Struts project"));
 }

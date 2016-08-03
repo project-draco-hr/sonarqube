@@ -1,17 +1,17 @@
 {
   ComponentDto project=createProject();
   ComponentDto module=ComponentTesting.newModuleDto(project).setKey("sample:root:module");
-  dbClient.componentDao().insert(session,module);
+  dbClient.componentDao().insert(dbSession,module);
   ComponentDto file=ComponentTesting.newFileDto(module).setKey("sample:root:module:src/File.xoo");
-  dbClient.componentDao().insert(session,file);
-  session.commit();
-  userSessionRule.login("john").addProjectUuidPermissions(UserRole.ADMIN,project.uuid());
-  service.bulkUpdateKey(project.key(),"sample","sample2");
-  session.commit();
-  assertThat(service.getNullableByKey(project.key())).isNull();
-  assertThat(service.getNullableByKey("sample2:root")).isNotNull();
-  assertThat(service.getNullableByKey(module.key())).isNull();
-  assertThat(service.getNullableByKey("sample2:root:module")).isNotNull();
-  assertThat(service.getNullableByKey(file.key())).isNull();
-  assertThat(service.getNullableByKey("sample2:root:module:src/File.xoo")).isNotNull();
+  dbClient.componentDao().insert(dbSession,file);
+  dbSession.commit();
+  userSession.login("john").addProjectUuidPermissions(UserRole.ADMIN,project.uuid());
+  underTest.bulkUpdateKey(project.key(),"sample","sample2");
+  dbSession.commit();
+  assertThat(underTest.getNullableByKey(project.key())).isNull();
+  assertThat(underTest.getNullableByKey("sample2:root")).isNotNull();
+  assertThat(underTest.getNullableByKey(module.key())).isNull();
+  assertThat(underTest.getNullableByKey("sample2:root:module")).isNotNull();
+  assertThat(underTest.getNullableByKey(file.key())).isNull();
+  assertThat(underTest.getNullableByKey("sample2:root:module:src/File.xoo")).isNotNull();
 }

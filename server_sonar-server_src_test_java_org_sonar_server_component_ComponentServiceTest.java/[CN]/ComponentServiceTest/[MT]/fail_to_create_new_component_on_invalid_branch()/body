@@ -1,10 +1,6 @@
 {
-  userSessionRule.login("john").setGlobalPermissions(PROVISIONING);
-  try {
-    service.create(NewComponent.create("struts","Struts project").setBranch("origin?branch"));
-    fail();
-  }
- catch (  Exception e) {
-    assertThat(e).isInstanceOf(BadRequestException.class).hasMessage("Malformed branch for Project: origin?branch. Allowed characters are alphanumeric, '-', '_', '.' and '/', with at least one non-digit.");
-  }
+  expectedException.expect(BadRequestException.class);
+  expectedException.expectMessage("Malformed branch for Project: origin?branch. Allowed characters are alphanumeric, '-', '_', '.' and '/', with at least one non-digit.");
+  userSession.login("john").setGlobalPermissions(PROVISIONING);
+  underTest.create(NewComponent.create("struts","Struts project").setBranch("origin?branch"));
 }

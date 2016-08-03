@@ -1,12 +1,12 @@
 {
   ComponentDto project=createProject();
   ComponentDto module=ComponentTesting.newModuleDto(project).setKey("sample:root:module");
-  dbClient.componentDao().insert(session,module);
+  dbClient.componentDao().insert(dbSession,module);
   ComponentDto module2=ComponentTesting.newModuleDto(project).setKey("foo:module");
-  dbClient.componentDao().insert(session,module2);
-  session.commit();
-  userSessionRule.login("john").addProjectUuidPermissions(UserRole.ADMIN,project.uuid());
-  Map<String,String> result=service.checkModuleKeysBeforeRenaming(project.key(),"sample:root","foo");
+  dbClient.componentDao().insert(dbSession,module2);
+  dbSession.commit();
+  userSession.login("john").addProjectUuidPermissions(UserRole.ADMIN,project.uuid());
+  Map<String,String> result=underTest.checkModuleKeysBeforeRenaming(project.key(),"sample:root","foo");
   assertThat(result).hasSize(2);
   assertThat(result.get("sample:root")).isEqualTo("foo");
   assertThat(result.get("sample:root:module")).isEqualTo("#duplicate_key#");

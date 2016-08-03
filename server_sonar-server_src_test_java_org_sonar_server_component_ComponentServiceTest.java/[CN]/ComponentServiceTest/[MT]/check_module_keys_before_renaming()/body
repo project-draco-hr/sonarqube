@@ -1,12 +1,12 @@
 {
   ComponentDto project=createProject();
   ComponentDto module=ComponentTesting.newModuleDto(project).setKey("sample:root:module");
-  dbClient.componentDao().insert(session,module);
+  dbClient.componentDao().insert(dbSession,module);
   ComponentDto file=ComponentTesting.newFileDto(module).setKey("sample:root:module:src/File.xoo");
-  dbClient.componentDao().insert(session,file);
-  session.commit();
-  userSessionRule.login("john").addProjectUuidPermissions(UserRole.ADMIN,project.uuid());
-  Map<String,String> result=service.checkModuleKeysBeforeRenaming(project.key(),"sample","sample2");
+  dbClient.componentDao().insert(dbSession,file);
+  dbSession.commit();
+  userSession.login("john").addProjectUuidPermissions(UserRole.ADMIN,project.uuid());
+  Map<String,String> result=underTest.checkModuleKeysBeforeRenaming(project.key(),"sample","sample2");
   assertThat(result).hasSize(2);
   assertThat(result.get("sample:root")).isEqualTo("sample2:root");
   assertThat(result.get("sample:root:module")).isEqualTo("sample2:root:module");

@@ -1,0 +1,14 @@
+{
+  ComponentDto project=insertSampleRootProject();
+  ComponentDto module=ComponentTesting.newModuleDto(project).setKey("sample:root:module");
+  dbClient.componentDao().insert(dbSession,module);
+  ComponentDto file=ComponentTesting.newFileDto(module).setKey("sample:root:module:src/File.xoo");
+  dbClient.componentDao().insert(dbSession,file);
+  dbSession.commit();
+  userSession.login("john").addProjectUuidPermissions(UserRole.ADMIN,project.uuid());
+  underTest.updateKey(module.key(),"sample:root2:module");
+  dbSession.commit();
+  assertThat(dbClient.componentDao().selectByKey(dbSession,project.key())).isPresent();
+  assertComponentKeyHasBeenUpdated(module.key(),"sample:root2:module");
+  assertComponentKeyHasBeenUpdated(file.key(),"sample:root2:module:src/File.xoo");
+}
