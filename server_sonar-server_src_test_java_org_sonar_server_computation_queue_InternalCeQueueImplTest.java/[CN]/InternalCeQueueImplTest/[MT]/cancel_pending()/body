@@ -2,11 +2,9 @@
   CeTask task=submit(CeTaskTypes.REPORT,"PROJECT_1");
   boolean canceled=underTest.cancel("UNKNOWN");
   assertThat(canceled).isFalse();
-  verifyZeroInteractions(listener);
   canceled=underTest.cancel(task.getUuid());
   assertThat(canceled).isTrue();
   Optional<CeActivityDto> activity=dbTester.getDbClient().ceActivityDao().selectByUuid(dbTester.getSession(),task.getUuid());
   assertThat(activity.isPresent()).isTrue();
   assertThat(activity.get().getStatus()).isEqualTo(CeActivityDto.Status.CANCELED);
-  verify(listener).onRemoved(task,CeActivityDto.Status.CANCELED);
 }

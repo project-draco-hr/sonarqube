@@ -1,22 +1,13 @@
 {
-  File zipDir=tempFolder.newDir();
-  final File metadataFile=new File(zipDir,"metadata.pb");
-  FileUtils.write(metadataFile,"{report}");
-  File zip=tempFolder.newFile();
-  ZipUtils.zipDir(zipDir,zip);
-  when(reportFiles.fileForUuid(TASK_UUID)).thenReturn(zip);
-  underTest.execute();
-  verify(reportDirectoryHolder).setDirectory(argThat(new TypeSafeMatcher<File>(){
-    @Override protected boolean matchesSafely(    File dir){
-      try {
-        return dir.isDirectory() && dir.exists() && dir.listFiles().length == 1 && FileUtils.contentEquals(dir.listFiles()[0],metadataFile);
-      }
- catch (      IOException e) {
-        throw new IllegalStateException(e);
-      }
-    }
-    @Override public void describeTo(    Description description){
-    }
+  File reportFile=generateReport();
+  try (InputStream input=FileUtils.openInputStream(reportFile)){
+    dbTester.getDbClient().ceTaskDataDao().insert(dbTester.getSession(),TASK_UUID,input);
   }
-));
+   dbTester.getSession().commit();
+  dbTester.getSession().close();
+  underTest.execute();
+  File unzippedDir=reportDirectoryHolder.getDirectory();
+  assertThat(unzippedDir).isDirectory().exists();
+  assertThat(unzippedDir.listFiles()).hasSize(1);
+  assertThat(new File(unzippedDir,"metadata.pb")).hasContent("{metadata}");
 }

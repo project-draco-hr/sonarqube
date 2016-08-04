@@ -1,0 +1,18 @@
+{
+  userSession.setGlobalPermissions(SCAN_EXECUTION,PROVISIONING);
+  when(queue.prepareSubmit()).thenReturn(new CeTaskSubmit.Builder(TASK_UUID));
+  when(componentService.getNullableByKey(PROJECT_KEY)).thenReturn(null);
+  when(componentService.create(any(DbSession.class),any(NewComponent.class))).thenReturn(new ComponentDto().setUuid(PROJECT_UUID).setKey(PROJECT_KEY));
+  when(permissionService.wouldCurrentUserHavePermissionWithDefaultTemplate(any(DbSession.class),eq(SCAN_EXECUTION),anyString(),eq(PROJECT_KEY),eq(Qualifiers.PROJECT))).thenReturn(true);
+  underTest.submit(PROJECT_KEY,null,PROJECT_NAME,IOUtils.toInputStream("{binary}"));
+  verifyReportIsPersisted(TASK_UUID);
+  verify(permissionService).applyDefaultPermissionTemplate(any(DbSession.class),eq(PROJECT_KEY));
+  verify(queue).submit(argThat(new TypeSafeMatcher<CeTaskSubmit>(){
+    @Override protected boolean matchesSafely(    CeTaskSubmit submit){
+      return submit.getType().equals(CeTaskTypes.REPORT) && submit.getComponentUuid().equals(PROJECT_UUID) && submit.getUuid().equals(TASK_UUID);
+    }
+    @Override public void describeTo(    Description description){
+    }
+  }
+));
+}

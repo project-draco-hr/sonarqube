@@ -1,0 +1,9 @@
+{
+  assertThat(underTest.selectUuidsNotInQueue(dbTester.getSession())).isEmpty();
+  insertData("U1");
+  insertData("U2");
+  assertThat(underTest.selectUuidsNotInQueue(dbTester.getSession())).containsOnly("U1","U2");
+  CeQueueDto inQueue=new CeQueueDto().setUuid("U2").setTaskType(CeTaskTypes.REPORT).setStatus(CeQueueDto.Status.IN_PROGRESS);
+  new CeQueueDao(system).insert(dbTester.getSession(),inQueue);
+  assertThat(underTest.selectUuidsNotInQueue(dbTester.getSession())).containsOnly("U1");
+}

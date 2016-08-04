@@ -1,16 +1,7 @@
 {
   dbClient.ceQueueDao().resetAllToPendingStatus(dbSession);
   dbSession.commit();
-  Set<String> uuidsInQueue=new HashSet<>();
-  for (  CeQueueDto queueDto : dbClient.ceQueueDao().selectAllInAscOrder(dbSession)) {
-    uuidsInQueue.add(queueDto.getUuid());
-    if (CeTaskTypes.REPORT.equals(queueDto.getTaskType()) && !reportFiles.fileForUuid(queueDto.getUuid()).exists()) {
-      queue.cancel(dbSession,queueDto);
-    }
-  }
-  for (  String uuid : reportFiles.listUuids()) {
-    if (!uuidsInQueue.contains(uuid)) {
-      reportFiles.deleteIfExists(uuid);
-    }
-  }
+  List<String> uuids=dbClient.ceTaskDataDao().selectUuidsNotInQueue(dbSession);
+  dbClient.ceTaskDataDao().deleteByUuids(dbSession,uuids);
+  dbSession.commit();
 }

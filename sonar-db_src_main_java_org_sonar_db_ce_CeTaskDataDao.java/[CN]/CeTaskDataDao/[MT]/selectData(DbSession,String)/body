@@ -1,0 +1,24 @@
+{
+  PreparedStatement stmt=null;
+  ResultSet rs=null;
+  DataStream result=null;
+  try {
+    stmt=dbSession.getConnection().prepareStatement("SELECT data FROM ce_task_data WHERE task_uuid=? AND data IS NOT NULL");
+    stmt.setString(1,taskUuid);
+    rs=stmt.executeQuery();
+    if (rs.next()) {
+      result=new DataStream(stmt,rs,rs.getBinaryStream(1));
+      return Optional.of(result);
+    }
+    return Optional.empty();
+  }
+ catch (  SQLException e) {
+    throw new IllegalStateException("Fail to select data of CE task " + taskUuid,e);
+  }
+ finally {
+    if (result == null) {
+      DatabaseUtils.closeQuietly(rs);
+      DatabaseUtils.closeQuietly(stmt);
+    }
+  }
+}
