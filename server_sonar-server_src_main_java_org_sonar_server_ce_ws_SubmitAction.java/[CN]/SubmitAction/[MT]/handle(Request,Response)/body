@@ -2,8 +2,10 @@
   String projectKey=wsRequest.mandatoryParam(PARAM_PROJECT_KEY);
   String projectBranch=wsRequest.param(PARAM_PROJECT_BRANCH);
   String projectName=StringUtils.defaultIfBlank(wsRequest.param(PARAM_PROJECT_NAME),projectKey);
-  InputStream reportInput=wsRequest.paramAsInputStream(PARAM_REPORT_DATA);
-  CeTask task=reportSubmitter.submit(projectKey,projectBranch,projectName,reportInput);
-  WsCe.SubmitResponse submitResponse=WsCe.SubmitResponse.newBuilder().setTaskId(task.getUuid()).setProjectId(task.getComponentUuid()).build();
+  CeTask task;
+  try (InputStream report=new BufferedInputStream(wsRequest.paramAsInputStream(PARAM_REPORT_DATA))){
+    task=reportSubmitter.submit(projectKey,projectBranch,projectName,report);
+  }
+   WsCe.SubmitResponse submitResponse=WsCe.SubmitResponse.newBuilder().setTaskId(task.getUuid()).setProjectId(task.getComponentUuid()).build();
   WsUtils.writeProtobuf(submitResponse,wsRequest,wsResponse);
 }

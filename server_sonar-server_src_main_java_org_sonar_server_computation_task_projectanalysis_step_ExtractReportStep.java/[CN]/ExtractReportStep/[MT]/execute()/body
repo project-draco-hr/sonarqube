@@ -3,8 +3,8 @@
     Optional<CeTaskDataDao.DataStream> opt=dbClient.ceTaskDataDao().selectData(dbSession,task.getUuid());
     if (opt.isPresent()) {
       File unzippedDir=tempFolder.newDir();
-      try (CeTaskDataDao.DataStream reportStream=opt.get()){
-        ZipUtils.unzip(reportStream.getInputStream(),unzippedDir);
+      try (CeTaskDataDao.DataStream reportStream=opt.get();InputStream zipStream=new BufferedInputStream(reportStream.getInputStream())){
+        ZipUtils.unzip(zipStream,unzippedDir);
       }
  catch (      IOException e) {
         throw new IllegalStateException("Fail to extract report " + task.getUuid() + " from database",e);
