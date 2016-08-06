@@ -1,0 +1,15 @@
+{
+  cache.put("foo1","bar1");
+  cache.put("foo2","bar2");
+  ScannerReportWriter writer=mock(ScannerReportWriter.class);
+  underTest.publish(writer);
+  verify(writer).writeContextProperties(argThat(new TypeSafeMatcher<Iterable<ScannerReport.ContextProperty>>(){
+    @Override protected boolean matchesSafely(    Iterable<ScannerReport.ContextProperty> props){
+      Map<String,ScannerReport.ContextProperty> map=Maps.uniqueIndex(props,ContextPropertyToKey.INSTANCE);
+      return map.size() == 2 && map.get("foo1").getValue().equals("bar1") && map.get("foo2").getValue().equals("bar2");
+    }
+    @Override public void describeTo(    Description description){
+    }
+  }
+));
+}

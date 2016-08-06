@@ -1,0 +1,7 @@
+{
+  reportReader.putContextProperties(asList(ScannerReport.ContextProperty.newBuilder().setKey("foo").setValue("bar").build()));
+  underTest.finished(true);
+  verify(postProjectAnalysisTask).finished(projectAnalysisArgumentCaptor.capture());
+  org.sonar.api.ce.posttask.ScannerContext scannerContext=projectAnalysisArgumentCaptor.getValue().getScannerContext();
+  assertThat(scannerContext.getProperties()).containsExactly(entry("foo","bar"));
+}
