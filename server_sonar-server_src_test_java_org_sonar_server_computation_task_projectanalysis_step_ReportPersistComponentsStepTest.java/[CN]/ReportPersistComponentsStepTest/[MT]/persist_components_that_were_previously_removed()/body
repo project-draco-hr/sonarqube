@@ -4,7 +4,7 @@
   ComponentDto removedModule=ComponentTesting.newModuleDto("BCDE",project).setKey(MODULE_KEY).setName("Module").setEnabled(false);
   dbClient.componentDao().insert(dbTester.getSession(),removedModule);
   ComponentDto removedDirectory=ComponentTesting.newDirectory(removedModule,"src/main/java/dir").setUuid("CDEF").setKey("MODULE_KEY:src/main/java/dir").setEnabled(false);
-  ComponentDto removedFile=ComponentTesting.newFileDto(removedModule,"DEFG").setUuidPath(formatUuidPathFromParent(removedDirectory)).setPath("src/main/java/dir/Foo.java").setName("Foo.java").setKey("MODULE_KEY:src/main/java/dir/Foo.java").setEnabled(false);
+  ComponentDto removedFile=ComponentTesting.newFileDto(removedModule,removedDirectory,"DEFG").setPath("src/main/java/dir/Foo.java").setName("Foo.java").setKey("MODULE_KEY:src/main/java/dir/Foo.java").setEnabled(false);
   dbClient.componentDao().insert(dbTester.getSession(),removedDirectory,removedFile);
   dbTester.getSession().commit();
   treeRootHolder.setRoot(builder(PROJECT,1).setUuid("ABCD").setKey(PROJECT_KEY).setName("Project").addChildren(builder(Component.Type.MODULE,2).setUuid("BCDE").setKey(MODULE_KEY).setName("Module").addChildren(builder(DIRECTORY,3).setUuid("CDEF").setKey("MODULE_KEY:src/main/java/dir").setPath("src/main/java/dir").addChildren(builder(FILE,4).setUuid("DEFG").setKey("MODULE_KEY:src/main/java/dir/Foo.java").setPath("src/main/java/dir/Foo.java").build()).build()).build()).build());
