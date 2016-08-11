@@ -1,0 +1,7 @@
+{
+  ComponentDto project=componentDb.insertComponent(newProjectDto("A").setKey("project"));
+  componentDb.insertComponent(newModuleDto(project).setKey("project:enabled-module"));
+  componentDb.insertComponent(newModuleDto(project).setKey("project:disabled-module").setEnabled(false));
+  Map<String,String> result=underTest.simulateBulkUpdateKey(dbSession,"A","project","new-project");
+  assertThat(result).hasSize(2).containsOnly(entry("project","new-project"),entry("project:enabled-module","new-project:enabled-module"));
+}
