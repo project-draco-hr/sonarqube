@@ -1,0 +1,9 @@
+{
+  InputStream responseStream=ws.newRequest().setMethod("POST").setParam(PARAM_PROJECT_KEY,PROJECT_KEY).setParam(PARAM_NAME,name).setParam(PARAM_URL,url).setMediaType(PROTOBUF).execute().getInputStream();
+  WsProjectLinks.CreateWsResponse response=WsProjectLinks.CreateWsResponse.parseFrom(responseStream);
+  long newId=Long.valueOf(response.getLink().getId());
+  ComponentLinkDto link=dbClient.componentLinkDao().selectById(dbSession,newId);
+  assertThat(link.getName()).isEqualTo(name);
+  assertThat(link.getHref()).isEqualTo(url);
+  assertThat(link.getType()).isEqualTo(type);
+}
