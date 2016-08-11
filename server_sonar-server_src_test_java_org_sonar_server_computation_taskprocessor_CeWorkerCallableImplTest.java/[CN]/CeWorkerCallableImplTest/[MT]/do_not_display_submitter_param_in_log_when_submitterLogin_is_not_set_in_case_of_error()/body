@@ -5,13 +5,12 @@
   makeTaskProcessorFail(ceTask);
   underTest.call();
   List<String> logs=logTester.logs(LoggerLevel.INFO);
+  assertThat(logs).hasSize(1);
+  assertThat(logs.get(0)).doesNotContain(" | submitter=");
+  logs=logTester.logs(LoggerLevel.ERROR);
   assertThat(logs).hasSize(2);
   for (int i=0; i < 2; i++) {
     assertThat(logs.get(i)).doesNotContain(" | submitter=");
   }
-  logs=logTester.logs(LoggerLevel.ERROR);
-  assertThat(logs).hasSize(3);
-  for (int i=0; i < 3; i++) {
-    assertThat(logs.get(i)).doesNotContain(" | submitter=");
-  }
+  assertThat(logTester.logs(LoggerLevel.DEBUG)).isEmpty();
 }

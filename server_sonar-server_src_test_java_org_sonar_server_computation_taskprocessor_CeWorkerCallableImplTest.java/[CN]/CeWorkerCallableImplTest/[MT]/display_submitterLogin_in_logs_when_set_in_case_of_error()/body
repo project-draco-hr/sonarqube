@@ -5,14 +5,10 @@
   makeTaskProcessorFail(ceTask);
   underTest.call();
   List<String> logs=logTester.logs(LoggerLevel.INFO);
-  assertThat(logs).hasSize(2);
-  for (int i=0; i < 2; i++) {
-    assertThat(logs.get(i)).contains(" | submitter=FooBar");
-  }
+  assertThat(logs).hasSize(1);
+  assertThat(logs.iterator().next()).contains(" | submitter=FooBar");
   logs=logTester.logs(LoggerLevel.ERROR);
-  assertThat(logs).hasSize(3);
-  for (int i=0; i < 3; i++) {
-    String log=logs.get(i);
-    assertThat(log.contains(" | submitter=FooBar | time=") || log.equals("Failed to execute task " + ceTask.getUuid())).isTrue();
-  }
+  assertThat(logs).hasSize(2);
+  assertThat(logs.get(0)).isEqualTo("Failed to execute task " + ceTask.getUuid());
+  assertThat(logs.get(1)).contains(" | submitter=FooBar | time=");
 }
