@@ -1,0 +1,17 @@
+{
+  Optional<MeasureVariations> newLines=counter.newLines.toMeasureVariations();
+  Optional<MeasureVariations> newDuplicatedLines=counter.newDuplicatedLines.toMeasureVariations();
+  DoubleVariationValue.Array newDuplicatedLinesDensity=DoubleVariationValue.newArray();
+  if (newLines.isPresent() && newDuplicatedLines.isPresent()) {
+    MeasureVariations newLinesVariations=newLines.get();
+    MeasureVariations newDuplicatedLinesVariations=newDuplicatedLines.get();
+    for (    Period period : context.getPeriods()) {
+      double currentNewLines=newLinesVariations.getVariation(period.getIndex());
+      if (currentNewLines > 0d) {
+        double density=Math.min(100d,100d * newDuplicatedLinesVariations.getVariation(period.getIndex()) / currentNewLines);
+        newDuplicatedLinesDensity.increment(period,density);
+      }
+    }
+  }
+  return createMeasure(newDuplicatedLinesDensity.toMeasureVariations());
+}
