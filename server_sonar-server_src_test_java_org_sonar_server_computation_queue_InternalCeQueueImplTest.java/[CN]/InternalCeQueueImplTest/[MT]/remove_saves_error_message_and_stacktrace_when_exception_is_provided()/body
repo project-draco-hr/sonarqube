@@ -1,0 +1,10 @@
+{
+  Throwable error=new NullPointerException("Fake NPE to test persistence to DB");
+  CeTask task=submit(CeTaskTypes.REPORT,"PROJECT_1");
+  Optional<CeTask> peek=underTest.peek();
+  underTest.remove(peek.get(),CeActivityDto.Status.FAILED,null,error);
+  Optional<CeActivityDto> activityDto=dbTester.getDbClient().ceActivityDao().selectByUuid(session,task.getUuid());
+  assertThat(activityDto).isPresent();
+  assertThat(activityDto.get().getErrorMessage()).isEqualTo(error.getMessage());
+  assertThat(activityDto.get().getErrorStacktrace()).isEqualToIgnoringWhitespace(stacktraceToString(error));
+}

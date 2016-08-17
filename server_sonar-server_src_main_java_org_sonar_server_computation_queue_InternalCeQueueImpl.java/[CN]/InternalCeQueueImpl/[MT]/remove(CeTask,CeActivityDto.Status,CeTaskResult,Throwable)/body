@@ -1,14 +1,14 @@
 {
+  checkArgument(error == null || status == CeActivityDto.Status.FAILED,"Error can be provided only when status is FAILED");
   DbSession dbSession=dbClient.openSession(false);
   try {
     Optional<CeQueueDto> queueDto=dbClient.ceQueueDao().selectByUuid(dbSession,task.getUuid());
-    if (!queueDto.isPresent()) {
-      throw new IllegalStateException(format("Task does not exist anymore: %s",task));
-    }
+    checkState(queueDto.isPresent(),"Task does not exist anymore: %s",task);
     CeActivityDto activityDto=new CeActivityDto(queueDto.get());
     activityDto.setStatus(status);
     updateQueueStatus(status,activityDto);
     updateTaskResult(activityDto,taskResult);
+    updateError(activityDto,error);
     remove(dbSession,queueDto.get(),activityDto);
   }
   finally {

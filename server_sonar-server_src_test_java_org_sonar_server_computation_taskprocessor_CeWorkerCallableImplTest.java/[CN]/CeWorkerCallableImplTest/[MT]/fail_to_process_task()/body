@@ -2,10 +2,10 @@
   CeTask task=createCeTask(null);
   when(queue.peek()).thenReturn(Optional.of(task));
   taskProcessorRepository.setProcessorForTask(task.getType(),taskProcessor);
-  makeTaskProcessorFail(task);
+  Throwable error=makeTaskProcessorFail(task);
   assertThat(underTest.call()).isTrue();
   inOrder.verify(ceLogging).initForTask(task);
   inOrder.verify(taskProcessor).process(task);
-  inOrder.verify(queue).remove(task,CeActivityDto.Status.FAILED,null);
+  inOrder.verify(queue).remove(task,CeActivityDto.Status.FAILED,null,error);
   inOrder.verify(ceLogging).clearForTask();
 }

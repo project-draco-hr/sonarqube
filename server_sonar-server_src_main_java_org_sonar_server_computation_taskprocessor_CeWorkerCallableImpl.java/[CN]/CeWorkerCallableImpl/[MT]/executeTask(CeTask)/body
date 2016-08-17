@@ -2,11 +2,12 @@
   ceLogging.initForTask(task);
   Profiler ceProfiler=startActivityProfiler(task);
   CeActivityDto.Status status=CeActivityDto.Status.FAILED;
-  CeTaskResult process=null;
+  CeTaskResult taskResult=null;
+  Throwable error=null;
   try {
     Optional<CeTaskProcessor> taskProcessor=taskProcessorRepository.getForCeTask(task);
     if (taskProcessor.isPresent()) {
-      process=taskProcessor.get().process(task);
+      taskResult=taskProcessor.get().process(task);
       status=CeActivityDto.Status.SUCCESS;
     }
  else {
@@ -16,9 +17,10 @@
   }
  catch (  Throwable e) {
     LOG.error(format("Failed to execute task %s",task.getUuid()),e);
+    error=e;
   }
  finally {
-    queue.remove(task,status,process);
+    queue.remove(task,status,taskResult,error);
     stopActivityProfiler(ceProfiler,task,status);
     ceLogging.clearForTask();
   }
