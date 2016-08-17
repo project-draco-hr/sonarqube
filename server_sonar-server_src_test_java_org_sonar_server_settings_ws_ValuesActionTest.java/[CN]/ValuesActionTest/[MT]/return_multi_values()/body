@@ -1,0 +1,18 @@
+{
+  setUserAsSystemAdmin();
+  propertyDefinitions.addComponent(PropertyDefinition.builder("default").multiValues(true).defaultValue("one,two").build());
+  propertyDefinitions.addComponent(PropertyDefinition.builder("global").multiValues(true).build());
+  insertProperties(newGlobalPropertyDto().setKey("global").setValue("three,four"));
+  ValuesWsResponse result=newRequestForGlobalProperties("default","global");
+  assertThat(result.getValuesList()).hasSize(2);
+  Settings.Value foo=result.getValues(0);
+  assertThat(foo.getKey()).isEqualTo("default");
+  assertThat(foo.hasValue()).isFalse();
+  assertThat(foo.getValuesList()).containsOnly("one","two");
+  assertThat(foo.getSetValues()).isEmpty();
+  Settings.Value bar=result.getValues(1);
+  assertThat(bar.getKey()).isEqualTo("global");
+  assertThat(bar.hasValue()).isFalse();
+  assertThat(bar.getValuesList()).containsOnly("three","four");
+  assertThat(bar.getSetValues()).isEmpty();
+}

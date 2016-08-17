@@ -1,0 +1,12 @@
+{
+  setUserAsSystemAdmin();
+  propertyDefinitions.addComponent(PropertyDefinition.builder("property").defaultValue("default").build());
+  insertProperties(newGlobalPropertyDto().setKey("property").setValue("one"),newComponentPropertyDto(project).setKey("property").setValue("two"));
+  ValuesWsResponse result=newRequestForProjectProperties("property");
+  assertThat(result.getValuesList()).hasSize(1);
+  Settings.Value globalPropertyValue=result.getValues(0);
+  assertThat(globalPropertyValue.getKey()).isEqualTo("property");
+  assertThat(globalPropertyValue.getValue()).isEqualTo("two");
+  assertThat(globalPropertyValue.getIsDefault()).isFalse();
+  assertThat(globalPropertyValue.getIsInherited()).isFalse();
+}

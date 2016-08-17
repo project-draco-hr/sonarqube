@@ -1,0 +1,14 @@
+{
+  ComponentDto project=ComponentTesting.newProjectDto();
+  dbClient.componentDao().insert(session,project);
+  UserDto user=UserTesting.newUserDto();
+  dbClient.userDao().insert(session,user);
+  String key="key";
+  String anotherKey="anotherKey";
+  insertProperties(newGlobalPropertyDto().setKey(key),newComponentPropertyDto(project).setKey(key),newUserPropertyDto(user).setKey(key),newComponentPropertyDto(project).setKey(anotherKey));
+  assertThat(dao.selectComponentPropertiesByKeys(session,newHashSet(key),project.getId())).extracting("key").containsOnly(key);
+  assertThat(dao.selectComponentPropertiesByKeys(session,newHashSet(key,anotherKey),project.getId())).extracting("key").containsOnly(key,anotherKey);
+  assertThat(dao.selectComponentPropertiesByKeys(session,newHashSet(key,anotherKey,"unknown"),project.getId())).extracting("key").containsOnly(key,anotherKey);
+  assertThat(dao.selectComponentPropertiesByKeys(session,newHashSet("unknown"),project.getId())).isEmpty();
+  assertThat(dao.selectComponentPropertiesByKeys(session,newHashSet(key),123456789L)).isEmpty();
+}

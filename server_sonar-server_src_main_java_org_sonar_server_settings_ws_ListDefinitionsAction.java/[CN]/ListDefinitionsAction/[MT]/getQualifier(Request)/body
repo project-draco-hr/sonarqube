@@ -1,15 +1,9 @@
 {
   DbSession dbSession=dbClient.openSession(false);
   try {
-    if (request.hasParam(PARAM_COMPONENT_ID) || request.hasParam(PARAM_COMPONENT_KEY)) {
-      ComponentDto component=componentFinder.getByUuidOrKey(dbSession,request.param(PARAM_COMPONENT_ID),request.param(PARAM_COMPONENT_KEY),ComponentFinder.ParamNames.ID_AND_KEY);
-      userSession.checkComponentUuidPermission(UserRole.ADMIN,component.uuid());
-      return component.qualifier();
-    }
- else {
-      userSession.checkPermission(GlobalPermissions.SYSTEM_ADMIN);
-      return null;
-    }
+    ComponentDto component=settingsWsComponentParameters.getComponent(dbSession,request);
+    settingsWsComponentParameters.checkAdminPermission(component);
+    return component == null ? null : component.qualifier();
   }
   finally {
     dbClient.closeSession(dbSession);
