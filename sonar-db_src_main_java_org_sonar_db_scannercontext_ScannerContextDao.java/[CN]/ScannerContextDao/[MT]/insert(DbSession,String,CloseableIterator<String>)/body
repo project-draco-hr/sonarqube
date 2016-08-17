@@ -1,0 +1,14 @@
+{
+  checkArgument(scannerContextLines.hasNext(),"Scanner context can not be empty");
+  long now=system.now();
+  try (PreparedStatement stmt=dbSession.getConnection().prepareStatement("INSERT INTO scanner_context (analysis_uuid, created_at, updated_at, data) VALUES (?, ?, ?, ?)");InputStream inputStream=new LogsIteratorInputStream(scannerContextLines,UTF_8)){
+    stmt.setString(1,analysisUuid);
+    stmt.setLong(2,now);
+    stmt.setLong(3,now);
+    stmt.setBinaryStream(4,inputStream);
+    stmt.executeUpdate();
+  }
+ catch (  SQLException|IOException e) {
+    throw new IllegalStateException("Fail to insert scanner context for analysis " + analysisUuid,e);
+  }
+}
