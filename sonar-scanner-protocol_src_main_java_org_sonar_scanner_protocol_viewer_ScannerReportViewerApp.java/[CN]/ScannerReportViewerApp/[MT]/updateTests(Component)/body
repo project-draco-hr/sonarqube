@@ -1,0 +1,17 @@
+{
+  testsEditor.setText("");
+  File tests=reader.readTests(component.getRef());
+  if (tests == null) {
+    return;
+  }
+  try (InputStream inputStream=FileUtils.openInputStream(tests)){
+    ScannerReport.Test test=ScannerReport.Test.parser().parseDelimitedFrom(inputStream);
+    while (test != null) {
+      testsEditor.getDocument().insertString(testsEditor.getDocument().getEndPosition().getOffset(),test.toString() + "\n",null);
+      test=ScannerReport.Test.parser().parseDelimitedFrom(inputStream);
+    }
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException(e);
+  }
+}
