@@ -11,8 +11,10 @@
  else {
       Optional<CeActivityDto> activityDto=dbClient.ceActivityDao().selectByUuid(dbSession,taskUuid);
       if (activityDto.isPresent()) {
-        checkPermission(activityDto.get().getComponentUuid());
-        wsTaskResponse.setTask(wsTaskFormatter.formatActivity(dbSession,activityDto.get()));
+        CeActivityDto ceActivityDto=activityDto.get();
+        checkPermission(ceActivityDto.getComponentUuid());
+        maskErrorStacktrace(wsRequest,ceActivityDto);
+        wsTaskResponse.setTask(wsTaskFormatter.formatActivity(dbSession,ceActivityDto));
       }
  else {
         throw new NotFoundException();
