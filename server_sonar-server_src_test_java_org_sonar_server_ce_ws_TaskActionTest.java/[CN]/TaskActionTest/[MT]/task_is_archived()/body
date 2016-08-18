@@ -1,16 +1,16 @@
 {
   userSession.login("john").setGlobalPermissions(SYSTEM_ADMIN);
-  CeActivityDto activityDto=createActivityDto("TASK_1");
+  CeActivityDto activityDto=createActivityDto(SOME_TASK_UUID);
   persist(activityDto);
-  TestResponse wsResponse=ws.newRequest().setMediaType(PROTOBUF).setParam("id","TASK_1").execute();
+  TestResponse wsResponse=ws.newRequest().setMediaType(PROTOBUF).setParam("id",SOME_TASK_UUID).execute();
   WsCe.TaskResponse taskResponse=Protobuf.read(wsResponse.getInputStream(),WsCe.TaskResponse.PARSER);
   WsCe.Task task=taskResponse.getTask();
-  assertThat(task.getId()).isEqualTo("TASK_1");
+  assertThat(task.getId()).isEqualTo(SOME_TASK_UUID);
   assertThat(task.getStatus()).isEqualTo(WsCe.TaskStatus.FAILED);
   assertThat(task.getComponentId()).isEqualTo(PROJECT.uuid());
   assertThat(task.getComponentKey()).isEqualTo(PROJECT.key());
   assertThat(task.getComponentName()).isEqualTo(PROJECT.name());
-  assertThat(task.getAnalysisId()).isEqualTo("U1");
+  assertThat(task.getAnalysisId()).isEqualTo(activityDto.getAnalysisUuid());
   assertThat(task.getExecutionTimeMs()).isEqualTo(500L);
   assertThat(task.getLogs()).isFalse();
 }

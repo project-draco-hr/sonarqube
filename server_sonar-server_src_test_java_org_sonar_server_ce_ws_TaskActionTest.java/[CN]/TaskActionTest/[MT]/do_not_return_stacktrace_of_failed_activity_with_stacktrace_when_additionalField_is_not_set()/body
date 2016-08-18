@@ -1,11 +1,11 @@
 {
   userSession.login("john").setGlobalPermissions(SYSTEM_ADMIN);
-  CeActivityDto activityDto=createActivityDto("TASK_1").setErrorMessage("error msg").setErrorStacktrace("error stack");
+  CeActivityDto activityDto=createActivityDto(SOME_TASK_UUID).setErrorMessage("error msg").setErrorStacktrace("error stack");
   persist(activityDto);
-  TestResponse wsResponse=ws.newRequest().setMediaType(PROTOBUF).setParam("id","TASK_1").execute();
+  TestResponse wsResponse=ws.newRequest().setMediaType(PROTOBUF).setParam("id",SOME_TASK_UUID).execute();
   WsCe.TaskResponse taskResponse=Protobuf.read(wsResponse.getInputStream(),WsCe.TaskResponse.PARSER);
   WsCe.Task task=taskResponse.getTask();
-  assertThat(task.getId()).isEqualTo("TASK_1");
+  assertThat(task.getId()).isEqualTo(SOME_TASK_UUID);
   assertThat(task.getErrorMessage()).isEqualTo(activityDto.getErrorMessage());
   assertThat(task.hasErrorStacktrace()).isFalse();
 }

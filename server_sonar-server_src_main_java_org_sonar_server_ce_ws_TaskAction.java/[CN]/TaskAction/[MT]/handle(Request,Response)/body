@@ -13,8 +13,9 @@
       if (activityDto.isPresent()) {
         CeActivityDto ceActivityDto=activityDto.get();
         checkPermission(ceActivityDto.getComponentUuid());
-        maskErrorStacktrace(wsRequest,ceActivityDto);
-        wsTaskResponse.setTask(wsTaskFormatter.formatActivity(dbSession,ceActivityDto));
+        Set<AdditionalField> additionalFields=AdditionalField.getFromRequest(wsRequest);
+        maskErrorStacktrace(ceActivityDto,additionalFields);
+        wsTaskResponse.setTask(wsTaskFormatter.formatActivity(dbSession,ceActivityDto,extractScannerContext(dbSession,taskUuid,additionalFields)));
       }
  else {
         throw new NotFoundException();

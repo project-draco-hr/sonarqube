@@ -1,12 +1,12 @@
 {
+  assumeTrue(!dbTester.database().getDialect().getId().equals(H2.ID));
   userSession.login("john").setGlobalPermissions(SYSTEM_ADMIN);
-  CeActivityDto activityDto=createActivityDto(SOME_TASK_UUID).setErrorMessage("error msg").setErrorStacktrace("error stack");
-  persist(activityDto);
+  String scannerContext="this is some scanner context, yeah!";
+  CeActivityDto activityDto=persist(createActivityDto(SOME_TASK_UUID));
+  persistScannerContext(activityDto.getAnalysisUuid(),scannerContext);
   TestResponse wsResponse=ws.newRequest().setMediaType(PROTOBUF).setParam("id",SOME_TASK_UUID).setParam("additionalFields","stacktrace").execute();
   WsCe.TaskResponse taskResponse=Protobuf.read(wsResponse.getInputStream(),WsCe.TaskResponse.PARSER);
   WsCe.Task task=taskResponse.getTask();
   assertThat(task.getId()).isEqualTo(SOME_TASK_UUID);
-  assertThat(task.getErrorMessage()).isEqualTo(activityDto.getErrorMessage());
-  assertThat(task.hasErrorStacktrace()).isTrue();
-  assertThat(task.getErrorStacktrace()).isEqualTo(activityDto.getErrorStacktrace());
+  assertThat(task.hasScannerContext()).isFalse();
 }

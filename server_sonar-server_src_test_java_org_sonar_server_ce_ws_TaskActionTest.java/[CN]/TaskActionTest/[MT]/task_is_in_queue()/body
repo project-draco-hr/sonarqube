@@ -2,14 +2,14 @@
   userSession.login("john").setGlobalPermissions(SYSTEM_ADMIN);
   CeQueueDto queueDto=new CeQueueDto();
   queueDto.setTaskType(CeTaskTypes.REPORT);
-  queueDto.setUuid("TASK_1");
+  queueDto.setUuid(SOME_TASK_UUID);
   queueDto.setComponentUuid(PROJECT.uuid());
   queueDto.setStatus(CeQueueDto.Status.PENDING);
   queueDto.setSubmitterLogin("john");
   persist(queueDto);
-  TestResponse wsResponse=ws.newRequest().setMediaType(PROTOBUF).setParam("id","TASK_1").execute();
+  TestResponse wsResponse=ws.newRequest().setMediaType(PROTOBUF).setParam("id",SOME_TASK_UUID).execute();
   WsCe.TaskResponse taskResponse=Protobuf.read(wsResponse.getInputStream(),WsCe.TaskResponse.PARSER);
-  assertThat(taskResponse.getTask().getId()).isEqualTo("TASK_1");
+  assertThat(taskResponse.getTask().getId()).isEqualTo(SOME_TASK_UUID);
   assertThat(taskResponse.getTask().getStatus()).isEqualTo(WsCe.TaskStatus.PENDING);
   assertThat(taskResponse.getTask().getSubmitterLogin()).isEqualTo("john");
   assertThat(taskResponse.getTask().getComponentId()).isEqualTo(PROJECT.uuid());
