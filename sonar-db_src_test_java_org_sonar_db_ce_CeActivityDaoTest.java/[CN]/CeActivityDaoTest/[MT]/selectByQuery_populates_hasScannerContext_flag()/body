@@ -1,0 +1,9 @@
+{
+  insert("TASK_1",REPORT,"PROJECT_1",SUCCESS);
+  CeActivityDto dto2=insert("TASK_2",REPORT,"PROJECT_2",SUCCESS);
+  insertScannerContext(dto2.getAnalysisUuid());
+  CeActivityDto dto=underTest.selectByQuery(db.getSession(),new CeTaskQuery().setComponentUuid("PROJECT_1"),0,100).iterator().next();
+  assertThat(dto.isHasScannerContext()).isFalse();
+  dto=underTest.selectByQuery(db.getSession(),new CeTaskQuery().setComponentUuid("PROJECT_2"),0,100).iterator().next();
+  assertThat(dto.isHasScannerContext()).isTrue();
+}
