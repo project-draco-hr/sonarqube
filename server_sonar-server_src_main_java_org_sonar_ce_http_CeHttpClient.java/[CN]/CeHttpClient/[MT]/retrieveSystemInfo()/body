@@ -1,13 +1,13 @@
 {
-  try (DefaultProcessCommands commands=DefaultProcessCommands.secondary(ipcSharedDir,processId.getIpcIndex())){
+  try (DefaultProcessCommands commands=DefaultProcessCommands.secondary(ipcSharedDir,COMPUTE_ENGINE.getIpcIndex())){
     if (commands.isUp()) {
       String url=commands.getHttpUrl() + "/systemInfo";
       byte[] protobuf=IOUtils.toByteArray(new URI(url));
       return Optional.of(ProtobufSystemInfo.SystemInfo.parseFrom(protobuf));
     }
-    return Optional.absent();
+    return Optional.empty();
   }
  catch (  Exception e) {
-    throw new IllegalStateException("Can not get system info of process " + processId,e);
+    throw new IllegalStateException("Can not get system info of process " + COMPUTE_ENGINE,e);
   }
 }
