@@ -1,2 +1,15 @@
 {
+  DbSession dbSession=dbClient.openSession(true);
+  try {
+    ComponentDto component=settingsWsComponentParameters.getComponent(dbSession,request);
+    settingsWsComponentParameters.checkAdminPermission(component);
+    Set<String> keys=new HashSet<>(request.mandatoryParamAsStrings(PARAM_KEYS));
+    ValuesWsResponse.Builder valuesBuilder=ValuesWsResponse.newBuilder();
+    new SettingsBuilder(dbSession,valuesBuilder,getDefinitions(keys),keys,component).build();
+    ValuesWsResponse response=valuesBuilder.build();
+    return response;
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
 }
