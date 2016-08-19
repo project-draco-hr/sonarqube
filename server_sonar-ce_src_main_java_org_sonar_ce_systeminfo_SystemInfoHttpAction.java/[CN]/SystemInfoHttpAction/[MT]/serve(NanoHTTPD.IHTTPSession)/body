@@ -1,9 +1,12 @@
 {
+  if (session.getMethod() != NanoHTTPD.Method.GET) {
+    return newFixedLengthResponse(METHOD_NOT_ALLOWED,MIME_PLAINTEXT,null);
+  }
   ProtobufSystemInfo.SystemInfo.Builder infoBuilder=ProtobufSystemInfo.SystemInfo.newBuilder();
   for (  SystemInfoSection sectionProvider : sectionProviders) {
     ProtobufSystemInfo.Section section=sectionProvider.toProtobuf();
     infoBuilder.addSections(section);
   }
   byte[] bytes=infoBuilder.build().toByteArray();
-  return newFixedLengthResponse(NanoHTTPD.Response.Status.OK,PROTOBUF_MIME_TYPE,new ByteArrayInputStream(bytes),bytes.length);
+  return newFixedLengthResponse(OK,PROTOBUF_MIME_TYPE,new ByteArrayInputStream(bytes),bytes.length);
 }
