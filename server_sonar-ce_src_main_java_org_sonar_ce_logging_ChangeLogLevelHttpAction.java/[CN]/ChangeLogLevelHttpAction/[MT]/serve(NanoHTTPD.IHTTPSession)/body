@@ -1,0 +1,19 @@
+{
+  if (session.getMethod() != NanoHTTPD.Method.POST) {
+    return newFixedLengthResponse(METHOD_NOT_ALLOWED,MIME_PLAINTEXT,null);
+  }
+  String levelStr=session.getParms().get(PARAM_LEVEL);
+  if (levelStr == null || levelStr.isEmpty()) {
+    return newFixedLengthResponse(BAD_REQUEST,MIME_PLAINTEXT,format("Parameter '%s' is missing",PARAM_LEVEL));
+  }
+  try {
+    LoggerLevel level=LoggerLevel.valueOf(levelStr);
+    db.enableSqlLogging(level.equals(LoggerLevel.TRACE));
+    logging.changeLevel(level);
+    return newFixedLengthResponse(OK,MIME_PLAINTEXT,null);
+  }
+ catch (  IllegalArgumentException e) {
+    Loggers.get(ChangeLogLevelHttpAction.class).debug("Value '{}' for parameter '{}' is invalid",levelStr,PARAM_LEVEL,e);
+    return newFixedLengthResponse(BAD_REQUEST,MIME_PLAINTEXT,format("Value '%s' for parameter '%s' is invalid",levelStr,PARAM_LEVEL));
+  }
+}
