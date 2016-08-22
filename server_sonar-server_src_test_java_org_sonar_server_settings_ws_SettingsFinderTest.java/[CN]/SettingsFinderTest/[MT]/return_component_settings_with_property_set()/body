@@ -1,0 +1,8 @@
+{
+  ComponentDto project=componentDb.insertComponent(newProjectDto());
+  addDefinitions(PropertyDefinition.builder("set1").type(PROPERTY_SET).fields(asList(PropertyFieldDefinition.build("key").name("Key").build(),PropertyFieldDefinition.build("size").name("Size").build())).build(),PropertyDefinition.builder("another").type(PROPERTY_SET).fields(singletonList(PropertyFieldDefinition.build("key").name("Key").build())).build());
+  insertProperties(newComponentPropertyDto(project).setKey("set1").setValue("1,2"),newComponentPropertyDto(project).setKey("set1.1.key").setValue("key1"),newComponentPropertyDto(project).setKey("set1.1.size").setValue("size1"),newComponentPropertyDto(project).setKey("set1.2.key").setValue("key2"),newComponentPropertyDto(project).setKey("set2").setValue("1"),newComponentPropertyDto(project).setKey("another.1.key").setValue("key1"));
+  Multimap<String,Setting> settings=underTest.loadComponentSettings(dbSession,newHashSet("set1"),project);
+  assertThat(settings).hasSize(1);
+  assertSetting(settings.get(project.uuid()).iterator().next(),"set1","1,2",project.getId(),true,ImmutableMap.of("key","key1","size","size1"),ImmutableMap.of("key","key2"));
+}

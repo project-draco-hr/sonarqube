@@ -1,0 +1,21 @@
+{
+  PropertyDefinition definition=setting.getDefinition();
+  String value=setting.getValue();
+  if (definition == null) {
+    valueBuilder.setValue(value);
+    return;
+  }
+  if (definition.type().equals(PROPERTY_SET)) {
+    Settings.FieldsValues.Builder builder=Settings.FieldsValues.newBuilder();
+    for (    Map<String,String> propertySetMap : setting.getPropertySets()) {
+      builder.addFieldsValuesBuilder().putAllValue(propertySetMap);
+    }
+    valueBuilder.setFieldsValues(builder);
+  }
+ else   if (definition.multiValues()) {
+    valueBuilder.setValues(Settings.Values.newBuilder().addAllValues(COMMA_SPLITTER.split(value)));
+  }
+ else {
+    valueBuilder.setValue(value);
+  }
+}

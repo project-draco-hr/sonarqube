@@ -1,0 +1,11 @@
+{
+  ComponentDto project=componentDb.insertComponent(newProjectDto());
+  addDefinitions(PropertyDefinition.builder("property").defaultValue("default").build());
+  insertProperties(newComponentPropertyDto(project).setKey("property").setValue("one"));
+  Multimap<String,Setting> result=underTest.loadComponentSettings(dbSession,newHashSet("property"),project);
+  assertThat(result.values()).hasSize(1);
+  List<Setting> settings=new ArrayList<>(result.get(project.uuid()));
+  assertThat(settings).hasSize(1);
+  assertSetting(settings.get(0),"property","one",project.getId(),true);
+  assertThat(underTest.loadComponentSettings(dbSession,newHashSet("unknown"),project)).isEmpty();
+}

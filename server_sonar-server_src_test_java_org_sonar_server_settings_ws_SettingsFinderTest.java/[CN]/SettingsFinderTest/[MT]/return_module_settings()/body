@@ -1,0 +1,13 @@
+{
+  ComponentDto project=componentDb.insertComponent(newProjectDto());
+  ComponentDto module=componentDb.insertComponent(newModuleDto(project));
+  ComponentDto subModule=componentDb.insertComponent(newModuleDto(module));
+  ComponentDto anotherProject=componentDb.insertComponent(newProjectDto());
+  insertProperties(newComponentPropertyDto(project).setKey("property").setValue("one"),newComponentPropertyDto(module).setKey("property").setValue("two"),newComponentPropertyDto(subModule).setKey("property2").setValue("three"),newComponentPropertyDto(anotherProject).setKey("property").setValue("another one"));
+  Multimap<String,Setting> result=underTest.loadComponentSettings(dbSession,newHashSet("property","property2"),subModule);
+  assertThat(result).hasSize(3);
+  assertThat(result.keySet()).containsExactly(project.uuid(),module.uuid(),subModule.uuid());
+  assertSetting(result.get(subModule.uuid()).iterator().next(),"property2","three",subModule.getId(),false);
+  assertSetting(result.get(module.uuid()).iterator().next(),"property","two",module.getId(),false);
+  assertSetting(result.get(project.uuid()).iterator().next(),"property","one",project.getId(),false);
+}

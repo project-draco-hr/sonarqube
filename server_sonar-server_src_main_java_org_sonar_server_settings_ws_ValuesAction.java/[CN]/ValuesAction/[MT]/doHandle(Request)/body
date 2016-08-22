@@ -1,13 +1,11 @@
 {
   DbSession dbSession=dbClient.openSession(true);
   try {
-    ComponentDto component=settingsWsComponentParameters.getComponent(dbSession,request);
-    settingsWsComponentParameters.checkAdminPermission(component);
+    ComponentDto componentDto=settingsWsComponentParameters.getComponent(dbSession,request);
+    settingsWsComponentParameters.checkAdminPermission(componentDto);
     Set<String> keys=new HashSet<>(request.mandatoryParamAsStrings(PARAM_KEYS));
-    ValuesWsResponse.Builder valuesBuilder=ValuesWsResponse.newBuilder();
-    new SettingsBuilder(dbSession,valuesBuilder,getDefinitions(keys),keys,component).build();
-    ValuesWsResponse response=valuesBuilder.build();
-    return response;
+    Optional<ComponentDto> component=Optional.ofNullable(componentDto);
+    return new ValuesResponseBuilder(loadSettings(dbSession,component,keys),component).build();
   }
   finally {
     dbClient.closeSession(dbSession);
