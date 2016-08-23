@@ -2,8 +2,8 @@
   Oracle dialect=new Oracle();
   when(underTest.getHandler(dialect)).thenReturn(handler);
   when(db.getDialect()).thenReturn(dialect);
-  doThrow(new SQLException("failure")).when(handler).handle(any(Connection.class),anySet());
+  doThrow(new SQLException("failure")).when(handler).handle(any(Connection.class),any(DatabaseCharsetChecker.State.class));
   expectedException.expect(IllegalStateException.class);
   expectedException.expectMessage("failure");
-  underTest.check(AUTO_REPAIR_COLLATION);
+  underTest.check(DatabaseCharsetChecker.State.UPGRADE);
 }

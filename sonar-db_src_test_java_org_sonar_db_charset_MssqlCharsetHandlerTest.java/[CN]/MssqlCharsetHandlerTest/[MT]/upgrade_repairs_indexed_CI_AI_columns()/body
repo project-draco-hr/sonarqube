@@ -1,0 +1,11 @@
+{
+  answerDefaultCollation("Latin1_General_CS_AS");
+  answerColumnDefs(new ColumnDef(TABLE_ISSUES,COLUMN_KEE,"Latin1_General","Latin1_General_CS_AS","varchar",10,false),new ColumnDef(TABLE_PROJECTS,COLUMN_NAME,"Latin1_General","Latin1_General_CI_AI","varchar",10,false));
+  answerIndices(new MssqlCharsetHandler.ColumnIndex("projects_name",false,"name"),new MssqlCharsetHandler.ColumnIndex("projects_login_and_name",true,"login,name"));
+  underTest.handle(connection,DatabaseCharsetChecker.State.UPGRADE);
+  verify(sqlExecutor).executeDdl(connection,"DROP INDEX projects.projects_name");
+  verify(sqlExecutor).executeDdl(connection,"DROP INDEX projects.projects_login_and_name");
+  verify(sqlExecutor).executeDdl(connection,"ALTER TABLE projects ALTER COLUMN name varchar(10) COLLATE Latin1_General_CS_AS NOT NULL");
+  verify(sqlExecutor).executeDdl(connection,"CREATE  INDEX projects_name ON projects (name)");
+  verify(sqlExecutor).executeDdl(connection,"CREATE UNIQUE INDEX projects_login_and_name ON projects (login,name)");
+}

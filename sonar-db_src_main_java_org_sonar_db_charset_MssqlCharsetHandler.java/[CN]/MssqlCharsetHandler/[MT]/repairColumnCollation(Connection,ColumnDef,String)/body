@@ -1,0 +1,16 @@
+{
+  List<ColumnIndex> indices=metadata.getColumnIndices(connection,column);
+  for (  ColumnIndex index : indices) {
+    getSqlExecutor().executeDdl(connection,format("DROP INDEX %s.%s",column.getTable(),index.name));
+  }
+  String nullability=column.isNullable() ? "NULL" : "NOT NULL";
+  String size=column.getSize() >= 0 ? String.valueOf(column.getSize()) : "max";
+  String alterSql=format("ALTER TABLE %s ALTER COLUMN %s %s(%s) COLLATE %s %s",column.getTable(),column.getColumn(),column.getDataType(),size,expectedCollation,nullability);
+  LOGGER.info("Changing collation of column [{}.{}] from {} to {} | sql=",column.getTable(),column.getColumn(),column.getCollation(),expectedCollation,alterSql);
+  getSqlExecutor().executeDdl(connection,alterSql);
+  for (  ColumnIndex index : indices) {
+    String uniqueSql=index.unique ? "UNIQUE" : "";
+    String createIndexSql=format("CREATE %s INDEX %s ON %s (%s)",uniqueSql,index.name,column.getTable(),index.csvColumns);
+    getSqlExecutor().executeDdl(connection,createIndexSql);
+  }
+}

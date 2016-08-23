@@ -1,6 +1,6 @@
 {
-  answerColumns(Collections.singletonList(new ColumnDef(TABLE_ISSUES,COLUMN_KEE,"Latin1_General",collation,"varchar",10,false)));
-  Connection connection=mock(Connection.class);
-  underTest.handle(connection,immutableEnumSet(AUTO_REPAIR_COLLATION));
-  verify(selectExecutor).executeUpdate(connection,"ALTER TABLE issues ALTER COLUMN kee varchar(10) COLLATE " + expectedCollation + " NOT NULL");
+  answerDefaultCollation("Latin1_General_CS_AS");
+  answerColumnDefs(new ColumnDef(TABLE_ISSUES,COLUMN_KEE,"Latin1_General",collation,"varchar",10,false));
+  underTest.handle(connection,DatabaseCharsetChecker.State.UPGRADE);
+  verify(sqlExecutor).executeDdl(connection,"ALTER TABLE issues ALTER COLUMN kee varchar(10) COLLATE " + expectedCollation + " NOT NULL");
 }

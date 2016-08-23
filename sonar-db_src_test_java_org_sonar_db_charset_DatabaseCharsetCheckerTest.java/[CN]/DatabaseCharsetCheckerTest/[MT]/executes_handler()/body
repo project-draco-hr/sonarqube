@@ -2,13 +2,6 @@
   Oracle dialect=new Oracle();
   when(underTest.getHandler(dialect)).thenReturn(handler);
   when(db.getDialect()).thenReturn(dialect);
-  underTest.check(ENFORCE_UTF8);
-  verify(handler).handle(any(Connection.class),argThat(new TypeSafeMatcher<Set<DatabaseCharsetChecker.Flag>>(){
-    @Override protected boolean matchesSafely(    Set<DatabaseCharsetChecker.Flag> flags){
-      return flags.contains(ENFORCE_UTF8) && flags.size() == 1;
-    }
-    @Override public void describeTo(    Description description){
-    }
-  }
-));
+  underTest.check(DatabaseCharsetChecker.State.UPGRADE);
+  verify(handler).handle(any(Connection.class),eq(DatabaseCharsetChecker.State.UPGRADE));
 }

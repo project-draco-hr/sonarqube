@@ -1,0 +1,12 @@
+{
+  List<String[]> rows=getSqlExecutor().select(connection,"select table_name, column_name, collation_name " + "from information_schema.columns " + "where table_schema='public' "+ "and udt_name='varchar' "+ "order by table_name, column_name",new SqlExecutor.StringsConverter(3));
+  Set<String> errors=new LinkedHashSet<>();
+  for (  String[] row : rows) {
+    if (!isBlank(row[2]) && !containsIgnoreCase(row[2],UTF8)) {
+      errors.add(format("%s.%s",row[0],row[1]));
+    }
+  }
+  if (!errors.isEmpty()) {
+    throw MessageException.of(format("Database columns [%s] must have UTF8 charset.",Joiner.on(", ").join(errors)));
+  }
+}
