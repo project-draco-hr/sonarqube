@@ -29,11 +29,10 @@
   byte[] longOverallCovCond=row.getNullableBytes(28);
   byte[] shortDuplicationData=row.getNullableBytes(29);
   byte[] longDuplicationData=row.getNullableBytes(30);
-  long snapshotId=row.getLong(31);
-  if (snapshotId == previousSnapshotId) {
+  if (Objects.equals(fileUuid,previousFileUuid)) {
     return false;
   }
-  this.previousSnapshotId=snapshotId;
+  this.previousFileUuid=fileUuid;
   String[] sourceData=new FileSourceDto(source,ofNullableBytes(shortRevisions,longRevisions),ofNullableBytes(shortAuthors,longAuthors),ofNullableBytes(shortDates,longDates),ofNullableBytes(shortUtHits,longUtHits),ofNullableBytes(shortUtCond,longUtCond),ofNullableBytes(shortUtCovCond,longUtCovCond),ofNullableBytes(shortItHits,longItHits),ofNullableBytes(shortItCond,longItCond),ofNullableBytes(shortItCovCond,longItCovCond),ofNullableBytes(shortOverallHits,longOverallHits),ofNullableBytes(shortOverallCond,longOverallCond),ofNullableBytes(shortOverallCovCond,longOverallCovCond),ofNullableBytes(shortDuplicationData,longDuplicationData)).getSourceData();
   update.setString(1,projectUuid).setString(2,fileUuid).setLong(3,now).setLong(4,updatedAt == null ? now : updatedAt.getTime()).setString(5,sourceData[0]).setString(6,sourceData[1]).setString(7,"");
   return true;
