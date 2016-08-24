@@ -2,10 +2,7 @@
   Buffer response=new Buffer();
   response.read(ProtobufSystemInfo.Section.newBuilder().build().toByteArray());
   server.enqueue(new MockResponse().setBody(response));
-  try (DefaultProcessCommands processCommands=DefaultProcessCommands.secondary(ipcSharedDir,ProcessId.COMPUTE_ENGINE.getIpcIndex())){
-    processCommands.setUp();
-    processCommands.setHttpUrl(format("http://%s:%d",server.getHostName(),server.getPort()));
-  }
-   Optional<ProtobufSystemInfo.SystemInfo> info=underTest.retrieveSystemInfo();
+  setUpWithHttpUrl(ProcessId.COMPUTE_ENGINE);
+  Optional<ProtobufSystemInfo.SystemInfo> info=underTest.retrieveSystemInfo();
   assertThat(info.get().getSectionsCount()).isEqualTo(0);
 }

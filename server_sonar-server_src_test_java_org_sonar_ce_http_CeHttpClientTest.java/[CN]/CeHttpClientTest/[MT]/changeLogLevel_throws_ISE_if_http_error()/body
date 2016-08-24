@@ -1,0 +1,9 @@
+{
+  String message="blah";
+  server.enqueue(new MockResponse().setResponseCode(500).setBody(message));
+  setUpWithHttpUrl(ProcessId.COMPUTE_ENGINE);
+  expectedException.expect(IllegalStateException.class);
+  expectedException.expectMessage("Failed to call HTTP server of process " + ProcessId.COMPUTE_ENGINE);
+  expectedException.expectCause(hasType(IOException.class).andMessage(format("Failed to change log level in Compute Engine. Code was '500' and response was 'blah' for url " + "'http://%s:%s/changeLogLevel'",server.getHostName(),server.getPort())));
+  underTest.changeLogLevel(LoggerLevel.DEBUG);
+}
