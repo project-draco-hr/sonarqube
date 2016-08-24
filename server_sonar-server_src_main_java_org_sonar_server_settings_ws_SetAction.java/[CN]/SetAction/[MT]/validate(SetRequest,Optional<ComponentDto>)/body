@@ -1,0 +1,11 @@
+{
+  PropertyDefinition definition=propertyDefinitions.get(request.getKey());
+  if (definition == null) {
+    return;
+  }
+  PropertyDefinition.Result result=definition.validate(request.getValue());
+  checkRequest(result.isValid(),i18n.message(Locale.ENGLISH,"property.error." + result.getErrorKey(),"Error when validating setting with key '%s' and value '%s'"),request.getKey(),request.getValue());
+  checkRequest(component.isPresent() || definition.global(),"Setting '%s' cannot be global",request.getKey());
+  String qualifier=component.isPresent() ? component.get().qualifier() : "";
+  checkRequest(!component.isPresent() || definition.qualifiers().contains(component.get().qualifier()),"Setting '%s' cannot be set on a %s",request.getKey(),i18n.message(Locale.ENGLISH,"qualifier." + qualifier,null));
+}
