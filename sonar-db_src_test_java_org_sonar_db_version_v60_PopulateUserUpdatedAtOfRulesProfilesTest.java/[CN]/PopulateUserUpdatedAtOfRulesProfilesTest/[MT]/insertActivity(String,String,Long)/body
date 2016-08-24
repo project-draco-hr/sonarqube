@@ -1,11 +1,12 @@
 {
   final String sqlInsertActivity="insert into activities (profile_key, user_login, created_at) values (?, ?, ?) ";
-  try (PreparedStatement ps=db.getSession().getConnection().prepareStatement(sqlInsertActivity)){
+  Connection connection=db.getSession().getConnection();
+  try (PreparedStatement ps=connection.prepareStatement(sqlInsertActivity)){
     ps.setString(1,profileKey);
     ps.setString(2,login);
     ps.setTimestamp(3,createdAt == null ? null : new Timestamp(createdAt));
     ps.executeUpdate();
-    db.getSession().commit();
+    connection.commit();
   }
  catch (  SQLException e) {
     throw Throwables.propagate(e);
