@@ -1,15 +1,15 @@
 {
   File dir=temp.newFolder();
-  AllProcessesCommands commands=new AllProcessesCommands(dir);
-  for (int i=0; i < MAX_PROCESSES; i++) {
-    commands.setOperational(i);
-    commands.setUp(i);
+  try (AllProcessesCommands commands=new AllProcessesCommands(dir)){
+    for (int i=0; i < MAX_PROCESSES; i++) {
+      commands.setOperational(i);
+      commands.setUp(i);
+    }
+    int resetProcess=3;
+    DefaultProcessCommands.reset(dir,resetProcess);
+    for (int i=0; i < MAX_PROCESSES; i++) {
+      assertThat(commands.isOperational(i)).isEqualTo(i != resetProcess);
+      assertThat(commands.isUp(i)).isEqualTo(i != resetProcess);
+    }
   }
-  int resetProcess=3;
-  DefaultProcessCommands.reset(dir,resetProcess);
-  for (int i=0; i < MAX_PROCESSES; i++) {
-    assertThat(commands.isOperational(i)).isEqualTo(i != resetProcess);
-    assertThat(commands.isUp(i)).isEqualTo(i != resetProcess);
-  }
-  commands.close();
-}
+ }
