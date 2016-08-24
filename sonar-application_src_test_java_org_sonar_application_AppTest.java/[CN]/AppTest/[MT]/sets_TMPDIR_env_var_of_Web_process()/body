@@ -1,0 +1,11 @@
+{
+  Monitor monitor=mock(Monitor.class);
+  App app=new App(monitor);
+  Props props=initDefaultProps();
+  String expectedTmpDir="expected tmp dir";
+  props.set("sonar.path.temp",expectedTmpDir);
+  app.start(props);
+  ArgumentCaptor<List<JavaCommand>> argument=newJavaCommandArgumentCaptor();
+  verify(monitor).start(argument.capture());
+  assertThat(argument.getValue().get(1).getEnvVariables()).contains(entry("TMPDIR",expectedTmpDir));
+}
