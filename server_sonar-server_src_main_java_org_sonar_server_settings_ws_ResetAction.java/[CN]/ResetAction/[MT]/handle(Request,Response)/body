@@ -1,0 +1,21 @@
+{
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    ResetRequest resetRequest=toWsRequest(request);
+    Optional<ComponentDto> component=getComponent(dbSession,resetRequest);
+    checkPermissions(component);
+    PropertyDefinition definition=definitions.get(resetRequest.getKey());
+    String key=definition != null ? definition.key() : resetRequest.getKey();
+    if (component.isPresent()) {
+      dbClient.propertiesDao().deleteProjectProperty(key,component.get().getId(),dbSession);
+    }
+ else {
+      dbClient.propertiesDao().deleteGlobalProperty(key,dbSession);
+    }
+    dbSession.commit();
+    response.noContent();
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
+}
