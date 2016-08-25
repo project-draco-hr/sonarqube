@@ -5,7 +5,8 @@
     Optional<ComponentDto> component=getComponent(dbSession,valuesRequest);
     checkAdminPermission(component);
     Set<String> keys=new HashSet<>(valuesRequest.getKeys());
-    return new ValuesResponseBuilder(loadSettings(dbSession,component,keys),component).build();
+    Map<String,String> keysToDisplayMap=getKeysToDisplayMap(keys);
+    return new ValuesResponseBuilder(loadSettings(dbSession,component,keysToDisplayMap.keySet()),component,keysToDisplayMap).build();
   }
   finally {
     dbClient.closeSession(dbSession);
