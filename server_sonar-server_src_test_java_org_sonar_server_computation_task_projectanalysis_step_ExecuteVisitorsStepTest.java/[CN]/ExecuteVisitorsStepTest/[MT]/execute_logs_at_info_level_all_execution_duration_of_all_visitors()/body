@@ -1,11 +1,12 @@
 {
-  ExecuteVisitorsStep underStep=new ExecuteVisitorsStep(treeRootHolder,asList(new VisitorA(),new VisitorB(),new VisitorC()),ceLogging);
-  underStep.execute();
-  verify(ceLogging).logCeActivity(any(Logger.class),any(Runnable.class));
-  List<String> logs=logTester.logs(LoggerLevel.INFO);
-  assertThat(logs).hasSize(4);
-  assertThat(logs.get(0)).isEqualTo("  Execution time for each component visitor:");
-  assertThat(logs.get(1)).startsWith("  - VisitorA | time=");
-  assertThat(logs.get(2)).startsWith("  - VisitorB | time=");
-  assertThat(logs.get(3)).startsWith("  - VisitorC | time=");
-}
+  try (ChangeLogLevel executor=new ChangeLogLevel(ExecuteVisitorsStep.class,LoggerLevel.DEBUG);ChangeLogLevel step1=new ChangeLogLevel(VisitorA.class,LoggerLevel.DEBUG);ChangeLogLevel step2=new ChangeLogLevel(VisitorB.class,LoggerLevel.DEBUG);ChangeLogLevel step3=new ChangeLogLevel(VisitorB.class,LoggerLevel.DEBUG)){
+    ExecuteVisitorsStep underStep=new ExecuteVisitorsStep(treeRootHolder,asList(new VisitorA(),new VisitorB(),new VisitorC()));
+    underStep.execute();
+    List<String> logs=logTester.logs(LoggerLevel.DEBUG);
+    assertThat(logs).hasSize(4);
+    assertThat(logs.get(0)).isEqualTo("  Execution time for each component visitor:");
+    assertThat(logs.get(1)).startsWith("  - VisitorA | time=");
+    assertThat(logs.get(2)).startsWith("  - VisitorB | time=");
+    assertThat(logs.get(3)).startsWith("  - VisitorC | time=");
+  }
+ }
