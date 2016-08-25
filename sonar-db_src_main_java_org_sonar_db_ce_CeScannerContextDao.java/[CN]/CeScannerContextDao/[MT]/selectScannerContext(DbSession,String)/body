@@ -1,0 +1,14 @@
+{
+  try (PreparedStatement stmt=dbSession.getConnection().prepareStatement("select data from ce_scanner_context where task_uuid=?")){
+    stmt.setString(1,taskUuid);
+    try (ResultSet rs=stmt.executeQuery()){
+      if (rs.next()) {
+        return Optional.of(IOUtils.toString(rs.getBinaryStream(1),UTF_8));
+      }
+      return Optional.empty();
+    }
+   }
+ catch (  SQLException|IOException e) {
+    throw new IllegalStateException("Fail to retrieve scanner context of task " + taskUuid,e);
+  }
+}
