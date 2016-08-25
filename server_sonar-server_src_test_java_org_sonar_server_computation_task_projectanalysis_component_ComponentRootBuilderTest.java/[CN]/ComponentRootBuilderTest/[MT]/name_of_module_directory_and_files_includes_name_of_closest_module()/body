@@ -1,0 +1,35 @@
+{
+  ScannerReport.Component project=newBuilder().setType(PROJECT).setRef(1).addChildRef(11).addChildRef(21).addChildRef(31).build();
+  scannerComponentProvider.add(newBuilder().setRef(11).setType(MODULE).setKey("module 1").addChildRef(12).addChildRef(22).addChildRef(32));
+  scannerComponentProvider.add(newBuilder().setRef(12).setType(MODULE).setKey("module 2").addChildRef(13).addChildRef(23).addChildRef(33));
+  scannerComponentProvider.add(newBuilder().setRef(13).setType(MODULE).setKey("module 3").addChildRef(24).addChildRef(34));
+  scannerComponentProvider.add(newBuilder().setRef(21).setType(DIRECTORY).setPath("directory in project").addChildRef(35));
+  scannerComponentProvider.add(newBuilder().setRef(22).setType(DIRECTORY).setPath("directory in module 1").addChildRef(36));
+  scannerComponentProvider.add(newBuilder().setRef(23).setType(DIRECTORY).setPath("directory in module 2").addChildRef(37));
+  scannerComponentProvider.add(newBuilder().setRef(24).setType(DIRECTORY).setPath("directory in module 3").addChildRef(38));
+  scannerComponentProvider.add(newBuilder().setRef(31).setType(FILE).setPath("file in project"));
+  scannerComponentProvider.add(newBuilder().setRef(32).setType(FILE).setPath("file in module 1"));
+  scannerComponentProvider.add(newBuilder().setRef(33).setType(FILE).setPath("file in module 2"));
+  scannerComponentProvider.add(newBuilder().setRef(34).setType(FILE).setPath("file in module 3"));
+  scannerComponentProvider.add(newBuilder().setRef(35).setType(FILE).setPath("file in directory in project"));
+  scannerComponentProvider.add(newBuilder().setRef(36).setType(FILE).setPath("file in directory in module 1"));
+  scannerComponentProvider.add(newBuilder().setRef(37).setType(FILE).setPath("file in directory in module 2"));
+  scannerComponentProvider.add(newBuilder().setRef(38).setType(FILE).setPath("file in directory in module 3"));
+  Component root=underTest.build(project,PROJECT_KEY);
+  Map<Integer,Component> componentsByRef=indexComponentByRef(root);
+  assertThat(componentsByRef.get(11).getKey()).isEqualTo("module 1");
+  assertThat(componentsByRef.get(12).getKey()).isEqualTo("module 2");
+  assertThat(componentsByRef.get(13).getKey()).isEqualTo("module 3");
+  assertThat(componentsByRef.get(21).getKey()).startsWith(PROJECT_KEY + ":");
+  assertThat(componentsByRef.get(22).getKey()).startsWith("module 1" + ":");
+  assertThat(componentsByRef.get(23).getKey()).startsWith("module 2" + ":");
+  assertThat(componentsByRef.get(24).getKey()).startsWith("module 3" + ":");
+  assertThat(componentsByRef.get(31).getKey()).startsWith(PROJECT_KEY + ":");
+  assertThat(componentsByRef.get(32).getKey()).startsWith("module 1" + ":");
+  assertThat(componentsByRef.get(33).getKey()).startsWith("module 2" + ":");
+  assertThat(componentsByRef.get(34).getKey()).startsWith("module 3" + ":");
+  assertThat(componentsByRef.get(35).getKey()).startsWith(PROJECT_KEY + ":");
+  assertThat(componentsByRef.get(36).getKey()).startsWith("module 1" + ":");
+  assertThat(componentsByRef.get(37).getKey()).startsWith("module 2" + ":");
+  assertThat(componentsByRef.get(38).getKey()).startsWith("module 3" + ":");
+}

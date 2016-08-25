@@ -1,0 +1,14 @@
+{
+  ScannerReport.Component project=newBuilder().setType(PROJECT).setRef(1).addChildRef(2).build();
+  scannerComponentProvider.add(newBuilder().setRef(2).setType(MODULE).setKey(MODULE_KEY).addChildRef(3));
+  scannerComponentProvider.add(newBuilder().setRef(3).setType(DIRECTORY).setPath(DIRECTORY_PATH).addChildRef(4));
+  scannerComponentProvider.add(newBuilder().setRef(4).setType(FILE).setPath(FILE_PATH));
+  Component root=underTest.build(project,PROJECT_KEY);
+  assertThat(root.getKey()).isEqualTo(PROJECT_KEY);
+  Component module=root.getChildren().iterator().next();
+  assertThat(module.getName()).isEqualTo(MODULE_KEY);
+  Component directory=module.getChildren().iterator().next();
+  assertThat(directory.getName()).isEqualTo(module.getKey() + ":" + DIRECTORY_PATH);
+  Component file=directory.getChildren().iterator().next();
+  assertThat(file.getName()).isEqualTo(module.getKey() + ":" + FILE_PATH);
+}
