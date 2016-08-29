@@ -1,7 +1,7 @@
 {
-  for (  File f : fileSystem.files(FileQuery.onMain().onLanguage(Xoo.KEY))) {
-    String relativePathFromSourceDir=new PathResolver().relativePath(fileSystem.baseDir(),f);
-    org.sonar.api.resources.File sonarFile=org.sonar.api.resources.File.create(relativePathFromSourceDir);
+  for (  File f : fs.files(fs.predicates().and(fs.predicates().hasType(Type.MAIN),fs.predicates().hasLanguage(Xoo.KEY)))) {
+    String relativePathFromBaseDir=new PathResolver().relativePath(fs.baseDir(),f);
+    org.sonar.api.resources.File sonarFile=org.sonar.api.resources.File.create(relativePathFromBaseDir);
     Issuable issuable=perspectives.as(Issuable.class,sonarFile);
     issuable.addIssue(issuable.newIssueBuilder().ruleKey(RuleKey.of(XooRulesDefinition.XOO_REPOSITORY,RULE_KEY)).message("Issue created using deprecated API").line(1).build());
     issuable.addIssue(issuable.newIssueBuilder().ruleKey(RuleKey.of(XooRulesDefinition.XOO_REPOSITORY,RULE_KEY)).message(null).line(null).build());
