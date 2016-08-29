@@ -1,0 +1,26 @@
+{
+  int index=1;
+  List<PropertyDto> propertyDtos=new ArrayList<>();
+  List<String> ids=new ArrayList<>();
+  for (  Map<String,String> fieldValue : fieldValues) {
+    for (    Map.Entry<String,String> entry : fieldValue.entrySet()) {
+      String key=settingBaseKey + "." + index+ "."+ entry.getKey();
+      if (componentDto != null) {
+        propertyDtos.add(newComponentPropertyDto(componentDto).setKey(key).setValue(entry.getValue()));
+      }
+ else {
+        propertyDtos.add(newGlobalPropertyDto().setKey(key).setValue(entry.getValue()));
+      }
+    }
+    ids.add(Integer.toString(index));
+    index++;
+  }
+  String idsValue=Joiner.on(",").join(ids);
+  if (componentDto != null) {
+    propertyDtos.add(newComponentPropertyDto(componentDto).setKey(settingBaseKey).setValue(idsValue));
+  }
+ else {
+    propertyDtos.add(newGlobalPropertyDto().setKey(settingBaseKey).setValue(idsValue));
+  }
+  insertProperties(propertyDtos);
+}

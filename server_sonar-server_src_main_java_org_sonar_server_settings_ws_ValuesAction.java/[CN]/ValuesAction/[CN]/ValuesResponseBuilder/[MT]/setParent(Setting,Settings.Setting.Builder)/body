@@ -1,0 +1,21 @@
+{
+  Setting parent=settingsByParentKey.get(setting.getKey());
+  if (parent != null) {
+    String value=valueBuilder.getInherited() ? setting.getValue() : parent.getValue();
+    PropertyDefinition definition=setting.getDefinition();
+    if (definition == null) {
+      valueBuilder.setParentValue(value);
+      return;
+    }
+    if (definition.type().equals(PROPERTY_SET)) {
+      valueBuilder.setParentFieldValues(createFieldValuesBuilder(valueBuilder.getInherited() ? setting.getPropertySets() : parent.getPropertySets()));
+    }
+ else     if (definition.multiValues()) {
+      valueBuilder.setParentValues(createValuesBuilder(value));
+    }
+ else {
+      valueBuilder.setParentValue(value);
+    }
+  }
+  settingsByParentKey.put(setting.getKey(),setting);
+}

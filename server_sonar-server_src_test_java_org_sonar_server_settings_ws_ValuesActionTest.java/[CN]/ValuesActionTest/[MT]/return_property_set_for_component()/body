@@ -1,14 +1,12 @@
 {
   setUserAsSystemAdmin();
   propertyDefinitions.addComponent(PropertyDefinition.builder("foo").type(PropertyType.PROPERTY_SET).fields(asList(PropertyFieldDefinition.build("key").name("Key").build(),PropertyFieldDefinition.build("size").name("Size").build())).build());
-  insertProperties(newComponentPropertyDto(project).setKey("foo").setValue("1,2"),newComponentPropertyDto(project).setKey("foo.1.key").setValue("key1"),newComponentPropertyDto(project).setKey("foo.1.size").setValue("size1"),newComponentPropertyDto(project).setKey("foo.2.key").setValue("key2"));
+  propertyDb.insertPropertySet("foo",project,ImmutableMap.of("key","key1","size","size1"),ImmutableMap.of("key","key2"));
   ValuesWsResponse result=executeRequestForProjectProperties("foo");
   assertThat(result.getSettingsList()).hasSize(1);
   Settings.Setting value=result.getSettings(0);
   assertThat(value.getKey()).isEqualTo("foo");
   assertThat(value.hasValue()).isFalse();
   assertThat(value.hasValues()).isFalse();
-  assertThat(value.getFieldsValues().getFieldsValuesList()).hasSize(2);
-  assertThat(value.getFieldsValues().getFieldsValuesList().get(0).getValue()).containsOnly(entry("key","key1"),entry("size","size1"));
-  assertThat(value.getFieldsValues().getFieldsValuesList().get(1).getValue()).containsOnly(entry("key","key2"));
+  assertFieldValues(value,ImmutableMap.of("key","key1","size","size1"),ImmutableMap.of("key","key2"));
 }
