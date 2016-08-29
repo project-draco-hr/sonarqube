@@ -1,0 +1,13 @@
+{
+  propertyDefinitions.addComponent(PropertyDefinition.builder("my.key").name("foo").description("desc").category("cat").subCategory("subCat").type(PropertyType.PROPERTY_SET).defaultValue("default").fields(newArrayList(PropertyFieldDefinition.build("firstField").name("First Field").type(PropertyType.STRING).build(),PropertyFieldDefinition.build("secondField").name("Second Field").type(PropertyType.STRING).build())).build());
+  callForGlobalPropertySet("my.key",newArrayList(GSON.toJson(ImmutableMap.of("firstField","firstValue","secondField","secondValue")),GSON.toJson(ImmutableMap.of("firstField","anotherFirstValue","secondField","anotherSecondValue")),GSON.toJson(ImmutableMap.of("firstField","yetFirstValue","secondField","yetSecondValue"))));
+  assertThat(dbClient.propertiesDao().selectGlobalProperties(dbSession)).hasSize(7);
+  assertGlobalSetting("my.key","1,2,3");
+  assertGlobalSetting("my.key.1.firstField","firstValue");
+  assertGlobalSetting("my.key.1.secondField","secondValue");
+  assertGlobalSetting("my.key.2.firstField","anotherFirstValue");
+  assertGlobalSetting("my.key.2.secondField","anotherSecondValue");
+  assertGlobalSetting("my.key.3.firstField","yetFirstValue");
+  assertGlobalSetting("my.key.3.secondField","yetSecondValue");
+  verify(settingsChangeNotifier).onGlobalPropertyChange("my.key","1,2,3");
+}

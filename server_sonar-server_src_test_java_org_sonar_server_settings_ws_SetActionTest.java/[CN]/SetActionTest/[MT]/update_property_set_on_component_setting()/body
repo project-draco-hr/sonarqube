@@ -1,0 +1,18 @@
+{
+  propertyDefinitions.addComponent(PropertyDefinition.builder("my.key").name("foo").description("desc").category("cat").subCategory("subCat").type(PropertyType.PROPERTY_SET).defaultValue("default").onQualifiers(Qualifiers.PROJECT).fields(newArrayList(PropertyFieldDefinition.build("firstField").name("First Field").type(PropertyType.STRING).build(),PropertyFieldDefinition.build("secondField").name("Second Field").type(PropertyType.STRING).build())).build());
+  ComponentDto project=componentDb.insertProject();
+  propertyDb.insertProperties(newGlobalPropertyDto("my.key","1"),newGlobalPropertyDto("my.key.1.firstField","oldFirstValue"),newGlobalPropertyDto("my.key.1.secondField","oldSecondValue"),newComponentPropertyDto("my.key","1",project),newComponentPropertyDto("my.key.1.firstField","componentFirstValue",project),newComponentPropertyDto("my.key.1.firstField","componentSecondValue",project));
+  callForComponentPropertySetByUuid("my.key",newArrayList(GSON.toJson(ImmutableMap.of("firstField","firstValue","secondField","secondValue")),GSON.toJson(ImmutableMap.of("firstField","anotherFirstValue","secondField","anotherSecondValue"))),project.uuid());
+  assertThat(dbClient.propertiesDao().selectGlobalProperties(dbSession)).hasSize(3);
+  assertThat(dbClient.propertiesDao().selectProjectProperties(dbSession,project.key())).hasSize(5);
+  assertGlobalSetting("my.key","1");
+  assertGlobalSetting("my.key.1.firstField","oldFirstValue");
+  assertGlobalSetting("my.key.1.secondField","oldSecondValue");
+  Long projectId=project.getId();
+  assertComponentSetting("my.key","1,2",projectId);
+  assertComponentSetting("my.key.1.firstField","firstValue",projectId);
+  assertComponentSetting("my.key.1.secondField","secondValue",projectId);
+  assertComponentSetting("my.key.2.firstField","anotherFirstValue",projectId);
+  assertComponentSetting("my.key.2.secondField","anotherSecondValue",projectId);
+  verifyZeroInteractions(settingsChangeNotifier);
+}

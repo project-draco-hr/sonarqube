@@ -1,0 +1,19 @@
+{
+  Optional<ComponentDto> component=searchComponent(dbSession,request);
+  checkPermissions(component);
+  PropertyDefinition definition=propertyDefinitions.get(request.getKey());
+  String value;
+  commonChecks(request,definition,component);
+  if (!request.getFieldValues().isEmpty()) {
+    value=doHandlePropertySet(dbSession,request,definition,component);
+  }
+ else {
+    validate(request);
+    PropertyDto property=toProperty(request,component);
+    value=property.getValue();
+    dbClient.propertiesDao().insertProperty(dbSession,property);
+  }
+  if (!component.isPresent()) {
+    settingsChangeNotifier.onGlobalPropertyChange(request.getKey(),value);
+  }
+}
