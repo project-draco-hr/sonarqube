@@ -1,0 +1,20 @@
+{
+  setUserAsSystemAdmin();
+  addServerIdSettings("12345");
+  String data=createBase64License("SonarSource","governance","12345","2099-01-01","PRODUCTION",ImmutableMap.of("other","value"));
+  addLicenseSetting("sonar.governance.license.secured",data);
+  ListWsResponse result=executeRequest();
+  assertThat(result.getLicensesList()).hasSize(1);
+  Licenses.License license=result.getLicenses(0);
+  assertThat(license.getKey()).isEqualTo("sonar.governance.license.secured");
+  assertThat(license.getValue()).isEqualTo(data);
+  assertThat(license.getProduct()).isEqualTo("governance");
+  assertThat(license.getOrganization()).isEqualTo("SonarSource");
+  assertThat(license.getExpiration()).isEqualTo("2099-01-01");
+  assertThat(license.getType()).isEqualTo("PRODUCTION");
+  assertThat(license.getServerId()).isEqualTo("12345");
+  assertThat(license.getAdditionalProperties().getAdditionalProperties()).containsOnly(entry("other","value"));
+  assertThat(license.hasInvalidProduct()).isFalse();
+  assertThat(license.hasInvalidExpiration()).isFalse();
+  assertThat(license.hasInvalidServerId()).isFalse();
+}
