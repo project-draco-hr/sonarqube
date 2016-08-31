@@ -1,7 +1,15 @@
 {
   assertThat(underTest.getParams()).isEmpty();
+  assertThat(underTest.getParameters().getKeys()).isEmpty();
   underTest.setParam("keyB","b");
   assertThat(underTest.getParams()).containsExactly(entry("keyB","b"));
+  assertParameters(entry("keyB","b"));
+  assertMultiValueParameters(entry("keyB",singletonList("b")));
   underTest.setParam("keyA","a");
   assertThat(underTest.getParams()).containsExactly(entry("keyB","b"),entry("keyA","a"));
+  assertParameters(entry("keyB","b"),entry("keyA","a"));
+  assertMultiValueParameters(entry("keyB",singletonList("b")),entry("keyA",singletonList("a")));
+  underTest.setParam("keyC",ImmutableList.of("c1","c2","c3"));
+  assertParameters(entry("keyB","b"),entry("keyA","a"),entry("keyC","c1"));
+  assertMultiValueParameters(entry("keyB",singletonList("b")),entry("keyA",singletonList("a")),entry("keyC",ImmutableList.of("c1","c2","c3")));
 }
