@@ -1,10 +1,11 @@
 {
-  String newValue=properties.get(definitions.validKey(key));
-  if (StringUtils.isEmpty(newValue)) {
-    newValue=StringUtils.trim(value);
+  Optional<String> existingValue=getRawString(definitions.validKey(key));
+  String newValue;
+  if (!existingValue.isPresent()) {
+    newValue=trim(value);
   }
  else {
-    newValue+="," + StringUtils.trim(value);
+    newValue=existingValue.get() + "," + trim(value);
   }
   return setProperty(key,newValue);
 }

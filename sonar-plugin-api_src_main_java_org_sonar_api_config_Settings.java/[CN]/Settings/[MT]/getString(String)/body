@@ -1,12 +1,16 @@
 {
-  String value=getClearString(key);
-  if (value != null && encryption.isEncrypted(value)) {
+  String effectiveKey=definitions.validKey(key);
+  Optional<String> value=getRawString(effectiveKey);
+  if (!value.isPresent()) {
+    return getDefaultValue(effectiveKey);
+  }
+  if (encryption.isEncrypted(value.get())) {
     try {
-      value=encryption.decrypt(value);
+      return encryption.decrypt(value.get());
     }
  catch (    Exception e) {
-      throw new IllegalStateException("Fail to decrypt the property " + key + ". Please check your secret key.",e);
+      throw new IllegalStateException("Fail to decrypt the property " + effectiveKey + ". Please check your secret key.",e);
     }
   }
-  return value;
+  return value.get();
 }

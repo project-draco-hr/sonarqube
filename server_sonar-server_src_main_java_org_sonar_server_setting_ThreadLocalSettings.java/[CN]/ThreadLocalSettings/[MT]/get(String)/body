@@ -1,0 +1,19 @@
+{
+  String value=systemProps.getProperty(key);
+  if (value != null) {
+    return Optional.of(value);
+  }
+  Map<String,String> dbProps=CACHE.get();
+  if (dbProps == null) {
+    return Optional.ofNullable(settingLoader.load(key));
+  }
+  String loadedValue;
+  if (dbProps.containsKey(key)) {
+    loadedValue=dbProps.get(key);
+  }
+ else {
+    loadedValue=settingLoader.load(key);
+    dbProps.put(key,loadedValue);
+  }
+  return Optional.ofNullable(loadedValue);
+}

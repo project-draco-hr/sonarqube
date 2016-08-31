@@ -1,0 +1,13 @@
+{
+  insertPropertyIntoDb(A_KEY,"v1");
+  underTest=create(Collections.emptyMap());
+  underTest.load();
+  assertThat(underTest.get(A_KEY).get()).isEqualTo("v1");
+  deletePropertyFromDb(A_KEY);
+  assertThat(underTest.get(A_KEY).get()).isEqualTo("v1");
+  verifyValueInNewThread(underTest,null);
+  insertPropertyIntoDb(A_KEY,"v2");
+  assertThat(underTest.get(A_KEY).get()).isEqualTo("v1");
+  verifyValueInNewThread(underTest,"v2");
+  underTest.unload();
+}

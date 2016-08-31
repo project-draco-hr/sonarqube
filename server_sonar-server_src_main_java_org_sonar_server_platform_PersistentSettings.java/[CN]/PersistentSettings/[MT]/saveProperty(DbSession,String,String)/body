@@ -1,5 +1,11 @@
 {
-  serverSettings.setProperty(key,value);
-  propertiesDao.insertProperty(dbSession,new PropertyDto().setKey(key).setValue(value));
+  if (value == null) {
+    dbClient.propertiesDao().deleteGlobalProperty(key,dbSession);
+  }
+ else {
+    dbClient.propertiesDao().insertProperty(dbSession,new PropertyDto().setKey(key).setValue(value));
+  }
+  delegate.setProperty(key,value);
+  changeNotifier.onGlobalPropertyChange(key,value);
   return this;
 }

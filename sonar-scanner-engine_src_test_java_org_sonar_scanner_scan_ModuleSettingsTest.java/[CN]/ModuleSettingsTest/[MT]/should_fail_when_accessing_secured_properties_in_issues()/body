@@ -1,11 +1,9 @@
 {
-  GlobalSettings batchSettings=mock(GlobalSettings.class);
-  when(batchSettings.getDefinitions()).thenReturn(new PropertyDefinitions());
-  when(batchSettings.getProperties()).thenReturn(ImmutableMap.of("sonar.foo.secured","bar"));
+  GlobalSettings globalSettings=newGlobalSettings(ImmutableMap.of("sonar.foo.secured","bar"));
   ProjectRepositories projSettingsRepo=createSettings("struts-core",ImmutableMap.of("sonar.foo.license.secured","bar2"));
   when(mode.isIssues()).thenReturn(true);
   ProjectDefinition module=ProjectDefinition.create().setKey("struts-core");
-  ModuleSettings moduleSettings=new ModuleSettings(batchSettings,module,projSettingsRepo,mode,mock(AnalysisContextReportPublisher.class));
+  ModuleSettings moduleSettings=new ModuleSettings(globalSettings,module,projSettingsRepo,mode,mock(AnalysisContextReportPublisher.class));
   assertThat(moduleSettings.getString("sonar.foo.license.secured")).isEqualTo("bar2");
   thrown.expect(MessageException.class);
   thrown.expectMessage("Access to the secured property 'sonar.foo.secured' is not possible in issues mode. The SonarQube plugin which requires this property must be deactivated in issues mode.");

@@ -1,6 +1,6 @@
 {
-  PropertyDefinition property=getDefinitions().get(key);
-  if ((null == property) || (!property.multiValues())) {
+  Optional<PropertyDefinition> def=getDefinition(key);
+  if (!def.isPresent() || (!def.get().multiValues())) {
     throw new IllegalStateException("Fail to set multiple values on a single value property " + key);
   }
   String text=null;
@@ -15,7 +15,7 @@
       }
     }
     String escapedValue=Joiner.on(',').join(escaped);
-    text=StringUtils.trim(escapedValue);
+    text=trim(escapedValue);
   }
   return setProperty(key,text);
 }

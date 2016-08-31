@@ -1,15 +1,18 @@
 {
+  HttpServletRequest request=(HttpServletRequest)servletRequest;
+  HttpServletResponse response=(HttpServletResponse)servletResponse;
+  ThreadLocalSettings settings=platform.getContainer().getComponentByType(ThreadLocalSettings.class);
+  UserSessionInitializer userSessionInitializer=platform.getContainer().getComponentByType(UserSessionInitializer.class);
+  settings.load();
   try {
-    HttpServletRequest request=(HttpServletRequest)servletRequest;
-    HttpServletResponse response=(HttpServletResponse)servletResponse;
-    init();
-    if (!isInitialized() || userSessionInitializer.initUserSession(request,response)) {
+    if (userSessionInitializer == null || userSessionInitializer.initUserSession(request,response)) {
       chain.doFilter(servletRequest,servletResponse);
     }
   }
   finally {
-    if (isInitialized()) {
+    if (userSessionInitializer != null) {
       userSessionInitializer.removeUserSession();
     }
+    settings.unload();
   }
 }
