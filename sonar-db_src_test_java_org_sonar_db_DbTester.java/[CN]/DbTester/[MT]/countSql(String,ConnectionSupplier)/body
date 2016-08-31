@@ -1,6 +1,6 @@
 {
   checkArgument(StringUtils.contains(sql,"count("),"Parameter must be a SQL request containing 'count(x)' function. Got " + sql);
-  try (Connection connection=connectionSupplier.get();PreparedStatement stmt=connection.prepareStatement(sql);ResultSet rs=stmt.executeQuery()){
+  try (ConnectionSupplier supplier=connectionSupplier;PreparedStatement stmt=supplier.get().prepareStatement(sql);ResultSet rs=stmt.executeQuery()){
     if (rs.next()) {
       return rs.getInt(1);
     }
