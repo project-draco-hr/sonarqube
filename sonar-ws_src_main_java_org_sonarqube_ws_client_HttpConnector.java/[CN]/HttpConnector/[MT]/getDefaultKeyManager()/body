@@ -1,0 +1,40 @@
+{
+  final String defaultKeyStore=System.getProperty("javax.net.ssl.keyStore","");
+  String defaultKeyStoreType=System.getProperty("javax.net.ssl.keyStoreType",KeyStore.getDefaultType());
+  String defaultKeyStoreProvider=System.getProperty("javax.net.ssl.keyStoreProvider","");
+  logDebug("keyStore is : " + defaultKeyStore);
+  logDebug("keyStore type is : " + defaultKeyStoreType);
+  logDebug("keyStore provider is : " + defaultKeyStoreProvider);
+  if (P11KEYSTORE.equals(defaultKeyStoreType) && !NONE.equals(defaultKeyStore)) {
+    throw new IllegalArgumentException("if keyStoreType is " + P11KEYSTORE + ", then keyStore must be "+ NONE);
+  }
+  KeyStore ks=null;
+  String defaultKeyStorePassword=System.getProperty("javax.net.ssl.keyStorePassword","");
+  char[] passwd=defaultKeyStorePassword.isEmpty() ? null : defaultKeyStorePassword.toCharArray();
+  if (!defaultKeyStoreType.isEmpty()) {
+    logDebug("init keystore");
+    if (defaultKeyStoreProvider.isEmpty()) {
+      ks=KeyStore.getInstance(defaultKeyStoreType);
+    }
+ else {
+      ks=KeyStore.getInstance(defaultKeyStoreType,defaultKeyStoreProvider);
+    }
+    if (!defaultKeyStore.isEmpty() && !NONE.equals(defaultKeyStore)) {
+      try (FileInputStream fs=new FileInputStream(defaultKeyStore)){
+        ks.load(fs,passwd);
+      }
+     }
+ else {
+      ks.load(null,passwd);
+    }
+  }
+  logDebug("init keymanager of type " + KeyManagerFactory.getDefaultAlgorithm());
+  KeyManagerFactory kmf=KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+  if (P11KEYSTORE.equals(defaultKeyStoreType)) {
+    kmf.init(ks,null);
+  }
+ else {
+    kmf.init(ks,passwd);
+  }
+  return kmf.getKeyManagers();
+}
