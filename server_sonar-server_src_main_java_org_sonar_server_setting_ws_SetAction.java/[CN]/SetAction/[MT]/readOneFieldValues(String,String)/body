@@ -2,10 +2,11 @@
   Type type=new TypeToken<Map<String,String>>(){
   }
 .getType();
+  Gson gson=GsonHelper.create();
   try {
-    return (Map<String,String>)GsonHelper.create().fromJson(json,type);
+    return (Map<String,String>)gson.fromJson(json,type);
   }
- catch (  JsonParseException e) {
-    throw new BadRequestException(String.format("Invalid JSON '%s' for setting '%s'",json,key));
+ catch (  JsonSyntaxException e) {
+    throw new BadRequestException(String.format("JSON '%s' does not respect expected format for setting '%s'. Ex: {\"field1\":\"value1\", \"field2\":\"value2\"}",json,key));
   }
 }
