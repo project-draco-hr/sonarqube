@@ -1,0 +1,20 @@
+{
+  checkKey(key);
+  InternalPropertiesMapper mapper=getMapper(dbSession);
+  InternalPropertyDto res=mapper.selectAsText(key);
+  if (res == null) {
+    return Optional.empty();
+  }
+  if (res.isEmpty()) {
+    return OPTIONAL_OF_EMPTY_STRING;
+  }
+  if (res.getValue() != null) {
+    return Optional.of(res.getValue());
+  }
+  res=mapper.selectAsClob(key);
+  if (res == null) {
+    Loggers.get(InternalPropertiesDao.class).debug("Internal property {} has been found in db but has neither text value nor is empty. " + "Still we couldn't be retrieved with clob value. Ignoring the property.",key);
+    return Optional.empty();
+  }
+  return Optional.of(res.getValue());
+}

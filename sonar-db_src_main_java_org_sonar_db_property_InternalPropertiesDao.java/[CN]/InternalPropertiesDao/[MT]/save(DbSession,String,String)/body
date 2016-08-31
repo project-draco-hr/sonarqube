@@ -1,0 +1,13 @@
+{
+  checkKey(key);
+  checkArgument(value != null && !value.isEmpty(),"value can't be null nor empty");
+  InternalPropertiesMapper mapper=getMapper(dbSession);
+  mapper.deleteByKey(key);
+  long now=system2.now();
+  if (mustsBeStoredInClob(value)) {
+    mapper.insertAsClob(key,value,now);
+  }
+ else {
+    mapper.insertAsText(key,value,now);
+  }
+}
