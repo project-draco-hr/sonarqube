@@ -4,6 +4,5 @@
   SonarScanner withDeprecatedKey=SonarScanner.create(projectDir("shared/xoo-sample")).setProperty("sonar.deprecatedKey","true");
   SonarScanner withNewKey=SonarScanner.create(projectDir("shared/xoo-sample")).setProperty("sonar.newKey","true");
   orchestrator.executeBuilds(withDeprecatedKey,withNewKey);
-  Selenese selenese=Selenese.builder().setHtmlTestsInClasspath("property_relocation","/settings/SettingsTest/property_relocation.html").build();
-  new SeleneseTest(selenese).runOn(orchestrator);
+  Navigation.get(orchestrator).openHomepage().logIn().asAdmin().openSettings(null).assertMenuContains("General").assertSettingDisplayed("sonar.newKey").assertSettingNotDisplayed("sonar.deprecatedKey");
 }

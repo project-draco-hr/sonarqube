@@ -2,6 +2,7 @@
   URL secretKeyUrl=getClass().getResource("/settings/SettingsTest/sonar-secret.txt");
   orchestrator=Orchestrator.builderEnv().addPlugin(pluginArtifact("settings-plugin")).addPlugin(pluginArtifact("license-plugin")).setServerProperty("sonar.secretKeyPath",secretKeyUrl.getFile()).build();
   orchestrator.start();
-  Selenese selenese=Selenese.builder().setHtmlTestsInClasspath("test_settings","/settings/SettingsTest/general-settings.html","/settings/SettingsTest/hidden-extension-property.html","/settings/SettingsTest/global-extension-property.html","/settings/SettingsTest/ignore-corrupted-license.html","/settings/SettingsTest/display-license.html","/settings/SettingsTest/display-untyped-license.html","/settings/SettingsTest/generate-secret-key.html","/settings/SettingsTest/encrypt-text.html","/settings/SettingsTest/validate-property-type.html","/settings/SettingsTest/hide-passwords.html").build();
+  Navigation.get(orchestrator).openHomepage().logIn().asAdmin().openSettings(null).assertMenuContains("General").assertSettingDisplayed("sonar.dbcleaner.cleanDirectory").assertSettingNotDisplayed("settings.extension.hidden").assertSettingNotDisplayed("settings.extension.global");
+  Selenese selenese=Selenese.builder().setHtmlTestsInClasspath("test_settings","/settings/SettingsTest/generate-secret-key.html","/settings/SettingsTest/encrypt-text.html").build();
   new SeleneseTest(selenese).runOn(orchestrator);
 }
