@@ -1,0 +1,22 @@
+{
+  when(system2.now()).thenReturn(NOW);
+  db.executeInsert("properties","prop_key","views.def","text_value",xml);
+  db.executeInsert("properties","prop_key","other.property","text_value","other content");
+  underTest.execute();
+  assertThat(db.countRowsOfTable("internal_properties")).isEqualTo(1);
+  Map<String,Object> internalProp=db.selectFirst("select" + " kee as \"key\", is_empty as \"isEmpty\", text_value as \"textValue\", clob_value as \"clobValue\", created_at as \"createdAt\"" + " from internal_properties");
+  assertThat(internalProp.get("key")).isEqualTo("xmlDefinition");
+  assertThat(internalProp.get("isEmpty")).isEqualTo(false);
+  if (isClob) {
+    assertThat(internalProp.get("clobValue")).isEqualTo(xml);
+    assertThat(internalProp.get("textValue")).isNull();
+  }
+ else {
+    assertThat(internalProp.get("textValue")).isEqualTo(xml);
+    assertThat(internalProp.get("clobValue")).isNull();
+  }
+  assertThat(internalProp.get("createdAt")).isEqualTo(NOW);
+  List<Map<String,Object>> properties=db.select("select prop_key as \"prop_key\" from properties");
+  assertThat(properties).hasSize(1);
+  assertThat(properties.get(0).get("prop_key")).isEqualTo("other.property");
+}
