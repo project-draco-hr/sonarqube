@@ -1,0 +1,11 @@
+{
+  updateEmailSettings("localhost",Integer.toString(SMTP_SERVER.getServer().getPort()),null,null,null,null,null);
+  sendEmail("test@example.org","Test Message from SonarQube","This is a test message from SonarQube");
+  waitUntilAllNotificationsAreDelivered();
+  Iterator<WiserMessage> emails=SMTP_SERVER.getMessages().iterator();
+  MimeMessage message=emails.next().getMimeMessage();
+  assertThat(message.getHeader("To",null)).isEqualTo("<test@example.org>");
+  assertThat(message.getSubject()).contains("Test Message from SonarQube");
+  assertThat((String)message.getContent()).contains("This is a test message from SonarQube");
+  assertThat(emails.hasNext()).isFalse();
+}
