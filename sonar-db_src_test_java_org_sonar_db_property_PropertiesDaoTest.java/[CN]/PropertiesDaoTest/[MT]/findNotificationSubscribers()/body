@@ -1,13 +1,20 @@
 {
-  dbTester.prepareDbUnit(getClass(),"findNotificationSubscribers.xml");
-  List<String> users=dao.selectNotificationSubscribers("NotSexyDispatcher","Email","org.apache:struts");
+  insertUser(1);
+  insertUser(2);
+  insertProject("PROJECT_A",42);
+  insertProperty(1,"notification.DispatcherWithGlobalSubscribers.Email","true",null,2);
+  insertProperty(2,"notification.DispatcherWithProjectSubscribers.Email","true",42,1);
+  insertProperty(3,"notification.DispatcherWithGlobalAndProjectSubscribers.Email","true",56,1);
+  insertProperty(4,"notification.DispatcherWithGlobalAndProjectSubscribers.Email","true",42,1);
+  insertProperty(5,"notification.DispatcherWithGlobalAndProjectSubscribers.Email","true",null,2);
+  List<String> users=underTest.selectNotificationSubscribers("NotSexyDispatcher","Email","project42");
   assertThat(users).isEmpty();
-  users=dao.selectNotificationSubscribers("DispatcherWithGlobalSubscribers","Email","org.apache:struts");
-  assertThat(users).containsOnly("simon");
-  users=dao.selectNotificationSubscribers("DispatcherWithGlobalSubscribers","Email",null);
-  assertThat(users).containsOnly("simon");
-  users=dao.selectNotificationSubscribers("DispatcherWithProjectSubscribers","Email","org.apache:struts");
-  assertThat(users).containsOnly("eric");
-  users=dao.selectNotificationSubscribers("DispatcherWithGlobalAndProjectSubscribers","Email","org.apache:struts");
-  assertThat(users).containsOnly("eric","simon");
+  users=underTest.selectNotificationSubscribers("DispatcherWithGlobalSubscribers","Email","project42");
+  assertThat(users).containsOnly("user2");
+  users=underTest.selectNotificationSubscribers("DispatcherWithGlobalSubscribers","Email",null);
+  assertThat(users).containsOnly("user2");
+  users=underTest.selectNotificationSubscribers("DispatcherWithProjectSubscribers","Email","project42");
+  assertThat(users).containsOnly("user1");
+  users=underTest.selectNotificationSubscribers("DispatcherWithGlobalAndProjectSubscribers","Email","project42");
+  assertThat(users).containsOnly("user1","user2");
 }

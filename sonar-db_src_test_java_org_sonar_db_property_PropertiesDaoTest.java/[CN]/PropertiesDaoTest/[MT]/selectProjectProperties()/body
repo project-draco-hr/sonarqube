@@ -1,8 +1,9 @@
 {
-  dbTester.prepareDbUnit(getClass(),"selectProjectProperties.xml");
-  List<PropertyDto> properties=dao.selectProjectProperties("org.struts:struts");
-  assertThat(properties.size(),is(1));
-  PropertyDto first=properties.get(0);
-  assertThat(first.getKey(),is("struts.one"));
-  assertThat(first.getValue(),is("one"));
+  insertProject("A",10);
+  insertProperty(1,"global.one","one",null,null);
+  insertProperty(2,"global.two","two",null,null);
+  insertProperty(3,"project.one","one",10,null);
+  insertProperty(4,"project.two","two",10,null);
+  List<PropertyDto> properties=underTest.selectProjectProperties("project10");
+  assertThat(properties).hasSize(2).extracting("key","value").containsOnly(tuple("project.one","one"),tuple("project.two","two"));
 }

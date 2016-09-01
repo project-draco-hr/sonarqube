@@ -1,15 +1,10 @@
 {
-  Preconditions.checkArgument(!Strings.isNullOrEmpty(oldKey),"Old property key must not be empty");
-  Preconditions.checkArgument(!Strings.isNullOrEmpty(newKey),"New property key must not be empty");
+  checkArgument(!Strings.isNullOrEmpty(oldKey),"Old property key must not be empty");
+  checkArgument(!Strings.isNullOrEmpty(newKey),"New property key must not be empty");
   if (!newKey.equals(oldKey)) {
-    DbSession session=mybatis.openSession(false);
-    PropertiesMapper mapper=session.getMapper(PropertiesMapper.class);
-    try {
-      mapper.renamePropertyKey(oldKey,newKey);
+    try (DbSession session=mybatis.openSession(false)){
+      getMapper(session).renamePropertyKey(oldKey,newKey);
       session.commit();
     }
-  finally {
-      MyBatis.closeQuietly(session);
-    }
-  }
+   }
 }

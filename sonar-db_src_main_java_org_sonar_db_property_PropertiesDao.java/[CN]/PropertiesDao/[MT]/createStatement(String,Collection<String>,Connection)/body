@@ -1,0 +1,11 @@
+{
+  String sql="SELECT count(1) FROM properties pp " + "left outer join projects pj on pp.resource_id = pj.id " + "where pp.user_id is not null and (pp.resource_id is null or pj.uuid=?) "+ "and (" + DatabaseUtils.repeatCondition("pp.prop_key like ?",dispatcherKeys.size(),"or") + ")";
+  PreparedStatement res=connection.prepareStatement(sql);
+  res.setString(1,projectUuid);
+  int index=2;
+  for (  String dispatcherKey : dispatcherKeys) {
+    res.setString(index,"notification." + dispatcherKey + ".%");
+    index++;
+  }
+  return res;
+}

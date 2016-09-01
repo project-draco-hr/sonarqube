@@ -1,18 +1,26 @@
 {
-  dbTester.prepareDbUnit(getClass(),"shouldFindUsersForNotification.xml");
-  List<String> users=dao.selectUsersForNotification("NewViolations","Email",null);
+  insertProject("uuid_45",45);
+  insertProject("uuid_56",56);
+  insertUser(1);
+  insertUser(2);
+  insertUser(3);
+  insertProperty(1,"notification.NewViolations.Email","true",45,2);
+  insertProperty(2,"notification.NewViolations.Twitter","true",null,3);
+  insertProperty(3,"notification.NewViolations.Twitter","true",56,1);
+  insertProperty(4,"notification.NewViolations.Twitter","true",56,3);
+  List<String> users=underTest.selectUsersForNotification("NewViolations","Email",null);
   assertThat(users).isEmpty();
-  users=dao.selectUsersForNotification("NewViolations","Email","uuid_78");
+  users=underTest.selectUsersForNotification("NewViolations","Email","uuid_78");
   assertThat(users).isEmpty();
-  users=dao.selectUsersForNotification("NewViolations","Email","uuid_45");
+  users=underTest.selectUsersForNotification("NewViolations","Email","uuid_45");
   assertThat(users).hasSize(1);
   assertThat(users).containsOnly("user2");
-  users=dao.selectUsersForNotification("NewViolations","Twitter",null);
+  users=underTest.selectUsersForNotification("NewViolations","Twitter",null);
   assertThat(users).hasSize(1);
   assertThat(users).containsOnly("user3");
-  users=dao.selectUsersForNotification("NewViolations","Twitter","uuid_78");
+  users=underTest.selectUsersForNotification("NewViolations","Twitter","uuid_78");
   assertThat(users).isEmpty();
-  users=dao.selectUsersForNotification("NewViolations","Twitter","uuid_56");
+  users=underTest.selectUsersForNotification("NewViolations","Twitter","uuid_56");
   assertThat(users).hasSize(2);
   assertThat(users).containsOnly("user1","user3");
 }

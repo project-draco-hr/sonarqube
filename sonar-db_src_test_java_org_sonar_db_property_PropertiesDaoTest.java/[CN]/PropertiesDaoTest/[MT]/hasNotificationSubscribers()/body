@@ -1,9 +1,16 @@
 {
-  dbTester.prepareDbUnit(getClass(),"findNotificationSubscribers.xml");
-  assertThat(dao.hasProjectNotificationSubscribersForDispatchers("PROJECT_A",asList("NotSexyDispatcher"))).isFalse();
-  assertThat(dao.hasProjectNotificationSubscribersForDispatchers("PROJECT_A",asList("DispatcherWithGlobalSubscribers"))).isTrue();
-  assertThat(dao.hasProjectNotificationSubscribersForDispatchers("PROJECT_A",asList("DispatcherWithProjectSubscribers"))).isTrue();
-  assertThat(dao.hasProjectNotificationSubscribersForDispatchers("PROJECT_B",asList("DispatcherWithProjectSubscribers"))).isFalse();
-  assertThat(dao.hasProjectNotificationSubscribersForDispatchers("PROJECT_A",asList("DispatcherWithGlobalAndProjectSubscribers"))).isTrue();
-  assertThat(dao.hasProjectNotificationSubscribersForDispatchers("PROJECT_B",asList("DispatcherWithGlobalAndProjectSubscribers"))).isTrue();
+  insertUser(1);
+  insertUser(2);
+  insertProject("PROJECT_A",42);
+  insertProperty(1,"notification.DispatcherWithGlobalSubscribers.Email","true",null,2);
+  insertProperty(2,"notification.DispatcherWithProjectSubscribers.Email","true",42,1);
+  insertProperty(3,"notification.DispatcherWithGlobalAndProjectSubscribers.Email","true",56,1);
+  insertProperty(4,"notification.DispatcherWithGlobalAndProjectSubscribers.Email","true",42,1);
+  insertProperty(5,"notification.DispatcherWithGlobalAndProjectSubscribers.Email","true",null,2);
+  assertThat(underTest.hasProjectNotificationSubscribersForDispatchers("PROJECT_A",singletonList("NotSexyDispatcher"))).isFalse();
+  assertThat(underTest.hasProjectNotificationSubscribersForDispatchers("PROJECT_A",singletonList("DispatcherWithGlobalSubscribers"))).isTrue();
+  assertThat(underTest.hasProjectNotificationSubscribersForDispatchers("PROJECT_A",singletonList("DispatcherWithProjectSubscribers"))).isTrue();
+  assertThat(underTest.hasProjectNotificationSubscribersForDispatchers("PROJECT_B",singletonList("DispatcherWithProjectSubscribers"))).isFalse();
+  assertThat(underTest.hasProjectNotificationSubscribersForDispatchers("PROJECT_A",singletonList("DispatcherWithGlobalAndProjectSubscribers"))).isTrue();
+  assertThat(underTest.hasProjectNotificationSubscribersForDispatchers("PROJECT_B",singletonList("DispatcherWithGlobalAndProjectSubscribers"))).isTrue();
 }

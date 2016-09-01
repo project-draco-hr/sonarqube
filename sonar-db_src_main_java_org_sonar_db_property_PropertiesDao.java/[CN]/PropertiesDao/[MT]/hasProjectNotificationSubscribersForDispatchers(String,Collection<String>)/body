@@ -1,25 +1,8 @@
 {
-  DbSession session=mybatis.openSession(false);
-  Connection connection=session.getConnection();
-  PreparedStatement pstmt=null;
-  ResultSet rs=null;
-  String sql="SELECT count(1) FROM properties pp " + "left outer join projects pj on pp.resource_id = pj.id " + "where pp.user_id is not null and (pp.resource_id is null or pj.uuid=?) "+ "and (" + DatabaseUtils.repeatCondition("pp.prop_key like ?",dispatcherKeys.size(),"or") + ")";
-  try {
-    pstmt=connection.prepareStatement(sql);
-    pstmt.setString(1,projectUuid);
-    int index=2;
-    for (    String dispatcherKey : dispatcherKeys) {
-      pstmt.setString(index,"notification." + dispatcherKey + ".%");
-      index++;
-    }
-    rs=pstmt.executeQuery();
+  try (DbSession session=mybatis.openSession(false);Connection connection=session.getConnection();PreparedStatement pstmt=createStatement(projectUuid,dispatcherKeys,connection);ResultSet rs=pstmt.executeQuery()){
     return rs.next() && rs.getInt(1) > 0;
   }
  catch (  SQLException e) {
-    throw new IllegalStateException("Fail to execute SQL request: " + sql,e);
-  }
- finally {
-    DbUtils.closeQuietly(connection,pstmt,rs);
-    MyBatis.closeQuietly(session);
+    throw new IllegalStateException("Fail to execute SQL for hasProjectNotificationSubscribersForDispatchers",e);
   }
 }
