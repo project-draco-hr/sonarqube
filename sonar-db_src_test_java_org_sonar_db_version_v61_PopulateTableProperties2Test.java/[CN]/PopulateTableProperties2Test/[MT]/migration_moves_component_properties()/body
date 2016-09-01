@@ -1,0 +1,14 @@
+{
+  when(system2.now()).thenReturn(DATE_1,DATE_2,DATE_3,DATE_4);
+  insertProperty(1,VALUE_SMALL,11,null);
+  insertProperty(2,EMPTY_PROPERTY,12,null);
+  insertProperty(3,VALUE_SIZE_4000,13,null);
+  insertProperty(4,VALUE_SIZE_4001,14,null);
+  underTest.execute();
+  assertThat(dbTester.countRowsOfTable("properties")).isEqualTo(4);
+  assertThat(dbTester.countRowsOfTable("properties2")).isEqualTo(4);
+  assertThatProperty2(1).hasResourceId(11).hasNoUserId().hasTextValue(VALUE_SMALL).hasCreatedAt(DATE_1);
+  assertThatProperty2(2).hasResourceId(12).hasNoUserId().isEmpty().hasCreatedAt(DATE_2);
+  assertThatProperty2(3).hasResourceId(13).hasNoUserId().hasTextValue(VALUE_SIZE_4000).hasCreatedAt(DATE_3);
+  assertThatProperty2(4).hasResourceId(14).hasNoUserId().hasClobValue(VALUE_SIZE_4001).hasCreatedAt(DATE_4);
+}
