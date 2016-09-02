@@ -1,0 +1,14 @@
+{
+  when(system2.now()).thenReturn(DATE_1,DATE_2,DATE_3,DATE_4,DATE_5);
+  long userId=100;
+  underTest.saveProperty(new PropertyDto().setKey("user.null").setUserId(userId).setValue(null));
+  underTest.saveProperty(new PropertyDto().setKey("user.empty").setUserId(userId).setValue(""));
+  underTest.saveProperty(new PropertyDto().setKey("user.text").setUserId(userId).setValue("some text"));
+  underTest.saveProperty(new PropertyDto().setKey("user.4000").setUserId(userId).setValue(VALUE_SIZE_4000));
+  underTest.saveProperty(new PropertyDto().setKey("user.clob").setUserId(userId).setValue(VALUE_SIZE_4001));
+  assertThatPropertiesRow("user.null").hasNoResourceId().hasUserId(userId).isEmpty().hasCreatedAt(DATE_1);
+  assertThatPropertiesRow("user.empty").hasNoResourceId().hasUserId(userId).isEmpty().hasCreatedAt(DATE_2);
+  assertThatPropertiesRow("user.text").hasNoResourceId().hasUserId(userId).hasTextValue("some text").hasCreatedAt(DATE_3);
+  assertThatPropertiesRow("user.4000").hasNoResourceId().hasUserId(userId).hasTextValue(VALUE_SIZE_4000).hasCreatedAt(DATE_4);
+  assertThatPropertiesRow("user.clob").hasNoResourceId().hasUserId(userId).hasClobValue(VALUE_SIZE_4001).hasCreatedAt(DATE_5);
+}

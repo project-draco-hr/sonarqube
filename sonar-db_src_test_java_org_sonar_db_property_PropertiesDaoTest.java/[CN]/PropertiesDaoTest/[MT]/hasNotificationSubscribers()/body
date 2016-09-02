@@ -1,12 +1,12 @@
 {
-  insertUser(1);
-  insertUser(2);
-  insertProject("PROJECT_A",42);
-  insertProperty(1,"notification.DispatcherWithGlobalSubscribers.Email","true",null,2);
-  insertProperty(2,"notification.DispatcherWithProjectSubscribers.Email","true",42,1);
-  insertProperty(3,"notification.DispatcherWithGlobalAndProjectSubscribers.Email","true",56,1);
-  insertProperty(4,"notification.DispatcherWithGlobalAndProjectSubscribers.Email","true",42,1);
-  insertProperty(5,"notification.DispatcherWithGlobalAndProjectSubscribers.Email","true",null,2);
+  long userId1=insertUser("user1");
+  long userId2=insertUser("user2");
+  Long projectId=insertProject("PROJECT_A").getId();
+  insertProperty("notification.DispatcherWithGlobalSubscribers.Email","true",null,userId2);
+  insertProperty("notification.DispatcherWithProjectSubscribers.Email","true",projectId,userId1);
+  insertProperty("notification.DispatcherWithGlobalAndProjectSubscribers.Email","true",56L,userId1);
+  insertProperty("notification.DispatcherWithGlobalAndProjectSubscribers.Email","true",projectId,userId1);
+  insertProperty("notification.DispatcherWithGlobalAndProjectSubscribers.Email","true",null,userId2);
   assertThat(underTest.hasProjectNotificationSubscribersForDispatchers("PROJECT_A",singletonList("NotSexyDispatcher"))).isFalse();
   assertThat(underTest.hasProjectNotificationSubscribersForDispatchers("PROJECT_A",singletonList("DispatcherWithGlobalSubscribers"))).isTrue();
   assertThat(underTest.hasProjectNotificationSubscribersForDispatchers("PROJECT_A",singletonList("DispatcherWithProjectSubscribers"))).isTrue();

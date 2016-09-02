@@ -1,20 +1,17 @@
 {
-  insertUser(1);
-  insertUser(2);
-  insertProject("PROJECT_A",42);
-  insertProperty(1,"notification.DispatcherWithGlobalSubscribers.Email","true",null,2);
-  insertProperty(2,"notification.DispatcherWithProjectSubscribers.Email","true",42,1);
-  insertProperty(3,"notification.DispatcherWithGlobalAndProjectSubscribers.Email","true",56,1);
-  insertProperty(4,"notification.DispatcherWithGlobalAndProjectSubscribers.Email","true",42,1);
-  insertProperty(5,"notification.DispatcherWithGlobalAndProjectSubscribers.Email","true",null,2);
-  List<String> users=underTest.selectNotificationSubscribers("NotSexyDispatcher","Email","project42");
-  assertThat(users).isEmpty();
-  users=underTest.selectNotificationSubscribers("DispatcherWithGlobalSubscribers","Email","project42");
-  assertThat(users).containsOnly("user2");
-  users=underTest.selectNotificationSubscribers("DispatcherWithGlobalSubscribers","Email",null);
-  assertThat(users).containsOnly("user2");
-  users=underTest.selectNotificationSubscribers("DispatcherWithProjectSubscribers","Email","project42");
-  assertThat(users).containsOnly("user1");
-  users=underTest.selectNotificationSubscribers("DispatcherWithGlobalAndProjectSubscribers","Email","project42");
-  assertThat(users).containsOnly("user1","user2");
+  long userId1=insertUser("user1");
+  long userId2=insertUser("user2");
+  ComponentDto projectDto=insertProject("PROJECT_A");
+  long projectId=projectDto.getId();
+  String projectKey=projectDto.key();
+  insertProperty("notification.DispatcherWithGlobalSubscribers.Email","true",null,userId2);
+  insertProperty("notification.DispatcherWithProjectSubscribers.Email","true",projectId,userId1);
+  insertProperty("notification.DispatcherWithGlobalAndProjectSubscribers.Email","true",56L,userId1);
+  insertProperty("notification.DispatcherWithGlobalAndProjectSubscribers.Email","true",projectId,userId1);
+  insertProperty("notification.DispatcherWithGlobalAndProjectSubscribers.Email","true",null,userId2);
+  assertThat(underTest.selectNotificationSubscribers("NotSexyDispatcher","Email",projectKey)).isEmpty();
+  assertThat(underTest.selectNotificationSubscribers("DispatcherWithGlobalSubscribers","Email",projectKey)).containsOnly("user2");
+  assertThat(underTest.selectNotificationSubscribers("DispatcherWithGlobalSubscribers","Email",null)).containsOnly("user2");
+  assertThat(underTest.selectNotificationSubscribers("DispatcherWithProjectSubscribers","Email",projectKey)).containsOnly("user1");
+  assertThat(underTest.selectNotificationSubscribers("DispatcherWithGlobalAndProjectSubscribers","Email",projectKey)).containsOnly("user1","user2");
 }

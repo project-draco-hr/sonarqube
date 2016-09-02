@@ -1,0 +1,13 @@
+{
+  when(system2.now()).thenReturn(DATE_1,DATE_2,DATE_3,DATE_4,DATE_5);
+  underTest.saveProperty(new PropertyDto().setKey("global.null").setValue(null));
+  underTest.saveProperty(new PropertyDto().setKey("global.empty").setValue(""));
+  underTest.saveProperty(new PropertyDto().setKey("global.text").setValue("some text"));
+  underTest.saveProperty(new PropertyDto().setKey("global.4000").setValue(VALUE_SIZE_4000));
+  underTest.saveProperty(new PropertyDto().setKey("global.clob").setValue(VALUE_SIZE_4001));
+  assertThatPropertiesRow("global.null").hasNoResourceId().hasNoUserId().isEmpty().hasCreatedAt(DATE_1);
+  assertThatPropertiesRow("global.empty").hasNoResourceId().hasNoUserId().isEmpty().hasCreatedAt(DATE_2);
+  assertThatPropertiesRow("global.text").hasNoResourceId().hasNoUserId().hasTextValue("some text").hasCreatedAt(DATE_3);
+  assertThatPropertiesRow("global.4000").hasNoResourceId().hasNoUserId().hasTextValue(VALUE_SIZE_4000).hasCreatedAt(DATE_4);
+  assertThatPropertiesRow("global.clob").hasNoResourceId().hasNoUserId().hasClobValue(VALUE_SIZE_4001).hasCreatedAt(DATE_5);
+}

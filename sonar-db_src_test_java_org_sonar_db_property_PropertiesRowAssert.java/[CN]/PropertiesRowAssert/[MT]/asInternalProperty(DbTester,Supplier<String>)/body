@@ -1,0 +1,12 @@
+{
+  String whereClause=whereClauseSupplier.get();
+  List<Map<String,Object>> rows=dbTester.select("select" + " prop_key as \"key\", user_id as \"userId\", resource_id as \"resourceId\", is_empty as \"isEmpty\", text_value as \"textValue\", clob_value as \"clobValue\", created_at as \"createdAt\"" + " from properties"+ whereClause);
+  checkState(rows.size() < 2,"More than one property found for where clause \"" + whereClause + "\"");
+  if (rows.isEmpty()) {
+    return null;
+  }
+ else {
+    Map<String,Object> row=rows.iterator().next();
+    return new PropertiesRow((String)row.get("key"),(Long)row.get("userId"),(Long)row.get("resourceId"),toBoolean(row.get("isEmpty")),(String)row.get("textValue"),(String)row.get("clobValue"),(Long)row.get("createdAt"));
+  }
+}

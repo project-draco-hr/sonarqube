@@ -1,5 +1,20 @@
 {
-  dbTester.prepareDbUnit(getClass(),"delete_project_property.xml");
-  underTest.deleteProjectProperty("struts.one",10L);
-  dbTester.assertDbUnit(getClass(),"delete_project_property-result.xml","properties");
+  long projectId1=insertProject("A").getId();
+  long projectId2=insertProject("B").getId();
+  long projectId3=insertProject("C").getId();
+  long id1=insertProperty("global.one","one",null,null);
+  long id2=insertProperty("global.two","two",null,null);
+  long id3=insertProperty("struts.one","one",projectId1,null);
+  long id4=insertProperty("commonslang.one","one",projectId2,null);
+  long id5=insertProperty("user.one","one",null,100L);
+  long id6=insertProperty("user.two","two",null,100L);
+  long id7=insertProperty("other.one","one",projectId3,null);
+  underTest.deleteProjectProperty("struts.one",projectId1);
+  assertThatPropertiesRow(id1).hasKey("global.one").hasNoResourceId().hasNoUserId().hasTextValue("one");
+  assertThatPropertiesRow(id2).hasKey("global.two").hasNoResourceId().hasNoUserId().hasTextValue("two");
+  assertThatPropertiesRow(id3).doesNotExist();
+  assertThatPropertiesRow(id4).hasKey("commonslang.one").hasResourceId(projectId2).hasNoUserId().hasTextValue("one");
+  assertThatPropertiesRow(id5).hasKey("user.one").hasNoResourceId().hasUserId(100).hasTextValue("one");
+  assertThatPropertiesRow(id6).hasKey("user.two").hasNoResourceId().hasUserId(100).hasTextValue("two");
+  assertThatPropertiesRow(id7).hasKey("other.one").hasResourceId(projectId3).hasNoUserId().hasTextValue("one");
 }

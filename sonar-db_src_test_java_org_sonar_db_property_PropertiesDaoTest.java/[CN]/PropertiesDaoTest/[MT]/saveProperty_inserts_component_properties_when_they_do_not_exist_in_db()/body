@@ -1,0 +1,14 @@
+{
+  when(system2.now()).thenReturn(DATE_1,DATE_2,DATE_3,DATE_4,DATE_5);
+  long resourceId=12;
+  underTest.saveProperty(new PropertyDto().setKey("component.null").setResourceId(resourceId).setValue(null));
+  underTest.saveProperty(new PropertyDto().setKey("component.empty").setResourceId(resourceId).setValue(""));
+  underTest.saveProperty(new PropertyDto().setKey("component.text").setResourceId(resourceId).setValue("some text"));
+  underTest.saveProperty(new PropertyDto().setKey("component.4000").setResourceId(resourceId).setValue(VALUE_SIZE_4000));
+  underTest.saveProperty(new PropertyDto().setKey("component.clob").setResourceId(resourceId).setValue(VALUE_SIZE_4001));
+  assertThatPropertiesRow("component.null").hasResourceId(resourceId).hasNoUserId().isEmpty().hasCreatedAt(DATE_1);
+  assertThatPropertiesRow("component.empty").hasResourceId(resourceId).hasNoUserId().isEmpty().hasCreatedAt(DATE_2);
+  assertThatPropertiesRow("component.text").hasResourceId(resourceId).hasNoUserId().hasTextValue("some text").hasCreatedAt(DATE_3);
+  assertThatPropertiesRow("component.4000").hasResourceId(resourceId).hasNoUserId().hasTextValue(VALUE_SIZE_4000).hasCreatedAt(DATE_4);
+  assertThatPropertiesRow("component.clob").hasResourceId(resourceId).hasNoUserId().hasClobValue(VALUE_SIZE_4001).hasCreatedAt(DATE_5);
+}

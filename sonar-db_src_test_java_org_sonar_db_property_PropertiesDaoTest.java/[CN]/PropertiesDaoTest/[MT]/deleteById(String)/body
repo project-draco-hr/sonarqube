@@ -1,0 +1,17 @@
+{
+  long id1=insertProperty("global.key",value,null,null);
+  long id2=insertProperty("component.key",value,10L,null);
+  long id3=insertProperty("user.key",value,null,100L);
+  underTest.deleteById(dbTester.getSession(),id1);
+  dbTester.getSession().commit();
+  assertThatPropertiesRow(id1).doesNotExist();
+  assertThatPropertiesRow(id2).hasKey("component.key");
+  assertThatPropertiesRow(id3).hasKey("user.key");
+  underTest.deleteById(dbTester.getSession(),id2);
+  dbTester.getSession().commit();
+  assertThatPropertiesRow(id2).doesNotExist();
+  assertThatPropertiesRow(id3).hasKey("user.key");
+  underTest.deleteById(dbTester.getSession(),id3);
+  dbTester.getSession().commit();
+  assertThatPropertiesRow(id3).doesNotExist();
+}

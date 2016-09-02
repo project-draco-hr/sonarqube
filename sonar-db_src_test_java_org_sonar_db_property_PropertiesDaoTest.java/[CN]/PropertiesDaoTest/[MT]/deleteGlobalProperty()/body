@@ -1,5 +1,12 @@
 {
-  dbTester.prepareDbUnit(getClass(),"deleteGlobalProperty.xml");
+  long id1=insertProperty("global.key","new_global",null,null);
+  long id2=insertProperty("to_be_deleted","xxx",null,null);
+  long id3=insertProperty("to_be_deleted","new_project",10L,null);
+  long id4=insertProperty("user.key","new_user",null,100L);
   underTest.deleteGlobalProperty("to_be_deleted");
-  dbTester.assertDbUnit(getClass(),"deleteGlobalProperty-result.xml","properties");
+  assertThatPropertiesRow(id1).hasKey("global.key").hasNoUserId().hasNoResourceId().hasTextValue("new_global");
+  assertThatPropertiesRow(id2).doesNotExist();
+  assertThatPropertiesRow("to_be_deleted",null,null).doesNotExist();
+  assertThatPropertiesRow(id3).hasKey("to_be_deleted").hasResourceId(10).hasNoUserId().hasTextValue("new_project");
+  assertThatPropertiesRow(id4).hasKey("user.key").hasNoResourceId().hasUserId(100).hasTextValue("new_user");
 }

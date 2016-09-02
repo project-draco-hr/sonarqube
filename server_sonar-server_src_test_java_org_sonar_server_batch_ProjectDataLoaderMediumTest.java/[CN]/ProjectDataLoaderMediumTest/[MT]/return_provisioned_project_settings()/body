@@ -3,8 +3,8 @@
   userSessionRule.login("john").setGlobalPermissions(SCAN_EXECUTION);
   tester.get(DbClient.class).componentDao().insert(dbSession,project);
   addDefaultProfile();
-  tester.get(DbClient.class).propertiesDao().insertProperty(dbSession,new PropertyDto().setKey("sonar.jira.project.key").setValue("SONAR").setResourceId(project.getId()));
-  tester.get(DbClient.class).propertiesDao().insertProperty(dbSession,new PropertyDto().setKey("sonar.jira.login.secured").setValue("john").setResourceId(project.getId()));
+  tester.get(DbClient.class).propertiesDao().saveProperty(dbSession,new PropertyDto().setKey("sonar.jira.project.key").setValue("SONAR").setResourceId(project.getId()));
+  tester.get(DbClient.class).propertiesDao().saveProperty(dbSession,new PropertyDto().setKey("sonar.jira.login.secured").setValue("john").setResourceId(project.getId()));
   dbSession.commit();
   ProjectRepositories ref=underTest.load(ProjectDataQuery.create().setModuleKey(project.key()));
   assertThat(ref.settings(project.key())).isEqualTo(ImmutableMap.of("sonar.jira.project.key","SONAR","sonar.jira.login.secured","john"));

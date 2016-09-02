@@ -1,5 +1,15 @@
 {
-  dbTester.prepareDbUnit(getClass(),"delete_project_properties.xml");
+  long id1=insertProperty("sonar.profile.java","Sonar Way",1L,null);
+  long id2=insertProperty("sonar.profile.java","Sonar Way",2L,null);
+  long id3=insertProperty("sonar.profile.java","Sonar Way",null,null);
+  long id4=insertProperty("sonar.profile.js","Sonar Way",1L,null);
+  long id5=insertProperty("sonar.profile.js","Sonar Way",2L,null);
+  long id6=insertProperty("sonar.profile.js","Sonar Way",null,null);
   underTest.deleteProjectProperties("sonar.profile.java","Sonar Way");
-  dbTester.assertDbUnit(getClass(),"delete_project_properties-result.xml","properties");
+  assertThatPropertiesRow(id1).doesNotExist();
+  assertThatPropertiesRow(id2).doesNotExist();
+  assertThatPropertiesRow(id3).hasKey("sonar.profile.java").hasNoResourceId().hasNoUserId().hasTextValue("Sonar Way");
+  assertThatPropertiesRow(id4).hasKey("sonar.profile.js").hasResourceId(1).hasNoUserId().hasTextValue("Sonar Way");
+  assertThatPropertiesRow(id5).hasKey("sonar.profile.js").hasResourceId(2).hasNoUserId().hasTextValue("Sonar Way");
+  assertThatPropertiesRow(id6).hasKey("sonar.profile.js").hasNoResourceId().hasNoUserId().hasTextValue("Sonar Way");
 }

@@ -1,0 +1,17 @@
+{
+  long resourceId=999L;
+  long id=insertProperty("global",oldValue,resourceId,null,DATE_1);
+  when(system2.now()).thenReturn(DATE_4);
+  underTest.saveProperty(new PropertyDto().setKey("global").setResourceId(resourceId).setValue(newValue));
+  assertThatPropertiesRow(id).doesNotExist();
+  PropertiesRowAssert propertiesRowAssert=assertThatPropertiesRow("global").hasResourceId(resourceId).hasNoUserId().hasCreatedAt(DATE_4);
+  if (newValue == null || newValue.isEmpty()) {
+    propertiesRowAssert.isEmpty();
+  }
+ else   if (newValue.length() > 4000) {
+    propertiesRowAssert.hasClobValue(newValue);
+  }
+ else {
+    propertiesRowAssert.hasTextValue(newValue);
+  }
+}

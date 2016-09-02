@@ -1,0 +1,7 @@
+{
+  DbSession session=dbTester.getSession();
+  PropertyDto dto=new PropertyDto().setKey(key).setResourceId(resourceId == null ? null : resourceId.longValue()).setUserId(userId == null ? null : userId).setValue(value);
+  dbTester.getDbClient().propertiesDao().saveProperty(session,dto);
+  session.commit();
+  return (long)dbTester.selectFirst(session,"select id as \"id\" from properties" + " where prop_key='" + key + "'"+ " and user_id"+ (userId == null ? " is null" : "='" + userId + "'")+ " and resource_id"+ (resourceId == null ? " is null" : "='" + resourceId + "'")).get("id");
+}
