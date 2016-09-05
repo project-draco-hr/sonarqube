@@ -1,0 +1,10 @@
+{
+  setUpMocks();
+  doAnswer(addUser(ASSIGNEE_SIMON,new NotificationChannel[]{emailChannel,gtalkChannel})).when(commentOnIssueAssignedToMe).dispatch(same(notification),any(NotificationDispatcher.Context.class));
+  underTest.start();
+  verify(emailChannel,timeout(2000)).deliver(notification,ASSIGNEE_SIMON);
+  verify(gtalkChannel,timeout(2000)).deliver(notification,ASSIGNEE_SIMON);
+  underTest.stop();
+  verify(emailChannel,never()).deliver(notification,CREATOR_EVGENY);
+  verify(gtalkChannel,never()).deliver(notification,CREATOR_EVGENY);
+}
