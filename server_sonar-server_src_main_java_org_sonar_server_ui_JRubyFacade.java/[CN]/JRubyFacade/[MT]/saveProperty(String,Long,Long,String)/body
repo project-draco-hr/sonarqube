@@ -1,0 +1,18 @@
+{
+  if (componentId == null && userId == null) {
+    get(PersistentSettings.class).saveProperty(key,value);
+  }
+ else {
+    DbClient dbClient=get(DbClient.class);
+    PropertiesDao propertiesDao=dbClient.propertiesDao();
+    try (DbSession dbSession=dbClient.openSession(false)){
+      if (value == null) {
+        propertiesDao.delete(dbSession,new PropertyDto().setKey(key).setResourceId(componentId).setUserId(userId));
+      }
+ else {
+        propertiesDao.saveProperty(dbSession,new PropertyDto().setKey(key).setResourceId(componentId).setUserId(userId).setValue(value));
+      }
+      dbSession.commit();
+    }
+   }
+}
