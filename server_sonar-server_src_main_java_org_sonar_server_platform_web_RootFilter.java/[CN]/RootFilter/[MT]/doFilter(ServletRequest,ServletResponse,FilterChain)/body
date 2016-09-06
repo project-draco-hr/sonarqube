@@ -1,15 +1,15 @@
 {
   if (request instanceof HttpServletRequest) {
-    HttpServletRequest httpRequest=(HttpServletRequest)request;
+    HttpServletRequest httpRequest=new ServletRequestWrapper((HttpServletRequest)request);
     String requestUri=httpRequest.getRequestURI();
     String rootDir=getRootDir(requestUri);
     if (staticResourceDirs.contains(rootDir)) {
-      chain.doFilter(request,response);
+      chain.doFilter(httpRequest,response);
     }
  else {
       Profiler profiler=Profiler.createIfDebug(Logger).start();
       try {
-        chain.doFilter(request,response);
+        chain.doFilter(httpRequest,response);
       }
   finally {
         if (profiler.isDebugEnabled()) {
