@@ -1,12 +1,10 @@
 {
-  String id=null;
-  String organisation=organisationName.trim();
+  String organization=organizationName.trim();
   String ip=ipAddress.trim();
-  if (StringUtils.isNotBlank(organisation) && StringUtils.isNotBlank(ip) && isValidOrganizationName(organisation)) {
-    InetAddress inetAddress=toValidAddress(ip);
-    if (inetAddress != null) {
-      id=toId(organisation,inetAddress);
-    }
-  }
-  return id;
+  checkArgument(isNotBlank(organization),"Organization name must not be null or empty");
+  checkArgument(isValidOrganizationName(organization),"Organization name is invalid. Alpha numeric characters and space only are allowed. '%s' was provided.",organization);
+  checkArgument(isNotBlank(ip),"IP must not be null or empty");
+  InetAddress inetAddress=toValidAddress(ip);
+  checkArgument(inetAddress != null,"Invalid IP '%s'",ip);
+  return toId(organization,inetAddress);
 }
