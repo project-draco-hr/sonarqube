@@ -1,20 +1,2 @@
 {
-  DbSession dbSession=dbClient.openSession(false);
-  final ListResponse.Builder listResponseBuilder=ListResponse.newBuilder();
-  final ListResponse.Rule.Builder ruleBuilder=ListResponse.Rule.newBuilder();
-  try {
-    dbClient.ruleDao().selectEnabled(dbSession,new ResultHandler(){
-      @Override public void handleResult(      ResultContext resultContext){
-        RuleDto dto=(RuleDto)resultContext.getResultObject();
-        ruleBuilder.clear().setRepository(dto.getRepositoryKey()).setKey(dto.getRuleKey()).setName(nullToEmpty(dto.getName())).setInternalKey(nullToEmpty(dto.getConfigKey()));
-        listResponseBuilder.addRules(ruleBuilder.build());
-      }
-    }
-);
-  }
-  finally {
-    dbClient.closeSession(dbSession);
-  }
-  wsResponse.stream().setMediaType(MediaTypes.PROTOBUF);
-  listResponseBuilder.build().writeTo(wsResponse.stream().output());
 }

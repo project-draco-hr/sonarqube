@@ -1,0 +1,8 @@
+{
+  when(settings.getString(DEFAULT_GROUP_NAME_KEY)).thenReturn(null);
+  GroupDto existingGroup=groupDao.insert(dbSession,new GroupDto().setName(DEFAULT_GROUP_NAME_VALUE).setDescription("Default group name"));
+  dbSession.commit();
+  loginAsAdmin();
+  newRequest().setParam("id",existingGroup.getId().toString()).setParam("name","new-name").execute();
+  verify(settings,never()).saveProperty(any(DbSession.class),eq(DEFAULT_GROUP_NAME_KEY),eq("new-name"));
+}
