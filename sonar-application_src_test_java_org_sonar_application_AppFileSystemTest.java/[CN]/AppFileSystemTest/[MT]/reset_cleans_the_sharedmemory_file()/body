@@ -1,0 +1,15 @@
+{
+  File tempDir=new File(homeDir,DEFAULT_TEMP_DIR_NAME);
+  assertThat(tempDir.mkdir()).isTrue();
+  try (AllProcessesCommands commands=new AllProcessesCommands(tempDir)){
+    for (int i=0; i < MAX_PROCESSES; i++) {
+      commands.create(i).setUp();
+    }
+    AppFileSystem underTest=new AppFileSystem(new Props(properties));
+    underTest.verifyProps();
+    underTest.reset();
+    for (int i=0; i < MAX_PROCESSES; i++) {
+      assertThat(commands.create(i).isUp()).isFalse();
+    }
+  }
+ }
