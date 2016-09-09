@@ -1,4 +1,9 @@
 {
-  Selenese selenese=Selenese.builder().setHtmlTestsInClasspath("server_id","/serverSystem/ServerSystemTest/missing_ip.html","/serverSystem/ServerSystemTest/organisation_must_not_accept_special_chars.html","/serverSystem/ServerSystemTest/valid_id.html").build();
-  new SeleneseTest(selenese).runOn(orchestrator);
+  Navigation nav=Navigation.get(orchestrator).openHomepage().logIn().asAdmin();
+  String validIpAddress=getValidIpAddress();
+  nav.openServerId().setOrganization("Name with invalid chars like $").setIpAddress(validIpAddress).submitForm().assertError();
+  nav.openServerId().setOrganization("DEMO").setIpAddress("invalid_address").submitForm().assertError();
+  ServerIdPage page=nav.openServerId().setOrganization("DEMO").setIpAddress(validIpAddress).submitForm();
+  String serverId=page.serverIdInput().val();
+  assertThat(serverId).isNotEmpty();
 }
