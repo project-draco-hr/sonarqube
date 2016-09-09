@@ -2,7 +2,12 @@
   URL secretKeyUrl=getClass().getResource("/settings/SettingsTest/sonar-secret.txt");
   orchestrator=Orchestrator.builderEnv().addPlugin(pluginArtifact("settings-plugin")).addPlugin(pluginArtifact("license-plugin")).setServerProperty("sonar.secretKeyPath",secretKeyUrl.getFile()).build();
   orchestrator.start();
-  Navigation.get(orchestrator).openHomepage().logIn().asAdmin().openSettings(null).assertMenuContains("General").assertSettingDisplayed("sonar.dbcleaner.cleanDirectory").assertSettingNotDisplayed("settings.extension.hidden").assertSettingNotDisplayed("settings.extension.global");
-  Selenese selenese=Selenese.builder().setHtmlTestsInClasspath("test_settings","/settings/SettingsTest/generate-secret-key.html","/settings/SettingsTest/encrypt-text.html").build();
-  new SeleneseTest(selenese).runOn(orchestrator);
+  Navigation nav=Navigation.get(orchestrator).openHomepage().logIn().asAdmin();
+  nav.openSettings(null).assertMenuContains("General").assertSettingDisplayed("sonar.dbcleaner.cleanDirectory").assertSettingNotDisplayed("settings.extension.hidden").assertSettingNotDisplayed("settings.extension.global");
+  EncryptionPage encryptionPage=nav.openEncryption();
+  assertThat(encryptionPage.encryptValue("clear")).isEqualTo("{aes}4aQbfYe1lrEjiRzv/ETbyg==");
+  encryptionPage.generateNewKey();
+  encryptionPage.generationForm().shouldBe(visible).submit();
+  encryptionPage.generationForm().shouldNotBe(visible);
+  encryptionPage.newSecretKey().shouldBe(visible);
 }
