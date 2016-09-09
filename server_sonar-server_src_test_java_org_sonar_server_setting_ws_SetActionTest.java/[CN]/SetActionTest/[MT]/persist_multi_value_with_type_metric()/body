@@ -1,0 +1,8 @@
+{
+  definitions.addComponent(PropertyDefinition.builder("my.key").name("foo").description("desc").category("cat").subCategory("subCat").type(PropertyType.METRIC).defaultValue("default").multiValues(true).build());
+  dbClient.metricDao().insert(dbSession,newMetricDto().setKey("metric.key.1"));
+  dbClient.metricDao().insert(dbSession,newMetricDto().setKey("metric.key.2"));
+  dbSession.commit();
+  callForMultiValueGlobalSetting("my.key",newArrayList("metric.key.1","metric.key.2"));
+  assertGlobalSetting("my.key","metric.key.1,metric.key.2");
+}

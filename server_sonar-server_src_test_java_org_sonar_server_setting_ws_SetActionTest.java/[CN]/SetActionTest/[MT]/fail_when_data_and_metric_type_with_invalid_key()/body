@@ -1,0 +1,8 @@
+{
+  definitions.addComponent(PropertyDefinition.builder("my.key").name("foo").description("desc").category("cat").subCategory("subCat").type(PropertyType.METRIC).defaultValue("default").multiValues(true).build());
+  dbClient.metricDao().insert(dbSession,newMetricDto().setKey("metric.key"));
+  dbSession.commit();
+  expectedException.expect(BadRequestException.class);
+  expectedException.expectMessage("Error when validating metric setting with key 'my.key' and values [metric.key, My Value]. A value is not a valid metric key.");
+  callForMultiValueGlobalSetting("my.key",newArrayList("metric.key","My Value"));
+}
