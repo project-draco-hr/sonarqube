@@ -1,12 +1,10 @@
 {
-  new StartupMetadataPersister(new StartupMetadata(AN_ID,A_DATE),dbTester.getDbClient()).start();
+  new StartupMetadataPersister(new StartupMetadata(A_DATE),dbTester.getDbClient()).start();
   cluster.setStartupLeader(isStartupLeader);
-  StartupMetadata metadata=underTest.provide(uuidFactory,system,runtime,cluster,dbTester.getDbClient());
+  StartupMetadata metadata=underTest.provide(system,runtime,cluster,dbTester.getDbClient());
   assertThat(metadata.getStartedAt()).isEqualTo(A_DATE);
-  assertThat(metadata.getStartupId()).isEqualTo(AN_ID);
-  assertPersistedProperty(CoreProperties.SERVER_ID,AN_ID);
   assertPersistedProperty(CoreProperties.SERVER_STARTTIME,DateUtils.formatDateTime(A_DATE));
-  StartupMetadata secondMetadata=underTest.provide(uuidFactory,system,runtime,cluster,dbTester.getDbClient());
+  StartupMetadata secondMetadata=underTest.provide(system,runtime,cluster,dbTester.getDbClient());
   assertThat(secondMetadata).isSameAs(metadata);
-  verifyZeroInteractions(uuidFactory,system);
+  verifyZeroInteractions(system);
 }

@@ -1,0 +1,11 @@
+{
+  try (DbSession dbSession=dbClient.openSession(false)){
+    PropertyDto dto=dbClient.propertiesDao().selectGlobalProperty(dbSession,SERVER_ID);
+    if (runtime.getSonarQubeSide() == SonarQubeSide.SERVER && cluster.isStartupLeader()) {
+      persistServerIdIfMissingOrOldFormatted(dbSession,dto);
+    }
+ else {
+      ensureServerIdIsSet(dto);
+    }
+  }
+ }
