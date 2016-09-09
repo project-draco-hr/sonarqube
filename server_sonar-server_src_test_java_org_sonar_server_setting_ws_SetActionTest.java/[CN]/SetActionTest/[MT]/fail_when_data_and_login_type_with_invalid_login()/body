@@ -1,0 +1,8 @@
+{
+  definitions.addComponent(PropertyDefinition.builder("my.key").name("foo").description("desc").category("cat").subCategory("subCat").type(PropertyType.USER_LOGIN).defaultValue("default").multiValues(true).build());
+  userDb.insertUser(newUserDto().setLogin("login.1"));
+  userDb.insertUser(newUserDto().setLogin("login.2").setActive(false));
+  expectedException.expect(BadRequestException.class);
+  expectedException.expectMessage("Error when validating login setting with key 'my.key' and values [login.1, login.2]. A value is not a valid login.");
+  callForMultiValueGlobalSetting("my.key",newArrayList("login.1","login.2"));
+}
