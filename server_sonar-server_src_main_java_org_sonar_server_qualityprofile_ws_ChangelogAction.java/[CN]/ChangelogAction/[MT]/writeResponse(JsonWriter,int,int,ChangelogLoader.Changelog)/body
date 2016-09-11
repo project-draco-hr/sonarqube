@@ -1,0 +1,14 @@
+{
+  json.beginObject();
+  json.prop("total",changelog.getTotal());
+  json.prop(Param.PAGE,page);
+  json.prop(Param.PAGE_SIZE,pageSize);
+  json.name("events").beginArray();
+  for (  ChangelogLoader.Change change : changelog.getChanges()) {
+    json.beginObject().prop("date",DateUtils.formatDateTime(change.getCreatedAt())).prop("authorLogin",change.getUserLogin()).prop("authorName",change.getUserName()).prop("action",change.getType()).prop("ruleKey",change.getRuleKey() == null ? null : change.getRuleKey().toString()).prop("ruleName",change.getRuleName());
+    writeParameters(json,change);
+    json.endObject();
+  }
+  json.endArray();
+  json.endObject().close();
+}
