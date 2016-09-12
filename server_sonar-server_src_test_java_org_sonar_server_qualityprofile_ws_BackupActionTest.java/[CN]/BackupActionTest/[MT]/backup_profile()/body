@@ -1,5 +1,5 @@
 {
-  String profileKey="polop-palap-xoo-12345";
+  when(profileFactory.find(QProfileRef.fromKey(SOME_PROFILE_KEY))).thenReturn(QualityProfileTesting.newQualityProfileDto().setKey(SOME_PROFILE_KEY));
   final String response="<polop><palap/></polop>";
   doAnswer(new Answer<Void>(){
     @Override public Void answer(    InvocationOnMock invocation) throws Throwable {
@@ -9,8 +9,8 @@
       return null;
     }
   }
-).when(backuper).backup(eq(profileKey),any(Writer.class));
-  Result result=tester.newGetRequest("api/qualityprofiles","backup").setParam("profileKey",profileKey).execute();
+).when(backuper).backup(eq(SOME_PROFILE_KEY),any(Writer.class));
+  Result result=tester.newGetRequest("api/qualityprofiles","backup").setParam(QProfileRef.PARAM_PROFILE_KEY,SOME_PROFILE_KEY).execute();
   assertThat(result.outputAsString()).isEqualTo(response);
-  result.assertHeader("Content-Disposition","attachment; filename=polop-palap-xoo-12345.xml");
+  result.assertHeader("Content-Disposition","attachment; filename=" + SOME_PROFILE_KEY + ".xml");
 }

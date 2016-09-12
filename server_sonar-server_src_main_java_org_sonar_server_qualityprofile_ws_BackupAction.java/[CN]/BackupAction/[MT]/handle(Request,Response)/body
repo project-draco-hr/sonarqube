@@ -1,15 +1,9 @@
 {
   Stream stream=response.stream();
   stream.setMediaType(MediaTypes.XML);
-  DbSession dbSession=dbClient.openSession(false);
-  OutputStreamWriter writer=new OutputStreamWriter(stream.output(),StandardCharsets.UTF_8);
-  try {
-    String profileKey=QProfileIdentificationParamUtils.getProfileKeyFromParameters(request,profileFactory,dbSession);
-    response.setHeader("Content-Disposition",String.format("attachment; filename=%s.xml",profileKey));
-    backuper.backup(profileKey,writer);
+  try (OutputStreamWriter writer=new OutputStreamWriter(stream.output(),StandardCharsets.UTF_8)){
+    QualityProfileDto profile=profileFactory.find(QProfileRef.from(request));
+    response.setHeader("Content-Disposition",String.format("attachment; filename=%s.xml",profile.getKee()));
+    backuper.backup(profile.getKee(),writer);
   }
-  finally {
-    dbSession.close();
-    IOUtils.closeQuietly(writer);
-  }
-}
+ }
