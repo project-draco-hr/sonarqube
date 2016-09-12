@@ -1,12 +1,12 @@
 {
   dbTester.prepareDbUnit(getClass(),"shared.xml");
-  List<QualityProfileDto> dtos=dao.selectByNameAndLanguages("Sonar Way",singletonList("java"),dbTester.getSession());
+  List<QualityProfileDto> dtos=underTest.selectByNameAndLanguages("Sonar Way",singletonList("java"),dbTester.getSession());
   assertThat(dtos).hasSize(1);
   QualityProfileDto dto=dtos.iterator().next();
   assertThat(dto.getId()).isEqualTo(1);
   assertThat(dto.getName()).isEqualTo("Sonar Way");
   assertThat(dto.getLanguage()).isEqualTo("java");
   assertThat(dto.getParentKee()).isNull();
-  assertThat(dao.selectByNameAndLanguages("Sonar Way",singletonList("unknown"),dbTester.getSession())).isEmpty();
-  assertThat(dao.selectByNameAndLanguages("Sonar Way",of("java","unknown"),dbTester.getSession())).extracting("id").containsOnly(1);
+  assertThat(underTest.selectByNameAndLanguages("Sonar Way",singletonList("unknown"),dbTester.getSession())).isEmpty();
+  assertThat(underTest.selectByNameAndLanguages("Sonar Way",of("java","unknown"),dbTester.getSession())).extracting("id").containsOnly(1);
 }
