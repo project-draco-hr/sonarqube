@@ -1,10 +1,10 @@
 {
-  String componentUuid=wsRequest.mandatoryParam(PARAM_COMPONENT_UUID);
-  userSession.checkComponentUuidPermission(UserRole.USER,componentUuid);
   DbSession dbSession=dbClient.openSession(false);
   try {
-    List<CeQueueDto> queueDtos=dbClient.ceQueueDao().selectByComponentUuid(dbSession,componentUuid);
-    CeTaskQuery activityQuery=new CeTaskQuery().setComponentUuid(componentUuid).setOnlyCurrents(true);
+    ComponentDto component=componentFinder.getByUuid(dbSession,wsRequest.mandatoryParam(PARAM_COMPONENT_UUID));
+    userSession.checkComponentUuidPermission(UserRole.USER,component.uuid());
+    List<CeQueueDto> queueDtos=dbClient.ceQueueDao().selectByComponentUuid(dbSession,component.uuid());
+    CeTaskQuery activityQuery=new CeTaskQuery().setComponentUuid(component.uuid()).setOnlyCurrents(true);
     List<CeActivityDto> activityDtos=dbClient.ceActivityDao().selectByQuery(dbSession,activityQuery,0,1);
     ProjectResponse.Builder wsResponseBuilder=ProjectResponse.newBuilder();
     wsResponseBuilder.addAllQueue(formatter.formatQueue(dbSession,queueDtos));
