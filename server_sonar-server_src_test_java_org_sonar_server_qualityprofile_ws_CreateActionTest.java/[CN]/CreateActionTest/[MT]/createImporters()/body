@@ -1,8 +1,8 @@
 {
 class DefaultProfileImporter extends ProfileImporter {
-    private DefaultProfileImporter(    String key,    String name,    String... languages){
-      super(key,name);
-      setSupportedLanguages(languages);
+    private DefaultProfileImporter(){
+      super("xoo_lint","Xoo Lint");
+      setSupportedLanguages(XOO_LANGUAGE);
     }
     @Override public RulesProfile importProfile(    Reader reader,    ValidationMessages messages){
       RulesProfile rulesProfile=RulesProfile.create();
@@ -10,5 +10,28 @@ class DefaultProfileImporter extends ProfileImporter {
       return rulesProfile;
     }
   }
-  return new ProfileImporter[]{new DefaultProfileImporter("xoo_lint","Xoo Lint",XOO_LANGUAGE)};
+class ProfileImporterGeneratingMessages extends ProfileImporter {
+    private ProfileImporterGeneratingMessages(){
+      super("with_messages","With messages");
+      setSupportedLanguages(XOO_LANGUAGE);
+    }
+    @Override public RulesProfile importProfile(    Reader reader,    ValidationMessages messages){
+      RulesProfile rulesProfile=RulesProfile.create();
+      messages.addWarningText("a warning");
+      messages.addInfoText("an info");
+      return rulesProfile;
+    }
+  }
+class ProfileImporterGeneratingErrors extends ProfileImporter {
+    private ProfileImporterGeneratingErrors(){
+      super("with_errors","With errors");
+      setSupportedLanguages(XOO_LANGUAGE);
+    }
+    @Override public RulesProfile importProfile(    Reader reader,    ValidationMessages messages){
+      RulesProfile rulesProfile=RulesProfile.create();
+      messages.addErrorText("error!");
+      return rulesProfile;
+    }
+  }
+  return new ProfileImporter[]{new DefaultProfileImporter(),new ProfileImporterGeneratingMessages(),new ProfileImporterGeneratingErrors()};
 }

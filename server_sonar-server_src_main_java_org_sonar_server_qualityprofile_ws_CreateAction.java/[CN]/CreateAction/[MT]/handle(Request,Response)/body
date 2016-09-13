@@ -1,22 +1,9 @@
 {
   userSession.checkLoggedIn().checkPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN);
-  String name=request.mandatoryParam(PARAM_PROFILE_NAME);
-  String language=request.mandatoryParam(PARAM_LANGUAGE);
+  CreateRequest createRequest=toRequest(request);
   DbSession dbSession=dbClient.openSession(false);
   try {
-    QProfileResult result=new QProfileResult();
-    QualityProfileDto profile=profileFactory.create(dbSession,QProfileName.createFor(language,name));
-    result.setProfile(profile);
-    for (    ProfileImporter importer : importers) {
-      InputStream contentToImport=request.paramAsInputStream(getBackupParamName(importer.getKey()));
-      if (contentToImport != null) {
-        result.add(exporters.importXml(profile,importer.getKey(),contentToImport,dbSession));
-      }
-    }
-    dbSession.commit();
-    response.stream().setMediaType(request.getMediaType());
-    JsonWriter jsonWriter=JsonWriter.of(new OutputStreamWriter(response.stream().output(),StandardCharsets.UTF_8));
-    writeResult(jsonWriter,result);
+    writeProtobuf(doHandle(dbSession,createRequest,request),request,response);
   }
   finally {
     dbSession.close();

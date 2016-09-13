@@ -1,0 +1,14 @@
+{
+  QProfileResult result=new QProfileResult();
+  QualityProfileDto profile=profileFactory.create(dbSession,QProfileName.createFor(createRequest.getLanguage(),createRequest.getProfileName()));
+  result.setProfile(profile);
+  for (  ProfileImporter importer : importers) {
+    String importerKey=importer.getKey();
+    InputStream contentToImport=request.paramAsInputStream(getBackupParamName(importerKey));
+    if (contentToImport != null) {
+      result.add(exporters.importXml(profile,importerKey,contentToImport,dbSession));
+    }
+  }
+  dbSession.commit();
+  return buildResponse(result);
+}

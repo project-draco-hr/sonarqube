@@ -1,8 +1,16 @@
 {
   setUserAsQualityProfileAdmin();
-  executeRequest("New Profile",XOO_LANGUAGE);
-  QualityProfileDto profile=dbClient.qualityProfileDao().selectByNameAndLanguage("New Profile",XOO_LANGUAGE,dbSession);
-  assertThat(profile.getKey()).isNotNull();
-  assertThat(profile.getLanguage()).isEqualTo(XOO_LANGUAGE);
+  CreateWsResponse response=executeRequest("New Profile",XOO_LANGUAGE);
+  QualityProfileDto dto=dbClient.qualityProfileDao().selectByNameAndLanguage("New Profile",XOO_LANGUAGE,dbSession);
+  assertThat(dto.getKey()).isNotNull();
+  assertThat(dto.getLanguage()).isEqualTo(XOO_LANGUAGE);
+  assertThat(dto.getName()).isEqualTo("New Profile");
+  QualityProfile profile=response.getProfile();
+  assertThat(profile.getKey()).isEqualTo(dto.getKey());
   assertThat(profile.getName()).isEqualTo("New Profile");
+  assertThat(profile.getLanguage()).isEqualTo(XOO_LANGUAGE);
+  assertThat(profile.getIsInherited()).isFalse();
+  assertThat(profile.getIsDefault()).isFalse();
+  assertThat(profile.hasInfos()).isFalse();
+  assertThat(profile.hasWarnings()).isFalse();
 }
