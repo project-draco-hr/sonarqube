@@ -1,8 +1,8 @@
 {
   Stream stream=response.stream();
   stream.setMediaType(MediaTypes.XML);
-  try (OutputStreamWriter writer=new OutputStreamWriter(stream.output(),StandardCharsets.UTF_8)){
-    QualityProfileDto profile=profileFactory.find(QProfileRef.from(request));
+  try (OutputStreamWriter writer=new OutputStreamWriter(stream.output(),StandardCharsets.UTF_8);DbSession dbSession=dbClient.openSession(false)){
+    QualityProfileDto profile=profileFactory.find(dbSession,QProfileRef.from(request));
     response.setHeader("Content-Disposition",String.format("attachment; filename=%s.xml",profile.getKee()));
     backuper.backup(profile.getKee(),writer);
   }

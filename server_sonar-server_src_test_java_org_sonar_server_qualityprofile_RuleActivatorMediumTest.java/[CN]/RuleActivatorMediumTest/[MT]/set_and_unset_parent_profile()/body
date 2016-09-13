@@ -7,13 +7,13 @@
   activation=new RuleActivation(XOO_X2);
   activation.setSeverity("MAJOR");
   activate(activation,XOO_P2_KEY);
-  ruleActivator.setParent(XOO_P2_KEY,XOO_P1_KEY);
+  ruleActivator.setParent(dbSession,XOO_P2_KEY,XOO_P1_KEY);
   dbSession.clearCache();
   assertThat(db.qualityProfileDao().selectByKey(dbSession,XOO_P2_KEY).getParentKee()).isEqualTo(XOO_P1_KEY);
   verifyHasActiveRuleInDbAndIndex(ActiveRuleKey.of(XOO_P2_KEY,XOO_X1),MAJOR,INHERITED,ImmutableMap.of("max","10"));
   verifyHasActiveRuleInDbAndIndex(ActiveRuleKey.of(XOO_P2_KEY,XOO_X2),MAJOR,null,Collections.emptyMap());
   dbSession.clearCache();
-  ruleActivator.setParent(XOO_P2_KEY,null);
+  ruleActivator.setParent(dbSession,XOO_P2_KEY,null);
   assertThat(countActiveRules(XOO_P2_KEY)).isEqualTo(1);
   assertThat(db.qualityProfileDao().selectByKey(dbSession,XOO_P2_KEY).getParentKee()).isNull();
   verifyHasActiveRuleInDbAndIndex(ActiveRuleKey.of(XOO_P2_KEY,XOO_X2),MAJOR,null,Collections.emptyMap());

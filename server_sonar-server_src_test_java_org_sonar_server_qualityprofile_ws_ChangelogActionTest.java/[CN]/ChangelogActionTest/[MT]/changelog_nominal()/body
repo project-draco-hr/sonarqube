@@ -1,8 +1,8 @@
 {
-  when(profileFactory.find(eq(QProfileRef.fromKey(XOO_P1_KEY)))).thenReturn(QProfileTesting.newXooP1());
+  when(profileFactory.find(any(DbSession.class),eq(QProfileRef.fromKey(XOO_P1_KEY)))).thenReturn(QProfileTesting.newXooP1());
   ChangelogLoader.Change change1=new ChangelogLoader.Change("C1","ACTIVATED",A_DATE,null,null,null,null,null,null);
   ChangelogLoader.Change change2=new ChangelogLoader.Change("C2","ACTIVATED",A_DATE + 10,null,null,null,null,null,null);
   List<ChangelogLoader.Change> changes=asList(change1,change2);
-  when(changelogLoader.load(any(QProfileChangeQuery.class))).thenReturn(new ChangelogLoader.Changelog(10,changes));
+  when(changelogLoader.load(any(DbSession.class),any(QProfileChangeQuery.class))).thenReturn(new ChangelogLoader.Changelog(10,changes));
   wsTester.newGetRequest(QProfilesWs.API_ENDPOINT,"changelog").setParam(PARAM_PROFILE_KEY,XOO_P1_KEY).execute().assertJson(getClass(),"changelog_nominal.json");
 }

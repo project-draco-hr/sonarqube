@@ -1,14 +1,17 @@
 {
   userSession.checkLoggedIn().checkPermission(GlobalPermissions.QUALITY_PROFILE_ADMIN);
-  QualityProfileDto profile=profileFactory.find(QProfileRef.from(request));
-  String parentKey=request.param(PARAM_PARENT_KEY);
-  String parentName=request.param(PARAM_PARENT_NAME);
-  if (isEmpty(parentKey) && isEmpty(parentName)) {
-    ruleActivator.setParent(profile.getKey(),null);
-  }
+  try (DbSession dbSession=dbClient.openSession(false)){
+    QualityProfileDto profile=profileFactory.find(dbSession,QProfileRef.from(request));
+    String parentKey=request.param(PARAM_PARENT_KEY);
+    String parentName=request.param(PARAM_PARENT_NAME);
+    if (isEmpty(parentKey) && isEmpty(parentName)) {
+      ruleActivator.setParent(dbSession,profile.getKey(),null);
+    }
  else {
-    QualityProfileDto parent=profileFactory.find(QProfileRef.from(parentKey,request.param(QProfileRef.PARAM_LANGUAGE),parentName));
-    ruleActivator.setParent(profile.getKey(),parent.getKey());
+      QProfileRef parentRef=QProfileRef.from(parentKey,request.param(QProfileRef.PARAM_LANGUAGE),parentName);
+      QualityProfileDto parent=profileFactory.find(dbSession,parentRef);
+      ruleActivator.setParent(dbSession,profile.getKey(),parent.getKey());
+    }
+    response.noContent();
   }
-  response.noContent();
-}
+ }

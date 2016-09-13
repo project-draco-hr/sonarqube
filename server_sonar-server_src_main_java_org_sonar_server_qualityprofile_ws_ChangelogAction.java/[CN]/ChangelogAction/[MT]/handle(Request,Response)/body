@@ -1,17 +1,19 @@
 {
-  QualityProfileDto profile=profileFactory.find(QProfileRef.from(request));
-  QProfileChangeQuery query=new QProfileChangeQuery(profile.getKey());
-  Date since=request.paramAsDateTime(PARAM_SINCE);
-  if (since != null) {
-    query.setFromIncluded(since.getTime());
+  try (DbSession dbSession=dbClient.openSession(false)){
+    QualityProfileDto profile=profileFactory.find(dbSession,QProfileRef.from(request));
+    QProfileChangeQuery query=new QProfileChangeQuery(profile.getKey());
+    Date since=request.paramAsDateTime(PARAM_SINCE);
+    if (since != null) {
+      query.setFromIncluded(since.getTime());
+    }
+    Date to=request.paramAsDateTime(PARAM_TO);
+    if (to != null) {
+      query.setToExcluded(to.getTime());
+    }
+    int page=request.mandatoryParamAsInt(Param.PAGE);
+    int pageSize=request.mandatoryParamAsInt(Param.PAGE_SIZE);
+    query.setPage(page,pageSize);
+    ChangelogLoader.Changelog changelog=changelogLoader.load(dbSession,query);
+    writeResponse(response.newJsonWriter(),page,pageSize,changelog);
   }
-  Date to=request.paramAsDateTime(PARAM_TO);
-  if (to != null) {
-    query.setToExcluded(to.getTime());
-  }
-  int page=request.mandatoryParamAsInt(Param.PAGE);
-  int pageSize=request.mandatoryParamAsInt(Param.PAGE_SIZE);
-  query.setPage(page,pageSize);
-  ChangelogLoader.Changelog changelog=changelogLoader.load(query);
-  writeResponse(response.newJsonWriter(),page,pageSize,changelog);
-}
+ }
