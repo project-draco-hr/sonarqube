@@ -2,11 +2,11 @@
   try (DbSession dbSession=dbClient.openSession(false)){
     QualityProfileDto profile=profileFactory.find(dbSession,QProfileRef.from(request));
     QProfileChangeQuery query=new QProfileChangeQuery(profile.getKey());
-    Date since=request.paramAsDateTime(PARAM_SINCE);
+    Date since=parseStartingDateOrDateTime(request.param(PARAM_SINCE));
     if (since != null) {
       query.setFromIncluded(since.getTime());
     }
-    Date to=request.paramAsDateTime(PARAM_TO);
+    Date to=parseEndingDateOrDateTime(request.param(PARAM_TO));
     if (to != null) {
       query.setToExcluded(to.getTime());
     }
