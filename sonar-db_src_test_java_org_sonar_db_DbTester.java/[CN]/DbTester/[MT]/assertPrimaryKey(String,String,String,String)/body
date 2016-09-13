@@ -1,0 +1,22 @@
+{
+  try (Connection connection=getConnection()){
+    PK pk=pkOf(connection,tableName.toUpperCase(Locale.ENGLISH));
+    if (pk == null) {
+      pkOf(connection,tableName.toLowerCase(Locale.ENGLISH));
+    }
+    assertThat(pk).as("No primary key is defined on table %s",tableName).isNotNull();
+    if (expectedPkName != null) {
+      assertThat(pk.getName()).isEqualToIgnoringCase(expectedPkName);
+    }
+    List<String> expectedColumns=ImmutableList.copyOf(Iterables.concat(Collections.singletonList(columnName),Arrays.asList(otherColumnNames)));
+    assertThat(pk.getColumns()).as("Primary key does not have the '%s' expected columns",expectedColumns.size()).hasSize(expectedColumns.size());
+    Iterator<String> expectedColumnsIt=expectedColumns.iterator();
+    Iterator<String> actualColumnsIt=pk.getColumns().iterator();
+    while (expectedColumnsIt.hasNext() && actualColumnsIt.hasNext()) {
+      assertThat(actualColumnsIt.next()).isEqualToIgnoringCase(expectedColumnsIt.next());
+    }
+  }
+ catch (  SQLException e) {
+    throw new IllegalStateException("Fail to check primary key",e);
+  }
+}

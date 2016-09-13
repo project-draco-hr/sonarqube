@@ -1,0 +1,20 @@
+{
+  try (ResultSet resultSet=connection.getMetaData().getPrimaryKeys(null,null,tableName)){
+    String pkName=null;
+    ArrayList<String> columnNames=null;
+    while (resultSet.next()) {
+      if (columnNames == null) {
+        pkName=resultSet.getString("PK_NAME");
+        columnNames=new ArrayList<>(1);
+      }
+ else {
+        assertThat(pkName).as("Multiple primary keys found").isEqualTo(resultSet.getString("PK_NAME"));
+      }
+      columnNames.add(resultSet.getInt("KEY_SEQ") - 1,resultSet.getString("COLUMN_NAME"));
+    }
+    if (columnNames == null) {
+      return null;
+    }
+    return new PK(pkName,columnNames);
+  }
+ }
