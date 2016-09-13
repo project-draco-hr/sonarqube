@@ -1,0 +1,10 @@
+{
+  ComponentDto project=componentDbTester.insertComponent(ComponentTesting.newProjectDto());
+  QualityProfileDto profile1Language1=insertQualityProfileDto("profile1","Profile 1","xoo");
+  QualityProfileDto profile2Language2=insertQualityProfileDto("profile2","Profile 2","xoo2");
+  QualityProfileDto profile3Language1=insertQualityProfileDto("profile3","Profile 3","xoo");
+  qualityProfileDb.associateProjectWithQualityProfile(project,profile1Language1,profile2Language2);
+  underTest.updateProjectProfileAssociation(project.uuid(),profile3Language1.getKey(),profile1Language1.getKey(),dbSession);
+  assertThat(underTest.selectByProjectAndLanguage(dbSession,project.getKey(),"xoo").getKey()).isEqualTo(profile3Language1.getKey());
+  assertThat(underTest.selectByProjectAndLanguage(dbSession,project.getKey(),"xoo2").getKey()).isEqualTo(profile2Language2.getKey());
+}
