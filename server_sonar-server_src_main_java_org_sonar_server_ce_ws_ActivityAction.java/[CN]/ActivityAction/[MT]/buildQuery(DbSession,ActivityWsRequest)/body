@@ -2,8 +2,10 @@
   CeTaskQuery query=new CeTaskQuery();
   query.setType(request.getType());
   query.setOnlyCurrents(request.getOnlyCurrents());
-  query.setMinSubmittedAt(parseFromDate(request.getMinSubmittedAt()));
-  query.setMaxExecutedAt(parseToDate(request.getMaxExecutedAt()));
+  Date minSubmittedAt=parseStartingDateOrDateTime(request.getMinSubmittedAt());
+  query.setMinSubmittedAt(minSubmittedAt == null ? null : minSubmittedAt.getTime());
+  Date maxExecutedAt=parseEndingDateOrDateTime(request.getMaxExecutedAt());
+  query.setMaxExecutedAt(maxExecutedAt == null ? null : maxExecutedAt.getTime());
   List<String> statuses=request.getStatus();
   if (statuses != null && !statuses.isEmpty()) {
     query.setStatuses(request.getStatus());
