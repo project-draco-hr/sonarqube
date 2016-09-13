@@ -3,7 +3,7 @@
   db.qualityProfileDao().insert(dbSession,profileDto);
   dbSession.commit();
   assertThat(db.activeRuleDao().selectByProfileKey(dbSession,profileDto.getKey())).isEmpty();
-  QProfileResult result=exporters.importXml(profileDto,"XooProfileImporter","<xml/>",dbSession);
+  QProfileResult result=exporters.importXml(profileDto,"XooProfileImporter",toInputStream("<xml/>",UTF_8),dbSession);
   dbSession.commit();
   activeRuleIndexer.index(result.getChanges());
   List<ActiveRuleDto> activeRules=db.activeRuleDao().selectByProfileKey(dbSession,profileDto.getKey());
