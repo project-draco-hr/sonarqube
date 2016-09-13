@@ -1,13 +1,13 @@
 {
-  Logger logger=mock(Logger.class);
   AtomicLong counter=new AtomicLong(42L);
-  ProgressLogger progress=new ProgressLogger("ProgressLoggerTest",counter,logger);
+  ProgressLogger progress=new ProgressLogger("ProgressLoggerTest",counter,Loggers.get(getClass()));
   progress.setPeriodMs(1L);
   progress.start();
-  Thread.sleep(80L);
+  while (!hasInfoLog("42 rows processed")) {
+    Uninterruptibles.sleepUninterruptibly(1,TimeUnit.MILLISECONDS);
+  }
   progress.stop();
-  verify(logger,atLeast(1)).info(startsWith("42 rows processed"));
   counter.incrementAndGet();
   progress.log();
-  verify(logger).info(startsWith("43 rows processed"));
+  assertThat(hasInfoLog("43 rows processed")).isTrue();
 }
