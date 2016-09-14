@@ -1,0 +1,34 @@
+{
+  json.beginArray();
+  for (  Entry<RuleKey,ActiveRuleDiff> diffEntry : modified.entrySet()) {
+    RuleKey key=diffEntry.getKey();
+    ActiveRuleDiff value=diffEntry.getValue();
+    json.beginObject();
+    RuleDto rule=rulesByKey.get(key);
+    writeRule(json,rule,repositoriesByKey.get(rule.getRepositoryKey()));
+    json.name(ATTRIBUTE_LEFT).beginObject();
+    json.prop(ATTRIBUTE_SEVERITY,value.leftSeverity());
+    json.name(ATTRIBUTE_PARAMS).beginObject();
+    for (    Entry<String,ValueDifference<String>> valueDiff : value.paramDifference().entriesDiffering().entrySet()) {
+      json.prop(valueDiff.getKey(),valueDiff.getValue().leftValue());
+    }
+    for (    Entry<String,String> valueDiff : value.paramDifference().entriesOnlyOnLeft().entrySet()) {
+      json.prop(valueDiff.getKey(),valueDiff.getValue());
+    }
+    json.endObject();
+    json.endObject();
+    json.name(ATTRIBUTE_RIGHT).beginObject();
+    json.prop(ATTRIBUTE_SEVERITY,value.rightSeverity());
+    json.name(ATTRIBUTE_PARAMS).beginObject();
+    for (    Entry<String,ValueDifference<String>> valueDiff : value.paramDifference().entriesDiffering().entrySet()) {
+      json.prop(valueDiff.getKey(),valueDiff.getValue().rightValue());
+    }
+    for (    Entry<String,String> valueDiff : value.paramDifference().entriesOnlyOnRight().entrySet()) {
+      json.prop(valueDiff.getKey(),valueDiff.getValue());
+    }
+    json.endObject();
+    json.endObject();
+    json.endObject();
+  }
+  json.endArray();
+}
