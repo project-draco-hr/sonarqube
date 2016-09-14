@@ -1,0 +1,10 @@
+{
+  orchestrator.getServer().provisionProject(MULTI_MODULE_PROJECT_KEY,MULTI_MODULE_PROJECT_KEY);
+  setServerProperty(orchestrator,MULTI_MODULE_PROJECT_KEY,"sonar.timemachine.period1","previous_analysis");
+  orchestrator.getServer().associateProjectToQualityProfile(MULTI_MODULE_PROJECT_KEY,"xoo","empty");
+  runProjectAnalysis(orchestrator,"shared/xoo-multi-modules-sample","sonar.projectDate",formatDate(addDays(new Date(),-60)),"sonar.modules","module_a");
+  orchestrator.getServer().restoreProfile(FileLocation.ofClasspath("/measureHistory/one-issue-per-line-profile.xml"));
+  orchestrator.getServer().associateProjectToQualityProfile(MULTI_MODULE_PROJECT_KEY,"xoo","one-issue-per-line");
+  runProjectAnalysis(orchestrator,"shared/xoo-multi-modules-sample","sonar.projectDate",formatDate(addDays(new Date(),-20)),"sonar.modules","module_a,module_b");
+  assertNoMeasures(MULTI_MODULE_PROJECT_KEY,"new_lines","new_lines_to_cover");
+}
