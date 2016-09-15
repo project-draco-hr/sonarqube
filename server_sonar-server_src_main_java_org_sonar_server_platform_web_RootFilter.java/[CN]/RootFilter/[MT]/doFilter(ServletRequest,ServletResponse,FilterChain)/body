@@ -1,22 +1,14 @@
 {
   if (request instanceof HttpServletRequest) {
-    HttpServletRequest httpRequest=new ServletRequestWrapper((HttpServletRequest)request);
-    String requestUri=httpRequest.getRequestURI();
-    String rootDir=getRootDir(requestUri);
-    if (staticResourceDirs.contains(rootDir)) {
-      chain.doFilter(httpRequest,response);
+    HttpServletRequest httpRequest=(HttpServletRequest)request;
+    HttpServletResponse httpResponse=(HttpServletResponse)response;
+    try {
+      doFilter(new ServletRequestWrapper(httpRequest),httpResponse,chain);
     }
- else {
-      Profiler profiler=Profiler.createIfDebug(Logger).start();
-      try {
-        chain.doFilter(httpRequest,response);
-      }
-  finally {
-        if (profiler.isDebugEnabled()) {
-          String queryString=httpRequest.getQueryString();
-          String message=String.format(queryString == null ? MESSAGE_WITHOUT_QUERY : MESSAGE_WITH_QUERY,httpRequest.getMethod(),requestUri,queryString);
-          profiler.stopDebug(message);
-        }
+ catch (    Throwable e) {
+      Loggers.get(RootFilter.class).error(format("Processing of request %s failed",toUrl(httpRequest)),e);
+      if (!response.isCommitted()) {
+        httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       }
     }
   }
