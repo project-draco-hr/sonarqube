@@ -1,0 +1,8 @@
+{
+  ComponentDto project=componentDbTester.insertProject();
+  setUserWithBrowsePermission(project);
+  insertActivity("T1",project.uuid(),CeActivityDto.Status.SUCCESS);
+  TestResponse wsResponse=ws.newRequest().setParam(PARAM_COMPONENT_KEY,project.key()).setMediaType(MediaTypes.PROTOBUF).execute();
+  WsCe.ProjectResponse response=Protobuf.read(wsResponse.getInputStream(),WsCe.ProjectResponse.parser());
+  assertThat(response.hasCurrent()).isTrue();
+}
