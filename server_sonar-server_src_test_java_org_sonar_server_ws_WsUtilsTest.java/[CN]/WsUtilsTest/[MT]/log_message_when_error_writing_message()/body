@@ -2,11 +2,8 @@
   TestRequest request=new TestRequest();
   request.setMediaType(MediaTypes.PROTOBUF);
   WsPermissions.Permission message=WsPermissions.Permission.newBuilder().setName("permission-name").build();
-  try {
-    WsUtils.writeProtobuf(message,null,new DumbResponse());
-  }
- catch (  Exception e) {
-    assertThat(e).isInstanceOf(NullPointerException.class);
-    assertThat(logger.logs()).contains("Error while writing protobuf message org.sonarqube.ws.WsPermissions.Permission[name: \"permission-name\"]");
-  }
+  expectedException.expect(IllegalStateException.class);
+  expectedException.expectCause(hasType(NullPointerException.class));
+  expectedException.expectMessage("Error while writing protobuf message org.sonarqube.ws.WsPermissions.Permission[name: \"permission-name\"]");
+  WsUtils.writeProtobuf(message,null,new DumbResponse());
 }
