@@ -1,0 +1,13 @@
+{
+  setServerProperty(orchestrator,"sonar.timemachine.period1","previous_analysis");
+  setServerProperty(orchestrator,"sonar.timemachine.period2","30");
+  defineQualityProfile("one-issue-per-line");
+  provisionSampleProject();
+  setSampleProjectQualityProfile("one-issue-per-line");
+  runSampleProjectAnalysis("v1","sonar.projectDate",formatDate(addDays(FIRST_COMMIT_DATE,1)));
+  assertNoNewDebtRatio();
+  runSampleProjectAnalysis("v2","sonar.projectDate",formatDate(addDays(SECOND_COMMIT_DATE,1)));
+  assertNewDebtRatio(4.44,4.44);
+  runSampleProjectAnalysis("v3","sonar.projectDate",formatDate(addDays(THIRD_COMMIT_DATE,1)));
+  assertNewDebtRatio(4.17,4.28);
+}
