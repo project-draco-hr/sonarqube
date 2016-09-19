@@ -1,0 +1,10 @@
+{
+  dbClient.metricDao().insert(dbSession,newMetricDto().setKey("metric").setShortName("Metric").setDomain(null).setValueType(BOOL.name()).setHidden(true));
+  dbSession.commit();
+  AppWsResponse response=executeRequest();
+  List<AppWsResponse.Metric> metrics=response.getMetricsList();
+  assertThat(metrics).hasSize(1);
+  AppWsResponse.Metric metric=metrics.get(0);
+  assertThat(metric.getKey()).isEqualTo("metric");
+  assertThat(metric.hasDomain()).isFalse();
+}

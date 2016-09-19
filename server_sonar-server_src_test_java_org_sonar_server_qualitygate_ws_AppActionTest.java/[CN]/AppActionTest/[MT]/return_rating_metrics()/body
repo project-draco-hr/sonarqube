@@ -1,0 +1,13 @@
+{
+  dbClient.metricDao().insert(dbSession,newMetricDto().setKey("reliability_rating").setShortName("Reliability Rating").setDomain("Reliability").setValueType(RATING.name()).setHidden(false));
+  dbSession.commit();
+  AppWsResponse response=executeRequest();
+  List<AppWsResponse.Metric> metrics=response.getMetricsList();
+  assertThat(metrics).hasSize(1);
+  AppWsResponse.Metric metric=metrics.get(0);
+  assertThat(metric.getKey()).isEqualTo("reliability_rating");
+  assertThat(metric.getName()).isEqualTo("Reliability Rating");
+  assertThat(metric.getDomain()).isEqualTo("Reliability");
+  assertThat(metric.getType()).isEqualTo(RATING.name());
+  assertThat(metric.getHidden()).isFalse();
+}
