@@ -2,12 +2,5 @@
   MetricDto metricDto=dbClient.metricDao().insert(dbSession,newMetricDto().setKey("new_coverage").setValueType(INT.name()).setHidden(false));
   dbSession.commit();
   QualityGateConditionDto result=underTest.createCondition(dbSession,qualityGateDto.getId(),"new_coverage","LT",null,"80",1);
-  assertThat(result.getQualityGateId()).isEqualTo(qualityGateDto.getId());
-  assertThat(result.getMetricId()).isEqualTo(metricDto.getId().longValue());
-  assertThat(result.getMetricKey()).isEqualTo("new_coverage");
-  assertThat(result.getOperator()).isEqualTo("LT");
-  assertThat(result.getWarningThreshold()).isNull();
-  assertThat(result.getErrorThreshold()).isEqualTo("80");
-  assertThat(result.getPeriod()).isEqualTo(1);
-  assertThat(dbClient.gateConditionDao().selectById(result.getId(),dbSession)).isNotNull();
+  verifyCondition(result,metricDto.getId(),"LT",null,"80",1);
 }

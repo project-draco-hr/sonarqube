@@ -1,0 +1,9 @@
+{
+  QualityGateConditionDto condition=getNonNullCondition(dbSession,condId);
+  MetricDto metric=getNonNullMetric(dbSession,metricKey);
+  validateCondition(metric,operator,warningThreshold,errorThreshold,period);
+  checkConditionDoesNotAlreadyExistOnSameMetricAndPeriod(getConditions(dbSession,condition.getQualityGateId(),condition.getId()),metric,period);
+  condition.setMetricId(metric.getId()).setMetricKey(metric.getKey()).setOperator(operator).setWarningThreshold(warningThreshold).setErrorThreshold(errorThreshold).setPeriod(period);
+  dbClient.gateConditionDao().update(condition,dbSession);
+  return condition;
+}

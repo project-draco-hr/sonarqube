@@ -1,0 +1,8 @@
+{
+  MetricDto metricDto=dbClient.metricDao().insert(dbSession,newMetricDto().setKey(metricKey).setValueType(valueType.name()).setHidden(hidden));
+  QualityGateConditionDto condition=insertCondition(metricDto.getId(),"LT",null,"80",null);
+  dbSession.commit();
+  expectedException.expect(BadRequestException.class);
+  expectedException.expectMessage("Metric '" + metricKey + "' cannot be used to define a condition.");
+  underTest.updateCondition(dbSession,condition.getId(),metricDto.getKey(),"GT","60",null,1);
+}

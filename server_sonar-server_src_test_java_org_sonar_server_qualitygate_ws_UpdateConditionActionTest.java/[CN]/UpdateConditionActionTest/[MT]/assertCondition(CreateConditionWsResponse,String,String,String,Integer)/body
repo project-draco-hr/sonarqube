@@ -1,0 +1,32 @@
+{
+  List<QualityGateConditionDto> conditionDtoList=new ArrayList<>(dbClient.gateConditionDao().selectForQualityGate(qualityGateDto.getId(),dbSession));
+  assertThat(conditionDtoList).hasSize(1);
+  QualityGateConditionDto qualityGateConditionDto=conditionDtoList.get(0);
+  assertThat(qualityGateConditionDto.getQualityGateId()).isEqualTo(qualityGateDto.getId());
+  assertThat(qualityGateConditionDto.getMetricId()).isEqualTo(coverageMetricDto.getId().longValue());
+  assertThat(qualityGateConditionDto.getOperator()).isEqualTo(operator);
+  assertThat(qualityGateConditionDto.getWarningThreshold()).isEqualTo(warning);
+  assertThat(qualityGateConditionDto.getErrorThreshold()).isEqualTo(error);
+  assertThat(qualityGateConditionDto.getPeriod()).isEqualTo(period);
+  assertThat(response.getId()).isEqualTo(qualityGateConditionDto.getId());
+  assertThat(response.getMetric()).isEqualTo(coverageMetricDto.getKey());
+  assertThat(response.getOp()).isEqualTo(operator);
+  if (warning != null) {
+    assertThat(response.getWarning()).isEqualTo(warning);
+  }
+ else {
+    assertThat(response.hasWarning()).isFalse();
+  }
+  if (error != null) {
+    assertThat(response.getError()).isEqualTo(error);
+  }
+ else {
+    assertThat(response.hasError()).isFalse();
+  }
+  if (period != null) {
+    assertThat(response.getPeriod()).isEqualTo(period);
+  }
+ else {
+    assertThat(response.hasPeriod()).isFalse();
+  }
+}
