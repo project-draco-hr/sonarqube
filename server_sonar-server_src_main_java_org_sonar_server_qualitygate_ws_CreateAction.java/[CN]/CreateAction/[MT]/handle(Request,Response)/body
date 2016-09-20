@@ -1,6 +1,13 @@
 {
   userSession.checkPermission(GlobalPermissions.QUALITY_GATE_ADMIN);
-  QualityGateDto newQualityGate=qualityGateUpdater.create(request.mandatoryParam(PARAM_NAME));
-  CreateWsResponse.Builder createWsResponse=CreateWsResponse.newBuilder().setId(newQualityGate.getId()).setName(newQualityGate.getName());
-  writeProtobuf(createWsResponse.build(),request,response);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    QualityGateDto newQualityGate=qualityGateUpdater.create(dbSession,request.mandatoryParam(PARAM_NAME));
+    CreateWsResponse.Builder createWsResponse=CreateWsResponse.newBuilder().setId(newQualityGate.getId()).setName(newQualityGate.getName());
+    writeProtobuf(createWsResponse.build(),request,response);
+    dbSession.commit();
+  }
+  finally {
+    dbClient.closeSession(dbSession);
+  }
 }

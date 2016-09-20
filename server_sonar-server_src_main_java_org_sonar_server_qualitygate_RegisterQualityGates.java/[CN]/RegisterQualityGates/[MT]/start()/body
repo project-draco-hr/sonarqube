@@ -1,6 +1,13 @@
 {
-  if (shouldRegisterBuiltinQualityGate()) {
-    createBuiltinQualityGate();
-    registerBuiltinQualityGate();
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    if (shouldRegisterBuiltinQualityGate(dbSession)) {
+      createBuiltinQualityGate(dbSession);
+      registerBuiltinQualityGate(dbSession);
+      dbSession.commit();
+    }
+  }
+  finally {
+    dbClient.closeSession(dbSession);
   }
 }

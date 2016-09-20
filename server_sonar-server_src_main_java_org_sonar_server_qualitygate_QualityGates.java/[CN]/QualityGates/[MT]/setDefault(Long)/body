@@ -1,10 +1,10 @@
 {
-  checkPermission();
-  if (idToUseAsDefault == null) {
-    propertiesDao.deleteGlobalProperty(SONAR_QUALITYGATE_PROPERTY);
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    setDefault(dbSession,idToUseAsDefault);
+    dbSession.commit();
   }
- else {
-    QualityGateDto newDefault=getNonNullQgate(idToUseAsDefault);
-    propertiesDao.saveProperty(new PropertyDto().setKey(SONAR_QUALITYGATE_PROPERTY).setValue(newDefault.getId().toString()));
+  finally {
+    dbClient.closeSession(dbSession);
   }
 }
