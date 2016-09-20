@@ -1,0 +1,7 @@
+{
+  MetricDto metricDto=dbClient.metricDao().insert(dbSession,newMetricDto().setKey("rating_metric").setValueType(RATING.name()).setHidden(false));
+  dbSession.commit();
+  QualityGateConditionDto condition=insertCondition(metricDto.getId(),"LT",null,"3",null);
+  QualityGateConditionDto result=underTest.updateCondition(dbSession,condition.getId(),"rating_metric","GT","4",null,1);
+  verifyCondition(result,metricDto.getId(),"GT","4",null,1);
+}
