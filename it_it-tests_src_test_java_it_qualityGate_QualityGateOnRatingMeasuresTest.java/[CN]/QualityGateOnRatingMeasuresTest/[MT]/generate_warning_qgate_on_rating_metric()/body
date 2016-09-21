@@ -1,0 +1,7 @@
+{
+  QUALITY_GATES.createCondition(CreateConditionRequest.builder().setQualityGateId(qualityGateId.intValue()).setMetricKey("security_rating").setOperator("GT").setWarning("3").build());
+  orchestrator.getServer().restoreProfile(FileLocation.ofClasspath("/qualityGate/QualityGateOnRatingMeasuresTest/with-many-rules.xml"));
+  orchestrator.getServer().associateProjectToQualityProfile(PROJECT_KEY,"xoo","with-many-rules");
+  runProjectAnalysis(orchestrator,"qualitygate/xoo-sample");
+  assertThat(fetchGateStatus().getData()).isEqualTo("WARN");
+}

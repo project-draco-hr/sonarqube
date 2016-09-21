@@ -1,0 +1,11 @@
+{
+  setServerProperty(orchestrator,"sonar.timemachine.period1","previous_analysis");
+  QUALITY_GATES.createCondition(CreateConditionRequest.builder().setQualityGateId(qualityGateId.intValue()).setMetricKey("security_rating").setOperator("GT").setError("3").setPeriod(1).build());
+  orchestrator.getServer().associateProjectToQualityProfile(PROJECT_KEY,"xoo","empty");
+  runProjectAnalysis(orchestrator,"qualitygate/xoo-sample");
+  assertThat(fetchGateStatus().getData()).isEqualTo("OK");
+  orchestrator.getServer().restoreProfile(FileLocation.ofClasspath("/qualityGate/QualityGateOnRatingMeasuresTest/with-many-rules.xml"));
+  orchestrator.getServer().associateProjectToQualityProfile(PROJECT_KEY,"xoo","with-many-rules");
+  runProjectAnalysis(orchestrator,"qualitygate/xoo-sample");
+  assertThat(fetchGateStatus().getData()).isEqualTo("ERROR");
+}
