@@ -1,0 +1,16 @@
+{
+  userSession.checkPermission(GlobalPermissions.SYSTEM_ADMIN);
+  String name=getAndCheckName(request);
+  String requestKey=getAndCheckKey(request);
+  String key=useOrGenerateKey(requestKey,name);
+  checkParamMaxLength(request,PARAM_DESCRIPTION,256);
+  checkParamMaxLength(request,PARAM_URL,256);
+  checkParamMaxLength(request,PARAM_AVATAR_URL,256);
+  try (DbSession dbSession=dbClient.openSession(false)){
+    checkKeyIsNotUsed(dbSession,key,requestKey,name);
+    OrganizationDto dto=createOrganizationDto(request,name,key,system2.now());
+    dbClient.organizationDao().insert(dbSession,dto);
+    dbSession.commit();
+    writeResponse(request,response,dto);
+  }
+ }
