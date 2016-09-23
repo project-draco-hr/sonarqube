@@ -1,13 +1,12 @@
 {
-  when(permissionDao.selectGlobalPermissions("john")).thenReturn(newArrayList(GlobalPermissions.SYSTEM_ADMIN));
-  when(permissionDao.selectGlobalPermissions("arthur")).thenReturn(Collections.<String>emptyList());
+  when(permissionDao.selectGlobalPermissions("arthur")).thenReturn(Collections.emptyList());
   when(issueFilterDao.selectById(1L)).thenReturn(new IssueFilterDto().setId(1L).setName("My Old Filter").setDescription("Old description").setUserLogin("arthur").setShared(true));
   try {
     underTest.update(new IssueFilterDto().setId(1L).setName("My New Filter").setDescription("New description").setShared(true).setUserLogin("arthur"),userSession);
     fail();
   }
  catch (  Exception e) {
-    assertThat(e).isInstanceOf(ForbiddenException.class).hasMessage("User cannot own this filter because of insufficient rights");
+    assertThat(e).isInstanceOf(ForbiddenException.class).hasMessage("User is not authorized to modify this filter");
   }
   verify(issueFilterDao,never()).update(any(IssueFilterDto.class));
 }
