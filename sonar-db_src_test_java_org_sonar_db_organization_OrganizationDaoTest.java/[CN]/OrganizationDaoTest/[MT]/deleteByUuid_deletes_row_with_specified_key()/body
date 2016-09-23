@@ -1,0 +1,16 @@
+{
+  insertOrganization(ORGANIZATION_DTO);
+  String anotherKey="key";
+  insertOrganization(copyOf(ORGANIZATION_DTO).setUuid("uuid").setKey(anotherKey));
+  assertThat(dbTester.countRowsOfTable("organizations")).isEqualTo(2);
+  assertThat(underTest.deleteByKey(dbSession,anotherKey)).isEqualTo(1);
+  dbSession.commit();
+  assertThat(underTest.selectByKey(dbSession,anotherKey)).isEmpty();
+  assertThat(underTest.selectByKey(dbSession,ORGANIZATION_DTO.getKey())).isNotEmpty();
+  assertThat(dbTester.countRowsOfTable("organizations")).isEqualTo(1);
+  assertThat(underTest.deleteByKey(dbSession,anotherKey)).isEqualTo(0);
+  assertThat(underTest.deleteByKey(dbSession,ORGANIZATION_DTO.getKey())).isEqualTo(1);
+  dbSession.commit();
+  assertThat(underTest.selectByKey(dbSession,ORGANIZATION_DTO.getKey())).isEmpty();
+  assertThat(dbTester.countRowsOfTable("organizations")).isEqualTo(0);
+}
