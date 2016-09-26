@@ -1,0 +1,13 @@
+{
+  requireNonNull(request);
+  if (request.hasComponentIds()) {
+    List<ComponentDto> componentsByUuid=searchByComponentUuids(dbSession,request.getComponentIds());
+    checkArgument(componentsByUuid.size() == request.getComponentIds().size(),"Some components are not found in: '%s'",String.join(", ",request.getComponentIds()));
+    return componentsByUuid;
+  }
+ else {
+    List<ComponentDto> componentsByKey=searchByComponentKeys(dbSession,request.getComponentKeys());
+    checkArgument(componentsByKey.size() == request.getComponentKeys().size(),"Some components are not found in: '%s'",String.join(", ",request.getComponentKeys()));
+    return componentsByKey;
+  }
+}
