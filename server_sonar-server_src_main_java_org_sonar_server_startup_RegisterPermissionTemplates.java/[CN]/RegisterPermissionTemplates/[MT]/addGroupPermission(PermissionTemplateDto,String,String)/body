@@ -1,11 +1,11 @@
 {
-  Long groupId=null;
-  if (DefaultGroups.isAnyone(groupName)) {
-    groupId=null;
-  }
+  DbSession dbSession=dbClient.openSession(false);
+  try {
+    Long groupId=null;
+    if (DefaultGroups.isAnyone(groupName)) {
+      groupId=null;
+    }
  else {
-    DbSession dbSession=dbClient.openSession(false);
-    try {
       GroupDto groupDto=dbClient.groupDao().selectByName(dbSession,groupName);
       if (groupDto != null) {
         groupId=groupDto.getId();
@@ -14,9 +14,9 @@
         LOG.error("Cannot setup default permission for group: " + groupName);
       }
     }
-  finally {
-      dbClient.closeSession(dbSession);
-    }
+    dbClient.permissionTemplateDao().insertGroupPermission(dbSession,template.getId(),groupId,permission);
   }
-  dbClient.permissionTemplateDao().insertGroupPermission(template.getId(),groupId,permission);
+  finally {
+    dbClient.closeSession(dbSession);
+  }
 }
