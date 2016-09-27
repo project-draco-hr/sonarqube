@@ -1,0 +1,10 @@
+{
+  insertGlobalPermission(SYSTEM_ADMIN,user1.getId());
+  insertProjectPermission(USER,user1.getId(),project1.getId());
+  insertProjectPermission(ISSUE_ADMIN,user1.getId(),project1.getId());
+  insertProjectPermission(ISSUE_ADMIN,user2.getId(),project1.getId());
+  insertProjectPermission(ISSUE_ADMIN,user2.getId(),project2.getId());
+  assertThat(underTest.countUsersByProjectPermission(dbTester.getSession(),Collections.emptyList())).isEmpty();
+  expectCount(asList(project1.getId()),new UserCountPerProjectPermission(project1.getId(),USER,1),new UserCountPerProjectPermission(project1.getId(),ISSUE_ADMIN,2));
+  expectCount(asList(project1.getId(),project2.getId(),-1L),new UserCountPerProjectPermission(project1.getId(),USER,1),new UserCountPerProjectPermission(project1.getId(),ISSUE_ADMIN,2),new UserCountPerProjectPermission(project2.getId(),ISSUE_ADMIN,1));
+}
