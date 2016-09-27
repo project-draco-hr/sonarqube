@@ -1,0 +1,32 @@
+{
+  UserPermissionDto global1=insertGlobalPermission(SYSTEM_ADMIN,user1.getId());
+  UserPermissionDto global2=insertGlobalPermission(SYSTEM_ADMIN,user2.getId());
+  UserPermissionDto global3=insertGlobalPermission(PROVISIONING,user2.getId());
+  UserPermissionDto project1Perm=insertProjectPermission(USER,user3.getId(),this.project1.getId());
+  PermissionQuery query=PermissionQuery.builder().withAtLeastOnePermission().build();
+  expectPermissions(query,null,global1,global2,global3);
+  query=PermissionQuery.builder().build();
+  expectPermissions(query,null,global1,global2,global3,project1Perm);
+  query=PermissionQuery.builder().withAtLeastOnePermission().build();
+  expectPermissions(query,asList(user1.getLogin()),global1);
+  query=PermissionQuery.builder().withAtLeastOnePermission().build();
+  expectPermissions(query,asList(user2.getLogin()),global2,global3);
+  query=PermissionQuery.builder().withAtLeastOnePermission().build();
+  expectPermissions(query,asList(user1.getLogin(),user2.getLogin(),"missing"),global1,global2,global3);
+  query=PermissionQuery.builder().withAtLeastOnePermission().build();
+  expectPermissions(query,asList("missing"));
+  query=PermissionQuery.builder().withAtLeastOnePermission().build();
+  expectPermissions(query,asList(user3.getLogin()));
+  query=PermissionQuery.builder().withAtLeastOnePermission().build();
+  expectPermissions(query,asList(user3.getLogin()));
+  query=PermissionQuery.builder().setPermission(SYSTEM_ADMIN).build();
+  expectPermissions(query,null,global1,global2);
+  query=PermissionQuery.builder().setPermission("missing").build();
+  expectPermissions(query,null);
+  query=PermissionQuery.builder().withAtLeastOnePermission().setSearchQuery("Mari").build();
+  expectPermissions(query,null,global1,global2,global3);
+  query=PermissionQuery.builder().setSearchQuery("Mari").setPermission(PROVISIONING).build();
+  expectPermissions(query,null,global3);
+  query=PermissionQuery.builder().setSearchQuery("Unknown").build();
+  expectPermissions(query,null);
+}
