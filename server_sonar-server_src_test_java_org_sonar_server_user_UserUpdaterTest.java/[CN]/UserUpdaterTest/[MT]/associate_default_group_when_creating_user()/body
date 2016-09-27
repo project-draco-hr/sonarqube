@@ -1,8 +1,6 @@
 {
   createDefaultGroup();
   userUpdater.create(NewUser.create().setLogin("user").setName("User").setEmail("user@mail.com").setPassword("password").setScmAccounts(newArrayList("u1","u_1")));
-  GroupMembershipFinder.Membership membership=groupMembershipFinder.find(GroupMembershipQuery.builder().login("user").build());
-  assertThat(membership.groups()).hasSize(1);
-  assertThat(membership.groups().get(0).name()).isEqualTo("sonar-users");
-  assertThat(membership.groups().get(0).isMember()).isTrue();
+  Multimap<String,String> groups=dbClient.groupMembershipDao().selectGroupsByLogins(session,asList("user"));
+  assertThat(groups.get("user")).containsOnly("sonar-users");
 }

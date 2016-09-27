@@ -1,15 +1,2 @@
 {
-  db.prepareDbUnit(getClass(),"not_associate_default_group_when_updating_user_if_already_existing.xml");
-  settings.setProperty(CORE_DEFAULT_GROUP,"sonar-users");
-  session.commit();
-  GroupMembershipFinder.Membership membership=groupMembershipFinder.find(GroupMembershipQuery.builder().login(DEFAULT_LOGIN).groupSearch("sonar-users").build());
-  assertThat(membership.groups()).hasSize(1);
-  assertThat(membership.groups().get(0).name()).isEqualTo("sonar-users");
-  assertThat(membership.groups().get(0).isMember()).isTrue();
-  userUpdater.update(UpdateUser.create(DEFAULT_LOGIN).setName("Marius2").setEmail("marius2@mail.com").setPassword("password2").setScmAccounts(newArrayList("ma2")));
-  session.commit();
-  membership=groupMembershipFinder.find(GroupMembershipQuery.builder().login(DEFAULT_LOGIN).groupSearch("sonar-users").build());
-  assertThat(membership.groups()).hasSize(1);
-  assertThat(membership.groups().get(0).name()).isEqualTo("sonar-users");
-  assertThat(membership.groups().get(0).isMember()).isTrue();
 }
