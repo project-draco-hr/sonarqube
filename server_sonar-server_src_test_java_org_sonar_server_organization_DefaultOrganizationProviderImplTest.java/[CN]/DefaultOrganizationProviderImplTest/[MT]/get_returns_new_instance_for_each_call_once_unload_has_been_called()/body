@@ -1,0 +1,15 @@
+{
+  insertOrganization(ORGANIZATION_DTO_1,DATE_1);
+  dbClient.internalPropertiesDao().save(dbSession,DEFAULT_ORGANIZATION,ORGANIZATION_DTO_1.getUuid());
+  dbSession.commit();
+  try {
+    underTest.load();
+    DefaultOrganization cached=underTest.get();
+    assertThat(cached).isSameAs(underTest.get());
+    underTest.unload();
+    assertThat(underTest.get()).isNotSameAs(underTest.get()).isNotSameAs(cached);
+  }
+  finally {
+    underTest.unload();
+  }
+}

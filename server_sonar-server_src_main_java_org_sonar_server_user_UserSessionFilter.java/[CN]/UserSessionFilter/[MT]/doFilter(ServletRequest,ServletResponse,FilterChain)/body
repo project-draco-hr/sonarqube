@@ -2,17 +2,19 @@
   HttpServletRequest request=(HttpServletRequest)servletRequest;
   HttpServletResponse response=(HttpServletResponse)servletResponse;
   ThreadLocalSettings settings=platform.getContainer().getComponentByType(ThreadLocalSettings.class);
+  DefaultOrganizationCache defaultOrganizationCache=platform.getContainer().getComponentByType(DefaultOrganizationCache.class);
   UserSessionInitializer userSessionInitializer=platform.getContainer().getComponentByType(UserSessionInitializer.class);
-  settings.load();
+  defaultOrganizationCache.load();
   try {
-    if (userSessionInitializer == null || userSessionInitializer.initUserSession(request,response)) {
-      chain.doFilter(servletRequest,servletResponse);
+    settings.load();
+    try {
+      doFilter(request,response,chain,userSessionInitializer);
+    }
+  finally {
+      settings.unload();
     }
   }
   finally {
-    if (userSessionInitializer != null) {
-      userSessionInitializer.removeUserSession();
-    }
-    settings.unload();
+    defaultOrganizationCache.unload();
   }
 }

@@ -1,0 +1,13 @@
+{
+  mockNoUserSessionInitializer();
+  RuntimeException thrown=new RuntimeException("Faking Settings.unload failing");
+  doThrow(thrown).when(settings).unload();
+  try {
+    underTest.doFilter(request,response,chain);
+    fail("A RuntimeException should have been thrown");
+  }
+ catch (  RuntimeException e) {
+    assertThat(e).isSameAs(thrown);
+    verify(defaultOrganizationCache).unload();
+  }
+}
