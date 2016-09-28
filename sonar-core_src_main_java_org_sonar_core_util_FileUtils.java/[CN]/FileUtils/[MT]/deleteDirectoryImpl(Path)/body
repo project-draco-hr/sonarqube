@@ -1,10 +1,11 @@
 {
   requireNonNull(path,DIRECTORY_CAN_NOT_BE_NULL);
-  if (!Files.exists(path)) {
+  File file=path.toFile();
+  if (!file.exists()) {
     return;
   }
   checkIO(!Files.isSymbolicLink(path),"Directory '%s' is a symbolic link",path);
-  checkIO(!Files.isRegularFile(path),"Directory '%s' is a file",path);
+  checkIO(!file.isFile(),"Directory '%s' is a file",path);
   Files.walkFileTree(path,DeleteRecursivelyFileVisitor.INSTANCE);
-  checkIO(!Files.exists(path),"Unable to delete directory '%s'",path);
+  checkIO(!file.exists(),"Unable to delete directory '%s'",path);
 }
