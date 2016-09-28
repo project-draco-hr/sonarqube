@@ -1,7 +1,8 @@
 {
-  Long componentId=getComponentId(session,permissionChange.componentKey());
+  ComponentDto project=getComponent(session,permissionChange.componentKey());
+  Long projectId=project != null ? project.getId() : null;
   checkProjectAdminUserByComponentKey(userSession,permissionChange.componentKey());
-  List<String> existingPermissions=dbClient.roleDao().selectGroupPermissions(session,permissionChange.groupName(),componentId);
+  List<String> existingPermissions=dbClient.roleDao().selectGroupPermissions(session,permissionChange.groupName(),projectId);
   if (shouldSkipPermissionChange(operation,existingPermissions,permissionChange)) {
     return false;
   }
@@ -9,11 +10,11 @@
   String permission=permissionChange.permission();
   if (Operation.ADD == operation) {
     validateNotAnyoneAndAdminPermission(permission,permissionChange.groupName());
-    permissionRepository.insertGroupPermission(componentId,targetedGroup,permission,session);
+    permissionRepository.insertGroupPermission(projectId,targetedGroup,permission,session);
   }
  else {
     checkAdminUsersExistOutsideTheRemovedGroup(session,permissionChange,targetedGroup);
-    permissionRepository.deleteGroupPermission(componentId,targetedGroup,permission,session);
+    permissionRepository.deleteGroupPermission(projectId,targetedGroup,permission,session);
   }
   return true;
 }

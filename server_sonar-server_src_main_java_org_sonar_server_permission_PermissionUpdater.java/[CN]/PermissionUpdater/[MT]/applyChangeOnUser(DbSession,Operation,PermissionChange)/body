@@ -1,17 +1,19 @@
 {
-  Long componentId=getComponentId(session,permissionChange.componentKey());
+  ComponentDto project=getComponent(session,permissionChange.componentKey());
+  Long projectId=project != null ? project.getId() : null;
+  String projectUuid=project != null ? project.uuid() : null;
   checkProjectAdminUserByComponentKey(userSession,permissionChange.componentKey());
-  List<String> existingPermissions=dbClient.roleDao().selectUserPermissions(session,permissionChange.userLogin(),componentId);
+  Set<String> existingPermissions=dbClient.userPermissionDao().selectPermissionsByLogin(session,permissionChange.userLogin(),projectUuid);
   if (shouldSkipPermissionChange(operation,existingPermissions,permissionChange)) {
     return false;
   }
   Long targetedUser=getTargetedUser(session,permissionChange.userLogin());
   if (Operation.ADD == operation) {
-    permissionRepository.insertUserPermission(componentId,targetedUser,permissionChange.permission(),session);
+    permissionRepository.insertUserPermission(projectId,targetedUser,permissionChange.permission(),session);
   }
  else {
     checkOtherAdminUsersExist(session,permissionChange);
-    permissionRepository.deleteUserPermission(componentId,targetedUser,permissionChange.permission(),session);
+    permissionRepository.deleteUserPermission(projectId,targetedUser,permissionChange.permission(),session);
   }
   return true;
 }

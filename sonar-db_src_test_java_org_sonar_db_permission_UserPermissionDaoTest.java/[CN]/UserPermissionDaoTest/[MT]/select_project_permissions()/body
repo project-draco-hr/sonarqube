@@ -6,8 +6,6 @@
   insertProjectPermission(ISSUE_ADMIN,user3.getId(),project2.getId());
   PermissionQuery query=PermissionQuery.builder().withAtLeastOnePermission().setComponentUuid(project1.uuid()).build();
   expectPermissions(query,null,perm3,perm2,perm1);
-  query=PermissionQuery.builder().setComponentUuid(project1.uuid()).build();
-  expectPermissions(query,null,perm3,perm2,perm1);
   query=PermissionQuery.builder().withAtLeastOnePermission().setComponentUuid(project1.uuid()).build();
   expectPermissions(query,asList(user1.getLogin()),perm2,perm1);
   query=PermissionQuery.builder().withAtLeastOnePermission().setComponentUuid(project1.uuid()).build();
@@ -20,12 +18,12 @@
   expectPermissions(query,asList(user3.getLogin()));
   query=PermissionQuery.builder().setPermission("missing").setComponentUuid(project1.uuid()).build();
   expectPermissions(query,null);
-  query=PermissionQuery.builder().setSearchQuery("Mari").setComponentUuid(project1.uuid()).build();
+  query=PermissionQuery.builder().setSearchQuery("Mari").withAtLeastOnePermission().setComponentUuid(project1.uuid()).build();
   expectPermissions(query,null,perm3,perm2,perm1);
   query=PermissionQuery.builder().setSearchQuery("Mari").setPermission(ISSUE_ADMIN).setComponentUuid(project1.uuid()).build();
   expectPermissions(query,null,perm3,perm2);
   query=PermissionQuery.builder().setSearchQuery("Unknown").setComponentUuid(project1.uuid()).build();
   expectPermissions(query,null);
-  query=PermissionQuery.builder().setComponentUuid("missing").build();
+  query=PermissionQuery.builder().setComponentUuid("missing").withAtLeastOnePermission().build();
   expectPermissions(query,null);
 }

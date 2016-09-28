@@ -2,10 +2,10 @@
   userSession.login().addProjectUuidPermissions(SYSTEM_ADMIN,"project-uuid");
   ComponentDto project=componentDbTester.insertComponent(newProjectDto("project-uuid").setKey("project-key"));
   UserDto user=userDb.insertUser(newUserDto());
-  insertUserRole(new UserPermissionDto().setPermission(ISSUE_ADMIN).setUserId(user.getId()).setComponentId(project.getId()));
+  insertUserPermission(new UserPermissionDto(ISSUE_ADMIN,user.getId(),project.getId()));
   ComponentDto anotherProject=componentDbTester.insertComponent(newProjectDto());
   UserDto userHavePermissionOnAnotherProject=userDb.insertUser(newUserDto());
-  insertUserRole(new UserPermissionDto().setPermission(ISSUE_ADMIN).setUserId(userHavePermissionOnAnotherProject.getId()).setComponentId(anotherProject.getId()));
+  insertUserPermission(new UserPermissionDto(ISSUE_ADMIN,userHavePermissionOnAnotherProject.getId(),anotherProject.getId()));
   UserDto withoutPermission=userDb.insertUser(newUserDto());
   dbSession.commit();
   String result=ws.newRequest().setParam(PARAM_PERMISSION,ISSUE_ADMIN).setParam(PARAM_PROJECT_ID,"project-uuid").execute().getInput();
