@@ -1,0 +1,12 @@
+{
+  ComponentDto project=ComponentTesting.newProjectDto(PROJECT_UUID);
+  dbTester.getDbClient().componentDao().insert(dbTester.getSession(),project);
+  QualityProfileDao qProfileDao=dbTester.getDbClient().qualityProfileDao();
+  QualityProfileDto profile=QualityProfileTesting.newQualityProfileDto().setLanguage("js");
+  qProfileDao.insert(dbTester.getSession(),profile);
+  qProfileDao.insertProjectProfileAssociation(PROJECT_UUID,profile.getKey(),dbTester.getSession());
+  dbTester.commit();
+  assertThat(underTest.findProfileByProjectAndLanguage(1,"java")).isNull();
+  assertThat(underTest.findProfileByProjectAndLanguage(project.getId(),"java")).isNull();
+  assertThat(underTest.findProfileByProjectAndLanguage(project.getId(),"js").key()).isEqualTo(profile.getKey());
+}
