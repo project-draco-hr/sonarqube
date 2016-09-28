@@ -1,10 +1,16 @@
 {
   if (!projectPermissionsCheckedByKey.contains(permission)) {
-    Collection<String> projectKeys=permissionDao.selectAuthorizedRootProjectsKeys(userId,permission);
-    for (    String key : projectKeys) {
-      projectKeyByPermission.put(permission,key);
+    DbSession dbSession=dbClient.openSession(false);
+    try {
+      Collection<String> projectKeys=permissionDao.selectAuthorizedRootProjectsKeys(dbSession,userId,permission);
+      for (      String key : projectKeys) {
+        projectKeyByPermission.put(permission,key);
+      }
+      projectPermissionsCheckedByKey.add(permission);
     }
-    projectPermissionsCheckedByKey.add(permission);
+  finally {
+      dbClient.closeSession(dbSession);
+    }
   }
   return projectKeyByPermission.get(permission).contains(projectKey);
 }

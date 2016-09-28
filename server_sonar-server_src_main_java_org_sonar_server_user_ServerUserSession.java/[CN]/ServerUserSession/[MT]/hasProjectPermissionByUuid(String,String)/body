@@ -1,7 +1,13 @@
 {
   if (!projectPermissionsCheckedByUuid.contains(permission)) {
-    Collection<String> projectUuids=permissionDao.selectAuthorizedRootProjectsUuids(userId,permission);
-    addProjectPermission(permission,projectUuids);
+    DbSession dbSession=dbClient.openSession(false);
+    try {
+      Collection<String> projectUuids=permissionDao.selectAuthorizedRootProjectsUuids(dbSession,userId,permission);
+      addProjectPermission(permission,projectUuids);
+    }
+  finally {
+      dbClient.closeSession(dbSession);
+    }
   }
   return projectUuidByPermission.get(permission).contains(projectUuid);
 }
