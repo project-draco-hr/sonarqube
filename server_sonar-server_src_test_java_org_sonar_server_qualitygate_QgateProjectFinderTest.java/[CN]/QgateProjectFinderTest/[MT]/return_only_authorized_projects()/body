@@ -2,7 +2,7 @@
   userSession.login(userDto.getLogin()).setUserId(userDto.getId().intValue());
   ComponentDto project1=componentDbTester.insertComponent(newProjectDto());
   componentDbTester.insertComponent(newProjectDto());
-  dbClient.roleDao().insertUserRole(dbSession,new UserPermissionDto().setUserId(userDto.getId()).setComponentId(project1.getId()).setPermission(UserRole.USER));
+  dbClient.userPermissionDao().insert(dbSession,new UserPermissionDto(UserRole.USER,userDto.getId(),project1.getId()));
   dbTester.commit();
   Association result=underTest.find(builder().gateId(Long.toString(qGate.getId())).build());
   verifyProjects(result,project1.getId());

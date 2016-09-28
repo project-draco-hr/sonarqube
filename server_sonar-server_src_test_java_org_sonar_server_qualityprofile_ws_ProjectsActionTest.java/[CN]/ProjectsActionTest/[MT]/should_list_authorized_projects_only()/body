@@ -2,7 +2,7 @@
   project1=newProject("ABCD","Project One");
   project2=newProject("BCDE","Project Two");
   dbClient.componentDao().insert(session,project1,project2);
-  roleDao.insertUserRole(session,new UserPermissionDto().setUserId(userId).setComponentId(project1.getId()).setPermission(UserRole.USER));
+  dbClient.userPermissionDao().insert(session,new UserPermissionDto(UserRole.USER,userId,project1.getId()));
   associateProjectsWithProfile(session,xooP1,project1,project2);
   session.commit();
   newRequest().setParam("key",xooP1.getKey()).setParam("selected","selected").execute().assertJson(this.getClass(),"authorized_selected.json");
