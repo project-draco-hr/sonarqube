@@ -2,10 +2,10 @@
   userSession.login().addProjectUuidPermissions(ADMIN,"project-uuid");
   ComponentDto project=componentDb.insertComponent(newProjectDto("project-uuid"));
   GroupDto group=insertGroup(new GroupDto().setName("project-group-name"));
-  insertGroupRole(new GroupRoleDto().setGroupId(group.getId()).setRole(ISSUE_ADMIN).setResourceId(project.getId()));
+  insertGroupRole(new GroupPermissionDto().setGroupId(group.getId()).setRole(ISSUE_ADMIN).setResourceId(project.getId()));
   ComponentDto anotherProject=componentDb.insertComponent(newProjectDto());
   GroupDto anotherGroup=insertGroup(new GroupDto().setName("another-project-group-name"));
-  insertGroupRole(new GroupRoleDto().setGroupId(anotherGroup.getId()).setRole(ISSUE_ADMIN).setResourceId(anotherProject.getId()));
+  insertGroupRole(new GroupPermissionDto().setGroupId(anotherGroup.getId()).setRole(ISSUE_ADMIN).setResourceId(anotherProject.getId()));
   GroupDto groupWithoutPermission=insertGroup(new GroupDto().setName("group-without-permission"));
   String result=ws.newRequest().setParam(PARAM_PERMISSION,ISSUE_ADMIN).setParam(PARAM_PROJECT_ID,"project-uuid").execute().getInput();
   assertThat(result).contains(group.getName()).doesNotContain(anotherGroup.getName()).doesNotContain(groupWithoutPermission.getName());
