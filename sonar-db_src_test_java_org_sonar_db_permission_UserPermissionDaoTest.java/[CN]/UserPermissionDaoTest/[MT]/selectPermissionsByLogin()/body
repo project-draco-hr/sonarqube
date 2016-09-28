@@ -1,0 +1,13 @@
+{
+  insertGlobalPermission(SYSTEM_ADMIN,user1.getId());
+  insertProjectPermission(USER,user1.getId(),project1.getId());
+  insertProjectPermission(USER,user2.getId(),project1.getId());
+  insertProjectPermission(ISSUE_ADMIN,user2.getId(),project1.getId());
+  insertProjectPermission(ISSUE_ADMIN,user2.getId(),project2.getId());
+  assertThat(underTest.selectPermissionsByLogin(dbTester.getSession(),user1.getLogin(),null)).hasSize(1);
+  assertThat(underTest.selectPermissionsByLogin(dbTester.getSession(),user2.getLogin(),null)).hasSize(0);
+  assertThat(underTest.selectPermissionsByLogin(dbTester.getSession(),user1.getLogin(),project1.uuid())).hasSize(1);
+  assertThat(underTest.selectPermissionsByLogin(dbTester.getSession(),user2.getLogin(),project1.uuid())).hasSize(2);
+  assertThat(underTest.selectPermissionsByLogin(dbTester.getSession(),user1.getLogin(),"missing")).hasSize(0);
+  assertThat(underTest.selectPermissionsByLogin(dbTester.getSession(),"missing",null)).hasSize(0);
+}

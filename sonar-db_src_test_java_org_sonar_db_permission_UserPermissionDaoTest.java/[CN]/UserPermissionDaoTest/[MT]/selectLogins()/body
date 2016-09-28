@@ -1,0 +1,11 @@
+{
+  insertProjectPermission(USER,user1.getId(),project1.getId());
+  insertProjectPermission(USER,user2.getId(),project1.getId());
+  insertProjectPermission(ISSUE_ADMIN,user2.getId(),project1.getId());
+  insertProjectPermission(ISSUE_ADMIN,user2.getId(),project2.getId());
+  PermissionQuery query=PermissionQuery.builder().setComponentUuid(project1.uuid()).withAtLeastOnePermission().build();
+  List<String> logins=underTest.selectLogins(dbTester.getSession(),query);
+  assertThat(logins).containsExactly(user2.getLogin(),user1.getLogin());
+  query=PermissionQuery.builder().setComponentUuid("missing").withAtLeastOnePermission().build();
+  assertThat(underTest.selectLogins(dbTester.getSession(),query)).isEmpty();
+}
