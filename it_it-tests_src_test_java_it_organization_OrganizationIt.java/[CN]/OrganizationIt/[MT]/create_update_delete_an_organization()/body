@@ -1,19 +1,18 @@
 {
   verifyNoExtraOrganization();
   Organizations.Organization createdOrganization=adminOrganizationService.create(new CreateWsRequest.Builder().setName(NAME).setKey(KEY).setDescription(DESCRIPTION).setUrl(URL).setAvatar(AVATAR_URL).build()).getOrganization();
-  assertThat(createdOrganization.getId()).isNotNull();
   assertThat(createdOrganization.getName()).isEqualTo(NAME);
   assertThat(createdOrganization.getKey()).isEqualTo(KEY);
   assertThat(createdOrganization.getDescription()).isEqualTo(DESCRIPTION);
   assertThat(createdOrganization.getUrl()).isEqualTo(URL);
   assertThat(createdOrganization.getAvatar()).isEqualTo(AVATAR_URL);
   verifySingleSearchResult(createdOrganization,NAME,DESCRIPTION,URL,AVATAR_URL);
-  adminOrganizationService.update(new UpdateWsRequest.Builder().setId(createdOrganization.getId()).setName("new name").setDescription("new description").setUrl("new url").setAvatar("new avatar url").build());
+  adminOrganizationService.update(new UpdateWsRequest.Builder().setKey(createdOrganization.getKey()).setName("new name").setDescription("new description").setUrl("new url").setAvatar("new avatar url").build());
   verifySingleSearchResult(createdOrganization,"new name","new description","new url","new avatar url");
-  adminOrganizationService.update(new UpdateWsRequest.Builder().setId(createdOrganization.getId()).setName("new name 2").setDescription("new description 2").setUrl("new url 2").setAvatar("new avatar url 2").build());
+  adminOrganizationService.update(new UpdateWsRequest.Builder().setKey(createdOrganization.getKey()).setName("new name 2").setDescription("new description 2").setUrl("new url 2").setAvatar("new avatar url 2").build());
   verifySingleSearchResult(createdOrganization,"new name 2","new description 2","new url 2","new avatar url 2");
-  adminOrganizationService.update(new UpdateWsRequest.Builder().setId(createdOrganization.getId()).setName("new name 3").build());
+  adminOrganizationService.update(new UpdateWsRequest.Builder().setKey(createdOrganization.getKey()).setName("new name 3").build());
   verifySingleSearchResult(createdOrganization,"new name 3",null,null,null);
-  adminOrganizationService.delete(createdOrganization.getId(),null);
+  adminOrganizationService.delete(createdOrganization.getKey());
   verifyNoExtraOrganization();
 }

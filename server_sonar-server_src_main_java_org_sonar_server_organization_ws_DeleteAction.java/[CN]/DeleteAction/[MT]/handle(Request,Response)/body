@@ -1,16 +1,9 @@
 {
   userSession.checkPermission(GlobalPermissions.SYSTEM_ADMIN);
-  String uuid=request.param(PARAM_ID);
-  String key=request.param(PARAM_KEY);
-  wsSupport.checkKeyOrId(uuid,key);
-  preventDeletionOfDefaultOrganization(uuid,key,defaultOrganizationProvider.get());
+  String key=request.mandatoryParam(PARAM_KEY);
+  preventDeletionOfDefaultOrganization(key,defaultOrganizationProvider.get());
   try (DbSession dbSession=dbClient.openSession(false)){
-    if (uuid != null) {
-      dbClient.organizationDao().deleteByUuid(dbSession,uuid);
-    }
- else {
-      dbClient.organizationDao().deleteByKey(dbSession,key);
-    }
+    dbClient.organizationDao().deleteByKey(dbSession,key);
     dbSession.commit();
     response.noContent();
   }
