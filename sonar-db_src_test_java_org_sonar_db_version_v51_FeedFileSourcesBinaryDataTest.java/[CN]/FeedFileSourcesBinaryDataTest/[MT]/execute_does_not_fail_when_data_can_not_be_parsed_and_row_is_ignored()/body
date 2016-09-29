@@ -1,0 +1,9 @@
+{
+  db.prepareDbUnit(getClass(),"bad_data.xml");
+  MigrationStep migration=new FeedFileSourcesBinaryData(db.database());
+  migration.execute();
+  try (Connection connection=db.openConnection()){
+    DbFileSources.Data data=selectData(connection,1L);
+    assertThat(data.getLinesList()).isEmpty();
+  }
+ }
