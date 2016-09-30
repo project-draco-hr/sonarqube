@@ -1,0 +1,10 @@
+{
+  dbTester.prepareDbUnit(getClass(),"shared.xml");
+  TestTesting.updateDataColumn(dbTester.getSession(),"F1","THIS_IS_NOT_PROTOBUF".getBytes());
+  underTest=TestResultSetIterator.create(dbTester.getDbClient(),dbTester.getSession(),0L,null);
+  FileSourcesUpdaterHelper.Row row=underTest.next();
+  assertThat(row.getFileUuid()).isEqualTo("F1");
+  assertThat(row.getUpdateRequests()).isEmpty();
+  assertThat(underTest.hasNext()).isFalse();
+  assertThat(logTester.logs(LoggerLevel.WARN)).contains("Invalid file_sources.binary_data on row with file_uuid='F1', test file will be ignored");
+}
