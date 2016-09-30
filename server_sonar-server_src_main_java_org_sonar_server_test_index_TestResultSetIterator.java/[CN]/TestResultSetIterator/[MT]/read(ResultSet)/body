@@ -2,6 +2,13 @@
   String projectUuid=rs.getString(1);
   String fileUuid=rs.getString(2);
   Date updatedAt=new Date(rs.getLong(3));
-  List<DbFileSources.Test> data=FileSourceDto.decodeTestData(rs.getBinaryStream(4));
+  InputStream dataInput=rs.getBinaryStream(4);
+  List<DbFileSources.Test> data;
+  if (dataInput != null) {
+    data=FileSourceDto.decodeTestData(dataInput);
+  }
+ else {
+    data=Collections.emptyList();
+  }
   return toRow(projectUuid,fileUuid,updatedAt,data);
 }
