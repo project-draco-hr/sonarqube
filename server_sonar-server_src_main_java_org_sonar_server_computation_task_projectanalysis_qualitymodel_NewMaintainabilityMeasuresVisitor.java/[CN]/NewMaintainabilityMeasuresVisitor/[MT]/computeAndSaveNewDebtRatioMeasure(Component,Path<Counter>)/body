@@ -1,11 +1,15 @@
 {
-  MeasureVariations.Builder builder=newMeasureVariationsBuilder();
+  MeasureVariations.Builder newDebtRatio=newMeasureVariationsBuilder();
+  MeasureVariations.Builder newMaintainability=newMeasureVariationsBuilder();
   for (  Period period : periodsHolder.getPeriods()) {
     double density=computeDensity(path.current(),period);
-    builder.setVariation(period,100.0 * density);
+    newDebtRatio.setVariation(period,100.0 * density);
+    newMaintainability.setVariation(period,ratingGrid.getRatingForDensity(density).getIndex());
   }
-  if (!builder.isEmpty()) {
-    Measure measure=newMeasureBuilder().setVariations(builder.build()).createNoValue();
-    measureRepository.add(component,this.newDebtRatioMetric,measure);
+  if (!newDebtRatio.isEmpty()) {
+    measureRepository.add(component,this.newDebtRatioMetric,newMeasureBuilder().setVariations(newDebtRatio.build()).createNoValue());
+  }
+  if (!newMaintainability.isEmpty()) {
+    measureRepository.add(component,this.newMaintainabilityRatingMetric,newMeasureBuilder().setVariations(newMaintainability.build()).createNoValue());
   }
 }

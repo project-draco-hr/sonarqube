@@ -1,0 +1,17 @@
+{
+  setTwoPeriods();
+  when(ratingSettings.getDevCost(LANGUAGE_1_KEY)).thenReturn(LANGUAGE_1_DEV_COST);
+  treeRootHolder.setRoot(builder(PROJECT,ROOT_REF).addChildren(builder(MODULE,11).addChildren(builder(DIRECTORY,111).addChildren(builder(FILE,LANGUAGE_1_FILE_REF).setFileAttributes(new FileAttributes(false,LANGUAGE_1_KEY)).build()).build()).build()).build());
+  Measure newDebtMeasure=createNewDebtMeasure(50,12);
+  measureRepository.addRawMeasure(LANGUAGE_1_FILE_REF,NEW_TECHNICAL_DEBT_KEY,newDebtMeasure);
+  measureRepository.addRawMeasure(111,NEW_TECHNICAL_DEBT_KEY,createNewDebtMeasure(150,112));
+  measureRepository.addRawMeasure(11,NEW_TECHNICAL_DEBT_KEY,createNewDebtMeasure(200,112));
+  measureRepository.addRawMeasure(ROOT_REF,NEW_TECHNICAL_DEBT_KEY,createNewDebtMeasure(250,212));
+  measureRepository.addRawMeasure(LANGUAGE_1_FILE_REF,NCLOC_DATA_KEY,createNclocDataMeasure(2,3,4));
+  scmInfoRepository.setScmInfo(LANGUAGE_1_FILE_REF,createChangesets(PERIOD_2_SNAPSHOT_DATE - 100,2,PERIOD_2_SNAPSHOT_DATE + 100,2));
+  underTest.visit(treeRootHolder.getRoot());
+  assertNewMaintainability(LANGUAGE_1_FILE_REF,D,A);
+  assertNewMaintainability(111,D,A);
+  assertNewMaintainability(11,D,A);
+  assertNewMaintainability(ROOT_REF,D,A);
+}
