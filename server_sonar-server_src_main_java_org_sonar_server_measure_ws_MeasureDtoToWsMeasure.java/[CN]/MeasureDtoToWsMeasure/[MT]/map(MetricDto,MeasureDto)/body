@@ -1,0 +1,19 @@
+{
+  try {
+    Measure.Builder measure=Measure.newBuilder();
+    measure.setMetric(dbMetric.getKey());
+    if (dbMeasure.getValue() != null || dbMeasure.getData() != null) {
+      measure.setValue(formatMeasureValue(dbMeasure,dbMetric));
+    }
+    WsMeasures.PeriodValue.Builder periodBuilder=WsMeasures.PeriodValue.newBuilder();
+    for (int i=1; i <= 5; i++) {
+      if (dbMeasure.getVariation(i) != null) {
+        measure.getPeriodsBuilder().addPeriodsValue(periodBuilder.clear().setIndex(i).setValue(formatNumericalValue(dbMeasure.getVariation(i),dbMetric)));
+      }
+    }
+    return measure;
+  }
+ catch (  Exception e) {
+    throw new IllegalStateException(String.format("Error while mapping a measure of metric key '%s' and parameters %s",dbMetric.getKey(),dbMeasure.toString()),e);
+  }
+}
