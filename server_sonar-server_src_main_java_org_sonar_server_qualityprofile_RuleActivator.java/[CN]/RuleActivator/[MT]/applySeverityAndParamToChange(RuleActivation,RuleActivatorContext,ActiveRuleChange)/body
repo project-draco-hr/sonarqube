@@ -10,7 +10,8 @@
     change.setSeverity(firstNonNull(request.getSeverity(),context.currentSeverity(),context.parentSeverity(),context.defaultSeverity()));
     for (    RuleParamDto ruleParamDto : context.ruleParams()) {
       String paramKey=ruleParamDto.getName();
-      change.setParameter(paramKey,validateParam(ruleParamDto,firstNonNull(context.requestParamValue(request,paramKey),context.currentParamValue(paramKey),context.parentParamValue(paramKey),context.defaultParamValue(paramKey))));
+      String paramValue=context.hasRequestParamValue(request,paramKey) ? firstNonNull(context.requestParamValue(request,paramKey),context.parentParamValue(paramKey),context.defaultParamValue(paramKey)) : firstNonNull(context.currentParamValue(paramKey),context.parentParamValue(paramKey),context.defaultParamValue(paramKey));
+      change.setParameter(paramKey,validateParam(ruleParamDto,paramValue));
     }
   }
  else   if (context.activeRule() == null) {
