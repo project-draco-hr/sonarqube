@@ -2,12 +2,11 @@
   Properties p=new Properties();
   File propsFile=new File(homeDir,"conf/sonar.properties");
   if (propsFile.exists()) {
-    Reader reader=new InputStreamReader(new FileInputStream(propsFile),StandardCharsets.UTF_8);
-    try {
+    try (Reader reader=new InputStreamReader(new FileInputStream(propsFile),StandardCharsets.UTF_8)){
       p.load(reader);
     }
-  finally {
-      IOUtils.closeQuietly(reader);
+ catch (    IOException e) {
+      throw new IllegalStateException("Cannot open file " + propsFile,e);
     }
   }
   return p;
